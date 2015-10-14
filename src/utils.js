@@ -112,6 +112,7 @@ function hasKey(obj, key) {
 }
 
 function clone(obj) {
+    // FIXME:
     return JSON.parse(JSON.stringify(obj));
 }
 
@@ -128,10 +129,22 @@ utils.keys = Object.keys || function (obj) {
             }
         }
 
-        // FIXME: ie < 9
+        // ie < 9 不考虑
     };
+
 utils.hasKey = hasKey;
 utils.clone = clone;
+
+utils.extend = function (dist) {
+    each(slice.call(arguments, 1), function (source) {
+        if (source) {
+            for (var prop in source) {
+                dist[prop] = source[prop];
+            }
+        }
+    });
+    return dist;
+};
 
 // Array
 // -----
@@ -149,7 +162,7 @@ utils.indexOf = arrProto.indexOf ?
         return -1;
     };
 
-utils.each = function (list, iteratee, context) {
+var each = utils.each = function (list, iteratee, context) {
     var i;
 
     if (isArrayLike(list)) {

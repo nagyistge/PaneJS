@@ -38,11 +38,10 @@ Class.create = function (parent, properties) {
     //    }
     //}
 
-    // By: bubkoo
     var SubClass = properties.constructor;
     // unspecified constructor
     if (SubClass === Object.prototype.constructor) {
-        SubClass = function SubClass() {};
+        SubClass = function Class() {};
     }
 
     // Inherit class (static) properties from parent.

@@ -1,10 +1,7 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Class = require('./class');
 var utils = require('./utils');
+var Class = require('../class');
+var EventObject = require('./EventObject');
 
-var isFunction = utils.isFunction;
-var invoke = utils.invoke;
 var keys = utils.keys;
 var each = utils.each;
 var eventSplitter = /\s+/;
@@ -22,25 +19,27 @@ module.exports = Class.create({
         return this.eventEnabled;
     },
 
-    enableEvent: function () {
+    setIsEventEnabled: function (enabled) {
         var that = this;
-        that.eventEnabled = true;
+        that.eventEnabled = enabled;
         return that;
     },
 
+    enableEvent: function () {
+        return this.setIsEventEnabled(true);
+    },
+
     disableEvent: function () {
-        var that = this;
-        that.eventEnabled = false;
-        return that;
+        return this.setIsEventEnabled(false);
     },
 
     getEventSource: function () {
         return this.eventSource;
     },
 
-    setEventSource: function () {
+    setEventSource: function (value) {
         var that = this;
-        this.eventSource = value;
+        that.eventSource = value;
         return that;
     },
 
@@ -118,55 +117,42 @@ module.exports = Class.create({
         return that;
     },
 
-    emit: function (events, sender) {
+    emit: function (eventObj, sender) {
         var that = this;
+        var returned = [];
         var listeners = that.eventListeners;
 
         // No events.
         if (!listeners || !that.isEventEnabled()) {
-            return that;
+            return returned;
         }
 
-        events = events.split(eventSplitter);
+        eventObj = eventObj || new EventObject();
 
-        var returned = true;
-        var args;
+        var eventName = eventObj.getName();
 
-        each(arguments, function (arg, index) {
-            if (index > 0) {
-                args[index - 1] = arg;
+        if (!eventName) {
+            return returned;
+        }
+
+        // fix sender
+        sender = sender || that.getEventSource();
+        sender = sender || that;
+
+
+        var list = listeners[eventName];
+        var length = list ? list.length : 0;
+        var ret;
+
+        for (var i = 0; i < length; i += 2) {
+            ret = list[i].call(list[i + 1] || that, eventObj, sender);
+            if (length > 2) {
+                returned.push(ret); // result as array
+            } else {
+                returned = ret;
             }
-        });
-
-        each(events, function (event) {
-            var all = listeners['*'];
-            var list = listeners[event];
-
-            // Copy callback lists to prevent modification.
-            all = all && all.slice();
-            list = list && list.slice();
-
-            // Execute event callbacks except one named '*'
-            if (event !== '*') {
-                returned = triggerEvents(list, args, this) && returned;
-            }
-
-            // Execute '*' callbacks.
-            returned = triggerEvents(all, [event].concat(args), this) && returned;
-        });
+        }
 
         return returned;
     }
 });
-
-function triggerEvents(list, args, context) {
-    var ret = true;
-
-    if (list) {
-        for (var i = 0, l = list.length; i < l; i += 2) {
-            ret = invoke(list[i], args, list[i + 1] || context) !== false && ret;
-        }
-    }
-    // trigger will return false if one of the callbacks return false
-    return ret;
-}
