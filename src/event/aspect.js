@@ -1,4 +1,3 @@
-
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var utils = require('./utils');
@@ -18,7 +17,7 @@ function weave(when, methodName, callback, context) {
         var method = that[name];
 
         if (!method || !isFunction(method)) {
-            throw new Error('Invalid method name: ' + name);
+            throw new Error('Event handler must be function, event name: ' + name);
         }
 
         if (!method.__isAspected) {
@@ -33,7 +32,7 @@ function weave(when, methodName, callback, context) {
 
 function wrap(methodName) {
     var that = this;
-    var old = that[methodName];
+    var originMethod = that[methodName];
 
     that[methodName] = function () {
         var that = this;
@@ -46,7 +45,7 @@ function wrap(methodName) {
         }
 
         // call the origin method.
-        var ret = old.apply(this, arguments);
+        var ret = originMethod.apply(this, arguments);
         var afterArgs = ['after:' + methodName, ret].concat(args);
         invoke(that.trigger, afterArgs, that);
 
@@ -56,17 +55,17 @@ function wrap(methodName) {
     that[methodName].__isAspected = true;
 }
 
-module.exports = {
-    before: function (methodName, callback, context) {
-        return weave.call(this, 'before', methodName, callback, context);
-    },
-    after: function (methodName, callback, context) {
-        return weave.call(this, 'after', methodName, callback, context);
-    },
-    around: function (methodName, callback, context) {
-        weave.call(this, 'before', methodName, callback, context);
-        weave.call(this, 'after', methodName, callback, context);
-        return this;
-    }
+exports.before = function (methodName, callback, context) {
+    return weave.call(this, 'before', methodName, callback, context);
+};
+
+exports.after = function (methodName, callback, context) {
+    return weave.call(this, 'after', methodName, callback, context);
+};
+
+exports.around = function (methodName, callback, context) {
+    weave.call(this, 'before', methodName, callback, context);
+    weave.call(this, 'after', methodName, callback, context);
+    return this;
 };
 
