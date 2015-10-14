@@ -1,0 +1,13 @@
+.DS_Store
+.idea
+
+.editorconfig
+.npmignore
+.jshintrc
+.jshintignore
+.travis.yml
+Gruntfile.js
+npm-debug.log
+node_modules
+test
+coverage
