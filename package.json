@@ -1,0 +1,24 @@
+{
+  "name": "PaneJS",
+  "version": "0.0.1",
+  "description": "JavaScript diagramming library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PaneJS/PaneJS.git"
+  },
+  "keywords": [
+    "diagramming",
+    "BPMN",
+    "UML"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PaneJS/PaneJS/issues"
+  },
+  "homepage": "https://github.com/PaneJS/PaneJS"
+}
