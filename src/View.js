@@ -90,11 +90,11 @@ module.exports = Class.create({
 
     setCurrentRoot: function (root) {
         if (this.currentRoot !== root) {
-            var change = new mxCurrentRootChange(this, root);
+            var change = new CurrentRootChange(this, root);
             change.execute();
             var edit = new mxUndoableEdit(this, false);
             edit.add(change);
-            this.fireEvent(new mxEventObject(mxEvent.UNDO, 'edit', edit));
+            this.fireEvent(new EventObject(mxEvent.UNDO, 'edit', edit));
             this.graph.sizeDidChange();
         }
 

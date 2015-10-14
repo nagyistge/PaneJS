@@ -11,7 +11,7 @@ var isNUllOrUndefined = utils.isNUllOrUndefined;
 
 module.exports = Class.create({
     Implements: Event,
-    constructor: function Graph(container, model/*, stylesheet*/) {
+    constructor: function Graph(container, model, stylesheet) {
 
         var graph = this;
 

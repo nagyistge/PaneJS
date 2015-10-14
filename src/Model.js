@@ -3,6 +3,7 @@
 var Class = require('./common/class');
 var utils = require('./common/utils');
 var Event = require('./events/Event');
+var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
 var Cell = require('./Cell');
@@ -418,9 +419,11 @@ module.exports = Class.create({
         this.beginUpdate();
 
         //this.currentEdit.add(change);
-        this.fireEvent(new mxEventObject(mxEvent.EXECUTE, 'change', change));
+        //this.fireEvent(new mxEventObject(mxEvent.EXECUTE, 'change', change));
+        this.emit(new EventObject('execute', {change: change}));
         // New global executed event
-        this.fireEvent(new mxEventObject(mxEvent.EXECUTED, 'change', change));
+        //this.fireEvent(new mxEventObject(mxEvent.EXECUTED, 'change', change));
+        this.emit(new EventObject('executed', {change: change}));
 
         this.endUpdate();
 
@@ -428,10 +431,12 @@ module.exports = Class.create({
 
     beginUpdate: function () {
         this.updateLevel++;
-        this.fireEvent(new mxEventObject(mxEvent.BEGIN_UPDATE));
+        //this.fireEvent(new mxEventObject(mxEvent.BEGIN_UPDATE));
+        this.emit(new EventObject('beginUpdate'));
 
         if (this.updateLevel == 1) {
-            this.fireEvent(new mxEventObject(mxEvent.START_EDIT));
+            //this.fireEvent(new mxEventObject(mxEvent.START_EDIT));
+            this.emit(new EventObject('startEdit'));
         }
     },
 
@@ -439,20 +444,24 @@ module.exports = Class.create({
         this.updateLevel--;
 
         if (this.updateLevel == 0) {
-            this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
+            //this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
+            this.emit(new EventObject('endEdit'));
         }
 
         if (!this.endingUpdate) {
             this.endingUpdate = this.updateLevel == 0;
-            this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
+            //this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
+            this.emit(new EventObject('endUpdate', {edit: this.currentEdit}));
 
             try {
                 if (this.endingUpdate && !this.currentEdit.isEmpty()) {
-                    this.fireEvent(new mxEventObject(mxEvent.BEFORE_UNDO, 'edit', this.currentEdit));
+                    //this.fireEvent(new mxEventObject(mxEvent.BEFORE_UNDO, 'edit', this.currentEdit));
+                    this.emit(new EventObject('beforeUndo', {edit: this.currentEdit}));
                     var tmp = this.currentEdit;
                     this.currentEdit = this.createUndoableEdit();
                     tmp.notify();
-                    this.fireEvent(new mxEventObject(mxEvent.UNDO, 'edit', tmp));
+                    //this.fireEvent(new mxEventObject(mxEvent.UNDO, 'edit', tmp));
+                    this.emit(new EventObject('undo', {edit: tmp}));
                 }
             }
             finally {
