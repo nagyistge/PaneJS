@@ -12,11 +12,9 @@ window.zGraph = module.exports = {
     Rectangle: require('./Rectangle'),
     Shape: require('./Shape'),
     View: require('./View'),
-    aspect: require('./aspect'),
     class: require('./class'),
     constants: require('./constants'),
     events: require('./events'),
-    objectIdentity: require('./objectIdentity'),
     utils: require('./utils'),
     // changes
     Change: require('./changes/Change'),

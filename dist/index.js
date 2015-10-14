@@ -556,7 +556,7 @@ each([
 
 module.exports = Class.create(proto);
 
-},{"./class":18,"./constants":19,"./utils":24}],2:[function(require,module,exports){
+},{"./class":17,"./constants":19,"./utils":23}],2:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 /*jshint -W030 */
@@ -564,8 +564,8 @@ module.exports = Class.create(proto);
 // TODO: cell 可以细分为 连线和节点 两种，这里放在同一个类中有点生硬
 
 var Class = require('./class');
-var constants = require('./constants');
 var utils = require('./utils');
+var constants = require('./constants');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
 
@@ -721,7 +721,7 @@ module.exports = Class.create({
             child.removeFromParent();
             child.setParent(this);
 
-            if (this.children === null) {
+            if (!this.children) {
                 this.children = [];
                 this.children.push(child);
             } else {
@@ -859,7 +859,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./class":18,"./constants":19,"./utils":24}],3:[function(require,module,exports){
+},{"./class":17,"./constants":19,"./utils":23}],3:[function(require,module,exports){
 'use strict';
 
 var Class = require('./class');
@@ -895,7 +895,7 @@ var CellRenderer = Class.create({
 
 });
 
-},{"./class":18}],4:[function(require,module,exports){
+},{"./class":17}],4:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
@@ -972,7 +972,7 @@ module.exports = Rectangle.extend({
 
 var Class = require('./class');
 var utils = require('./utils');
-var objectIdentity = require('./objectIdentity');
+var objectIdentity = require('./common/objectIdentity');
 
 var isObject = utils.isObject;
 var keys = utils.keys;
@@ -1053,7 +1053,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./class":18,"./objectIdentity":22,"./utils":24}],6:[function(require,module,exports){
+},{"./class":17,"./common/objectIdentity":18,"./utils":23}],6:[function(require,module,exports){
 var Class = require('./class');
 var utils = require('./utils');
 
@@ -1090,7 +1090,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./class":18,"./utils":24}],7:[function(require,module,exports){
+},{"./class":17,"./utils":23}],7:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Rectangle = require('./Rectangle');
@@ -1384,15 +1384,17 @@ module.exports = Class.create({
 });
 
 
-},{"./Model":9,"./View":13,"./class":18,"./constants":19,"./events":20,"./utils":24}],9:[function(require,module,exports){
+},{"./Model":9,"./View":13,"./class":17,"./constants":19,"./events":20,"./utils":23}],9:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./class');
-var Events = require('./events');
 var utils = require('./utils');
+var Events = require('./events');
 var Cell = require('./Cell');
 var RootChange = require('./changes/RootChange');
+var ChildChange = require('./changes/ChildChange');
 
+var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
@@ -1420,13 +1422,17 @@ module.exports = Class.create({
     clear: function () {
 
         var model = this;
-        model.setRoot(model.createRoot());
+        var root = model.createRoot();
+
+        model.setRoot(root);
+
         return model;
     },
 
     createRoot: function () {
 
         var cell = new Cell();
+
         cell.insert(new Cell());
 
         return cell;
@@ -1442,13 +1448,13 @@ module.exports = Class.create({
     },
 
     getRoot: function (cell) {
-        var root = cell || this.root;
 
-        if (cell != null) {
-            while (cell != null) {
-                root = cell;
-                cell = this.getParent(cell);
-            }
+        var model = this;
+        var root = cell || model.root;
+
+        while (cell) {
+            root = cell;
+            cell = model.getParent(cell);
         }
 
         return root;
@@ -1479,9 +1485,11 @@ module.exports = Class.create({
     },
 
     filterDescendants: function (filter, parent) {
+
+        var model = this;
         var result = [];
 
-        parent = parent || this.getRoot();
+        parent = parent || model.getRoot();
 
         if (isNullOrUndefined(filter) || filter(parent)) {
             result.push(parent);
@@ -1499,12 +1507,14 @@ module.exports = Class.create({
     },
 
     rootChanged: function (root) {
-        var oldRoot = this.root;
-        this.root = root;
 
-        this.nextId = 0;
-        this.cells = null;
-        this.cellAdded(root);
+        var model = this;
+        var oldRoot = model.root;
+
+        model.root = root;
+        model.nextId = 0;
+        model.cells = null;
+        model.cellAdded(root);
 
         return oldRoot;
     },
@@ -1514,7 +1524,10 @@ module.exports = Class.create({
     },
 
     isLayer: function (cell) {
-        return this.isRoot(this.getParent(cell));
+        var model = this;
+        var parent = model.getParent(cell);
+
+        return model.isRoot(parent);
     },
 
     isAncestor: function (parent, child) {
@@ -1542,7 +1555,7 @@ module.exports = Class.create({
     },
 
     add: function (parent, child, index) {
-        if (child !== parent && parent && child) {
+        if (parent && child && child !== parent) {
             if (isNullOrUndefined(index)) {
                 index = this.getChildCount(parent);
             }
@@ -1592,7 +1605,7 @@ module.exports = Class.create({
         }
 
         // Makes sure IDs of deleted cells are not reused
-        if (mxUtils.isNumeric(cell.getId())) {
+        if (isNumeric(cell.getId())) {
             this.nextId = Math.max(this.nextId, cell.getId());
         }
 
@@ -1851,7 +1864,7 @@ module.exports = Class.create({
 });
 
 
-},{"./Cell":2,"./changes/RootChange":17,"./class":18,"./events":20,"./utils":24}],10:[function(require,module,exports){
+},{"./Cell":2,"./changes/ChildChange":15,"./changes/RootChange":16,"./class":17,"./events":20,"./utils":23}],10:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Klass = require('./class');
@@ -1875,7 +1888,7 @@ var Point = Klass.create({
 module.exports = Point;
 
 
-},{"./class":18}],11:[function(require,module,exports){
+},{"./class":17}],11:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
@@ -1963,14 +1976,14 @@ var Rect = Klass.create({
 module.exports = Rect;
 
 
-},{"./class":18,"./point":23}],12:[function(require,module,exports){
+},{"./class":17,"./point":22}],12:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
 var Klass = require('./class');
 var utils = require('./utils');
 var constants = require('./constants');
-//var Point = require('./Point');
+var Point = require('./Point');
 var Rectangle = require('./Rectangle');
 var Canvas2D = require('./Canvas2D');
 
@@ -2227,7 +2240,7 @@ var Shape = Klass.create({
 
 module.exports = Shape;
 
-},{"./Canvas2D":1,"./Rectangle":11,"./class":18,"./constants":19,"./utils":24}],13:[function(require,module,exports){
+},{"./Canvas2D":1,"./Point":10,"./Rectangle":11,"./class":17,"./constants":19,"./utils":23}],13:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: false */
 /* global document */
 
@@ -2861,81 +2874,7 @@ module.exports = Class.create({
 });
 
 
-},{"./Dictionary":5,"./Point":10,"./Rectangle":11,"./class":18,"./constants":19,"./events":20,"./utils":24}],14:[function(require,module,exports){
-
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var utils = require('./utils');
-
-var isFunction = utils.isFunction;
-var each = utils.each;
-var invoke = utils.invoke;
-var toArray = utils.toArray;
-var eventSplitter = /\s+/;
-
-
-function weave(when, methodName, callback, context) {
-    var that = this;
-    var names = methodName.split(eventSplitter);
-
-    each(names, function (name) {
-        var method = that[name];
-
-        if (!method || !isFunction(method)) {
-            throw new Error('Invalid method name: ' + name);
-        }
-
-        if (!method.__isAspected) {
-            wrap.call(that, name);
-        }
-
-        that.on(when + ':' + name, callback, context);
-    });
-
-    return that;
-}
-
-function wrap(methodName) {
-    var that = this;
-    var old = that[methodName];
-
-    that[methodName] = function () {
-        var that = this;
-        var args = toArray(arguments);
-        var beforeArgs = ['before:' + methodName].concat(args);
-
-        // prevent if trigger return false
-        if (invoke(that.trigger, beforeArgs, that) === false) {
-            return;
-        }
-
-        // call the origin method.
-        var ret = old.apply(this, arguments);
-        var afterArgs = ['after:' + methodName, ret].concat(args);
-        invoke(that.trigger, afterArgs, that);
-
-        return ret;
-    };
-
-    that[methodName].__isAspected = true;
-}
-
-module.exports = {
-    before: function (methodName, callback, context) {
-        return weave.call(this, 'before', methodName, callback, context);
-    },
-    after: function (methodName, callback, context) {
-        return weave.call(this, 'after', methodName, callback, context);
-    },
-    around: function (methodName, callback, context) {
-        weave.call(this, 'before', methodName, callback, context);
-        weave.call(this, 'after', methodName, callback, context);
-        return this;
-    }
-};
-
-
-},{"./utils":24}],15:[function(require,module,exports){
+},{"./Dictionary":5,"./Point":10,"./Rectangle":11,"./class":17,"./constants":19,"./events":20,"./utils":23}],14:[function(require,module,exports){
 'use strict';
 
 var klass = require('../class');
@@ -2950,7 +2889,7 @@ module.exports = klass.create({
 });
 
 
-},{"../class":18}],16:[function(require,module,exports){
+},{"../class":17}],15:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
@@ -3043,7 +2982,7 @@ module.exports = Change.extend({
     }
 });
 
-},{"../utils":24,"./Change":15}],17:[function(require,module,exports){
+},{"../utils":23,"./Change":14}],16:[function(require,module,exports){
 'use strict';
 
 var Change = require('./Change');
@@ -3075,7 +3014,7 @@ module.exports = Change.extend({
 });
 
 
-},{"../utils":24,"./Change":15}],18:[function(require,module,exports){
+},{"../utils":23,"./Change":14}],17:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 // ref: https://github.com/aralejs/class
@@ -3233,7 +3172,39 @@ function mix(receiver, supplier, whiteList) {
 module.exports = Class;
 
 
-},{"./utils":24}],19:[function(require,module,exports){
+},{"./utils":23}],18:[function(require,module,exports){
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global window */
+
+var utils = require('../utils');
+
+var isObject = utils.isObject;
+var isNullOrUndefined = utils.isNullOrUndefined;
+var getFunctionName = utils.getFunctionName;
+
+var FIELD_NAME = 'paneObjectId';
+var counter = 0;
+
+
+exports.get = function (obj) {
+
+    var isObj = isObject(obj);
+
+    if (isObj && isNullOrUndefined(obj[FIELD_NAME])) {
+        var ctorName = getFunctionName(obj.constructor);
+        obj[FIELD_NAME] = ctorName + '#' + counter++;
+    }
+
+    return isObj ? obj[FIELD_NAME] : '' + obj;
+};
+
+exports.clear = function (obj) {
+    if (isObject(obj)) {
+        delete obj[FIELD_NAME];
+    }
+};
+
+},{"../utils":23}],19:[function(require,module,exports){
 
 var Rectangle = require('./Rectangle');
 
@@ -3424,7 +3395,7 @@ function triggerEvents(list, args, context) {
 module.exports = Events;
 
 
-},{"./utils":24}],21:[function(require,module,exports){
+},{"./utils":23}],21:[function(require,module,exports){
 window.zGraph = module.exports = {
     Canvas2D: require('./Canvas2D'),
     Cell: require('./EventObject'),
@@ -3439,50 +3410,19 @@ window.zGraph = module.exports = {
     Rectangle: require('./Rectangle'),
     Shape: require('./Shape'),
     View: require('./View'),
-    aspect: require('./aspect'),
     class: require('./class'),
     constants: require('./constants'),
     events: require('./events'),
-    objectIdentity: require('./objectIdentity'),
     utils: require('./utils'),
     // changes
     Change: require('./changes/Change'),
     ChildChange: require('./changes/ChildChange'),
     RootChange: require('./changes/RootChange'),
 };
-},{"./Canvas2D":1,"./CellRenderer":3,"./CellState":4,"./Dictionary":5,"./EventObject":6,"./Geometry":7,"./Graph":8,"./Model":9,"./Point":10,"./Rectangle":11,"./Shape":12,"./View":13,"./aspect":14,"./changes/Change":15,"./changes/ChildChange":16,"./changes/RootChange":17,"./class":18,"./constants":19,"./events":20,"./objectIdentity":22,"./utils":24}],22:[function(require,module,exports){
 
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
-///* global window */
-
-var utils = require('./utils');
-
-var isObject = utils.isObject;
-var isNullOrUndefined = utils.isNullOrUndefined;
-var getFunctionName = utils.getFunctionName;
-
-var FIELD_NAME = 'zObjectId';
-var counter = 0;
-
-
-exports.get = function (obj) {
-    if (isObject(obj) && isNullOrUndefined(obj[FIELD_NAME])) {
-        var ctor = getFunctionName(obj.constructor);
-        obj[FIELD_NAME] = ctor + '#' + counter++;
-    }
-
-    return obj[FIELD_NAME];
-};
-
-exports.clear = function (obj) {
-    if (isObject(obj)) {
-        delete obj[FIELD_NAME];
-    }
-};
-
-},{"./utils":24}],23:[function(require,module,exports){
+},{"./Canvas2D":1,"./CellRenderer":3,"./CellState":4,"./Dictionary":5,"./EventObject":6,"./Geometry":7,"./Graph":8,"./Model":9,"./Point":10,"./Rectangle":11,"./Shape":12,"./View":13,"./changes/Change":14,"./changes/ChildChange":15,"./changes/RootChange":16,"./class":17,"./constants":19,"./events":20,"./utils":23}],22:[function(require,module,exports){
 arguments[4][10][0].apply(exports,arguments)
-},{"./class":18,"dup":10}],24:[function(require,module,exports){
+},{"./class":17,"dup":10}],23:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global window */
 
@@ -3546,10 +3486,15 @@ function isArrayLike(obj) {
         typeof length === 'number' && length > 0 && ( length - 1 ) in obj;
 }
 
+function isNumeric(obj) {
+    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+}
+
 utils.isType = isType;
 utils.isNull = isNull;
 utils.isArray = isArray;
 utils.isWindow = isWindow;
+utils.isNumeric = isNumeric;
 utils.isFunction = isFunction;
 utils.isUndefined = isUndefined;
 utils.isArrayLike = isArrayLike;
@@ -3577,6 +3522,10 @@ utils.ucFirst = function (str) {
 utils.toFixed = function (value, precision) {
     var power = Math.pow(10, precision);
     return (Math.round(value * power) / power).toFixed(precision);
+};
+
+utils.mod = function (n, m) {
+    return ((n % m) + m) % m;
 };
 
 

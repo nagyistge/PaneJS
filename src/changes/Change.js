@@ -1,8 +1,8 @@
 'use strict';
 
-var klass = require('../class');
+var Class = require('../class');
 
-module.exports = klass.create({
+module.exports = Class.create({
 
     constructor: function Change(model) {
         this.model = model;

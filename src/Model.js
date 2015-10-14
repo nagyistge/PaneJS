@@ -1,11 +1,13 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./class');
-var Events = require('./events');
 var utils = require('./utils');
+var Events = require('./events');
 var Cell = require('./Cell');
 var RootChange = require('./changes/RootChange');
+var ChildChange = require('./changes/ChildChange');
 
+var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
@@ -33,13 +35,17 @@ module.exports = Class.create({
     clear: function () {
 
         var model = this;
-        model.setRoot(model.createRoot());
+        var root = model.createRoot();
+
+        model.setRoot(root);
+
         return model;
     },
 
     createRoot: function () {
 
         var cell = new Cell();
+
         cell.insert(new Cell());
 
         return cell;
@@ -55,13 +61,13 @@ module.exports = Class.create({
     },
 
     getRoot: function (cell) {
-        var root = cell || this.root;
 
-        if (cell != null) {
-            while (cell != null) {
-                root = cell;
-                cell = this.getParent(cell);
-            }
+        var model = this;
+        var root = cell || model.root;
+
+        while (cell) {
+            root = cell;
+            cell = model.getParent(cell);
         }
 
         return root;
@@ -92,9 +98,11 @@ module.exports = Class.create({
     },
 
     filterDescendants: function (filter, parent) {
+
+        var model = this;
         var result = [];
 
-        parent = parent || this.getRoot();
+        parent = parent || model.getRoot();
 
         if (isNullOrUndefined(filter) || filter(parent)) {
             result.push(parent);
@@ -112,12 +120,14 @@ module.exports = Class.create({
     },
 
     rootChanged: function (root) {
-        var oldRoot = this.root;
-        this.root = root;
 
-        this.nextId = 0;
-        this.cells = null;
-        this.cellAdded(root);
+        var model = this;
+        var oldRoot = model.root;
+
+        model.root = root;
+        model.nextId = 0;
+        model.cells = null;
+        model.cellAdded(root);
 
         return oldRoot;
     },
@@ -127,7 +137,10 @@ module.exports = Class.create({
     },
 
     isLayer: function (cell) {
-        return this.isRoot(this.getParent(cell));
+        var model = this;
+        var parent = model.getParent(cell);
+
+        return model.isRoot(parent);
     },
 
     isAncestor: function (parent, child) {
@@ -155,7 +168,7 @@ module.exports = Class.create({
     },
 
     add: function (parent, child, index) {
-        if (child !== parent && parent && child) {
+        if (parent && child && child !== parent) {
             if (isNullOrUndefined(index)) {
                 index = this.getChildCount(parent);
             }
@@ -205,7 +218,7 @@ module.exports = Class.create({
         }
 
         // Makes sure IDs of deleted cells are not reused
-        if (mxUtils.isNumeric(cell.getId())) {
+        if (isNumeric(cell.getId())) {
             this.nextId = Math.max(this.nextId, cell.getId());
         }
 

@@ -5,8 +5,8 @@
 // TODO: cell 可以细分为 连线和节点 两种，这里放在同一个类中有点生硬
 
 var Class = require('./class');
-var constants = require('./constants');
 var utils = require('./utils');
+var constants = require('./constants');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
 

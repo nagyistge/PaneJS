@@ -4,7 +4,7 @@
 var Klass = require('./class');
 var utils = require('./utils');
 var constants = require('./constants');
-//var Point = require('./Point');
+var Point = require('./Point');
 var Rectangle = require('./Rectangle');
 var Canvas2D = require('./Canvas2D');
 

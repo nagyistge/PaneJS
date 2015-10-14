@@ -2,7 +2,7 @@
 
 var Class = require('./class');
 var utils = require('./utils');
-var objectIdentity = require('./objectIdentity');
+var objectIdentity = require('./common/objectIdentity');
 
 var isObject = utils.isObject;
 var keys = utils.keys;

@@ -61,10 +61,15 @@ function isArrayLike(obj) {
         typeof length === 'number' && length > 0 && ( length - 1 ) in obj;
 }
 
+function isNumeric(obj) {
+    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+}
+
 utils.isType = isType;
 utils.isNull = isNull;
 utils.isArray = isArray;
 utils.isWindow = isWindow;
+utils.isNumeric = isNumeric;
 utils.isFunction = isFunction;
 utils.isUndefined = isUndefined;
 utils.isArrayLike = isArrayLike;
@@ -92,6 +97,10 @@ utils.ucFirst = function (str) {
 utils.toFixed = function (value, precision) {
     var power = Math.pow(10, precision);
     return (Math.round(value * power) / power).toFixed(precision);
+};
+
+utils.mod = function (n, m) {
+    return ((n % m) + m) % m;
 };
 
 

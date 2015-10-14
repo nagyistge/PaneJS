@@ -1,24 +1,26 @@
-
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global window */
 
-var utils = require('./utils');
+var utils = require('../utils');
 
 var isObject = utils.isObject;
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getFunctionName = utils.getFunctionName;
 
-var FIELD_NAME = 'zObjectId';
+var FIELD_NAME = 'paneObjectId';
 var counter = 0;
 
 
 exports.get = function (obj) {
-    if (isObject(obj) && isNullOrUndefined(obj[FIELD_NAME])) {
-        var ctor = getFunctionName(obj.constructor);
-        obj[FIELD_NAME] = ctor + '#' + counter++;
+
+    var isObj = isObject(obj);
+
+    if (isObj && isNullOrUndefined(obj[FIELD_NAME])) {
+        var ctorName = getFunctionName(obj.constructor);
+        obj[FIELD_NAME] = ctorName + '#' + counter++;
     }
 
-    return obj[FIELD_NAME];
+    return isObj ? obj[FIELD_NAME] : '' + obj;
 };
 
 exports.clear = function (obj) {
