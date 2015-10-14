@@ -7,7 +7,8 @@ var isObject = utils.isObject;
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getFunctionName = utils.getFunctionName;
 
-var FIELD_NAME = 'paneObjectId';
+// TODO: constants
+var FIELD_NAME = 'objectId';
 var counter = 0;
 
 

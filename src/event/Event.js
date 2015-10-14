@@ -4,6 +4,7 @@ var EventObject = require('./EventObject');
 
 var keys = utils.keys;
 var each = utils.each;
+// TODO: constants
 var eventSplitter = /\s+/;
 
 

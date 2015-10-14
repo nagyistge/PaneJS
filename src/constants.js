@@ -1,9 +1,12 @@
 var Rectangle = require('./Rectangle');
 
 module.exports = {
-    EVENT_SPLITTER: /\s+/,
+
     NONE: 'none',
     NS_SVG: 'http://www.w3.org/2000/svg',
+
+    EVENT_SPLITTER: /\s+/,
+    OBJECT_ID: 'objectId',
 
     SHADOW_COLOR: 'gray',
     SHADOW_OFFSET_X: 2,

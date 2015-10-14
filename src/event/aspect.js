@@ -6,6 +6,7 @@ var isFunction = utils.isFunction;
 var each = utils.each;
 var invoke = utils.invoke;
 var toArray = utils.toArray;
+// TODO: constants
 var eventSplitter = /\s+/;
 
 
