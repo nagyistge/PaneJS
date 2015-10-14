@@ -68,6 +68,7 @@ function isNumeric(obj) {
 utils.isType = isType;
 utils.isNull = isNull;
 utils.isArray = isArray;
+utils.isObject = isObject;
 utils.isWindow = isWindow;
 utils.isNumeric = isNumeric;
 utils.isFunction = isFunction;

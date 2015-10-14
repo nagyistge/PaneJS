@@ -1,28 +1,32 @@
-
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Klass = require('./common/class');
-var Point = require('./point');
+var Point = require('./Point');
 
-var Rect = Klass.create({
+var Rectangle = Klass.create({
+
     Extends: Point,
+
     constructor: function Rectangle(x, y, width, height) {
-        //
-        Rect.superclass.constructor.call(this, x, y);
 
-        this.width = width === null ? 0 : width;
-        this.height = height === null ? 0 : height;
-    },
+        var rect = this;
 
-    fromRect: function (rect) {
-        return new Rect(rect.x, rect.y, rect.width, rect.height);
+        Rectangle.superclass.constructor.call(rect, x, y);
+
+        rect.width = width ? width : 0;
+        rect.height = height ? height : 0;
     },
 
     setRect: function (x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+
+        var rect = this;
+
+        rect.x = x;
+        rect.y = y;
+        rect.width = width;
+        rect.height = height;
+
+        return rect;
     },
 
     getCenterX: function () {
@@ -38,49 +42,73 @@ var Rect = Klass.create({
     },
 
     add: function (rect) {
+
         if (!rect) {
             return;
         }
 
-        var minX = Math.min(this.x, rect.x);
-        var minY = Math.min(this.y, rect.y);
-        var maxX = Math.max(this.x + this.width, rect.x + rect.width);
-        var maxY = Math.max(this.y + this.height, rect.y + rect.height);
+        var that = this;
+        var minX = Math.min(that.x, rect.x);
+        var minY = Math.min(that.y, rect.y);
+        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
+        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
 
-        this.x = minX;
-        this.y = minY;
-        this.width = maxX - minX;
-        this.height = maxY - minY;
+        that.x = minX;
+        that.y = minY;
+        that.width = maxX - minX;
+        that.height = maxY - minY;
+
+        return that;
     },
 
+
     grow: function (amount) {
-        this.x -= amount;
-        this.y -= amount;
-        this.width += 2 * amount;
-        this.height += 2 * amount;
+
+        var rect = this;
+
+        rect.x -= amount;
+        rect.y -= amount;
+        rect.width += 2 * amount;
+        rect.height += 2 * amount;
+
+        return rect;
     },
 
     rotate90: function () {
-        var t = (this.width - this.height) / 2;
-        this.x += t;
-        this.y -= t;
-        var tmp = this.width;
-        this.width = this.height;
-        this.height = tmp;
+
+        var rect = this;
+        var w = rect.width;
+        var h = rect.height;
+        var t = (w - h) / 2;
+
+        rect.x += t;
+        rect.y -= t;
+        rect.width = h;
+        rect.height = w;
+
+        return rect;
     },
 
-
     equals: function (rect) {
-        return Rect.superclass.equals.call(this, rect) &&
-            rect instanceof Rect &&
-            rect.width == this.width &&
-            rect.height == this.height;
+
+        var that = this;
+
+        return Rectangle.superclass.equals.call(that, rect) &&
+            rect instanceof Rectangle &&
+            rect.width === that.width &&
+            rect.height === that.height;
+    },
+
+    fromRect: function (rect) {
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
     },
 
     clone: function () {
-        return this.fromRect(this);
+
+        var rect = this;
+        return rect.fromRect(rect);
     }
 });
 
-module.exports = Rect;
+module.exports = Rectangle;
 

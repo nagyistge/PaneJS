@@ -7,6 +7,7 @@ var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
 var Cell = require('./Cell');
+var UndoableEdit = requires('./UndoableEdit');
 
 var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -17,7 +18,7 @@ module.exports = Class.create({
 
         var model = this;
 
-        //this.currentEdit = this.createUndoableEdit();
+        this.currentEdit = this.createUndoableEdit();
 
         root ? model.setRoot(root) : model.clear();
     },
@@ -418,7 +419,7 @@ module.exports = Class.create({
 
         this.beginUpdate();
 
-        //this.currentEdit.add(change);
+        this.currentEdit.add(change);
         //this.fireEvent(new mxEventObject(mxEvent.EXECUTE, 'change', change));
         this.emit(new EventObject('execute', {change: change}));
         // New global executed event
@@ -470,7 +471,30 @@ module.exports = Class.create({
         }
     },
 
-    createUndoableEdit: function () {},
+    createUndoableEdit: function () {
+        var edit = new UndoableEdit(this, true);
+
+        edit.notify = function () {
+            var model = edit.source;
+
+            model.emit(new EventObject('change', {
+                edit: edit,
+                changes: edit.changes
+            }));
+            model.emit(new EventObject('notify', {
+                edit: edit,
+                changes: edit.changes
+            }));
+
+            // LATER: Remove changes property (deprecated)
+            //edit.source.fireEvent(new mxEventObject(mxEvent.CHANGE,
+            //    'edit', edit, 'changes', edit.changes));
+            //edit.source.fireEvent(new mxEventObject(mxEvent.NOTIFY,
+            //    'edit', edit, 'changes', edit.changes));
+        };
+
+        return edit;
+    },
     mergeChildren: function (from, to, cloneAllEdges) {},
     mergeChildrenImpl: function (from, to, cloneAllEdges, mapping) {},
 

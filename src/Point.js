@@ -5,8 +5,8 @@ var Klass = require('./common/class');
 var Point = Klass.create({
 
     constructor: function Point(x, y) {
-        this.x = x === null ? 0 : x;
-        this.y = y === null ? 0 : y;
+        this.x = x ? x : 0;
+        this.y = y ? y : 0;
     },
 
     equals: function (point) {
