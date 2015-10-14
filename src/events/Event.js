@@ -1,5 +1,5 @@
-var utils = require('./utils');
-var Class = require('../class');
+var utils = require('../common/utils');
+var Class = require('../common/class');
 var EventObject = require('./EventObject');
 
 var keys = utils.keys;

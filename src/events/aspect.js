@@ -1,6 +1,6 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var utils = require('./utils');
+var utils = require('../common/utils');
 
 var isFunction = utils.isFunction;
 var each = utils.each;

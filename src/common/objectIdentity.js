@@ -1,7 +1,7 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global window */
 
-var utils = require('../utils');
+var utils = require('./utils');
 
 var isObject = utils.isObject;
 var isNullOrUndefined = utils.isNullOrUndefined;

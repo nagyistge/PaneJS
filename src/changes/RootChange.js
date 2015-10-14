@@ -1,7 +1,6 @@
 'use strict';
 
 var Change = require('./Change');
-var utils = require('../utils');
 
 module.exports = Change.extend({
 

@@ -1,17 +1,17 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Class = require('./class');
-var utils = require('./utils');
-var Events = require('./events');
-var Cell = require('./Cell');
+var Class = require('./common/class');
+var utils = require('./common/utils');
+var Event = require('./events/Event');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
+var Cell = require('./Cell');
 
 var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
-    Implements: Events,
+    Implements: Event,
     constructor: function Model(root) {
 
         var model = this;

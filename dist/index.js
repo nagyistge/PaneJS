@@ -2,9 +2,9 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
-var Class = require('./class');
+var Class = require('./common/class');
+var utils = require('./common/utils');
 var constants = require('./constants');
-var utils = require('./utils');
 
 
 var each = utils.each;
@@ -556,15 +556,15 @@ each([
 
 module.exports = Class.create(proto);
 
-},{"./class":17,"./constants":19,"./utils":23}],2:[function(require,module,exports){
+},{"./common/class":16,"./common/utils":18,"./constants":19}],2:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 /*jshint -W030 */
 
 // TODO: cell 可以细分为 连线和节点 两种，这里放在同一个类中有点生硬
 
-var Class = require('./class');
-var utils = require('./utils');
+var Class = require('./common/class');
+var utils = require('./common/utils');
 var constants = require('./constants');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -859,10 +859,10 @@ module.exports = Class.create({
     }
 });
 
-},{"./class":17,"./constants":19,"./utils":23}],3:[function(require,module,exports){
+},{"./common/class":16,"./common/utils":18,"./constants":19}],3:[function(require,module,exports){
 'use strict';
 
-var Class = require('./class');
+var Class = require('./common/class');
 
 var CellRenderer = Class.create({
     // 静态属性和方法
@@ -895,7 +895,7 @@ var CellRenderer = Class.create({
 
 });
 
-},{"./class":17}],4:[function(require,module,exports){
+},{"./common/class":16}],4:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
@@ -967,130 +967,7 @@ module.exports = Rectangle.extend({
 });
 
 
-},{"./Point":10,"./Rectangle":11}],5:[function(require,module,exports){
-'use strict';
-
-var Class = require('./class');
-var utils = require('./utils');
-var objectIdentity = require('./common/objectIdentity');
-
-var isObject = utils.isObject;
-var keys = utils.keys;
-var each = utils.each;
-
-function getId(key) {
-
-    if (isObject(key)) {
-        return objectIdentity.get(key);
-    }
-
-    return '' + key;
-}
-
-module.exports = Class.create({
-
-    constructor: function Dictionary() {
-        return this.clear();
-    },
-
-    clear: function () {
-        var dic = this;
-
-        dic.map = {};
-
-        return dic;
-    },
-
-    get: function (key) {
-        var id = getId(key);
-        return this.map[id];
-    },
-
-    set: function (key, value) {
-
-        var map = this.map;
-        var id = getId(key);
-        var previous = map[id];
-
-        map[id] = value;
-
-        return previous;
-    },
-
-    remove: function (key) {
-
-        var map = this.map;
-        var id = getId(key);
-        var previous = map[id];
-
-        delete map[id];
-
-        return previous;
-    },
-
-    getKeys: function () {
-        return keys(this.map);
-    },
-
-    getValues: function () {
-
-        var result = [];
-
-        each(this.map, function (value) {
-            result.push(value);
-        });
-
-        return result;
-    },
-
-    visit: function (visitor) {
-
-        var dic = this;
-
-        each(dic.map, visitor);
-
-        return dic;
-    }
-});
-
-},{"./class":17,"./common/objectIdentity":18,"./utils":23}],6:[function(require,module,exports){
-var Class = require('./class');
-var utils = require('./utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Class.create({
-    constructor: function EventObject(name) {
-        var evt = this;
-
-        evt.name = name;
-        evt.properties = {};
-        evt.consumed = false;
-
-        for (var i = 1, l = arguments.length; i < l; i += 2) {
-            evt.properties[arguments[i]] = arguments[i + 1];
-        }
-    },
-
-    getName: function () {
-        return this.name;
-    },
-
-    getData: function (key) {
-        var data = this.data;
-        return isNullOrUndefined(key) ? data : data[key];
-    },
-
-    isConsumed: function () {
-        return this.consumed;
-    },
-
-    consume: function () {
-        this.consumed = true;
-    }
-});
-
-},{"./class":17,"./utils":23}],7:[function(require,module,exports){
+},{"./Point":8,"./Rectangle":9}],5:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Rectangle = require('./Rectangle');
@@ -1156,20 +1033,20 @@ module.exports = Rectangle.extend({
     }
 });
 
-},{"./Rectangle":11}],8:[function(require,module,exports){
+},{"./Rectangle":9}],6:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Class = require('./class');
+var Class = require('./common/class');
+var utils = require('./common/utils');
+var Event = require('./events/Event');
 var constants = require('./constants');
 var View = require('./View');
 var Model = require('./Model');
-var Events = require('./events');
-var utils = require('./utils');
 
 var isNUllOrUndefined = utils.isNUllOrUndefined;
 
 module.exports = Class.create({
-    Implements: Events,
+    Implements: Event,
     constructor: function Graph(container, model/*, stylesheet*/) {
 
         var graph = this;
@@ -1384,21 +1261,21 @@ module.exports = Class.create({
 });
 
 
-},{"./Model":9,"./View":13,"./class":17,"./constants":19,"./events":20,"./utils":23}],9:[function(require,module,exports){
+},{"./Model":7,"./View":11,"./common/class":16,"./common/utils":18,"./constants":19,"./events/Event":20}],7:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Class = require('./class');
-var utils = require('./utils');
-var Events = require('./events');
-var Cell = require('./Cell');
+var Class = require('./common/class');
+var utils = require('./common/utils');
+var Event = require('./events/Event');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
+var Cell = require('./Cell');
 
 var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
-    Implements: Events,
+    Implements: Event,
     constructor: function Model(root) {
 
         var model = this;
@@ -1864,10 +1741,10 @@ module.exports = Class.create({
 });
 
 
-},{"./Cell":2,"./changes/ChildChange":15,"./changes/RootChange":16,"./class":17,"./events":20,"./utils":23}],10:[function(require,module,exports){
+},{"./Cell":2,"./changes/ChildChange":13,"./changes/RootChange":14,"./common/class":16,"./common/utils":18,"./events/Event":20}],8:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Klass = require('./class');
+var Klass = require('./common/class');
 
 var Point = Klass.create({
 
@@ -1888,11 +1765,11 @@ var Point = Klass.create({
 module.exports = Point;
 
 
-},{"./class":17}],11:[function(require,module,exports){
+},{"./common/class":16}],9:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Klass = require('./class');
+var Klass = require('./common/class');
 var Point = require('./point');
 
 var Rect = Klass.create({
@@ -1976,12 +1853,12 @@ var Rect = Klass.create({
 module.exports = Rect;
 
 
-},{"./class":17,"./point":22}],12:[function(require,module,exports){
+},{"./common/class":16,"./point":23}],10:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
-var Klass = require('./class');
-var utils = require('./utils');
+var Klass = require('./common/class');
+var utils = require('./common/utils');
 var constants = require('./constants');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');
@@ -2240,25 +2117,25 @@ var Shape = Klass.create({
 
 module.exports = Shape;
 
-},{"./Canvas2D":1,"./Point":10,"./Rectangle":11,"./class":17,"./constants":19,"./utils":23}],13:[function(require,module,exports){
+},{"./Canvas2D":1,"./Point":8,"./Rectangle":9,"./common/class":16,"./common/utils":18,"./constants":19}],11:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: false */
 /* global document */
 
 'use strict';
 
-var Class = require('./class');
+var Class = require('./common/class');
+var utils = require('./common/utils');
+var Event = require('./events/Event');
+var Dictionary = require('./common/Dictionary');
 var constants = require('./constants');
-var Events = require('./events');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');
-var Dictionary = require('./Dictionary');
-var utils = require('./utils');
 
 var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
-    Implements: Events,
+    Implements: Event,
     constructor: function View(graph) {
 
         var view = this;
@@ -2874,12 +2751,12 @@ module.exports = Class.create({
 });
 
 
-},{"./Dictionary":5,"./Point":10,"./Rectangle":11,"./class":17,"./constants":19,"./events":20,"./utils":23}],14:[function(require,module,exports){
+},{"./Point":8,"./Rectangle":9,"./common/Dictionary":15,"./common/class":16,"./common/utils":18,"./constants":19,"./events/Event":20}],12:[function(require,module,exports){
 'use strict';
 
-var klass = require('../class');
+var Class = require('../common/class');
 
-module.exports = klass.create({
+module.exports = Class.create({
 
     constructor: function Change(model) {
         this.model = model;
@@ -2889,13 +2766,14 @@ module.exports = klass.create({
 });
 
 
-},{"../class":17}],15:[function(require,module,exports){
-
+},{"../common/class":16}],13:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 
 var Change = require('./Change');
-var utils = require('../utils');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Change.extend({
 
@@ -2946,7 +2824,7 @@ module.exports = Change.extend({
         var change = this;
         var model = change.model;
 
-        isConnect = utils.isNullOrUndefined(isConnect) ? true : isConnect;
+        isConnect = isNullOrUndefined(isConnect) ? true : isConnect;
 
         var source = cell.getTerminal(true);
         var target = cell.getTerminal(false);
@@ -2982,11 +2860,10 @@ module.exports = Change.extend({
     }
 });
 
-},{"../utils":23,"./Change":14}],16:[function(require,module,exports){
+},{"../common/utils":18,"./Change":12}],14:[function(require,module,exports){
 'use strict';
 
 var Change = require('./Change');
-var utils = require('../utils');
 
 module.exports = Change.extend({
 
@@ -3014,7 +2891,93 @@ module.exports = Change.extend({
 });
 
 
-},{"../utils":23,"./Change":14}],17:[function(require,module,exports){
+},{"./Change":12}],15:[function(require,module,exports){
+'use strict';
+
+var Class = require('./class');
+var utils = require('./utils');
+var objectIdentity = require('./objectIdentity');
+
+var isObject = utils.isObject;
+var keys = utils.keys;
+var each = utils.each;
+
+function getId(key) {
+
+    if (isObject(key)) {
+        return objectIdentity.get(key);
+    }
+
+    return '' + key;
+}
+
+module.exports = Class.create({
+
+    constructor: function Dictionary() {
+        return this.clear();
+    },
+
+    clear: function () {
+        var dic = this;
+
+        dic.map = {};
+
+        return dic;
+    },
+
+    get: function (key) {
+        var id = getId(key);
+        return this.map[id];
+    },
+
+    set: function (key, value) {
+
+        var map = this.map;
+        var id = getId(key);
+        var previous = map[id];
+
+        map[id] = value;
+
+        return previous;
+    },
+
+    remove: function (key) {
+
+        var map = this.map;
+        var id = getId(key);
+        var previous = map[id];
+
+        delete map[id];
+
+        return previous;
+    },
+
+    getKeys: function () {
+        return keys(this.map);
+    },
+
+    getValues: function () {
+
+        var result = [];
+
+        each(this.map, function (value) {
+            result.push(value);
+        });
+
+        return result;
+    },
+
+    visit: function (visitor) {
+
+        var dic = this;
+
+        each(dic.map, visitor);
+
+        return dic;
+    }
+});
+
+},{"./class":16,"./objectIdentity":17,"./utils":18}],16:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 // ref: https://github.com/aralejs/class
@@ -3022,10 +2985,10 @@ module.exports = Change.extend({
 
 var utils = require('./utils');
 
+var each = utils.each;
+var hasKey = utils.hasKey;
 var isArray = utils.isArray;
 var isFunction = utils.isFunction;
-var hasKey = utils.hasKey;
-var each = utils.each;
 
 function Class(o) {
     // Convert existed function to Class.
@@ -3055,11 +3018,10 @@ Class.create = function (parent, properties) {
     //    }
     //}
 
-    // By: bubkoo
     var SubClass = properties.constructor;
     // unspecified constructor
     if (SubClass === Object.prototype.constructor) {
-        SubClass = function SubClass() {};
+        SubClass = function Class() {};
     }
 
     // Inherit class (static) properties from parent.
@@ -3172,17 +3134,18 @@ function mix(receiver, supplier, whiteList) {
 module.exports = Class;
 
 
-},{"./utils":23}],18:[function(require,module,exports){
+},{"./utils":18}],17:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global window */
 
-var utils = require('../utils');
+var utils = require('./utils');
 
 var isObject = utils.isObject;
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getFunctionName = utils.getFunctionName;
 
-var FIELD_NAME = 'paneObjectId';
+// TODO: constants
+var FIELD_NAME = 'objectId';
 var counter = 0;
 
 
@@ -3204,225 +3167,7 @@ exports.clear = function (obj) {
     }
 };
 
-},{"../utils":23}],19:[function(require,module,exports){
-
-var Rectangle = require('./Rectangle');
-
-module.exports = {
-    NONE: 'none',
-    NS_SVG: 'http://www.w3.org/2000/svg',
-
-    SHADOW_COLOR: 'gray',
-    SHADOW_OFFSET_X: 2,
-    SHADOW_OFFSET_Y: 3,
-    SHADOW_OPACITY: 1,
-
-    DEFAULT_FONT_SIZE: 11,
-    DEFAULT_FONT_FAMILY: 'Arial,Helvetica',
-
-    NODETYPE_ELEMENT: 1,
-
-    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
-    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
-    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
-    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
-
-    STYLE_FILLCOLOR: 'fillColor',
-
-};
-
-
-},{"./Rectangle":11}],20:[function(require,module,exports){
-
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var utils = require('./utils');
-
-var isFunction = utils.isFunction;
-var invoke = utils.invoke;
-var keys = utils.keys;
-var each = utils.each;
-var eventSplitter = /\s+/;
-
-function Events() {}
-
-Events.prototype.on = function (events, callback, context) {
-
-    var that = this;
-
-    if (!callback) {
-        return that;
-    }
-
-    var cache = this.__events || (this.__events = {});
-
-    events = events.split(eventSplitter);
-
-    each(events, function (event) {
-        var list = cache[event] || (cache[event] = []);
-        list.push(callback, context);
-    });
-
-    return that;
-};
-
-Events.prototype.once = function (events, callback, context) {
-
-    var that = this;
-    var cb = function () {
-        that.off(events, cb);
-        callback.apply(context || that, arguments);
-    };
-
-    return that.on(events, cb, context);
-};
-
-Events.prototype.off = function (events, callback, context) {
-
-    var that = this;
-    var cache = that.__events;
-
-    // No events.
-    if (!cache) {
-        return that;
-    }
-
-    // removing *all* events.
-    if (!(events || callback || context)) {
-        delete that.__events;
-        return that;
-    }
-
-    events = events ? events.split(eventSplitter) : keys(cache);
-
-    each(events, function (event) {
-
-        var list = cache[event];
-
-        if (!list) {
-            return;
-        }
-
-        // remove all event.
-        if (!(callback || context)) {
-            delete cache[event];
-            return;
-        }
-
-        for (var i = list.length - 2; i >= 0; i -= 2) {
-            if (!(callback && list[i] !== callback ||
-                context && list[i + 1] !== context)) {
-                list.splice(i, 2);
-            }
-        }
-    });
-
-    return that;
-};
-
-Events.prototype.trigger = function (events) {
-
-    var that = this;
-    var cache = that.__events;
-
-    // No events.
-    if (!cache) {
-        return that;
-    }
-
-    events = events.split(eventSplitter);
-
-    var returned = true;
-    var args;
-
-    each(arguments, function (arg, index) {
-        if (index > 0) {
-            args[index - 1] = arg;
-        }
-    });
-
-    each(events, function (event) {
-        var all = cache['*'];
-        var list = cache[event];
-
-        // Copy callback lists to prevent modification.
-        all = all && all.slice();
-        list = list && list.slice();
-
-        // Execute event callbacks except one named '*'
-        if (event !== '*') {
-            returned = triggerEvents(list, args, this) && returned;
-        }
-
-        // Execute '*' callbacks.
-        returned = triggerEvents(all, [event].concat(args), this) && returned;
-    });
-
-    return returned;
-};
-
-Events.prototype.emit = Events.prototype.trigger;
-
-Events.mixTo = function (receiver) {
-    var proto = Events.prototype;
-
-    if (isFunction(receiver)) {
-        each(proto, function (value, key) {
-            receiver.prototype[key] = value;
-        });
-    } else {
-        var event = new Events();
-        each(proto, function (value, key) {
-            receiver[key] = function () {
-                invoke(value, arguments, event);
-            };
-        });
-    }
-};
-
-function triggerEvents(list, args, context) {
-    var ret = true;
-
-    if (list) {
-        for (var i = 0, l = list.length; i < l; i += 2) {
-            ret = invoke(list[i], args, list[i + 1] || context) !== false && ret;
-        }
-    }
-    // trigger will return false if one of the callbacks return false
-    return ret;
-}
-
-module.exports = Events;
-
-
-},{"./utils":23}],21:[function(require,module,exports){
-window.zGraph = module.exports = {
-    Canvas2D: require('./Canvas2D'),
-    Cell: require('./EventObject'),
-    CellRenderer: require('./CellRenderer'),
-    CellState: require('./CellState'),
-    Dictionary: require('./Dictionary'),
-    EventObject: require('./EventObject'),
-    Geometry: require('./Geometry'),
-    Graph: require('./Graph'),
-    Model: require('./Model'),
-    Point: require('./Point'),
-    Rectangle: require('./Rectangle'),
-    Shape: require('./Shape'),
-    View: require('./View'),
-    class: require('./class'),
-    constants: require('./constants'),
-    events: require('./events'),
-    utils: require('./utils'),
-    // changes
-    Change: require('./changes/Change'),
-    ChildChange: require('./changes/ChildChange'),
-    RootChange: require('./changes/RootChange'),
-};
-
-},{"./Canvas2D":1,"./CellRenderer":3,"./CellState":4,"./Dictionary":5,"./EventObject":6,"./Geometry":7,"./Graph":8,"./Model":9,"./Point":10,"./Rectangle":11,"./Shape":12,"./View":13,"./changes/Change":14,"./changes/ChildChange":15,"./changes/RootChange":16,"./class":17,"./constants":19,"./events":20,"./utils":23}],22:[function(require,module,exports){
-arguments[4][10][0].apply(exports,arguments)
-},{"./class":17,"dup":10}],23:[function(require,module,exports){
+},{"./utils":18}],18:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global window */
 
@@ -3537,6 +3282,7 @@ function hasKey(obj, key) {
 }
 
 function clone(obj) {
+    // FIXME:
     return JSON.parse(JSON.stringify(obj));
 }
 
@@ -3553,10 +3299,22 @@ utils.keys = Object.keys || function (obj) {
             }
         }
 
-        // FIXME: ie < 9
+        // ie < 9 不考虑
     };
+
 utils.hasKey = hasKey;
 utils.clone = clone;
+
+utils.extend = function (dist) {
+    each(slice.call(arguments, 1), function (source) {
+        if (source) {
+            for (var prop in source) {
+                dist[prop] = source[prop];
+            }
+        }
+    });
+    return dist;
+};
 
 // Array
 // -----
@@ -3574,7 +3332,7 @@ utils.indexOf = arrProto.indexOf ?
         return -1;
     };
 
-utils.each = function (list, iteratee, context) {
+var each = utils.each = function (list, iteratee, context) {
     var i;
 
     if (isArrayLike(list)) {
@@ -3678,4 +3436,266 @@ utils.toRadians = function (deg) {
 module.exports = utils;
 
 
-},{}]},{},[21]);
+},{}],19:[function(require,module,exports){
+var Rectangle = require('./Rectangle');
+
+module.exports = {
+
+    NONE: 'none',
+    NS_SVG: 'http://www.w3.org/2000/svg',
+
+    EVENT_SPLITTER: /\s+/,
+    OBJECT_ID: 'objectId',
+
+    SHADOW_COLOR: 'gray',
+    SHADOW_OFFSET_X: 2,
+    SHADOW_OFFSET_Y: 3,
+    SHADOW_OPACITY: 1,
+
+    DEFAULT_FONT_SIZE: 11,
+    DEFAULT_FONT_FAMILY: 'Arial,Helvetica',
+
+    NODETYPE_ELEMENT: 1,
+
+    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
+    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
+    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
+    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
+
+    STYLE_FILLCOLOR: 'fillColor',
+
+};
+
+
+},{"./Rectangle":9}],20:[function(require,module,exports){
+var utils = require('../common/utils');
+var Class = require('../common/class');
+var EventObject = require('./EventObject');
+
+var keys = utils.keys;
+var each = utils.each;
+// TODO: constants
+var eventSplitter = /\s+/;
+
+
+module.exports = Class.create({
+
+    eventListeners: null,
+    eventEnabled: true,
+    eventSource: null,
+
+    constructor: function Events() {},
+
+    isEventEnabled: function () {
+        return this.eventEnabled;
+    },
+
+    setIsEventEnabled: function (enabled) {
+        var that = this;
+        that.eventEnabled = enabled;
+        return that;
+    },
+
+    enableEvent: function () {
+        return this.setIsEventEnabled(true);
+    },
+
+    disableEvent: function () {
+        return this.setIsEventEnabled(false);
+    },
+
+    getEventSource: function () {
+        return this.eventSource;
+    },
+
+    setEventSource: function (value) {
+        var that = this;
+        that.eventSource = value;
+        return that;
+    },
+
+    on: function (events, callback, context) {
+
+        var that = this;
+
+        if (!callback) {
+            return that;
+        }
+
+        var listeners = that.eventListeners || (that.eventListeners = {});
+
+        events = events.split(eventSplitter);
+
+        each(events, function (event) {
+            var list = listeners[event] || (listeners[event] = []);
+            list.push(callback, context);
+        });
+
+        return that;
+    },
+
+    once: function (events, callback, context) {
+
+        var that = this;
+        var cb = function () {
+            that.off(events, cb);
+            callback.apply(context || that, arguments);
+        };
+
+        return that.on(events, cb, context);
+    },
+
+    off: function (events, callback, context) {
+
+        var that = this;
+        var listeners = that.eventListeners;
+
+        // No events.
+        if (!listeners) {
+            return that;
+        }
+
+        // removing *all* events.
+        if (!(events || callback || context)) {
+            delete that.eventListeners;
+            return that;
+        }
+
+        events = events ? events.split(eventSplitter) : keys(listeners);
+
+        each(events, function (event) {
+
+            var list = listeners[event];
+
+            if (!list) {
+                return;
+            }
+
+            // remove all event.
+            if (!(callback || context)) {
+                delete listeners[event];
+                return;
+            }
+
+            for (var i = list.length - 2; i >= 0; i -= 2) {
+                if (!(callback && list[i] !== callback ||
+                    context && list[i + 1] !== context)) {
+                    list.splice(i, 2);
+                }
+            }
+        });
+
+        return that;
+    },
+
+    emit: function (eventObj, sender) {
+        var that = this;
+        var returned = [];
+        var listeners = that.eventListeners;
+
+        // No events.
+        if (!listeners || !that.isEventEnabled()) {
+            return returned;
+        }
+
+        eventObj = eventObj || new EventObject();
+
+        var eventName = eventObj.getName();
+
+        if (!eventName) {
+            return returned;
+        }
+
+        // fix sender
+        sender = sender || that.getEventSource();
+        sender = sender || that;
+
+
+        var list = listeners[eventName];
+        var length = list ? list.length : 0;
+        var ret;
+
+        for (var i = 0; i < length; i += 2) {
+            ret = list[i].call(list[i + 1] || that, eventObj, sender);
+            if (length > 2) {
+                returned.push(ret); // result as array
+            } else {
+                returned = ret;
+            }
+        }
+
+        return returned;
+    }
+});
+
+},{"../common/class":16,"../common/utils":18,"./EventObject":21}],21:[function(require,module,exports){
+var Class = require('../common/class');
+var utils = require('../common/utils');
+
+var isObject = utils.isObject;
+var extend = utils.extend;
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Class.create({
+    constructor: function EventObject(name, eventData) {
+        var evtObj = this;
+        var data = evtObj.data = {};
+
+        evtObj.name = name;
+        evtObj.consumed = false;
+
+        isObject(eventData) && extend(data, eventData);
+    },
+
+    getName: function () {
+        return this.name;
+    },
+
+    addData: function (key, value) {
+
+        var evtObj = this;
+        var data = evtObj.data;
+
+        if (isObject(key)) {
+            extend(data, key);
+        } else {
+            data[key] = value;
+        }
+
+        return evtObj;
+    },
+
+    getData: function (key) {
+        var data = this.data;
+        return isNullOrUndefined(key) ? data : data[key];
+    },
+
+    isConsumed: function () {
+        return this.consumed;
+    },
+
+    consume: function () {
+        this.consumed = true;
+    }
+});
+
+},{"../common/class":16,"../common/utils":18}],22:[function(require,module,exports){
+window.zGraph = module.exports = {
+    Canvas2D: require('./Canvas2D'),
+    Cell: require('./Cell'),
+    CellRenderer: require('./CellRenderer'),
+    CellState: require('./CellState'),
+    EventObject: require('./events/EventObject'),
+    Geometry: require('./Geometry'),
+    Graph: require('./Graph'),
+    Model: require('./Model'),
+    Point: require('./Point'),
+    Rectangle: require('./Rectangle'),
+    Shape: require('./Shape'),
+    View: require('./View'),
+    constants: require('./constants')
+};
+
+},{"./Canvas2D":1,"./Cell":2,"./CellRenderer":3,"./CellState":4,"./Geometry":5,"./Graph":6,"./Model":7,"./Point":8,"./Rectangle":9,"./Shape":10,"./View":11,"./constants":19,"./events/EventObject":21}],23:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"./common/class":16,"dup":8}]},{},[22]);

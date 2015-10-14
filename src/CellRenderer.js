@@ -1,6 +1,6 @@
 'use strict';
 
-var Class = require('./class');
+var Class = require('./common/class');
 
 var CellRenderer = Class.create({
     // 静态属性和方法

@@ -3,19 +3,19 @@
 
 'use strict';
 
-var Class = require('./class');
+var Class = require('./common/class');
+var utils = require('./common/utils');
+var Event = require('./events/Event');
+var Dictionary = require('./common/Dictionary');
 var constants = require('./constants');
-var Events = require('./events');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');
-var Dictionary = require('./Dictionary');
-var utils = require('./utils');
 
 var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
-    Implements: Events,
+    Implements: Event,
     constructor: function View(graph) {
 
         var view = this;

@@ -1,9 +1,10 @@
-
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 
 var Change = require('./Change');
-var utils = require('../utils');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Change.extend({
 
@@ -54,7 +55,7 @@ module.exports = Change.extend({
         var change = this;
         var model = change.model;
 
-        isConnect = utils.isNullOrUndefined(isConnect) ? true : isConnect;
+        isConnect = isNullOrUndefined(isConnect) ? true : isConnect;
 
         var source = cell.getTerminal(true);
         var target = cell.getTerminal(false);

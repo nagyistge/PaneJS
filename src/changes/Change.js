@@ -1,6 +1,6 @@
 'use strict';
 
-var Class = require('../class');
+var Class = require('../common/class');
 
 module.exports = Class.create({
 

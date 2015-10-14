@@ -1,9 +1,9 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
-var Class = require('./class');
+var Class = require('./common/class');
+var utils = require('./common/utils');
 var constants = require('./constants');
-var utils = require('./utils');
 
 
 var each = utils.each;

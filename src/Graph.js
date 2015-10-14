@@ -1,16 +1,16 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Class = require('./class');
+var Class = require('./common/class');
+var utils = require('./common/utils');
+var Event = require('./events/Event');
 var constants = require('./constants');
 var View = require('./View');
 var Model = require('./Model');
-var Events = require('./events');
-var utils = require('./utils');
 
 var isNUllOrUndefined = utils.isNUllOrUndefined;
 
 module.exports = Class.create({
-    Implements: Events,
+    Implements: Event,
     constructor: function Graph(container, model/*, stylesheet*/) {
 
         var graph = this;

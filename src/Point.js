@@ -1,6 +1,6 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-var Klass = require('./class');
+var Klass = require('./common/class');
 
 var Point = Klass.create({
 

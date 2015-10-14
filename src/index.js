@@ -1,10 +1,9 @@
 window.zGraph = module.exports = {
     Canvas2D: require('./Canvas2D'),
-    Cell: require('./EventObject'),
+    Cell: require('./Cell'),
     CellRenderer: require('./CellRenderer'),
     CellState: require('./CellState'),
-    Dictionary: require('./Dictionary'),
-    EventObject: require('./EventObject'),
+    EventObject: require('./events/EventObject'),
     Geometry: require('./Geometry'),
     Graph: require('./Graph'),
     Model: require('./Model'),
@@ -12,12 +11,5 @@ window.zGraph = module.exports = {
     Rectangle: require('./Rectangle'),
     Shape: require('./Shape'),
     View: require('./View'),
-    class: require('./class'),
-    constants: require('./constants'),
-    events: require('./events'),
-    utils: require('./utils'),
-    // changes
-    Change: require('./changes/Change'),
-    ChildChange: require('./changes/ChildChange'),
-    RootChange: require('./changes/RootChange'),
+    constants: require('./constants')
 };

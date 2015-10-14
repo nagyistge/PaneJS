@@ -5,10 +5,10 @@
 
 var utils = require('./utils');
 
+var each = utils.each;
+var hasKey = utils.hasKey;
 var isArray = utils.isArray;
 var isFunction = utils.isFunction;
-var hasKey = utils.hasKey;
-var each = utils.each;
 
 function Class(o) {
     // Convert existed function to Class.

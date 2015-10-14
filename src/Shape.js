@@ -1,8 +1,8 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
-var Klass = require('./class');
-var utils = require('./utils');
+var Klass = require('./common/class');
+var utils = require('./common/utils');
 var constants = require('./constants');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');

@@ -1,5 +1,5 @@
-var Class = require('./class');
-var utils = require('./utils');
+var Class = require('../common/class');
+var utils = require('../common/utils');
 
 var isObject = utils.isObject;
 var extend = utils.extend;
