@@ -556,7 +556,7 @@ each([
 
 module.exports = Class.create(proto);
 
-},{"./common/class":16,"./common/utils":18,"./constants":19}],2:[function(require,module,exports){
+},{"./common/class":17,"./common/utils":19,"./constants":20}],2:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 /*jshint -W030 */
@@ -859,7 +859,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./common/class":16,"./common/utils":18,"./constants":19}],3:[function(require,module,exports){
+},{"./common/class":17,"./common/utils":19,"./constants":20}],3:[function(require,module,exports){
 'use strict';
 
 var Class = require('./common/class');
@@ -895,7 +895,7 @@ var CellRenderer = Class.create({
 
 });
 
-},{"./common/class":16}],4:[function(require,module,exports){
+},{"./common/class":17}],4:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
@@ -1042,30 +1042,12 @@ var Event = require('./events/Event');
 var constants = require('./constants');
 var View = require('./View');
 var Model = require('./Model');
+var CellRenderer = require('./CellRenderer');
 
 var isNUllOrUndefined = utils.isNUllOrUndefined;
 
 module.exports = Class.create({
     Implements: Event,
-    constructor: function Graph(container, model, stylesheet) {
-
-        var graph = this;
-
-        graph.mouseListeners = null;
-        graph.model = model ? model : graph.createModel();
-        graph.multiplicities = [];
-        graph.imageBundles = [];
-        //graph.cellRenderer = graph.createCellRenderer();
-        //graph.setSelectionModel(graph.createSelectionModel());
-        //graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
-        graph.view = graph.createView();
-
-        if (container) {
-            graph.init(container);
-        }
-
-        graph.view.revalidate();
-    },
 
     EMPTY_ARRAY: [],
     mouseListeners: null,
@@ -1184,6 +1166,30 @@ module.exports = Class.create({
     containsValidationErrorsResource: null,
     collapseExpandResource: null,
 
+    constructor: function Graph(container, model, stylesheet) {
+
+        var graph = this;
+
+        graph.mouseListeners = null;
+        graph.model = model ? model : new Model();
+        graph.multiplicities = [];
+        graph.imageBundles = [];
+        graph.cellRenderer = graph.createCellRenderer();
+        graph.setSelectionModel(graph.createSelectionModel());
+        graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
+        graph.view = graph.createView();
+
+        graph.model.on('change', function (sender, evt) {
+            graph.graphModelChanged(evt.getData('edit').changes);
+        });
+
+        if (container) {
+            graph.init(container);
+        }
+
+        graph.view.revalidate();
+    },
+
     init: function (container) {
 
         var graph = this;
@@ -1191,7 +1197,7 @@ module.exports = Class.create({
         graph.container = container;
 
         // Initializes the in-place editor
-        //this.cellEditor = this.createCellEditor();
+        this.cellEditor = this.createCellEditor();
 
         // Initializes the container using the view
         graph.view.init();
@@ -1207,29 +1213,147 @@ module.exports = Class.create({
         //}));
     },
 
-    createModel: function () {
-        return new Model();
-    },
 
+    createHandlers: function () {},
+    //
+    //
+    createSelectionModel: function () {},
+    createStylesheet: function () {},
     createView: function () {
         return new View(this);
     },
-
+    createCellRenderer: function () {
+        return new CellRenderer();
+    },
+    createCellEditor: function () {},
     getModel: function () {
         return this.model;
     },
-
     getView: function () {
         return this.view;
     },
 
+    getStylesheet: function () {
+        return this.stylesheet;
+    },
+    setStylesheet: function (stylesheet) {
+        this.stylesheet = stylesheet;
+    },
+    getSelectionModel: function () {
+        return this.selectionModel;
+    },
+    setSelectionModel: function (selectionModel) {
+        this.selectionModel = selectionModel;
+    },
+    getSelectionCellsForChanges: function () {},
+    graphModelChanged: function (changes) {
+        for (var i = 0; i < changes.length; i++) {
+            this.processChange(changes[i]);
+        }
 
+        this.removeSelectionCells(this.getRemovedCellsForChanges(changes));
+
+        this.view.validate();
+        this.sizeDidChange();
+    },
+    processChange: function (change) {},
+    getRemovedCellsForChanges: function () {},
+    removeStateForCell: function (cell) {
+        var childCount = this.model.getChildCount(cell);
+
+        for (var i = 0; i < childCount; i++) {
+            this.removeStateForCell(this.model.getChildAt(cell, i));
+        }
+
+        this.view.invalidate(cell, false, true);
+        this.view.removeState(cell);
+    },
+
+
+    // Overlays
+    // ---------
+    addCellOverlay: function (cell, overlay) {},
+    getCellOverlays: function (cell) {
+        return cell.overlays;
+    },
+    removeCellOverlay: function (cell, overlay) {},
+    removeCellOverlays: function (cell) {},
+    clearCellOverlays: function (cell) {},
+    setCellWarning: function () {},
+
+
+    // In-place editing
+    // ----------------
+    startEditing: function (evt) {},
+    startEditingAtCell: function (cell, evt) {},
+    getEditingValue: function (cell, evt) {},
+    stopEditing: function (cancel) {},
+    labelChanged: function (cell, value, evt) {},
+    cellLabelChanged: function (cell, value, autoSize) {},
+
+
+    // Event processing
+    // ----------------
+    escape: function (evt) {},
+    click: function (me) {},
+    dblClick: function (evt, cell) {},
+    tapAndHold: function (me) {},
+
+    scrollPointToVisible: function (x, y, extend, border) {},
+    createPanningManager: function () {},
+    getBorderSizes: function () {},
+    getPreferredPageSize: function (bounds, width, height) {},
+    sizeDidChange: function () {},
+    doResizeContainer: function (width, height) {},
+    updatePageBreaks: function (visible, width, height) {},
+
+
+    // Cell styles
+    // -----------
+    getCellStyle: function (cell) {},
+    postProcessCellStyle: function (style) {},
+    setCellStyle: function (style, cells) {},
+    setCellStyles: function (key, value, cells) {},
+    toggleCellStyle: function (key, defaultValue, cell) {},
+    toggleCellStyles: function (key, defaultValue, cells) {},
+    toggleCellStyleFlags: function (key, flag, cells) {},
+    setCellStyleFlags: function (key, flag, value, cells) {},
+
+
+    // Cell alignment and orientation
+    // ------------------------------
+    alignCells: function (align, cells, param) {},
+    flipEdge: function (edge) {},
+    addImageBundle: function (bundle) {},
+    removeImageBundle: function (bundle) {},
+    getImageFromBundles: function (key) {},
+
+
+    // Order
+    // -----
+    orderCells: function (back, cells) {},
+    cellsOrdered: function (cells, back) {},
+
+
+    // Grouping
+    // --------
+    groupCells: function (group, border, cells) {},
+    getCellsForGroup: function (cells) {},
+    getBoundsForGroup: function (group, children, border) {},
+    createGroupCell: function (cells) {},
+    ungroupCells: function (cells) {},
+    removeCellsFromParent: function (cells) {},
+    updateGroupBounds: function (cells, border, moveGroup, topBorder, rightBorder, bottomBorder, leftBorder) {},
+
+
+    // Cell cloning, insertion and removal
+    // -----------------------------------
+    cloneCells: function (cells, allowInvalidEdges) {},
     insertVertex: function (parent, id, value, x, y, width, height, style, relative) {
         var graph = this;
         var vertex = graph.createVertex(parent, id, value, x, y, width, height, style, relative);
         return graph.addCell(vertex, parent);
     },
-
     createVertex: function (parent, id, value, x, y, width, height, style, relative) {
         var geometry = new Geometry(x, y, width, height);
         geometry.relative = !isNUllOrUndefined(relative) ? relative : false;
@@ -1242,11 +1366,9 @@ module.exports = Class.create({
 
         return vertex;
     },
-
     insertEdge: function (parent, id, value, source, target, style) {
 
     },
-
     createEdge: function (parent, id, value, source, target, style) {
         var geometry = new Geometry();
         geometry.relative = true;
@@ -1257,11 +1379,354 @@ module.exports = Class.create({
 
         return edge;
     },
+    addEdge: function (edge, parent, source, target, index) {},
+    addCell: function (cell, parent, index, source, target) {},
+    addCells: function (cells, parent, index, source, target) {},
+    cellsAdded: function (cells, parent, index, source, target, absolute, constrain) {},
+    autoSizeCell: function (cell, recurse) {},
+    removeCells: function (cells, includeEdges) {},
+    cellsRemoved: function (cells) {},
+    splitEdge: function (edge, cells, newEdge, dx, dy) {},
 
+
+    // Cell visibility
+    // ---------------
+    toggleCells: function (show, cells, includeEdges) {},
+    cellsToggled: function (cells, show) {},
+
+
+    // Folding
+    // -------
+    foldCells: function () {},
+    cellsFolded: function () {},
+    swapBounds: function () {},
+    updateAlternateBounds: function () {},
+    addAllEdges: function () {},
+    getAllEdges: function () {},
+
+
+    // Cell sizing
+    // -----------
+    updateCellSize: function () {},
+    cellSizeUpdated: function () {},
+    getPreferredSizeForCell: function () {},
+    resizeCell: function () {},
+    resizeCells: function () {},
+    cellsResized: function () {},
+    cellResized: function () {},
+    resizeChildCells: function () {},
+    constrainChildCells: function () {},
+    scaleCell: function () {},
+    extendParent: function () {},
+
+
+    // Cell moving
+    // -----------
+    importCells: function () {},
+    moveCells: function () {},
+    cellsMoved: function () {},
+    translateCell: function () {},
+    getCellContainmentArea: function () {},
+    getMaximumGraphBounds: function () {},
+    constrainChild: function () {},
+    resetEdges: function () {},
+    resetEdge: function () {},
+
+
+    // Cell connecting and connection constraints
+    // ------------------------------------------
+    getOutlineConstraint: function () {},
+    getAllConnectionConstraints: function () {},
+    getConnectionConstraint: function () {},
+    setConnectionConstraint: function () {},
+    getConnectionPoint: function () {},
+    connectCell: function () {},
+    cellConnected: function () {},
+    disconnectGraph: function () {},
+
+
+    // Drilldown
+    // ---------
+    getCurrentRoot: function () {},
+    getTranslateForRoot: function () {},
+    isPort: function () {},
+    getTerminalForPort: function () {},
+    getChildOffsetForCell: function () {},
+    enterGroup: function () {},
+    exitGroup: function () {},
+    home: function () {},
+    isValidRoot: function () {},
+
+
+    // Graph display
+    // -------------
+    getGraphBounds: function () {},
+    getCellBounds: function () {},
+    getBoundingBoxFromGeometry: function () {},
+    refresh: function () {},
+    snap: function () {},
+    panGraph: function () {},
+    zoomIn: function () {},
+    zoomOut: function () {},
+    zoomActual: function () {},
+    zoomTo: function () {},
+    center: function () {},
+    zoom: function () {},
+    zoomToRect: function () {},
+    fit: function () {},
+    scrollCellToVisible: function () {},
+    scrollRectToVisible: function () {},
+    getCellGeometry: function () {},
+    isCellVisible: function (cell) {
+        return this.model.isVisible(cell);
+    },
+    isCellCollapsed: function () {},
+    isCellConnectable: function () {},
+    isOrthogonal: function () {},
+    isLoop: function () {},
+    isCloneEvent: function () {},
+    isToggleEvent: function () {},
+    isGridEnabledEvent: function () {},
+    isConstrainedEvent: function () {},
+
+
+    // Validation
+    // ----------
+
+    validationAlert: function () {},
+    isEdgeValid: function () {},
+    getEdgeValidationError: function () {},
+    validateEdge: function () {},
+    validateGraph: function () {},
+    getCellValidationError: function () {},
+    validateCell: function () {},
+
+
+    // Graph appearance
+    // ----------------
+    getBackgroundImage: function () {},
+    setBackgroundImage: function () {},
+    getFoldingImage: function () {},
+    convertValueToString: function () {},
+    getLabel: function () {},
+    isHtmlLabel: function () {},
+    isHtmlLabels: function () {},
+    setHtmlLabels: function () {},
+    isWrapping: function () {},
+    isLabelClipped: function () {},
+    getTooltip: function () {},
+    getTooltipForCell: function () {},
+    getCursorForMouseEvent: function () {},
+    getCursorForCell: function () {},
+    getStartSize: function () {},
+    getImage: function () {},
+    getVerticalAlign: function () {},
+    getIndicatorColor: function () {},
+    getIndicatorGradientColor: function () {},
+    getIndicatorShape: function () {},
+    getIndicatorImage: function () {},
+    getBorder: function () {},
+    setBorder: function () {},
+    isSwimlane: function () {},
+
+
+    // Graph behaviour
+    // ---------------
+    isResizeContainer: function () {},
+    setResizeContainer: function () {},
+    isEnabled: function () {},
+    setEnabled: function () {},
+    isEscapeEnabled: function () {},
+    setEscapeEnabled: function () {},
+    isInvokesStopCellEditing: function () {},
+    setInvokesStopCellEditing: function () {},
+    isEnterStopsCellEditing: function () {},
+    setEnterStopsCellEditing: function () {},
+    isCellLocked: function () {},
+    isCellsLocked: function () {},
+    setCellsLocked: function () {},
+    getCloneableCells: function () {},
+    isCellCloneable: function () {},
+    isCellsCloneable: function () {},
+    setCellsCloneable: function () {},
+    getExportableCells: function () {},
+    canExportCell: function () {},
+    getImportableCells: function () {},
+    canImportCell: function () {},
+    isCellSelectable: function () {},
+    isCellsSelectable: function () {},
+    setCellsSelectable: function () {},
+    getDeletableCells: function () {},
+    isCellDeletable: function () {},
+    isCellsDeletable: function () {},
+    setCellsDeletable: function () {},
+    isLabelMovable: function () {},
+    isCellRotatable: function () {},
+    getMovableCells: function () {},
+    isCellMovable: function () {},
+    isCellsMovable: function () {},
+    setCellsMovable: function () {},
+    isGridEnabled: function () {},
+    setGridEnabled: function () {},
+    isPortsEnabled: function () {},
+    setPortsEnabled: function () {},
+    getGridSize: function () {},
+    setGridSize: function () {},
+    getTolerance: function () {},
+    setTolerance: function () {},
+    isVertexLabelsMovable: function () {},
+    setVertexLabelsMovable: function () {},
+    isEdgeLabelsMovable: function () {},
+    setEdgeLabelsMovable: function () {},
+    isSwimlaneNesting: function () {},
+    setSwimlaneNesting: function () {},
+    isSwimlaneSelectionEnabled: function () {},
+    setSwimlaneSelectionEnabled: function () {},
+    isMultigraph: function () {},
+    setMultigraph: function () {},
+    isAllowLoops: function () {},
+    setAllowDanglingEdges: function () {},
+    isAllowDanglingEdges: function () {},
+    setConnectableEdges: function () {},
+    isConnectableEdges: function () {},
+    setCloneInvalidEdges: function () {},
+    isCloneInvalidEdges: function () {},
+    setAllowLoops: function () {},
+    isDisconnectOnMove: function () {},
+    setDisconnectOnMove: function () {},
+    isDropEnabled: function () {},
+    setDropEnabled: function () {},
+    isSplitEnabled: function () {},
+    setSplitEnabled: function () {},
+    isCellResizable: function () {},
+    isCellsResizable: function () {},
+    setCellsResizable: function () {},
+    isTerminalPointMovable: function () {},
+    isCellBendable: function () {},
+    isCellsBendable: function () {},
+    setCellsBendable: function () {},
+    isCellEditable: function () {},
+    isCellsEditable: function () {},
+    setCellsEditable: function () {},
+    isCellDisconnectable: function () {},
+    isCellsDisconnectable: function () {},
+    setCellsDisconnectable: function () {},
+    isValidSource: function () {},
+    isValidTarget: function () {},
+    isValidConnection: function () {},
+    setConnectable: function () {},
+    isConnectable: function () {},
+    setTooltips: function () {},
+    setPanning: function () {},
+    isEditing: function () {},
+    isAutoSizeCell: function () {},
+    isAutoSizeCells: function () {},
+    setAutoSizeCells: function () {},
+    isExtendParent: function () {},
+    isExtendParents: function () {},
+    setExtendParents: function () {},
+    isExtendParentsOnAdd: function () {},
+    setExtendParentsOnAdd: function () {},
+    isExtendParentsOnMove: function () {},
+    setExtendParentsOnMove: function () {},
+    isRecursiveResize: function () {},
+    setRecursiveResize: function () {},
+    isConstrainChild: function () {},
+    isConstrainChildren: function () {},
+    setConstrainChildren: function () {},
+    setConstrainChildrenOnResize: function () {},
+    isConstrainChildrenOnResize: function () {},
+    isAllowNegativeCoordinates: function () {},
+    setAllowNegativeCoordinates: function () {},
+    getOverlap: function () {},
+    isAllowOverlapParent: function () {},
+    getFoldableCells: function () {},
+    isCellFoldable: function () {},
+    isValidDropTarget: function () {},
+    isSplitTarget: function () {},
+    getDropTarget: function () {},
+
+
+    // Cell retrieval
+    // ---------------
+    getDefaultParent: function () {},
+    setDefaultParent: function () {},
+    getSwimlane: function () {},
+    getSwimlaneAt: function () {},
+    getCellAt: function () {},
+    intersects: function () {},
+    hitsSwimlaneContent: function () {},
+    getChildVertices: function () {},
+    getChildEdges: function () {},
+    getChildCells: function () {},
+    getConnections: function () {},
+    getIncomingEdges: function () {},
+    getOutgoingEdges: function () {},
+    getEdges: function () {},
+    isValidAncestor: function () {},
+    getOpposites: function () {},
+    getEdgesBetween: function () {},
+    getPointForEvent: function () {},
+    getCells: function () {},
+    getCellsBeyond: function () {},
+    findTreeRoots: function () {},
+    traverse: function () {},
+
+
+    // Selection
+    // ---------
+    isCellSelected: function () {},
+    isSelectionEmpty: function () {},
+    clearSelection: function () {},
+    getSelectionCount: function () {},
+    getSelectionCell: function () {},
+    getSelectionCells: function () {},
+    setSelectionCell: function () {},
+    setSelectionCells: function () {},
+    addSelectionCell: function () {},
+    addSelectionCells: function () {},
+    removeSelectionCell: function () {},
+    removeSelectionCells: function () {},
+    selectRegion: function () {},
+    selectNextCell: function () {},
+    selectPreviousCell: function () {},
+    selectParentCell: function () {},
+    selectChildCell: function () {},
+    selectCell: function () {},
+    selectAll: function () {},
+    selectVertices: function () {},
+    selectEdges: function () {},
+    selectCells: function () {},
+    selectCellForEvent: function () {},
+    selectCellsForEvent: function () {},
+
+    // Selection state
+    // ---------------
+    createHandler: function () {},
+    createVertexHandler: function () {},
+    createEdgeHandler: function () {},
+    createEdgeSegmentHandler: function () {},
+    createElbowEdgeHandler: function () {},
+
+
+    // Graph events
+    // ------------
+    addMouseListener: function () {},
+    removeMouseListener: function () {},
+    updateMouseEvent: function () {},
+    getStateForTouchEvent: function () {},
+    isEventIgnored: function () {},
+    isSyntheticEventIgnored: function () {},
+    isEventSourceIgnored: function () {},
+    fireMouseEvent: function () {},
+    consumeMouseEvent: function () {},
+    fireGestureEvent: function () {},
+
+    destroy: function () {}
 });
 
 
-},{"./Model":7,"./View":11,"./common/class":16,"./common/utils":18,"./constants":19,"./events/Event":20}],7:[function(require,module,exports){
+},{"./CellRenderer":3,"./Model":7,"./View":12,"./common/class":17,"./common/utils":19,"./constants":20,"./events/Event":21}],7:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./common/class');
@@ -1271,21 +1736,14 @@ var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
 var Cell = require('./Cell');
+var UndoableEdit = require('./UndoableEdit');
 
+var each = utils.each;
 var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
     Implements: Event,
-    constructor: function Model(root) {
-
-        var model = this;
-
-        //this.currentEdit = this.createUndoableEdit();
-
-        root ? model.setRoot(root) : model.clear();
-    },
-
     root: null,
     cells: null,
     maintainEdgeParent: true,
@@ -1296,6 +1754,15 @@ module.exports = Class.create({
     currentEdit: null,
     updateLevel: 0,
     endingUpdate: false,
+
+    constructor: function Model(root) {
+
+        var model = this;
+
+        this.currentEdit = model.createUndoableEdit();
+
+        root ? model.setRoot(root) : model.clear();
+    },
 
     clear: function () {
 
@@ -1337,7 +1804,6 @@ module.exports = Class.create({
 
         return root;
     },
-
 
     getCell: function (id) {
         var cells = this.cells;
@@ -1463,18 +1929,16 @@ module.exports = Class.create({
         }
 
         if (cell.getId()) {
-            var collision = this.getCell(cell.getId());
+            var exists = this.getCell(cell.getId());
 
-            if (collision != cell) {
-                // Creates new Id for the cell
-                // as long as there is a collision
-                while (collision != null) {
+            if (exists !== cell) {
+                // 避免 ID 冲突
+                while (exists) {
                     cell.setId(this.createId(cell));
-                    collision = this.getCell(cell.getId());
+                    exists = this.getCell(cell.getId());
                 }
 
-                // Lazily creates the cells dictionary
-                if (this.cells == null) {
+                if (!this.cells) {
                     this.cells = {};
                 }
 
@@ -1496,21 +1960,27 @@ module.exports = Class.create({
     },
 
     createId: function () {
-        var id = this.nextId;
-        this.nextId++;
+        var model = this;
+        var id = model.nextId;
 
-        return this.prefix + id + this.postfix;
+        model.nextId++;
+
+        return model.prefix + id + model.postfix;
     },
+
     updateEdgeParents: function (cell, root) {},
+
     updateEdgeParent: function (cell, root) {},
+
     getOrigin: function (cell) {
+        var model = this;
         var result = null;
 
         if (cell) {
-            result = this.getOrigin(this.getParent(cell));
+            result = model.getOrigin(model.getParent(cell));
 
-            if (!this.isEdge(cell)) {
-                var geo = this.getGeometry(cell);
+            if (!model.isEdge(cell)) {
+                var geo = model.getGeometry(cell);
 
                 if (geo) {
                     result.x += geo.x;
@@ -1528,14 +1998,18 @@ module.exports = Class.create({
     getNearestCommonAncestor: function (cell1, cell2) {},
 
     remove: function (cell) {
-        if (cell === this.root) {
-            this.setRoot(null);
-        } else if (this.getParent(cell)) {
-            this.execute(new ChildChange(this, null, cell));
+
+        var model = this;
+
+        if (cell === model.root) {
+            model.setRoot(null);
+        } else if (model.getParent(cell)) {
+            model.execute(new ChildChange(this, null, cell));
         }
 
         return cell;
     },
+
     cellRemoved: function (cell) {
         if (cell && this.cells) {
             // Recursively processes child cells
@@ -1562,6 +2036,9 @@ module.exports = Class.create({
     },
     getChildren: function (cell) {
         return cell ? cell.children : null;
+    },
+    eachChildren: function (cell, iterator) {
+        each(cell ? cell.children : [], iterator);
     },
     getChildVertices: function (parent) {
         return this.getChildCells(parent, true, false);
@@ -1682,7 +2159,7 @@ module.exports = Class.create({
 
         this.beginUpdate();
 
-        //this.currentEdit.add(change);
+        this.currentEdit.add(change);
         //this.fireEvent(new mxEventObject(mxEvent.EXECUTE, 'change', change));
         this.emit(new EventObject('execute', {change: change}));
         // New global executed event
@@ -1734,14 +2211,43 @@ module.exports = Class.create({
         }
     },
 
-    createUndoableEdit: function () {},
+    createUndoableEdit: function () {
+        var edit = new UndoableEdit(this, true);
+
+        edit.notify = function () {
+            var model = edit.source;
+
+            model.emit(new EventObject('change', {
+                edit: edit,
+                changes: edit.changes
+            }));
+            model.emit(new EventObject('notify', {
+                edit: edit,
+                changes: edit.changes
+            }));
+
+            // LATER: Remove changes property (deprecated)
+            //edit.source.fireEvent(new mxEventObject(mxEvent.CHANGE,
+            //    'edit', edit, 'changes', edit.changes));
+            //edit.source.fireEvent(new mxEventObject(mxEvent.NOTIFY,
+            //    'edit', edit, 'changes', edit.changes));
+        };
+
+        return edit;
+    },
+
     mergeChildren: function (from, to, cloneAllEdges) {},
+
     mergeChildrenImpl: function (from, to, cloneAllEdges, mapping) {},
 
     getParents: function (cell) {},
+
     cloneCell: function (cell) {},
+
     cloneCells: function (cell, includeChildren) {},
+
     cloneCellImpl: function (cell, mapping, includeChildren) {},
+
     cellCloned: function (cell) {},
 
     restoreClone: function (clone, cell, mapping) {},
@@ -1750,7 +2256,7 @@ module.exports = Class.create({
 });
 
 
-},{"./Cell":2,"./changes/ChildChange":13,"./changes/RootChange":14,"./common/class":16,"./common/utils":18,"./events/Event":20,"./events/EventObject":21}],8:[function(require,module,exports){
+},{"./Cell":2,"./UndoableEdit":11,"./changes/ChildChange":14,"./changes/RootChange":15,"./common/class":17,"./common/utils":19,"./events/Event":21,"./events/EventObject":22}],8:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Klass = require('./common/class');
@@ -1758,8 +2264,8 @@ var Klass = require('./common/class');
 var Point = Klass.create({
 
     constructor: function Point(x, y) {
-        this.x = x === null ? 0 : x;
-        this.y = y === null ? 0 : y;
+        this.x = x ? x : 0;
+        this.y = y ? y : 0;
     },
 
     equals: function (point) {
@@ -1774,32 +2280,36 @@ var Point = Klass.create({
 module.exports = Point;
 
 
-},{"./common/class":16}],9:[function(require,module,exports){
-
+},{"./common/class":17}],9:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Klass = require('./common/class');
-var Point = require('./point');
+var Point = require('./Point');
 
-var Rect = Klass.create({
+var Rectangle = Klass.create({
+
     Extends: Point,
+
     constructor: function Rectangle(x, y, width, height) {
-        //
-        Rect.superclass.constructor.call(this, x, y);
 
-        this.width = width === null ? 0 : width;
-        this.height = height === null ? 0 : height;
-    },
+        var rect = this;
 
-    fromRect: function (rect) {
-        return new Rect(rect.x, rect.y, rect.width, rect.height);
+        Rectangle.superclass.constructor.call(rect, x, y);
+
+        rect.width = width ? width : 0;
+        rect.height = height ? height : 0;
     },
 
     setRect: function (x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+
+        var rect = this;
+
+        rect.x = x;
+        rect.y = y;
+        rect.width = width;
+        rect.height = height;
+
+        return rect;
     },
 
     getCenterX: function () {
@@ -1815,54 +2325,78 @@ var Rect = Klass.create({
     },
 
     add: function (rect) {
+
         if (!rect) {
             return;
         }
 
-        var minX = Math.min(this.x, rect.x);
-        var minY = Math.min(this.y, rect.y);
-        var maxX = Math.max(this.x + this.width, rect.x + rect.width);
-        var maxY = Math.max(this.y + this.height, rect.y + rect.height);
+        var that = this;
+        var minX = Math.min(that.x, rect.x);
+        var minY = Math.min(that.y, rect.y);
+        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
+        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
 
-        this.x = minX;
-        this.y = minY;
-        this.width = maxX - minX;
-        this.height = maxY - minY;
+        that.x = minX;
+        that.y = minY;
+        that.width = maxX - minX;
+        that.height = maxY - minY;
+
+        return that;
     },
 
+
     grow: function (amount) {
-        this.x -= amount;
-        this.y -= amount;
-        this.width += 2 * amount;
-        this.height += 2 * amount;
+
+        var rect = this;
+
+        rect.x -= amount;
+        rect.y -= amount;
+        rect.width += 2 * amount;
+        rect.height += 2 * amount;
+
+        return rect;
     },
 
     rotate90: function () {
-        var t = (this.width - this.height) / 2;
-        this.x += t;
-        this.y -= t;
-        var tmp = this.width;
-        this.width = this.height;
-        this.height = tmp;
+
+        var rect = this;
+        var w = rect.width;
+        var h = rect.height;
+        var t = (w - h) / 2;
+
+        rect.x += t;
+        rect.y -= t;
+        rect.width = h;
+        rect.height = w;
+
+        return rect;
     },
 
-
     equals: function (rect) {
-        return Rect.superclass.equals.call(this, rect) &&
-            rect instanceof Rect &&
-            rect.width == this.width &&
-            rect.height == this.height;
+
+        var that = this;
+
+        return Rectangle.superclass.equals.call(that, rect) &&
+            rect instanceof Rectangle &&
+            rect.width === that.width &&
+            rect.height === that.height;
+    },
+
+    fromRect: function (rect) {
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
     },
 
     clone: function () {
-        return this.fromRect(this);
+
+        var rect = this;
+        return rect.fromRect(rect);
     }
 });
 
-module.exports = Rect;
+module.exports = Rectangle;
 
 
-},{"./common/class":16,"./point":23}],10:[function(require,module,exports){
+},{"./Point":8,"./common/class":17}],10:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
@@ -2126,7 +2660,44 @@ var Shape = Klass.create({
 
 module.exports = Shape;
 
-},{"./Canvas2D":1,"./Point":8,"./Rectangle":9,"./common/class":16,"./common/utils":18,"./constants":19}],11:[function(require,module,exports){
+},{"./Canvas2D":1,"./Point":8,"./Rectangle":9,"./common/class":17,"./common/utils":19,"./constants":20}],11:[function(require,module,exports){
+var Class = require('./common/class');
+var utils = require('./common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Class.create({
+    constructor: function UndoableEdit(source, significant) {
+
+        var that = this;
+
+        that.source = source;
+        that.changes = [];
+        that.significant = !isNullOrUndefined(significant) ? significant : true;
+        that.undone = false;
+        that.redone = false;
+
+    },
+
+    isEmpty: function () {
+        return this.changes.length === 0;
+    },
+
+    isSignificant: function () {
+        return this.significant;
+    },
+
+    add: function (change) {
+        this.changes.push(change);
+    },
+
+    notify: function () {},
+    die: function () {},
+    undo: function () {},
+    redo: function () {}
+});
+
+},{"./common/class":17,"./common/utils":19}],12:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: false */
 /* global document */
 
@@ -2760,7 +3331,7 @@ module.exports = Class.create({
 });
 
 
-},{"./Point":8,"./Rectangle":9,"./common/Dictionary":15,"./common/class":16,"./common/utils":18,"./constants":19,"./events/Event":20}],12:[function(require,module,exports){
+},{"./Point":8,"./Rectangle":9,"./common/Dictionary":16,"./common/class":17,"./common/utils":19,"./constants":20,"./events/Event":21}],13:[function(require,module,exports){
 'use strict';
 
 var Class = require('../common/class');
@@ -2775,7 +3346,7 @@ module.exports = Class.create({
 });
 
 
-},{"../common/class":16}],13:[function(require,module,exports){
+},{"../common/class":17}],14:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 
@@ -2869,7 +3440,7 @@ module.exports = Change.extend({
     }
 });
 
-},{"../common/utils":18,"./Change":12}],14:[function(require,module,exports){
+},{"../common/utils":19,"./Change":13}],15:[function(require,module,exports){
 'use strict';
 
 var Change = require('./Change');
@@ -2900,7 +3471,7 @@ module.exports = Change.extend({
 });
 
 
-},{"./Change":12}],15:[function(require,module,exports){
+},{"./Change":13}],16:[function(require,module,exports){
 'use strict';
 
 var Class = require('./class');
@@ -2986,7 +3557,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./class":16,"./objectIdentity":17,"./utils":18}],16:[function(require,module,exports){
+},{"./class":17,"./objectIdentity":18,"./utils":19}],17:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 // ref: https://github.com/aralejs/class
@@ -3143,7 +3714,7 @@ function mix(receiver, supplier, whiteList) {
 module.exports = Class;
 
 
-},{"./utils":18}],17:[function(require,module,exports){
+},{"./utils":19}],18:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global window */
 
@@ -3176,7 +3747,7 @@ exports.clear = function (obj) {
     }
 };
 
-},{"./utils":18}],18:[function(require,module,exports){
+},{"./utils":19}],19:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global window */
 
@@ -3446,7 +4017,7 @@ utils.toRadians = function (deg) {
 module.exports = utils;
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var Rectangle = require('./Rectangle');
 
 module.exports = {
@@ -3477,7 +4048,7 @@ module.exports = {
 };
 
 
-},{"./Rectangle":9}],20:[function(require,module,exports){
+},{"./Rectangle":9}],21:[function(require,module,exports){
 var utils = require('../common/utils');
 var Class = require('../common/class');
 var EventObject = require('./EventObject');
@@ -3638,7 +4209,7 @@ module.exports = Class.create({
     }
 });
 
-},{"../common/class":16,"../common/utils":18,"./EventObject":21}],21:[function(require,module,exports){
+},{"../common/class":17,"../common/utils":19,"./EventObject":22}],22:[function(require,module,exports){
 var Class = require('../common/class');
 var utils = require('../common/utils');
 
@@ -3689,7 +4260,7 @@ module.exports = Class.create({
     }
 });
 
-},{"../common/class":16,"../common/utils":18}],22:[function(require,module,exports){
+},{"../common/class":17,"../common/utils":19}],23:[function(require,module,exports){
 window.zGraph = module.exports = {
     Canvas2D: require('./Canvas2D'),
     Cell: require('./Cell'),
@@ -3706,6 +4277,4 @@ window.zGraph = module.exports = {
     constants: require('./constants')
 };
 
-},{"./Canvas2D":1,"./Cell":2,"./CellRenderer":3,"./CellState":4,"./Geometry":5,"./Graph":6,"./Model":7,"./Point":8,"./Rectangle":9,"./Shape":10,"./View":11,"./constants":19,"./events/EventObject":21}],23:[function(require,module,exports){
-arguments[4][8][0].apply(exports,arguments)
-},{"./common/class":16,"dup":8}]},{},[22]);
+},{"./Canvas2D":1,"./Cell":2,"./CellRenderer":3,"./CellState":4,"./Geometry":5,"./Graph":6,"./Model":7,"./Point":8,"./Rectangle":9,"./Shape":10,"./View":12,"./constants":20,"./events/EventObject":22}]},{},[23]);

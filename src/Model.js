@@ -7,22 +7,14 @@ var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
 var Cell = require('./Cell');
-var UndoableEdit = requires('./UndoableEdit');
+var UndoableEdit = require('./UndoableEdit');
 
+var each = utils.each;
 var isNumeric = utils.isNumeric;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
     Implements: Event,
-    constructor: function Model(root) {
-
-        var model = this;
-
-        this.currentEdit = this.createUndoableEdit();
-
-        root ? model.setRoot(root) : model.clear();
-    },
-
     root: null,
     cells: null,
     maintainEdgeParent: true,
@@ -33,6 +25,15 @@ module.exports = Class.create({
     currentEdit: null,
     updateLevel: 0,
     endingUpdate: false,
+
+    constructor: function Model(root) {
+
+        var model = this;
+
+        this.currentEdit = model.createUndoableEdit();
+
+        root ? model.setRoot(root) : model.clear();
+    },
 
     clear: function () {
 
@@ -74,7 +75,6 @@ module.exports = Class.create({
 
         return root;
     },
-
 
     getCell: function (id) {
         var cells = this.cells;
@@ -200,18 +200,16 @@ module.exports = Class.create({
         }
 
         if (cell.getId()) {
-            var collision = this.getCell(cell.getId());
+            var exists = this.getCell(cell.getId());
 
-            if (collision != cell) {
-                // Creates new Id for the cell
-                // as long as there is a collision
-                while (collision != null) {
+            if (exists !== cell) {
+                // 避免 ID 冲突
+                while (exists) {
                     cell.setId(this.createId(cell));
-                    collision = this.getCell(cell.getId());
+                    exists = this.getCell(cell.getId());
                 }
 
-                // Lazily creates the cells dictionary
-                if (this.cells == null) {
+                if (!this.cells) {
                     this.cells = {};
                 }
 
@@ -233,21 +231,27 @@ module.exports = Class.create({
     },
 
     createId: function () {
-        var id = this.nextId;
-        this.nextId++;
+        var model = this;
+        var id = model.nextId;
 
-        return this.prefix + id + this.postfix;
+        model.nextId++;
+
+        return model.prefix + id + model.postfix;
     },
+
     updateEdgeParents: function (cell, root) {},
+
     updateEdgeParent: function (cell, root) {},
+
     getOrigin: function (cell) {
+        var model = this;
         var result = null;
 
         if (cell) {
-            result = this.getOrigin(this.getParent(cell));
+            result = model.getOrigin(model.getParent(cell));
 
-            if (!this.isEdge(cell)) {
-                var geo = this.getGeometry(cell);
+            if (!model.isEdge(cell)) {
+                var geo = model.getGeometry(cell);
 
                 if (geo) {
                     result.x += geo.x;
@@ -265,14 +269,18 @@ module.exports = Class.create({
     getNearestCommonAncestor: function (cell1, cell2) {},
 
     remove: function (cell) {
-        if (cell === this.root) {
-            this.setRoot(null);
-        } else if (this.getParent(cell)) {
-            this.execute(new ChildChange(this, null, cell));
+
+        var model = this;
+
+        if (cell === model.root) {
+            model.setRoot(null);
+        } else if (model.getParent(cell)) {
+            model.execute(new ChildChange(this, null, cell));
         }
 
         return cell;
     },
+
     cellRemoved: function (cell) {
         if (cell && this.cells) {
             // Recursively processes child cells
@@ -299,6 +307,9 @@ module.exports = Class.create({
     },
     getChildren: function (cell) {
         return cell ? cell.children : null;
+    },
+    eachChildren: function (cell, iterator) {
+        each(cell ? cell.children : [], iterator);
     },
     getChildVertices: function (parent) {
         return this.getChildCells(parent, true, false);
@@ -495,13 +506,19 @@ module.exports = Class.create({
 
         return edit;
     },
+
     mergeChildren: function (from, to, cloneAllEdges) {},
+
     mergeChildrenImpl: function (from, to, cloneAllEdges, mapping) {},
 
     getParents: function (cell) {},
+
     cloneCell: function (cell) {},
+
     cloneCells: function (cell, includeChildren) {},
+
     cloneCellImpl: function (cell, mapping, includeChildren) {},
+
     cellCloned: function (cell) {},
 
     restoreClone: function (clone, cell, mapping) {},

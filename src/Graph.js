@@ -6,30 +6,12 @@ var Event = require('./events/Event');
 var constants = require('./constants');
 var View = require('./View');
 var Model = require('./Model');
+var CellRenderer = require('./CellRenderer');
 
 var isNUllOrUndefined = utils.isNUllOrUndefined;
 
 module.exports = Class.create({
     Implements: Event,
-    constructor: function Graph(container, model, stylesheet) {
-
-        var graph = this;
-
-        graph.mouseListeners = null;
-        graph.model = model ? model : graph.createModel();
-        graph.multiplicities = [];
-        graph.imageBundles = [];
-        //graph.cellRenderer = graph.createCellRenderer();
-        //graph.setSelectionModel(graph.createSelectionModel());
-        //graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
-        graph.view = graph.createView();
-
-        if (container) {
-            graph.init(container);
-        }
-
-        graph.view.revalidate();
-    },
 
     EMPTY_ARRAY: [],
     mouseListeners: null,
@@ -148,6 +130,30 @@ module.exports = Class.create({
     containsValidationErrorsResource: null,
     collapseExpandResource: null,
 
+    constructor: function Graph(container, model, stylesheet) {
+
+        var graph = this;
+
+        graph.mouseListeners = null;
+        graph.model = model ? model : new Model();
+        graph.multiplicities = [];
+        graph.imageBundles = [];
+        graph.cellRenderer = graph.createCellRenderer();
+        graph.setSelectionModel(graph.createSelectionModel());
+        graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
+        graph.view = graph.createView();
+
+        graph.model.on('change', function (sender, evt) {
+            graph.graphModelChanged(evt.getData('edit').changes);
+        });
+
+        if (container) {
+            graph.init(container);
+        }
+
+        graph.view.revalidate();
+    },
+
     init: function (container) {
 
         var graph = this;
@@ -155,7 +161,7 @@ module.exports = Class.create({
         graph.container = container;
 
         // Initializes the in-place editor
-        //this.cellEditor = this.createCellEditor();
+        this.cellEditor = this.createCellEditor();
 
         // Initializes the container using the view
         graph.view.init();
@@ -171,29 +177,147 @@ module.exports = Class.create({
         //}));
     },
 
-    createModel: function () {
-        return new Model();
-    },
 
+    createHandlers: function () {},
+    //
+    //
+    createSelectionModel: function () {},
+    createStylesheet: function () {},
     createView: function () {
         return new View(this);
     },
-
+    createCellRenderer: function () {
+        return new CellRenderer();
+    },
+    createCellEditor: function () {},
     getModel: function () {
         return this.model;
     },
-
     getView: function () {
         return this.view;
     },
 
+    getStylesheet: function () {
+        return this.stylesheet;
+    },
+    setStylesheet: function (stylesheet) {
+        this.stylesheet = stylesheet;
+    },
+    getSelectionModel: function () {
+        return this.selectionModel;
+    },
+    setSelectionModel: function (selectionModel) {
+        this.selectionModel = selectionModel;
+    },
+    getSelectionCellsForChanges: function () {},
+    graphModelChanged: function (changes) {
+        for (var i = 0; i < changes.length; i++) {
+            this.processChange(changes[i]);
+        }
 
+        this.removeSelectionCells(this.getRemovedCellsForChanges(changes));
+
+        this.view.validate();
+        this.sizeDidChange();
+    },
+    processChange: function (change) {},
+    getRemovedCellsForChanges: function () {},
+    removeStateForCell: function (cell) {
+        var childCount = this.model.getChildCount(cell);
+
+        for (var i = 0; i < childCount; i++) {
+            this.removeStateForCell(this.model.getChildAt(cell, i));
+        }
+
+        this.view.invalidate(cell, false, true);
+        this.view.removeState(cell);
+    },
+
+
+    // Overlays
+    // ---------
+    addCellOverlay: function (cell, overlay) {},
+    getCellOverlays: function (cell) {
+        return cell.overlays;
+    },
+    removeCellOverlay: function (cell, overlay) {},
+    removeCellOverlays: function (cell) {},
+    clearCellOverlays: function (cell) {},
+    setCellWarning: function () {},
+
+
+    // In-place editing
+    // ----------------
+    startEditing: function (evt) {},
+    startEditingAtCell: function (cell, evt) {},
+    getEditingValue: function (cell, evt) {},
+    stopEditing: function (cancel) {},
+    labelChanged: function (cell, value, evt) {},
+    cellLabelChanged: function (cell, value, autoSize) {},
+
+
+    // Event processing
+    // ----------------
+    escape: function (evt) {},
+    click: function (me) {},
+    dblClick: function (evt, cell) {},
+    tapAndHold: function (me) {},
+
+    scrollPointToVisible: function (x, y, extend, border) {},
+    createPanningManager: function () {},
+    getBorderSizes: function () {},
+    getPreferredPageSize: function (bounds, width, height) {},
+    sizeDidChange: function () {},
+    doResizeContainer: function (width, height) {},
+    updatePageBreaks: function (visible, width, height) {},
+
+
+    // Cell styles
+    // -----------
+    getCellStyle: function (cell) {},
+    postProcessCellStyle: function (style) {},
+    setCellStyle: function (style, cells) {},
+    setCellStyles: function (key, value, cells) {},
+    toggleCellStyle: function (key, defaultValue, cell) {},
+    toggleCellStyles: function (key, defaultValue, cells) {},
+    toggleCellStyleFlags: function (key, flag, cells) {},
+    setCellStyleFlags: function (key, flag, value, cells) {},
+
+
+    // Cell alignment and orientation
+    // ------------------------------
+    alignCells: function (align, cells, param) {},
+    flipEdge: function (edge) {},
+    addImageBundle: function (bundle) {},
+    removeImageBundle: function (bundle) {},
+    getImageFromBundles: function (key) {},
+
+
+    // Order
+    // -----
+    orderCells: function (back, cells) {},
+    cellsOrdered: function (cells, back) {},
+
+
+    // Grouping
+    // --------
+    groupCells: function (group, border, cells) {},
+    getCellsForGroup: function (cells) {},
+    getBoundsForGroup: function (group, children, border) {},
+    createGroupCell: function (cells) {},
+    ungroupCells: function (cells) {},
+    removeCellsFromParent: function (cells) {},
+    updateGroupBounds: function (cells, border, moveGroup, topBorder, rightBorder, bottomBorder, leftBorder) {},
+
+
+    // Cell cloning, insertion and removal
+    // -----------------------------------
+    cloneCells: function (cells, allowInvalidEdges) {},
     insertVertex: function (parent, id, value, x, y, width, height, style, relative) {
         var graph = this;
         var vertex = graph.createVertex(parent, id, value, x, y, width, height, style, relative);
         return graph.addCell(vertex, parent);
     },
-
     createVertex: function (parent, id, value, x, y, width, height, style, relative) {
         var geometry = new Geometry(x, y, width, height);
         geometry.relative = !isNUllOrUndefined(relative) ? relative : false;
@@ -206,11 +330,9 @@ module.exports = Class.create({
 
         return vertex;
     },
-
     insertEdge: function (parent, id, value, source, target, style) {
 
     },
-
     createEdge: function (parent, id, value, source, target, style) {
         var geometry = new Geometry();
         geometry.relative = true;
@@ -221,6 +343,349 @@ module.exports = Class.create({
 
         return edge;
     },
+    addEdge: function (edge, parent, source, target, index) {},
+    addCell: function (cell, parent, index, source, target) {},
+    addCells: function (cells, parent, index, source, target) {},
+    cellsAdded: function (cells, parent, index, source, target, absolute, constrain) {},
+    autoSizeCell: function (cell, recurse) {},
+    removeCells: function (cells, includeEdges) {},
+    cellsRemoved: function (cells) {},
+    splitEdge: function (edge, cells, newEdge, dx, dy) {},
 
+
+    // Cell visibility
+    // ---------------
+    toggleCells: function (show, cells, includeEdges) {},
+    cellsToggled: function (cells, show) {},
+
+
+    // Folding
+    // -------
+    foldCells: function () {},
+    cellsFolded: function () {},
+    swapBounds: function () {},
+    updateAlternateBounds: function () {},
+    addAllEdges: function () {},
+    getAllEdges: function () {},
+
+
+    // Cell sizing
+    // -----------
+    updateCellSize: function () {},
+    cellSizeUpdated: function () {},
+    getPreferredSizeForCell: function () {},
+    resizeCell: function () {},
+    resizeCells: function () {},
+    cellsResized: function () {},
+    cellResized: function () {},
+    resizeChildCells: function () {},
+    constrainChildCells: function () {},
+    scaleCell: function () {},
+    extendParent: function () {},
+
+
+    // Cell moving
+    // -----------
+    importCells: function () {},
+    moveCells: function () {},
+    cellsMoved: function () {},
+    translateCell: function () {},
+    getCellContainmentArea: function () {},
+    getMaximumGraphBounds: function () {},
+    constrainChild: function () {},
+    resetEdges: function () {},
+    resetEdge: function () {},
+
+
+    // Cell connecting and connection constraints
+    // ------------------------------------------
+    getOutlineConstraint: function () {},
+    getAllConnectionConstraints: function () {},
+    getConnectionConstraint: function () {},
+    setConnectionConstraint: function () {},
+    getConnectionPoint: function () {},
+    connectCell: function () {},
+    cellConnected: function () {},
+    disconnectGraph: function () {},
+
+
+    // Drilldown
+    // ---------
+    getCurrentRoot: function () {},
+    getTranslateForRoot: function () {},
+    isPort: function () {},
+    getTerminalForPort: function () {},
+    getChildOffsetForCell: function () {},
+    enterGroup: function () {},
+    exitGroup: function () {},
+    home: function () {},
+    isValidRoot: function () {},
+
+
+    // Graph display
+    // -------------
+    getGraphBounds: function () {},
+    getCellBounds: function () {},
+    getBoundingBoxFromGeometry: function () {},
+    refresh: function () {},
+    snap: function () {},
+    panGraph: function () {},
+    zoomIn: function () {},
+    zoomOut: function () {},
+    zoomActual: function () {},
+    zoomTo: function () {},
+    center: function () {},
+    zoom: function () {},
+    zoomToRect: function () {},
+    fit: function () {},
+    scrollCellToVisible: function () {},
+    scrollRectToVisible: function () {},
+    getCellGeometry: function () {},
+    isCellVisible: function (cell) {
+        return this.model.isVisible(cell);
+    },
+    isCellCollapsed: function () {},
+    isCellConnectable: function () {},
+    isOrthogonal: function () {},
+    isLoop: function () {},
+    isCloneEvent: function () {},
+    isToggleEvent: function () {},
+    isGridEnabledEvent: function () {},
+    isConstrainedEvent: function () {},
+
+
+    // Validation
+    // ----------
+
+    validationAlert: function () {},
+    isEdgeValid: function () {},
+    getEdgeValidationError: function () {},
+    validateEdge: function () {},
+    validateGraph: function () {},
+    getCellValidationError: function () {},
+    validateCell: function () {},
+
+
+    // Graph appearance
+    // ----------------
+    getBackgroundImage: function () {},
+    setBackgroundImage: function () {},
+    getFoldingImage: function () {},
+    convertValueToString: function () {},
+    getLabel: function () {},
+    isHtmlLabel: function () {},
+    isHtmlLabels: function () {},
+    setHtmlLabels: function () {},
+    isWrapping: function () {},
+    isLabelClipped: function () {},
+    getTooltip: function () {},
+    getTooltipForCell: function () {},
+    getCursorForMouseEvent: function () {},
+    getCursorForCell: function () {},
+    getStartSize: function () {},
+    getImage: function () {},
+    getVerticalAlign: function () {},
+    getIndicatorColor: function () {},
+    getIndicatorGradientColor: function () {},
+    getIndicatorShape: function () {},
+    getIndicatorImage: function () {},
+    getBorder: function () {},
+    setBorder: function () {},
+    isSwimlane: function () {},
+
+
+    // Graph behaviour
+    // ---------------
+    isResizeContainer: function () {},
+    setResizeContainer: function () {},
+    isEnabled: function () {},
+    setEnabled: function () {},
+    isEscapeEnabled: function () {},
+    setEscapeEnabled: function () {},
+    isInvokesStopCellEditing: function () {},
+    setInvokesStopCellEditing: function () {},
+    isEnterStopsCellEditing: function () {},
+    setEnterStopsCellEditing: function () {},
+    isCellLocked: function () {},
+    isCellsLocked: function () {},
+    setCellsLocked: function () {},
+    getCloneableCells: function () {},
+    isCellCloneable: function () {},
+    isCellsCloneable: function () {},
+    setCellsCloneable: function () {},
+    getExportableCells: function () {},
+    canExportCell: function () {},
+    getImportableCells: function () {},
+    canImportCell: function () {},
+    isCellSelectable: function () {},
+    isCellsSelectable: function () {},
+    setCellsSelectable: function () {},
+    getDeletableCells: function () {},
+    isCellDeletable: function () {},
+    isCellsDeletable: function () {},
+    setCellsDeletable: function () {},
+    isLabelMovable: function () {},
+    isCellRotatable: function () {},
+    getMovableCells: function () {},
+    isCellMovable: function () {},
+    isCellsMovable: function () {},
+    setCellsMovable: function () {},
+    isGridEnabled: function () {},
+    setGridEnabled: function () {},
+    isPortsEnabled: function () {},
+    setPortsEnabled: function () {},
+    getGridSize: function () {},
+    setGridSize: function () {},
+    getTolerance: function () {},
+    setTolerance: function () {},
+    isVertexLabelsMovable: function () {},
+    setVertexLabelsMovable: function () {},
+    isEdgeLabelsMovable: function () {},
+    setEdgeLabelsMovable: function () {},
+    isSwimlaneNesting: function () {},
+    setSwimlaneNesting: function () {},
+    isSwimlaneSelectionEnabled: function () {},
+    setSwimlaneSelectionEnabled: function () {},
+    isMultigraph: function () {},
+    setMultigraph: function () {},
+    isAllowLoops: function () {},
+    setAllowDanglingEdges: function () {},
+    isAllowDanglingEdges: function () {},
+    setConnectableEdges: function () {},
+    isConnectableEdges: function () {},
+    setCloneInvalidEdges: function () {},
+    isCloneInvalidEdges: function () {},
+    setAllowLoops: function () {},
+    isDisconnectOnMove: function () {},
+    setDisconnectOnMove: function () {},
+    isDropEnabled: function () {},
+    setDropEnabled: function () {},
+    isSplitEnabled: function () {},
+    setSplitEnabled: function () {},
+    isCellResizable: function () {},
+    isCellsResizable: function () {},
+    setCellsResizable: function () {},
+    isTerminalPointMovable: function () {},
+    isCellBendable: function () {},
+    isCellsBendable: function () {},
+    setCellsBendable: function () {},
+    isCellEditable: function () {},
+    isCellsEditable: function () {},
+    setCellsEditable: function () {},
+    isCellDisconnectable: function () {},
+    isCellsDisconnectable: function () {},
+    setCellsDisconnectable: function () {},
+    isValidSource: function () {},
+    isValidTarget: function () {},
+    isValidConnection: function () {},
+    setConnectable: function () {},
+    isConnectable: function () {},
+    setTooltips: function () {},
+    setPanning: function () {},
+    isEditing: function () {},
+    isAutoSizeCell: function () {},
+    isAutoSizeCells: function () {},
+    setAutoSizeCells: function () {},
+    isExtendParent: function () {},
+    isExtendParents: function () {},
+    setExtendParents: function () {},
+    isExtendParentsOnAdd: function () {},
+    setExtendParentsOnAdd: function () {},
+    isExtendParentsOnMove: function () {},
+    setExtendParentsOnMove: function () {},
+    isRecursiveResize: function () {},
+    setRecursiveResize: function () {},
+    isConstrainChild: function () {},
+    isConstrainChildren: function () {},
+    setConstrainChildren: function () {},
+    setConstrainChildrenOnResize: function () {},
+    isConstrainChildrenOnResize: function () {},
+    isAllowNegativeCoordinates: function () {},
+    setAllowNegativeCoordinates: function () {},
+    getOverlap: function () {},
+    isAllowOverlapParent: function () {},
+    getFoldableCells: function () {},
+    isCellFoldable: function () {},
+    isValidDropTarget: function () {},
+    isSplitTarget: function () {},
+    getDropTarget: function () {},
+
+
+    // Cell retrieval
+    // ---------------
+    getDefaultParent: function () {},
+    setDefaultParent: function () {},
+    getSwimlane: function () {},
+    getSwimlaneAt: function () {},
+    getCellAt: function () {},
+    intersects: function () {},
+    hitsSwimlaneContent: function () {},
+    getChildVertices: function () {},
+    getChildEdges: function () {},
+    getChildCells: function () {},
+    getConnections: function () {},
+    getIncomingEdges: function () {},
+    getOutgoingEdges: function () {},
+    getEdges: function () {},
+    isValidAncestor: function () {},
+    getOpposites: function () {},
+    getEdgesBetween: function () {},
+    getPointForEvent: function () {},
+    getCells: function () {},
+    getCellsBeyond: function () {},
+    findTreeRoots: function () {},
+    traverse: function () {},
+
+
+    // Selection
+    // ---------
+    isCellSelected: function () {},
+    isSelectionEmpty: function () {},
+    clearSelection: function () {},
+    getSelectionCount: function () {},
+    getSelectionCell: function () {},
+    getSelectionCells: function () {},
+    setSelectionCell: function () {},
+    setSelectionCells: function () {},
+    addSelectionCell: function () {},
+    addSelectionCells: function () {},
+    removeSelectionCell: function () {},
+    removeSelectionCells: function () {},
+    selectRegion: function () {},
+    selectNextCell: function () {},
+    selectPreviousCell: function () {},
+    selectParentCell: function () {},
+    selectChildCell: function () {},
+    selectCell: function () {},
+    selectAll: function () {},
+    selectVertices: function () {},
+    selectEdges: function () {},
+    selectCells: function () {},
+    selectCellForEvent: function () {},
+    selectCellsForEvent: function () {},
+
+    // Selection state
+    // ---------------
+    createHandler: function () {},
+    createVertexHandler: function () {},
+    createEdgeHandler: function () {},
+    createEdgeSegmentHandler: function () {},
+    createElbowEdgeHandler: function () {},
+
+
+    // Graph events
+    // ------------
+    addMouseListener: function () {},
+    removeMouseListener: function () {},
+    updateMouseEvent: function () {},
+    getStateForTouchEvent: function () {},
+    isEventIgnored: function () {},
+    isSyntheticEventIgnored: function () {},
+    isEventSourceIgnored: function () {},
+    fireMouseEvent: function () {},
+    consumeMouseEvent: function () {},
+    fireGestureEvent: function () {},
+
+    destroy: function () {}
 });
 

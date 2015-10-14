@@ -16,8 +16,18 @@
 
         console.log(zGraph);
 
-        var Graph = zGraph.Graph;
-        var graph = new Graph(container);
+        var graph = new zGraph.Graph(container);
+        var parent = graph.getDefaultParent();
+
+        graph.getModel().beginUpdate();
+
+        try {
+            var v1 = graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
+        }
+        finally {
+            graph.getModel().endUpdate();
+        }
+
     };
 </script>
 </body>
