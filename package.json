@@ -4,7 +4,14 @@
   "description": "JavaScript diagramming library",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "browserify  src/index.js > dist/index.js",
+    "test": "browserify spec/index.spec.js > spec/index.js "
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "^11.2.0",
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3"
   },
   "repository": {
     "type": "git",
@@ -15,7 +22,10 @@
     "BPMN",
     "UML"
   ],
-  "author": "",
+  "author": {
+    "description": "team of PaneJS",
+    "url": "https://github.com/orgs/PaneJS/teams"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PaneJS/PaneJS/issues"
