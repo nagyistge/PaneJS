@@ -4,7 +4,8 @@
   "description": "JavaScript diagramming library",
   "main": "index.js",
   "scripts": {
-    "compile": "browserify  src/index.js > dist/index.js",
+    "compile": "browserify  src/index.js > dist/all.js & node bin/2amd-build.js & node bin/2amd-dist.js",
+    "release": "uglifyjs dist/all.js > dist/all.min.js & uglifyjs dist/all.amd.js > dist/all.amd.min.js",
     "test": "browserify spec/index.spec.js > spec/index.js "
   },
   "dependencies": {},

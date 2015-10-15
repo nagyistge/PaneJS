@@ -6,6 +6,8 @@ install:
 	npm install
 compile:
 	npm run-script compile
+release:
+	npm run-script release
 test:
 	#make server
 	npm test

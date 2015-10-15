@@ -53,7 +53,5 @@ arrayUtils.each(packingModules, function(module) {
     result += content;
 });
 
-console.log(result);
-
 fsExtraPromise.writeFileSync('./dist/all.amd.js', result);
 
