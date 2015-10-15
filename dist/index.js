@@ -864,7 +864,7 @@ module.exports = Class.create({
 
 var Class = require('./common/class');
 
-var CellRenderer = Class.create({
+module.exports = Class.create({
     // 静态属性和方法
     Statics: {
         shapes: {},
@@ -872,7 +872,6 @@ var CellRenderer = Class.create({
             CellRenderer.shapes[key] = shape;
         }
     },
-    constructor: function CellRenderer() {},
 
     defaultEdgeShape: null,
     defaultVertexShape: null,
@@ -881,19 +880,22 @@ var CellRenderer = Class.create({
     legacySpacing: true,
     antiAlias: true,
 
+    constructor: function CellRenderer() {},
+
     createShape: function (state) {
 
     },
 
     getShape: function (name) {
-        return CellRenderer.shapes[name];
+        return this.constructor.shapes[name];
     },
 
     getShapeConstructor: function (state) {
 
     }
-
 });
+
+
 
 },{"./common/class":17}],4:[function(require,module,exports){
 
@@ -1039,12 +1041,18 @@ module.exports = Rectangle.extend({
 var Class = require('./common/class');
 var utils = require('./common/utils');
 var Event = require('./events/Event');
+var EventObject = require('./events/EventObject');
 var constants = require('./constants');
 var View = require('./View');
 var Model = require('./Model');
+var Cell = require('./Cell');
+var Geometry = require('./Geometry');
+var Point = require('./Point');
 var CellRenderer = require('./CellRenderer');
+var RootChange = require('./changes/RootChange');
+var ChildChange = require('./changes/ChildChange');
 
-var isNUllOrUndefined = utils.isNUllOrUndefined;
+var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
     Implements: Event,
@@ -1179,7 +1187,7 @@ module.exports = Class.create({
         graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
         graph.view = graph.createView();
 
-        graph.model.on('change', function (sender, evt) {
+        graph.model.on('change', function (evt) {
             graph.graphModelChanged(evt.getData('edit').changes);
         });
 
@@ -1247,6 +1255,7 @@ module.exports = Class.create({
     },
     getSelectionCellsForChanges: function () {},
     graphModelChanged: function (changes) {
+        console.log(changes);
         for (var i = 0; i < changes.length; i++) {
             this.processChange(changes[i]);
         }
@@ -1256,7 +1265,36 @@ module.exports = Class.create({
         this.view.validate();
         this.sizeDidChange();
     },
-    processChange: function (change) {},
+    processChange: function (change) {
+        if (change instanceof RootChange) {
+
+        } else if (change instanceof ChildChange) {
+            var newParent = this.model.getParent(change.child);
+            this.view.invalidate(change.child, true, true);
+
+            if (!newParent || this.isCellCollapsed(newParent)) {
+                this.view.invalidate(change.child, true, true);
+                this.removeStateForCell(change.child);
+
+                // Handles special case of current root of view being removed
+                if (this.view.currentRoot === change.child) {
+                    this.home();
+                }
+            }
+
+            if (newParent !== change.previous) {
+                // Refreshes the collapse/expand icons on the parents
+                if (newParent) {
+                    this.view.invalidate(newParent, false, false);
+                }
+
+                if (change.previous != null) {
+                    this.view.invalidate(change.previous, false, false);
+                }
+            }
+        }
+
+    },
     getRemovedCellsForChanges: function () {},
     removeStateForCell: function (cell) {
         var childCount = this.model.getChildCount(cell);
@@ -1356,7 +1394,7 @@ module.exports = Class.create({
     },
     createVertex: function (parent, id, value, x, y, width, height, style, relative) {
         var geometry = new Geometry(x, y, width, height);
-        geometry.relative = !isNUllOrUndefined(relative) ? relative : false;
+        geometry.relative = !isNullOrUndefined(relative) ? relative : false;
 
         // Creates the vertex
         var vertex = new Cell(value, geometry, style);
@@ -1380,9 +1418,124 @@ module.exports = Class.create({
         return edge;
     },
     addEdge: function (edge, parent, source, target, index) {},
-    addCell: function (cell, parent, index, source, target) {},
-    addCells: function (cells, parent, index, source, target) {},
-    cellsAdded: function (cells, parent, index, source, target, absolute, constrain) {},
+    addCell: function (cell, parent, index, source, target) {
+        return this.addCells([cell], parent, index, source, target)[0];
+    },
+    addCells: function (cells, parent, index, source, target) {
+        parent = parent || this.getDefaultParent();
+        index = !isNullOrUndefined(index) ? index : this.model.getChildCount(parent);
+
+        this.model.beginUpdate();
+        try {
+            this.cellsAdded(cells, parent, index, source, target, false, true);
+
+            //this.fireEvent(new mxEventObject(mxEvent.ADD_CELLS, 'cells', cells,
+            //    'parent', parent, 'index', index, 'source', source, 'target', target));
+
+            this.emit(new EventObject('addCells', {
+                cells: cells,
+                parent: parent,
+                index: index,
+                source: source,
+                target: target
+            }));
+        }
+        finally {
+            this.model.endUpdate();
+        }
+
+        return cells;
+    },
+    cellsAdded: function (cells, parent, index, source, target, absolute, constrain) {
+        if (cells && parent && !isNullOrUndefined(index)) {
+            this.model.beginUpdate();
+            try {
+                var parentState = absolute ? this.view.getState(parent) : null;
+                var o1 = parentState ? parentState.origin : null;
+                var zero = new Point(0, 0);
+
+                for (var i = 0; i < cells.length; i++) {
+                    if (!cells[i]) {
+                        index--;
+                    } else {
+                        var previous = this.model.getParent(cells[i]);
+
+                        // Keeps the cell at its absolute location
+                        if (o1 && cells[i] !== parent && parent !== previous) {
+                            var oldState = this.view.getState(previous);
+                            var o2 = oldState ? oldState.origin : zero;
+                            var geo = this.model.getGeometry(cells[i]);
+
+                            if (geo) {
+                                var dx = o2.x - o1.x;
+                                var dy = o2.y - o1.y;
+
+                                // FIXME: Cells should always be inserted first before any other edit
+                                // to avoid forward references in sessions.
+                                geo = geo.clone();
+                                geo.translate(dx, dy);
+
+                                if (!geo.relative && this.model.isVertex(cells[i]) && !this.isAllowNegativeCoordinates()) {
+                                    geo.x = Math.max(0, geo.x);
+                                    geo.y = Math.max(0, geo.y);
+                                }
+
+                                this.model.setGeometry(cells[i], geo);
+                            }
+                        }
+
+                        // Decrements all following indices
+                        // if cell is already in parent
+                        if (parent === previous && index + i > this.model.getChildCount(parent)) {
+                            index--;
+                        }
+
+                        this.model.add(parent, cells[i], index + i);
+
+                        if (this.autoSizeCellsOnAdd) {
+                            this.autoSizeCell(cells[i], true);
+                        }
+
+                        // Extends the parent or constrains the child
+                        if (this.isExtendParentsOnAdd() && this.isExtendParent(cells[i])) {
+                            this.extendParent(cells[i]);
+                        }
+
+                        // Additionally constrains the child after extending the parent
+                        if (constrain == null || constrain) {
+                            this.constrainChild(cells[i]);
+                        }
+
+                        // Sets the source terminal
+                        if (source != null) {
+                            this.cellConnected(cells[i], source, true);
+                        }
+
+                        // Sets the target terminal
+                        if (target != null) {
+                            this.cellConnected(cells[i], target, false);
+                        }
+                    }
+                }
+
+                //this.fireEvent(new mxEventObject(mxEvent.CELLS_ADDED, 'cells', cells,
+                //    'parent', parent, 'index', index, 'source', source, 'target', target,
+                //    'absolute', absolute));
+
+                this.emit(new EventObject('cellsAdded', {
+                    cells: cells,
+                    parent: parent,
+                    index: index,
+                    source: source,
+                    target: target,
+                    absolute: absolute
+                }));
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
     autoSizeCell: function (cell, recurse) {},
     removeCells: function (cells, includeEdges) {},
     cellsRemoved: function (cells) {},
@@ -1447,7 +1600,9 @@ module.exports = Class.create({
 
     // Drilldown
     // ---------
-    getCurrentRoot: function () {},
+    getCurrentRoot: function () {
+        return this.view.currentRoot;
+    },
     getTranslateForRoot: function () {},
     isPort: function () {},
     getTerminalForPort: function () {},
@@ -1649,7 +1804,16 @@ module.exports = Class.create({
 
     // Cell retrieval
     // ---------------
-    getDefaultParent: function () {},
+    getDefaultParent: function () {
+        var parent = this.getCurrentRoot() || this.defaultParent;
+
+        if (!parent) {
+            var root = this.model.getRoot();
+            parent = this.model.getChildAt(root, 0);
+        }
+
+        return parent;
+    },
     setDefaultParent: function () {},
     getSwimlane: function () {},
     getSwimlaneAt: function () {},
@@ -1726,7 +1890,7 @@ module.exports = Class.create({
 });
 
 
-},{"./CellRenderer":3,"./Model":7,"./View":12,"./common/class":17,"./common/utils":19,"./constants":20,"./events/Event":21}],7:[function(require,module,exports){
+},{"./Cell":2,"./CellRenderer":3,"./Geometry":5,"./Model":7,"./Point":8,"./View":12,"./changes/ChildChange":14,"./changes/RootChange":15,"./common/class":17,"./common/utils":19,"./constants":20,"./events/Event":21,"./events/EventObject":22}],7:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./common/class');
@@ -2149,7 +2313,9 @@ module.exports = Class.create({
     setCollapsed: function (cell, collapsed) {},
     collapsedStateForCellChanged: function (cell, collapsed) {},
 
-    isVisible: function (cell) {},
+    isVisible: function (cell) {
+        return cell ? cell.isVisible() : false;
+    },
     setVisible: function (cell, visible) {},
     visibleStateForCellChanged: function (cell, visible) {},
 
@@ -2715,16 +2881,8 @@ var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
+
     Implements: Event,
-    constructor: function View(graph) {
-
-        var view = this;
-
-        view.graph = graph;
-        view.translate = new Point();
-        view.graphBounds = new Rectangle();
-        view.states = new Dictionary();
-    },
 
     EMPTY_POINT: new Point(),
     doneResource: '',
@@ -2743,6 +2901,16 @@ module.exports = Class.create({
     lastHtmlNode: null,
     lastForegroundNode: null,
     lastForegroundHtmlNode: null,
+
+    constructor: function View(graph) {
+
+        var view = this;
+
+        view.graph = graph;
+        view.translate = new Point();
+        view.graphBounds = new Rectangle();
+        view.states = new Dictionary();
+    },
 
     init: function () {
         return this.installListeners().createSvg();

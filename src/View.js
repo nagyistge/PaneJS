@@ -15,16 +15,8 @@ var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
+
     Implements: Event,
-    constructor: function View(graph) {
-
-        var view = this;
-
-        view.graph = graph;
-        view.translate = new Point();
-        view.graphBounds = new Rectangle();
-        view.states = new Dictionary();
-    },
 
     EMPTY_POINT: new Point(),
     doneResource: '',
@@ -43,6 +35,16 @@ module.exports = Class.create({
     lastHtmlNode: null,
     lastForegroundNode: null,
     lastForegroundHtmlNode: null,
+
+    constructor: function View(graph) {
+
+        var view = this;
+
+        view.graph = graph;
+        view.translate = new Point();
+        view.graphBounds = new Rectangle();
+        view.states = new Dictionary();
+    },
 
     init: function () {
         return this.installListeners().createSvg();

@@ -420,7 +420,9 @@ module.exports = Class.create({
     setCollapsed: function (cell, collapsed) {},
     collapsedStateForCellChanged: function (cell, collapsed) {},
 
-    isVisible: function (cell) {},
+    isVisible: function (cell) {
+        return cell ? cell.isVisible() : false;
+    },
     setVisible: function (cell, visible) {},
     visibleStateForCellChanged: function (cell, visible) {},
 
