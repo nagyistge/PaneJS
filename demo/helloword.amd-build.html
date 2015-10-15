@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello, Graph</title>
+    <script src="../node_modules/requirejs/require.js"></script>
+</head>
+<body>
+<div id="graphContainer"
+     style="position:relative;overflow:hidden;width:321px;height:241px;background:url('images/grid.gif');cursor:default;">
+</div>
+<script>
+    window.onload = function () {
+        require([
+            '../build/Graph'
+        ], function(
+            Graph
+        ) {
+            console.log(Graph);
+
+            var container = document.getElementById('graphContainer');
+
+            var graph = new Graph(container);
+            var parent = graph.getDefaultParent();
+
+            graph.getModel().beginUpdate();
+
+            try {
+                graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
+            }
+            finally {
+                graph.getModel().endUpdate();
+            }
+        });
+    };
+</script>
+</body>
+</html>
