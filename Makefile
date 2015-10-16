@@ -5,12 +5,14 @@ make:
 install:
 	npm install
 compile:
-	npm run-script compile
+	browserify src/index.js > dist/all.js
+	node bin/2amd-build.js
+	node bin/2amd-dist.js
 release:
-	npm run-script release
+	uglifyjs dist/all.js > dist/all.min.js
+	uglifyjs dist/all.amd.js > dist/all.amd.min.js
 test:
-	#make server
-	npm test
+	browserify spec/index.spec.js > spec/index.js
 publish:
 	npm publish
 	cnpm sync zero-zgraph
