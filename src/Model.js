@@ -297,7 +297,29 @@ module.exports = Class.create({
         }
     },
 
-    parentForCellChanged: function (cell, parent, index) {},
+    // 更新 cell 的 parent
+    parentForCellChanged: function (cell, parent, index) {
+        var previous = this.getParent(cell);
+
+        if (parent) {
+            if (parent !== previous || previous.getIndex(cell) !== index) {
+                parent.insert(cell, index);
+            }
+        } else if (previous != null) { // remove from parent
+            var oldIndex = previous.getIndex(cell);
+            previous.remove(oldIndex);
+        }
+
+        // Checks if the previous parent was already in the
+        // model and avoids calling cellAdded if it was.
+        if (!this.contains(previous) && parent) {
+            this.cellAdded(cell);
+        } else if (parent == null) {
+            this.cellRemoved(cell);
+        }
+
+        return previous;
+    },
 
     getChildCount: function (cell) {
         return cell ? cell.getChildCount() : 0;

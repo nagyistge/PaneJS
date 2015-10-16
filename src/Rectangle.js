@@ -7,6 +7,12 @@ var Rectangle = Klass.create({
 
     Extends: Point,
 
+    Statics: {
+        fromRectangle: function (rect) {
+            return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+        }
+    },
+
     constructor: function Rectangle(x, y, width, height) {
 
         var rect = this;
@@ -99,14 +105,9 @@ var Rectangle = Klass.create({
             rect.height === that.height;
     },
 
-    fromRect: function (rect) {
-        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-    },
-
     clone: function () {
-
         var rect = this;
-        return rect.fromRect(rect);
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
     }
 });
 

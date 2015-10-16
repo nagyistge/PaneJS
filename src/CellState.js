@@ -30,10 +30,45 @@ module.exports = Rectangle.extend({
     shape: null,
     text: null,
 
-    getPerimeterBounds: function (/*border, bounds*/) {
+    getPerimeterBounds: function (border, bounds) {
+        border = border || 0;
+        bounds = (bounds) ? bounds : new Rectangle(this.x, this.y, this.width, this.height);
+
+        if (this.shape != null && this.shape.stencil != null) {
+            var aspect = this.shape.stencil.computeAspect(this.style, bounds.x, bounds.y, bounds.width, bounds.height);
+
+            bounds.x = aspect.x;
+            bounds.y = aspect.y;
+            bounds.width = this.shape.stencil.w0 * aspect.width;
+            bounds.height = this.shape.stencil.h0 * aspect.height;
+        }
+
+        if (border != 0) {
+            bounds.grow(border);
+        }
+
+        return bounds;
     },
 
-    setAbsoluteTerminalPoint: function (/*point, isSource*/) {
+    setAbsoluteTerminalPoint: function (point, isSource) {
+        if (this.absolutePoints == null) {
+            this.absolutePoints = [];
+        }
+
+        if (isSource) {
+            this.absolutePoints.length === 0
+                ? this.absolutePoints.push(point)
+                : this.absolutePoints[0] = point;
+        } else {
+            if (this.absolutePoints.length === 0) {
+                this.absolutePoints.push(null);
+                this.absolutePoints.push(point);
+            } else if (this.absolutePoints.length == 1) {
+                this.absolutePoints.push(point);
+            } else {
+                this.absolutePoints[this.absolutePoints.length - 1] = point;
+            }
+        }
     },
 
     setCursor: function (cursor) {
@@ -46,24 +81,47 @@ module.exports = Rectangle.extend({
         }
     },
 
-    getVisibleTerminal: function (/*source*/) {
+    getVisibleTerminal: function (isSource) {
+        var tmp = this.getVisibleTerminalState(isSource);
+
+        return (tmp != null) ? tmp.cell : null;
     },
-    getVisibleTerminalState: function (/*source*/) {
+
+    getVisibleTerminalState: function (isSource) {
+        return isSource ? this.visibleSourceState : this.visibleTargetState;
     },
-    setVisibleTerminalState: function (/*terminalState, source*/) {
+
+    setVisibleTerminalState: function (terminalState, isSource) {
+        if (isSource) {
+            this.visibleSourceState = terminalState;
+        } else {
+            this.visibleTargetState = terminalState;
+        }
     },
 
     getCellBounds: function () {
+        return this.cellBounds;
     },
     getPaintBounds: function () {
+        return this.paintBounds;
     },
     updateCachedBounds: function () {
+        var tr = this.view.translate;
+        var s = this.view.scale;
+        // 计算 translate 和 scale 之前的 bound
+        this.cellBounds = new Rectangle(this.x / s - tr.x, this.y / s - tr.y, this.width / s, this.height / s);
+        this.paintBounds = Rectangle.fromRectangle(this.cellBounds);
+
+        if (this.shape != null && this.shape.isPaintBoundsInverted()) {
+            this.paintBounds.rotate90();
+        }
     },
 
     clone: function () {
     },
 
     destroy: function () {
+        this.view.graph.cellRenderer.destroy(this);
     }
 });
 
