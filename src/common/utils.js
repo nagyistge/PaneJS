@@ -146,6 +146,16 @@ utils.getValue = function (obj, key, defaultValue) {
     return value;
 };
 
+utils.getNumber = function (obj, key, defaultValue) {
+    var value = obj ? obj[key] : null;
+
+    if (isNullOrUndefined(value)) {
+        value = defaultValue || 0;
+    }
+
+    return Number(value);
+};
+
 utils.extend = function (dist) {
     each(slice.call(arguments, 1), function (source) {
         if (source) {
@@ -274,6 +284,8 @@ utils.isNode = function (node, nodeName, attributeName, attributeValue) {
 
     return ret;
 };
+
+utils.createSvgGroup = function () {};
 
 //
 utils.getBaseUrl = function () {
