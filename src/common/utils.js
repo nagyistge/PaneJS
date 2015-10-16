@@ -112,9 +112,27 @@ function hasKey(obj, key) {
     return obj !== null && hasOwn.call(obj, key);
 }
 
-function clone(obj) {
-    // FIXME:
-    return JSON.parse(JSON.stringify(obj));
+function clone(obj, transients, shallow) {
+
+    shallow = (shallow != null) ? shallow : false;
+    var cloned = null;
+
+    if (obj && isFunction(obj.constructor)) {
+        cloned = new obj.constructor();
+
+        for (var i in obj) {
+            //if (i != mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
+            if (i !== 'objectId' && (!transients || indexOf(transients, i) < 0)) {
+                if (!shallow && typeof(obj[i]) == 'object') {
+                    cloned[i] = clone(obj[i]);
+                } else {
+                    cloned[i] = obj[i];
+                }
+            }
+        }
+    }
+
+    return cloned;
 }
 
 utils.keys = Object.keys || function (obj) {
@@ -286,6 +304,20 @@ utils.isNode = function (node, nodeName, attributeName, attributeValue) {
 };
 
 utils.createSvgGroup = function () {};
+
+utils.write = function (parent, text) {
+
+    var node = null;
+
+    if (parent) {
+        var doc = parent.ownerDocument;
+
+        node = doc.createTextNode(text);
+        parent.appendChild(node);
+    }
+
+    return node;
+};
 
 //
 utils.getBaseUrl = function () {
