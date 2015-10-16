@@ -412,7 +412,9 @@ module.exports = Class.create({
     setGeometry: function (cell, geometry) {},
     geometryForCellChanged: function (cell, geometry) {},
 
-    getStyle: function (cell) {},
+    getStyle: function (cell) {
+        return cell ? cell.getStyle() : null;
+    },
     setStyle: function (cell, style) {},
     styleForCellChanged: function (cell, style) {},
 

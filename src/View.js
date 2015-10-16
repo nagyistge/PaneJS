@@ -10,6 +10,7 @@ var Dictionary = require('./common/Dictionary');
 var constants = require('./constants');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');
+var CellState = require('./CellState');
 
 var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -30,7 +31,7 @@ module.exports = Class.create({
     graphBounds: null,
     scale: 1,
     translate: null,
-    updateStyle: null,
+    updateStyle: false,
     lastNode: null,
     lastHtmlNode: null,
     lastForegroundNode: null,
@@ -431,7 +432,70 @@ module.exports = Class.create({
     },
 
     updateCellState: function (state) {
+        state.absoluteOffset.x = 0;
+        state.absoluteOffset.y = 0;
+        state.origin.x = 0;
+        state.origin.y = 0;
+        state.length = 0;
 
+        if (state.cell != this.currentRoot) {
+            var model = this.graph.getModel();
+            var pState = this.getState(model.getParent(state.cell));
+
+            if (pState != null && pState.cell != this.currentRoot) {
+                state.origin.x += pState.origin.x;
+                state.origin.y += pState.origin.y;
+            }
+
+            var offset = this.graph.getChildOffsetForCell(state.cell);
+
+            if (offset != null) {
+                state.origin.x += offset.x;
+                state.origin.y += offset.y;
+            }
+
+            var geo = this.graph.getCellGeometry(state.cell);
+
+            if (geo != null) {
+                if (!model.isEdge(state.cell)) {
+                    offset = geo.offset || this.EMPTY_POINT;
+
+                    if (geo.relative && pState != null) {
+                        if (model.isEdge(pState.cell)) {
+                            var origin = this.getPoint(pState, geo);
+
+                            if (origin != null) {
+                                state.origin.x += (origin.x / this.scale) - pState.origin.x - this.translate.x;
+                                state.origin.y += (origin.y / this.scale) - pState.origin.y - this.translate.y;
+                            }
+                        }
+                        else {
+                            state.origin.x += geo.x * pState.width / this.scale + offset.x;
+                            state.origin.y += geo.y * pState.height / this.scale + offset.y;
+                        }
+                    }
+                    else {
+                        state.absoluteOffset.x = this.scale * offset.x;
+                        state.absoluteOffset.y = this.scale * offset.y;
+                        state.origin.x += geo.x;
+                        state.origin.y += geo.y;
+                    }
+                }
+
+                state.x = this.scale * (this.translate.x + state.origin.x);
+                state.y = this.scale * (this.translate.y + state.origin.y);
+                state.width = this.scale * geo.width;
+                state.height = this.scale * geo.height;
+
+                if (model.isVertex(state.cell)) {
+                    this.updateVertexState(state, geo);
+                }
+
+                if (model.isEdge(state.cell)) {
+                    this.updateEdgeState(state, geo);
+                }
+            }
+        }
     },
 
     isCellCollapsed: function (cell) {
@@ -487,11 +551,11 @@ module.exports = Class.create({
 
         state = view.states.get(cell);
 
-        if (create && (state === null || view.updateStyle) && view.graph.isCellVisible(cell)) {
-            if (state === null) {
+        if (create && (!state  || view.updateStyle) && view.graph.isCellVisible(cell)) {
+            if (!state) {
                 state = view.createState(cell);
-                view.states.put(cell, state);
-            } else {
+                view.states.set(cell, state);
+            } else { // updateStyle
                 state.style = view.graph.getCellStyle(cell);
             }
         }

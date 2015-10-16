@@ -1,4 +1,3 @@
-
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Point = require('./Point');
@@ -26,7 +25,7 @@ module.exports = Rectangle.extend({
     visibleSourceState: null,
     visibleTargetState: null,
     terminalDistance: 0,
-    length: 0,
+    //length: 0, // length 导致 isArrayLike 判断出错
     segments: null,
     shape: null,
     text: null,

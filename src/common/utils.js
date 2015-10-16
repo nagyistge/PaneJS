@@ -58,7 +58,7 @@ function isArrayLike(obj) {
     var length = !!obj && 'length' in obj && obj.length;
 
     return length === 0 ||
-        typeof length === 'number' && length > 0 && ( length - 1 ) in obj;
+        typeof length === 'number' && length > 0 && (length - 1) in obj;
 }
 
 function isNumeric(obj) {
@@ -135,6 +135,16 @@ utils.keys = Object.keys || function (obj) {
 
 utils.hasKey = hasKey;
 utils.clone = clone;
+
+utils.getValue = function (obj, key, defaultValue) {
+    var value = obj ? obj[key] : null;
+
+    if (isNullOrUndefined(value)) {
+        value = defaultValue;
+    }
+
+    return value;
+};
 
 utils.extend = function (dist) {
     each(slice.call(arguments, 1), function (source) {
@@ -246,6 +256,23 @@ utils.getFunctionName = function (fn) {
     }
 
     return str;
+};
+
+// BOW
+// ---
+utils.isNode = function (node, nodeName, attributeName, attributeValue) {
+
+    var ret = node && !isNaN(node.nodeType);
+
+    if (ret) {
+        ret = isNullOrUndefined(nodeName) || node.nodeName.toLowerCase() === nodeName.toLowerCase();
+    }
+
+    if (ret) {
+        ret = isNullOrUndefined(attributeName) || node.getAttribute(attributeName) === attributeValue;
+    }
+
+    return ret;
 };
 
 //

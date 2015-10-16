@@ -11,6 +11,7 @@ var Cell = require('./Cell');
 var Geometry = require('./Geometry');
 var Point = require('./Point');
 var CellRenderer = require('./CellRenderer');
+var Stylesheet = require('./Stylesheet');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
 
@@ -188,7 +189,9 @@ module.exports = Class.create({
     //
     //
     createSelectionModel: function () {},
-    createStylesheet: function () {},
+    createStylesheet: function () {
+        return new Stylesheet();
+    },
     createView: function () {
         return new View(this);
     },
@@ -310,7 +313,30 @@ module.exports = Class.create({
 
     // Cell styles
     // -----------
-    getCellStyle: function (cell) {},
+    getCellStyle: function (cell) {
+        var stylename = this.model.getStyle(cell);
+        var style = null;
+
+        // Gets the default style for the cell
+        if (this.model.isEdge(cell)) {
+            style = this.stylesheet.getDefaultEdgeStyle();
+        }
+        else {
+            style = this.stylesheet.getDefaultVertexStyle();
+        }
+
+        // Resolves the stylename using the above as the default
+        if (stylename != null) {
+            style = this.postProcessCellStyle(this.stylesheet.getCellStyle(stylename, style));
+        }
+
+        // Returns a non-null value if no style can be found
+        if (style == null) {
+            style = [];//mxGraph.prototype.EMPTY_ARRAY;
+        }
+
+        return style;
+    },
     postProcessCellStyle: function (style) {},
     setCellStyle: function (style, cells) {},
     setCellStyles: function (key, value, cells) {},
@@ -568,7 +594,9 @@ module.exports = Class.create({
     getTranslateForRoot: function () {},
     isPort: function () {},
     getTerminalForPort: function () {},
-    getChildOffsetForCell: function () {},
+    getChildOffsetForCell: function (cell) {
+        return null;
+    },
     enterGroup: function () {},
     exitGroup: function () {},
     home: function () {},
@@ -597,7 +625,9 @@ module.exports = Class.create({
     isCellVisible: function (cell) {
         return this.model.isVisible(cell);
     },
-    isCellCollapsed: function () {},
+    isCellCollapsed: function (cell) {
+        return this.model.isCollapsed(cell);
+    },
     isCellConnectable: function () {},
     isOrthogonal: function () {},
     isLoop: function () {},
@@ -624,24 +654,74 @@ module.exports = Class.create({
     getBackgroundImage: function () {},
     setBackgroundImage: function () {},
     getFoldingImage: function () {},
-    convertValueToString: function () {},
-    getLabel: function () {},
-    isHtmlLabel: function () {},
-    isHtmlLabels: function () {},
+    convertValueToString: function (cell) {
+        var value = this.model.getValue(cell);
+
+        if (value) {
+            if (utils.isNode(value)) {
+                return value.nodeName;
+            } else if (utils.isFunction(value.toString)) {
+                return value.toString();
+            }
+        }
+
+        return '';
+    },
+    getLabel: function (cell) {
+        var result = '';
+
+        if (this.labelsVisible && cell) {
+            var state = this.view.getState(cell);
+            var style = (state) ? state.style : this.getCellStyle(cell);
+
+            if (!utils.getValue(style, constants.STYLE_NOLABEL, false)) {
+                result = this.convertValueToString(cell);
+            }
+        }
+
+        return result;
+    },
+    isHtmlLabel: function () {
+        return this.isHtmlLabels();
+    },
+    isHtmlLabels: function () {
+        return this.htmlLabels;
+    },
     setHtmlLabels: function () {},
-    isWrapping: function () {},
-    isLabelClipped: function () {},
+    isWrapping: function (cell) {
+        var state = this.view.getState(cell);
+        var style = (state) ? state.style : this.getCellStyle(cell);
+
+        return (style) ? style[constants.STYLE_WHITE_SPACE] == 'wrap' : false;
+    },
+    isLabelClipped: function () {
+        var state = this.view.getState(cell);
+        var style = (state) ? state.style : this.getCellStyle(cell);
+
+        return (style) ? style[constants.STYLE_OVERFLOW] == 'hidden' : false;
+    },
     getTooltip: function () {},
     getTooltipForCell: function () {},
     getCursorForMouseEvent: function () {},
     getCursorForCell: function () {},
     getStartSize: function () {},
-    getImage: function () {},
+    getImage: function (state) {
+        return (state && state.style) ? state.style[constants.STYLE_IMAGE] : null;
+    },
     getVerticalAlign: function () {},
-    getIndicatorColor: function () {},
-    getIndicatorGradientColor: function () {},
-    getIndicatorShape: function () {},
-    getIndicatorImage: function () {},
+    getIndicatorColor: function (state) {
+        return (state && state.style) ? state.style[constants.STYLE_INDICATOR_COLOR] : null;
+    },
+    getIndicatorGradientColor: function () {
+        return (state && state.style) ? state.style[constants.STYLE_INDICATOR_GRADIENTCOLOR] : null;
+    },
+    getIndicatorShape: function (state) {
+        return (state && state.style) ? state.style[constants.STYLE_INDICATOR_SHAPE] : null;
+
+    },
+    getIndicatorImage: function (state) {
+        return (state && state.style) ? state.style[constants.STYLE_INDICATOR_IMAGE] : null;
+    },
     getBorder: function () {},
     setBorder: function () {},
     isSwimlane: function () {},
