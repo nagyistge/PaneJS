@@ -18,15 +18,15 @@ var isNullOrUndefined = utils.isNullOrUndefined;
 
 var Shape = Base.extend({
 
-    node: null,     // 图形的根节点，通常是 g 元素
-    state: null,    // cellState
-    style: null,    // cellStyle
-    bounds: null,   // Rectangle 表示该图形的区域范围
-    boundingBox: null, // 图形的边框
+    node: null,         // 图形的根节点，通常是 g 元素
+    state: null,        // cellState
+    style: null,        // cellStyle
+    bounds: null,       // Rectangle 表示该图形的区域范围
+    boundingBox: null,  // 图形的边框
     stencil: null,
     scale: 1,
     points: null,
-    antiAlias: true, // 抗锯齿，平滑处理
+    antiAlias: true,    // 抗锯齿，平滑处理
     pointerEvents: true,
     svgPointerEvents: 'all',
     svgStrokeTolerance: 8,
@@ -34,77 +34,78 @@ var Shape = Base.extend({
     stencilPointerEvents: false,
 
     outline: false,
-    visible: true,
+    visible: true,      // 默认可见
 
     constructor: function Shape(stencil) {
-        var shape = this;
 
-        shape.stencil = stencil; // 模板
-        shape.strokewidth = 1;
-        shape.rotation = 0;
-        shape.opacity = 100;
-        shape.flipH = false; // 水平翻转
-        shape.flipV = false; // 垂直翻转
+        var that = this;
+
+        that.stencil = stencil; // 模板
+        that.strokewidth = 1;
+        that.rotation = 0;
+        that.opacity = 100;
+        that.flipH = false;    // 水平翻转
+        that.flipV = false;    // 垂直翻转
     },
 
     // 根据 state.style 初始化该图形的样式属性
     apply: function (state) {
 
-        var shape = this;
+        var that = this;
 
-        shape.state = state;
-        shape.style = state.style;
+        that.state = state;
+        that.style = state.style;
 
-        if (shape.style) {
-            shape.fill = getValue(shape.style, constants.STYLE_FILLCOLOR, shape.fill);
-            shape.gradient = getValue(shape.style, constants.STYLE_GRADIENTCOLOR, shape.gradient);
-            shape.gradientDirection = getValue(shape.style, constants.STYLE_GRADIENT_DIRECTION, shape.gradientDirection);
-            shape.opacity = getValue(shape.style, constants.STYLE_OPACITY, shape.opacity);
-            shape.stroke = getValue(shape.style, constants.STYLE_STROKECOLOR, shape.stroke);
-            shape.strokewidth = getNumber(shape.style, constants.STYLE_STROKEWIDTH, shape.strokewidth);
+        if (that.style) {
+            that.fill = getValue(that.style, constants.STYLE_FILLCOLOR, that.fill);
+            that.gradient = getValue(that.style, constants.STYLE_GRADIENTCOLOR, that.gradient);
+            that.gradientDirection = getValue(that.style, constants.STYLE_GRADIENT_DIRECTION, that.gradientDirection);
+            that.opacity = getValue(that.style, constants.STYLE_OPACITY, that.opacity);
+            that.stroke = getValue(that.style, constants.STYLE_STROKECOLOR, that.stroke);
+            that.strokewidth = getNumber(that.style, constants.STYLE_STROKEWIDTH, that.strokewidth);
             // Arrow stroke width is used to compute the arrow heads size in mxConnector
-            shape.arrowStrokewidth = getNumber(shape.style, constants.STYLE_STROKEWIDTH, shape.strokewidth);
-            shape.spacing = getValue(shape.style, constants.STYLE_SPACING, shape.spacing);
-            shape.startSize = getNumber(shape.style, constants.STYLE_STARTSIZE, shape.startSize);
-            shape.endSize = getNumber(shape.style, constants.STYLE_ENDSIZE, shape.endSize);
-            shape.startArrow = getValue(shape.style, constants.STYLE_STARTARROW, shape.startArrow);
-            shape.endArrow = getValue(shape.style, constants.STYLE_ENDARROW, shape.endArrow);
-            shape.rotation = getValue(shape.style, constants.STYLE_ROTATION, shape.rotation);
-            shape.direction = getValue(shape.style, constants.STYLE_DIRECTION, shape.direction);
-            shape.flipH = getValue(shape.style, constants.STYLE_FLIPH, 0) === 1;
-            shape.flipV = getValue(shape.style, constants.STYLE_FLIPV, 0) === 1;
+            that.arrowStrokewidth = getNumber(that.style, constants.STYLE_STROKEWIDTH, that.strokewidth);
+            that.spacing = getValue(that.style, constants.STYLE_SPACING, that.spacing);
+            that.startSize = getNumber(that.style, constants.STYLE_STARTSIZE, that.startSize);
+            that.endSize = getNumber(that.style, constants.STYLE_ENDSIZE, that.endSize);
+            that.startArrow = getValue(that.style, constants.STYLE_STARTARROW, that.startArrow);
+            that.endArrow = getValue(that.style, constants.STYLE_ENDARROW, that.endArrow);
+            that.rotation = getValue(that.style, constants.STYLE_ROTATION, that.rotation);
+            that.direction = getValue(that.style, constants.STYLE_DIRECTION, that.direction);
+            that.flipH = getValue(that.style, constants.STYLE_FLIPH, 0) === 1;
+            that.flipV = getValue(that.style, constants.STYLE_FLIPV, 0) === 1;
 
             // Legacy support for stencilFlipH/V
-            if (shape.stencil) {
-                shape.flipH = getValue(shape.style, 'stencilFlipH', 0) === 1 || shape.flipH;
-                shape.flipV = getValue(shape.style, 'stencilFlipV', 0) === 1 || shape.flipV;
+            if (that.stencil) {
+                that.flipH = getValue(that.style, 'stencilFlipH', 0) === 1 || that.flipH;
+                that.flipV = getValue(that.style, 'stencilFlipV', 0) === 1 || that.flipV;
             }
 
-            if (shape.direction === constants.DIRECTION_NORTH || shape.direction === constants.DIRECTION_SOUTH) {
-                var tmp = shape.flipH;
-                shape.flipH = shape.flipV;
-                shape.flipV = tmp;
+            if (that.direction === constants.DIRECTION_NORTH || that.direction === constants.DIRECTION_SOUTH) {
+                var tmp = that.flipH;
+                that.flipH = that.flipV;
+                that.flipV = tmp;
             }
 
-            shape.isShadow = getValue(shape.style, constants.STYLE_SHADOW, shape.isShadow) === 1;
-            shape.isDashed = getValue(shape.style, constants.STYLE_DASHED, shape.isDashed) === 1;
-            shape.isRounded = getValue(shape.style, constants.STYLE_ROUNDED, shape.isRounded) === 1;
-            shape.glass = getValue(shape.style, constants.STYLE_GLASS, shape.glass) === 1;
+            that.isShadow = getValue(that.style, constants.STYLE_SHADOW, that.isShadow) === 1;
+            that.isDashed = getValue(that.style, constants.STYLE_DASHED, that.isDashed) === 1;
+            that.isRounded = getValue(that.style, constants.STYLE_ROUNDED, that.isRounded) === 1;
+            that.glass = getValue(that.style, constants.STYLE_GLASS, that.glass) === 1;
 
-            if (shape.fill === constants.NONE) {
-                shape.fill = null;
+            if (that.fill === constants.NONE) {
+                that.fill = null;
             }
 
-            if (shape.gradient === constants.NONE) {
-                shape.gradient = null;
+            if (that.gradient === constants.NONE) {
+                that.gradient = null;
             }
 
-            if (shape.stroke === constants.NONE) {
-                shape.stroke = null;
+            if (that.stroke === constants.NONE) {
+                that.stroke = null;
             }
         }
 
-        return shape;
+        return that;
     },
 
     // 创建该图形的根节点
