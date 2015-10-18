@@ -1,12 +1,13 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
-var Class = require('./common/class');
-var utils = require('./common/utils');
-var constants = require('./constants');
-var Point = require('./Point');
-var Rectangle = require('./Rectangle');
-var Canvas2D = require('./Canvas2D');
+var Class = require('../common/class');
+var utils = require('../common/utils');
+var constants = require('../constants');
+var Point = require('../Point');
+var Rectangle = require('../Rectangle');
+var Canvas2D = require('../Canvas2D');
+
 
 var each = utils.each;
 var getValue = utils.getValue;
@@ -15,16 +16,16 @@ var isNullOrUndefined = utils.isNullOrUndefined;
 
 var Shape = Class.create({
 
-    stencil: null,
-    scale: 1,
-    antiAlias: true, // 抗锯齿，平滑处理
-    bounds: null,
-    points: null,
     node: null,     // 形状的根节点
     state: null,    // cellState
     style: null,    // cellStyle
+    stencil: null,
+    scale: 1,
+    bounds: null,
+    points: null,
     boundingBox: null,
     svgStrokeTolerance: 8,
+    antiAlias: true, // 抗锯齿，平滑处理
     pointerEvents: true,
     svgPointerEvents: 'all',
     shapePointerEvents: false,

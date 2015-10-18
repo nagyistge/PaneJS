@@ -1,23 +1,32 @@
 'use strict';
 
 var Class = require('./common/class');
+var utils = require('./common/utils');
 var Dictionary = require('./common/Dictionary');
-var Shape = require('./Shape');
 var Rectangle = require('./Rectangle');
 var Point = require('./Point');
 var constants = require('./constants');
 
-module.exports = Class.create({
+var Shape = require('./shapes/Shape');
+var RectangleShape = require('./shapes/RectangleShape');
+
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+var CellRenderer = Class.create({
     // 静态属性和方法
     Statics: {
         shapes: {},
+        getShape: function (name) {
+            return CellRenderer.shapes[name];
+        },
         registerShape: function (key, shape) {
             CellRenderer.shapes[key] = shape;
         }
     },
 
     defaultEdgeShape: null,
-    defaultVertexShape: null,
+    defaultVertexShape: RectangleShape,
     defaultTextShape: null,
     legacyControlPosition: true,
     legacySpacing: true,
@@ -25,6 +34,7 @@ module.exports = Class.create({
 
     constructor: function CellRenderer() {},
 
+    // 应用 state 中的样式，并创建 g 根节点，然后放入 drawPane 中
     initializeShape: function (state) {
         this.configureShape(state);
         state.shape.init(state.view.getDrawPane());
@@ -53,10 +63,12 @@ module.exports = Class.create({
         state.shape.indicatorShape = this.getShape(state.view.graph.getIndicatorShape(state));
     },
 
+    // 获取构造函数
     getShape: function (name) {
         return this.constructor.shapes[name];
     },
 
+    // 获取构造函数
     getShapeConstructor: function (state) {
         var Ctor = this.getShape(state.style[constants.STYLE_SHAPE]);
 
@@ -69,6 +81,7 @@ module.exports = Class.create({
         return Ctor;
     },
 
+    // 应用样式
     configureShape: function (state) {
         state.shape.apply(state);
         state.shape.image = state.view.graph.getImage(state);
@@ -313,6 +326,7 @@ module.exports = Class.create({
         }
     },
 
+    // 创建展开/折叠按钮
     createControl: function (state) {
         var graph = state.view.graph;
         var image = graph.getFoldingImage(state);
@@ -389,8 +403,12 @@ module.exports = Class.create({
         return true;
     },
 
+    // 监听 DOM 事件
     installListeners: function (state) {
         var graph = state.view.graph;
+
+        // TODO: event
+        return;
 
         // Workaround for touch devices routing all events for a mouse
         // gesture (down, move, up) via the initial DOM node. Same for
@@ -775,43 +793,44 @@ module.exports = Class.create({
     redrawShape: function (state, force, rendering) {
         var shapeChanged = false;
 
-        if (state.shape != null) {
+        if (state.shape) {
             // Lazy initialization
-            if (state.shape.node == null) {
+            if (!state.shape.node) {
                 this.createIndicatorShape(state);
+                // 应用 state 中的样式，创建 shape 的根节点，并加入到 drawPane 中
                 this.initializeShape(state);
                 this.createCellOverlays(state);
+                // DOM 事件
                 this.installListeners(state);
             }
 
             // Handles changes of the collapse icon
             this.createControl(state);
 
-            if (!mxUtils.equalEntries(state.shape.style, state.style)) {
-                this.configureShape(state);
-                force = true;
-            }
+            // 检查样式是否有更新
+            //if (!mxUtils.equalEntries(state.shape.style, state.style)) {
+            //    this.configureShape(state);
+            //    force = true;
+            //}
 
             // Redraws the cell if required, ignores changes to bounds if points are
             // defined as the bounds are updated for the given points inside the shape
             if (force || state.shape.bounds == null || state.shape.scale != state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
-                (state.absolutePoints != null && !mxUtils.equalPoints(state.shape.points, state.absolutePoints))) {
+                (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
                 if (state.absolutePoints != null) {
                     state.shape.points = state.absolutePoints.slice();
                     state.shape.bounds = null;
-                }
-                else {
+                } else {
                     state.shape.points = null;
-                    state.shape.bounds = new mxRectangle(state.x, state.y, state.width, state.height);
+                    state.shape.bounds = new Rectangle(state.x, state.y, state.width, state.height);
                 }
 
                 state.shape.scale = state.view.scale;
 
-                if (rendering == null || rendering) {
+                if (isNullOrUndefined(rendering) || rendering) {
                     state.shape.redraw();
-                }
-                else {
+                } else {
                     state.shape.updateBoundingBox();
                 }
 
@@ -848,4 +867,25 @@ module.exports = Class.create({
     }
 });
 
+
+var registerShape = CellRenderer.registerShape;
+
+registerShape(constants.SHAPE_RECTANGLE, RectangleShape);
+//registerShape(constants.SHAPE_ELLIPSE, mxEllipse);
+//registerShape(constants.SHAPE_RHOMBUS, mxRhombus);
+//registerShape(constants.SHAPE_CYLINDER, mxCylinder);
+//registerShape(constants.SHAPE_CONNECTOR, mxConnector);
+//registerShape(constants.SHAPE_ACTOR, mxActor);
+//registerShape(constants.SHAPE_TRIANGLE, mxTriangle);
+//registerShape(constants.SHAPE_HEXAGON, mxHexagon);
+//registerShape(constants.SHAPE_CLOUD, mxCloud);
+//registerShape(constants.SHAPE_LINE, mxLine);
+//registerShape(constants.SHAPE_ARROW, mxArrow);
+//registerShape(constants.SHAPE_DOUBLE_ELLIPSE, mxDoubleEllipse);
+//registerShape(constants.SHAPE_SWIMLANE, mxSwimlane);
+//registerShape(constants.SHAPE_IMAGE, mxImageShape);
+//registerShape(constants.SHAPE_LABEL, mxLabel);
+
+
+module.exports = CellRenderer;
 

@@ -712,7 +712,7 @@ module.exports = Class.create({
     getIndicatorColor: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_COLOR] : null;
     },
-    getIndicatorGradientColor: function () {
+    getIndicatorGradientColor: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_GRADIENTCOLOR] : null;
     },
     getIndicatorShape: function (state) {

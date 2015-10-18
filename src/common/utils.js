@@ -185,6 +185,40 @@ utils.extend = function (dist) {
     return dist;
 };
 
+utils.equalEntries = function (a, b) {
+    if ((a == null && b != null) || (a != null && b == null) ||
+        (a != null && b != null && a.length != b.length)) {
+        return false;
+    }
+    else if (a && b) {
+        for (var key in a) {
+            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] != b[key]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
+utils.equalPoints = function (points1, points2) {
+    if ((!points1 && points2) || (points1 && !points2) ||
+        (points1 && points2 && points1.length !== points2.length)) {
+        return false;
+    } else if (points1 && points2) {
+        for (var i = 0; i < points1.length; i++) {
+            var p1 = points1[i];
+            var p2 = points2[i];
+
+            if((!p1 && p2)||(p1&&!p2)||(p1&&p2&&!p1.equal(p2))){
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
 // Array
 // -----
 
