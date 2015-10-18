@@ -36,8 +36,7 @@ module.exports = Rectangle.extend({
     },
 
     getTerminalPoint: function (isSource) {
-        var that = this;
-        return isSource ? that.sourcePoint : that.targetPoint;
+        return isSource ? this.sourcePoint : this.targetPoint;
     },
 
     setTerminalPoint: function (point, isSource) {
