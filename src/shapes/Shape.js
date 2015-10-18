@@ -1,7 +1,7 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
-var Class = require('../common/class');
+var Base = require('../Base');
 var utils = require('../common/utils');
 var constants = require('../constants');
 var Point = require('../Point');
@@ -16,7 +16,7 @@ var isNullOrUndefined = utils.isNullOrUndefined;
 
 // style 的属性：style[constants.STYLE_SHAPE]
 
-var Shape = Class.create({
+var Shape = Base.extend({
 
     node: null,     // 图形的根节点，通常是 g 元素
     state: null,    // cellState
@@ -26,12 +26,13 @@ var Shape = Class.create({
     stencil: null,
     scale: 1,
     points: null,
-    svgStrokeTolerance: 8,
     antiAlias: true, // 抗锯齿，平滑处理
     pointerEvents: true,
     svgPointerEvents: 'all',
+    svgStrokeTolerance: 8,
     shapePointerEvents: false,
     stencilPointerEvents: false,
+
     outline: false,
     visible: true,
 
@@ -575,7 +576,8 @@ var Shape = Class.create({
         var rot = this.getRotation();
 
         if (getValue(this.style, constants.STYLE_HORIZONTAL, 1) !== 1) {
-            rot += mxText.prototype.verticalTextRotation;
+            //rot += mxText.prototype.verticalTextRotation;
+            rot += -90;
         }
 
         return rot;

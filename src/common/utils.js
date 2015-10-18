@@ -93,6 +93,22 @@ utils.ucFirst = function (str) {
     return str.charAt(0).toUpperCase() + str.substr(1);
 };
 
+utils.ltrim = function (str, chars) {
+    chars = chars || "\\s";
+
+    return str.replace(new RegExp("^[" + chars + "]+", "g"), "");
+};
+
+utils.rtrim = function (str, chars) {
+    chars = chars || "\\s";
+
+    return str.replace(new RegExp("[" + chars + "]+$", "g"), "");
+};
+
+utils.trim = function (str, chars) {
+    return utils.ltrim(utils.rtrim(str, chars), chars);
+};
+
 // Number
 // ------
 utils.toFixed = function (value, precision) {
@@ -210,7 +226,7 @@ utils.equalPoints = function (points1, points2) {
             var p1 = points1[i];
             var p2 = points2[i];
 
-            if((!p1 && p2)||(p1&&!p2)||(p1&&p2&&!p1.equal(p2))){
+            if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
                 return false;
             }
         }

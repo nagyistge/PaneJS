@@ -380,7 +380,7 @@ var proto = {
             node.setAttribute('xlink:href', src);
         }
         else {
-            node.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', src);
+            node.setAttributeNS(constants.NS_XLINK, 'xlink:href', src);
         }
 
         if (!aspect) {
@@ -665,20 +665,20 @@ var proto = {
                 var dx = 0;
                 var dy = 0;
 
-                if (align == mxConstants.ALIGN_CENTER) {
+                if (align == constants.ALIGN_CENTER) {
                     dx -= w / 2;
                 }
-                else if (align == mxConstants.ALIGN_RIGHT) {
+                else if (align == constants.ALIGN_RIGHT) {
                     dx -= w;
                 }
 
                 x += dx;
 
                 // FIXME: LINE_HEIGHT not ideal for all text sizes, fix for export
-                if (valign == mxConstants.ALIGN_MIDDLE) {
+                if (valign == constants.ALIGN_MIDDLE) {
                     dy -= h / 2 - 1;
                 }
-                else if (valign == mxConstants.ALIGN_BOTTOM) {
+                else if (valign == constants.ALIGN_BOTTOM) {
                     dy -= h - 2;
                 }
 
@@ -742,18 +742,18 @@ var proto = {
             var cx = x;
             var cy = y;
 
-            if (align == mxConstants.ALIGN_CENTER) {
+            if (align == constants.ALIGN_CENTER) {
                 cx -= w / 2;
             }
-            else if (align == mxConstants.ALIGN_RIGHT) {
+            else if (align == constants.ALIGN_RIGHT) {
                 cx -= w;
             }
 
             if (overflow != 'fill') {
-                if (valign == mxConstants.ALIGN_MIDDLE) {
+                if (valign == constants.ALIGN_MIDDLE) {
                     cy -= h / 2;
                 }
-                else if (valign == mxConstants.ALIGN_BOTTOM) {
+                else if (valign == constants.ALIGN_BOTTOM) {
                     cy -= h;
                 }
             }
@@ -780,8 +780,8 @@ var proto = {
         }
 
         // Default is left
-        var anchor = (align == mxConstants.ALIGN_RIGHT) ? 'end' :
-            (align == mxConstants.ALIGN_CENTER) ? 'middle' :
+        var anchor = (align == constants.ALIGN_RIGHT) ? 'end' :
+            (align == constants.ALIGN_CENTER) ? 'middle' :
                 'start';
 
         // Text-anchor start is default in SVG
@@ -789,7 +789,7 @@ var proto = {
             node.setAttribute('text-anchor', anchor);
         }
 
-        if (!this.styleEnabled || size != mxConstants.DEFAULT_FONTSIZE) {
+        if (!this.styleEnabled || size != constants.DEFAULT_FONTSIZE) {
             node.setAttribute('font-size', Math.round(size * s.scale) + 'px');
         }
 
@@ -802,12 +802,12 @@ var proto = {
         }
 
         var lines = str.split('\n');
-        var lh = Math.round(size * mxConstants.LINE_HEIGHT);
+        var lh = Math.round(size * constants.LINE_HEIGHT);
         var textHeight = size + (lines.length - 1) * lh;
 
         var cy = y + size - 1;
 
-        if (valign == mxConstants.ALIGN_MIDDLE) {
+        if (valign == constants.ALIGN_MIDDLE) {
             if (overflow == 'fill') {
                 cy -= h / 2;
             }
@@ -816,7 +816,7 @@ var proto = {
                 cy -= dy + 1;
             }
         }
-        else if (valign == mxConstants.ALIGN_BOTTOM) {
+        else if (valign == constants.ALIGN_BOTTOM) {
             if (overflow == 'fill') {
                 cy -= h;
             }
@@ -828,13 +828,13 @@ var proto = {
 
         for (var i = 0; i < lines.length; i++) {
             // Workaround for bounding box of empty lines and spaces
-            if (lines[i].length > 0 && mxUtils.trim(lines[i]).length > 0) {
+            if (lines[i].length > 0 && utils.trim(lines[i]).length > 0) {
                 var text = this.createElement('text');
                 // LATER: Match horizontal HTML alignment
                 text.setAttribute('x', this.format(x * s.scale));
                 text.setAttribute('y', this.format(cy * s.scale));
 
-                mxUtils.write(text, lines[i]);
+                utils.write(text, lines[i]);
                 node.appendChild(text);
             }
 
@@ -906,17 +906,17 @@ var proto = {
             var bbox = null;
 
             if (overflow == 'fill' || overflow == 'width') {
-                if (align == mxConstants.ALIGN_CENTER) {
+                if (align == constants.ALIGN_CENTER) {
                     x -= w / 2;
                 }
-                else if (align == mxConstants.ALIGN_RIGHT) {
+                else if (align == constants.ALIGN_RIGHT) {
                     x -= w;
                 }
 
-                if (valign == mxConstants.ALIGN_MIDDLE) {
+                if (valign == constants.ALIGN_MIDDLE) {
                     y -= h / 2;
                 }
-                else if (valign == mxConstants.ALIGN_BOTTOM) {
+                else if (valign == constants.ALIGN_BOTTOM) {
                     y -= h;
                 }
 
@@ -938,7 +938,7 @@ var proto = {
                 var div = document.createElement('div');
 
                 // Wrapping and clipping can be ignored here
-                div.style.lineHeight = (mxConstants.ABSOLUTE_LINE_HEIGHT) ? Math.round(s.fontSize * mxConstants.LINE_HEIGHT) + 'px' : mxConstants.LINE_HEIGHT;
+                div.style.lineHeight = (constants.ABSOLUTE_LINE_HEIGHT) ? Math.round(s.fontSize * constants.LINE_HEIGHT) + 'px' : constants.LINE_HEIGHT;
                 div.style.fontSize = Math.round(s.fontSize) + 'px';
                 div.style.fontFamily = s.fontFamily;
                 div.style.whiteSpace = 'nowrap';
@@ -947,11 +947,11 @@ var proto = {
                 div.style.display = (mxClient.IS_QUIRKS) ? 'inline' : 'inline-block';
                 div.style.zoom = '1';
 
-                if ((s.fontStyle & mxConstants.FONT_BOLD) == mxConstants.FONT_BOLD) {
+                if ((s.fontStyle & constants.FONT_BOLD) == constants.FONT_BOLD) {
                     div.style.fontWeight = 'bold';
                 }
 
-                if ((s.fontStyle & mxConstants.FONT_ITALIC) == mxConstants.FONT_ITALIC) {
+                if ((s.fontStyle & constants.FONT_ITALIC) == constants.FONT_ITALIC) {
                     div.style.fontStyle = 'italic';
                 }
 
@@ -963,17 +963,17 @@ var proto = {
                 var h = div.offsetHeight;
                 div.parentNode.removeChild(div);
 
-                if (align == mxConstants.ALIGN_CENTER) {
+                if (align == constants.ALIGN_CENTER) {
                     x -= w / 2;
                 }
-                else if (align == mxConstants.ALIGN_RIGHT) {
+                else if (align == constants.ALIGN_RIGHT) {
                     x -= w;
                 }
 
-                if (valign == mxConstants.ALIGN_MIDDLE) {
+                if (valign == constants.ALIGN_MIDDLE) {
                     y -= h / 2;
                 }
-                else if (valign == mxConstants.ALIGN_BOTTOM) {
+                else if (valign == constants.ALIGN_BOTTOM) {
                     y -= h;
                 }
 
@@ -1405,7 +1405,7 @@ var proto = {
             if (node.setAttributeNS == null || (this.root.ownerDocument != document && document.documentMode == null)) {
                 node.setAttribute('xlink:href', link);
             } else {
-                node.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', link);
+                node.setAttributeNS(constants.NS_XLINK, 'xlink:href', link);
             }
 
             this.root.appendChild(node);

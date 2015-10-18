@@ -696,7 +696,7 @@ module.exports = Class.create({
 
         return (style) ? style[constants.STYLE_WHITE_SPACE] == 'wrap' : false;
     },
-    isLabelClipped: function () {
+    isLabelClipped: function (cell) {
         var state = this.view.getState(cell);
         var style = (state) ? state.style : this.getCellStyle(cell);
 

@@ -9,9 +9,11 @@ var constants = require('./constants');
 
 var Shape = require('./shapes/Shape');
 var RectangleShape = require('./shapes/RectangleShape');
+var Text = require('./shapes/Text');
 
 
 var isNullOrUndefined = utils.isNullOrUndefined;
+var getValue = utils.getValue;
 
 var CellRenderer = Class.create({
     // 静态属性和方法
@@ -27,7 +29,7 @@ var CellRenderer = Class.create({
 
     defaultEdgeShape: null,
     defaultVertexShape: RectangleShape,
-    defaultTextShape: null,
+    defaultTextShape: Text,
     legacyControlPosition: true,
     legacySpacing: true,
     antiAlias: true,
@@ -476,7 +478,7 @@ var CellRenderer = Class.create({
     redrawLabel: function (state, forced) {
         var value = this.getLabelValue(state);
 
-        if (state.text == null && value != null && (mxUtils.isNode(value) || value.length > 0)) {
+        if (state.text == null && value != null && (utils.isNode(value) || value.length > 0)) {
             this.createLabel(state, value);
         }
         else if (state.text != null && (value == null || value.length == 0)) {
@@ -490,7 +492,7 @@ var CellRenderer = Class.create({
             var clipping = graph.isLabelClipped(state.cell);
             var bounds = this.getLabelBounds(state);
 
-            var isForceHtml = (state.view.graph.isHtmlLabel(state.cell) || (value != null && mxUtils.isNode(value)));
+            var isForceHtml = (state.view.graph.isHtmlLabel(state.cell) || (value != null && utils.isNode(value)));
             var dialect = (isForceHtml) ? constants.DIALECT_STRICTHTML : state.view.graph.dialect;
 
             // Text is a special case where change of dialect is possible at runtime
@@ -546,10 +548,10 @@ var CellRenderer = Class.create({
             bounds.width = Math.max(1, state.width);
             bounds.height = Math.max(1, state.height);
 
-            var sc = mxUtils.getValue(state.style, constants.STYLE_STROKECOLOR, constants.NONE);
+            var sc = getValue(state.style, constants.STYLE_STROKECOLOR, constants.NONE);
 
             if (sc != constants.NONE && sc != '') {
-                var s = parseFloat(mxUtils.getValue(state.style, constants.STYLE_STROKEWIDTH, 1)) * scale / 2;
+                var s = parseFloat(getValue(state.style, constants.STYLE_STROKEWIDTH, 1)) * scale / 2;
                 var s2 = 2 * s + 0.5;
 
                 bounds.x += s;
@@ -575,7 +577,7 @@ var CellRenderer = Class.create({
         }
 
         // Label width style overrides actual label width
-        var lw = mxUtils.getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+        var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
 
         if (lw != null) {
             bounds.width = parseFloat(lw) * scale;
@@ -598,9 +600,9 @@ var CellRenderer = Class.create({
             bounds.x += spacing.x * s;
             bounds.y += spacing.y * s;
 
-            var hpos = mxUtils.getValue(state.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER);
-            var vpos = mxUtils.getValue(state.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE);
-            var lw = mxUtils.getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+            var hpos = getValue(state.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER);
+            var vpos = getValue(state.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE);
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
 
             bounds.width = Math.max(0, bounds.width - ((hpos == constants.ALIGN_CENTER && lw == null) ? (state.text.spacingLeft * s + state.text.spacingRight * s) : 0));
             bounds.height = Math.max(0, bounds.height - ((vpos == constants.ALIGN_MIDDLE) ? (state.text.spacingTop * s + state.text.spacingBottom * s) : 0));
