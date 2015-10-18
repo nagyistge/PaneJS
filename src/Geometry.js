@@ -4,10 +4,6 @@ var Rectangle = require('./Rectangle');
 
 module.exports = Rectangle.extend({
 
-    constructor: function Geometry(x, y, width, height) {
-        Geometry.superclass.constructor.call(this, x, y, width, height);
-    },
-
     TRANSLATE_CONTROL_POINTS: true,
     alternateBounds: null,
     sourcePoint: null,
@@ -16,29 +12,32 @@ module.exports = Rectangle.extend({
     offset: null,
     relative: false,
 
+    constructor: function Geometry(x, y, width, height) {
+        Geometry.superclass.constructor.call(this, x, y, width, height);
+    },
 
     swap: function () {
 
-        var geom = this;
-        var alternateBounds = geom.alternateBounds;
+        var that = this;
+        var alternateBounds = that.alternateBounds;
 
         if (alternateBounds) {
-            var old = new Rectangle(geom.x, geom.y, geom.width, geom.height);
+            var old = new Rectangle(that.x, that.y, that.width, that.height);
 
-            geom.x = alternateBounds.x;
-            geom.y = alternateBounds.y;
-            geom.width = alternateBounds.width;
-            geom.height = alternateBounds.height;
+            that.x = alternateBounds.x;
+            that.y = alternateBounds.y;
+            that.width = alternateBounds.width;
+            that.height = alternateBounds.height;
 
-            geom.alternateBounds = old;
+            that.alternateBounds = old;
         }
 
-        return geom;
+        return that;
     },
 
     getTerminalPoint: function (isSource) {
-        var geom = this;
-        return isSource ? geom.sourcePoint : geom.targetPoint;
+        var that = this;
+        return isSource ? that.sourcePoint : that.targetPoint;
     },
 
     setTerminalPoint: function (point, isSource) {

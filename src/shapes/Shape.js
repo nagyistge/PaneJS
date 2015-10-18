@@ -111,15 +111,15 @@ var Shape = Base.extend({
     // 创建该图形的根节点
     init: function (container) {
 
-        var shape = this;
-        var node = shape.node || shape.create(container);
+        var that = this;
+        var node = that.node || that.create(container);
 
         if (node && container) {
-            shape.node = node;
+            that.node = node;
             container.appendChild(node);
         }
 
-        return shape;
+        return that;
     },
 
     create: function (container) {
@@ -132,8 +132,8 @@ var Shape = Base.extend({
     // 删除根节点下所有的子元素
     clear: function () {
 
-        var shape = this;
-        var node = shape.node;
+        var that = this;
+        var node = that.node;
 
         if (node && node.ownerDocument) {
             while (node.lastChild) {
@@ -141,17 +141,17 @@ var Shape = Base.extend({
             }
         }
 
-        return shape;
+        return that;
     },
 
     getScreenOffset: function () {
 
-        var shape = this;
-        var strokeWidth = shape.stencil && shape.stencil.strokewidth !== 'inherit'
-            ? shape.stencil.strokewidth
-            : shape.strokewidth;
+        var that = this;
+        var strokeWidth = that.stencil && that.stencil.strokewidth !== 'inherit'
+            ? that.stencil.strokewidth
+            : that.strokewidth;
 
-        return (utils.mod(Math.max(1, Math.round(strokeWidth * shape.scale)), 2) === 1) ? 0.5 : 0;
+        return (utils.mod(Math.max(1, Math.round(strokeWidth * that.scale)), 2) === 1) ? 0.5 : 0;
     },
 
     reconfigure: function () {
@@ -160,22 +160,24 @@ var Shape = Base.extend({
 
     redraw: function () {
 
-        var shape = this;
-        var node = shape.node;
+        var that = this;
+        var node = that.node;
 
-        shape.updateBoundsFromPoints();
+        that.updateBoundsFromPoints();
 
-        if (shape.visible && shape.checkBounds()) {
+        if (that.visible && that.checkBounds()) {
             node.style.visibility = 'visible';
-            shape.clear()
-                .redrawShape()
-                .updateBoundingBox();
+            // 删除根节点下的所有子元素
+            that.clear();
+            //
+            that.redrawShape();
+            that.updateBoundingBox();
         } else {
             node.style.visibility = 'hidden';
-            shape.boundingBox = null;
+            that.boundingBox = null;
         }
 
-        return shape;
+        return that;
     },
 
     redrawShape: function () {
@@ -235,7 +237,7 @@ var Shape = Base.extend({
         if (shape.stencil) {
             shape.stencil.drawShape(canvas, shape, x, y, w, h);
         } else {
-            // Stencils have separate strokewidth
+            // Stencils have separate strokeWidth
             canvas.setStrokeWidth(shape.strokewidth);
 
             if (shape.points) {
@@ -266,13 +268,9 @@ var Shape = Base.extend({
         this.paintForeground(c, x, y, w, h);
     },
 
-    paintBackground: function (c, x, y, w, h) {
+    paintBackground: function (c, x, y, w, h) { },
 
-    },
-
-    paintForeground: function (c, x, y, w, h) {
-
-    },
+    paintForeground: function (c, x, y, w, h) { },
 
     paintEdgeShape: function (c, pts) {},
 
