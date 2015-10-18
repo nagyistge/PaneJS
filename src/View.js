@@ -45,12 +45,12 @@ module.exports = Class.create({
 
     constructor: function View(graph) {
 
-        var view = this;
+        var that = this;
 
-        view.graph = graph || null;
-        view.translate = new Point();
-        view.graphBounds = new Rectangle();
-        view.states = new Dictionary();
+        that.graph = graph || null;
+        that.translate = new Point();
+        that.graphBounds = new Rectangle();
+        that.states = new Dictionary();
     },
 
     init: function () {
@@ -67,32 +67,33 @@ module.exports = Class.create({
 
     getBounds: function (cells) {
 
-        var view = this;
+        var that = this;
         var result = null;
 
-        if (cells && cells.length) {
+        if (!cells || !cells.length) {
+            return result;
+        }
 
-            var model = view.graph.getModel();
+        var model = that.graph.getModel();
 
-            each(cells, function (cell) {
+        each(cells, function (cell) {
 
-                if (model.isVertex(cell) || model.isEdge(cell)) {
+            if (model.isVertex(cell) || model.isEdge(cell)) {
 
-                    var state = view.getState(cell);
+                var state = that.getState(cell);
 
-                    if (state) {
+                if (state) {
 
-                        var rect = new Rectangle(state.x, state.y, state.width, state.height);
+                    var rect = new Rectangle(state.x, state.y, state.width, state.height);
 
-                        if (result) {
-                            result.add(rect);
-                        } else {
-                            result = rect;
-                        }
+                    if (result) {
+                        result.add(rect);
+                    } else {
+                        result = rect;
                     }
                 }
-            });
-        }
+            }
+        });
 
         return result;
     },
@@ -111,48 +112,50 @@ module.exports = Class.create({
     },
 
     scaleAndTranslate: function (scale, dx, dy) {
-        var view = this;
-        var ts = view.translate;
-        var previousScale = view.scale;
+
+        var that = this;
+        var ts = that.translate;
+        var previousScale = that.scale;
         var previousTranslate = new Point(ts.x, ts.y);
 
         if (previousScale !== scale || ts.x !== dx || ts.y !== dy) {
 
-            view.scale = scale;
+            that.scale = scale;
 
-            view.translate.x = dx;
-            view.translate.y = dy;
+            that.translate.x = dx;
+            that.translate.y = dy;
 
-            if (view.isEventsEnabled()) {
-                view.revalidate();
-                view.graph.sizeDidChange();
+            if (that.isEventEnabled()) {
+                that.revalidate();
+                that.graph.sizeDidChange();
             }
         }
 
-        view.fireEvent(new EventObject(mxEvent.SCALE_AND_TRANSLATE,
+        that.fireEvent(new EventObject(mxEvent.SCALE_AND_TRANSLATE,
             'scale', scale, 'previousScale', previousScale,
-            'translate', view.translate, 'previousTranslate', previousTranslate));
+            'translate', that.translate, 'previousTranslate', previousTranslate));
     },
 
     getScale: function () {
         return this.scale;
     },
 
-    setScale: function (value) {
-        var view = this;
-        var previousScale = view.scale;
+    setScale: function (scale) {
 
-        if (previousScale !== value) {
-            view.scale = value;
+        var that = this;
+        var previousScale = that.scale;
 
-            if (view.isEventsEnabled()) {
-                view.revalidate();
-                view.graph.sizeDidChange();
+        if (previousScale !== scale) {
+            that.scale = scale;
+
+            if (that.isEventEnabled()) {
+                that.revalidate();
+                that.graph.sizeDidChange();
             }
         }
 
-        view.fireEvent(new EventObject(mxEvent.SCALE,
-            'scale', value, 'previousScale', previousScale));
+        //that.fireEvent(new EventObject('scale',
+        //    'scale', scale, 'previousScale', previousScale));
     },
 
     getTranslate: function () {
@@ -160,68 +163,81 @@ module.exports = Class.create({
     },
 
     setTranslate: function (dx, dy) {
-        var view = this;
-        var translate = view.translate;
+
+        var that = this;
+        var translate = that.translate;
         var previousTranslate = new Point(translate.x, translate.y);
 
         if (translate.x !== dx || translate.y !== dy) {
             translate.x = dx;
             translate.y = dy;
 
-            if (view.isEventsEnabled()) {
-                view.revalidate();
-                view.graph.sizeDidChange();
+            if (that.isEventEnabled()) {
+                that.revalidate();
+                that.graph.sizeDidChange();
             }
         }
 
-        view.fireEvent(new EventObject(mxEvent.TRANSLATE,
+        that.fireEvent(new EventObject(mxEvent.TRANSLATE,
             'translate', translate, 'previousTranslate', previousTranslate));
     },
 
     refresh: function () {
-        if (this.currentRoot != null) {
-            this.clear();
+
+        var that = this;
+
+        if (that.currentRoot) {
+            that.clear();
         }
 
-        this.revalidate();
+        that.revalidate();
+
+        return that;
     },
 
     revalidate: function () {
-        this.invalidate();
-        this.validate();
+
+        var that = this;
+
+        that.invalidate();
+        that.validate();
+
+        return that;
     },
 
     clear: function (cell, force, recurse) {
-        var view = this;
-        var model = view.graph.getModel();
+
+        var that = this;
+        var model = that.graph.getModel();
 
         cell = cell || model.getRoot();
         force = !isNullOrUndefined(force) ? force : false;
         recurse = !isNullOrUndefined(recurse) ? recurse : true;
 
-        view.removeState(cell);
+        that.removeState(cell);
 
-        if (recurse && (force || cell !== this.currentRoot)) {
+        if (recurse && (force || cell !== that.currentRoot)) {
 
             var childCount = model.getChildCount(cell);
 
             for (var i = 0; i < childCount; i++) {
-                view.clear(model.getChildAt(cell, i), force);
+                that.clear(model.getChildAt(cell, i), force);
             }
         } else {
-            view.invalidate(cell);
+            that.invalidate(cell);
         }
     },
 
     invalidate: function (cell, recurse, includeEdges) {
-        var view = this;
-        var model = view.graph.getModel();
+
+        var that = this;
+        var model = that.graph.getModel();
 
         cell = cell || model.getRoot();
         recurse = !isNullOrUndefined(recurse) ? recurse : true;
         includeEdges = !isNullOrUndefined(includeEdges) ? includeEdges : true;
 
-        var state = view.getState(cell);
+        var state = that.getState(cell);
 
         if (state) {
             state.invalid = true;
@@ -231,22 +247,20 @@ module.exports = Class.create({
         if (!cell.invalidating) {
             cell.invalidating = true;
 
-            // Recursively invalidates all descendants
             if (recurse) {
                 var childCount = model.getChildCount(cell);
 
                 for (var i = 0; i < childCount; i++) {
                     var child = model.getChildAt(cell, i);
-                    view.invalidate(child, recurse, includeEdges);
+                    that.invalidate(child, recurse, includeEdges);
                 }
             }
 
-            // Propagates invalidation to all connected edges
             if (includeEdges) {
                 var edgeCount = model.getEdgeCount(cell);
 
                 for (var i = 0; i < edgeCount; i++) {
-                    view.invalidate(model.getEdgeAt(cell, i), recurse, includeEdges);
+                    that.invalidate(model.getEdgeAt(cell, i), recurse, includeEdges);
                 }
             }
 
@@ -255,25 +269,106 @@ module.exports = Class.create({
     },
 
     validate: function (cell) {
-        this.resetValidationState();
 
-        var graphBounds = this.getBoundingBox(this.validateCellState(
-            this.validateCell(cell || ((this.currentRoot != null) ?
-                    this.currentRoot : this.graph.getModel().getRoot()))));
+        var that = this;
 
-        this.setGraphBounds((graphBounds != null) ? graphBounds : this.getEmptyBounds());
+        if (!cell) {
+            cell = that.currentRoot || that.graph.getModel().getRoot();
+        }
 
-        this.validateBackground();
+        that.resetValidationState();
 
-        this.resetValidationState();
+        that.validateCell(cell);
+        that.validateCellState(cell);
+        var graphBounds = that.getBoundingBox(cell);
+
+        that.setGraphBounds(graphBounds || that.getEmptyBounds());
+        that.validateBackground();
+        that.resetValidationState();
     },
 
-    getEmptyBounds: function () {
-        var view = this;
-        var translate = view.translate;
-        var scale = view.scale;
+    validateCell: function (cell, visible) {
 
-        return new Rectangle(translate.x * scale, translate.y * scale);
+        var that = this;
+
+        if (!cell) {
+            return cell;
+        }
+
+        visible = !isNullOrUndefined(visible) ? visible : true;
+        visible = visible && that.graph.isCellVisible(cell);
+
+        var state = that.getState(cell, visible);
+
+        if (state && !visible) {
+            that.removeState(cell);
+        } else {
+
+            var model = that.graph.getModel();
+            var childCount = model.getChildCount(cell);
+
+            for (var i = 0; i < childCount; i++) {
+                this.validateCell(model.getChildAt(cell, i), visible &&
+                    (!this.isCellCollapsed(cell) || cell == this.currentRoot));
+            }
+        }
+
+        return cell;
+    },
+
+    validateCellState: function (cell, recurse) {
+
+        var view = this;
+        var state = null;
+
+        if (!cell) {
+            return state;
+        }
+
+        state = view.getState(cell);
+
+        if (!state) {
+            return state;
+        }
+
+        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+
+        var model = view.graph.getModel();
+
+        if (state.invalid) {
+            state.invalid = false;
+
+            if (cell !== this.currentRoot) {
+                this.validateCellState(model.getParent(cell), false);
+            }
+
+            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, true), false), true);
+            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, false), false), false);
+
+            this.updateCellState(state);
+
+            // Repaint happens immediately after the cell is validated
+            if (cell !== this.currentRoot) {
+                this.graph.cellRenderer.redraw(state, false, this.isRendering());
+            }
+        }
+
+        if (recurse) {
+            state.updateCachedBounds();
+
+            // Updates order in DOM if recursively traversing
+            if (state.shape) {
+                this.stateValidated(state);
+            }
+
+            var childCount = model.getChildCount(cell);
+
+            for (var i = 0; i < childCount; i++) {
+                this.validateCellState(model.getChildAt(cell, i));
+            }
+        }
+
+        return state;
     },
 
     getBoundingBox: function (state, recurse) {
@@ -320,6 +415,14 @@ module.exports = Class.create({
         return bbox;
     },
 
+    getEmptyBounds: function () {
+        var view = this;
+        var translate = view.translate;
+        var scale = view.scale;
+
+        return new Rectangle(translate.x * scale, translate.y * scale);
+    },
+
     createBackgroundPageShape: function (bounds) {
 
     },
@@ -351,90 +454,6 @@ module.exports = Class.create({
         backgroundImage.bounds.height = this.scale * bg.height;
 
         backgroundImage.redraw();
-    },
-
-    validateCell: function (cell, visible) {
-
-        var view = this;
-
-        if (!cell) {
-            return cell;
-        }
-
-        visible = !isNullOrUndefined(visible) ? visible : true;
-        visible = visible && view.graph.isCellVisible(cell);
-
-        var state = view.getState(cell, visible);
-
-        if (state && !visible) {
-            view.removeState(cell);
-        } else {
-
-            var model = view.graph.getModel();
-            var childCount = model.getChildCount(cell);
-
-            for (var i = 0; i < childCount; i++) {
-                this.validateCell(model.getChildAt(cell, i), visible &&
-                    (!this.isCellCollapsed(cell) || cell == this.currentRoot));
-            }
-        }
-
-        return cell;
-    },
-
-    validateCellState: function (cell, recurse) {
-
-        var view = this;
-        var state = null;
-
-        if (isNullOrUndefined(cell)) {
-            return state;
-        }
-
-        state = view.getState(cell);
-
-        if (isNullOrUndefined(state)) {
-            return state;
-        }
-
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-
-        var model = view.graph.getModel();
-
-        if (state.invalid) {
-            state.invalid = false;
-
-            if (cell != this.currentRoot) {
-                this.validateCellState(model.getParent(cell), false);
-            }
-
-            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, true), false), true);
-            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, false), false), false);
-
-            this.updateCellState(state);
-
-            // Repaint happens immediately after the cell is validated
-            if (cell != this.currentRoot) {
-                this.graph.cellRenderer.redraw(state, false, this.isRendering());
-            }
-        }
-
-        if (recurse) {
-            state.updateCachedBounds();
-
-            // Updates order in DOM if recursively traversing
-            if (state.shape != null) {
-                this.stateValidated(state);
-            }
-
-            var childCount = model.getChildCount(cell);
-
-            for (var i = 0; i < childCount; i++) {
-                this.validateCellState(model.getChildAt(cell, i));
-            }
-        }
-
-        return state;
     },
 
     updateCellState: function (state) {
@@ -566,7 +585,7 @@ module.exports = Class.create({
 
     getState: function (cell, create) {
 
-        var view = this;
+        var that = this;
         var state = null;
 
         if (!cell) {
@@ -575,14 +594,14 @@ module.exports = Class.create({
 
         create = create || false;
 
-        state = view.states.get(cell);
+        state = that.states.get(cell);
 
-        if (create && (!state || view.updateStyle) && view.graph.isCellVisible(cell)) {
+        if (create && (!state || that.updateStyle) && that.graph.isCellVisible(cell)) {
             if (!state) {
-                state = view.createState(cell);
-                view.states.set(cell, state);
+                state = that.createState(cell);
+                that.states.set(cell, state);
             } else { // updateStyle
-                state.style = view.graph.getCellStyle(cell);
+                state.style = that.graph.getCellStyle(cell);
             }
         }
 
@@ -717,8 +736,10 @@ module.exports = Class.create({
 
         return this;
     },
+
     // 更新容器的样式
     updateContainerStyle: function (container) {},
+
     destroy: function () {}
 });
 

@@ -19,12 +19,15 @@
             var container = document.getElementById('graphContainer');
 
             var graph = new Graph(container);
+
+            graph.getView().setScale(1.5);
+
             var parent = graph.getDefaultParent();
 
             graph.getModel().beginUpdate();
 
             try {
-                graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
+                graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 100);
             }
             finally {
                 graph.getModel().endUpdate();
