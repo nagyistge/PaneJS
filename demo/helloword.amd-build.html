@@ -20,14 +20,17 @@
 
             var graph = new Graph(container);
 
-            graph.getView().setScale(1.5);
+            //            graph.getView().setScale(1.5);
+            //            graph.getView().setTranslate(10, 20);
 
             var parent = graph.getDefaultParent();
 
             graph.getModel().beginUpdate();
 
             try {
-                graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 100);
+                var v1 = graph.insertVertex(parent, null, 'Hello, ', 20, 20, 100, 100);
+                var v2 = graph.insertVertex(parent, null, 'PaneJS', 200, 150, 80, 30);
+                var e1 = graph.insertEdge(parent, null, '', v1, v2);
             }
             finally {
                 graph.getModel().endUpdate();

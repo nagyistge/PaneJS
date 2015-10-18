@@ -184,8 +184,8 @@ var Shape = Class.create({
         if (canvas) {
             canvas.pointerEvents = that.pointerEvents;
 
-            that.paint(canvas)
-                .destroyCanvas(canvas);
+            that.paint(canvas);
+            that.destroyCanvas(canvas);
         }
 
         return that;

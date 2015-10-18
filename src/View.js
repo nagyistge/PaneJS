@@ -178,8 +178,8 @@ module.exports = Class.create({
             }
         }
 
-        that.fireEvent(new EventObject(mxEvent.TRANSLATE,
-            'translate', translate, 'previousTranslate', previousTranslate));
+        //that.fireEvent(new EventObject(mxEvent.TRANSLATE,
+        //    'translate', translate, 'previousTranslate', previousTranslate));
     },
 
     refresh: function () {
@@ -268,6 +268,7 @@ module.exports = Class.create({
         }
     },
 
+    //
     validate: function (cell) {
 
         var that = this;
@@ -287,6 +288,7 @@ module.exports = Class.create({
         that.resetValidationState();
     },
 
+    // 创建或移除 cell 对应的 state
     validateCell: function (cell, visible) {
 
         var that = this;
@@ -608,6 +610,19 @@ module.exports = Class.create({
         return state;
     },
 
+    createState: function (cell) {
+        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
+        var model = this.graph.getModel();
+
+        if (state.view.graph.container != null && state.cell != state.view.currentRoot &&
+            (model.isVertex(state.cell) || model.isEdge(state.cell))) {
+            // 根据 state 中的样式，初始化 state 对应的 shape
+            this.graph.cellRenderer.createShape(state);
+        }
+
+        return state;
+    },
+
     isRendering: function () {
         return this.rendering;
     },
@@ -665,17 +680,7 @@ module.exports = Class.create({
 
         return state;
     },
-    createState: function (cell) {
-        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
-        var model = this.graph.getModel();
 
-        if (state.view.graph.container != null && state.cell != state.view.currentRoot &&
-            (model.isVertex(state.cell) || model.isEdge(state.cell))) {
-            this.graph.cellRenderer.createShape(state);
-        }
-
-        return state;
-    },
     getCanvas: function () {
         return this.canvas;
     },
