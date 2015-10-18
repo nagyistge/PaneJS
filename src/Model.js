@@ -430,7 +430,9 @@ module.exports = Class.create({
     },
     valueForCellChanged: function (cell, value) {},
 
-    getGeometry: function (cell) {},
+    getGeometry: function (cell) {
+        return cell ? cell.getGeometry() : null;
+    },
     setGeometry: function (cell, geometry) {},
     geometryForCellChanged: function (cell, geometry) {},
 

@@ -17,18 +17,18 @@ module.exports = Rectangle.extend({
 
     view: null,
     cell: null,
-    style: null,
-    invalid: true,
+    style: null,    // cellStyle
+    shape: null,
+    text: null,
+    invalid: true,  // 某个 cell 是否无效，true 表示需要重绘
     origin: null,
     absolutePoints: null,
     absoluteOffset: null,
     visibleSourceState: null,
     visibleTargetState: null,
     terminalDistance: 0,
-    //length: 0, // length 导致 isArrayLike 判断出错
+    //length: 0, // FIXME: length 导致 isArrayLike 判断出错
     segments: null,
-    shape: null,
-    text: null,
 
     getPerimeterBounds: function (border, bounds) {
         border = border || 0;
@@ -102,9 +102,11 @@ module.exports = Rectangle.extend({
     getCellBounds: function () {
         return this.cellBounds;
     },
+
     getPaintBounds: function () {
         return this.paintBounds;
     },
+
     updateCachedBounds: function () {
         var tr = this.view.translate;
         var s = this.view.scale;
@@ -118,6 +120,7 @@ module.exports = Rectangle.extend({
     },
 
     clone: function () {
+
     },
 
     destroy: function () {

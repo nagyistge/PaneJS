@@ -621,7 +621,9 @@ module.exports = Class.create({
     fit: function () {},
     scrollCellToVisible: function () {},
     scrollRectToVisible: function () {},
-    getCellGeometry: function () {},
+    getCellGeometry: function (cell) {
+        return this.model.getGeometry(cell);
+    },
     isCellVisible: function (cell) {
         return this.model.isVisible(cell);
     },

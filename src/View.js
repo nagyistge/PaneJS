@@ -19,14 +19,20 @@ module.exports = Class.create({
 
     Implements: Event,
 
+    // 属性
+    // ----
+
+    graph: null,
+
     EMPTY_POINT: new Point(),
+    // 国际化
     doneResource: '',
     updatingDocumentResource: '',
+
     allowEval: true,
     captureDocumentGesture: true,
     optimizeVmlReflows: true,
     rendering: true,
-    graph: null,
     currentRoot: null,
     graphBounds: null,
     scale: 1,
@@ -41,7 +47,7 @@ module.exports = Class.create({
 
         var view = this;
 
-        view.graph = graph;
+        view.graph = graph || null;
         view.translate = new Point();
         view.graphBounds = new Rectangle();
         view.states = new Dictionary();
@@ -456,7 +462,7 @@ module.exports = Class.create({
 
             var geo = this.graph.getCellGeometry(state.cell);
 
-            if (geo != null) {
+            if (geo) {
                 if (!model.isEdge(state.cell)) {
                     offset = geo.offset || this.EMPTY_POINT;
 
@@ -502,7 +508,27 @@ module.exports = Class.create({
         return this.graph.isCellCollapsed(cell);
     },
 
-    updateVertexState: function (state, geo) {},
+    updateVertexState: function (state, geo) {
+        var model = this.graph.getModel();
+        var pState = this.getState(model.getParent(state.cell));
+
+        if (geo.relative && pState && !model.isEdge(pState.cell)) {
+            var alpha = mxUtils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
+
+            if (alpha != 0) {
+                var cos = Math.cos(alpha);
+                var sin = Math.sin(alpha);
+
+                var ct = new Point(state.getCenterX(), state.getCenterY());
+                var cx = new Point(pState.getCenterX(), pState.getCenterY());
+                var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+                state.x = pt.x - state.width / 2;
+                state.y = pt.y - state.height / 2;
+            }
+        }
+
+        this.updateVertexLabelOffset(state);
+    },
 
     updateEdgeState: function (state, geo) {},
 
@@ -551,7 +577,7 @@ module.exports = Class.create({
 
         state = view.states.get(cell);
 
-        if (create && (!state  || view.updateStyle) && view.graph.isCellVisible(cell)) {
+        if (create && (!state || view.updateStyle) && view.graph.isCellVisible(cell)) {
             if (!state) {
                 state = view.createState(cell);
                 view.states.set(cell, state);

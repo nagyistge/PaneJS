@@ -40,6 +40,7 @@ var CellRenderer = Class.create({
         state.shape.init(state.view.getDrawPane());
     },
 
+    // 创建 state 之后，调用该方法初始化 state 的 shape
     createShape: function (state) {
         if (state.style != null) {
             // 模板
@@ -815,10 +816,10 @@ var CellRenderer = Class.create({
 
             // Redraws the cell if required, ignores changes to bounds if points are
             // defined as the bounds are updated for the given points inside the shape
-            if (force || state.shape.bounds == null || state.shape.scale != state.view.scale ||
+            if (force || !state.shape.bounds || state.shape.scale != state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
                 (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
-                if (state.absolutePoints != null) {
+                if (state.absolutePoints) {
                     state.shape.points = state.absolutePoints.slice();
                     state.shape.bounds = null;
                 } else {

@@ -1190,38 +1190,38 @@ var proto = {
 
     addNode: function (filled, stroked) {
 
-        var canvas = this;
-        var root = canvas.root;
-        var node = canvas.node;
-        var state = canvas.state;
+        var that = this;
+        var root = that.root;
+        var node = that.node;
+        var state = that.state;
 
         if (!node) {
-            return canvas;
+            return that;
         }
 
 
         if (node.nodeName === 'path') {
 
-            var path = canvas.path;
+            var path = that.path;
             if (path && path.length) {
                 node.setAttribute('d', path.join(' '));
             } else {
-                return canvas;
+                return that;
             }
         }
 
         //
         if (filled && state.fillColor) {
-            canvas.updateFill();
-        } else if (!canvas.styleEnabled) {
+            that.updateFill();
+        } else if (!that.styleEnabled) {
             node.setAttribute('fill', 'none');
             // Sets the actual filled state for stroke tolerance
             filled = false;
         }
 
         if (stroked && state.strokeColor) {
-            state.updateStroke();
-        } else if (!canvas.styleEnabled) {
+            that.updateStroke();
+        } else if (!that.styleEnabled) {
             node.setAttribute('stroke', 'none');
         }
 
@@ -1230,27 +1230,27 @@ var proto = {
         }
 
         if (state.shadow) {
-            root.appendChild(canvas.createShadow(node));
+            root.appendChild(that.createShadow(node));
         }
 
         // Adds stroke tolerance
-        if (canvas.strokeTolerance > 0 && !filled) {
-            root.appendChild(canvas.createTolerance(node));
+        if (that.strokeTolerance > 0 && !filled) {
+            root.appendChild(that.createTolerance(node));
         }
 
         // Adds pointer events
-        if (canvas.pointerEvents && (node.nodeName != 'path' ||
+        if (that.pointerEvents && (node.nodeName != 'path' ||
             this.path[this.path.length - 1] == this.closeOp)) {
             node.setAttribute('pointer-events', this.pointerEventsValue);
         }
         // Enables clicks for nodes inside a link element
-        else if (!canvas.pointerEvents && canvas.originalRoot === null) {
+        else if (!that.pointerEvents && that.originalRoot === null) {
             node.setAttribute('pointer-events', 'none');
         }
 
         root.appendChild(node);
 
-        return canvas;
+        return that;
     },
 
     updateFill: function () {

@@ -14,16 +14,18 @@ var getValue = utils.getValue;
 var getNumber = utils.getNumber;
 var isNullOrUndefined = utils.isNullOrUndefined;
 
+// style 的属性：style[constants.STYLE_SHAPE]
+
 var Shape = Class.create({
 
-    node: null,     // 形状的根节点
+    node: null,     // 图形的根节点，通常是 g 元素
     state: null,    // cellState
     style: null,    // cellStyle
+    bounds: null,   // Rectangle 表示该图形的区域范围
+    boundingBox: null, // 图形的边框
     stencil: null,
     scale: 1,
-    bounds: null,
     points: null,
-    boundingBox: null,
     svgStrokeTolerance: 8,
     antiAlias: true, // 抗锯齿，平滑处理
     pointerEvents: true,
@@ -44,6 +46,7 @@ var Shape = Class.create({
         shape.flipV = false; // 垂直翻转
     },
 
+    // 根据 state.style 初始化该图形的样式属性
     apply: function (state) {
 
         var shape = this;
@@ -103,6 +106,7 @@ var Shape = Class.create({
         return shape;
     },
 
+    // 创建该图形的根节点
     init: function (container) {
 
         var shape = this;
@@ -123,6 +127,7 @@ var Shape = Class.create({
             null;
     },
 
+    // 删除根节点下所有的子元素
     clear: function () {
 
         var shape = this;
@@ -173,17 +178,17 @@ var Shape = Class.create({
 
     redrawShape: function () {
 
-        var shape = this;
-        var canvas = shape.createCanvas();
+        var that = this;
+        var canvas = that.createCanvas();
 
         if (canvas) {
-            canvas.pointerEvents = shape.pointerEvents;
+            canvas.pointerEvents = that.pointerEvents;
 
-            shape.paint(canvas)
+            that.paint(canvas)
                 .destroyCanvas(canvas);
         }
 
-        return shape;
+        return that;
     },
 
     paint: function (canvas) {
@@ -259,9 +264,13 @@ var Shape = Class.create({
         this.paintForeground(c, x, y, w, h);
     },
 
-    paintBackground: function (c, x, y, w, h) {},
+    paintBackground: function (c, x, y, w, h) {
 
-    paintForeground: function (c, x, y, w, h) {},
+    },
+
+    paintForeground: function (c, x, y, w, h) {
+
+    },
 
     paintEdgeShape: function (c, pts) {},
 
@@ -369,24 +378,18 @@ var Shape = Class.create({
     updateBoundsFromPoints: function () {
 
         var shape = this;
-        var bounds = null;
+        var bounds;
 
-        each(shape.points || [], function (point) {
-
-            if (!point) {
-                return;
-            }
+        each(shape.points || [], function (point, index) {
 
             var rect = new Rectangle(point.x, point.y, 1, 1);
 
-            if (bounds) {
-                bounds.add(rect);
+            if (index === 0) {
+                shape.bounds = bounds = rect;
             } else {
-                bounds = rect;
+                bounds.add(rect);
             }
         });
-
-        shape.bounds = bounds;
 
         return shape;
     },
@@ -465,16 +468,16 @@ var Shape = Class.create({
 
     createCanvas: function () {
 
-        var shape = this;
-        var node = shape.node;
+        var that = this;
+        var node = that.node;
         var canvas = new Canvas2D(node, false);
 
-        canvas.strokeTolerance = shape.pointerEvents ? shape.svgStrokeTolerance : 0;
-        canvas.pointerEventsValue = shape.svgPointerEvents;
+        canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
+        canvas.pointerEventsValue = that.svgPointerEvents;
         canvas.blockImagePointerEvents = false;//mxClient.IS_FF;
-        canvas.antiAlias = shape.antiAlias; // 抗锯齿
+        canvas.antiAlias = that.antiAlias; // 抗锯齿
 
-        var off = this.getSvgScreenOffset();
+        var off = that.getScreenOffset();
 
         if (off === 0) {
             node.removeAttribute('transform');
@@ -482,7 +485,7 @@ var Shape = Class.create({
             node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
         }
 
-        if (shape.outline) {
+        if (that.outline) {
             canvas.setStrokeWidth(this.strokewidth);
             canvas.setStrokeColor(this.stroke);
 
