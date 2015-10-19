@@ -11,6 +11,10 @@ var constants = require('./constants');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');
 var CellState = require('./CellState');
+var client = require('./client');
+var MouseEvent = require('./events/MouseEvent');
+var domEvent = require('./events/domEvent');
+var eventNames = require('./events/eventNames');
 
 var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -1084,24 +1088,99 @@ module.exports = Class.create({
     getCanvas: function () {
         return this.canvas;
     },
+
     getBackgroundPane: function () {
         return this.backgroundPane;
     },
+
     getDrawPane: function () {
         return this.drawPane;
     },
+
     getOverlayPane: function () {
         return this.overlayPane;
     },
+
     getDecoratorPane: function () {
         return this.decoratorPane;
     },
-    isContainerEvent: function (evt) {},
 
-    isScrollEvent: function (evt) {},
+    isScrollEvent: function (evt) {
+        var that = this;
+        var container = that.graph.container;
+
+        var offset = utils.getOffset(container);
+        var pt = new Point(evt.clientX - offset.left, evt.clientY - offset.top);
+
+        var outWidth = container.offsetWidth;
+        var inWidth = container.clientWidth;
+
+        if (outWidth > inWidth && pt.x > inWidth + 2 && pt.x <= outWidth) {
+            return true;
+        }
+
+        var outHeight = container.offsetHeight;
+        var inHeight = container.clientHeight;
+
+        return outHeight > inHeight && pt.y > inHeight + 2 && pt.y <= outHeight;
+    },
+
+    isContainerEvent: function (evt) {
+        var that = this;
+        var source = domEvent.getSource(evt);
+
+        return (source === that.graph.container ||
+        source.parentNode == that.backgroundPane ||
+        (source.parentNode && source.parentNode.parentNode === that.backgroundPane) ||
+        source === that.canvas.parentNode ||
+        source === that.canvas ||
+        source === that.backgroundPane ||
+        source === that.drawPane ||
+        source === that.overlayPane ||
+        source === that.decoratorPane);
+    },
 
     installListeners: function () {
-        return this;
+
+        var that = this;
+        var graph = that.graph;
+        var container = graph.container;
+
+        if (container) {
+
+            // Support for touch device gestures (eg. pinch to zoom)
+            // Double-tap handling is implemented in graph.fireMouseEvent
+            if (client.IS_TOUCH) {
+
+                var handler = function (evt) {
+                    graph.fireGestureEvent(evt);
+                    domEvent.consume(evt);
+                };
+
+                domEvent.on(container, 'gesturestart', handler);
+                domEvent.on(container, 'gesturechange', handler);
+                domEvent.on(container, 'gestureend', handler);
+            }
+
+            domEvent.onGesture(container,
+                function (evt) {
+                    // Condition to avoid scrollbar events starting a rubberband selection
+                    if (that.isContainerEvent(evt) &&
+                        ((!client.IS_IE && !client.IS_IE11 && !client.IS_GC && !client.IS_OP && !client.IS_SF) || !that.isScrollEvent(evt))) {
+                        graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt));
+                    }
+                },
+                function (evt) {
+                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_MOVE, new MouseEvent(evt));
+                },
+                function (evt) {
+                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt));
+                });
+
+        }
+
+
+        return that;
     },
 
     createSvg: function () {

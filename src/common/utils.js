@@ -353,6 +353,46 @@ utils.isNode = function (node, nodeName, attributeName, attributeValue) {
     return ret;
 };
 
+utils.getOffset = function (container, scrollOffset) {
+    var offsetLeft = 0;
+    var offsetTop = 0;
+
+    if (scrollOffset != null && scrollOffset) {
+        var offset = utils.getDocumentScrollOrigin(container.ownerDocument);
+        offsetLeft += offset.left;
+        offsetTop += offset.top;
+    }
+
+    while (container.offsetParent) {
+        offsetLeft += container.offsetLeft;
+        offsetTop += container.offsetTop;
+
+        container = container.offsetParent;
+    }
+
+    return {
+        left: offsetLeft,
+        top: offsetTop
+    };
+};
+
+utils.getDocumentScrollOrigin = function (doc) {
+    var wnd = doc.defaultView || doc.parentWindow;
+
+    var x = (wnd && window.pageXOffset !== undefined)
+        ? window.pageXOffset
+        : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+
+    var y = (wnd && window.pageYOffset !== undefined)
+        ? window.pageYOffset
+        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+    return {
+        left: x,
+        top: y
+    };
+};
+
 utils.createSvgGroup = function () {};
 
 utils.write = function (parent, text) {
