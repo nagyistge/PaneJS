@@ -27,6 +27,7 @@ var CellRenderer = Class.create({
         }
     },
 
+    // 属性
     defaultEdgeShape: null,
     defaultVertexShape: RectangleShape,
     defaultTextShape: Text,
