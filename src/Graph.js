@@ -9,6 +9,7 @@ var View = require('./View');
 var Model = require('./Model');
 var Cell = require('./Cell');
 var Geometry = require('./Geometry');
+var Rectangle = require('./Rectangle');
 var Point = require('./Point');
 var CellRenderer = require('./CellRenderer');
 var Stylesheet = require('./Stylesheet');
@@ -306,9 +307,184 @@ module.exports = Class.create({
     createPanningManager: function () {},
     getBorderSizes: function () {},
     getPreferredPageSize: function (bounds, width, height) {},
-    sizeDidChange: function () {},
-    doResizeContainer: function (width, height) {},
-    updatePageBreaks: function (visible, width, height) {},
+    sizeDidChange: function () {
+        var bounds = this.getGraphBounds();
+
+        if (this.container) {
+            var border = this.getBorder();
+
+            var width = Math.max(0, bounds.x + bounds.width + 1 + border);
+            var height = Math.max(0, bounds.y + bounds.height + 1 + border);
+
+            if (this.minimumContainerSize) {
+                width = Math.max(width, this.minimumContainerSize.width);
+                height = Math.max(height, this.minimumContainerSize.height);
+            }
+
+            if (this.resizeContainer) {
+                this.doResizeContainer(width, height);
+            }
+
+            //if (this.preferPageSize || (!mxClient.IS_IE && this.pageVisible)) {
+            if (this.preferPageSize || this.pageVisible) {
+                var size = this.getPreferredPageSize(bounds, width, height);
+
+                if (size != null) {
+                    width = size.width;
+                    height = size.height;
+                }
+            }
+
+            if (this.minimumGraphSize != null) {
+                width = Math.max(width, this.minimumGraphSize.width * this.view.scale);
+                height = Math.max(height, this.minimumGraphSize.height * this.view.scale);
+            }
+
+            width = Math.ceil(width - 1);
+            height = Math.ceil(height - 1);
+
+            //if (this.dialect == mxConstants.DIALECT_SVG) {
+            var root = this.view.getDrawPane().ownerSVGElement;
+
+            root.style.minWidth = Math.max(1, width) + 'px';
+            root.style.minHeight = Math.max(1, height) + 'px';
+            root.style.width = '100%';
+            root.style.height = '100%';
+            //}
+            //else {
+            //    if (mxClient.IS_QUIRKS) {
+            // Quirks mode has no minWidth/minHeight support
+            //this.view.updateHtmlCanvasSize(Math.max(1, width), Math.max(1, height));
+            //}
+            //else {
+            //    this.view.canvas.style.minWidth = Math.max(1, width) + 'px';
+            //    this.view.canvas.style.minHeight = Math.max(1, height) + 'px';
+            //}
+            //}
+
+            return;
+
+            this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
+        }
+
+        //this.fireEvent(new mxEventObject(mxEvent.SIZE, 'bounds', bounds));
+    },
+    doResizeContainer: function (width, height) {
+        // Fixes container size for different box models
+        //if (mxClient.IS_IE) {
+        //    if (mxClient.IS_QUIRKS) {
+        //        var borders = this.getBorderSizes();
+        //
+        //        // max(2, ...) required for native IE8 in quirks mode
+        //        width += Math.max(2, borders.x + borders.width + 1);
+        //        height += Math.max(2, borders.y + borders.height + 1);
+        //    }
+        //    else if (document.documentMode >= 9) {
+        //        width += 3;
+        //        height += 5;
+        //    }
+        //    else {
+        //        width += 1;
+        //        height += 1;
+        //    }
+        //}
+        //else {
+        height += 1;
+        //}
+
+        if (this.maximumContainerSize != null) {
+            width = Math.min(this.maximumContainerSize.width, width);
+            height = Math.min(this.maximumContainerSize.height, height);
+        }
+
+        this.container.style.width = Math.ceil(width) + 'px';
+        this.container.style.height = Math.ceil(height) + 'px';
+    },
+    updatePageBreaks: function (visible, width, height) {
+        var scale = this.view.scale;
+        var tr = this.view.translate;
+        var fmt = this.pageFormat;
+        var ps = scale * this.pageScale;
+        var bounds = new Rectangle(scale * tr.x, scale * tr.y, fmt.width * ps, fmt.height * ps);
+
+        // Does not show page breaks if the scale is too small
+        visible = visible && Math.min(bounds.width, bounds.height) > this.minPageBreakDist;
+
+        // Draws page breaks independent of translate. To ignore
+        // the translate set bounds.x/y = 0. Note that modulo
+        // in JavaScript has a bug, so use mxUtils instead.
+        bounds.x = utils.mod(bounds.x, bounds.width);
+        bounds.y = utils.mod(bounds.y, bounds.height);
+
+        var horizontalCount = (visible) ? Math.ceil((width - bounds.x) / bounds.width) : 0;
+        var verticalCount = (visible) ? Math.ceil((height - bounds.y) / bounds.height) : 0;
+        var right = width;
+        var bottom = height;
+
+        if (this.horizontalPageBreaks == null && horizontalCount > 0) {
+            this.horizontalPageBreaks = [];
+        }
+
+        if (this.horizontalPageBreaks != null) {
+            for (var i = 0; i <= horizontalCount; i++) {
+                var pts = [new mxPoint(bounds.x + i * bounds.width, 1),
+                    new mxPoint(bounds.x + i * bounds.width, bottom)];
+
+                if (this.horizontalPageBreaks[i] != null) {
+                    this.horizontalPageBreaks[i].points = pts;
+                    this.horizontalPageBreaks[i].redraw();
+                }
+                else {
+                    var pageBreak = new mxPolyline(pts, this.pageBreakColor);
+                    pageBreak.dialect = this.dialect;
+                    pageBreak.pointerEvents = false;
+                    pageBreak.isDashed = this.pageBreakDashed;
+                    pageBreak.init(this.view.backgroundPane);
+                    pageBreak.redraw();
+
+                    this.horizontalPageBreaks[i] = pageBreak;
+                }
+            }
+
+            for (var i = horizontalCount; i < this.horizontalPageBreaks.length; i++) {
+                this.horizontalPageBreaks[i].destroy();
+            }
+
+            this.horizontalPageBreaks.splice(horizontalCount, this.horizontalPageBreaks.length - horizontalCount);
+        }
+
+        if (this.verticalPageBreaks == null && verticalCount > 0) {
+            this.verticalPageBreaks = [];
+        }
+
+        if (this.verticalPageBreaks != null) {
+            for (var i = 0; i <= verticalCount; i++) {
+                var pts = [new Point(1, bounds.y + i * bounds.height),
+                    new Point(right, bounds.y + i * bounds.height)];
+
+                if (this.verticalPageBreaks[i] != null) {
+                    this.verticalPageBreaks[i].points = pts;
+                    this.verticalPageBreaks[i].redraw();
+                }
+                else {
+                    var pageBreak = new mxPolyline(pts, this.pageBreakColor);
+                    pageBreak.dialect = this.dialect;
+                    pageBreak.pointerEvents = false;
+                    pageBreak.isDashed = this.pageBreakDashed;
+                    pageBreak.init(this.view.backgroundPane);
+                    pageBreak.redraw();
+
+                    this.verticalPageBreaks[i] = pageBreak;
+                }
+            }
+
+            for (var i = verticalCount; i < this.verticalPageBreaks.length; i++) {
+                this.verticalPageBreaks[i].destroy();
+            }
+
+            this.verticalPageBreaks.splice(verticalCount, this.verticalPageBreaks.length - verticalCount);
+        }
+    },
 
 
     // Cell styles
@@ -605,7 +781,9 @@ module.exports = Class.create({
 
     // Graph display
     // -------------
-    getGraphBounds: function () {},
+    getGraphBounds: function () {
+        return this.view.getGraphBounds();
+    },
     getCellBounds: function () {},
     getBoundingBoxFromGeometry: function () {},
     refresh: function () {},
@@ -710,7 +888,11 @@ module.exports = Class.create({
     getImage: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_IMAGE] : null;
     },
-    getVerticalAlign: function () {},
+    getVerticalAlign: function (state) {
+        return state && state.style
+            ? (state.style[constants.STYLE_VERTICAL_ALIGN] || constants.ALIGN_MIDDLE ) :
+            null;
+    },
     getIndicatorColor: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_COLOR] : null;
     },
@@ -724,7 +906,9 @@ module.exports = Class.create({
     getIndicatorImage: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_IMAGE] : null;
     },
-    getBorder: function () {},
+    getBorder: function () {
+        return this.border;
+    },
     setBorder: function () {},
     isSwimlane: function () {},
 

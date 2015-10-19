@@ -14,6 +14,7 @@ var CellState = require('./CellState');
 
 var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
+var getValue = utils.getValue;
 
 module.exports = Class.create({
 
@@ -280,8 +281,8 @@ module.exports = Class.create({
         that.resetValidationState();
 
         that.validateCell(cell);
-        that.validateCellState(cell);
-        var graphBounds = that.getBoundingBox(cell);
+        var state = that.validateCellState(cell);
+        var graphBounds = that.getBoundingBox(state);
 
         that.setGraphBounds(graphBounds || that.getEmptyBounds());
         that.validateBackground();
@@ -509,6 +510,7 @@ module.exports = Class.create({
                     }
                 }
 
+                // 设置 scale 和 translate 之后的 x, y, w, h
                 state.x = this.scale * (this.translate.x + state.origin.x);
                 state.y = this.scale * (this.translate.y + state.origin.y);
                 state.width = this.scale * geo.width;
@@ -553,7 +555,55 @@ module.exports = Class.create({
 
     updateEdgeState: function (state, geo) {},
 
-    updateVertexLabelOffset: function (state) {},
+    // 更新 state.absoluteOffset
+    updateVertexLabelOffset: function (state) {
+        var h = getValue(state.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER);
+
+        if (h == constants.ALIGN_LEFT) {
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+
+            if (lw != null) {
+                lw *= this.scale;
+            }
+            else {
+                lw = state.width;
+            }
+
+            state.absoluteOffset.x -= lw;
+        }
+        else if (h == constants.ALIGN_RIGHT) {
+            state.absoluteOffset.x += state.width;
+        }
+        else if (h == constants.ALIGN_CENTER) {
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+
+            if (lw != null) {
+                // Aligns text block with given width inside the vertex width
+                var align = getValue(state.style, constants.STYLE_ALIGN, constants.ALIGN_CENTER);
+                var dx = 0;
+
+                if (align == constants.ALIGN_CENTER) {
+                    dx = 0.5;
+                }
+                else if (align == constants.ALIGN_RIGHT) {
+                    dx = 1;
+                }
+
+                if (dx != 0) {
+                    state.absoluteOffset.x -= (lw * this.scale - state.width) * dx;
+                }
+            }
+        }
+
+        var v = getValue(state.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE);
+
+        if (v == constants.ALIGN_TOP) {
+            state.absoluteOffset.y -= state.height;
+        }
+        else if (v == constants.ALIGN_BOTTOM) {
+            state.absoluteOffset.y += state.height;
+        }
+    },
 
     resetValidationState: function () {
         this.lastNode = null;

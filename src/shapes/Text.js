@@ -1,6 +1,7 @@
 var utils = require('../common/utils');
 var Shape = require('./Shape');
 var Point = require('../Point');
+var Rectangle = require('../Rectangle');
 var constants = require('../constants');
 
 var getValue = utils.getValue;
@@ -54,7 +55,9 @@ module.exports = Shape.extend({
     },
 
     isParseVml: function () {return false},
+
     isHtmlAllowed: function () {return true},
+
     getSvgScreenOffset: function () {return 0},
 
     checkBounds: function () {
@@ -87,10 +90,10 @@ module.exports = Shape.extend({
         this.boundingBox = this.bounds.clone();
         var rot = this.getTextRotation();
 
-        var h = (this.style != null) ? mxUtils.getValue(this.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER) : null;
-        var v = (this.style != null) ? mxUtils.getValue(this.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE) : null;
+        var h = (this.style) ? getValue(this.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER) : null;
+        var v = (this.style) ? getValue(this.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE) : null;
 
-        if (!this.ignoreStringSize && node != null && this.overflow != 'fill' && (!this.clipped || !this.ignoreClippedStringSize || h != constants.ALIGN_CENTER || v != constants.ALIGN_MIDDLE)) {
+        if (!this.ignoreStringSize && node && this.overflow != 'fill' && (!this.clipped || !this.ignoreClippedStringSize || h != constants.ALIGN_CENTER || v != constants.ALIGN_MIDDLE)) {
             var ow = null;
             var oh = null;
 
@@ -114,7 +117,7 @@ module.exports = Shape.extend({
                             return;
                         }
 
-                        this.boundingBox = new mxRectangle(b.x, b.y, b.width, b.height);
+                        this.boundingBox = new Rectangle(b.x, b.y, b.width, b.height);
                         rot = 0;
                     }
                     catch (e) {
@@ -185,7 +188,7 @@ module.exports = Shape.extend({
                 var x0 = this.bounds.x + this.margin.x * ow;
                 var y0 = this.bounds.y + this.margin.y * oh;
 
-                this.boundingBox = new mxRectangle(x0, y0, ow, oh);
+                this.boundingBox = new Rectangle(x0, y0, ow, oh);
             }
         }
         else {
@@ -193,7 +196,7 @@ module.exports = Shape.extend({
             this.boundingBox.y += this.margin.y * this.boundingBox.height;
         }
 
-        if (this.boundingBox != null) {
+        if (this.boundingBox) {
             if (rot != 0) {
                 var bbox = mxUtils.getBoundingBox(this.boundingBox, rot);
 
@@ -255,7 +258,7 @@ module.exports = Shape.extend({
 
         // Always renders labels as HTML in VML
         //var fmt = (realHtml || c instanceof mxVmlCanvas2D) ? 'html' : '';
-        var fmt =  '';
+        var fmt = '';
         var val = this.value;
 
         if (!realHtml && fmt == 'html') {
@@ -582,6 +585,8 @@ module.exports = Shape.extend({
         }
     },
 
+
+    // 根据对齐方式，返回一个代表对齐方式的 point
     updateMargin: function () {
         this.margin = this.getAlignmentAsPoint(this.align, this.valign);
     },
