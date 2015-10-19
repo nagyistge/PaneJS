@@ -23,8 +23,8 @@ module.exports = Class.create({
         style[constants.STYLE_PERIMETER] = perimeter.RectanglePerimeter;
         style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
         style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
-        style[constants.STYLE_FILLCOLOR] = '#C3D9FF';
-        style[constants.STYLE_STROKECOLOR] = '#6482B9';
+        style[constants.STYLE_FILLCOLOR] = '#e3f4ff';
+        style[constants.STYLE_STROKECOLOR] = '#289de9';
         style[constants.STYLE_FONTCOLOR] = '#774400';
 
         return style;
@@ -37,7 +37,7 @@ module.exports = Class.create({
         style[constants.STYLE_ENDARROW] = constants.ARROW_CLASSIC;
         style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
         style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
-        style[constants.STYLE_STROKECOLOR] = '#6482B9';
+        style[constants.STYLE_STROKECOLOR] = '#289de9';
         style[constants.STYLE_FONTCOLOR] = '#446299';
 
         return style;

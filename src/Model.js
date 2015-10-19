@@ -6,6 +6,7 @@ var Event = require('./events/Event');
 var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
+var TerminalChange = require('./changes/TerminalChange');
 var Cell = require('./Cell');
 var UndoableEdit = require('./UndoableEdit');
 
@@ -433,13 +434,25 @@ module.exports = Class.create({
     getGeometry: function (cell) {
         return cell ? cell.getGeometry() : null;
     },
-    setGeometry: function (cell, geometry) {},
+    setGeometry: function (cell, geometry) {
+        if (geometry != this.getGeometry(cell)) {
+            this.execute(new GeometryChange(this, cell, geometry));
+        }
+
+        return geometry;
+    },
     geometryForCellChanged: function (cell, geometry) {},
 
     getStyle: function (cell) {
         return cell ? cell.getStyle() : null;
     },
-    setStyle: function (cell, style) {},
+    setStyle: function (cell, style) {
+        if (style != this.getStyle(cell)) {
+            this.execute(new StyleChange(this, cell, style));
+        }
+
+        return style;
+    },
     styleForCellChanged: function (cell, style) {},
 
     isCollapsed: function (cell) {},

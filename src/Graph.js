@@ -13,10 +13,17 @@ var Rectangle = require('./Rectangle');
 var Point = require('./Point');
 var CellRenderer = require('./CellRenderer');
 var Stylesheet = require('./Stylesheet');
+var edgeStyle = require('./edgeStyle');
+
+var ConnectionConstraint = require('./ConnectionConstraint');
+
 var RootChange = require('./changes/RootChange');
 var ChildChange = require('./changes/ChildChange');
+var TerminalChange = require('./changes/TerminalChange');
+var GeometryChange = require('./changes/GeometryChange');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
+var getValue = utils.getValue;
 
 module.exports = Class.create({
     Implements: Event,
@@ -257,6 +264,11 @@ module.exports = Class.create({
                 if (change.previous != null) {
                     this.view.invalidate(change.previous, false, false);
                 }
+            }
+        } else if (change instanceof TerminalChange || change instanceof GeometryChange) {
+            if (change instanceof TerminalChange || ((change.previous == null && change.geometry != null) ||
+                (change.previous != null && !change.previous.equals(change.geometry)))) {
+                this.view.invalidate(change.cell);
             }
         }
 
@@ -514,8 +526,25 @@ module.exports = Class.create({
         return style;
     },
     postProcessCellStyle: function (style) {},
-    setCellStyle: function (style, cells) {},
-    setCellStyles: function (key, value, cells) {},
+    setCellStyle: function (style, cells) {
+        cells = cells || this.getSelectionCells();
+
+        if (cells) {
+            this.model.beginUpdate();
+            try {
+                for (var i = 0; i < cells.length; i++) {
+                    this.model.setStyle(cells[i], style);
+                }
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
+    setCellStyles: function (key, value, cells) {
+        cells = cells || this.getSelectionCells();
+        utils.setCellStyles(this.model, cells, key, value);
+    },
     toggleCellStyle: function (key, defaultValue, cell) {},
     toggleCellStyles: function (key, defaultValue, cells) {},
     toggleCellStyleFlags: function (key, flag, cells) {},
@@ -569,7 +598,9 @@ module.exports = Class.create({
         return vertex;
     },
     insertEdge: function (parent, id, value, source, target, style) {
+        var edge = this.createEdge(parent, id, value, source, target, style);
 
+        return this.addEdge(edge, parent, source, target);
     },
     createEdge: function (parent, id, value, source, target, style) {
         var geometry = new Geometry();
@@ -581,7 +612,9 @@ module.exports = Class.create({
 
         return edge;
     },
-    addEdge: function (edge, parent, source, target, index) {},
+    addEdge: function (edge, parent, source, target, index) {
+        return this.addCell(edge, parent, index, source, target);
+    },
     addCell: function (cell, parent, index, source, target) {
         return this.addCells([cell], parent, index, source, target)[0];
     },
@@ -747,18 +780,234 @@ module.exports = Class.create({
     getMaximumGraphBounds: function () {},
     constrainChild: function () {},
     resetEdges: function () {},
-    resetEdge: function () {},
+    resetEdge: function (edge) {
+        var geo = this.model.getGeometry(edge);
+
+        // Resets the control points
+        if (geo != null && geo.points != null && geo.points.length > 0) {
+            geo = geo.clone();
+            geo.points = [];
+            this.model.setGeometry(edge, geo);
+        }
+
+        return edge;
+    },
 
 
     // Cell connecting and connection constraints
     // ------------------------------------------
     getOutlineConstraint: function () {},
     getAllConnectionConstraints: function () {},
-    getConnectionConstraint: function () {},
-    setConnectionConstraint: function () {},
-    getConnectionPoint: function () {},
+
+    getConnectionConstraint: function (linkState, terminalState, isSource) {
+        var point = null;
+        var x = linkState.style[(isSource) ? constants.STYLE_EXIT_X : constants.STYLE_ENTRY_X];
+
+        if (x != null) {
+            var y = linkState.style[(isSource) ? constants.STYLE_EXIT_Y : constants.STYLE_ENTRY_Y];
+
+            if (y != null) {
+                point = new Point(parseFloat(x), parseFloat(y));
+            }
+        }
+
+        var perimeter = false;
+
+        if (point != null) {
+            perimeter = getValue(linkState.style, (isSource)
+                ? constants.STYLE_EXIT_PERIMETER
+                : constants.STYLE_ENTRY_PERIMETER, true);
+        }
+
+        return new ConnectionConstraint(point, perimeter);
+    },
+    setConnectionConstraint: function (edge, terminal, source, constraint) {
+        if (constraint) {
+            this.model.beginUpdate();
+
+            try {
+                if (constraint == null || constraint.point == null) {
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
+                        mxConstants.STYLE_ENTRY_X, null, [edge]);
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
+                        mxConstants.STYLE_ENTRY_Y, null, [edge]);
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
+                        mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                }
+                else if (constraint.point != null) {
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
+                        mxConstants.STYLE_ENTRY_X, constraint.point.x, [edge]);
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
+                        mxConstants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
+
+                    // Only writes 0 since 1 is default
+                    if (!constraint.perimeter) {
+                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
+                            mxConstants.STYLE_ENTRY_PERIMETER, '0', [edge]);
+                    }
+                    else {
+                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
+                            mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                    }
+                }
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
+    getConnectionPoint: function (vertex, constraint) {
+        var point = null;
+
+        if (vertex != null && constraint.point != null) {
+            var bounds = this.view.getPerimeterBounds(vertex);
+            var cx = new Point(bounds.getCenterX(), bounds.getCenterY());
+            var direction = vertex.style[constants.STYLE_DIRECTION];
+            var r1 = 0;
+
+            // Bounds need to be rotated by 90 degrees for further computation
+            if (direction != null) {
+                if (direction == mxConstants.DIRECTION_NORTH) {
+                    r1 += 270;
+                }
+                else if (direction == mxConstants.DIRECTION_WEST) {
+                    r1 += 180;
+                }
+                else if (direction == mxConstants.DIRECTION_SOUTH) {
+                    r1 += 90;
+                }
+
+                // Bounds need to be rotated by 90 degrees for further computation
+                if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
+                    bounds.rotate90();
+                }
+            }
+
+            if (constraint.point != null) {
+                var sx = 1;
+                var sy = 1;
+                var dx = 0;
+                var dy = 0;
+
+                // LATER: Add flipping support for image shapes
+                if (this.getModel().isVertex(vertex.cell)) {
+                    var flipH = vertex.style[mxConstants.STYLE_FLIPH];
+                    var flipV = vertex.style[mxConstants.STYLE_FLIPV];
+
+                    // Legacy support for stencilFlipH/V
+                    if (vertex.shape != null && vertex.shape.stencil != null) {
+                        flipH = mxUtils.getValue(vertex.style, 'stencilFlipH', 0) == 1 || flipH;
+                        flipV = mxUtils.getValue(vertex.style, 'stencilFlipV', 0) == 1 || flipV;
+                    }
+
+                    if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
+                        var tmp = flipH;
+                        flipH = flipV;
+                        flipV = tmp;
+                    }
+
+                    if (flipH) {
+                        sx = -1;
+                        dx = -bounds.width;
+                    }
+
+                    if (flipV) {
+                        sy = -1;
+                        dy = -bounds.height;
+                    }
+                }
+
+                point = new mxPoint(bounds.x + constraint.point.x * bounds.width * sx - dx,
+                    bounds.y + constraint.point.y * bounds.height * sy - dy);
+            }
+
+            // Rotation for direction before projection on perimeter
+            var r2 = vertex.style[mxConstants.STYLE_ROTATION] || 0;
+
+            if (constraint.perimeter) {
+                if (r1 != 0 && point != null) {
+                    // Only 90 degrees steps possible here so no trig needed
+                    var cos = 0;
+                    var sin = 0;
+
+                    if (r1 == 90) {
+                        sin = 1;
+                    }
+                    else if (r1 == 180) {
+                        cos = -1;
+                    }
+                    else if (r1 == 270) {
+                        sin = -1;
+                    }
+
+                    point = mxUtils.getRotatedPoint(point, cos, sin, cx);
+                }
+
+                if (point != null && constraint.perimeter) {
+                    point = this.view.getPerimeterPoint(vertex, point, false);
+                }
+            }
+            else {
+                r2 += r1;
+            }
+
+            // Generic rotation after projection on perimeter
+            if (r2 != 0 && point != null) {
+                var rad = mxUtils.toRadians(r2);
+                var cos = Math.cos(rad);
+                var sin = Math.sin(rad);
+
+                point = mxUtils.getRotatedPoint(point, cos, sin, cx);
+            }
+        }
+
+        if (point != null) {
+            point.x = Math.round(point.x);
+            point.y = Math.round(point.y);
+        }
+
+        return point;
+    },
     connectCell: function () {},
-    cellConnected: function () {},
+    cellConnected: function (edge, terminal, source, constraint) {
+        if (edge) {
+            this.model.beginUpdate();
+            try {
+                var previous = this.model.getTerminal(edge, source);
+
+                // Updates the constraint
+                this.setConnectionConstraint(edge, terminal, source, constraint);
+
+                // Checks if the new terminal is a port, uses the ID of the port in the
+                // style and the parent of the port as the actual terminal of the edge.
+                if (this.isPortsEnabled()) {
+                    var id = null;
+
+                    if (this.isPort(terminal)) {
+                        id = terminal.getId();
+                        terminal = this.getTerminalForPort(terminal, source);
+                    }
+
+                    // Sets or resets all previous information for connecting to a child port
+                    var key = source ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+                    this.setCellStyles(key, id, [edge]);
+                }
+
+                this.model.setTerminal(edge, terminal, source);
+
+                if (this.resetEdgesOnConnect) {
+                    this.resetEdge(edge);
+                }
+
+                //this.fireEvent(new mxEventObject(mxEvent.CELL_CONNECTED,
+                //    'edge', edge, 'terminal', terminal, 'source', source,
+                //    'previous', previous));
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
     disconnectGraph: function () {},
 
 
@@ -768,7 +1017,9 @@ module.exports = Class.create({
         return this.view.currentRoot;
     },
     getTranslateForRoot: function () {},
-    isPort: function () {},
+    isPort: function (cell) {
+        return false;
+    },
     getTerminalForPort: function () {},
     getChildOffsetForCell: function (cell) {
         return null;
@@ -809,7 +1060,23 @@ module.exports = Class.create({
         return this.model.isCollapsed(cell);
     },
     isCellConnectable: function () {},
-    isOrthogonal: function () {},
+
+    isOrthogonal: function (edge) {
+        var orthogonal = edge.style[constants.STYLE_ORTHOGONAL];
+
+        if (orthogonal != null) {
+            return orthogonal;
+        }
+
+        var tmp = this.view.getEdgeStyle(edge);
+
+        return tmp == edgeStyle.SegmentConnector ||
+            tmp == edgeStyle.ElbowConnector ||
+            tmp == edgeStyle.SideToSide ||
+            tmp == edgeStyle.TopToBottom ||
+            tmp == edgeStyle.EntityRelation ||
+            tmp == edgeStyle.OrthConnector;
+    },
     isLoop: function () {},
     isCloneEvent: function () {},
     isToggleEvent: function () {},
@@ -951,7 +1218,9 @@ module.exports = Class.create({
     setCellsMovable: function () {},
     isGridEnabled: function () {},
     setGridEnabled: function () {},
-    isPortsEnabled: function () {},
+    isPortsEnabled: function () {
+        return this.portsEnabled;
+    },
     setPortsEnabled: function () {},
     getGridSize: function () {},
     setGridSize: function () {},

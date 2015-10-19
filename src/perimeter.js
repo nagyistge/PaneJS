@@ -1,3 +1,5 @@
+var Point = require('./Point');
+
 module.exports =
 {
     RectanglePerimeter: function (bounds, vertex, next, orthogonal) {
@@ -6,7 +8,7 @@ module.exports =
         var dx = next.x - cx;
         var dy = next.y - cy;
         var alpha = Math.atan2(dy, dx);
-        var p = new mxPoint(0, 0);
+        var p = new Point(0, 0);
         var pi = Math.PI;
         var pi2 = Math.PI / 2;
         var beta = pi2 - alpha;

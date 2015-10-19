@@ -1003,7 +1003,7 @@ var proto = {
     },
 
     stroke: function () {
-        this.addNode(false, false);
+        this.addNode(false, true);
     },
 
     fill: function () {

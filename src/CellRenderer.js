@@ -10,6 +10,7 @@ var constants = require('./constants');
 var Shape = require('./shapes/Shape');
 var RectangleShape = require('./shapes/RectangleShape');
 var Text = require('./shapes/Text');
+var Connector = require('./shapes/Connector');
 
 
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -28,7 +29,7 @@ var CellRenderer = Class.create({
     },
 
     // 属性
-    defaultEdgeShape: null,
+    defaultEdgeShape: Connector,
     defaultVertexShape: RectangleShape,
     defaultTextShape: Text,
     legacyControlPosition: true,

@@ -385,5 +385,55 @@ utils.toRadians = function (deg) {
     return Math.PI * deg / 180;
 };
 
+utils.setCellStyles = function (model, cells, key, value) {
+    if (cells && cells.length) {
+        model.beginUpdate();
+        try {
+            for (var i = 0; i < cells.length; i++) {
+                if (cells[i] != null) {
+                    var style = utils.setStyle(model.getStyle(cells[i]), key, value);
+                    model.setStyle(cells[i], style);
+                }
+            }
+        }
+        finally {
+            model.endUpdate();
+        }
+    }
+};
+
+utils.setStyle = function (style, key, value) {
+    var isValue = value != null && (typeof(value.length) == 'undefined' || value.length > 0);
+
+    if (style == null || style.length == 0) {
+        if (isValue) {
+            style = key + '=' + value;
+        }
+    }
+    else {
+        var index = style.indexOf(key + '=');
+
+        if (index < 0) {
+            if (isValue) {
+                var sep = (style.charAt(style.length - 1) == ';') ? '' : ';';
+                style = style + sep + key + '=' + value;
+            }
+        }
+        else {
+            var tmp = (isValue) ? (key + '=' + value) : '';
+            var cont = style.indexOf(';', index);
+
+            if (!isValue) {
+                cont++;
+            }
+
+            style = style.substring(0, index) + tmp +
+                ((cont > index) ? style.substring(cont) : '');
+        }
+    }
+
+    return style;
+};
+
 module.exports = utils;
 

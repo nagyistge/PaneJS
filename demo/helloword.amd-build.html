@@ -8,7 +8,7 @@
 </head>
 <body>
 <div id="graphContainer"
-     style="position:relative;overflow:hidden;width:321px;height:241px;background:url('images/grid.gif');cursor:default;">
+     style="position:relative;overflow:hidden;width:800px;height:600px;background:url('images/grid.gif');cursor:default;">
 </div>
 <script>
     window.onload = function () {
@@ -20,17 +20,17 @@
 
             var graph = new Graph(container);
 
-                        graph.getView().setScale(1.5);
-                        graph.getView().setTranslate(10, 20);
+            graph.getView().setScale(1.5);
+            graph.getView().setTranslate(10, 20);
 
             var parent = graph.getDefaultParent();
 
             graph.getModel().beginUpdate();
 
             try {
-                var v1 = graph.insertVertex(parent, null, 'Hello, ',  20, 20, 80, 30);
-//                var v2 = graph.insertVertex(parent, null, 'PaneJS', 200, 150, 80, 30);
-//                var e1 = graph.insertEdge(parent, null, '', v1, v2);
+                var v1 = graph.insertVertex(parent, null, 'Hello, ', 20, 20, 80, 30);
+                var v2 = graph.insertVertex(parent, null, 'PaneJS', 200, 150, 80, 30);
+                var e1 = graph.insertEdge(parent, null, '', v1, v2);
             }
             finally {
                 graph.getModel().endUpdate();

@@ -553,7 +553,38 @@ module.exports = Class.create({
         this.updateVertexLabelOffset(state);
     },
 
-    updateEdgeState: function (state, geo) {},
+    updateEdgeState: function (linkState, geo) {
+        var sourceState = linkState.getVisibleTerminalState(true);
+        var targetState = linkState.getVisibleTerminalState(false);
+
+        // This will remove edges with no terminals and no terminal points
+        // as such edges are invalid and produce NPEs in the edge styles.
+        // Also removes connected edges that have no visible terminals.
+        if ((this.graph.model.getTerminal(linkState.cell, true) && sourceState == null) ||
+            (sourceState == null && geo.getTerminalPoint(true) == null) ||
+            (this.graph.model.getTerminal(linkState.cell, false) && targetState == null) ||
+            (targetState == null && geo.getTerminalPoint(false) == null)) {
+            this.clear(linkState.cell, true);
+        }
+        else {
+            this.updateFixedTerminalPoints(linkState, sourceState, targetState);
+            this.updatePoints(linkState, geo.points, sourceState, targetState);
+            this.updateFloatingTerminalPoints(linkState, sourceState, targetState);
+
+            var pts = linkState.absolutePoints;
+
+            if (linkState.cell != this.currentRoot && (pts == null || pts.length < 2 ||
+                pts[0] == null || pts[pts.length - 1] == null)) {
+                // This will remove edges with invalid points from the list of states in the view.
+                // Happens if the one of the terminals and the corresponding terminal point is null.
+                this.clear(linkState.cell, true);
+            }
+            else {
+                this.updateEdgeBounds(linkState);
+                this.updateEdgeLabelOffset(linkState);
+            }
+        }
+    },
 
     // 更新 state.absoluteOffset
     updateVertexLabelOffset: function (state) {
@@ -614,26 +645,345 @@ module.exports = Class.create({
 
     stateValidated: function (state) {},
 
-    updateFixedTerminalPoints: function (edge, source, target) {},
+    updateFixedTerminalPoints: function (linkState, sourceState, targetState) {
+        this.updateFixedTerminalPoint(linkState, sourceState, true, this.graph.getConnectionConstraint(linkState, sourceState, true));
+        this.updateFixedTerminalPoint(linkState, targetState, false, this.graph.getConnectionConstraint(linkState, targetState, false));
+    },
 
-    updateFixedTerminalPoint: function (edge, terminal, source, constraint) {},
-    updatePoints: function (edge, points, source, target) {},
+    updateFixedTerminalPoint: function (linkState, terminalState, isSource, constraint) {
+        var pt = null;
+
+        if (constraint) {
+            pt = this.graph.getConnectionPoint(terminalState, constraint);
+        }
+
+        if (pt == null && terminalState == null) {
+            var origin = linkState.origin;
+            var scale = this.scale;
+            var translate = this.translate;
+            var geo = this.graph.getCellGeometry(linkState.cell);
+            pt = geo.getTerminalPoint(isSource);
+
+            if (pt != null) {
+                pt = new Point(scale * (translate.x + pt.x + origin.x),
+                    scale * (translate.y + pt.y + origin.y));
+            }
+        }
+
+        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    },
+
+    updatePoints: function (linkState, points, sourceState, targetState) {
+        if (linkState != null) {
+            var pts = [];
+            pts.push(linkState.absolutePoints[0]);
+            var edgeStyle = this.getEdgeStyle(linkState, points, sourceState, targetState);
+
+            if (edgeStyle != null) {
+                var src = this.getTerminalPort(linkState, sourceState, true);
+                var trg = this.getTerminalPort(linkState, targetState, false);
+
+                edgeStyle(linkState, src, trg, points, pts);
+            }
+            else if (points != null) {
+                for (var i = 0; i < points.length; i++) {
+                    if (points[i] != null) {
+                        var pt = mxUtils.clone(points[i]);
+                        pts.push(this.transformControlPoint(linkState, pt));
+                    }
+                }
+            }
+
+            var tmp = linkState.absolutePoints;
+            pts.push(tmp[tmp.length - 1]);
+
+            linkState.absolutePoints = pts;
+        }
+    },
+
     transformControlPoint: function (state, pt) {},
-    getEdgeStyle: function (edge, points, source, target) {},
-    updateFloatingTerminalPoints: function (state, source, target) {},
-    updateFloatingTerminalPoint: function (edge, start, end, source) {},
-    getTerminalPort: function (state, terminal, source) {},
-    getPerimeterPoint: function (terminal, next, orthogonal, border) {},
+
+    getEdgeStyle: function (linkState, points, sourceState, targetState) {
+        var edgeStyle = (sourceState && sourceState === targetState)
+            ? getValue(linkState.style, constants.STYLE_LOOP, this.graph.defaultLoopStyle)
+            : (!getValue(linkState.style, constants.STYLE_NOEDGESTYLE, false) ? linkState.style[constants.STYLE_EDGE] : null);
+
+        // Converts string values to objects
+        if (typeof(edgeStyle) == "string") {
+            var tmp = mxStyleRegistry.getValue(edgeStyle);
+
+            if (tmp == null && this.isAllowEval()) {
+                tmp = mxUtils.eval(edgeStyle);
+            }
+
+            edgeStyle = tmp;
+        }
+
+        if (typeof(edgeStyle) == "function") {
+            return edgeStyle;
+        }
+
+        return null;
+    },
+
+    updateFloatingTerminalPoints: function (linkState, sourceState, targetState) {
+        var pts = linkState.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (pe == null && targetState != null) {
+            this.updateFloatingTerminalPoint(linkState, targetState, sourceState, false);
+        }
+
+        if (p0 == null && sourceState != null) {
+            this.updateFloatingTerminalPoint(linkState, sourceState, targetState, true);
+        }
+    },
+
+    // 获取连线与节点的连接点
+    updateFloatingTerminalPoint: function (linkState, start, end, isSource) {
+        start = this.getTerminalPort(linkState, start, isSource);
+        var next = this.getNextPoint(linkState, end, isSource);
+
+        var orth = this.graph.isOrthogonal(linkState);
+        var alpha = utils.toRadians(Number(start.style[constants.STYLE_ROTATION] || '0'));
+        var center = new Point(start.getCenterX(), start.getCenterY());
+
+        if (alpha != 0) {
+            var cos = Math.cos(-alpha);
+            var sin = Math.sin(-alpha);
+            next = utils.getRotatedPoint(next, cos, sin, center);
+        }
+
+        var border = parseFloat(linkState.style[constants.STYLE_PERIMETER_SPACING] || 0);
+        border += parseFloat(linkState.style[(isSource) ?
+                constants.STYLE_SOURCE_PERIMETER_SPACING :
+                constants.STYLE_TARGET_PERIMETER_SPACING] || 0);
+        var pt = this.getPerimeterPoint(start, next, alpha == 0 && orth, border);
+
+        if (alpha != 0) {
+            var cos = Math.cos(alpha);
+            var sin = Math.sin(alpha);
+            pt = utils.getRotatedPoint(pt, cos, sin, center);
+        }
+
+        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    },
+
+    getTerminalPort: function (linkState, terminalState, isSource) {
+        var key = (isSource) ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+        var id = getValue(linkState.style, key);
+
+        if (id != null) {
+            var tmp = this.getState(this.graph.getModel().getCell(id));
+
+            // Only uses ports where a cell state exists
+            if (tmp != null) {
+                terminalState = tmp;
+            }
+        }
+
+        return terminalState;
+    },
+
+    // 获取周长路径上的点
+    getPerimeterPoint: function (terminal, next, orthogonal, border) {
+        var point = null;
+
+        if (terminal != null) {
+            var perimeter = this.getPerimeterFunction(terminal);
+
+            if (perimeter != null && next != null) {
+                var bounds = this.getPerimeterBounds(terminal, border);
+
+                if (bounds.width > 0 || bounds.height > 0) {
+                    point = perimeter(bounds, terminal, next, orthogonal);
+
+                    if (point != null) {
+                        point.x = Math.round(point.x);
+                        point.y = Math.round(point.y);
+                    }
+                }
+            }
+
+            if (point == null) {
+                point = this.getPoint(terminal);
+            }
+        }
+
+        return point;
+    },
+
     getRoutingCenterX: function (state) {},
+
     getRoutingCenterY: function (state) {},
-    getPerimeterBounds: function (terminal, border) {},
-    getPerimeterFunction: function (state) {},
-    getNextPoint: function (edge, opposite, source) {},
-    getVisibleTerminal: function (edge, source) {},
-    updateEdgeBounds: function (state) {},
+
+    getPerimeterBounds: function (terminal, border) {
+        border = (border != null) ? border : 0;
+
+        if (terminal != null) {
+            border += parseFloat(terminal.style[constants.STYLE_PERIMETER_SPACING] || 0);
+        }
+
+        return terminal.getPerimeterBounds(border * this.scale);
+
+    },
+
+    getPerimeterFunction: function (state) {
+        var perimeter = state.style[constants.STYLE_PERIMETER];
+
+        // Converts string values to objects
+        if (typeof(perimeter) == "string") {
+            var tmp = mxStyleRegistry.getValue(perimeter);
+
+            if (tmp == null && this.isAllowEval()) {
+                tmp = mxUtils.eval(perimeter);
+            }
+
+            perimeter = tmp;
+        }
+
+        if (typeof(perimeter) == "function") {
+            return perimeter;
+        }
+
+        return null;
+    },
+
+    getNextPoint: function (edge, opposite, source) {
+        var pts = edge.absolutePoints;
+        var point = null;
+
+        if (pts != null && pts.length >= 2) {
+            var count = pts.length;
+            point = pts[(source) ? Math.min(1, count - 1) : Math.max(0, count - 2)];
+        }
+
+        if (point == null && opposite != null) {
+            point = new Point(opposite.getCenterX(), opposite.getCenterY());
+        }
+
+        return point;
+    },
+    getVisibleTerminal: function (edge, source) {
+        var model = this.graph.getModel();
+        var result = model.getTerminal(edge, source);
+        var best = result;
+
+        while (result && result != this.currentRoot) {
+            if (!this.graph.isCellVisible(best) || this.isCellCollapsed(result)) {
+                best = result;
+            }
+
+            result = model.getParent(result);
+        }
+
+        // Checks if the result is not a layer
+        if (model.getParent(best) == model.getRoot()) {
+            best = null;
+        }
+
+        return best;
+    },
+    updateEdgeBounds: function (state) {
+        var points = state.absolutePoints;
+        var p0 = points[0];
+        var pe = points[points.length - 1];
+
+        if (p0.x != pe.x || p0.y != pe.y) {
+            var dx = pe.x - p0.x;
+            var dy = pe.y - p0.y;
+            state.terminalDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+        else {
+            state.terminalDistance = 0;
+        }
+
+        var length = 0;
+        var segments = [];
+        var pt = p0;
+
+        if (pt != null) {
+            var minX = pt.x;
+            var minY = pt.y;
+            var maxX = minX;
+            var maxY = minY;
+
+            for (var i = 1; i < points.length; i++) {
+                var tmp = points[i];
+
+                if (tmp != null) {
+                    var dx = pt.x - tmp.x;
+                    var dy = pt.y - tmp.y;
+
+                    var segment = Math.sqrt(dx * dx + dy * dy);
+                    segments.push(segment);
+                    length += segment;
+
+                    pt = tmp;
+
+                    minX = Math.min(pt.x, minX);
+                    minY = Math.min(pt.y, minY);
+                    maxX = Math.max(pt.x, maxX);
+                    maxY = Math.max(pt.y, maxY);
+                }
+            }
+
+            state.length = length;
+            state.segments = segments;
+
+            var markerSize = 1; // TODO: include marker size
+
+            state.x = minX;
+            state.y = minY;
+            state.width = Math.max(markerSize, maxX - minX);
+            state.height = Math.max(markerSize, maxY - minY);
+        }
+    },
     getPoint: function (state, geometry) {},
     getRelativePoint: function (edgeState, x, y) {},
-    updateEdgeLabelOffset: function (state) {},
+    updateEdgeLabelOffset: function (state) {
+        var points = state.absolutePoints;
+
+        state.absoluteOffset.x = state.getCenterX();
+        state.absoluteOffset.y = state.getCenterY();
+
+        if (points != null && points.length > 0 && state.segments != null) {
+            var geometry = this.graph.getCellGeometry(state.cell);
+
+            if (geometry.relative) {
+                var offset = this.getPoint(state, geometry);
+
+                if (offset != null) {
+                    state.absoluteOffset = offset;
+                }
+            }
+            else {
+                var p0 = points[0];
+                var pe = points[points.length - 1];
+
+                if (p0 != null && pe != null) {
+                    var dx = pe.x - p0.x;
+                    var dy = pe.y - p0.y;
+                    var x0 = 0;
+                    var y0 = 0;
+
+                    var off = geometry.offset;
+
+                    if (off != null) {
+                        x0 = off.x;
+                        y0 = off.y;
+                    }
+
+                    var x = p0.x + dx / 2 + x0 * this.scale;
+                    var y = p0.y + dy / 2 + y0 * this.scale;
+
+                    state.absoluteOffset.x = x;
+                    state.absoluteOffset.y = y;
+                }
+            }
+        }
+    },
 
     getState: function (cell, create) {
 
