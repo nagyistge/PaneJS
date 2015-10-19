@@ -1177,6 +1177,14 @@ module.exports = Class.create({
                     that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt));
                 });
 
+            // double click
+            domEvent.on(container, 'dblclick', function (evt) {
+                if (that.isContainerEvent(evt)) {
+                    graph.dblClick(evt);
+                }
+            });
+
+
         }
 
 

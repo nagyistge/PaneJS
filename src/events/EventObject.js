@@ -7,11 +7,12 @@ var isNullOrUndefined = utils.isNullOrUndefined;
 
 module.exports = Class.create({
     constructor: function EventObject(name, eventData) {
-        var evtObj = this;
-        var data = evtObj.data = {};
 
-        evtObj.name = name;
-        evtObj.consumed = false;
+        var that = this;
+        var data = that.data = {};
+
+        that.name = name;
+        that.consumed = false;
 
         isObject(eventData) && extend(data, eventData);
     },

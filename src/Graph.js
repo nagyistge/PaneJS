@@ -4,6 +4,7 @@ var Class = require('./common/class');
 var utils = require('./common/utils');
 var Event = require('./events/Event');
 var EventObject = require('./events/EventObject');
+var eventNames = require('./events/eventNames');
 var constants = require('./constants');
 var View = require('./View');
 var Model = require('./Model');
@@ -1379,9 +1380,19 @@ module.exports = Class.create({
     isEventIgnored: function () {},
     isSyntheticEventIgnored: function () {},
     isEventSourceIgnored: function () {},
+
     fireMouseEvent: function () {},
+
     consumeMouseEvent: function () {},
-    fireGestureEvent: function () {},
+
+    fireGestureEvent: function (evt, cell) {
+        // Resets double tap event handling when gestures take place
+        this.lastTouchTime = 0;
+        this.emit(new EventObject(eventNames.GESTURE, {
+            event: evt,
+            cell: cell
+        }));
+    },
 
     destroy: function () {}
 });
