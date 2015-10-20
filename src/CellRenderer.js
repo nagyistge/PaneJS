@@ -2,6 +2,8 @@
 
 var Class = require('./common/class');
 var utils = require('./common/utils');
+var detector = require('./common/detector');
+
 var Dictionary = require('./common/Dictionary');
 var Rectangle = require('./Rectangle');
 var Point = require('./Point');
@@ -12,6 +14,9 @@ var RectangleShape = require('./shapes/RectangleShape');
 var Text = require('./shapes/Text');
 var Connector = require('./shapes/Connector');
 
+var MouseEvent = require('./events/MouseEvent');
+var domEvent = require('./events/domEvent');
+var eventNames = require('./events/eventNames');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getValue = utils.getValue;
@@ -410,69 +415,58 @@ var CellRenderer = Class.create({
 
     // 监听 DOM 事件
     installListeners: function (state) {
+        var that = this;
         var graph = state.view.graph;
-
-        // TODO: event
-        return;
 
         // Workaround for touch devices routing all events for a mouse
         // gesture (down, move, up) via the initial DOM node. Same for
         // HTML images in all IE versions (VML images are working).
-        var getState = function (evt) {
+        function getState(evt) {
             var result = state;
 
-            if ((graph.dialect != constants.DIALECT_SVG && mxEvent.getSource(evt).nodeName == 'IMG') || mxClient.IS_TOUCH) {
-                var x = mxEvent.getClientX(evt);
-                var y = mxEvent.getClientY(evt);
+            if (detector.IS_TOUCH) {
+                var x = domEvent.getClientX(evt);
+                var y = domEvent.getClientY(evt);
 
                 // Dispatches the drop event to the graph which
                 // consumes and executes the source function
-                var pt = mxUtils.convertPoint(graph.container, x, y);
+                var pt = utils.convertPoint(graph.container, x, y);
                 result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
             }
 
             return result;
-        };
+        }
 
-        mxEvent.addGestureListeners(state.shape.node,
-            mxUtils.bind(this, function (evt) {
-                if (this.isShapeEvent(state, evt)) {
-                    // Redirects events from the "event-transparent" region of a
-                    // swimlane to the graph. This is only required in HTML, SVG
-                    // and VML do not fire mouse events on transparent backgrounds.
-                    graph.fireMouseEvent(mxEvent.MOUSE_DOWN,
-                        new mxMouseEvent(evt, (state.shape != null &&
-                        mxEvent.getSource(evt) == state.shape.content) ?
-                            null : state));
+        domEvent.onGesture(state.shape.node,
+            function (evt) {
+                if (that.isShapeEvent(state, evt)) {
+                    state = state.shape && domEvent.getSource(evt) === state.shape.content ? null : state;
+                    graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt, state));
                 }
-            }),
-            mxUtils.bind(this, function (evt) {
-                if (this.isShapeEvent(state, evt)) {
-                    graph.fireMouseEvent(mxEvent.MOUSE_MOVE,
-                        new mxMouseEvent(evt, (state.shape != null &&
-                        mxEvent.getSource(evt) == state.shape.content) ?
-                            null : getState(evt)));
+            },
+            function (evt) {
+                if (that.isShapeEvent(state, evt)) {
+                    state = state.shape && domEvent.getSource(evt) === state.shape.content ? null : getState(evt);
+                    graph.fireMouseEvent(eventNames.MOUSE_MOVE, new MouseEvent(evt, state));
                 }
-            }),
-            mxUtils.bind(this, function (evt) {
-                if (this.isShapeEvent(state, evt)) {
-                    graph.fireMouseEvent(mxEvent.MOUSE_UP,
-                        new mxMouseEvent(evt, (state.shape != null &&
-                        mxEvent.getSource(evt) == state.shape.content) ?
-                            null : getState(evt)));
+            },
+            function (evt) {
+                if (that.isShapeEvent(state, evt)) {
+                    state = state.shape && domEvent.getSource(evt) === state.shape.content ? null : getState(evt);
+                    graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt, state));
                 }
-            })
+            }
         );
+
 
         // Uses double click timeout in mxGraph for quirks mode
         if (graph.nativeDblClickEnabled) {
-            mxEvent.addListener(state.shape.node, 'dblclick',
-                mxUtils.bind(this, function (evt) {
-                    if (this.isShapeEvent(state, evt)) {
+            domEvent.on(state.shape.node, 'dblclick', function (evt) {
+                    if (that.isLabelEvent(state, evt)) {
                         graph.dblClick(evt, state.cell);
-                        mxEvent.consume(evt);
+                        domEvent.consume(evt);
                     }
-                })
+                }
             );
         }
     },

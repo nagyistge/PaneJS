@@ -1315,7 +1315,41 @@ module.exports = Class.create({
     setDefaultParent: function () {},
     getSwimlane: function () {},
     getSwimlaneAt: function () {},
-    getCellAt: function () {},
+    getCellAt: function (x, y, parent, vertices, edges) {
+        vertices = (vertices != null) ? vertices : true;
+        edges = (edges != null) ? edges : true;
+
+        if (parent == null) {
+            parent = this.getCurrentRoot();
+
+            if (parent == null) {
+                parent = this.getModel().getRoot();
+            }
+        }
+
+        if (parent != null) {
+            var childCount = this.model.getChildCount(parent);
+
+            for (var i = childCount - 1; i >= 0; i--) {
+                var cell = this.model.getChildAt(parent, i);
+                var result = this.getCellAt(x, y, cell, vertices, edges);
+
+                if (result != null) {
+                    return result;
+                }
+                else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) ||
+                    vertices && this.model.isVertex(cell))) {
+                    var state = this.view.getState(cell);
+
+                    if (this.intersects(state, x, y)) {
+                        return cell;
+                    }
+                }
+            }
+        }
+
+        return null;
+    },
     intersects: function () {},
     hitsSwimlaneContent: function () {},
     getChildVertices: function () {},

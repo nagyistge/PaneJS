@@ -393,6 +393,36 @@ utils.getDocumentScrollOrigin = function (doc) {
     };
 };
 
+utils.getScrollOrigin = function (node) {
+    var b = document.body;
+    var d = document.documentElement;
+    var result = utils.getDocumentScrollOrigin(node ? node.ownerDocument : document);
+
+    while (node && node !== b && node !== d) {
+        if (!isNaN(node.scrollLeft) && !isNaN(node.scrollTop)) {
+            result.left += node.scrollLeft;
+            result.top += node.scrollTop;
+        }
+
+        node = node.parentNode;
+    }
+
+    return result;
+};
+
+utils.convertPoint = function (container, x, y) {
+    var origin = utils.getScrollOrigin(container);
+    var offset = utils.getOffset(container);
+
+    offset.left -= origin.left;
+    offset.top -= origin.top;
+
+    return {
+        left: x - offset.left,
+        top: y - offset.top
+    };
+};
+
 utils.createSvgGroup = function () {};
 
 utils.write = function (parent, text) {

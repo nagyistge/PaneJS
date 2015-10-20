@@ -1,11 +1,11 @@
 var utils = require('../common/utils');
-var client = require('../client');
+var detector = require('../common/detector');
 
 var each = utils.each;
 var indexOf = utils.indexOf;
 
-var IS_TOUCH = client.IS_TOUCH;
-var IS_POINTER = client.IS_POINTER;
+var IS_TOUCH = detector.IS_TOUCH;
+var IS_POINTER = detector.IS_POINTER;
 
 var domEvent = {
 
@@ -175,7 +175,7 @@ var domEvent = {
 
             var delta = 0;
 
-            if (client.IS_FF) {
+            if (detector.IS_FF) {
                 delta = -evt.detail / 2;
             } else {
                 delta = evt.wheelDelta / 120;
@@ -188,8 +188,8 @@ var domEvent = {
         };
 
         // Webkit has NS event API, but IE event name and details
-        if (client.IS_NS && !document.documentMode) {
-            var eventName = (client.IS_SF || client.IS_GC) ? 'mousewheel' : 'DOMMouseScroll';
+        if (detector.IS_NS && !document.documentMode) {
+            var eventName = (detector.IS_SF || detector.IS_GC) ? 'mousewheel' : 'DOMMouseScroll';
             domEvent.on(window, eventName, wheelHandler);
         } else {
             domEvent.on(document, 'mousewheel', wheelHandler);
@@ -199,6 +199,52 @@ var domEvent = {
 
     getSource: function (evt) {
         return evt.srcElement || evt.target;
+    },
+
+    getMainEvent: function (e) {
+        if ((e.type === 'touchstart' || e.type === 'touchmove') && e.touches && e.touches[0]) {
+            e = e.touches[0];
+        } else if (e.type === 'touchend' && e.changedTouches && e.changedTouches[0]) {
+            e = e.changedTouches[0];
+        }
+
+        return e;
+    },
+
+    getClientX: function (e) {
+        return domEvent.getMainEvent(e).clientX;
+    },
+
+    /**
+     * Function: getClientY
+     *
+     * Returns true if the meta key is pressed for the given event.
+     */
+    getClientY: function (e) {
+        return domEvent.getMainEvent(e).clientY;
+    },
+
+    consume: function (evt, preventDefault, stopPropagation) {
+        preventDefault = preventDefault ? preventDefault : true;
+        stopPropagation = stopPropagation ? stopPropagation : true;
+
+        if (preventDefault) {
+            if (evt.preventDefault) {
+                evt.preventDefault();
+            } else {
+                evt.returnValue = false;
+            }
+        }
+
+        if (stopPropagation) {
+            if (evt.stopPropagation) {
+                evt.stopPropagation();
+            }else{
+                evt.cancelBubble = true;
+            }
+        }
+
+        evt.isConsumed = true;
     },
 
 };
