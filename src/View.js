@@ -4,14 +4,14 @@
 'use strict';
 
 var Class = require('./common/class');
-var utils = require('./common/utils');
 var Event = require('./events/Event');
 var Dictionary = require('./common/Dictionary');
+var utils = require('./common/utils');
+var detector = require('./common/detector');
 var constants = require('./constants');
 var Point = require('./Point');
 var Rectangle = require('./Rectangle');
 var CellState = require('./CellState');
-var client = require('./client');
 var MouseEvent = require('./events/MouseEvent');
 var domEvent = require('./events/domEvent');
 var eventNames = require('./events/eventNames');
@@ -1150,7 +1150,7 @@ module.exports = Class.create({
 
             // Support for touch device gestures (eg. pinch to zoom)
             // Double-tap handling is implemented in graph.fireMouseEvent
-            if (client.IS_TOUCH) {
+            if (detector.IS_TOUCH) {
 
                 var handler = function (evt) {
                     graph.fireGestureEvent(evt);
@@ -1166,7 +1166,7 @@ module.exports = Class.create({
                 function (evt) {
                     // Condition to avoid scrollbar events starting a rubberband selection
                     if (that.isContainerEvent(evt) &&
-                        ((!client.IS_IE && !client.IS_IE11 && !client.IS_GC && !client.IS_OP && !client.IS_SF) || !that.isScrollEvent(evt))) {
+                        ((!detector.IS_IE && !detector.IS_IE11 && !detector.IS_GC && !detector.IS_OP && !detector.IS_SF) || !that.isScrollEvent(evt))) {
                         graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt));
                     }
                 },

@@ -1409,13 +1409,203 @@ module.exports = Class.create({
     // ------------
     addMouseListener: function () {},
     removeMouseListener: function () {},
-    updateMouseEvent: function () {},
+    updateMouseEvent: function (me) {
+        if (me.graphX == null || me.graphY == null) {
+            var pt = mxUtils.convertPoint(this.container, me.getX(), me.getY());
+
+            me.graphX = pt.x - this.panDx;
+            me.graphY = pt.y - this.panDy;
+        }
+
+        return me;
+    },
     getStateForTouchEvent: function () {},
     isEventIgnored: function () {},
     isSyntheticEventIgnored: function () {},
-    isEventSourceIgnored: function () {},
+    isEventSourceIgnored: function (evtName, me) {
+        var source = me.getSource();
+        var name = (source.nodeName != null) ? source.nodeName.toLowerCase() : '';
+        var candidate = !domEvent.isMouseEvent(me.getEvent()) || domEvent.isLeftMouseButton(me.getEvent());
 
-    fireMouseEvent: function () {},
+        return evtName == mxEvent.MOUSE_DOWN && candidate && (name == 'select' || name == 'option' ||
+            (name == 'input' && source.type != 'checkbox' && source.type != 'radio' &&
+            source.type != 'button' && source.type != 'submit' && source.type != 'file'));
+    },
+
+    fireMouseEvent: function (evtName, me, sender) {
+        //if (this.isEventSourceIgnored(evtName, me)) {
+        //    if (this.tooltipHandler != null) {
+        //        this.tooltipHandler.hide();
+        //    }
+        //
+        //    return;
+        //}
+
+        if (sender == null) {
+            sender = this;
+        }
+
+        // Updates the graph coordinates in the event
+        me = this.updateMouseEvent(me);
+
+        // Stops editing for all events other than from cellEditor
+        //if (evtName == mxEvent.MOUSE_DOWN && this.isEditing() && !this.cellEditor.isEventSource(me.getEvent())) {
+        //    this.stopEditing(!this.isInvokesStopCellEditing());
+        //}
+
+        // Detects and processes double taps for touch-based devices which do not have native double click events
+        // or where detection of double click is not always possible (quirks, IE10+). Note that this can only handle
+        // double clicks on cells because the sequence of events in IE prevents detection on the background, it fires
+        // two mouse ups, one of which without a cell but no mousedown for the second click which means we cannot
+        // detect which mouseup(s) are part of the first click, ie we do not know when the first click ends.
+        if ((!this.nativeDblClickEnabled && !mxEvent.isPopupTrigger(me.getEvent())) || (this.doubleTapEnabled &&
+            mxClient.IS_TOUCH && mxEvent.isTouchEvent(me.getEvent()))) {
+            var currentTime = new Date().getTime();
+
+            // NOTE: Second mouseDown for double click missing in quirks mode
+            if ((!mxClient.IS_QUIRKS && evtName == mxEvent.MOUSE_DOWN) || (mxClient.IS_QUIRKS && evtName == mxEvent.MOUSE_UP && !this.fireDoubleClick)) {
+                if (this.lastTouchEvent != null && this.lastTouchEvent != me.getEvent() &&
+                    currentTime - this.lastTouchTime < this.doubleTapTimeout &&
+                    Math.abs(this.lastTouchX - me.getX()) < this.doubleTapTolerance &&
+                    Math.abs(this.lastTouchY - me.getY()) < this.doubleTapTolerance &&
+                    this.doubleClickCounter < 2) {
+                    this.doubleClickCounter++;
+                    var doubleClickFired = false;
+
+                    if (evtName == mxEvent.MOUSE_UP) {
+                        if (me.getCell() == this.lastTouchCell && this.lastTouchCell != null) {
+                            this.lastTouchTime = 0;
+                            var cell = this.lastTouchCell;
+                            this.lastTouchCell = null;
+
+                            // Fires native dblclick event via event source
+                            // NOTE: This fires two double click events on edges in quirks mode. While
+                            // trying to fix this, we realized that nativeDoubleClick can be disabled for
+                            // quirks and IE10+ (or we didn't find the case mentioned above where it
+                            // would not work), ie. all double clicks seem to be working without this.
+                            if (mxClient.IS_QUIRKS) {
+                                me.getSource().fireEvent('ondblclick');
+                            }
+
+                            this.dblClick(me.getEvent(), cell);
+                            doubleClickFired = true;
+                        }
+                    }
+                    else {
+                        this.fireDoubleClick = true;
+                        this.lastTouchTime = 0;
+                    }
+
+                    // Do not ignore mouse up in quirks in this case
+                    if (!mxClient.IS_QUIRKS || doubleClickFired) {
+                        mxEvent.consume(me.getEvent());
+                        return;
+                    }
+                }
+                else if (this.lastTouchEvent == null || this.lastTouchEvent != me.getEvent()) {
+                    this.lastTouchCell = me.getCell();
+                    this.lastTouchX = me.getX();
+                    this.lastTouchY = me.getY();
+                    this.lastTouchTime = currentTime;
+                    this.lastTouchEvent = me.getEvent();
+                    this.doubleClickCounter = 0;
+                }
+            }
+            else if ((this.isMouseDown || evtName == mxEvent.MOUSE_UP) && this.fireDoubleClick) {
+                this.fireDoubleClick = false;
+                var cell = this.lastTouchCell;
+                this.lastTouchCell = null;
+                this.isMouseDown = false;
+
+                // Workaround for Chrome/Safari not firing native double click events for double touch on background
+                var valid = (cell != null) || (mxEvent.isTouchEvent(me.getEvent()) && (mxClient.IS_GC || mxClient.IS_SF));
+
+                if (valid && Math.abs(this.lastTouchX - me.getX()) < this.doubleTapTolerance &&
+                    Math.abs(this.lastTouchY - me.getY()) < this.doubleTapTolerance) {
+                    this.dblClick(me.getEvent(), cell);
+                }
+                else {
+                    mxEvent.consume(me.getEvent());
+                }
+
+                return;
+            }
+        }
+
+        if (!this.isEventIgnored(evtName, me, sender)) {
+            this.fireEvent(new mxEventObject(mxEvent.FIRE_MOUSE_EVENT, 'eventName', evtName, 'event', me));
+
+            if ((mxClient.IS_OP || mxClient.IS_SF || mxClient.IS_GC ||
+                (mxClient.IS_IE && mxClient.IS_SVG) || me.getEvent().target != this.container)) {
+                if (evtName == mxEvent.MOUSE_MOVE && this.isMouseDown && this.autoScroll && !mxEvent.isMultiTouchEvent(me.getEvent)) {
+                    this.scrollPointToVisible(me.getGraphX(), me.getGraphY(), this.autoExtend);
+                }
+
+                if (this.mouseListeners != null) {
+                    var args = [sender, me];
+
+                    // Does not change returnValue in Opera
+                    if (!me.getEvent().preventDefault) {
+                        me.getEvent().returnValue = true;
+                    }
+
+                    for (var i = 0; i < this.mouseListeners.length; i++) {
+                        var l = this.mouseListeners[i];
+
+                        if (evtName == mxEvent.MOUSE_DOWN) {
+                            l.mouseDown.apply(l, args);
+                        }
+                        else if (evtName == mxEvent.MOUSE_MOVE) {
+                            l.mouseMove.apply(l, args);
+                        }
+                        else if (evtName == mxEvent.MOUSE_UP) {
+                            l.mouseUp.apply(l, args);
+                        }
+                    }
+                }
+
+                // Invokes the click handler
+                if (evtName == mxEvent.MOUSE_UP) {
+                    this.click(me);
+                }
+            }
+
+            // Detects tapAndHold events using a timer
+            if (mxEvent.isTouchEvent(me.getEvent()) && evtName == mxEvent.MOUSE_DOWN &&
+                this.tapAndHoldEnabled && !this.tapAndHoldInProgress) {
+                this.tapAndHoldInProgress = true;
+                this.initialTouchX = me.getGraphX();
+                this.initialTouchY = me.getGraphY();
+
+                var handler = function () {
+                    if (this.tapAndHoldValid) {
+                        this.tapAndHold(me);
+                    }
+
+                    this.tapAndHoldInProgress = false;
+                    this.tapAndHoldValid = false;
+                };
+
+                if (this.tapAndHoldThread) {
+                    window.clearTimeout(this.tapAndHoldThread);
+                }
+
+                this.tapAndHoldThread = window.setTimeout(mxUtils.bind(this, handler), this.tapAndHoldDelay);
+                this.tapAndHoldValid = true;
+            }
+            else if (evtName == mxEvent.MOUSE_UP) {
+                this.tapAndHoldInProgress = false;
+                this.tapAndHoldValid = false;
+            }
+            else if (this.tapAndHoldValid) {
+                this.tapAndHoldValid =
+                    Math.abs(this.initialTouchX - me.getGraphX()) < this.tolerance &&
+                    Math.abs(this.initialTouchY - me.getGraphY()) < this.tolerance;
+            }
+
+            this.consumeMouseEvent(evtName, me, sender);
+        }
+    },
 
     consumeMouseEvent: function () {},
 

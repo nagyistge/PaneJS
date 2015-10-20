@@ -239,14 +239,64 @@ var domEvent = {
         if (stopPropagation) {
             if (evt.stopPropagation) {
                 evt.stopPropagation();
-            }else{
+            } else {
                 evt.cancelBubble = true;
             }
         }
 
-        evt.isConsumed = true;
+        evt.consumed = true;
     },
 
+    isTouchEvent: function (evt) {
+        return evt.pointerType
+            ? (evt.pointerType === 'touch' || evt.pointerType === evt.MSPOINTER_TYPE_TOUCH)
+            : (evt.mozInputSource ? evt.mozInputSource === 5 : evt.type.indexOf('touch') === 0);
+    },
+
+    isMultiTouchEvent: function (evt) {
+        return evt.type
+            && evt.type.indexOf('touch') === 0
+            && evt.touches
+            && evt.touches.length > 1;
+    },
+
+    isMouseEvent: function (evt) {
+        return evt.pointerType
+            ? (evt.pointerType === 'mouse' || evt.pointerType === evt.MSPOINTER_TYPE_MOUSE)
+            : (evt.mozInputSource ? evt.mozInputSource === 1 : evt.type.indexOf('mouse') === 0);
+    },
+
+    isLeftMouseButton: function (evt) {
+        return evt.button === ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 1 : 0);
+    },
+
+    isMiddleMouseButton: function (evt) {
+        return evt.button == ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 4 : 1);
+    },
+
+    isRightMouseButton: function (evt) {
+        return evt.button === 2;
+    },
+
+    isPopupTrigger: function (evt) {
+        return mxEvent.isRightMouseButton(evt) || (mxClient.IS_MAC && mxEvent.isControlDown(evt) && !mxEvent.isShiftDown(evt) && !mxEvent.isMetaDown(evt) && !mxEvent.isAltDown(evt));
+    },
+
+    isShiftDown: function (evt) {
+        return evt ? evt.shiftKey : false;
+    },
+
+    isAltDown: function (evt) {
+        return evt ? evt.altKey : false;
+    },
+
+    isControlDown: function (evt) {
+        return evt ? evt.ctrlKey : false;
+    },
+
+    isMetaDown: function (evt) {
+        return evt ? evt.metaKey : false;
+    }
 };
 
 module.exports = domEvent;

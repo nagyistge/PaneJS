@@ -7,5 +7,15 @@ module.exports = Class.create({
 
         that.evt = evt;
         that.state = state;
+        that.consumed = false;
+        that.graphX = null;
+        that.graphY = null;
+
     },
+
+    getEvent:function(){
+        return this.evt;
+    },
+
+
 });
