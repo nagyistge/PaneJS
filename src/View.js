@@ -37,6 +37,7 @@ module.exports = Class.create({
     allowEval: true,
     captureDocumentGesture: true,
     optimizeVmlReflows: true,
+
     rendering: true,
     currentRoot: null,
     graphBounds: null,
@@ -352,6 +353,7 @@ module.exports = Class.create({
             state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, true), false), true);
             state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, false), false), false);
 
+            // 关键代码，更新 state 的大小、位置信息
             this.updateCellState(state);
 
             // Repaint happens immediately after the cell is validated
@@ -470,7 +472,7 @@ module.exports = Class.create({
         state.origin.y = 0;
         state.length = 0;
 
-        if (state.cell != this.currentRoot) {
+        if (state.cell !== this.currentRoot) {
             var model = this.graph.getModel();
             var pState = this.getState(model.getParent(state.cell));
 
@@ -647,7 +649,9 @@ module.exports = Class.create({
         this.lastForegroundHtmlNode = null;
     },
 
-    stateValidated: function (state) {},
+    stateValidated: function (state) {
+
+    },
 
     updateFixedTerminalPoints: function (linkState, sourceState, targetState) {
         this.updateFixedTerminalPoint(linkState, sourceState, true, this.graph.getConnectionConstraint(linkState, sourceState, true));
