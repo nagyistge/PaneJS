@@ -227,9 +227,8 @@ module.exports = Class.create({
     },
 
     removeEdge: function (edge, isOutgoing) {
-        if (edge !== null) {
-            if (edge.getTerminal(!isOutgoing) !== this &&
-                this.edges !== null) {
+        if (edge) {
+            if (edge.getTerminal(!isOutgoing) !== this && this.edges) {
                 var index = this.getEdgeIndex(edge);
 
                 if (index >= 0) {
@@ -246,7 +245,7 @@ module.exports = Class.create({
     removeFromTerminal: function (isSource) {
         var terminal = this.getTerminal(isSource);
 
-        if (terminal !== null) {
+        if (terminal) {
             terminal.removeEdge(this, isSource);
         }
     },

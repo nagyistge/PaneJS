@@ -251,6 +251,7 @@ utils.indexOf = arrProto.indexOf ?
         return -1;
     };
 
+// TODO: 改为 forIn 和 each 两个方法
 var each = utils.each = function (list, iteratee, context) {
     var i;
 

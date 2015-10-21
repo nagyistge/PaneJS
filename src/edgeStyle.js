@@ -1,5 +1,4 @@
-var edgeStyle =
-{
+var edgeStyle = {
     EntityRelation: function (state, source, target, points, result) {
         var view = state.view;
         var graph = view.graph;

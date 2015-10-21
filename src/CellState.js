@@ -59,6 +59,7 @@ module.exports = Rectangle.extend({
         return bounds;
     },
 
+    // 设置连线起点或终点的位置
     setAbsoluteTerminalPoint: function (point, isSource) {
 
         var that = this;

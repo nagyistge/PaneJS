@@ -350,8 +350,13 @@ module.exports = Class.create({
                 this.validateCellState(model.getParent(cell), false);
             }
 
-            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, true), false), true);
-            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, false), false), false);
+            // 连线
+            var source = this.getVisibleTerminal(cell, true);
+            var target = this.getVisibleTerminal(cell, false);
+            var sourceState = this.validateCellState(source, false);
+            var targetState = this.validateCellState(target, false);
+            state.setVisibleTerminalState(sourceState, true);
+            state.setVisibleTerminalState(targetState, false);
 
             // 关键代码，更新 state 的大小、位置信息
             this.updateCellState(state);
@@ -432,8 +437,10 @@ module.exports = Class.create({
         return new Rectangle(translate.x * scale, translate.y * scale);
     },
 
+    // BackgroundPage
+    // ---------------
     createBackgroundPageShape: function (bounds) {
-
+        return new RectangleShape(bounds, 'white', 'black');
     },
 
     validateBackground: function () {
@@ -441,7 +448,45 @@ module.exports = Class.create({
         this.validateBackgroundPage();
     },
 
-    validateBackgroundImage: function () {},
+    validateBackgroundImage: function () {
+        var bg = this.graph.getBackgroundImage();
+
+        if (bg) {
+            if (this.backgroundImage == null || this.backgroundImage.image != bg.src) {
+                if (this.backgroundImage) {
+                    this.backgroundImage.destroy();
+                }
+
+                var bounds = new Rectangle(0, 0, 1, 1);
+
+                this.backgroundImage = new ImageShape(bounds, bg.src);
+                this.backgroundImage.dialect = this.graph.dialect;
+                this.backgroundImage.init(this.backgroundPane);
+                this.backgroundImage.redraw();
+
+                // Workaround for ignored event on background in IE8 standards mode
+                if (document.documentMode == 8 && !mxClient.IS_EM) {
+                    mxEvent.addGestureListeners(this.backgroundImage.node,
+                        mxUtils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
+                        }),
+                        mxUtils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
+                        }),
+                        mxUtils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
+                        })
+                    );
+                }
+            }
+
+            this.redrawBackgroundImage(this.backgroundImage, bg);
+        }
+        else if (this.backgroundImage != null) {
+            this.backgroundImage.destroy();
+            this.backgroundImage = null;
+        }
+    },
 
     validateBackgroundPage: function () {},
 
@@ -465,6 +510,9 @@ module.exports = Class.create({
         backgroundImage.redraw();
     },
 
+
+    // update cell state
+    // -----------------
     updateCellState: function (state) {
         state.absoluteOffset.x = 0;
         state.absoluteOffset.y = 0;
@@ -822,9 +870,19 @@ module.exports = Class.create({
         return point;
     },
 
-    getRoutingCenterX: function (state) {},
+    getRoutingCenterX: function (state) {
+        var f = (state.style != null) ? parseFloat(state.style
+            [mxConstants.STYLE_ROUTING_CENTER_X]) || 0 : 0;
 
-    getRoutingCenterY: function (state) {},
+        return state.getCenterX() + f * state.width;
+    },
+
+    getRoutingCenterY: function (state) {
+        var f = (state.style != null) ? parseFloat(state.style
+            [mxConstants.STYLE_ROUTING_CENTER_Y]) || 0 : 0;
+
+        return state.getCenterY() + f * state.height;
+    },
 
     getPerimeterBounds: function (terminal, border) {
         border = (border != null) ? border : 0;
@@ -948,8 +1006,150 @@ module.exports = Class.create({
             state.height = Math.max(markerSize, maxY - minY);
         }
     },
-    getPoint: function (state, geometry) {},
-    getRelativePoint: function (edgeState, x, y) {},
+    getPoint: function (state, geometry) {
+        var x = state.getCenterX();
+        var y = state.getCenterY();
+
+        if (state.segments != null && (geometry == null || geometry.relative)) {
+            var gx = (geometry != null) ? geometry.x / 2 : 0;
+            var pointCount = state.absolutePoints.length;
+            var dist = (gx + 0.5) * state.length;
+            var segment = state.segments[0];
+            var length = 0;
+            var index = 1;
+
+            while (dist > length + segment && index < pointCount - 1) {
+                length += segment;
+                segment = state.segments[index++];
+            }
+
+            var factor = (segment == 0) ? 0 : (dist - length) / segment;
+            var p0 = state.absolutePoints[index - 1];
+            var pe = state.absolutePoints[index];
+
+            if (p0 != null && pe != null) {
+                var gy = 0;
+                var offsetX = 0;
+                var offsetY = 0;
+
+                if (geometry != null) {
+                    gy = geometry.y;
+                    var offset = geometry.offset;
+
+                    if (offset != null) {
+                        offsetX = offset.x;
+                        offsetY = offset.y;
+                    }
+                }
+
+                var dx = pe.x - p0.x;
+                var dy = pe.y - p0.y;
+                var nx = (segment == 0) ? 0 : dy / segment;
+                var ny = (segment == 0) ? 0 : dx / segment;
+
+                x = p0.x + dx * factor + (nx * gy + offsetX) * this.scale;
+                y = p0.y + dy * factor - (ny * gy - offsetY) * this.scale;
+            }
+        }
+        else if (geometry != null) {
+            var offset = geometry.offset;
+
+            if (offset != null) {
+                x += offset.x;
+                y += offset.y;
+            }
+        }
+
+        return new mxPoint(x, y);
+    },
+    getRelativePoint: function (edgeState, x, y) {
+        var model = this.graph.getModel();
+        var geometry = model.getGeometry(edgeState.cell);
+
+        if (geometry != null) {
+            var pointCount = edgeState.absolutePoints.length;
+
+            if (geometry.relative && pointCount > 1) {
+                var totalLength = edgeState.length;
+                var segments = edgeState.segments;
+
+                // Works which line segment the point of the label is closest to
+                var p0 = edgeState.absolutePoints[0];
+                var pe = edgeState.absolutePoints[1];
+                var minDist = mxUtils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                var index = 0;
+                var tmp = 0;
+                var length = 0;
+
+                for (var i = 2; i < pointCount; i++) {
+                    tmp += segments[i - 2];
+                    pe = edgeState.absolutePoints[i];
+                    var dist = mxUtils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                    if (dist <= minDist) {
+                        minDist = dist;
+                        index = i - 1;
+                        length = tmp;
+                    }
+
+                    p0 = pe;
+                }
+
+                var seg = segments[index];
+                p0 = edgeState.absolutePoints[index];
+                pe = edgeState.absolutePoints[index + 1];
+
+                var x2 = p0.x;
+                var y2 = p0.y;
+
+                var x1 = pe.x;
+                var y1 = pe.y;
+
+                var px = x;
+                var py = y;
+
+                var xSegment = x2 - x1;
+                var ySegment = y2 - y1;
+
+                px -= x1;
+                py -= y1;
+                var projlenSq = 0;
+
+                px = xSegment - px;
+                py = ySegment - py;
+                var dotprod = px * xSegment + py * ySegment;
+
+                if (dotprod <= 0.0) {
+                    projlenSq = 0;
+                }
+                else {
+                    projlenSq = dotprod * dotprod
+                        / (xSegment * xSegment + ySegment * ySegment);
+                }
+
+                var projlen = Math.sqrt(projlenSq);
+
+                if (projlen > seg) {
+                    projlen = seg;
+                }
+
+                var yDistance = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, pe
+                    .x, pe.y, x, y));
+                var direction = mxUtils.relativeCcw(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                if (direction == -1) {
+                    yDistance = -yDistance;
+                }
+
+                // Constructs the relative point for the label
+                return new mxPoint(((totalLength / 2 - length - projlen) / totalLength) * -2,
+                    yDistance / this.scale);
+            }
+        }
+
+        return new mxPoint();
+    },
     updateEdgeLabelOffset: function (state) {
         var points = state.absolutePoints;
 

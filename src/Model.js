@@ -36,6 +36,7 @@ module.exports = Class.create({
         root ? model.setRoot(root) : model.clear();
     },
 
+    // 清理并创建一个默认的 root
     clear: function () {
 
         var model = this;
@@ -64,6 +65,7 @@ module.exports = Class.create({
         return model;
     },
 
+    // 获取 cell 所在的 root
     getRoot: function (cell) {
 
         var model = this;
@@ -190,12 +192,14 @@ module.exports = Class.create({
         return child;
     },
 
+    // 维护 id，和 cells，FIXME：不要利用外部传入 ID 的机制，在内部自己维护一套唯一 ID
+    // 机制（如自增），这样更直观方便，或许也可以直接使用 objectIdentity
     cellAdded: function (cell) {
         if (!cell) {
             return;
         }
 
-        // Creates an Id for the cell if not Id exists
+        // id 不存在时就创建
         if (!cell.getId() && this.createIds) {
             cell.setId(this.createId());
         }
@@ -240,19 +244,94 @@ module.exports = Class.create({
         return model.prefix + id + model.postfix;
     },
 
-    updateEdgeParents: function (cell, root) {},
+    //
+    updateEdgeParents: function (cell, root) {
+        // Gets the topmost node of the hierarchy
+        root = root || this.getRoot(cell);
 
-    updateEdgeParent: function (cell, root) {},
+        // Updates edges on children first
+        var childCount = this.getChildCount(cell);
+
+        for (var i = 0; i < childCount; i++) {
+            var child = this.getChildAt(cell, i);
+            this.updateEdgeParents(child, root);
+        }
+
+        // Updates the parents of all connected edges
+        var edgeCount = this.getEdgeCount(cell);
+        var edges = [];
+
+        for (var i = 0; i < edgeCount; i++) {
+            edges.push(this.getEdgeAt(cell, i));
+        }
+
+        for (var i = 0; i < edges.length; i++) {
+            var edge = edges[i];
+
+            // Updates edge parent if edge and child have
+            // a common root node (does not need to be the
+            // model root node)
+            if (this.isAncestor(root, edge)) {
+                this.updateEdgeParent(edge, root);
+            }
+        }
+    },
+
+    updateEdgeParent: function (edge, root) {
+        var sourceNode = this.getTerminal(edge, true);
+        var targetNode = this.getTerminal(edge, false);
+        var cell = null;
+
+        // Uses the first non-relative descendants of the source terminal
+        while (sourceNode && !this.isEdge(sourceNode) &&
+        sourceNode.geometry && sourceNode.geometry.relative) {
+            sourceNode = this.getParent(sourceNode);
+        }
+
+        // Uses the first non-relative descendants of the target terminal
+        while (targetNode && !this.isEdge(targetNode) &&
+        targetNode.geometry && targetNode.geometry.relative) {
+            targetNode = this.getParent(targetNode);
+        }
+
+        if (this.isAncestor(root, sourceNode) && this.isAncestor(root, targetNode)) {
+            if (sourceNode == targetNode) {
+                cell = this.getParent(sourceNode);
+            }
+            else {
+                cell = this.getNearestCommonAncestor(sourceNode, targetNode);
+            }
+
+            if (cell != null && (this.getParent(cell) != this.root ||
+                this.isAncestor(cell, edge)) && this.getParent(edge) != cell) {
+                var geo = this.getGeometry(edge);
+
+                if (geo != null) {
+                    var origin1 = this.getOrigin(this.getParent(edge));
+                    var origin2 = this.getOrigin(cell);
+
+                    var dx = origin2.x - origin1.x;
+                    var dy = origin2.y - origin1.y;
+
+                    geo = geo.clone();
+                    geo.translate(-dx, -dy);
+                    this.setGeometry(edge, geo);
+                }
+
+                this.add(cell, edge, this.getChildCount(cell));
+            }
+        }
+    },
 
     getOrigin: function (cell) {
-        var model = this;
+        var that = this;
         var result = null;
 
         if (cell) {
-            result = model.getOrigin(model.getParent(cell));
+            result = that.getOrigin(that.getParent(cell));
 
-            if (!model.isEdge(cell)) {
-                var geo = model.getGeometry(cell);
+            if (!that.isEdge(cell)) {
+                var geo = that.getGeometry(cell);
 
                 if (geo) {
                     result.x += geo.x;
@@ -267,7 +346,41 @@ module.exports = Class.create({
     },
 
     // 获取最近的共同父节点
-    getNearestCommonAncestor: function (cell1, cell2) {},
+    getNearestCommonAncestor: function (cell1, cell2) {
+        if (cell1 && cell2) {
+            // Creates the cell path for the second cell
+            var path = mxCellPath.create(cell2);
+
+            if (path && path.length > 0) {
+                // Bubbles through the ancestors of the first
+                // cell to find the nearest common ancestor.
+                var cell = cell1;
+                var current = mxCellPath.create(cell);
+
+                // Inverts arguments
+                if (path.length < current.length) {
+                    cell = cell2;
+                    var tmp = current;
+                    current = path;
+                    path = tmp;
+                }
+
+                while (cell != null) {
+                    var parent = this.getParent(cell);
+
+                    // Checks if the cell path is equal to the beginning of the given cell path
+                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+                        return cell;
+                    }
+
+                    current = mxCellPath.getParentPath(current);
+                    cell = parent;
+                }
+            }
+        }
+
+        return null;
+    },
 
     remove: function (cell) {
 
@@ -306,7 +419,7 @@ module.exports = Class.create({
             if (parent !== previous || previous.getIndex(cell) !== index) {
                 parent.insert(cell, index);
             }
-        } else if (previous != null) { // remove from parent
+        } else if (previous) { // remove from parent
             var oldIndex = previous.getIndex(cell);
             previous.remove(oldIndex);
         }
@@ -383,13 +496,14 @@ module.exports = Class.create({
             this.endUpdate();
         }
     },
+
+    // 连线的起点节点或终点节点改变后
     terminalForCellChanged: function (edge, cell, isSource) {
         var previous = this.getTerminal(edge, isSource);
 
-        if (cell != null) {
+        if (cell) {
             cell.insertEdge(edge, isSource);
-        }
-        else if (previous != null) {
+        } else if (previous) {
             previous.removeEdge(edge, isSource);
         }
 
@@ -399,41 +513,68 @@ module.exports = Class.create({
     getEdgeCount: function (cell) {
         return cell ? cell.getEdgeCount() : 0;
     },
+
     getEdgeAt: function (cell, index) {
         return cell ? cell.getEdgeAt(index) : null;
     },
-    getDirectedEdgeCount: function (cell, outgoing, ignoredEdge) {
 
+    // 获取直接连接的连线的数量
+    getDirectedEdgeCount: function (cell, outgoing, ignoredEdge) {
+        var count = 0;
+        var edgeCount = this.getEdgeCount(cell);
+
+        for (var i = 0; i < edgeCount; i++) {
+            var edge = this.getEdgeAt(cell, i);
+
+            if (edge != ignoredEdge && this.getTerminal(edge, outgoing) == cell) {
+                count++;
+            }
+        }
+
+        return count;
     },
+
     getConnections: function (cell) {},
+
     getIncomingEdges: function (cell) {},
+
     getOutgoingEdges: function (cell) {},
+
     getEdges: function (cell, incoming, outgoing, includeLoops) {},
+
     getEdgesBetween: function (source, target, directed) {},
+
     getOpposites: function (edges, terminal, sources, targets) {},
+
     getTopmostCells: function (cells) {},
 
     isVertex: function (cell) {
         return cell ? cell.isVertex() : false;
     },
+
     isEdge: function (cell) {
         return cell ? cell.isEdge() : false;
     },
+
     isConnectable: function (cell) {
         return cell ? cell.isConnectable() : false;
     },
+
     getValue: function (cell) {
         return cell ? cell.getValue() : null;
     },
+
     setValue: function (cell, value) {
         this.execute(new ValueChange(this, cell, value));
         return value;
     },
+
     valueForCellChanged: function (cell, value) {},
 
     getGeometry: function (cell) {
         return cell ? cell.getGeometry() : null;
     },
+
     setGeometry: function (cell, geometry) {
         if (geometry != this.getGeometry(cell)) {
             this.execute(new GeometryChange(this, cell, geometry));
@@ -441,11 +582,13 @@ module.exports = Class.create({
 
         return geometry;
     },
+
     geometryForCellChanged: function (cell, geometry) {},
 
     getStyle: function (cell) {
         return cell ? cell.getStyle() : null;
     },
+
     setStyle: function (cell, style) {
         if (style != this.getStyle(cell)) {
             this.execute(new StyleChange(this, cell, style));
@@ -453,16 +596,21 @@ module.exports = Class.create({
 
         return style;
     },
+
     styleForCellChanged: function (cell, style) {},
 
     isCollapsed: function (cell) {},
+
     setCollapsed: function (cell, collapsed) {},
+
     collapsedStateForCellChanged: function (cell, collapsed) {},
 
     isVisible: function (cell) {
         return cell ? cell.isVisible() : false;
     },
+
     setVisible: function (cell, visible) {},
+
     visibleStateForCellChanged: function (cell, visible) {},
 
     execute: function (change) {
