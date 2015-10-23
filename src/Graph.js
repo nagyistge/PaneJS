@@ -148,42 +148,42 @@ module.exports = Class.create({
 
     constructor: function Graph(container, model, stylesheet) {
 
-        var graph = this;
+        var that = this;
 
-        graph.mouseListeners = null;
-        graph.model = model ? model : new Model();
-        graph.multiplicities = [];
-        graph.imageBundles = [];
-        graph.cellRenderer = graph.createCellRenderer();
-        graph.setSelectionModel(graph.createSelectionModel());
-        graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
-        graph.view = graph.createView();
+        that.mouseListeners = null;
+        that.model = model ? model : new Model();
+        that.multiplicities = [];
+        that.imageBundles = [];
+        that.cellRenderer = that.createCellRenderer();
+        that.setSelectionModel(that.createSelectionModel());
+        that.setStylesheet(stylesheet ? stylesheet : that.createStylesheet());
+        that.view = that.createView();
 
-        graph.model.on('change', function (evt) {
-            graph.graphModelChanged(evt.getData('edit').changes);
+        that.model.on('change', function (evt) {
+            that.graphModelChanged(evt.getData('edit').changes);
         });
 
         if (container) {
-            graph.init(container);
+            that.init(container);
         }
 
-        graph.view.revalidate();
+        that.view.revalidate();
     },
 
     init: function (container) {
 
-        var graph = this;
+        var that = this;
 
-        graph.container = container;
+        that.container = container;
 
         // Initializes the in-place editor
         this.cellEditor = this.createCellEditor();
 
         // Initializes the container using the view
-        graph.view.init();
+        that.view.init();
 
         // Updates the size of the container for the current graph
-        graph.sizeDidChange();
+        that.sizeDidChange();
 
         // Hides tooltips and resets tooltip timer if mouse leaves container
         //mxEvent.addListener(container, 'mouseleave', mxUtils.bind(this, function () {

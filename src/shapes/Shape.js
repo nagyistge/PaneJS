@@ -197,17 +197,17 @@ var Shape = Base.extend({
 
     paint: function (canvas) {
 
-        var shape = this;
-        var bounds = shape.bounds;
+        var that = this;
+        var bounds = that.bounds;
 
         // Scale is passed-through to canvas
-        var scale = shape.scale;
+        var scale = that.scale;
         var x = bounds.x / scale;
         var y = bounds.y / scale;
         var w = bounds.width / scale;
         var h = bounds.height / scale;
 
-        if (shape.isPaintBoundsInverted()) {
+        if (that.isPaintBoundsInverted()) {
 
             var t = (w - h) / 2;
             x += t;
@@ -218,42 +218,42 @@ var Shape = Base.extend({
             h = tmp;
         }
 
-        shape.updateTransform(canvas, x, y, w, h);
-        shape.configureCanvas(canvas, x, y, w, h);
+        that.updateTransform(canvas, x, y, w, h);
+        that.configureCanvas(canvas, x, y, w, h);
 
         // Adds background rectangle to capture events
         var bg = null;
 
-        if ((!shape.stencil && !shape.points && shape.shapePointerEvents) ||
-            (shape.stencil && shape.stencilPointerEvents)) {
+        if ((!that.stencil && !that.points && that.shapePointerEvents) ||
+            (that.stencil && that.stencilPointerEvents)) {
 
-            var bb = shape.createBoundingBox();
+            var bb = that.createBoundingBox();
 
-            bg = shape.createTransparentSvgRectangle(bb.x, bb.y, bb.width, bb.height);
-            shape.node.appendChild(bg);
+            bg = that.createTransparentSvgRectangle(bb.x, bb.y, bb.width, bb.height);
+            that.node.appendChild(bg);
         }
 
 
-        if (shape.stencil) {
-            shape.stencil.drawShape(canvas, shape, x, y, w, h);
+        if (that.stencil) {
+            that.stencil.drawShape(canvas, that, x, y, w, h);
         } else {
             // Stencils have separate strokeWidth
-            canvas.setStrokeWidth(shape.strokewidth);
+            canvas.setStrokeWidth(that.strokewidth);
 
-            if (shape.points) {
+            if (that.points) {
                 // Paints edge shape
                 var pts = [];
 
-                for (var i = 0; i < shape.points.length; i++) {
-                    if (shape.points[i]) {
-                        pts.push(new Point(shape.points[i].x / scale, shape.points[i].y / scale));
+                for (var i = 0; i < that.points.length; i++) {
+                    if (that.points[i]) {
+                        pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
                     }
                 }
 
-                shape.paintEdgeShape(canvas, pts);
+                that.paintEdgeShape(canvas, pts);
             } else {
                 // Paints vertex shape
-                shape.paintVertexShape(canvas, x, y, w, h);
+                that.paintVertexShape(canvas, x, y, w, h);
             }
         }
 
@@ -377,21 +377,21 @@ var Shape = Base.extend({
 
     updateBoundsFromPoints: function () {
 
-        var shape = this;
+        var that = this;
         var bounds;
 
-        each(shape.points || [], function (point, index) {
+        each(that.points || [], function (point, index) {
 
             var rect = new Rectangle(point.x, point.y, 1, 1);
 
             if (index === 0) {
-                shape.bounds = bounds = rect;
+                that.bounds = bounds = rect;
             } else {
                 bounds.add(rect);
             }
         });
 
-        return shape;
+        return that;
     },
 
     checkBounds: function () {

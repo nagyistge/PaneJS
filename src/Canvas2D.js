@@ -46,17 +46,15 @@ var proto = {
 
         var canvas = this;
 
-        canvas.root = root;
+        canvas.root = root; // 根节点，即 shape 的根节点
         canvas.defs = null;
         canvas.gradients = [];
         canvas.styleEnabled = !isNullOrUndefined(styleEnabled) ? styleEnabled : false;
 
         canvas.reset();
 
-
-        // defs
-        // ----
-
+        // 初始化 defs
+        // ----------
         var svg = null;
 
         // 不在文档中
