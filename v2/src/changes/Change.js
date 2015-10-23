@@ -6,7 +6,7 @@ define([
     'use strict';
 
     return Base.extend({
-        constructor: function Change(model) {},
+        constructor: function Change() {},
         digest: function () {
             return this;
         }

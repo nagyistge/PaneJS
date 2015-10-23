@@ -7,8 +7,6 @@ define([
 ) {
     'use strict';
 
-
-
     return Cell.extend({
         constructor: function Link(value, geometry, style) {
 

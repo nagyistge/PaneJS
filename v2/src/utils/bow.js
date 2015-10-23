@@ -21,7 +21,12 @@ define([
         return ret;
     }
 
+    function getCurrentStyle(node) {
+        return node.currentStyle || window.getComputedStyle(node, null);
+    }
+
     return {
-        isNode: isNode
+        isNode: isNode,
+        getCurrentStyle: getCurrentStyle
     };
 });

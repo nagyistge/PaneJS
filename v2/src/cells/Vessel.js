@@ -11,7 +11,7 @@ define([
     var indexOf = utils.indexOf;
     var isNullOrUndefined = utils.isNullOrUndefined;
 
-    var Vessel = Node.extend({
+    return Node.extend({
         constructor: function Vessel(value, geometry, style) {
 
             var that = this;
@@ -43,7 +43,7 @@ define([
             var that = this;
             var children = that.children;
 
-            if (child) {
+            if (child && that.canInsert(child, index)) {
 
                 if (isNullOrUndefined(index)) {
                     index = children.length;
@@ -80,9 +80,9 @@ define([
             return child;
         },
 
-        cloneValue: function () {},
-
-        clone: function () {}
+        canInsert: function () {
+            return true;
+        }
     });
 });
 
