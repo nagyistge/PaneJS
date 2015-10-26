@@ -36,9 +36,5 @@
     "release": "npm run clean && webpack --config webpack.config.production.js && webpack --config webpack.config.min.js && zip dist/${npm_package_name}-${npm_package_version}.zip -j dist dist/*",
     "test": "browserify spec/index.spec.js > spec/index.js ",
     "validate": "npm ls"
-  },
-  "pre-commit": [
-    "lint",
-    "test"
-  ]
+  }
 }
