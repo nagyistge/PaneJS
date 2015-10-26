@@ -1,6 +1,7 @@
 import { isArrayLike } from './lang';
 
-var slice = Array.prototype.slice;
+var arrProto = Array.prototype;
+var slice = arrProto.slice;
 
 var indexOf = arrProto.indexOf ?
     function (arr, item) {

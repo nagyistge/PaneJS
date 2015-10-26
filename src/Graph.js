@@ -1,45 +1,36 @@
-define([
-    './lib/Base',
-    './Model',
-    './View'
-], function (
-    Base,
-    Model,
-    View
-) {
-    'use strict';
+import Base from './lib/Base';
+import Model from './Model';
+import View from './View';
 
-    return Base.extend({
-        constructor: function Graph(container, model, stylesheet) {
+export default Base.extend({
+    constructor: function Graph(container, model, stylesheet) {
 
-            var that = this;
+        var that = this;
 
-            that.model = model || new Model();
-            that.view = new View(that);
-            that.stylesheet = stylesheet || new Stylesheet();
+        that.model = model || new Model();
+        that.view = new View(that);
+        //that.stylesheet = stylesheet || new Stylesheet();
 
-            if (container) {
-                that.init(container);
-            }
+        if (container) {
+            that.init(container);
+        }
 
-            that.view.revalidate();
-        },
+        that.view.revalidate();
+    },
 
-        init: function (container) {
+    init: function (container) {
 
-            var that = this;
+        var that = this;
 
-            that.container = container;
-            that.view.init();
-        },
+        that.container = container;
+        that.view.init();
+    },
 
+    insertNode: function () {},
 
-        insertNode: function () {},
+    createNode: function () {},
 
-        createNode: function () {},
+    insertLink: function () {},
 
-        insertLink: function () {},
-
-        createLink: function () {}
-    });
+    createLink: function () {}
 });
