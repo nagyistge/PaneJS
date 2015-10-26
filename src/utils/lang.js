@@ -1,63 +1,77 @@
-var arrProto = Array.prototype;
-var objProto = Object.prototype;
-var slice = arrProto.slice;
-var toString = objProto.toString;
+define([], function () {
+    'use strict';
 
+    var toString = Object.prototype.toString;
 
-var isType = exports.isType = function (obj, type) {
-    return toString.call(obj) === '[object ' + type + ']';
-};
-
-exports.isObject = function (obj) {
-
-    if (!obj) {
-        return false;
+    function isNull(obj) {
+        return obj === null;
     }
 
-    var type = typeof obj;
+    function isUndefined(obj) {
+        return typeof obj === 'undefined';
+    }
 
-    return type === 'function' || type === 'object';
-};
+    function isNullOrUndefined(obj) {
+        return isUndefined(obj) || isNull(obj);
+    }
 
-exports.isFunction = function (obj) {
-    return isType(obj, 'Function');
-};
+    function isType(obj, type) {
+        return toString.call(obj) === '[object ' + type + ']';
+    }
 
-var isNull = exports.isNull = function (obj) {
-    return obj === null;
-};
+    function isObject(obj) {
+        if (!obj) {
+            return false;
+        }
 
-var isUndefined = exports.isUndefined = function (obj) {
-    return typeof obj === 'undefined';
-};
+        var type = typeof obj;
 
-exports.isNullOrUndefined = function (obj) {
-    return isUndefined(obj) || isNull(obj);
-};
+        return type === 'function' || type === 'object';
+    }
 
-exports.isWindow = function (obj) {
-    return obj && obj === obj.window;
-};
+    function isFunction(obj) {
+        return isType(obj, 'Function');
+    }
 
-var isArray = exports.isArray = Array.isArray || function (obj) {
-        return isType(obj, 'Array');
+    function isWindow(obj) {
+        return obj && obj === obj.window;
+    }
+
+    var isArray = Array.isArray || function (obj) {
+            return isType(obj, 'Array');
+        };
+
+    function isArrayLike(obj) {
+        if (isArray(obj)) {
+            return true;
+        }
+
+        if (isFunction(obj) || isWindow(obj)) {
+            return false;
+        }
+
+        var length = !!obj && 'length' in obj && obj.length;
+
+        return length === 0 ||
+            typeof length === 'number' && length > 0 && (length - 1) in obj;
+    }
+
+    function isNumeric(obj) {
+        return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+    }
+
+    return {
+        isNull: isNull,
+        isUndefined: isUndefined,
+        isNullOrUndefined: isNullOrUndefined,
+        isType: isType,
+        isObject: isObject,
+        isFunction: isFunction,
+        isWindow: isWindow,
+        isArray: isArray,
+        isArrayLike: isArrayLike,
+        isNumeric: isNumeric
     };
+});
 
-exports.isArrayLike = function (obj) {
-    if (isArray(obj)) {
-        return true;
-    }
 
-    if (isFunction(obj) || isWindow(obj)) {
-        return false;
-    }
-
-    var length = !!obj && 'length' in obj && obj.length;
-
-    return length === 0 ||
-        typeof length === 'number' && length > 0 && (length - 1) in obj;
-};
-
-exports.isNumeric = function (obj) {
-    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-};

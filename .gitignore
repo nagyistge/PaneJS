@@ -3,8 +3,5 @@
 
 npm-debug.log
 node_modules
-build
-bower_components
 test/coverage
 coverage
-tmp

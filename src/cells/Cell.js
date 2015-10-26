@@ -1,36 +1,59 @@
-var Base = require('../Base');
+define([
+    '../common/utils',
+    '../lib/Base'
+], function (
+    utils,
+    Base
+) {
+    'use strict';
 
-module.exports = Base.extend({
+    var clone = utils.clone;
+    var isNode = utils.isNode;
+    var isFunction = utils.isFunction;
+    var transients = ['id', 'value', 'parent', 'source', 'target', 'children', 'links'];
 
-    id: null,
-    value: null,
-    geometry: null,
-    style: null,
+    return Base.extend({
+        constructor: function Cell(value, geometry, style) {
 
-    //vertex: false,
-    //edge: false,
-    //connectable: true,
-    visible: true,
-    //collapsed: false,
+            var that = this;
 
-    //source: null,
-    //target: null,
+            that.value = value;
+            that.geometry = geometry;
+            that.style = style;
+            that.visible = true;
+        },
 
-    parent: null,
-    children: null,
-    //edges: null,
+        removeFromParent: function () {
+            var that = this;
+            var parent = that.parent;
 
-    constructor: function Cell(value, geometry, style) {
+            parent && parent.remove(that);
 
-        var that = this;
+            return that;
+        },
 
-        that.value = value;
-        that.setGeometry(geometry);
-        that.setStyle(style);
+        cloneValue: function () {
+            var value = this.value;
 
-        that.onInit && that.onInit();
-    },
+            if (value) {
+                if (value.clone && isFunction(value.clone)) {
+                    return value.clone();
+                }
 
+                if (isNode(value)) {
+                    return value.cloneNode(true);
+                }
+            }
 
+            return value;
+        },
 
+        clone: function () {
+            var that = this;
+            var cloned = clone(that, transients);
+            cloned.value = that.cloneValue();
+
+            return cloned;
+        }
+    });
 });

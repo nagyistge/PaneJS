@@ -1,29 +1,30 @@
-'use strict';
+define([
+    './Change'
+], function (
+    Change
+) {
+    'use strict';
 
-var Change = require('./Change');
+    return Change.extend({
+        constructor: function RootChange(model, root) {
 
-module.exports = Change.extend({
+            var that = this;
 
-    constructor: function RootChange(model, root) {
+            that.model = model;
+            that.root = root;
+            that.previous = root;
+        },
 
-        var change = this;
+        digest: function () {
 
-        RootChange.superclass.constructor.call(change, model);
+            var that = this;
+            var model = that.model;
+            var previous = that.previous;
 
-        change.root = root;
-        change.previous = root;
-    },
+            that.root = previous;
+            that.previous = model.rootChanged(previous);
 
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var previous = change.previous;
-
-        change.root = previous;
-        change.previous = model.rootChanged(previous);
-
-        return change;
-    }
+            return that;
+        }
+    });
 });
-

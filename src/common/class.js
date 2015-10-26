@@ -1,155 +1,155 @@
+define([
+    './utils'
+], function (
+    utils
+) {
+    'use strict';
 
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
-// ref: https://github.com/aralejs/class
-/*jshint -W030 */
+    var forin = utils.forin;
+    var hasKey = utils.hasKey;
+    var isArray = utils.isArray;
+    var isFunction = utils.isFunction;
 
-var utils = require('./utils');
-
-var each = utils.each;
-var hasKey = utils.hasKey;
-var isArray = utils.isArray;
-var isFunction = utils.isFunction;
-
-function Class(o) {
-    // Convert existed function to Class.
-    if (!(this instanceof Class) && isFunction(o)) {
-        return classify(o);
-    }
-}
-
-Class.create = function (parent, properties) {
-    if (!isFunction(parent)) {
-        properties = parent;
-        parent = null;
+    function Class(o) {
+        // Convert existed function to Class.
+        if (!(this instanceof Class) && isFunction(o)) {
+            return classify(o);
+        }
     }
 
-    properties || (properties = {});
-    parent || (parent = properties.Extends || Class);
-    properties.Extends = parent;
-
-    // The created class constructor.
-    //function SubClass() {
-    //    // Call the parent constructor.
-    //    parent.apply(this, arguments);
-    //
-    //    // Only call initialize in self constructor.
-    //    if (this.constructor === SubClass && this.initialize) {
-    //        this.initialize.apply(this, arguments);
-    //    }
-    //}
-
-    var SubClass = properties.constructor;
-    // unspecified constructor
-    if (SubClass === Object.prototype.constructor) {
-        SubClass = function Class() {};
-    }
-
-    // Inherit class (static) properties from parent.
-    if (parent !== Class) {
-        mix(SubClass, parent, parent.StaticsWhiteList);
-    }
-
-    // Add instance properties to the subclass.
-    implement.call(SubClass, properties);
-
-    // Make subclass extendable.
-    return classify(SubClass);
-};
-
-// Create a sub Class based on `Class`.
-Class.extend = function (properties) {
-    properties || (properties = {});
-    properties.Extends = this;
-
-    return Class.create(properties);
-};
-
-// define special properties.
-Class.Mutators = {
-
-    'Extends': function (parent) {
-        var existed = this.prototype;
-        var parentProto = parent.prototype;
-        var proto = createProto(parentProto);
-
-        // Keep existed properties.
-        mix(proto, existed);
-
-        // Enforce the constructor to be what we expect.
-        proto.constructor = this;
-
-        // Set the prototype chain to inherit from `parent`.
-        this.prototype = proto;
-
-        // Set a convenience property in case the parent's prototype is
-        // needed later.
-        this.superclass = parentProto;
-    },
-
-    'Implements': function (items) {
-
-        if (!isArray(items)) {
-            items = [items];
+    Class.create = function (parent, properties) {
+        if (!isFunction(parent)) {
+            properties = parent;
+            parent = null;
         }
 
-        var proto = this.prototype;
-        var item;
+        properties || (properties = {});
+        parent || (parent = properties.Extends || Class);
+        properties.Extends = parent;
 
-        while (item = items.shift()) {
-            mix(proto, item.prototype || item);
+        // The created class constructor.
+        //function SubClass() {
+        //    // Call the parent constructor.
+        //    parent.apply(this, arguments);
+        //
+        //    // Only call initialize in self constructor.
+        //    if (this.constructor === SubClass && this.initialize) {
+        //        this.initialize.apply(this, arguments);
+        //    }
+        //}
+
+        var SubClass = properties.constructor;
+        // unspecified constructor
+        if (SubClass === Object.prototype.constructor) {
+            SubClass = function Class() {};
         }
-    },
 
-    'Statics': function (staticProperties) {
-        mix(this, staticProperties);
-    }
-};
-
-function classify(cls) {
-    cls.extend = Class.extend;
-    cls.implement = implement;
-    return cls;
-}
-
-function implement(properties) {
-
-    var that = this;
-    var mutators = Class.Mutators;
-
-    each(properties, function (value, key) {
-        if (hasKey(mutators, key)) {
-            mutators[key].call(that, value);
-        } else {
-            that.prototype[key] = value;
+        // Inherit class (static) properties from parent.
+        if (parent !== Class) {
+            mix(SubClass, parent, parent.StaticsWhiteList);
         }
-    });
-}
 
+        // Add instance properties to the subclass.
+        implement.call(SubClass, properties);
 
-// Helpers
-// -------
-
-var createProto = Object.__proto__ ?
-    function (proto) {
-        return {__proto__: proto};
-    } :
-    function (proto) {
-        function Ctor() {}
-
-        Ctor.prototype = proto;
-        return new Ctor();
+        // Make subclass extendable.
+        return classify(SubClass);
     };
 
-function mix(receiver, supplier, whiteList) {
+    // Create a sub Class based on `Class`.
+    Class.extend = function (properties) {
+        properties || (properties = {});
+        properties.Extends = this;
 
-    each(supplier, function (value, key) {
-        if (whiteList && indexOf(whiteList, key) === -1) {
-            return;
+        return Class.create(properties);
+    };
+
+    // define special properties.
+    Class.Mutators = {
+
+        'Extends': function (parent) {
+            var existed = this.prototype;
+            var parentProto = parent.prototype;
+            var proto = createProto(parentProto);
+
+            // Keep existed properties.
+            mix(proto, existed);
+
+            // Enforce the constructor to be what we expect.
+            proto.constructor = this;
+
+            // Set the prototype chain to inherit from `parent`.
+            this.prototype = proto;
+
+            // Set a convenience property in case the parent's prototype is
+            // needed later.
+            this.super = parentProto;
+        },
+
+        'Implements': function (items) {
+
+            if (!isArray(items)) {
+                items = [items];
+            }
+
+            var proto = this.prototype;
+            var item;
+
+            while (item = items.shift()) {
+                mix(proto, item.prototype || item);
+            }
+        },
+
+        'Statics': function (staticProperties) {
+            mix(this, staticProperties);
         }
+    };
 
-        receiver[key] = value;
-    });
-}
+    function classify(cls) {
+        cls.extend = Class.extend;
+        cls.implement = implement;
+        return cls;
+    }
 
-module.exports = Class;
+    function implement(properties) {
 
+        var that = this;
+        var mutators = Class.Mutators;
+
+        forin(properties, function (value, key) {
+            if (hasKey(mutators, key)) {
+                mutators[key].call(that, value);
+            } else {
+                that.prototype[key] = value;
+            }
+        });
+    }
+
+
+    // Helpers
+    // -------
+
+    var createProto = Object.__proto__ ?
+        function (proto) {
+            return {__proto__: proto};
+        } :
+        function (proto) {
+            function Ctor() {}
+
+            Ctor.prototype = proto;
+            return new Ctor();
+        };
+
+    function mix(receiver, supplier, whiteList) {
+
+        forin(supplier, function (value, key) {
+            if (whiteList && indexOf(whiteList, key) === -1) {
+                return;
+            }
+
+            receiver[key] = value;
+        });
+    }
+
+
+});

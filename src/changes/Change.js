@@ -1,13 +1,14 @@
-'use strict';
+define([
+    '../lib/Base'
+], function (
+    Base
+) {
+    'use strict';
 
-var Class = require('../common/class');
-
-module.exports = Class.create({
-
-    constructor: function Change(model) {
-        this.model = model;
-    },
-
-    digest: function () { }
+    return Base.extend({
+        constructor: function Change() {},
+        digest: function () {
+            return this;
+        }
+    });
 });
-
