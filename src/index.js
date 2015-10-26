@@ -9,7 +9,7 @@ window.zGraph = module.exports = {
     Model: require('./Model'),
     Point: require('./Point'),
     Rectangle: require('./Rectangle'),
-    Shape: require('./Shape'),
+    Shape: require('./shapes/Shape'),
     View: require('./View'),
     constants: require('./constants')
 };
