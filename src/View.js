@@ -467,13 +467,13 @@ module.exports = Class.create({
                 // Workaround for ignored event on background in IE8 standards mode
                 if (document.documentMode == 8 && !mxClient.IS_EM) {
                     mxEvent.addGestureListeners(this.backgroundImage.node,
-                        mxUtils.bind(this, function (evt) {
+                        utils.bind(this, function (evt) {
                             this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
                         }),
-                        mxUtils.bind(this, function (evt) {
+                        utils.bind(this, function (evt) {
                             this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
                         }),
-                        mxUtils.bind(this, function (evt) {
+                        utils.bind(this, function (evt) {
                             this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
                         })
                     );
@@ -590,7 +590,7 @@ module.exports = Class.create({
         var pState = this.getState(model.getParent(state.cell));
 
         if (geo.relative && pState && !model.isEdge(pState.cell)) {
-            var alpha = mxUtils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
+            var alpha = utils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
 
             if (alpha != 0) {
                 var cos = Math.cos(alpha);
@@ -744,7 +744,7 @@ module.exports = Class.create({
             else if (points != null) {
                 for (var i = 0; i < points.length; i++) {
                     if (points[i] != null) {
-                        var pt = mxUtils.clone(points[i]);
+                        var pt = utils.clone(points[i]);
                         pts.push(this.transformControlPoint(linkState, pt));
                     }
                 }
@@ -769,7 +769,7 @@ module.exports = Class.create({
             var tmp = mxStyleRegistry.getValue(edgeStyle);
 
             if (tmp == null && this.isAllowEval()) {
-                tmp = mxUtils.eval(edgeStyle);
+                tmp = utils.eval(edgeStyle);
             }
 
             edgeStyle = tmp;
@@ -903,7 +903,7 @@ module.exports = Class.create({
             var tmp = mxStyleRegistry.getValue(perimeter);
 
             if (tmp == null && this.isAllowEval()) {
-                tmp = mxUtils.eval(perimeter);
+                tmp = utils.eval(perimeter);
             }
 
             perimeter = tmp;
@@ -1060,7 +1060,7 @@ module.exports = Class.create({
             }
         }
 
-        return new mxPoint(x, y);
+        return new Point(x, y);
     },
     getRelativePoint: function (edgeState, x, y) {
         var model = this.graph.getModel();
@@ -1076,7 +1076,7 @@ module.exports = Class.create({
                 // Works which line segment the point of the label is closest to
                 var p0 = edgeState.absolutePoints[0];
                 var pe = edgeState.absolutePoints[1];
-                var minDist = mxUtils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+                var minDist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
 
                 var index = 0;
                 var tmp = 0;
@@ -1085,7 +1085,7 @@ module.exports = Class.create({
                 for (var i = 2; i < pointCount; i++) {
                     tmp += segments[i - 2];
                     pe = edgeState.absolutePoints[i];
-                    var dist = mxUtils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+                    var dist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
 
                     if (dist <= minDist) {
                         minDist = dist;
@@ -1134,21 +1134,21 @@ module.exports = Class.create({
                     projlen = seg;
                 }
 
-                var yDistance = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, pe
+                var yDistance = Math.sqrt(utils.ptSegDistSq(p0.x, p0.y, pe
                     .x, pe.y, x, y));
-                var direction = mxUtils.relativeCcw(p0.x, p0.y, pe.x, pe.y, x, y);
+                var direction = utils.relativeCcw(p0.x, p0.y, pe.x, pe.y, x, y);
 
                 if (direction == -1) {
                     yDistance = -yDistance;
                 }
 
                 // Constructs the relative point for the label
-                return new mxPoint(((totalLength / 2 - length - projlen) / totalLength) * -2,
+                return new Point(((totalLength / 2 - length - projlen) / totalLength) * -2,
                     yDistance / this.scale);
             }
         }
 
-        return new mxPoint();
+        return new Point();
     },
     updateEdgeLabelOffset: function (state) {
         var points = state.absolutePoints;

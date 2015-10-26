@@ -299,7 +299,7 @@ module.exports = Class.create({
                 cell = this.getParent(sourceNode);
             }
             else {
-                cell = this.getNearestCommonAncestor(sourceNode, targetNode);
+                //cell = this.getNearestCommonAncestor(sourceNode, targetNode);
             }
 
             if (cell != null && (this.getParent(cell) != this.root ||

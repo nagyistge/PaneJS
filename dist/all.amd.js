@@ -1,6 +1,49 @@
+define('PaneJS/ConnectionConstraint',['require','exports','module'],function (require, exports, module) {function ConnectionConstraint(point, perimeter) {
+    this.point = point;
+    this.perimeter = (perimeter != null) ? perimeter : true;
+}
+
+module.exports = ConnectionConstraint;
+
+});
 
 
+define('PaneJS/common/detector',['require','exports','module'],function (require, exports, module) {var ua = navigator.userAgent;
+var av = navigator.appVersion;
 
+module.exports = {
+    // IE
+    IS_IE: ua.indexOf('MSIE') >= 0,
+
+    IS_IE11: !!ua.match(/Trident\/7\./),
+
+    // Netscape
+    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
+
+    // Firefox
+    IS_FF: ua.indexOf('Firefox/') >= 0,
+
+    // Chrome
+    IS_GC: ua.indexOf('Chrome/') >= 0,
+
+    // Safari
+    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
+
+    // Opera
+    IS_OP: ua.indexOf('Opera/') >= 0,
+
+    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
+
+    IS_WIN: av.indexOf('Win') > 0,
+
+    IS_MAC: av.indexOf('Mac') > 0,
+
+    IS_TOUCH: 'ontouchstart' in document.documentElement,
+
+    IS_POINTER: window.navigator.msPointerEnabled || false
+};
+
+});
 define('PaneJS/common/utils',['require','exports','module'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global window */
 
@@ -254,6 +297,7 @@ utils.indexOf = arrProto.indexOf ?
         return -1;
     };
 
+// TODO: 改为 forIn 和 each 两个方法
 var each = utils.each = function (list, iteratee, context) {
     var i;
 
@@ -356,6 +400,76 @@ utils.isNode = function (node, nodeName, attributeName, attributeValue) {
     return ret;
 };
 
+utils.getOffset = function (container, scrollOffset) {
+    var offsetLeft = 0;
+    var offsetTop = 0;
+
+    if (scrollOffset != null && scrollOffset) {
+        var offset = utils.getDocumentScrollOrigin(container.ownerDocument);
+        offsetLeft += offset.left;
+        offsetTop += offset.top;
+    }
+
+    while (container.offsetParent) {
+        offsetLeft += container.offsetLeft;
+        offsetTop += container.offsetTop;
+
+        container = container.offsetParent;
+    }
+
+    return {
+        left: offsetLeft,
+        top: offsetTop
+    };
+};
+
+utils.getDocumentScrollOrigin = function (doc) {
+    var wnd = doc.defaultView || doc.parentWindow;
+
+    var x = (wnd && window.pageXOffset !== undefined)
+        ? window.pageXOffset
+        : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+
+    var y = (wnd && window.pageYOffset !== undefined)
+        ? window.pageYOffset
+        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+    return {
+        left: x,
+        top: y
+    };
+};
+
+utils.getScrollOrigin = function (node) {
+    var b = document.body;
+    var d = document.documentElement;
+    var result = utils.getDocumentScrollOrigin(node ? node.ownerDocument : document);
+
+    while (node && node !== b && node !== d) {
+        if (!isNaN(node.scrollLeft) && !isNaN(node.scrollTop)) {
+            result.left += node.scrollLeft;
+            result.top += node.scrollTop;
+        }
+
+        node = node.parentNode;
+    }
+
+    return result;
+};
+
+utils.convertPoint = function (container, x, y) {
+    var origin = utils.getScrollOrigin(container);
+    var offset = utils.getOffset(container);
+
+    offset.left -= origin.left;
+    offset.top -= origin.top;
+
+    return {
+        left: x - offset.left,
+        top: y - offset.top
+    };
+};
+
 utils.createSvgGroup = function () {};
 
 utils.write = function (parent, text) {
@@ -388,13 +502,1226 @@ utils.toRadians = function (deg) {
     return Math.PI * deg / 180;
 };
 
+utils.setCellStyles = function (model, cells, key, value) {
+    if (cells && cells.length) {
+        model.beginUpdate();
+        try {
+            for (var i = 0; i < cells.length; i++) {
+                if (cells[i] != null) {
+                    var style = utils.setStyle(model.getStyle(cells[i]), key, value);
+                    model.setStyle(cells[i], style);
+                }
+            }
+        }
+        finally {
+            model.endUpdate();
+        }
+    }
+};
+
+utils.setStyle = function (style, key, value) {
+    var isValue = value != null && (typeof(value.length) == 'undefined' || value.length > 0);
+
+    if (style == null || style.length == 0) {
+        if (isValue) {
+            style = key + '=' + value;
+        }
+    }
+    else {
+        var index = style.indexOf(key + '=');
+
+        if (index < 0) {
+            if (isValue) {
+                var sep = (style.charAt(style.length - 1) == ';') ? '' : ';';
+                style = style + sep + key + '=' + value;
+            }
+        }
+        else {
+            var tmp = (isValue) ? (key + '=' + value) : '';
+            var cont = style.indexOf(';', index);
+
+            if (!isValue) {
+                cont++;
+            }
+
+            style = style.substring(0, index) + tmp +
+                ((cont > index) ? style.substring(cont) : '');
+        }
+    }
+
+    return style;
+};
+
 module.exports = utils;
 
 
 });
+define('PaneJS/edgeStyle',['require','exports','module'],function (require, exports, module) {var edgeStyle = {
+    EntityRelation: function (state, source, target, points, result) {
+        var view = state.view;
+        var graph = view.graph;
+        var segment = mxUtils.getValue(state.style,
+                mxConstants.STYLE_SEGMENT,
+                mxConstants.ENTITY_SEGMENT) * view.scale;
 
+        var pts = state.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
 
+        var isSourceLeft = false;
 
+        if (p0 != null) {
+            source = new mxCellState();
+            source.x = p0.x;
+            source.y = p0.y;
+        }
+        else if (source != null) {
+            var constraint = mxUtils.getPortConstraints(source, state, true, mxConstants.DIRECTION_MASK_NONE);
+
+            if (constraint != mxConstants.DIRECTION_MASK_NONE) {
+                isSourceLeft = constraint == mxConstants.DIRECTION_MASK_WEST;
+            }
+            else {
+                var sourceGeometry = graph.getCellGeometry(source.cell);
+
+                if (sourceGeometry.relative) {
+                    isSourceLeft = sourceGeometry.x <= 0.5;
+                }
+                else if (target != null) {
+                    isSourceLeft = target.x + target.width < source.x;
+                }
+            }
+        }
+        else {
+            return;
+        }
+
+        var isTargetLeft = true;
+
+        if (pe != null) {
+            target = new mxCellState();
+            target.x = pe.x;
+            target.y = pe.y;
+        }
+        else if (target != null) {
+            var constraint = mxUtils.getPortConstraints(target, state, false, mxConstants.DIRECTION_MASK_NONE);
+
+            if (constraint != mxConstants.DIRECTION_MASK_NONE) {
+                isTargetLeft = constraint == mxConstants.DIRECTION_MASK_WEST;
+            }
+            else {
+                var targetGeometry = graph.getCellGeometry(target.cell);
+
+                if (targetGeometry.relative) {
+                    isTargetLeft = targetGeometry.x <= 0.5;
+                }
+                else if (source != null) {
+                    isTargetLeft = source.x + source.width < target.x;
+                }
+            }
+        }
+
+        if (source != null && target != null) {
+            var x0 = (isSourceLeft) ? source.x : source.x + source.width;
+            var y0 = view.getRoutingCenterY(source);
+
+            var xe = (isTargetLeft) ? target.x : target.x + target.width;
+            var ye = view.getRoutingCenterY(target);
+
+            var seg = segment;
+
+            var dx = (isSourceLeft) ? -seg : seg;
+            var dep = new mxPoint(x0 + dx, y0);
+
+            dx = (isTargetLeft) ? -seg : seg;
+            var arr = new mxPoint(xe + dx, ye);
+
+            // Adds intermediate points if both go out on same side
+            if (isSourceLeft == isTargetLeft) {
+                var x = (isSourceLeft) ?
+                Math.min(x0, xe) - segment :
+                Math.max(x0, xe) + segment;
+
+                result.push(new mxPoint(x, y0));
+                result.push(new mxPoint(x, ye));
+            }
+            else if ((dep.x < arr.x) == isSourceLeft) {
+                var midY = y0 + (ye - y0) / 2;
+
+                result.push(dep);
+                result.push(new mxPoint(dep.x, midY));
+                result.push(new mxPoint(arr.x, midY));
+                result.push(arr);
+            }
+            else {
+                result.push(dep);
+                result.push(arr);
+            }
+        }
+    },
+    Loop: function (state, source, target, points, result) {
+        var pts = state.absolutePoints;
+
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (p0 != null && pe != null) {
+            // TODO: Implement loop routing for different edge styles
+            /*var edgeStyle = !mxUtils.getValue(state.style,
+             mxConstants.STYLE_NOEDGESTYLE, false) ?
+             state.style[mxConstants.STYLE_EDGE] :
+             null;
+
+             if (edgeStyle != null && edgeStyle != '')
+             {
+
+             }
+             else */
+            if (points != null && points.length > 0) {
+                for (var i = 0; i < points.length; i++) {
+                    var pt = points[i];
+                    pt = state.view.transformControlPoint(state, pt);
+                    result.push(new mxPoint(pt.x, pt.y));
+                }
+            }
+
+            return;
+        }
+
+        if (source != null) {
+            var view = state.view;
+            var graph = view.graph;
+            var pt = (points != null && points.length > 0) ? points[0] : null;
+
+            if (pt != null) {
+                pt = view.transformControlPoint(state, pt);
+
+                if (mxUtils.contains(source, pt.x, pt.y)) {
+                    pt = null;
+                }
+            }
+
+            var x = 0;
+            var dx = 0;
+            var y = 0;
+            var dy = 0;
+
+            var seg = mxUtils.getValue(state.style, mxConstants.STYLE_SEGMENT,
+                    graph.gridSize) * view.scale;
+            var dir = mxUtils.getValue(state.style, mxConstants.STYLE_DIRECTION,
+                mxConstants.DIRECTION_WEST);
+
+            if (dir == mxConstants.DIRECTION_NORTH ||
+                dir == mxConstants.DIRECTION_SOUTH) {
+                x = view.getRoutingCenterX(source);
+                dx = seg;
+            }
+            else {
+                y = view.getRoutingCenterY(source);
+                dy = seg;
+            }
+
+            if (pt == null ||
+                pt.x < source.x ||
+                pt.x > source.x + source.width) {
+                if (pt != null) {
+                    x = pt.x;
+                    dy = Math.max(Math.abs(y - pt.y), dy);
+                }
+                else {
+                    if (dir == mxConstants.DIRECTION_NORTH) {
+                        y = source.y - 2 * dx;
+                    }
+                    else if (dir == mxConstants.DIRECTION_SOUTH) {
+                        y = source.y + source.height + 2 * dx;
+                    }
+                    else if (dir == mxConstants.DIRECTION_EAST) {
+                        x = source.x - 2 * dy;
+                    }
+                    else {
+                        x = source.x + source.width + 2 * dy;
+                    }
+                }
+            }
+            else if (pt != null) {
+                x = view.getRoutingCenterX(source);
+                dx = Math.max(Math.abs(x - pt.x), dy);
+                y = pt.y;
+                dy = 0;
+            }
+
+            result.push(new mxPoint(x - dx, y - dy));
+            result.push(new mxPoint(x + dx, y + dy));
+        }
+    },
+    ElbowConnector: function (state, source, target, points, result) {
+        var pt = (points != null && points.length > 0) ? points[0] : null;
+
+        var vertical = false;
+        var horizontal = false;
+
+        if (source != null && target != null) {
+            if (pt != null) {
+                var left = Math.min(source.x, target.x);
+                var right = Math.max(source.x + source.width,
+                    target.x + target.width);
+
+                var top = Math.min(source.y, target.y);
+                var bottom = Math.max(source.y + source.height,
+                    target.y + target.height);
+
+                pt = state.view.transformControlPoint(state, pt);
+
+                vertical = pt.y < top || pt.y > bottom;
+                horizontal = pt.x < left || pt.x > right;
+            }
+            else {
+                var left = Math.max(source.x, target.x);
+                var right = Math.min(source.x + source.width,
+                    target.x + target.width);
+
+                vertical = left == right;
+
+                if (!vertical) {
+                    var top = Math.max(source.y, target.y);
+                    var bottom = Math.min(source.y + source.height,
+                        target.y + target.height);
+
+                    horizontal = top == bottom;
+                }
+            }
+        }
+
+        if (!horizontal && (vertical ||
+            state.style[mxConstants.STYLE_ELBOW] == mxConstants.ELBOW_VERTICAL)) {
+            mxEdgeStyle.TopToBottom(state, source, target, points, result);
+        }
+        else {
+            mxEdgeStyle.SideToSide(state, source, target, points, result);
+        }
+    },
+    SideToSide: function (state, source, target, points, result) {
+        var view = state.view;
+        var pt = (points != null && points.length > 0) ? points[0] : null;
+        var pts = state.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (pt != null) {
+            pt = view.transformControlPoint(state, pt);
+        }
+
+        if (p0 != null) {
+            source = new mxCellState();
+            source.x = p0.x;
+            source.y = p0.y;
+        }
+
+        if (pe != null) {
+            target = new mxCellState();
+            target.x = pe.x;
+            target.y = pe.y;
+        }
+
+        if (source != null && target != null) {
+            var l = Math.max(source.x, target.x);
+            var r = Math.min(source.x + source.width,
+                target.x + target.width);
+
+            var x = (pt != null) ? pt.x : r + (l - r) / 2;
+
+            var y1 = view.getRoutingCenterY(source);
+            var y2 = view.getRoutingCenterY(target);
+
+            if (pt != null) {
+                if (pt.y >= source.y && pt.y <= source.y + source.height) {
+                    y1 = pt.y;
+                }
+
+                if (pt.y >= target.y && pt.y <= target.y + target.height) {
+                    y2 = pt.y;
+                }
+            }
+
+            if (!mxUtils.contains(target, x, y1) && !mxUtils.contains(source, x, y1)) {
+                result.push(new mxPoint(x, y1));
+            }
+
+            if (!mxUtils.contains(target, x, y2) && !mxUtils.contains(source, x, y2)) {
+                result.push(new mxPoint(x, y2));
+            }
+
+            if (result.length == 1) {
+                if (pt != null) {
+                    if (!mxUtils.contains(target, x, pt.y) && !mxUtils.contains(source, x, pt.y)) {
+                        result.push(new mxPoint(x, pt.y));
+                    }
+                }
+                else {
+                    var t = Math.max(source.y, target.y);
+                    var b = Math.min(source.y + source.height,
+                        target.y + target.height);
+
+                    result.push(new mxPoint(x, t + (b - t) / 2));
+                }
+            }
+        }
+    },
+    TopToBottom: function (state, source, target, points, result) {
+        var view = state.view;
+        var pt = (points != null && points.length > 0) ? points[0] : null;
+        var pts = state.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (pt != null) {
+            pt = view.transformControlPoint(state, pt);
+        }
+
+        if (p0 != null) {
+            source = new mxCellState();
+            source.x = p0.x;
+            source.y = p0.y;
+        }
+
+        if (pe != null) {
+            target = new mxCellState();
+            target.x = pe.x;
+            target.y = pe.y;
+        }
+
+        if (source != null && target != null) {
+            var t = Math.max(source.y, target.y);
+            var b = Math.min(source.y + source.height,
+                target.y + target.height);
+
+            var x = view.getRoutingCenterX(source);
+
+            if (pt != null &&
+                pt.x >= source.x &&
+                pt.x <= source.x + source.width) {
+                x = pt.x;
+            }
+
+            var y = (pt != null) ? pt.y : b + (t - b) / 2;
+
+            if (!mxUtils.contains(target, x, y) && !mxUtils.contains(source, x, y)) {
+                result.push(new mxPoint(x, y));
+            }
+
+            if (pt != null &&
+                pt.x >= target.x &&
+                pt.x <= target.x + target.width) {
+                x = pt.x;
+            }
+            else {
+                x = view.getRoutingCenterX(target);
+            }
+
+            if (!mxUtils.contains(target, x, y) && !mxUtils.contains(source, x, y)) {
+                result.push(new mxPoint(x, y));
+            }
+
+            if (result.length == 1) {
+                if (pt != null && result.length == 1) {
+                    if (!mxUtils.contains(target, pt.x, y) && !mxUtils.contains(source, pt.x, y)) {
+                        result.push(new mxPoint(pt.x, y));
+                    }
+                }
+                else {
+                    var l = Math.max(source.x, target.x);
+                    var r = Math.min(source.x + source.width,
+                        target.x + target.width);
+
+                    result.push(new mxPoint(l + (r - l) / 2, y));
+                }
+            }
+        }
+    },
+    SegmentConnector: function (state, source, target, hints, result) {
+        // Creates array of all way- and terminalpoints
+        var pts = state.absolutePoints;
+        var tol = Math.max(1, 2 * state.view.scale);
+        // Whether the first segment outgoing from the source end is horizontal
+        var lastPushed = (result.length > 0) ? result[0] : null;
+        var horizontal = true;
+        var hint = null;
+
+        // Adds waypoints only if outside of tolerance
+        function pushPoint(pt) {
+            if (lastPushed == null || Math.abs(lastPushed.x - pt.x) > tol || Math.abs(lastPushed.y - pt.y) > tol) {
+                result.push(pt);
+                lastPushed = pt;
+            }
+
+            return lastPushed;
+        };
+
+        // Adds the first point
+        var pt = pts[0];
+
+        if (pt == null && source != null) {
+            pt = new mxPoint(state.view.getRoutingCenterX(source), state.view.getRoutingCenterY(source));
+        }
+        else if (pt != null) {
+            pt = pt.clone();
+        }
+
+        pt.x = Math.round(pt.x);
+        pt.y = Math.round(pt.y);
+
+        var lastInx = pts.length - 1;
+
+        // Adds the waypoints
+        if (hints != null && hints.length > 0) {
+            // Converts all hints
+            var newHints = [];
+
+            for (var i = 0; i < hints.length; i++) {
+                newHints[i] = state.view.transformControlPoint(state, hints[i]);
+                newHints[i].x = Math.round(newHints[i].x);
+                newHints[i].y = Math.round(newHints[i].y);
+            }
+
+            hints = newHints;
+
+            // Aligns source and target hint to fixed points
+            if (pt != null && hints[0] != null) {
+                if (Math.abs(hints[0].x - pt.x) <= tol) {
+                    hints[0].x = pt.x;
+                }
+
+                if (Math.abs(hints[0].y - pt.y) <= tol) {
+                    hints[0].y = pt.y;
+                }
+            }
+
+            var pe = pts[lastInx];
+
+            if (pe != null && hints[hints.length - 1] != null) {
+                if (Math.abs(hints[hints.length - 1].x - pe.x) <= tol) {
+                    hints[hints.length - 1].x = pe.x;
+                }
+
+                if (Math.abs(hints[hints.length - 1].y - pe.y) <= tol) {
+                    hints[hints.length - 1].y = pe.y;
+                }
+            }
+
+            hint = hints[0];
+
+            var currentTerm = source;
+            var currentPt = pts[0];
+            var hozChan = false;
+            var vertChan = false;
+            var currentHint = hint;
+
+            if (currentPt != null) {
+                currentPt.x = Math.round(currentPt.x);
+                currentPt.y = Math.round(currentPt.y);
+                currentTerm = null;
+            }
+
+            // Check for alignment with fixed points and with channels
+            // at source and target segments only
+            for (var i = 0; i < 2; i++) {
+                var fixedVertAlign = currentPt != null && currentPt.x == currentHint.x;
+                var fixedHozAlign = currentPt != null && currentPt.y == currentHint.y;
+
+                var inHozChan = currentTerm != null && (currentHint.y >= currentTerm.y &&
+                    currentHint.y <= currentTerm.y + currentTerm.height);
+                var inVertChan = currentTerm != null && (currentHint.x >= currentTerm.x &&
+                    currentHint.x <= currentTerm.x + currentTerm.width);
+
+                hozChan = fixedHozAlign || (currentPt == null && inHozChan);
+                vertChan = fixedVertAlign || (currentPt == null && inVertChan);
+
+                // If the current hint falls in both the hor and vert channels in the case
+                // of a floating port, or if the hint is exactly co-incident with a
+                // fixed point, ignore the source and try to work out the orientation
+                // from the target end
+                if (i == 0 && ((hozChan && vertChan) || (fixedVertAlign && fixedHozAlign))) {
+                }
+                else {
+                    if (currentPt != null && (!fixedHozAlign && !fixedVertAlign) && (inHozChan || inVertChan)) {
+                        horizontal = inHozChan ? false : true;
+                        break;
+                    }
+
+                    if (vertChan || hozChan) {
+                        horizontal = hozChan;
+
+                        if (i == 1) {
+                            // Work back from target end
+                            horizontal = hints.length % 2 == 0 ? hozChan : vertChan;
+                        }
+
+                        break;
+                    }
+                }
+
+                currentTerm = target;
+                currentPt = pts[lastInx];
+
+                if (currentPt != null) {
+                    currentPt.x = Math.round(currentPt.x);
+                    currentPt.y = Math.round(currentPt.y);
+                    currentTerm = null;
+                }
+
+                currentHint = hints[hints.length - 1];
+
+                if (fixedVertAlign && fixedHozAlign) {
+                    hints = hints.slice(1);
+                }
+            }
+
+            if (horizontal && ((pts[0] != null && pts[0].y != hint.y) ||
+                (pts[0] == null && source != null &&
+                (hint.y < source.y || hint.y > source.y + source.height)))) {
+                pushPoint(new mxPoint(pt.x, hint.y));
+            }
+            else if (!horizontal && ((pts[0] != null && pts[0].x != hint.x) ||
+                (pts[0] == null && source != null &&
+                (hint.x < source.x || hint.x > source.x + source.width)))) {
+                pushPoint(new mxPoint(hint.x, pt.y));
+            }
+
+            if (horizontal) {
+                pt.y = hint.y;
+            }
+            else {
+                pt.x = hint.x;
+            }
+
+            for (var i = 0; i < hints.length; i++) {
+                horizontal = !horizontal;
+                hint = hints[i];
+
+                //				mxLog.show();
+                //				mxLog.debug('hint', i, hint.x, hint.y);
+
+                if (horizontal) {
+                    pt.y = hint.y;
+                }
+                else {
+                    pt.x = hint.x;
+                }
+
+                pushPoint(pt.clone());
+            }
+        }
+        else {
+            hint = pt;
+            // FIXME: First click in connect preview toggles orientation
+            horizontal = true;
+        }
+
+        // Adds the last point
+        pt = pts[lastInx];
+
+        if (pt == null && target != null) {
+            pt = new mxPoint(state.view.getRoutingCenterX(target), state.view.getRoutingCenterY(target));
+        }
+
+        if (pt != null) {
+            pt.x = Math.round(pt.x);
+            pt.y = Math.round(pt.y);
+
+            if (hint != null) {
+                if (horizontal && ((pts[lastInx] != null && pts[lastInx].y != hint.y) ||
+                    (pts[lastInx] == null && target != null &&
+                    (hint.y < target.y || hint.y > target.y + target.height)))) {
+                    pushPoint(new mxPoint(pt.x, hint.y));
+                }
+                else if (!horizontal && ((pts[lastInx] != null && pts[lastInx].x != hint.x) ||
+                    (pts[lastInx] == null && target != null &&
+                    (hint.x < target.x || hint.x > target.x + target.width)))) {
+                    pushPoint(new mxPoint(hint.x, pt.y));
+                }
+            }
+        }
+
+        // Removes bends inside the source terminal for floating ports
+        if (pts[0] == null && source != null) {
+            while (result.length > 1 && result[1] != null &&
+            mxUtils.contains(source, result[1].x, result[1].y)) {
+                result.splice(1, 1);
+            }
+        }
+
+        // Removes bends inside the target terminal
+        if (pts[lastInx] == null && target != null) {
+            while (result.length > 1 && result[result.length - 1] != null &&
+            mxUtils.contains(target, result[result.length - 1].x, result[result.length - 1].y)) {
+                result.splice(result.length - 1, 1);
+            }
+        }
+
+        // Removes last point if inside tolerance with end point
+        if (pe != null && result[result.length - 1] != null &&
+            Math.abs(pe.x - result[result.length - 1].x) <= tol &&
+            Math.abs(pe.y - result[result.length - 1].y) <= tol) {
+            result.splice(result.length - 1, 1);
+
+            // Lines up second last point in result with end point
+            if (result[result.length - 1] != null) {
+                if (Math.abs(result[result.length - 1].x - pe.x) <= tol) {
+                    result[result.length - 1].x = pe.x;
+                }
+
+                if (Math.abs(result[result.length - 1].y - pe.y) <= tol) {
+                    result[result.length - 1].y = pe.y;
+                }
+            }
+        }
+
+        return result;
+    },
+
+    orthBuffer: 10,
+
+    orthPointsFallback: true,
+
+    dirVectors: [[-1, 0],
+        [0, -1], [1, 0], [0, 1], [-1, 0], [0, -1], [1, 0]],
+
+    wayPoints1: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+        [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
+
+    routePatterns: [
+        [[513, 2308, 2081, 2562], [513, 1090, 514, 2184, 2114, 2561],
+            [513, 1090, 514, 2564, 2184, 2562],
+            [513, 2308, 2561, 1090, 514, 2568, 2308]],
+        [[514, 1057, 513, 2308, 2081, 2562], [514, 2184, 2114, 2561],
+            [514, 2184, 2562, 1057, 513, 2564, 2184],
+            [514, 1057, 513, 2568, 2308, 2561]],
+        [[1090, 514, 1057, 513, 2308, 2081, 2562], [2114, 2561],
+            [1090, 2562, 1057, 513, 2564, 2184],
+            [1090, 514, 1057, 513, 2308, 2561, 2568]],
+        [[2081, 2562], [1057, 513, 1090, 514, 2184, 2114, 2561],
+            [1057, 513, 1090, 514, 2184, 2562, 2564],
+            [1057, 2561, 1090, 514, 2568, 2308]]],
+
+    inlineRoutePatterns: [
+        [null, [2114, 2568], null, null],
+        [null, [514, 2081, 2114, 2568], null, null],
+        [null, [2114, 2561], null, null],
+        [[2081, 2562], [1057, 2114, 2568],
+            [2184, 2562],
+            null]],
+    vertexSeperations: [],
+
+    limits: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+
+    LEFT_MASK: 32,
+
+    TOP_MASK: 64,
+
+    RIGHT_MASK: 128,
+
+    BOTTOM_MASK: 256,
+
+    LEFT: 1,
+
+    TOP: 2,
+
+    RIGHT: 4,
+
+    BOTTOM: 8,
+
+    // TODO remove magic numbers
+    SIDE_MASK: 480,
+    //mxEdgeStyle.LEFT_MASK | mxEdgeStyle.TOP_MASK | mxEdgeStyle.RIGHT_MASK
+    //| mxEdgeStyle.BOTTOM_MASK,
+
+    CENTER_MASK: 512,
+
+    SOURCE_MASK: 1024,
+
+    TARGET_MASK: 2048,
+
+    VERTEX_MASK: 3072,
+    // mxEdgeStyle.SOURCE_MASK | mxEdgeStyle.TARGET_MASK,
+
+    OrthConnector: function (state, source, target, points, result) {
+        var graph = state.view.graph;
+        var sourceEdge = source == null ? false : graph.getModel().isEdge(source.cell);
+        var targetEdge = target == null ? false : graph.getModel().isEdge(target.cell);
+
+        if (mxEdgeStyle.orthPointsFallback && (points != null && points.length > 0) || (sourceEdge) || (targetEdge)) {
+            mxEdgeStyle.SegmentConnector(state, source, target, points, result);
+
+            return;
+        }
+
+        var pts = state.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        var sourceX = source != null ? source.x : p0.x;
+        var sourceY = source != null ? source.y : p0.y;
+        var sourceWidth = source != null ? source.width : 0;
+        var sourceHeight = source != null ? source.height : 0;
+
+        var targetX = target != null ? target.x : pe.x;
+        var targetY = target != null ? target.y : pe.y;
+        var targetWidth = target != null ? target.width : 0;
+        var targetHeight = target != null ? target.height : 0;
+
+        var scaledOrthBuffer = state.view.scale * mxEdgeStyle.orthBuffer;
+        // Determine the side(s) of the source and target vertices
+        // that the edge may connect to
+        // portConstraint [source, target]
+        var portConstraint = [mxConstants.DIRECTION_MASK_ALL, mxConstants.DIRECTION_MASK_ALL];
+        var rotation = 0;
+
+        if (source != null) {
+            portConstraint[0] = mxUtils.getPortConstraints(source, state, true,
+                mxConstants.DIRECTION_MASK_ALL);
+            rotation = mxUtils.getValue(source.style, mxConstants.STYLE_ROTATION, 0);
+
+            if (rotation != 0) {
+                var newRect = mxUtils.getBoundingBox(new mxRectangle(sourceX, sourceY, sourceWidth, sourceHeight), rotation);
+                sourceX = newRect.x;
+                sourceY = newRect.y;
+                sourceWidth = newRect.width;
+                sourceHeight = newRect.height;
+            }
+        }
+
+        if (target != null) {
+            portConstraint[1] = mxUtils.getPortConstraints(target, state, false,
+                mxConstants.DIRECTION_MASK_ALL);
+            rotation = mxUtils.getValue(target.style, mxConstants.STYLE_ROTATION, 0);
+
+            if (rotation != 0) {
+                var newRect = mxUtils.getBoundingBox(new mxRectangle(targetX, targetY, targetWidth, targetHeight), rotation);
+                targetX = newRect.x;
+                targetY = newRect.y;
+                targetWidth = newRect.width;
+                targetHeight = newRect.height;
+            }
+        }
+
+        var dir = [0, 0];
+
+        // Work out which faces of the vertices present against each other
+        // in a way that would allow a 3-segment connection if port constraints
+        // permitted.
+        // geo -> [source, target] [x, y, width, height]
+        var geo = [[sourceX, sourceY, sourceWidth, sourceHeight],
+            [targetX, targetY, targetWidth, targetHeight]];
+
+        for (var i = 0; i < 2; i++) {
+            mxEdgeStyle.limits[i][1] = geo[i][0] - scaledOrthBuffer;
+            mxEdgeStyle.limits[i][2] = geo[i][1] - scaledOrthBuffer;
+            mxEdgeStyle.limits[i][4] = geo[i][0] + geo[i][2] + scaledOrthBuffer;
+            mxEdgeStyle.limits[i][8] = geo[i][1] + geo[i][3] + scaledOrthBuffer;
+        }
+
+        // Work out which quad the target is in
+        var sourceCenX = geo[0][0] + geo[0][2] / 2.0;
+        var sourceCenY = geo[0][1] + geo[0][3] / 2.0;
+        var targetCenX = geo[1][0] + geo[1][2] / 2.0;
+        var targetCenY = geo[1][1] + geo[1][3] / 2.0;
+
+        var dx = sourceCenX - targetCenX;
+        var dy = sourceCenY - targetCenY;
+
+        var quad = 0;
+
+        if (dx < 0) {
+            if (dy < 0) {
+                quad = 2;
+            }
+            else {
+                quad = 1;
+            }
+        }
+        else {
+            if (dy <= 0) {
+                quad = 3;
+
+                // Special case on x = 0 and negative y
+                if (dx == 0) {
+                    quad = 2;
+                }
+            }
+        }
+
+        // Check for connection constraints
+        var currentTerm = null;
+
+        if (source != null) {
+            currentTerm = p0;
+        }
+
+        var constraint = [[0.5, 0.5], [0.5, 0.5]];
+
+        for (var i = 0; i < 2; i++) {
+            if (currentTerm != null) {
+                constraint[i][0] = (currentTerm.x - geo[i][0]) / geo[i][2];
+
+                if (constraint[i][0] < 0.01) {
+                    dir[i] = mxConstants.DIRECTION_MASK_WEST;
+                }
+                else if (constraint[i][0] > 0.99) {
+                    dir[i] = mxConstants.DIRECTION_MASK_EAST;
+                }
+
+                constraint[i][1] = (currentTerm.y - geo[i][1]) / geo[i][3];
+
+                if (constraint[i][1] < 0.01) {
+                    dir[i] = mxConstants.DIRECTION_MASK_NORTH;
+                }
+                else if (constraint[i][1] > 0.99) {
+                    dir[i] = mxConstants.DIRECTION_MASK_SOUTH;
+                }
+            }
+
+            currentTerm = null;
+
+            if (target != null) {
+                currentTerm = pe;
+            }
+        }
+
+        var sourceTopDist = geo[0][1] - (geo[1][1] + geo[1][3]);
+        var sourceLeftDist = geo[0][0] - (geo[1][0] + geo[1][2]);
+        var sourceBottomDist = geo[1][1] - (geo[0][1] + geo[0][3]);
+        var sourceRightDist = geo[1][0] - (geo[0][0] + geo[0][2]);
+
+        mxEdgeStyle.vertexSeperations[1] = Math.max(
+            sourceLeftDist - 2 * scaledOrthBuffer, 0);
+        mxEdgeStyle.vertexSeperations[2] = Math.max(sourceTopDist - 2 * scaledOrthBuffer,
+            0);
+        mxEdgeStyle.vertexSeperations[4] = Math.max(sourceBottomDist - 2
+            * scaledOrthBuffer, 0);
+        mxEdgeStyle.vertexSeperations[3] = Math.max(sourceRightDist - 2
+            * scaledOrthBuffer, 0);
+
+        //==============================================================
+        // Start of source and target direction determination
+
+        // Work through the preferred orientations by relative positioning
+        // of the vertices and list them in preferred and available order
+
+        var dirPref = [];
+        var horPref = [];
+        var vertPref = [];
+
+        horPref[0] = (sourceLeftDist >= sourceRightDist) ? mxConstants.DIRECTION_MASK_WEST
+            : mxConstants.DIRECTION_MASK_EAST;
+        vertPref[0] = (sourceTopDist >= sourceBottomDist) ? mxConstants.DIRECTION_MASK_NORTH
+            : mxConstants.DIRECTION_MASK_SOUTH;
+
+        horPref[1] = mxUtils.reversePortConstraints(horPref[0]);
+        vertPref[1] = mxUtils.reversePortConstraints(vertPref[0]);
+
+        var preferredHorizDist = sourceLeftDist >= sourceRightDist ? sourceLeftDist
+            : sourceRightDist;
+        var preferredVertDist = sourceTopDist >= sourceBottomDist ? sourceTopDist
+            : sourceBottomDist;
+
+        var prefOrdering = [[0, 0], [0, 0]];
+        var preferredOrderSet = false;
+
+        // If the preferred port isn't available, switch it
+        for (var i = 0; i < 2; i++) {
+            if (dir[i] != 0x0) {
+                continue;
+            }
+
+            if ((horPref[i] & portConstraint[i]) == 0) {
+                horPref[i] = mxUtils.reversePortConstraints(horPref[i]);
+            }
+
+            if ((vertPref[i] & portConstraint[i]) == 0) {
+                vertPref[i] = mxUtils
+                    .reversePortConstraints(vertPref[i]);
+            }
+
+            prefOrdering[i][0] = vertPref[i];
+            prefOrdering[i][1] = horPref[i];
+        }
+
+        if (preferredVertDist > scaledOrthBuffer * 2
+            && preferredHorizDist > scaledOrthBuffer * 2) {
+            // Possibility of two segment edge connection
+            if (((horPref[0] & portConstraint[0]) > 0)
+                && ((vertPref[1] & portConstraint[1]) > 0)) {
+                prefOrdering[0][0] = horPref[0];
+                prefOrdering[0][1] = vertPref[0];
+                prefOrdering[1][0] = vertPref[1];
+                prefOrdering[1][1] = horPref[1];
+                preferredOrderSet = true;
+            }
+            else if (((vertPref[0] & portConstraint[0]) > 0)
+                && ((horPref[1] & portConstraint[1]) > 0)) {
+                prefOrdering[0][0] = vertPref[0];
+                prefOrdering[0][1] = horPref[0];
+                prefOrdering[1][0] = horPref[1];
+                prefOrdering[1][1] = vertPref[1];
+                preferredOrderSet = true;
+            }
+        }
+        if (preferredVertDist > scaledOrthBuffer * 2 && !preferredOrderSet) {
+            prefOrdering[0][0] = vertPref[0];
+            prefOrdering[0][1] = horPref[0];
+            prefOrdering[1][0] = vertPref[1];
+            prefOrdering[1][1] = horPref[1];
+            preferredOrderSet = true;
+
+        }
+        if (preferredHorizDist > scaledOrthBuffer * 2 && !preferredOrderSet) {
+            prefOrdering[0][0] = horPref[0];
+            prefOrdering[0][1] = vertPref[0];
+            prefOrdering[1][0] = horPref[1];
+            prefOrdering[1][1] = vertPref[1];
+            preferredOrderSet = true;
+        }
+
+        // The source and target prefs are now an ordered list of
+        // the preferred port selections
+        // It the list can contain gaps, compact it
+
+        for (var i = 0; i < 2; i++) {
+            if (dir[i] != 0x0) {
+                continue;
+            }
+
+            if ((prefOrdering[i][0] & portConstraint[i]) == 0) {
+                prefOrdering[i][0] = prefOrdering[i][1];
+            }
+
+            dirPref[i] = prefOrdering[i][0] & portConstraint[i];
+            dirPref[i] |= (prefOrdering[i][1] & portConstraint[i]) << 8;
+            dirPref[i] |= (prefOrdering[1 - i][i] & portConstraint[i]) << 16;
+            dirPref[i] |= (prefOrdering[1 - i][1 - i] & portConstraint[i]) << 24;
+
+            if ((dirPref[i] & 0xF) == 0) {
+                dirPref[i] = dirPref[i] << 8;
+            }
+            if ((dirPref[i] & 0xF00) == 0) {
+                dirPref[i] = (dirPref[i] & 0xF) | dirPref[i] >> 8;
+            }
+            if ((dirPref[i] & 0xF0000) == 0) {
+                dirPref[i] = (dirPref[i] & 0xFFFF)
+                    | ((dirPref[i] & 0xF000000) >> 8);
+            }
+
+            dir[i] = dirPref[i] & 0xF;
+
+            if (portConstraint[i] == mxConstants.DIRECTION_MASK_WEST
+                || portConstraint[i] == mxConstants.DIRECTION_MASK_NORTH
+                || portConstraint[i] == mxConstants.DIRECTION_MASK_EAST
+                || portConstraint[i] == mxConstants.DIRECTION_MASK_SOUTH) {
+                dir[i] = portConstraint[i];
+            }
+        }
+
+        //==============================================================
+        // End of source and target direction determination
+
+        var sourceIndex = dir[0] == mxConstants.DIRECTION_MASK_EAST ? 3
+            : dir[0];
+        var targetIndex = dir[1] == mxConstants.DIRECTION_MASK_EAST ? 3
+            : dir[1];
+
+        sourceIndex -= quad;
+        targetIndex -= quad;
+
+        if (sourceIndex < 1) {
+            sourceIndex += 4;
+        }
+        if (targetIndex < 1) {
+            targetIndex += 4;
+        }
+
+        var routePattern = mxEdgeStyle.routePatterns[sourceIndex - 1][targetIndex - 1];
+
+        mxEdgeStyle.wayPoints1[0][0] = geo[0][0];
+        mxEdgeStyle.wayPoints1[0][1] = geo[0][1];
+
+        switch (dir[0]) {
+            case mxConstants.DIRECTION_MASK_WEST:
+                mxEdgeStyle.wayPoints1[0][0] -= scaledOrthBuffer;
+                mxEdgeStyle.wayPoints1[0][1] += constraint[0][1] * geo[0][3];
+                break;
+            case mxConstants.DIRECTION_MASK_SOUTH:
+                mxEdgeStyle.wayPoints1[0][0] += constraint[0][0] * geo[0][2];
+                mxEdgeStyle.wayPoints1[0][1] += geo[0][3] + scaledOrthBuffer;
+                break;
+            case mxConstants.DIRECTION_MASK_EAST:
+                mxEdgeStyle.wayPoints1[0][0] += geo[0][2] + scaledOrthBuffer;
+                mxEdgeStyle.wayPoints1[0][1] += constraint[0][1] * geo[0][3];
+                break;
+            case mxConstants.DIRECTION_MASK_NORTH:
+                mxEdgeStyle.wayPoints1[0][0] += constraint[0][0] * geo[0][2];
+                mxEdgeStyle.wayPoints1[0][1] -= scaledOrthBuffer;
+                break;
+        }
+
+        var currentIndex = 0;
+
+        // Orientation, 0 horizontal, 1 vertical
+        var lastOrientation = (dir[0] & (mxConstants.DIRECTION_MASK_EAST | mxConstants.DIRECTION_MASK_WEST)) > 0 ? 0
+            : 1;
+        var initialOrientation = lastOrientation;
+        var currentOrientation = 0;
+
+        for (var i = 0; i < routePattern.length; i++) {
+            var nextDirection = routePattern[i] & 0xF;
+
+            // Rotate the index of this direction by the quad
+            // to get the real direction
+            var directionIndex = nextDirection == mxConstants.DIRECTION_MASK_EAST ? 3
+                : nextDirection;
+
+            directionIndex += quad;
+
+            if (directionIndex > 4) {
+                directionIndex -= 4;
+            }
+
+            var direction = mxEdgeStyle.dirVectors[directionIndex - 1];
+
+            currentOrientation = (directionIndex % 2 > 0) ? 0 : 1;
+            // Only update the current index if the point moved
+            // in the direction of the current segment move,
+            // otherwise the same point is moved until there is
+            // a segment direction change
+            if (currentOrientation != lastOrientation) {
+                currentIndex++;
+                // Copy the previous way point into the new one
+                // We can't base the new position on index - 1
+                // because sometime elbows turn out not to exist,
+                // then we'd have to rewind.
+                mxEdgeStyle.wayPoints1[currentIndex][0] = mxEdgeStyle.wayPoints1[currentIndex - 1][0];
+                mxEdgeStyle.wayPoints1[currentIndex][1] = mxEdgeStyle.wayPoints1[currentIndex - 1][1];
+            }
+
+            var tar = (routePattern[i] & mxEdgeStyle.TARGET_MASK) > 0;
+            var sou = (routePattern[i] & mxEdgeStyle.SOURCE_MASK) > 0;
+            var side = (routePattern[i] & mxEdgeStyle.SIDE_MASK) >> 5;
+            side = side << quad;
+
+            if (side > 0xF) {
+                side = side >> 4;
+            }
+
+            var center = (routePattern[i] & mxEdgeStyle.CENTER_MASK) > 0;
+
+            if ((sou || tar) && side < 9) {
+                var limit = 0;
+                var souTar = sou ? 0 : 1;
+
+                if (center && currentOrientation == 0) {
+                    limit = geo[souTar][0] + constraint[souTar][0] * geo[souTar][2];
+                }
+                else if (center) {
+                    limit = geo[souTar][1] + constraint[souTar][1] * geo[souTar][3];
+                }
+                else {
+                    limit = mxEdgeStyle.limits[souTar][side];
+                }
+
+                if (currentOrientation == 0) {
+                    var lastX = mxEdgeStyle.wayPoints1[currentIndex][0];
+                    var deltaX = (limit - lastX) * direction[0];
+
+                    if (deltaX > 0) {
+                        mxEdgeStyle.wayPoints1[currentIndex][0] += direction[0]
+                            * deltaX;
+                    }
+                }
+                else {
+                    var lastY = mxEdgeStyle.wayPoints1[currentIndex][1];
+                    var deltaY = (limit - lastY) * direction[1];
+
+                    if (deltaY > 0) {
+                        mxEdgeStyle.wayPoints1[currentIndex][1] += direction[1]
+                            * deltaY;
+                    }
+                }
+            }
+
+            else if (center) {
+                // Which center we're travelling to depend on the current direction
+                mxEdgeStyle.wayPoints1[currentIndex][0] += direction[0]
+                    * Math.abs(mxEdgeStyle.vertexSeperations[directionIndex] / 2);
+                mxEdgeStyle.wayPoints1[currentIndex][1] += direction[1]
+                    * Math.abs(mxEdgeStyle.vertexSeperations[directionIndex] / 2);
+            }
+
+            if (currentIndex > 0
+                && mxEdgeStyle.wayPoints1[currentIndex][currentOrientation] == mxEdgeStyle.wayPoints1[currentIndex - 1][currentOrientation]) {
+                currentIndex--;
+            }
+            else {
+                lastOrientation = currentOrientation;
+            }
+        }
+
+        for (var i = 0; i <= currentIndex; i++) {
+            if (i == currentIndex) {
+                // Last point can cause last segment to be in
+                // same direction as jetty/approach. If so,
+                // check the number of points is consistent
+                // with the relative orientation of source and target
+                // jettys. Same orientation requires an even
+                // number of turns (points), different requires
+                // odd.
+                var targetOrientation = (dir[1] & (mxConstants.DIRECTION_MASK_EAST | mxConstants.DIRECTION_MASK_WEST)) > 0 ? 0
+                    : 1;
+                var sameOrient = targetOrientation == initialOrientation ? 0 : 1;
+
+                // (currentIndex + 1) % 2 is 0 for even number of points,
+                // 1 for odd
+                if (sameOrient != (currentIndex + 1) % 2) {
+                    // The last point isn't required
+                    break;
+                }
+            }
+
+            result.push(new mxPoint(Math.round(mxEdgeStyle.wayPoints1[i][0]), Math.round(mxEdgeStyle.wayPoints1[i][1])));
+        }
+    },
+
+    getRoutePattern: function (dir, quad, dx, dy) {
+        var sourceIndex = dir[0] == mxConstants.DIRECTION_MASK_EAST ? 3
+            : dir[0];
+        var targetIndex = dir[1] == mxConstants.DIRECTION_MASK_EAST ? 3
+            : dir[1];
+
+        sourceIndex -= quad;
+        targetIndex -= quad;
+
+        if (sourceIndex < 1) {
+            sourceIndex += 4;
+        }
+        if (targetIndex < 1) {
+            targetIndex += 4;
+        }
+
+        var result = routePatterns[sourceIndex - 1][targetIndex - 1];
+
+        if (dx == 0 || dy == 0) {
+            if (inlineRoutePatterns[sourceIndex - 1][targetIndex - 1] != null) {
+                result = inlineRoutePatterns[sourceIndex - 1][targetIndex - 1];
+            }
+        }
+
+        return result;
+    }
+};
+
+module.exports = edgeStyle;
+
+});
 define('PaneJS/enums/align',['require','exports','module'],function (require, exports, module) {module.exports = {
     LEFT: 'left',
     CENTER: 'center',
@@ -597,7 +1924,1422 @@ define('PaneJS/enums/styleNames',['require','exports','module'],function (requir
 };
 
 });
-define('PaneJS/perimeter',['require','exports','module'],function (require, exports, module) {module.exports =
+define('PaneJS/events/eventNames',['require','exports','module'],function (require, exports, module) {module.exports = {
+
+    MOUSE_DOWN: 'mouseDown',
+    MOUSE_MOVE: 'mouseMove',
+    MOUSE_UP: 'mouseUp',
+    GESTURE: 'gesture',
+
+};
+
+});
+
+
+
+
+
+define('PaneJS/utils/lang',['require','exports','module'],function (require, exports, module) {var arrProto = Array.prototype;
+var objProto = Object.prototype;
+var slice = arrProto.slice;
+var toString = objProto.toString;
+
+
+var isType = exports.isType = function (obj, type) {
+    return toString.call(obj) === '[object ' + type + ']';
+};
+
+exports.isObject = function (obj) {
+
+    if (!obj) {
+        return false;
+    }
+
+    var type = typeof obj;
+
+    return type === 'function' || type === 'object';
+};
+
+exports.isFunction = function (obj) {
+    return isType(obj, 'Function');
+};
+
+var isNull = exports.isNull = function (obj) {
+    return obj === null;
+};
+
+var isUndefined = exports.isUndefined = function (obj) {
+    return typeof obj === 'undefined';
+};
+
+exports.isNullOrUndefined = function (obj) {
+    return isUndefined(obj) || isNull(obj);
+};
+
+exports.isWindow = function (obj) {
+    return obj && obj === obj.window;
+};
+
+var isArray = exports.isArray = Array.isArray || function (obj) {
+        return isType(obj, 'Array');
+    };
+
+exports.isArrayLike = function (obj) {
+    if (isArray(obj)) {
+        return true;
+    }
+
+    if (isFunction(obj) || isWindow(obj)) {
+        return false;
+    }
+
+    var length = !!obj && 'length' in obj && obj.length;
+
+    return length === 0 ||
+        typeof length === 'number' && length > 0 && (length - 1) in obj;
+};
+
+exports.isNumeric = function (obj) {
+    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+};
+
+});
+
+
+define('PaneJS/common/class',['require','exports','module','./utils'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+// ref: https://github.com/aralejs/class
+/*jshint -W030 */
+
+var utils = require('./utils');
+
+var each = utils.each;
+var hasKey = utils.hasKey;
+var isArray = utils.isArray;
+var isFunction = utils.isFunction;
+
+function Class(o) {
+    // Convert existed function to Class.
+    if (!(this instanceof Class) && isFunction(o)) {
+        return classify(o);
+    }
+}
+
+Class.create = function (parent, properties) {
+    if (!isFunction(parent)) {
+        properties = parent;
+        parent = null;
+    }
+
+    properties || (properties = {});
+    parent || (parent = properties.Extends || Class);
+    properties.Extends = parent;
+
+    // The created class constructor.
+    //function SubClass() {
+    //    // Call the parent constructor.
+    //    parent.apply(this, arguments);
+    //
+    //    // Only call initialize in self constructor.
+    //    if (this.constructor === SubClass && this.initialize) {
+    //        this.initialize.apply(this, arguments);
+    //    }
+    //}
+
+    var SubClass = properties.constructor;
+    // unspecified constructor
+    if (SubClass === Object.prototype.constructor) {
+        SubClass = function Class() {};
+    }
+
+    // Inherit class (static) properties from parent.
+    if (parent !== Class) {
+        mix(SubClass, parent, parent.StaticsWhiteList);
+    }
+
+    // Add instance properties to the subclass.
+    implement.call(SubClass, properties);
+
+    // Make subclass extendable.
+    return classify(SubClass);
+};
+
+// Create a sub Class based on `Class`.
+Class.extend = function (properties) {
+    properties || (properties = {});
+    properties.Extends = this;
+
+    return Class.create(properties);
+};
+
+// define special properties.
+Class.Mutators = {
+
+    'Extends': function (parent) {
+        var existed = this.prototype;
+        var parentProto = parent.prototype;
+        var proto = createProto(parentProto);
+
+        // Keep existed properties.
+        mix(proto, existed);
+
+        // Enforce the constructor to be what we expect.
+        proto.constructor = this;
+
+        // Set the prototype chain to inherit from `parent`.
+        this.prototype = proto;
+
+        // Set a convenience property in case the parent's prototype is
+        // needed later.
+        this.superclass = parentProto;
+    },
+
+    'Implements': function (items) {
+
+        if (!isArray(items)) {
+            items = [items];
+        }
+
+        var proto = this.prototype;
+        var item;
+
+        while (item = items.shift()) {
+            mix(proto, item.prototype || item);
+        }
+    },
+
+    'Statics': function (staticProperties) {
+        mix(this, staticProperties);
+    }
+};
+
+function classify(cls) {
+    cls.extend = Class.extend;
+    cls.implement = implement;
+    return cls;
+}
+
+function implement(properties) {
+
+    var that = this;
+    var mutators = Class.Mutators;
+
+    each(properties, function (value, key) {
+        if (hasKey(mutators, key)) {
+            mutators[key].call(that, value);
+        } else {
+            that.prototype[key] = value;
+        }
+    });
+}
+
+
+// Helpers
+// -------
+
+var createProto = Object.__proto__ ?
+    function (proto) {
+        return {__proto__: proto};
+    } :
+    function (proto) {
+        function Ctor() {}
+
+        Ctor.prototype = proto;
+        return new Ctor();
+    };
+
+function mix(receiver, supplier, whiteList) {
+
+    each(supplier, function (value, key) {
+        if (whiteList && indexOf(whiteList, key) === -1) {
+            return;
+        }
+
+        receiver[key] = value;
+    });
+}
+
+module.exports = Class;
+
+
+});
+define('PaneJS/common/objectIdentity',['require','exports','module','./utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global window */
+
+var utils = require('./utils');
+
+var isObject = utils.isObject;
+var isNullOrUndefined = utils.isNullOrUndefined;
+var getFunctionName = utils.getFunctionName;
+
+// TODO: constants
+var FIELD_NAME = 'objectId';
+var counter = 0;
+
+
+exports.get = function (obj) {
+
+    var isObj = isObject(obj);
+
+    if (isObj && isNullOrUndefined(obj[FIELD_NAME])) {
+        var ctorName = getFunctionName(obj.constructor);
+        obj[FIELD_NAME] = ctorName + '#' + counter++;
+    }
+
+    return isObj ? obj[FIELD_NAME] : '' + obj;
+};
+
+exports.clear = function (obj) {
+    if (isObject(obj)) {
+        delete obj[FIELD_NAME];
+    }
+};
+
+});
+define('PaneJS/events/aspect',['require','exports','module','../common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var utils = require('../common/utils');
+
+var isFunction = utils.isFunction;
+var each = utils.each;
+var invoke = utils.invoke;
+var toArray = utils.toArray;
+// TODO: constants
+var eventSplitter = /\s+/;
+
+
+function weave(when, methodName, callback, context) {
+    var that = this;
+    var names = methodName.split(eventSplitter);
+
+    each(names, function (name) {
+        var method = that[name];
+
+        if (!method || !isFunction(method)) {
+            throw new Error('Event handler must be function, event name: ' + name);
+        }
+
+        if (!method.__isAspected) {
+            wrap.call(that, name);
+        }
+
+        that.on(when + ':' + name, callback, context);
+    });
+
+    return that;
+}
+
+function wrap(methodName) {
+    var that = this;
+    var originMethod = that[methodName];
+
+    that[methodName] = function () {
+        var that = this;
+        var args = toArray(arguments);
+        var beforeArgs = ['before:' + methodName].concat(args);
+
+        // prevent if trigger return false
+        if (invoke(that.trigger, beforeArgs, that) === false) {
+            return;
+        }
+
+        // call the origin method.
+        var ret = originMethod.apply(this, arguments);
+        var afterArgs = ['after:' + methodName, ret].concat(args);
+        invoke(that.trigger, afterArgs, that);
+
+        return ret;
+    };
+
+    that[methodName].__isAspected = true;
+}
+
+exports.before = function (methodName, callback, context) {
+    return weave.call(this, 'before', methodName, callback, context);
+};
+
+exports.after = function (methodName, callback, context) {
+    return weave.call(this, 'after', methodName, callback, context);
+};
+
+exports.around = function (methodName, callback, context) {
+    weave.call(this, 'before', methodName, callback, context);
+    weave.call(this, 'after', methodName, callback, context);
+    return this;
+};
+
+
+});
+define('PaneJS/events/domEvent',['require','exports','module','../common/utils','../common/detector'],function (require, exports, module) {var utils = require('../common/utils');
+var detector = require('../common/detector');
+
+var each = utils.each;
+var indexOf = utils.indexOf;
+
+var IS_TOUCH = detector.IS_TOUCH;
+var IS_POINTER = detector.IS_POINTER;
+
+var domEvent = {
+
+    // 保存已经绑定事件的元素
+    cache: [],
+
+    on: function () {
+
+        var update = function (element, eventName, callback) {
+
+            var list = element.eventListeners;
+
+            if (!list) {
+                list = element.eventListeners = [];
+                domEvent.cache.push(element);
+            }
+
+            list.push({
+                eventName: eventName,
+                callback: callback
+            });
+        };
+
+        if (window.addEventListener) {
+            return function (element, eventName, callback) {
+                element.addEventListener(eventName, callback, false);
+                update(element, eventName, callback);
+            };
+        } else {
+            return function (element, eventName, callback) {
+                element.attachEvent('on' + eventName, callback);
+                update(element, eventName, callback);
+            };
+        }
+    }(),
+
+    off: function () {
+        var updateListener = function (element, eventName, callback) {
+
+            var list = element.eventListeners;
+
+            if (list) {
+                for (var i = list.length - 1; i >= 0; i--) {
+                    var entry = list[i];
+
+                    if (entry.eventName === eventName && entry.callback === callback) {
+                        list.splice(i, 1);
+                    }
+                }
+
+                if (list.length === 0) {
+                    delete element.eventListeners;
+
+                    var idx = indexOf(domEvent.cache, element);
+                    if (idx >= 0) {
+                        domEvent.cache.splice(idx, 1);
+                    }
+                }
+            }
+        };
+
+        if (window.removeEventListener) {
+            return function (element, eventName, callback) {
+                element.removeEventListener(eventName, callback, false);
+                updateListener(element, eventName, callback);
+            };
+        }
+        else {
+            return function (element, eventName, callback) {
+                element.detachEvent('on' + eventName, callback);
+                updateListener(element, eventName, callback);
+            };
+        }
+    }(),
+
+    clear: function (element) {
+
+        var list = element.eventListeners;
+
+        list && each(list, function (entry) {
+            domEvent.off(element, entry.eventName, entry.callback);
+
+        });
+    },
+
+    release: function (element) {
+        if (element) {
+            domEvent.clear(element);
+
+            var children = element.childNodes;
+
+            if (children) {
+                for (var i = 0, l = children.length; i < l; i += 1) {
+                    domEvent.release(children[i]);
+                }
+            }
+        }
+    },
+
+    onGesture: function (element, startListener, moveListener, endListener) {
+        if (startListener) {
+            domEvent.on(element, IS_POINTER ? 'MSPointerDown' : 'mousedown', startListener);
+        }
+
+        if (moveListener) {
+            domEvent.on(element, IS_POINTER ? 'MSPointerMove' : 'mousemove', moveListener);
+        }
+
+        if (endListener) {
+            domEvent.on(element, IS_POINTER ? 'MSPointerUp' : 'mouseup', endListener);
+        }
+
+        if (IS_TOUCH && !IS_POINTER) {
+            if (startListener) {
+                domEvent.on(element, 'touchstart', startListener);
+            }
+
+            if (moveListener) {
+                domEvent.on(element, 'touchmove', moveListener);
+            }
+
+            if (endListener) {
+                domEvent.on(element, 'touchend', endListener);
+            }
+        }
+    },
+
+    offGesture: function (element, startListener, moveListener, endListener) {
+        if (startListener) {
+            domEvent.off(element, (IS_POINTER) ? 'MSPointerDown' : 'mousedown', startListener);
+        }
+
+        if (moveListener) {
+            domEvent.off(element, (IS_POINTER) ? 'MSPointerMove' : 'mousemove', moveListener);
+        }
+
+        if (endListener) {
+            domEvent.off(element, (IS_POINTER) ? 'MSPointerUp' : 'mouseup', endListener);
+        }
+
+        if (IS_TOUCH && !IS_POINTER) {
+            if (startListener) {
+                domEvent.off(element, 'touchstart', startListener);
+            }
+
+            if (moveListener) {
+                domEvent.off(element, 'touchmove', moveListener);
+            }
+
+            if (endListener) {
+                domEvent.off(element, 'touchend', endListener);
+            }
+        }
+    },
+
+    onMouseWheel: function (callback) {
+        if (!callback) {
+            return;
+        }
+
+        var wheelHandler = function (evt) {
+
+            // IE does not give an event object but the
+            // global event object is the mousewheel event
+            // at this point in time.
+            evt = evt || window.event;
+
+            var delta = 0;
+
+            if (detector.IS_FF) {
+                delta = -evt.detail / 2;
+            } else {
+                delta = evt.wheelDelta / 120;
+            }
+
+            // Handles the event using the given function
+            if (delta !== 0) {
+                callback(evt, delta > 0);
+            }
+        };
+
+        // Webkit has NS event API, but IE event name and details
+        if (detector.IS_NS && !document.documentMode) {
+            var eventName = (detector.IS_SF || detector.IS_GC) ? 'mousewheel' : 'DOMMouseScroll';
+            domEvent.on(window, eventName, wheelHandler);
+        } else {
+            domEvent.on(document, 'mousewheel', wheelHandler);
+        }
+
+    },
+
+    getSource: function (evt) {
+        return evt.srcElement || evt.target;
+    },
+
+    getMainEvent: function (e) {
+        if ((e.type === 'touchstart' || e.type === 'touchmove') && e.touches && e.touches[0]) {
+            e = e.touches[0];
+        } else if (e.type === 'touchend' && e.changedTouches && e.changedTouches[0]) {
+            e = e.changedTouches[0];
+        }
+
+        return e;
+    },
+
+    getClientX: function (e) {
+        return domEvent.getMainEvent(e).clientX;
+    },
+
+    /**
+     * Function: getClientY
+     *
+     * Returns true if the meta key is pressed for the given event.
+     */
+    getClientY: function (e) {
+        return domEvent.getMainEvent(e).clientY;
+    },
+
+    consume: function (evt, preventDefault, stopPropagation) {
+        preventDefault = preventDefault ? preventDefault : true;
+        stopPropagation = stopPropagation ? stopPropagation : true;
+
+        if (preventDefault) {
+            if (evt.preventDefault) {
+                evt.preventDefault();
+            } else {
+                evt.returnValue = false;
+            }
+        }
+
+        if (stopPropagation) {
+            if (evt.stopPropagation) {
+                evt.stopPropagation();
+            } else {
+                evt.cancelBubble = true;
+            }
+        }
+
+        evt.consumed = true;
+    },
+
+    isTouchEvent: function (evt) {
+        return evt.pointerType
+            ? (evt.pointerType === 'touch' || evt.pointerType === evt.MSPOINTER_TYPE_TOUCH)
+            : (evt.mozInputSource ? evt.mozInputSource === 5 : evt.type.indexOf('touch') === 0);
+    },
+
+    isMultiTouchEvent: function (evt) {
+        return evt.type
+            && evt.type.indexOf('touch') === 0
+            && evt.touches
+            && evt.touches.length > 1;
+    },
+
+    isMouseEvent: function (evt) {
+        return evt.pointerType
+            ? (evt.pointerType === 'mouse' || evt.pointerType === evt.MSPOINTER_TYPE_MOUSE)
+            : (evt.mozInputSource ? evt.mozInputSource === 1 : evt.type.indexOf('mouse') === 0);
+    },
+
+    isLeftMouseButton: function (evt) {
+        return evt.button === ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 1 : 0);
+    },
+
+    isMiddleMouseButton: function (evt) {
+        return evt.button == ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 4 : 1);
+    },
+
+    isRightMouseButton: function (evt) {
+        return evt.button === 2;
+    },
+
+    isPopupTrigger: function (evt) {
+        return mxEvent.isRightMouseButton(evt) || (mxClient.IS_MAC && mxEvent.isControlDown(evt) && !mxEvent.isShiftDown(evt) && !mxEvent.isMetaDown(evt) && !mxEvent.isAltDown(evt));
+    },
+
+    isShiftDown: function (evt) {
+        return evt ? evt.shiftKey : false;
+    },
+
+    isAltDown: function (evt) {
+        return evt ? evt.altKey : false;
+    },
+
+    isControlDown: function (evt) {
+        return evt ? evt.ctrlKey : false;
+    },
+
+    isMetaDown: function (evt) {
+        return evt ? evt.metaKey : false;
+    }
+};
+
+module.exports = domEvent;
+
+});
+define('PaneJS/Base',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {// 全局基类
+
+var Class = require('PaneJS/common/class');
+var utils = require('PaneJS/common/utils');
+
+module.exports = Class.create({
+    constructor: function Base() {},
+
+    toString: function () {},
+
+    getValue: function () {},
+
+    destroy: function () {
+
+        var that = this;
+
+        that.destroyed = true;
+    }
+});
+
+});
+define('PaneJS/Point',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Class = require('PaneJS/common/class');
+var utils = require('PaneJS/common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+var Point = Class.create({
+
+    constructor: function Point(x, y) {
+        this.x = !isNullOrUndefined(x) ? x : 0;
+        this.y = !isNullOrUndefined(y) ? y : 0;
+    },
+
+    equals: function (point) {
+        return point &&
+            point instanceof Point &&
+            point.x === this.x &&
+            point.y === this.y;
+    },
+
+    clone: function () {
+        return new Point(this.x, this.y);
+    }
+});
+
+module.exports = Point;
+
+
+});
+define('PaneJS/UndoableEdit',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {var Class = require('PaneJS/common/class');
+var utils = require('PaneJS/common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Class.create({
+    constructor: function UndoableEdit(source, significant) {
+
+        var that = this;
+
+        that.source = source;
+        that.changes = [];
+        that.significant = !isNullOrUndefined(significant) ? significant : true;
+        that.undone = false;
+        that.redone = false;
+
+    },
+
+    isEmpty: function () {
+        return this.changes.length === 0;
+    },
+
+    isSignificant: function () {
+        return this.significant;
+    },
+
+    add: function (change) {
+        this.changes.push(change);
+    },
+
+    notify: function () {},
+    die: function () {},
+    undo: function () {},
+    redo: function () {}
+});
+
+});
+define('PaneJS/changes/Change',['require','exports','module','../common/class'],function (require, exports, module) {'use strict';
+
+var Class = require('../common/class');
+
+module.exports = Class.create({
+
+    constructor: function Change(model) {
+        this.model = model;
+    },
+
+    digest: function () { }
+});
+
+
+});
+define('PaneJS/common/Dictionary',['require','exports','module','./class','./utils','./objectIdentity'],function (require, exports, module) {'use strict';
+
+var Class = require('./class');
+var utils = require('./utils');
+var objectIdentity = require('./objectIdentity');
+
+var isObject = utils.isObject;
+var keys = utils.keys;
+var each = utils.each;
+
+function getId(key) {
+
+    if (isObject(key)) {
+        return objectIdentity.get(key);
+    }
+
+    return '' + key;
+}
+
+module.exports = Class.create({
+
+    constructor: function Dictionary() {
+        return this.clear();
+    },
+
+    clear: function () {
+        var dic = this;
+
+        dic.map = {};
+
+        return dic;
+    },
+
+    get: function (key) {
+        var id = getId(key);
+        return this.map[id];
+    },
+
+    set: function (key, value) {
+
+        var map = this.map;
+        var id = getId(key);
+        var previous = map[id];
+
+        map[id] = value;
+
+        return previous;
+    },
+
+    remove: function (key) {
+
+        var map = this.map;
+        var id = getId(key);
+        var previous = map[id];
+
+        delete map[id];
+
+        return previous;
+    },
+
+    getKeys: function () {
+        return keys(this.map);
+    },
+
+    getValues: function () {
+
+        var result = [];
+
+        each(this.map, function (value) {
+            result.push(value);
+        });
+
+        return result;
+    },
+
+    visit: function (visitor) {
+
+        var dic = this;
+
+        each(dic.map, visitor);
+
+        return dic;
+    }
+});
+
+});
+define('PaneJS/events/EventObject',['require','exports','module','../common/class','../common/utils'],function (require, exports, module) {var Class = require('../common/class');
+var utils = require('../common/utils');
+
+var isObject = utils.isObject;
+var extend = utils.extend;
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Class.create({
+    constructor: function EventObject(name, eventData) {
+
+        var that = this;
+        var data = that.data = {};
+
+        that.name = name;
+        that.consumed = false;
+
+        isObject(eventData) && extend(data, eventData);
+    },
+
+    getName: function () {
+        return this.name;
+    },
+
+    addData: function (key, value) {
+
+        var evtObj = this;
+        var data = evtObj.data;
+
+        if (isObject(key)) {
+            extend(data, key);
+        } else {
+            data[key] = value;
+        }
+
+        return evtObj;
+    },
+
+    getData: function (key) {
+        var data = this.data;
+        return isNullOrUndefined(key) ? data : data[key];
+    },
+
+    isConsumed: function () {
+        return this.consumed;
+    },
+
+    consume: function () {
+        this.consumed = true;
+    }
+});
+
+});
+define('PaneJS/events/MouseEvent',['require','exports','module','../common/class','../common/utils'],function (require, exports, module) {var Class = require('../common/class');
+var utils = require('../common/utils');
+
+module.exports = Class.create({
+    constructor: function MouseEvent(evt, state) {
+        var that = this;
+
+        that.evt = evt;
+        that.state = state;
+        that.consumed = false;
+        that.graphX = null;
+        that.graphY = null;
+
+    },
+
+    getEvent:function(){
+        return this.evt;
+    },
+
+
+});
+
+});
+define('PaneJS/Rectangle',['require','exports','module','PaneJS/common/class','PaneJS/Point'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Klass = require('PaneJS/common/class');
+var Point = require('PaneJS/Point');
+
+var Rectangle = Klass.create({
+
+    Extends: Point,
+
+    Statics: {
+        fromRectangle: function (rect) {
+            return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+        }
+    },
+
+    constructor: function Rectangle(x, y, width, height) {
+
+        var rect = this;
+
+        Rectangle.superclass.constructor.call(rect, x, y);
+
+        rect.width = width ? width : 0;
+        rect.height = height ? height : 0;
+    },
+
+    setRect: function (x, y, width, height) {
+
+        var rect = this;
+
+        rect.x = x;
+        rect.y = y;
+        rect.width = width;
+        rect.height = height;
+
+        return rect;
+    },
+
+    getCenterX: function () {
+        return this.x + this.width / 2;
+    },
+
+    getCenterY: function () {
+        return this.y + this.height / 2;
+    },
+
+    getCenter: function () {
+        return new Point(this.getCenterX(), this.getCenterY());
+    },
+
+    add: function (rect) {
+
+        if (!rect) {
+            return;
+        }
+
+        var that = this;
+        var minX = Math.min(that.x, rect.x);
+        var minY = Math.min(that.y, rect.y);
+        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
+        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
+
+        that.x = minX;
+        that.y = minY;
+        that.width = maxX - minX;
+        that.height = maxY - minY;
+
+        return that;
+    },
+
+
+    grow: function (amount) {
+
+        var rect = this;
+
+        rect.x -= amount;
+        rect.y -= amount;
+        rect.width += 2 * amount;
+        rect.height += 2 * amount;
+
+        return rect;
+    },
+
+    rotate90: function () {
+
+        var rect = this;
+        var w = rect.width;
+        var h = rect.height;
+        var t = (w - h) / 2;
+
+        rect.x += t;
+        rect.y -= t;
+        rect.width = h;
+        rect.height = w;
+
+        return rect;
+    },
+
+    equals: function (rect) {
+
+        var that = this;
+
+        return Rectangle.superclass.equals.call(that, rect) &&
+            rect instanceof Rectangle &&
+            rect.width === that.width &&
+            rect.height === that.height;
+    },
+
+    clone: function () {
+        var rect = this;
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+    }
+});
+
+module.exports = Rectangle;
+
+
+});
+define('PaneJS/cells/Cell',['require','exports','module','../Base'],function (require, exports, module) {var Base = require('../Base');
+
+module.exports = Base.extend({
+
+    id: null,
+    value: null,
+    geometry: null,
+    style: null,
+
+    //vertex: false,
+    //edge: false,
+    //connectable: true,
+    visible: true,
+    //collapsed: false,
+
+    //source: null,
+    //target: null,
+
+    parent: null,
+    children: null,
+    //edges: null,
+
+    constructor: function Cell(value, geometry, style) {
+
+        var that = this;
+
+        that.value = value;
+        that.setGeometry(geometry);
+        that.setStyle(style);
+
+        that.onInit && that.onInit();
+    },
+
+
+
+});
+
+});
+define('PaneJS/changes/ChildChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
+var Change = require('./Change');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Change.extend({
+
+    constructor: function ChildChange(model, parent, child, index) {
+
+        var change = this;
+
+        ChildChange.superclass.constructor.call(change, model);
+
+        change.parent = parent;
+        change.child = child;
+        change.index = index;
+        change.previous = parent;
+        change.previousIndex = index;
+    },
+
+    digest: function () {
+
+        var change = this;
+        var model = change.model;
+        var child = change.child;
+        var previous = change.previous;
+        var previousIndex = change.previousIndex;
+
+        var oldParent = model.getParent(child);
+        var oldIndex = oldParent ? oldParent.getIndex(child) : 0;
+
+        if (previous) {
+            change.connect(child, false);
+        }
+
+        oldParent = model.parentForCellChanged(child, previous, previousIndex);
+
+        if (previous) {
+            change.connect(child, true);
+        }
+
+        change.parent = previous;
+        change.index = previousIndex;
+        change.previous = oldParent;
+        change.previousIndex = oldIndex;
+
+        return change;
+    },
+
+    connect: function (cell, isConnect) {
+
+        var change = this;
+        var model = change.model;
+
+        isConnect = isNullOrUndefined(isConnect) ? true : isConnect;
+
+        var source = cell.getTerminal(true);
+        var target = cell.getTerminal(false);
+
+        if (source) {
+            if (isConnect) {
+                model.terminalForCellChanged(cell, source, true);
+            }
+            else {
+                model.terminalForCellChanged(cell, null, true);
+            }
+        }
+
+        if (target) {
+            if (isConnect) {
+                model.terminalForCellChanged(cell, target, false);
+            }
+            else {
+                model.terminalForCellChanged(cell, null, false);
+            }
+        }
+
+        cell.setTerminal(source, true);
+        cell.setTerminal(target, false);
+
+        var childCount = model.getChildCount(cell);
+
+        for (var i = 0; i < childCount; i++) {
+            change.connect(model.getChildAt(cell, i), isConnect);
+        }
+
+        return change;
+    }
+});
+
+});
+define('PaneJS/changes/CurrentRootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
+var Change = require('./Change');
+
+module.exports = Change.extend({
+
+    constructor: function CurrentRootChange(model, root) {
+
+        var change = this;
+
+        RootChange.superclass.constructor.call(change, model);
+
+        change.root = root;
+        change.previous = root;
+    },
+
+    digest: function () {
+
+        var change = this;
+        var model = change.model;
+        var previous = change.previous;
+
+        change.root = previous;
+        change.previous = model.rootChanged(previous);
+
+        return change;
+    }
+});
+
+
+});
+define('PaneJS/changes/RootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
+
+var Change = require('./Change');
+
+module.exports = Change.extend({
+
+    constructor: function RootChange(model, root) {
+
+        var change = this;
+
+        RootChange.superclass.constructor.call(change, model);
+
+        change.root = root;
+        change.previous = root;
+    },
+
+    digest: function () {
+
+        var change = this;
+        var model = change.model;
+        var previous = change.previous;
+
+        change.root = previous;
+        change.previous = model.rootChanged(previous);
+
+        return change;
+    }
+});
+
+
+});
+define('PaneJS/changes/TerminalChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {var Change = require('./Change');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Change.extend({
+
+    constructor: function TerminalChange(model, cell, terminal, source) {
+
+        var that = this;
+
+        TerminalChange.superclass.constructor.call(that, model);
+
+        that.cell = cell;
+        that.terminal = terminal;
+        that.previous = terminal;
+        that.source = source;
+
+    },
+
+    digest: function () {
+
+        this.terminal = this.previous;
+        this.previous = this.model.terminalForCellChanged(this.cell, this.previous, this.source);
+    }
+});
+
+});
+define('PaneJS/events/Event',['require','exports','module','../common/utils','../common/class','./EventObject'],function (require, exports, module) {var utils = require('../common/utils');
+var Class = require('../common/class');
+var EventObject = require('./EventObject');
+
+var keys = utils.keys;
+var each = utils.each;
+// TODO: constants
+var eventSplitter = /\s+/;
+
+
+module.exports = Class.create({
+
+    eventListeners: null,
+    eventEnabled: true,
+    eventSource: null,
+
+    constructor: function Events() {},
+
+    isEventEnabled: function () {
+        return this.eventEnabled;
+    },
+
+    setIsEventEnabled: function (enabled) {
+        var that = this;
+        that.eventEnabled = enabled;
+        return that;
+    },
+
+    enableEvent: function () {
+        return this.setIsEventEnabled(true);
+    },
+
+    disableEvent: function () {
+        return this.setIsEventEnabled(false);
+    },
+
+    getEventSource: function () {
+        return this.eventSource;
+    },
+
+    setEventSource: function (value) {
+        var that = this;
+        that.eventSource = value;
+        return that;
+    },
+
+    on: function (events, callback, context) {
+
+        var that = this;
+
+        if (!callback) {
+            return that;
+        }
+
+        var listeners = that.eventListeners || (that.eventListeners = {});
+
+        events = events.split(eventSplitter);
+
+        each(events, function (event) {
+            var list = listeners[event] || (listeners[event] = []);
+            list.push(callback, context);
+        });
+
+        return that;
+    },
+
+    once: function (events, callback, context) {
+
+        var that = this;
+        var cb = function () {
+            that.off(events, cb);
+            callback.apply(context || that, arguments);
+        };
+
+        return that.on(events, cb, context);
+    },
+
+    off: function (events, callback, context) {
+
+        var that = this;
+        var listeners = that.eventListeners;
+
+        // No events.
+        if (!listeners) {
+            return that;
+        }
+
+        // removing *all* events.
+        if (!(events || callback || context)) {
+            delete that.eventListeners;
+            return that;
+        }
+
+        events = events ? events.split(eventSplitter) : keys(listeners);
+
+        each(events, function (event) {
+
+            var list = listeners[event];
+
+            if (!list) {
+                return;
+            }
+
+            // remove all event.
+            if (!(callback || context)) {
+                delete listeners[event];
+                return;
+            }
+
+            for (var i = list.length - 2; i >= 0; i -= 2) {
+                if (!(callback && list[i] !== callback ||
+                    context && list[i + 1] !== context)) {
+                    list.splice(i, 2);
+                }
+            }
+        });
+
+        return that;
+    },
+
+    emit: function (eventObj, sender) {
+        var that = this;
+        var returned = [];
+        var listeners = that.eventListeners;
+
+        // No events.
+        if (!listeners || !that.isEventEnabled()) {
+            return returned;
+        }
+
+        eventObj = eventObj || new EventObject();
+
+        var eventName = eventObj.getName();
+
+        if (!eventName) {
+            return returned;
+        }
+
+        // fix sender
+        sender = sender || that.getEventSource();
+        sender = sender || that;
+
+
+        var list = listeners[eventName];
+        var length = list ? list.length : 0;
+        var ret;
+
+        for (var i = 0; i < length; i += 2) {
+            ret = list[i].call(list[i + 1] || that, eventObj, sender);
+            if (length > 2) {
+                returned.push(ret); // result as array
+            } else {
+                returned = ret;
+            }
+        }
+
+        return returned;
+    }
+});
+
+});
+define('PaneJS/perimeter',['require','exports','module','PaneJS/Point'],function (require, exports, module) {var Point = require('PaneJS/Point');
+
+module.exports =
 {
     RectanglePerimeter: function (bounds, vertex, next, orthogonal) {
         var cx = bounds.getCenterX();
@@ -605,7 +3347,7 @@ define('PaneJS/perimeter',['require','exports','module'],function (require, expo
         var dx = next.x - cx;
         var dy = next.y - cy;
         var alpha = Math.atan2(dy, dx);
-        var p = new mxPoint(0, 0);
+        var p = new Point(0, 0);
         var pi = Math.PI;
         var pi2 = Math.PI / 2;
         var beta = pi2 - alpha;
@@ -1264,1015 +4006,6 @@ define('PaneJS/perimeter',['require','exports','module'],function (require, expo
 
 
 });
-
-
-
-
-
-define('PaneJS/utils/lang',['require','exports','module'],function (require, exports, module) {var arrProto = Array.prototype;
-var objProto = Object.prototype;
-var slice = arrProto.slice;
-var toString = objProto.toString;
-
-
-var isType = exports.isType = function (obj, type) {
-    return toString.call(obj) === '[object ' + type + ']';
-};
-
-exports.isObject = function (obj) {
-
-    if (!obj) {
-        return false;
-    }
-
-    var type = typeof obj;
-
-    return type === 'function' || type === 'object';
-};
-
-exports.isFunction = function (obj) {
-    return isType(obj, 'Function');
-};
-
-var isNull = exports.isNull = function (obj) {
-    return obj === null;
-};
-
-var isUndefined = exports.isUndefined = function (obj) {
-    return typeof obj === 'undefined';
-};
-
-exports.isNullOrUndefined = function (obj) {
-    return isUndefined(obj) || isNull(obj);
-};
-
-exports.isWindow = function (obj) {
-    return obj && obj === obj.window;
-};
-
-var isArray = exports.isArray = Array.isArray || function (obj) {
-        return isType(obj, 'Array');
-    };
-
-exports.isArrayLike = function (obj) {
-    if (isArray(obj)) {
-        return true;
-    }
-
-    if (isFunction(obj) || isWindow(obj)) {
-        return false;
-    }
-
-    var length = !!obj && 'length' in obj && obj.length;
-
-    return length === 0 ||
-        typeof length === 'number' && length > 0 && (length - 1) in obj;
-};
-
-exports.isNumeric = function (obj) {
-    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-};
-
-});
-
-
-define('PaneJS/common/class',['require','exports','module','./utils'],function (require, exports, module) {
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
-// ref: https://github.com/aralejs/class
-/*jshint -W030 */
-
-var utils = require('./utils');
-
-var each = utils.each;
-var hasKey = utils.hasKey;
-var isArray = utils.isArray;
-var isFunction = utils.isFunction;
-
-function Class(o) {
-    // Convert existed function to Class.
-    if (!(this instanceof Class) && isFunction(o)) {
-        return classify(o);
-    }
-}
-
-Class.create = function (parent, properties) {
-    if (!isFunction(parent)) {
-        properties = parent;
-        parent = null;
-    }
-
-    properties || (properties = {});
-    parent || (parent = properties.Extends || Class);
-    properties.Extends = parent;
-
-    // The created class constructor.
-    //function SubClass() {
-    //    // Call the parent constructor.
-    //    parent.apply(this, arguments);
-    //
-    //    // Only call initialize in self constructor.
-    //    if (this.constructor === SubClass && this.initialize) {
-    //        this.initialize.apply(this, arguments);
-    //    }
-    //}
-
-    var SubClass = properties.constructor;
-    // unspecified constructor
-    if (SubClass === Object.prototype.constructor) {
-        SubClass = function Class() {};
-    }
-
-    // Inherit class (static) properties from parent.
-    if (parent !== Class) {
-        mix(SubClass, parent, parent.StaticsWhiteList);
-    }
-
-    // Add instance properties to the subclass.
-    implement.call(SubClass, properties);
-
-    // Make subclass extendable.
-    return classify(SubClass);
-};
-
-// Create a sub Class based on `Class`.
-Class.extend = function (properties) {
-    properties || (properties = {});
-    properties.Extends = this;
-
-    return Class.create(properties);
-};
-
-// define special properties.
-Class.Mutators = {
-
-    'Extends': function (parent) {
-        var existed = this.prototype;
-        var parentProto = parent.prototype;
-        var proto = createProto(parentProto);
-
-        // Keep existed properties.
-        mix(proto, existed);
-
-        // Enforce the constructor to be what we expect.
-        proto.constructor = this;
-
-        // Set the prototype chain to inherit from `parent`.
-        this.prototype = proto;
-
-        // Set a convenience property in case the parent's prototype is
-        // needed later.
-        this.superclass = parentProto;
-    },
-
-    'Implements': function (items) {
-
-        if (!isArray(items)) {
-            items = [items];
-        }
-
-        var proto = this.prototype;
-        var item;
-
-        while (item = items.shift()) {
-            mix(proto, item.prototype || item);
-        }
-    },
-
-    'Statics': function (staticProperties) {
-        mix(this, staticProperties);
-    }
-};
-
-function classify(cls) {
-    cls.extend = Class.extend;
-    cls.implement = implement;
-    return cls;
-}
-
-function implement(properties) {
-
-    var that = this;
-    var mutators = Class.Mutators;
-
-    each(properties, function (value, key) {
-        if (hasKey(mutators, key)) {
-            mutators[key].call(that, value);
-        } else {
-            that.prototype[key] = value;
-        }
-    });
-}
-
-
-// Helpers
-// -------
-
-var createProto = Object.__proto__ ?
-    function (proto) {
-        return {__proto__: proto};
-    } :
-    function (proto) {
-        function Ctor() {}
-
-        Ctor.prototype = proto;
-        return new Ctor();
-    };
-
-function mix(receiver, supplier, whiteList) {
-
-    each(supplier, function (value, key) {
-        if (whiteList && indexOf(whiteList, key) === -1) {
-            return;
-        }
-
-        receiver[key] = value;
-    });
-}
-
-module.exports = Class;
-
-
-});
-define('PaneJS/common/objectIdentity',['require','exports','module','./utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-///* global window */
-
-var utils = require('./utils');
-
-var isObject = utils.isObject;
-var isNullOrUndefined = utils.isNullOrUndefined;
-var getFunctionName = utils.getFunctionName;
-
-// TODO: constants
-var FIELD_NAME = 'objectId';
-var counter = 0;
-
-
-exports.get = function (obj) {
-
-    var isObj = isObject(obj);
-
-    if (isObj && isNullOrUndefined(obj[FIELD_NAME])) {
-        var ctorName = getFunctionName(obj.constructor);
-        obj[FIELD_NAME] = ctorName + '#' + counter++;
-    }
-
-    return isObj ? obj[FIELD_NAME] : '' + obj;
-};
-
-exports.clear = function (obj) {
-    if (isObject(obj)) {
-        delete obj[FIELD_NAME];
-    }
-};
-
-});
-define('PaneJS/events/aspect',['require','exports','module','../common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var utils = require('../common/utils');
-
-var isFunction = utils.isFunction;
-var each = utils.each;
-var invoke = utils.invoke;
-var toArray = utils.toArray;
-// TODO: constants
-var eventSplitter = /\s+/;
-
-
-function weave(when, methodName, callback, context) {
-    var that = this;
-    var names = methodName.split(eventSplitter);
-
-    each(names, function (name) {
-        var method = that[name];
-
-        if (!method || !isFunction(method)) {
-            throw new Error('Event handler must be function, event name: ' + name);
-        }
-
-        if (!method.__isAspected) {
-            wrap.call(that, name);
-        }
-
-        that.on(when + ':' + name, callback, context);
-    });
-
-    return that;
-}
-
-function wrap(methodName) {
-    var that = this;
-    var originMethod = that[methodName];
-
-    that[methodName] = function () {
-        var that = this;
-        var args = toArray(arguments);
-        var beforeArgs = ['before:' + methodName].concat(args);
-
-        // prevent if trigger return false
-        if (invoke(that.trigger, beforeArgs, that) === false) {
-            return;
-        }
-
-        // call the origin method.
-        var ret = originMethod.apply(this, arguments);
-        var afterArgs = ['after:' + methodName, ret].concat(args);
-        invoke(that.trigger, afterArgs, that);
-
-        return ret;
-    };
-
-    that[methodName].__isAspected = true;
-}
-
-exports.before = function (methodName, callback, context) {
-    return weave.call(this, 'before', methodName, callback, context);
-};
-
-exports.after = function (methodName, callback, context) {
-    return weave.call(this, 'after', methodName, callback, context);
-};
-
-exports.around = function (methodName, callback, context) {
-    weave.call(this, 'before', methodName, callback, context);
-    weave.call(this, 'after', methodName, callback, context);
-    return this;
-};
-
-
-});
-define('PaneJS/Base',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {// 全局基类
-
-var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
-
-module.exports = Class.create({
-    constructor: function Base() {},
-
-    getSuperclass: function () {
-        return this.constructor.superclass;
-    },
-
-    destroy: function () {
-
-        var that = this;
-
-        that.destroyed = true;
-    }
-});
-
-});
-define('PaneJS/Point',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-var Point = Class.create({
-
-    constructor: function Point(x, y) {
-        this.x = !isNullOrUndefined(x) ? x : 0;
-        this.y = !isNullOrUndefined(y) ? y : 0;
-    },
-
-    equals: function (point) {
-        return point &&
-            point instanceof Point &&
-            point.x === this.x &&
-            point.y === this.y;
-    },
-
-    clone: function () {
-        return new Point(this.x, this.y);
-    }
-});
-
-module.exports = Point;
-
-
-});
-define('PaneJS/UndoableEdit',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Class.create({
-    constructor: function UndoableEdit(source, significant) {
-
-        var that = this;
-
-        that.source = source;
-        that.changes = [];
-        that.significant = !isNullOrUndefined(significant) ? significant : true;
-        that.undone = false;
-        that.redone = false;
-
-    },
-
-    isEmpty: function () {
-        return this.changes.length === 0;
-    },
-
-    isSignificant: function () {
-        return this.significant;
-    },
-
-    add: function (change) {
-        this.changes.push(change);
-    },
-
-    notify: function () {},
-    die: function () {},
-    undo: function () {},
-    redo: function () {}
-});
-
-});
-define('PaneJS/changes/Change',['require','exports','module','../common/class'],function (require, exports, module) {'use strict';
-
-var Class = require('../common/class');
-
-module.exports = Class.create({
-
-    constructor: function Change(model) {
-        this.model = model;
-    },
-
-    digest: function () { }
-});
-
-
-});
-define('PaneJS/common/Dictionary',['require','exports','module','./class','./utils','./objectIdentity'],function (require, exports, module) {'use strict';
-
-var Class = require('./class');
-var utils = require('./utils');
-var objectIdentity = require('./objectIdentity');
-
-var isObject = utils.isObject;
-var keys = utils.keys;
-var each = utils.each;
-
-function getId(key) {
-
-    if (isObject(key)) {
-        return objectIdentity.get(key);
-    }
-
-    return '' + key;
-}
-
-module.exports = Class.create({
-
-    constructor: function Dictionary() {
-        return this.clear();
-    },
-
-    clear: function () {
-        var dic = this;
-
-        dic.map = {};
-
-        return dic;
-    },
-
-    get: function (key) {
-        var id = getId(key);
-        return this.map[id];
-    },
-
-    set: function (key, value) {
-
-        var map = this.map;
-        var id = getId(key);
-        var previous = map[id];
-
-        map[id] = value;
-
-        return previous;
-    },
-
-    remove: function (key) {
-
-        var map = this.map;
-        var id = getId(key);
-        var previous = map[id];
-
-        delete map[id];
-
-        return previous;
-    },
-
-    getKeys: function () {
-        return keys(this.map);
-    },
-
-    getValues: function () {
-
-        var result = [];
-
-        each(this.map, function (value) {
-            result.push(value);
-        });
-
-        return result;
-    },
-
-    visit: function (visitor) {
-
-        var dic = this;
-
-        each(dic.map, visitor);
-
-        return dic;
-    }
-});
-
-});
-define('PaneJS/events/EventObject',['require','exports','module','../common/class','../common/utils'],function (require, exports, module) {var Class = require('../common/class');
-var utils = require('../common/utils');
-
-var isObject = utils.isObject;
-var extend = utils.extend;
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Class.create({
-    constructor: function EventObject(name, eventData) {
-        var evtObj = this;
-        var data = evtObj.data = {};
-
-        evtObj.name = name;
-        evtObj.consumed = false;
-
-        isObject(eventData) && extend(data, eventData);
-    },
-
-    getName: function () {
-        return this.name;
-    },
-
-    addData: function (key, value) {
-
-        var evtObj = this;
-        var data = evtObj.data;
-
-        if (isObject(key)) {
-            extend(data, key);
-        } else {
-            data[key] = value;
-        }
-
-        return evtObj;
-    },
-
-    getData: function (key) {
-        var data = this.data;
-        return isNullOrUndefined(key) ? data : data[key];
-    },
-
-    isConsumed: function () {
-        return this.consumed;
-    },
-
-    consume: function () {
-        this.consumed = true;
-    }
-});
-
-});
-define('PaneJS/Rectangle',['require','exports','module','PaneJS/common/class','PaneJS/Point'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Klass = require('PaneJS/common/class');
-var Point = require('PaneJS/Point');
-
-var Rectangle = Klass.create({
-
-    Extends: Point,
-
-    Statics: {
-        fromRectangle: function (rect) {
-            return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-        }
-    },
-
-    constructor: function Rectangle(x, y, width, height) {
-
-        var rect = this;
-
-        Rectangle.superclass.constructor.call(rect, x, y);
-
-        rect.width = width ? width : 0;
-        rect.height = height ? height : 0;
-    },
-
-    setRect: function (x, y, width, height) {
-
-        var rect = this;
-
-        rect.x = x;
-        rect.y = y;
-        rect.width = width;
-        rect.height = height;
-
-        return rect;
-    },
-
-    getCenterX: function () {
-        return this.x + this.width / 2;
-    },
-
-    getCenterY: function () {
-        return this.y + this.height / 2;
-    },
-
-    getCenter: function () {
-        return new Point(this.getCenterX(), this.getCenterY());
-    },
-
-    add: function (rect) {
-
-        if (!rect) {
-            return;
-        }
-
-        var that = this;
-        var minX = Math.min(that.x, rect.x);
-        var minY = Math.min(that.y, rect.y);
-        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
-        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
-
-        that.x = minX;
-        that.y = minY;
-        that.width = maxX - minX;
-        that.height = maxY - minY;
-
-        return that;
-    },
-
-
-    grow: function (amount) {
-
-        var rect = this;
-
-        rect.x -= amount;
-        rect.y -= amount;
-        rect.width += 2 * amount;
-        rect.height += 2 * amount;
-
-        return rect;
-    },
-
-    rotate90: function () {
-
-        var rect = this;
-        var w = rect.width;
-        var h = rect.height;
-        var t = (w - h) / 2;
-
-        rect.x += t;
-        rect.y -= t;
-        rect.width = h;
-        rect.height = w;
-
-        return rect;
-    },
-
-    equals: function (rect) {
-
-        var that = this;
-
-        return Rectangle.superclass.equals.call(that, rect) &&
-            rect instanceof Rectangle &&
-            rect.width === that.width &&
-            rect.height === that.height;
-    },
-
-    clone: function () {
-        var rect = this;
-        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-    }
-});
-
-module.exports = Rectangle;
-
-
-});
-define('PaneJS/changes/ChildChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-///* global document */
-
-var Change = require('./Change');
-var utils = require('../common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Change.extend({
-
-    constructor: function ChildChange(model, parent, child, index) {
-
-        var change = this;
-
-        ChildChange.superclass.constructor.call(change, model);
-
-        change.parent = parent;
-        change.child = child;
-        change.index = index;
-        change.previous = parent;
-        change.previousIndex = index;
-    },
-
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var child = change.child;
-        var previous = change.previous;
-        var previousIndex = change.previousIndex;
-
-        var oldParent = model.getParent(child);
-        var oldIndex = oldParent ? oldParent.getIndex(child) : 0;
-
-        if (previous) {
-            change.connect(child, false);
-        }
-
-        oldParent = model.parentForCellChanged(child, previous, previousIndex);
-
-        if (previous) {
-            change.connect(child, true);
-        }
-
-        change.parent = previous;
-        change.index = previousIndex;
-        change.previous = oldParent;
-        change.previousIndex = oldIndex;
-
-        return change;
-    },
-
-    connect: function (cell, isConnect) {
-
-        var change = this;
-        var model = change.model;
-
-        isConnect = isNullOrUndefined(isConnect) ? true : isConnect;
-
-        var source = cell.getTerminal(true);
-        var target = cell.getTerminal(false);
-
-        if (source) {
-            if (isConnect) {
-                model.terminalForCellChanged(cell, source, true);
-            }
-            else {
-                model.terminalForCellChanged(cell, null, true);
-            }
-        }
-
-        if (target) {
-            if (isConnect) {
-                model.terminalForCellChanged(cell, target, false);
-            }
-            else {
-                model.terminalForCellChanged(cell, null, false);
-            }
-        }
-
-        cell.setTerminal(source, true);
-        cell.setTerminal(target, false);
-
-        var childCount = model.getChildCount(cell);
-
-        for (var i = 0; i < childCount; i++) {
-            change.connect(model.getChildAt(cell, i), isConnect);
-        }
-
-        return change;
-    }
-});
-
-});
-define('PaneJS/changes/CurrentRootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
-var Change = require('./Change');
-
-module.exports = Change.extend({
-
-    constructor: function CurrentRootChange(model, root) {
-
-        var change = this;
-
-        RootChange.superclass.constructor.call(change, model);
-
-        change.root = root;
-        change.previous = root;
-    },
-
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var previous = change.previous;
-
-        change.root = previous;
-        change.previous = model.rootChanged(previous);
-
-        return change;
-    }
-});
-
-
-});
-define('PaneJS/changes/RootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
-
-var Change = require('./Change');
-
-module.exports = Change.extend({
-
-    constructor: function RootChange(model, root) {
-
-        var change = this;
-
-        RootChange.superclass.constructor.call(change, model);
-
-        change.root = root;
-        change.previous = root;
-    },
-
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var previous = change.previous;
-
-        change.root = previous;
-        change.previous = model.rootChanged(previous);
-
-        return change;
-    }
-});
-
-
-});
-define('PaneJS/events/Event',['require','exports','module','../common/utils','../common/class','./EventObject'],function (require, exports, module) {var utils = require('../common/utils');
-var Class = require('../common/class');
-var EventObject = require('./EventObject');
-
-var keys = utils.keys;
-var each = utils.each;
-// TODO: constants
-var eventSplitter = /\s+/;
-
-
-module.exports = Class.create({
-
-    eventListeners: null,
-    eventEnabled: true,
-    eventSource: null,
-
-    constructor: function Events() {},
-
-    isEventEnabled: function () {
-        return this.eventEnabled;
-    },
-
-    setIsEventEnabled: function (enabled) {
-        var that = this;
-        that.eventEnabled = enabled;
-        return that;
-    },
-
-    enableEvent: function () {
-        return this.setIsEventEnabled(true);
-    },
-
-    disableEvent: function () {
-        return this.setIsEventEnabled(false);
-    },
-
-    getEventSource: function () {
-        return this.eventSource;
-    },
-
-    setEventSource: function (value) {
-        var that = this;
-        that.eventSource = value;
-        return that;
-    },
-
-    on: function (events, callback, context) {
-
-        var that = this;
-
-        if (!callback) {
-            return that;
-        }
-
-        var listeners = that.eventListeners || (that.eventListeners = {});
-
-        events = events.split(eventSplitter);
-
-        each(events, function (event) {
-            var list = listeners[event] || (listeners[event] = []);
-            list.push(callback, context);
-        });
-
-        return that;
-    },
-
-    once: function (events, callback, context) {
-
-        var that = this;
-        var cb = function () {
-            that.off(events, cb);
-            callback.apply(context || that, arguments);
-        };
-
-        return that.on(events, cb, context);
-    },
-
-    off: function (events, callback, context) {
-
-        var that = this;
-        var listeners = that.eventListeners;
-
-        // No events.
-        if (!listeners) {
-            return that;
-        }
-
-        // removing *all* events.
-        if (!(events || callback || context)) {
-            delete that.eventListeners;
-            return that;
-        }
-
-        events = events ? events.split(eventSplitter) : keys(listeners);
-
-        each(events, function (event) {
-
-            var list = listeners[event];
-
-            if (!list) {
-                return;
-            }
-
-            // remove all event.
-            if (!(callback || context)) {
-                delete listeners[event];
-                return;
-            }
-
-            for (var i = list.length - 2; i >= 0; i -= 2) {
-                if (!(callback && list[i] !== callback ||
-                    context && list[i + 1] !== context)) {
-                    list.splice(i, 2);
-                }
-            }
-        });
-
-        return that;
-    },
-
-    emit: function (eventObj, sender) {
-        var that = this;
-        var returned = [];
-        var listeners = that.eventListeners;
-
-        // No events.
-        if (!listeners || !that.isEventEnabled()) {
-            return returned;
-        }
-
-        eventObj = eventObj || new EventObject();
-
-        var eventName = eventObj.getName();
-
-        if (!eventName) {
-            return returned;
-        }
-
-        // fix sender
-        sender = sender || that.getEventSource();
-        sender = sender || that;
-
-
-        var list = listeners[eventName];
-        var length = list ? list.length : 0;
-        var ret;
-
-        for (var i = 0; i < length; i += 2) {
-            ret = list[i].call(list[i + 1] || that, eventObj, sender);
-            if (length > 2) {
-                returned.push(ret); // result as array
-            } else {
-                returned = ret;
-            }
-        }
-
-        return returned;
-    }
-});
-
-});
 define('PaneJS/CellState',['require','exports','module','PaneJS/Point','PaneJS/Rectangle'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Point = require('PaneJS/Point');
@@ -2334,6 +4067,7 @@ module.exports = Rectangle.extend({
         return bounds;
     },
 
+    // 设置连线起点或终点的位置
     setAbsoluteTerminalPoint: function (point, isSource) {
 
         var that = this;
@@ -2471,24 +4205,144 @@ module.exports = Rectangle.extend({
     },
 
     setTerminalPoint: function (point, isSource) {
-        var geom = this;
+        var that = this;
         if (isSource) {
-            geom.sourcePoint = point;
+            that.sourcePoint = point;
         } else {
-            geom.targetPoint = point;
+            that.targetPoint = point;
         }
 
         return point;
     },
 
-    rotate: function (/*angle, cx*/) {
+    rotate: function (angle, cx) {
+
+        var that = this;
+
+        var rad = utils.toRadians(angle);
+        var cos = Math.cos(rad);
+        var sin = Math.sin(rad);
+
+        // Rotates the geometry
+        if (!this.relative) {
+            var ct = new Point(this.getCenterX(), this.getCenterY());
+            var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+
+            this.x = Math.round(pt.x - this.width / 2);
+            this.y = Math.round(pt.y - this.height / 2);
+        }
+
+        // Rotates the source point
+        if (this.sourcePoint) {
+            var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
+            this.sourcePoint.x = Math.round(pt.x);
+            this.sourcePoint.y = Math.round(pt.y);
+        }
+
+        // Translates the target point
+        if (this.targetPoint) {
+            var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
+            this.targetPoint.x = Math.round(pt.x);
+            this.targetPoint.y = Math.round(pt.y);
+        }
+
+        // Translate the control points
+        if (this.points != null) {
+            for (var i = 0; i < this.points.length; i++) {
+                if (this.points[i] != null) {
+                    var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
+                    this.points[i].x = Math.round(pt.x);
+                    this.points[i].y = Math.round(pt.y);
+                }
+            }
+        }
     },
-    translate: function (/*dx, dy*/) {
+    translate: function (dx, dy) {
+        dx = parseFloat(dx);
+        dy = parseFloat(dy);
+
+        // Translates the geometry
+        if (!this.relative) {
+            this.x = parseFloat(this.x) + dx;
+            this.y = parseFloat(this.y) + dy;
+        }
+
+        // Translates the source point
+        if (this.sourcePoint != null) {
+            this.sourcePoint.x = parseFloat(this.sourcePoint.x) + dx;
+            this.sourcePoint.y = parseFloat(this.sourcePoint.y) + dy;
+        }
+
+        // Translates the target point
+        if (this.targetPoint != null) {
+            this.targetPoint.x = parseFloat(this.targetPoint.x) + dx;
+            this.targetPoint.y = parseFloat(this.targetPoint.y) + dy;
+        }
+
+        // Translate the control points
+        if (this.TRANSLATE_CONTROL_POINTS && this.points != null) {
+            for (var i = 0; i < this.points.length; i++) {
+                if (this.points[i] != null) {
+                    this.points[i].x = parseFloat(this.points[i].x) + dx;
+                    this.points[i].y = parseFloat(this.points[i].y) + dy;
+                }
+            }
+        }
     },
-    scale: function (/*sx, sy, fixedAspect*/) {
+    scale: function (sx, sy, fixedAspect) {
+        sx = parseFloat(sx);
+        sy = parseFloat(sy);
+
+        // Translates the source point
+        if (this.sourcePoint != null) {
+            this.sourcePoint.x = parseFloat(this.sourcePoint.x) * sx;
+            this.sourcePoint.y = parseFloat(this.sourcePoint.y) * sy;
+        }
+
+        // Translates the target point
+        if (this.targetPoint != null) {
+            this.targetPoint.x = parseFloat(this.targetPoint.x) * sx;
+            this.targetPoint.y = parseFloat(this.targetPoint.y) * sy;
+        }
+
+        // Translate the control points
+        if (this.points != null) {
+            for (var i = 0; i < this.points.length; i++) {
+                if (this.points[i] != null) {
+                    this.points[i].x = parseFloat(this.points[i].x) * sx;
+                    this.points[i].y = parseFloat(this.points[i].y) * sy;
+                }
+            }
+        }
+
+        // Translates the geometry
+        if (!this.relative) {
+            this.x = parseFloat(this.x) * sx;
+            this.y = parseFloat(this.y) * sy;
+
+            if (fixedAspect) {
+                sy = sx = Math.min(sx, sy);
+            }
+
+            this.width = parseFloat(this.width) * sx;
+            this.height = parseFloat(this.height) * sy;
+        }
     },
 
     equals: function (/*obj*/) {
+
+    }
+});
+
+});
+define('PaneJS/cells/Node',['require','exports','module','PaneJS/Cell'],function (require, exports, module) {var Cell = require('PaneJS/Cell');
+
+module.exports = Cell.extend({
+
+    isNode: true,
+
+    constructor: function Node(value, geometry, style) {
+        this.getSupclass().constructor.call(this, value, geometry, style);
     }
 });
 
@@ -2825,17 +4679,15 @@ var proto = {
 
         var canvas = this;
 
-        canvas.root = root;
+        canvas.root = root; // 根节点，即 shape 的根节点
         canvas.defs = null;
         canvas.gradients = [];
         canvas.styleEnabled = !isNullOrUndefined(styleEnabled) ? styleEnabled : false;
 
         canvas.reset();
 
-
-        // defs
-        // ----
-
+        // 初始化 defs
+        // ----------
         var svg = null;
 
         // 不在文档中
@@ -3782,7 +5634,7 @@ var proto = {
     },
 
     stroke: function () {
-        this.addNode(false, false);
+        this.addNode(false, true);
     },
 
     fill: function () {
@@ -4520,9 +6372,8 @@ module.exports = Class.create({
     },
 
     removeEdge: function (edge, isOutgoing) {
-        if (edge !== null) {
-            if (edge.getTerminal(!isOutgoing) !== this &&
-                this.edges !== null) {
+        if (edge) {
+            if (edge.getTerminal(!isOutgoing) !== this && this.edges) {
                 var index = this.getEdgeIndex(edge);
 
                 if (index >= 0) {
@@ -4539,7 +6390,7 @@ module.exports = Class.create({
     removeFromTerminal: function (isSource) {
         var terminal = this.getTerminal(isSource);
 
-        if (terminal !== null) {
+        if (terminal) {
             terminal.removeEdge(this, isSource);
         }
     },
@@ -4619,8 +6470,8 @@ module.exports = Class.create({
         style[constants.STYLE_PERIMETER] = perimeter.RectanglePerimeter;
         style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
         style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
-        style[constants.STYLE_FILLCOLOR] = '#C3D9FF';
-        style[constants.STYLE_STROKECOLOR] = '#6482B9';
+        style[constants.STYLE_FILLCOLOR] = '#e3f4ff';
+        style[constants.STYLE_STROKECOLOR] = '#289de9';
         style[constants.STYLE_FONTCOLOR] = '#774400';
 
         return style;
@@ -4633,7 +6484,7 @@ module.exports = Class.create({
         style[constants.STYLE_ENDARROW] = constants.ARROW_CLASSIC;
         style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
         style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
-        style[constants.STYLE_STROKECOLOR] = '#6482B9';
+        style[constants.STYLE_STROKECOLOR] = '#289de9';
         style[constants.STYLE_FONTCOLOR] = '#446299';
 
         return style;
@@ -4709,22 +6560,27 @@ module.exports = Class.create({
 });
 
 });
-define('PaneJS/View',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/events/Event','PaneJS/common/Dictionary','PaneJS/constants','PaneJS/Point','PaneJS/Rectangle','PaneJS/CellState'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: false */
+define('PaneJS/View',['require','exports','module','PaneJS/common/class','PaneJS/events/Event','PaneJS/common/Dictionary','PaneJS/common/utils','PaneJS/common/detector','PaneJS/constants','PaneJS/Point','PaneJS/Rectangle','PaneJS/CellState','PaneJS/events/MouseEvent','PaneJS/events/domEvent','PaneJS/events/eventNames'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: false */
 /* global document */
 
 'use strict';
 
 var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
 var Event = require('PaneJS/events/Event');
 var Dictionary = require('PaneJS/common/Dictionary');
+var utils = require('PaneJS/common/utils');
+var detector = require('PaneJS/common/detector');
 var constants = require('PaneJS/constants');
 var Point = require('PaneJS/Point');
 var Rectangle = require('PaneJS/Rectangle');
 var CellState = require('PaneJS/CellState');
+var MouseEvent = require('PaneJS/events/MouseEvent');
+var domEvent = require('PaneJS/events/domEvent');
+var eventNames = require('PaneJS/events/eventNames');
 
 var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
+var getValue = utils.getValue;
 
 module.exports = Class.create({
 
@@ -4743,6 +6599,7 @@ module.exports = Class.create({
     allowEval: true,
     captureDocumentGesture: true,
     optimizeVmlReflows: true,
+
     rendering: true,
     currentRoot: null,
     graphBounds: null,
@@ -4991,8 +6848,8 @@ module.exports = Class.create({
         that.resetValidationState();
 
         that.validateCell(cell);
-        that.validateCellState(cell);
-        var graphBounds = that.getBoundingBox(cell);
+        var state = that.validateCellState(cell);
+        var graphBounds = that.getBoundingBox(state);
 
         that.setGraphBounds(graphBounds || that.getEmptyBounds());
         that.validateBackground();
@@ -5055,9 +6912,15 @@ module.exports = Class.create({
                 this.validateCellState(model.getParent(cell), false);
             }
 
-            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, true), false), true);
-            state.setVisibleTerminalState(this.validateCellState(this.getVisibleTerminal(cell, false), false), false);
+            // 连线
+            var source = this.getVisibleTerminal(cell, true);
+            var target = this.getVisibleTerminal(cell, false);
+            var sourceState = this.validateCellState(source, false);
+            var targetState = this.validateCellState(target, false);
+            state.setVisibleTerminalState(sourceState, true);
+            state.setVisibleTerminalState(targetState, false);
 
+            // 关键代码，更新 state 的大小、位置信息
             this.updateCellState(state);
 
             // Repaint happens immediately after the cell is validated
@@ -5136,8 +6999,10 @@ module.exports = Class.create({
         return new Rectangle(translate.x * scale, translate.y * scale);
     },
 
+    // BackgroundPage
+    // ---------------
     createBackgroundPageShape: function (bounds) {
-
+        return new RectangleShape(bounds, 'white', 'black');
     },
 
     validateBackground: function () {
@@ -5145,7 +7010,45 @@ module.exports = Class.create({
         this.validateBackgroundPage();
     },
 
-    validateBackgroundImage: function () {},
+    validateBackgroundImage: function () {
+        var bg = this.graph.getBackgroundImage();
+
+        if (bg) {
+            if (this.backgroundImage == null || this.backgroundImage.image != bg.src) {
+                if (this.backgroundImage) {
+                    this.backgroundImage.destroy();
+                }
+
+                var bounds = new Rectangle(0, 0, 1, 1);
+
+                this.backgroundImage = new ImageShape(bounds, bg.src);
+                this.backgroundImage.dialect = this.graph.dialect;
+                this.backgroundImage.init(this.backgroundPane);
+                this.backgroundImage.redraw();
+
+                // Workaround for ignored event on background in IE8 standards mode
+                if (document.documentMode == 8 && !mxClient.IS_EM) {
+                    mxEvent.addGestureListeners(this.backgroundImage.node,
+                        utils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
+                        }),
+                        utils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
+                        }),
+                        utils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
+                        })
+                    );
+                }
+            }
+
+            this.redrawBackgroundImage(this.backgroundImage, bg);
+        }
+        else if (this.backgroundImage != null) {
+            this.backgroundImage.destroy();
+            this.backgroundImage = null;
+        }
+    },
 
     validateBackgroundPage: function () {},
 
@@ -5169,6 +7072,9 @@ module.exports = Class.create({
         backgroundImage.redraw();
     },
 
+
+    // update cell state
+    // -----------------
     updateCellState: function (state) {
         state.absoluteOffset.x = 0;
         state.absoluteOffset.y = 0;
@@ -5176,7 +7082,7 @@ module.exports = Class.create({
         state.origin.y = 0;
         state.length = 0;
 
-        if (state.cell != this.currentRoot) {
+        if (state.cell !== this.currentRoot) {
             var model = this.graph.getModel();
             var pState = this.getState(model.getParent(state.cell));
 
@@ -5220,6 +7126,7 @@ module.exports = Class.create({
                     }
                 }
 
+                // 设置 scale 和 translate 之后的 x, y, w, h
                 state.x = this.scale * (this.translate.x + state.origin.x);
                 state.y = this.scale * (this.translate.y + state.origin.y);
                 state.width = this.scale * geo.width;
@@ -5245,7 +7152,7 @@ module.exports = Class.create({
         var pState = this.getState(model.getParent(state.cell));
 
         if (geo.relative && pState && !model.isEdge(pState.cell)) {
-            var alpha = mxUtils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
+            var alpha = utils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
 
             if (alpha != 0) {
                 var cos = Math.cos(alpha);
@@ -5262,9 +7169,88 @@ module.exports = Class.create({
         this.updateVertexLabelOffset(state);
     },
 
-    updateEdgeState: function (state, geo) {},
+    updateEdgeState: function (linkState, geo) {
+        var sourceState = linkState.getVisibleTerminalState(true);
+        var targetState = linkState.getVisibleTerminalState(false);
 
-    updateVertexLabelOffset: function (state) {},
+        // This will remove edges with no terminals and no terminal points
+        // as such edges are invalid and produce NPEs in the edge styles.
+        // Also removes connected edges that have no visible terminals.
+        if ((this.graph.model.getTerminal(linkState.cell, true) && sourceState == null) ||
+            (sourceState == null && geo.getTerminalPoint(true) == null) ||
+            (this.graph.model.getTerminal(linkState.cell, false) && targetState == null) ||
+            (targetState == null && geo.getTerminalPoint(false) == null)) {
+            this.clear(linkState.cell, true);
+        }
+        else {
+            this.updateFixedTerminalPoints(linkState, sourceState, targetState);
+            this.updatePoints(linkState, geo.points, sourceState, targetState);
+            this.updateFloatingTerminalPoints(linkState, sourceState, targetState);
+
+            var pts = linkState.absolutePoints;
+
+            if (linkState.cell != this.currentRoot && (pts == null || pts.length < 2 ||
+                pts[0] == null || pts[pts.length - 1] == null)) {
+                // This will remove edges with invalid points from the list of states in the view.
+                // Happens if the one of the terminals and the corresponding terminal point is null.
+                this.clear(linkState.cell, true);
+            }
+            else {
+                this.updateEdgeBounds(linkState);
+                this.updateEdgeLabelOffset(linkState);
+            }
+        }
+    },
+
+    // 更新 state.absoluteOffset
+    updateVertexLabelOffset: function (state) {
+        var h = getValue(state.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER);
+
+        if (h == constants.ALIGN_LEFT) {
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+
+            if (lw != null) {
+                lw *= this.scale;
+            }
+            else {
+                lw = state.width;
+            }
+
+            state.absoluteOffset.x -= lw;
+        }
+        else if (h == constants.ALIGN_RIGHT) {
+            state.absoluteOffset.x += state.width;
+        }
+        else if (h == constants.ALIGN_CENTER) {
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+
+            if (lw != null) {
+                // Aligns text block with given width inside the vertex width
+                var align = getValue(state.style, constants.STYLE_ALIGN, constants.ALIGN_CENTER);
+                var dx = 0;
+
+                if (align == constants.ALIGN_CENTER) {
+                    dx = 0.5;
+                }
+                else if (align == constants.ALIGN_RIGHT) {
+                    dx = 1;
+                }
+
+                if (dx != 0) {
+                    state.absoluteOffset.x -= (lw * this.scale - state.width) * dx;
+                }
+            }
+        }
+
+        var v = getValue(state.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE);
+
+        if (v == constants.ALIGN_TOP) {
+            state.absoluteOffset.y -= state.height;
+        }
+        else if (v == constants.ALIGN_BOTTOM) {
+            state.absoluteOffset.y += state.height;
+        }
+    },
 
     resetValidationState: function () {
         this.lastNode = null;
@@ -5273,28 +7259,501 @@ module.exports = Class.create({
         this.lastForegroundHtmlNode = null;
     },
 
-    stateValidated: function (state) {},
+    stateValidated: function (state) {
 
-    updateFixedTerminalPoints: function (edge, source, target) {},
+    },
 
-    updateFixedTerminalPoint: function (edge, terminal, source, constraint) {},
-    updatePoints: function (edge, points, source, target) {},
+    updateFixedTerminalPoints: function (linkState, sourceState, targetState) {
+        this.updateFixedTerminalPoint(linkState, sourceState, true, this.graph.getConnectionConstraint(linkState, sourceState, true));
+        this.updateFixedTerminalPoint(linkState, targetState, false, this.graph.getConnectionConstraint(linkState, targetState, false));
+    },
+
+    updateFixedTerminalPoint: function (linkState, terminalState, isSource, constraint) {
+        var pt = null;
+
+        if (constraint) {
+            pt = this.graph.getConnectionPoint(terminalState, constraint);
+        }
+
+        if (pt == null && terminalState == null) {
+            var origin = linkState.origin;
+            var scale = this.scale;
+            var translate = this.translate;
+            var geo = this.graph.getCellGeometry(linkState.cell);
+            pt = geo.getTerminalPoint(isSource);
+
+            if (pt != null) {
+                pt = new Point(scale * (translate.x + pt.x + origin.x),
+                    scale * (translate.y + pt.y + origin.y));
+            }
+        }
+
+        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    },
+
+    updatePoints: function (linkState, points, sourceState, targetState) {
+        if (linkState != null) {
+            var pts = [];
+            pts.push(linkState.absolutePoints[0]);
+            var edgeStyle = this.getEdgeStyle(linkState, points, sourceState, targetState);
+
+            if (edgeStyle != null) {
+                var src = this.getTerminalPort(linkState, sourceState, true);
+                var trg = this.getTerminalPort(linkState, targetState, false);
+
+                edgeStyle(linkState, src, trg, points, pts);
+            }
+            else if (points != null) {
+                for (var i = 0; i < points.length; i++) {
+                    if (points[i] != null) {
+                        var pt = utils.clone(points[i]);
+                        pts.push(this.transformControlPoint(linkState, pt));
+                    }
+                }
+            }
+
+            var tmp = linkState.absolutePoints;
+            pts.push(tmp[tmp.length - 1]);
+
+            linkState.absolutePoints = pts;
+        }
+    },
+
     transformControlPoint: function (state, pt) {},
-    getEdgeStyle: function (edge, points, source, target) {},
-    updateFloatingTerminalPoints: function (state, source, target) {},
-    updateFloatingTerminalPoint: function (edge, start, end, source) {},
-    getTerminalPort: function (state, terminal, source) {},
-    getPerimeterPoint: function (terminal, next, orthogonal, border) {},
-    getRoutingCenterX: function (state) {},
-    getRoutingCenterY: function (state) {},
-    getPerimeterBounds: function (terminal, border) {},
-    getPerimeterFunction: function (state) {},
-    getNextPoint: function (edge, opposite, source) {},
-    getVisibleTerminal: function (edge, source) {},
-    updateEdgeBounds: function (state) {},
-    getPoint: function (state, geometry) {},
-    getRelativePoint: function (edgeState, x, y) {},
-    updateEdgeLabelOffset: function (state) {},
+
+    getEdgeStyle: function (linkState, points, sourceState, targetState) {
+        var edgeStyle = (sourceState && sourceState === targetState)
+            ? getValue(linkState.style, constants.STYLE_LOOP, this.graph.defaultLoopStyle)
+            : (!getValue(linkState.style, constants.STYLE_NOEDGESTYLE, false) ? linkState.style[constants.STYLE_EDGE] : null);
+
+        // Converts string values to objects
+        if (typeof(edgeStyle) == "string") {
+            var tmp = mxStyleRegistry.getValue(edgeStyle);
+
+            if (tmp == null && this.isAllowEval()) {
+                tmp = utils.eval(edgeStyle);
+            }
+
+            edgeStyle = tmp;
+        }
+
+        if (typeof(edgeStyle) == "function") {
+            return edgeStyle;
+        }
+
+        return null;
+    },
+
+    updateFloatingTerminalPoints: function (linkState, sourceState, targetState) {
+        var pts = linkState.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (pe == null && targetState != null) {
+            this.updateFloatingTerminalPoint(linkState, targetState, sourceState, false);
+        }
+
+        if (p0 == null && sourceState != null) {
+            this.updateFloatingTerminalPoint(linkState, sourceState, targetState, true);
+        }
+    },
+
+    // 获取连线与节点的连接点
+    updateFloatingTerminalPoint: function (linkState, start, end, isSource) {
+        start = this.getTerminalPort(linkState, start, isSource);
+        var next = this.getNextPoint(linkState, end, isSource);
+
+        var orth = this.graph.isOrthogonal(linkState);
+        var alpha = utils.toRadians(Number(start.style[constants.STYLE_ROTATION] || '0'));
+        var center = new Point(start.getCenterX(), start.getCenterY());
+
+        if (alpha != 0) {
+            var cos = Math.cos(-alpha);
+            var sin = Math.sin(-alpha);
+            next = utils.getRotatedPoint(next, cos, sin, center);
+        }
+
+        var border = parseFloat(linkState.style[constants.STYLE_PERIMETER_SPACING] || 0);
+        border += parseFloat(linkState.style[(isSource) ?
+                constants.STYLE_SOURCE_PERIMETER_SPACING :
+                constants.STYLE_TARGET_PERIMETER_SPACING] || 0);
+        var pt = this.getPerimeterPoint(start, next, alpha == 0 && orth, border);
+
+        if (alpha != 0) {
+            var cos = Math.cos(alpha);
+            var sin = Math.sin(alpha);
+            pt = utils.getRotatedPoint(pt, cos, sin, center);
+        }
+
+        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    },
+
+    getTerminalPort: function (linkState, terminalState, isSource) {
+        var key = (isSource) ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+        var id = getValue(linkState.style, key);
+
+        if (id != null) {
+            var tmp = this.getState(this.graph.getModel().getCell(id));
+
+            // Only uses ports where a cell state exists
+            if (tmp != null) {
+                terminalState = tmp;
+            }
+        }
+
+        return terminalState;
+    },
+
+    // 获取周长路径上的点
+    getPerimeterPoint: function (terminal, next, orthogonal, border) {
+        var point = null;
+
+        if (terminal != null) {
+            var perimeter = this.getPerimeterFunction(terminal);
+
+            if (perimeter != null && next != null) {
+                var bounds = this.getPerimeterBounds(terminal, border);
+
+                if (bounds.width > 0 || bounds.height > 0) {
+                    point = perimeter(bounds, terminal, next, orthogonal);
+
+                    if (point != null) {
+                        point.x = Math.round(point.x);
+                        point.y = Math.round(point.y);
+                    }
+                }
+            }
+
+            if (point == null) {
+                point = this.getPoint(terminal);
+            }
+        }
+
+        return point;
+    },
+
+    getRoutingCenterX: function (state) {
+        var f = (state.style != null) ? parseFloat(state.style
+            [mxConstants.STYLE_ROUTING_CENTER_X]) || 0 : 0;
+
+        return state.getCenterX() + f * state.width;
+    },
+
+    getRoutingCenterY: function (state) {
+        var f = (state.style != null) ? parseFloat(state.style
+            [mxConstants.STYLE_ROUTING_CENTER_Y]) || 0 : 0;
+
+        return state.getCenterY() + f * state.height;
+    },
+
+    getPerimeterBounds: function (terminal, border) {
+        border = (border != null) ? border : 0;
+
+        if (terminal != null) {
+            border += parseFloat(terminal.style[constants.STYLE_PERIMETER_SPACING] || 0);
+        }
+
+        return terminal.getPerimeterBounds(border * this.scale);
+
+    },
+
+    getPerimeterFunction: function (state) {
+        var perimeter = state.style[constants.STYLE_PERIMETER];
+
+        // Converts string values to objects
+        if (typeof(perimeter) == "string") {
+            var tmp = mxStyleRegistry.getValue(perimeter);
+
+            if (tmp == null && this.isAllowEval()) {
+                tmp = utils.eval(perimeter);
+            }
+
+            perimeter = tmp;
+        }
+
+        if (typeof(perimeter) == "function") {
+            return perimeter;
+        }
+
+        return null;
+    },
+
+    getNextPoint: function (edge, opposite, source) {
+        var pts = edge.absolutePoints;
+        var point = null;
+
+        if (pts != null && pts.length >= 2) {
+            var count = pts.length;
+            point = pts[(source) ? Math.min(1, count - 1) : Math.max(0, count - 2)];
+        }
+
+        if (point == null && opposite != null) {
+            point = new Point(opposite.getCenterX(), opposite.getCenterY());
+        }
+
+        return point;
+    },
+    getVisibleTerminal: function (edge, source) {
+        var model = this.graph.getModel();
+        var result = model.getTerminal(edge, source);
+        var best = result;
+
+        while (result && result != this.currentRoot) {
+            if (!this.graph.isCellVisible(best) || this.isCellCollapsed(result)) {
+                best = result;
+            }
+
+            result = model.getParent(result);
+        }
+
+        // Checks if the result is not a layer
+        if (model.getParent(best) == model.getRoot()) {
+            best = null;
+        }
+
+        return best;
+    },
+    updateEdgeBounds: function (state) {
+        var points = state.absolutePoints;
+        var p0 = points[0];
+        var pe = points[points.length - 1];
+
+        if (p0.x != pe.x || p0.y != pe.y) {
+            var dx = pe.x - p0.x;
+            var dy = pe.y - p0.y;
+            state.terminalDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+        else {
+            state.terminalDistance = 0;
+        }
+
+        var length = 0;
+        var segments = [];
+        var pt = p0;
+
+        if (pt != null) {
+            var minX = pt.x;
+            var minY = pt.y;
+            var maxX = minX;
+            var maxY = minY;
+
+            for (var i = 1; i < points.length; i++) {
+                var tmp = points[i];
+
+                if (tmp != null) {
+                    var dx = pt.x - tmp.x;
+                    var dy = pt.y - tmp.y;
+
+                    var segment = Math.sqrt(dx * dx + dy * dy);
+                    segments.push(segment);
+                    length += segment;
+
+                    pt = tmp;
+
+                    minX = Math.min(pt.x, minX);
+                    minY = Math.min(pt.y, minY);
+                    maxX = Math.max(pt.x, maxX);
+                    maxY = Math.max(pt.y, maxY);
+                }
+            }
+
+            state.length = length;
+            state.segments = segments;
+
+            var markerSize = 1; // TODO: include marker size
+
+            state.x = minX;
+            state.y = minY;
+            state.width = Math.max(markerSize, maxX - minX);
+            state.height = Math.max(markerSize, maxY - minY);
+        }
+    },
+    getPoint: function (state, geometry) {
+        var x = state.getCenterX();
+        var y = state.getCenterY();
+
+        if (state.segments != null && (geometry == null || geometry.relative)) {
+            var gx = (geometry != null) ? geometry.x / 2 : 0;
+            var pointCount = state.absolutePoints.length;
+            var dist = (gx + 0.5) * state.length;
+            var segment = state.segments[0];
+            var length = 0;
+            var index = 1;
+
+            while (dist > length + segment && index < pointCount - 1) {
+                length += segment;
+                segment = state.segments[index++];
+            }
+
+            var factor = (segment == 0) ? 0 : (dist - length) / segment;
+            var p0 = state.absolutePoints[index - 1];
+            var pe = state.absolutePoints[index];
+
+            if (p0 != null && pe != null) {
+                var gy = 0;
+                var offsetX = 0;
+                var offsetY = 0;
+
+                if (geometry != null) {
+                    gy = geometry.y;
+                    var offset = geometry.offset;
+
+                    if (offset != null) {
+                        offsetX = offset.x;
+                        offsetY = offset.y;
+                    }
+                }
+
+                var dx = pe.x - p0.x;
+                var dy = pe.y - p0.y;
+                var nx = (segment == 0) ? 0 : dy / segment;
+                var ny = (segment == 0) ? 0 : dx / segment;
+
+                x = p0.x + dx * factor + (nx * gy + offsetX) * this.scale;
+                y = p0.y + dy * factor - (ny * gy - offsetY) * this.scale;
+            }
+        }
+        else if (geometry != null) {
+            var offset = geometry.offset;
+
+            if (offset != null) {
+                x += offset.x;
+                y += offset.y;
+            }
+        }
+
+        return new Point(x, y);
+    },
+    getRelativePoint: function (edgeState, x, y) {
+        var model = this.graph.getModel();
+        var geometry = model.getGeometry(edgeState.cell);
+
+        if (geometry != null) {
+            var pointCount = edgeState.absolutePoints.length;
+
+            if (geometry.relative && pointCount > 1) {
+                var totalLength = edgeState.length;
+                var segments = edgeState.segments;
+
+                // Works which line segment the point of the label is closest to
+                var p0 = edgeState.absolutePoints[0];
+                var pe = edgeState.absolutePoints[1];
+                var minDist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                var index = 0;
+                var tmp = 0;
+                var length = 0;
+
+                for (var i = 2; i < pointCount; i++) {
+                    tmp += segments[i - 2];
+                    pe = edgeState.absolutePoints[i];
+                    var dist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                    if (dist <= minDist) {
+                        minDist = dist;
+                        index = i - 1;
+                        length = tmp;
+                    }
+
+                    p0 = pe;
+                }
+
+                var seg = segments[index];
+                p0 = edgeState.absolutePoints[index];
+                pe = edgeState.absolutePoints[index + 1];
+
+                var x2 = p0.x;
+                var y2 = p0.y;
+
+                var x1 = pe.x;
+                var y1 = pe.y;
+
+                var px = x;
+                var py = y;
+
+                var xSegment = x2 - x1;
+                var ySegment = y2 - y1;
+
+                px -= x1;
+                py -= y1;
+                var projlenSq = 0;
+
+                px = xSegment - px;
+                py = ySegment - py;
+                var dotprod = px * xSegment + py * ySegment;
+
+                if (dotprod <= 0.0) {
+                    projlenSq = 0;
+                }
+                else {
+                    projlenSq = dotprod * dotprod
+                        / (xSegment * xSegment + ySegment * ySegment);
+                }
+
+                var projlen = Math.sqrt(projlenSq);
+
+                if (projlen > seg) {
+                    projlen = seg;
+                }
+
+                var yDistance = Math.sqrt(utils.ptSegDistSq(p0.x, p0.y, pe
+                    .x, pe.y, x, y));
+                var direction = utils.relativeCcw(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                if (direction == -1) {
+                    yDistance = -yDistance;
+                }
+
+                // Constructs the relative point for the label
+                return new Point(((totalLength / 2 - length - projlen) / totalLength) * -2,
+                    yDistance / this.scale);
+            }
+        }
+
+        return new Point();
+    },
+    updateEdgeLabelOffset: function (state) {
+        var points = state.absolutePoints;
+
+        state.absoluteOffset.x = state.getCenterX();
+        state.absoluteOffset.y = state.getCenterY();
+
+        if (points != null && points.length > 0 && state.segments != null) {
+            var geometry = this.graph.getCellGeometry(state.cell);
+
+            if (geometry.relative) {
+                var offset = this.getPoint(state, geometry);
+
+                if (offset != null) {
+                    state.absoluteOffset = offset;
+                }
+            }
+            else {
+                var p0 = points[0];
+                var pe = points[points.length - 1];
+
+                if (p0 != null && pe != null) {
+                    var dx = pe.x - p0.x;
+                    var dy = pe.y - p0.y;
+                    var x0 = 0;
+                    var y0 = 0;
+
+                    var off = geometry.offset;
+
+                    if (off != null) {
+                        x0 = off.x;
+                        y0 = off.y;
+                    }
+
+                    var x = p0.x + dx / 2 + x0 * this.scale;
+                    var y = p0.y + dy / 2 + y0 * this.scale;
+
+                    state.absoluteOffset.x = x;
+                    state.absoluteOffset.y = y;
+                }
+            }
+        }
+    },
 
     getState: function (cell, create) {
 
@@ -5395,24 +7854,107 @@ module.exports = Class.create({
     getCanvas: function () {
         return this.canvas;
     },
+
     getBackgroundPane: function () {
         return this.backgroundPane;
     },
+
     getDrawPane: function () {
         return this.drawPane;
     },
+
     getOverlayPane: function () {
         return this.overlayPane;
     },
+
     getDecoratorPane: function () {
         return this.decoratorPane;
     },
-    isContainerEvent: function (evt) {},
 
-    isScrollEvent: function (evt) {},
+    isScrollEvent: function (evt) {
+        var that = this;
+        var container = that.graph.container;
+
+        var offset = utils.getOffset(container);
+        var pt = new Point(evt.clientX - offset.left, evt.clientY - offset.top);
+
+        var outWidth = container.offsetWidth;
+        var inWidth = container.clientWidth;
+
+        if (outWidth > inWidth && pt.x > inWidth + 2 && pt.x <= outWidth) {
+            return true;
+        }
+
+        var outHeight = container.offsetHeight;
+        var inHeight = container.clientHeight;
+
+        return outHeight > inHeight && pt.y > inHeight + 2 && pt.y <= outHeight;
+    },
+
+    isContainerEvent: function (evt) {
+        var that = this;
+        var source = domEvent.getSource(evt);
+
+        return (source === that.graph.container ||
+        source.parentNode == that.backgroundPane ||
+        (source.parentNode && source.parentNode.parentNode === that.backgroundPane) ||
+        source === that.canvas.parentNode ||
+        source === that.canvas ||
+        source === that.backgroundPane ||
+        source === that.drawPane ||
+        source === that.overlayPane ||
+        source === that.decoratorPane);
+    },
 
     installListeners: function () {
-        return this;
+
+        var that = this;
+        var graph = that.graph;
+        var container = graph.container;
+
+        if (container) {
+
+            // Support for touch device gestures (eg. pinch to zoom)
+            // Double-tap handling is implemented in graph.fireMouseEvent
+            if (detector.IS_TOUCH) {
+
+                var handler = function (evt) {
+                    graph.fireGestureEvent(evt);
+                    domEvent.consume(evt);
+                };
+
+                domEvent.on(container, 'gesturestart', handler);
+                domEvent.on(container, 'gesturechange', handler);
+                domEvent.on(container, 'gestureend', handler);
+            }
+
+            domEvent.onGesture(container,
+                function (evt) {
+                    // Condition to avoid scrollbar events starting a rubberband selection
+                    if (that.isContainerEvent(evt) &&
+                        ((!detector.IS_IE && !detector.IS_IE11 && !detector.IS_GC && !detector.IS_OP && !detector.IS_SF) || !that.isScrollEvent(evt))) {
+                        graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt));
+                    }
+                },
+                function (evt) {
+                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_MOVE, new MouseEvent(evt));
+                },
+                function (evt) {
+                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt));
+                });
+
+            // double click
+            domEvent.on(container, 'dblclick', function (evt) {
+                if (that.isContainerEvent(evt)) {
+                    graph.dblClick(evt);
+                }
+            });
+
+
+        }
+
+
+        return that;
     },
 
     createSvg: function () {
@@ -5461,7 +8003,155 @@ module.exports = Class.create({
 
 
 });
-define('PaneJS/Model',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/events/Event','PaneJS/events/EventObject','PaneJS/changes/RootChange','PaneJS/changes/ChildChange','PaneJS/Cell','PaneJS/UndoableEdit'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define('PaneJS/marker',['require','exports','module','PaneJS/constants'],function (require, exports, module) {var constants = require('PaneJS/constants');
+
+var marker = {
+    markers: [],
+    addMarker: function (type, fn) {
+        marker.markers[type] = fn;
+    },
+    createMarker: function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+        var fn = marker.markers[type];
+
+        return fn ? fn(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) : null;
+    }
+};
+
+function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    // The angle of the forward facing arrow sides against the x axis is
+    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+    // only half the strokewidth is processed ).
+    var endOffsetX = unitX * sw * 1.118;
+    var endOffsetY = unitY * sw * 1.118;
+
+    unitX = unitX * (size + sw);
+    unitY = unitY * (size + sw);
+
+    var pt = pe.clone();
+    pt.x -= endOffsetX;
+    pt.y -= endOffsetY;
+
+    var f = (type != constants.ARROW_CLASSIC) ? 1 : 3 / 4;
+    pe.x += -unitX * f - endOffsetX;
+    pe.y += -unitY * f - endOffsetY;
+
+    return function () {
+        canvas.begin();
+        canvas.moveTo(pt.x, pt.y);
+        canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+
+        if (type == constants.ARROW_CLASSIC) {
+            canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+        }
+
+        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+        canvas.close();
+
+        if (filled) {
+            canvas.fillAndStroke();
+        }
+        else {
+            canvas.stroke();
+        }
+    };
+}
+
+marker.addMarker('classic', arrow);
+marker.addMarker('block', arrow);
+
+marker.addMarker('open', function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    // The angle of the forward facing arrow sides against the x axis is
+    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+    // only half the strokewidth is processed ).
+    var endOffsetX = unitX * sw * 1.118;
+    var endOffsetY = unitY * sw * 1.118;
+
+    unitX = unitX * (size + sw);
+    unitY = unitY * (size + sw);
+
+    var pt = pe.clone();
+    pt.x -= endOffsetX;
+    pt.y -= endOffsetY;
+
+    pe.x += -endOffsetX * 2;
+    pe.y += -endOffsetY * 2;
+
+    return function () {
+        canvas.begin();
+        canvas.moveTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+        canvas.lineTo(pt.x, pt.y);
+        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+        canvas.stroke();
+    };
+});
+
+marker.addMarker('oval', function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    var a = size / 2;
+
+    var pt = pe.clone();
+    pe.x -= unitX * a;
+    pe.y -= unitY * a;
+
+    return function () {
+        canvas.ellipse(pt.x - a, pt.y - a, size, size);
+
+        if (filled) {
+            canvas.fillAndStroke();
+        }
+        else {
+            canvas.stroke();
+        }
+    };
+});
+
+function diamond(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    // The angle of the forward facing arrow sides against the x axis is
+    // 45 degrees, 1/sin(45) = 1.4142 / 2 = 0.7071 ( / 2 allows for
+    // only half the strokewidth is processed ). Or 0.9862 for thin diamond.
+    // Note these values and the tk variable below are dependent, update
+    // both together (saves trig hard coding it).
+    var swFactor = (type == constants.ARROW_DIAMOND) ? 0.7071 : 0.9862;
+    var endOffsetX = unitX * sw * swFactor;
+    var endOffsetY = unitY * sw * swFactor;
+
+    unitX = unitX * (size + sw);
+    unitY = unitY * (size + sw);
+
+    var pt = pe.clone();
+    pt.x -= endOffsetX;
+    pt.y -= endOffsetY;
+
+    pe.x += -unitX - endOffsetX;
+    pe.y += -unitY - endOffsetY;
+
+    // thickness factor for diamond
+    var tk = ((type == constants.ARROW_DIAMOND) ? 2 : 3.4);
+
+    return function () {
+        canvas.begin();
+        canvas.moveTo(pt.x, pt.y);
+        canvas.lineTo(pt.x - unitX / 2 - unitY / tk, pt.y + unitX / tk - unitY / 2);
+        canvas.lineTo(pt.x - unitX, pt.y - unitY);
+        canvas.lineTo(pt.x - unitX / 2 + unitY / tk, pt.y - unitY / 2 - unitX / tk);
+        canvas.close();
+
+        if (filled) {
+            canvas.fillAndStroke();
+        }
+        else {
+            canvas.stroke();
+        }
+    };
+}
+
+marker.addMarker('diamond', diamond);
+marker.addMarker('diamondThin', diamond);
+
+
+module.exports = marker;
+
+});
+define('PaneJS/Model',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/events/Event','PaneJS/events/EventObject','PaneJS/changes/RootChange','PaneJS/changes/ChildChange','PaneJS/changes/TerminalChange','PaneJS/Cell','PaneJS/UndoableEdit'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('PaneJS/common/class');
 var utils = require('PaneJS/common/utils');
@@ -5469,6 +8159,7 @@ var Event = require('PaneJS/events/Event');
 var EventObject = require('PaneJS/events/EventObject');
 var RootChange = require('PaneJS/changes/RootChange');
 var ChildChange = require('PaneJS/changes/ChildChange');
+var TerminalChange = require('PaneJS/changes/TerminalChange');
 var Cell = require('PaneJS/Cell');
 var UndoableEdit = require('PaneJS/UndoableEdit');
 
@@ -5498,6 +8189,7 @@ module.exports = Class.create({
         root ? model.setRoot(root) : model.clear();
     },
 
+    // 清理并创建一个默认的 root
     clear: function () {
 
         var model = this;
@@ -5526,6 +8218,7 @@ module.exports = Class.create({
         return model;
     },
 
+    // 获取 cell 所在的 root
     getRoot: function (cell) {
 
         var model = this;
@@ -5652,12 +8345,14 @@ module.exports = Class.create({
         return child;
     },
 
+    // 维护 id，和 cells，FIXME：不要利用外部传入 ID 的机制，在内部自己维护一套唯一 ID
+    // 机制（如自增），这样更直观方便，或许也可以直接使用 objectIdentity
     cellAdded: function (cell) {
         if (!cell) {
             return;
         }
 
-        // Creates an Id for the cell if not Id exists
+        // id 不存在时就创建
         if (!cell.getId() && this.createIds) {
             cell.setId(this.createId());
         }
@@ -5702,19 +8397,94 @@ module.exports = Class.create({
         return model.prefix + id + model.postfix;
     },
 
-    updateEdgeParents: function (cell, root) {},
+    //
+    updateEdgeParents: function (cell, root) {
+        // Gets the topmost node of the hierarchy
+        root = root || this.getRoot(cell);
 
-    updateEdgeParent: function (cell, root) {},
+        // Updates edges on children first
+        var childCount = this.getChildCount(cell);
+
+        for (var i = 0; i < childCount; i++) {
+            var child = this.getChildAt(cell, i);
+            this.updateEdgeParents(child, root);
+        }
+
+        // Updates the parents of all connected edges
+        var edgeCount = this.getEdgeCount(cell);
+        var edges = [];
+
+        for (var i = 0; i < edgeCount; i++) {
+            edges.push(this.getEdgeAt(cell, i));
+        }
+
+        for (var i = 0; i < edges.length; i++) {
+            var edge = edges[i];
+
+            // Updates edge parent if edge and child have
+            // a common root node (does not need to be the
+            // model root node)
+            if (this.isAncestor(root, edge)) {
+                this.updateEdgeParent(edge, root);
+            }
+        }
+    },
+
+    updateEdgeParent: function (edge, root) {
+        var sourceNode = this.getTerminal(edge, true);
+        var targetNode = this.getTerminal(edge, false);
+        var cell = null;
+
+        // Uses the first non-relative descendants of the source terminal
+        while (sourceNode && !this.isEdge(sourceNode) &&
+        sourceNode.geometry && sourceNode.geometry.relative) {
+            sourceNode = this.getParent(sourceNode);
+        }
+
+        // Uses the first non-relative descendants of the target terminal
+        while (targetNode && !this.isEdge(targetNode) &&
+        targetNode.geometry && targetNode.geometry.relative) {
+            targetNode = this.getParent(targetNode);
+        }
+
+        if (this.isAncestor(root, sourceNode) && this.isAncestor(root, targetNode)) {
+            if (sourceNode == targetNode) {
+                cell = this.getParent(sourceNode);
+            }
+            else {
+                //cell = this.getNearestCommonAncestor(sourceNode, targetNode);
+            }
+
+            if (cell != null && (this.getParent(cell) != this.root ||
+                this.isAncestor(cell, edge)) && this.getParent(edge) != cell) {
+                var geo = this.getGeometry(edge);
+
+                if (geo != null) {
+                    var origin1 = this.getOrigin(this.getParent(edge));
+                    var origin2 = this.getOrigin(cell);
+
+                    var dx = origin2.x - origin1.x;
+                    var dy = origin2.y - origin1.y;
+
+                    geo = geo.clone();
+                    geo.translate(-dx, -dy);
+                    this.setGeometry(edge, geo);
+                }
+
+                this.add(cell, edge, this.getChildCount(cell));
+            }
+        }
+    },
 
     getOrigin: function (cell) {
-        var model = this;
+        var that = this;
         var result = null;
 
         if (cell) {
-            result = model.getOrigin(model.getParent(cell));
+            result = that.getOrigin(that.getParent(cell));
 
-            if (!model.isEdge(cell)) {
-                var geo = model.getGeometry(cell);
+            if (!that.isEdge(cell)) {
+                var geo = that.getGeometry(cell);
 
                 if (geo) {
                     result.x += geo.x;
@@ -5729,7 +8499,41 @@ module.exports = Class.create({
     },
 
     // 获取最近的共同父节点
-    getNearestCommonAncestor: function (cell1, cell2) {},
+    getNearestCommonAncestor: function (cell1, cell2) {
+        if (cell1 && cell2) {
+            // Creates the cell path for the second cell
+            var path = mxCellPath.create(cell2);
+
+            if (path && path.length > 0) {
+                // Bubbles through the ancestors of the first
+                // cell to find the nearest common ancestor.
+                var cell = cell1;
+                var current = mxCellPath.create(cell);
+
+                // Inverts arguments
+                if (path.length < current.length) {
+                    cell = cell2;
+                    var tmp = current;
+                    current = path;
+                    path = tmp;
+                }
+
+                while (cell != null) {
+                    var parent = this.getParent(cell);
+
+                    // Checks if the cell path is equal to the beginning of the given cell path
+                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+                        return cell;
+                    }
+
+                    current = mxCellPath.getParentPath(current);
+                    cell = parent;
+                }
+            }
+        }
+
+        return null;
+    },
 
     remove: function (cell) {
 
@@ -5768,7 +8572,7 @@ module.exports = Class.create({
             if (parent !== previous || previous.getIndex(cell) !== index) {
                 parent.insert(cell, index);
             }
-        } else if (previous != null) { // remove from parent
+        } else if (previous) { // remove from parent
             var oldIndex = previous.getIndex(cell);
             previous.remove(oldIndex);
         }
@@ -5845,13 +8649,14 @@ module.exports = Class.create({
             this.endUpdate();
         }
     },
+
+    // 连线的起点节点或终点节点改变后
     terminalForCellChanged: function (edge, cell, isSource) {
         var previous = this.getTerminal(edge, isSource);
 
-        if (cell != null) {
+        if (cell) {
             cell.insertEdge(edge, isSource);
-        }
-        else if (previous != null) {
+        } else if (previous) {
             previous.removeEdge(edge, isSource);
         }
 
@@ -5861,58 +8666,104 @@ module.exports = Class.create({
     getEdgeCount: function (cell) {
         return cell ? cell.getEdgeCount() : 0;
     },
+
     getEdgeAt: function (cell, index) {
         return cell ? cell.getEdgeAt(index) : null;
     },
-    getDirectedEdgeCount: function (cell, outgoing, ignoredEdge) {
 
+    // 获取直接连接的连线的数量
+    getDirectedEdgeCount: function (cell, outgoing, ignoredEdge) {
+        var count = 0;
+        var edgeCount = this.getEdgeCount(cell);
+
+        for (var i = 0; i < edgeCount; i++) {
+            var edge = this.getEdgeAt(cell, i);
+
+            if (edge != ignoredEdge && this.getTerminal(edge, outgoing) == cell) {
+                count++;
+            }
+        }
+
+        return count;
     },
+
     getConnections: function (cell) {},
+
     getIncomingEdges: function (cell) {},
+
     getOutgoingEdges: function (cell) {},
+
     getEdges: function (cell, incoming, outgoing, includeLoops) {},
+
     getEdgesBetween: function (source, target, directed) {},
+
     getOpposites: function (edges, terminal, sources, targets) {},
+
     getTopmostCells: function (cells) {},
 
     isVertex: function (cell) {
         return cell ? cell.isVertex() : false;
     },
+
     isEdge: function (cell) {
         return cell ? cell.isEdge() : false;
     },
+
     isConnectable: function (cell) {
         return cell ? cell.isConnectable() : false;
     },
+
     getValue: function (cell) {
         return cell ? cell.getValue() : null;
     },
+
     setValue: function (cell, value) {
         this.execute(new ValueChange(this, cell, value));
         return value;
     },
+
     valueForCellChanged: function (cell, value) {},
 
     getGeometry: function (cell) {
         return cell ? cell.getGeometry() : null;
     },
-    setGeometry: function (cell, geometry) {},
+
+    setGeometry: function (cell, geometry) {
+        if (geometry != this.getGeometry(cell)) {
+            this.execute(new GeometryChange(this, cell, geometry));
+        }
+
+        return geometry;
+    },
+
     geometryForCellChanged: function (cell, geometry) {},
 
     getStyle: function (cell) {
         return cell ? cell.getStyle() : null;
     },
-    setStyle: function (cell, style) {},
+
+    setStyle: function (cell, style) {
+        if (style != this.getStyle(cell)) {
+            this.execute(new StyleChange(this, cell, style));
+        }
+
+        return style;
+    },
+
     styleForCellChanged: function (cell, style) {},
 
     isCollapsed: function (cell) {},
+
     setCollapsed: function (cell, collapsed) {},
+
     collapsedStateForCellChanged: function (cell, collapsed) {},
 
     isVisible: function (cell) {
         return cell ? cell.isVisible() : false;
     },
+
     setVisible: function (cell, visible) {},
+
     visibleStateForCellChanged: function (cell, visible) {},
 
     execute: function (change) {
@@ -6218,17 +9069,17 @@ var Shape = Base.extend({
 
     paint: function (canvas) {
 
-        var shape = this;
-        var bounds = shape.bounds;
+        var that = this;
+        var bounds = that.bounds;
 
         // Scale is passed-through to canvas
-        var scale = shape.scale;
+        var scale = that.scale;
         var x = bounds.x / scale;
         var y = bounds.y / scale;
         var w = bounds.width / scale;
         var h = bounds.height / scale;
 
-        if (shape.isPaintBoundsInverted()) {
+        if (that.isPaintBoundsInverted()) {
 
             var t = (w - h) / 2;
             x += t;
@@ -6239,42 +9090,42 @@ var Shape = Base.extend({
             h = tmp;
         }
 
-        shape.updateTransform(canvas, x, y, w, h);
-        shape.configureCanvas(canvas, x, y, w, h);
+        that.updateTransform(canvas, x, y, w, h);
+        that.configureCanvas(canvas, x, y, w, h);
 
         // Adds background rectangle to capture events
         var bg = null;
 
-        if ((!shape.stencil && !shape.points && shape.shapePointerEvents) ||
-            (shape.stencil && shape.stencilPointerEvents)) {
+        if ((!that.stencil && !that.points && that.shapePointerEvents) ||
+            (that.stencil && that.stencilPointerEvents)) {
 
-            var bb = shape.createBoundingBox();
+            var bb = that.createBoundingBox();
 
-            bg = shape.createTransparentSvgRectangle(bb.x, bb.y, bb.width, bb.height);
-            shape.node.appendChild(bg);
+            bg = that.createTransparentSvgRectangle(bb.x, bb.y, bb.width, bb.height);
+            that.node.appendChild(bg);
         }
 
 
-        if (shape.stencil) {
-            shape.stencil.drawShape(canvas, shape, x, y, w, h);
+        if (that.stencil) {
+            that.stencil.drawShape(canvas, that, x, y, w, h);
         } else {
             // Stencils have separate strokeWidth
-            canvas.setStrokeWidth(shape.strokewidth);
+            canvas.setStrokeWidth(that.strokewidth);
 
-            if (shape.points) {
+            if (that.points) {
                 // Paints edge shape
                 var pts = [];
 
-                for (var i = 0; i < shape.points.length; i++) {
-                    if (shape.points[i]) {
-                        pts.push(new Point(shape.points[i].x / scale, shape.points[i].y / scale));
+                for (var i = 0; i < that.points.length; i++) {
+                    if (that.points[i]) {
+                        pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
                     }
                 }
 
-                shape.paintEdgeShape(canvas, pts);
+                that.paintEdgeShape(canvas, pts);
             } else {
                 // Paints vertex shape
-                shape.paintVertexShape(canvas, x, y, w, h);
+                that.paintVertexShape(canvas, x, y, w, h);
             }
         }
 
@@ -6398,21 +9249,21 @@ var Shape = Base.extend({
 
     updateBoundsFromPoints: function () {
 
-        var shape = this;
+        var that = this;
         var bounds;
 
-        each(shape.points || [], function (point, index) {
+        each(that.points || [], function (point, index) {
 
             var rect = new Rectangle(point.x, point.y, 1, 1);
 
             if (index === 0) {
-                shape.bounds = bounds = rect;
+                that.bounds = bounds = rect;
             } else {
                 bounds.add(rect);
             }
         });
 
-        return shape;
+        return that;
     },
 
     checkBounds: function () {
@@ -6676,6 +9527,77 @@ var Shape = Base.extend({
 module.exports = Shape;
 
 });
+define('PaneJS/shapes/Polyline',['require','exports','module','../common/utils','./Shape','../constants'],function (require, exports, module) {var utils = require('../common/utils');
+var Shape = require('./Shape');
+var constants = require('../constants');
+
+var getValue = utils.getValue;
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+
+module.exports = Shape.extend({
+    constructor: function Polyline(points, stroke, strokewidth) {
+
+        var shape = this;
+
+        Polyline.superclass.constructor.call(shape);
+
+        shape.points = points;
+        shape.stroke = stroke;
+        shape.strokewidth = !isNullOrUndefined(strokewidth) ? strokewidth : 1;
+    },
+
+    getRotation: function () { return 0; },
+    getShapeRotation: function () { return 0; },
+    isPaintBoundsInverted: function () {
+        return false;
+    },
+
+    paintEdgeShape: function (canvas, pts) {
+
+        if (this.style || this.style[constants.STYLE_CURVED] != 1) {
+            this.paintLine(canvas, pts, this.isRounded);
+        }
+        else {
+            this.paintCurvedLine(canvas, pts);
+        }
+    },
+
+    paintLine: function (canvas, pts, rounded) {
+
+        var arcSize = getValue(this.style, constants.STYLE_ARCSIZE, constants.LINE_ARCSIZE) / 2;
+        canvas.begin();
+        this.addPoints(canvas, pts, rounded, arcSize, false);
+        canvas.stroke();
+    },
+
+    paintCurvedLine: function (canvas, pts) {
+        canvas.begin();
+
+        var pt = pts[0];
+        var n = pts.length;
+
+        canvas.moveTo(pt.x, pt.y);
+
+        for (var i = 1; i < n - 2; i++) {
+            var p0 = pts[i];
+            var p1 = pts[i + 1];
+            var ix = (p0.x + p1.x) / 2;
+            var iy = (p0.y + p1.y) / 2;
+
+            canvas.quadTo(p0.x, p0.y, ix, iy);
+        }
+
+        var p0 = pts[n - 2];
+        var p1 = pts[n - 1];
+
+        canvas.quadTo(p0.x, p0.y, p1.x, p1.y);
+        canvas.stroke();
+    }
+});
+
+
+});
 define('PaneJS/shapes/RectangleShape',['require','exports','module','../common/utils','./Shape'],function (require, exports, module) {var utils = require('../common/utils');
 var Shape = require('./Shape');
 
@@ -6731,9 +9653,10 @@ module.exports = Shape.extend({
 });
 
 });
-define('PaneJS/shapes/Text',['require','exports','module','../common/utils','./Shape','../Point','../constants'],function (require, exports, module) {var utils = require('../common/utils');
+define('PaneJS/shapes/Text',['require','exports','module','../common/utils','./Shape','../Point','../Rectangle','../constants'],function (require, exports, module) {var utils = require('../common/utils');
 var Shape = require('./Shape');
 var Point = require('../Point');
+var Rectangle = require('../Rectangle');
 var constants = require('../constants');
 
 var getValue = utils.getValue;
@@ -6787,7 +9710,9 @@ module.exports = Shape.extend({
     },
 
     isParseVml: function () {return false},
+
     isHtmlAllowed: function () {return true},
+
     getSvgScreenOffset: function () {return 0},
 
     checkBounds: function () {
@@ -6820,10 +9745,10 @@ module.exports = Shape.extend({
         this.boundingBox = this.bounds.clone();
         var rot = this.getTextRotation();
 
-        var h = (this.style != null) ? mxUtils.getValue(this.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER) : null;
-        var v = (this.style != null) ? mxUtils.getValue(this.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE) : null;
+        var h = (this.style) ? getValue(this.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER) : null;
+        var v = (this.style) ? getValue(this.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE) : null;
 
-        if (!this.ignoreStringSize && node != null && this.overflow != 'fill' && (!this.clipped || !this.ignoreClippedStringSize || h != constants.ALIGN_CENTER || v != constants.ALIGN_MIDDLE)) {
+        if (!this.ignoreStringSize && node && this.overflow != 'fill' && (!this.clipped || !this.ignoreClippedStringSize || h != constants.ALIGN_CENTER || v != constants.ALIGN_MIDDLE)) {
             var ow = null;
             var oh = null;
 
@@ -6847,7 +9772,7 @@ module.exports = Shape.extend({
                             return;
                         }
 
-                        this.boundingBox = new mxRectangle(b.x, b.y, b.width, b.height);
+                        this.boundingBox = new Rectangle(b.x, b.y, b.width, b.height);
                         rot = 0;
                     }
                     catch (e) {
@@ -6918,7 +9843,7 @@ module.exports = Shape.extend({
                 var x0 = this.bounds.x + this.margin.x * ow;
                 var y0 = this.bounds.y + this.margin.y * oh;
 
-                this.boundingBox = new mxRectangle(x0, y0, ow, oh);
+                this.boundingBox = new Rectangle(x0, y0, ow, oh);
             }
         }
         else {
@@ -6926,7 +9851,7 @@ module.exports = Shape.extend({
             this.boundingBox.y += this.margin.y * this.boundingBox.height;
         }
 
-        if (this.boundingBox != null) {
+        if (this.boundingBox) {
             if (rot != 0) {
                 var bbox = mxUtils.getBoundingBox(this.boundingBox, rot);
 
@@ -6988,7 +9913,7 @@ module.exports = Shape.extend({
 
         // Always renders labels as HTML in VML
         //var fmt = (realHtml || c instanceof mxVmlCanvas2D) ? 'html' : '';
-        var fmt =  '';
+        var fmt = '';
         var val = this.value;
 
         if (!realHtml && fmt == 'html') {
@@ -7315,6 +10240,8 @@ module.exports = Shape.extend({
         }
     },
 
+
+    // 根据对齐方式，返回一个代表对齐方式的 point
     updateMargin: function () {
         this.margin = this.getAlignmentAsPoint(this.align, this.valign);
     },
@@ -7372,10 +10299,270 @@ module.exports = Shape.extend({
 
 
 });
-define('PaneJS/CellRenderer',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/common/Dictionary','PaneJS/Rectangle','PaneJS/Point','PaneJS/constants','PaneJS/shapes/Shape','PaneJS/shapes/RectangleShape','PaneJS/shapes/Text'],function (require, exports, module) {'use strict';
+define('PaneJS/shapes/Connector',['require','exports','module','../common/utils','../marker','./Polyline','../constants'],function (require, exports, module) {var utils = require('../common/utils');
+var marker = require('../marker');
+var Polyline = require('./Polyline');
+var constants = require('../constants');
+
+var getValue = utils.getValue;
+var getNumber = utils.getNumber;
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+var Connector = module.exports = Polyline.extend({
+    constructor: function Connector(points, stroke, strokewidth) {
+        Connector.superclass.constructor.call(this, points, stroke, strokewidth);
+    },
+
+    paintEdgeShape: function (c, pts) {
+        var sourceMarker = this.createMarker(c, pts, true);
+        var targetMarker = this.createMarker(c, pts, false);
+
+        Connector.superclass.paintEdgeShape.apply(this, arguments);
+
+        // Disables shadows, dashed styles and fixes fill color for markers
+        c.setFillColor(this.stroke);
+        c.setShadow(false);
+        c.setDashed(false);
+
+        if (sourceMarker != null) {
+            sourceMarker();
+        }
+
+        if (targetMarker != null) {
+            targetMarker();
+        }
+    },
+
+    createMarker: function (c, pts, isSource) {
+        var result = null;
+        var n = pts.length;
+        var type = getValue(this.style, isSource ? constants.STYLE_STARTARROW : constants.STYLE_ENDARROW);
+        var p0 = isSource ? pts[1] : pts[n - 2];
+        var pe = isSource ? pts[0] : pts[n - 1];
+
+        if (type && p0 && pe) {
+            var count = 1;
+
+            // Uses next non-overlapping point
+            while (count < n - 1 && Math.round(p0.x - pe.x) == 0 && Math.round(p0.y - pe.y) == 0) {
+                p0 = (isSource) ? pts[1 + count] : pts[n - 2 - count];
+                count++;
+            }
+
+            // Computes the norm and the inverse norm
+            var dx = pe.x - p0.x;
+            var dy = pe.y - p0.y;
+
+            var dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+
+            var unitX = dx / dist;
+            var unitY = dy / dist;
+
+            var size = getNumber(this.style, (isSource) ? constants.STYLE_STARTSIZE : constants.STYLE_ENDSIZE, constants.DEFAULT_MARKERSIZE);
+
+            // Allow for stroke width in the end point used and the
+            // orthogonal vectors describing the direction of the marker
+            var filled = this.style[(isSource) ? constants.STYLE_STARTFILL : constants.STYLE_ENDFILL] != 0;
+
+            result = marker.createMarker(c, this, type, pe, unitX, unitY, size, isSource, this.arrowStrokewidth, filled);
+        }
+
+        return result;
+    },
+
+    augmentBoundingBox: function (bbox) {
+        Connector.superclass.augmentBoundingBox.apply(this, arguments);
+
+        // Adds marker sizes
+        var size = 0;
+
+        if (getValue(this.style, constants.STYLE_STARTARROW, constants.NONE) !== constants.NONE) {
+            size = getNumber(this.style, constants.STYLE_STARTSIZE, constants.DEFAULT_MARKERSIZE) + 1;
+        }
+
+        if (getValue(this.style, constants.STYLE_ENDARROW, constants.NONE) !== constants.NONE) {
+            size = Math.max(size, getNumber(this.style, constants.STYLE_ENDSIZE, constants.DEFAULT_MARKERSIZE)) + 1;
+        }
+
+        bbox.grow(Math.ceil(size * this.scale));
+    }
+});
+
+});
+define('PaneJS/shapes/Label',['require','exports','module','../common/utils','./RectangleShape','../constants'],function (require, exports, module) {var utils = require('../common/utils');
+var RectangleShape = require('./RectangleShape');
+var constants = require('../constants');
+
+var getValue = utils.getValue;
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+
+module.exports = RectangleShape.extend({
+
+    imageSize: constants.DEFAULT_IMAGESIZE,
+    spacing: 2,
+    indicatorSize: 10,
+    indicatorSpacing: 2,
+
+
+    constructor: function Label(bounds, fill, stroke, strokeWidth) {
+        this.constructor.superclass.constructor.call(this, bounds, fill, stroke, strokeWidth);
+    },
+
+    init: function (container) {
+        this.constructor.superclass.prototype.init.apply(this, arguments);
+
+        if (this.indicatorShape) {
+            this.indicator = new this.indicatorShape();
+            this.indicator.dialect = this.dialect;
+            this.indicator.init(this.node);
+        }
+    },
+
+    redraw: function () {
+        if (this.indicator) {
+            this.indicator.fill = this.indicatorColor;
+            this.indicator.stroke = this.indicatorStrokeColor;
+            this.indicator.gradient = this.indicatorGradientColor;
+            this.indicator.direction = this.indicatorDirection;
+        }
+
+        this.constructor.superclass.prototype.redraw.apply(this, arguments);
+    },
+
+    isHtmlAllowed: function () {
+
+        return this.constructor.superclass.prototype.isHtmlAllowed.apply(this, arguments) &&
+            this.indicatorColor == null && this.indicatorShape == null;
+    },
+
+    paintForeground: function (c, x, y, w, h) {
+
+        this.paintImage(c, x, y, w, h);
+        this.paintIndicator(c, x, y, w, h);
+
+        this.constructor.superclass.prototype.paintForeground.apply(this, arguments);
+    },
+
+    paintImage: function (c, x, y, w, h) {
+        if (this.image != null) {
+            var bounds = this.getImageBounds(x, y, w, h);
+            c.image(bounds.x, bounds.y, bounds.width, bounds.height, this.image, false, false, false);
+        }
+    },
+
+    getImageBounds: function (x, y, w, h) {
+        var align = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_ALIGN, mxConstants.ALIGN_LEFT);
+        var valign = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
+        var width = mxUtils.getNumber(this.style, mxConstants.STYLE_IMAGE_WIDTH, mxConstants.DEFAULT_IMAGESIZE);
+        var height = mxUtils.getNumber(this.style, mxConstants.STYLE_IMAGE_HEIGHT, mxConstants.DEFAULT_IMAGESIZE);
+        var spacing = mxUtils.getNumber(this.style, mxConstants.STYLE_SPACING, this.spacing) + 5;
+
+        if (align == mxConstants.ALIGN_CENTER) {
+            x += (w - width) / 2;
+        }
+        else if (align == mxConstants.ALIGN_RIGHT) {
+            x += w - width - spacing;
+        }
+        else // default is left
+        {
+            x += spacing;
+        }
+
+        if (valign == mxConstants.ALIGN_TOP) {
+            y += spacing;
+        }
+        else if (valign == mxConstants.ALIGN_BOTTOM) {
+            y += h - height - spacing;
+        }
+        else // default is middle
+        {
+            y += (h - height) / 2;
+        }
+
+        return new mxRectangle(x, y, width, height);
+    },
+
+    paintIndicator: function (c, x, y, w, h) {
+        if (this.indicator != null) {
+            this.indicator.bounds = this.getIndicatorBounds(x, y, w, h);
+            this.indicator.paint(c);
+        }
+        else if (this.indicatorImage != null) {
+            var bounds = this.getIndicatorBounds(x, y, w, h);
+            c.image(bounds.x, bounds.y, bounds.width, bounds.height, this.indicatorImage, false, false, false);
+        }
+    },
+
+    getIndicatorBounds: function (x, y, w, h) {
+        var align = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_ALIGN, mxConstants.ALIGN_LEFT);
+        var valign = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
+        var width = mxUtils.getNumber(this.style, mxConstants.STYLE_INDICATOR_WIDTH, this.indicatorSize);
+        var height = mxUtils.getNumber(this.style, mxConstants.STYLE_INDICATOR_HEIGHT, this.indicatorSize);
+        var spacing = this.spacing + 5;
+
+        if (align == mxConstants.ALIGN_RIGHT) {
+            x += w - width - spacing;
+        }
+        else if (align == mxConstants.ALIGN_CENTER) {
+            x += (w - width) / 2;
+        }
+        else // default is left
+        {
+            x += spacing;
+        }
+
+        if (valign == mxConstants.ALIGN_BOTTOM) {
+            y += h - height - spacing;
+        }
+        else if (valign == mxConstants.ALIGN_TOP) {
+            y += spacing;
+        }
+        else // default is middle
+        {
+            y += (h - height) / 2;
+        }
+
+        return new mxRectangle(x, y, width, height);
+    },
+
+    redrawHtmlShape: function () {
+        mxRectangleShape.prototype.redrawHtmlShape.apply(this, arguments);
+
+        // Removes all children
+        while (this.node.hasChildNodes()) {
+            this.node.removeChild(this.node.lastChild);
+        }
+
+        if (this.image != null) {
+            var node = document.createElement('img');
+            node.style.position = 'relative';
+            node.setAttribute('border', '0');
+
+            var bounds = this.getImageBounds(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
+            bounds.x -= this.bounds.x;
+            bounds.y -= this.bounds.y;
+
+            node.style.left = Math.round(bounds.x) + 'px';
+            node.style.top = Math.round(bounds.y) + 'px';
+            node.style.width = Math.round(bounds.width) + 'px';
+            node.style.height = Math.round(bounds.height) + 'px';
+
+            node.src = this.image;
+
+            this.node.appendChild(node);
+        }
+    }
+});
+
+
+});
+define('PaneJS/CellRenderer',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/common/detector','PaneJS/common/Dictionary','PaneJS/Rectangle','PaneJS/Point','PaneJS/constants','PaneJS/shapes/Shape','PaneJS/shapes/RectangleShape','PaneJS/shapes/Text','PaneJS/shapes/Connector','PaneJS/events/MouseEvent','PaneJS/events/domEvent','PaneJS/events/eventNames'],function (require, exports, module) {'use strict';
 
 var Class = require('PaneJS/common/class');
 var utils = require('PaneJS/common/utils');
+var detector = require('PaneJS/common/detector');
+
 var Dictionary = require('PaneJS/common/Dictionary');
 var Rectangle = require('PaneJS/Rectangle');
 var Point = require('PaneJS/Point');
@@ -7384,7 +10571,11 @@ var constants = require('PaneJS/constants');
 var Shape = require('PaneJS/shapes/Shape');
 var RectangleShape = require('PaneJS/shapes/RectangleShape');
 var Text = require('PaneJS/shapes/Text');
+var Connector = require('PaneJS/shapes/Connector');
 
+var MouseEvent = require('PaneJS/events/MouseEvent');
+var domEvent = require('PaneJS/events/domEvent');
+var eventNames = require('PaneJS/events/eventNames');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getValue = utils.getValue;
@@ -7401,7 +10592,8 @@ var CellRenderer = Class.create({
         }
     },
 
-    defaultEdgeShape: null,
+    // 属性
+    defaultEdgeShape: Connector,
     defaultVertexShape: RectangleShape,
     defaultTextShape: Text,
     legacyControlPosition: true,
@@ -7782,69 +10974,58 @@ var CellRenderer = Class.create({
 
     // 监听 DOM 事件
     installListeners: function (state) {
+        var that = this;
         var graph = state.view.graph;
-
-        // TODO: event
-        return;
 
         // Workaround for touch devices routing all events for a mouse
         // gesture (down, move, up) via the initial DOM node. Same for
         // HTML images in all IE versions (VML images are working).
-        var getState = function (evt) {
+        function getState(evt) {
             var result = state;
 
-            if ((graph.dialect != constants.DIALECT_SVG && mxEvent.getSource(evt).nodeName == 'IMG') || mxClient.IS_TOUCH) {
-                var x = mxEvent.getClientX(evt);
-                var y = mxEvent.getClientY(evt);
+            if (detector.IS_TOUCH) {
+                var x = domEvent.getClientX(evt);
+                var y = domEvent.getClientY(evt);
 
                 // Dispatches the drop event to the graph which
                 // consumes and executes the source function
-                var pt = mxUtils.convertPoint(graph.container, x, y);
+                var pt = utils.convertPoint(graph.container, x, y);
                 result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
             }
 
             return result;
-        };
+        }
 
-        mxEvent.addGestureListeners(state.shape.node,
-            mxUtils.bind(this, function (evt) {
-                if (this.isShapeEvent(state, evt)) {
-                    // Redirects events from the "event-transparent" region of a
-                    // swimlane to the graph. This is only required in HTML, SVG
-                    // and VML do not fire mouse events on transparent backgrounds.
-                    graph.fireMouseEvent(mxEvent.MOUSE_DOWN,
-                        new mxMouseEvent(evt, (state.shape != null &&
-                        mxEvent.getSource(evt) == state.shape.content) ?
-                            null : state));
+        domEvent.onGesture(state.shape.node,
+            function (evt) {
+                if (that.isShapeEvent(state, evt)) {
+                    state = state.shape && domEvent.getSource(evt) === state.shape.content ? null : state;
+                    graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt, state));
                 }
-            }),
-            mxUtils.bind(this, function (evt) {
-                if (this.isShapeEvent(state, evt)) {
-                    graph.fireMouseEvent(mxEvent.MOUSE_MOVE,
-                        new mxMouseEvent(evt, (state.shape != null &&
-                        mxEvent.getSource(evt) == state.shape.content) ?
-                            null : getState(evt)));
+            },
+            function (evt) {
+                if (that.isShapeEvent(state, evt)) {
+                    state = state.shape && domEvent.getSource(evt) === state.shape.content ? null : getState(evt);
+                    graph.fireMouseEvent(eventNames.MOUSE_MOVE, new MouseEvent(evt, state));
                 }
-            }),
-            mxUtils.bind(this, function (evt) {
-                if (this.isShapeEvent(state, evt)) {
-                    graph.fireMouseEvent(mxEvent.MOUSE_UP,
-                        new mxMouseEvent(evt, (state.shape != null &&
-                        mxEvent.getSource(evt) == state.shape.content) ?
-                            null : getState(evt)));
+            },
+            function (evt) {
+                if (that.isShapeEvent(state, evt)) {
+                    state = state.shape && domEvent.getSource(evt) === state.shape.content ? null : getState(evt);
+                    graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt, state));
                 }
-            })
+            }
         );
+
 
         // Uses double click timeout in mxGraph for quirks mode
         if (graph.nativeDblClickEnabled) {
-            mxEvent.addListener(state.shape.node, 'dblclick',
-                mxUtils.bind(this, function (evt) {
-                    if (this.isShapeEvent(state, evt)) {
+            domEvent.on(state.shape.node, 'dblclick', function (evt) {
+                    if (that.isLabelEvent(state, evt)) {
                         graph.dblClick(evt, state.cell);
-                        mxEvent.consume(evt);
+                        domEvent.consume(evt);
                     }
-                })
+                }
             );
         }
     },
@@ -8268,192 +11449,33 @@ module.exports = CellRenderer;
 
 
 });
-define('PaneJS/shapes/Label',['require','exports','module','../common/utils','./RectangleShape','../constants'],function (require, exports, module) {var utils = require('../common/utils');
-var RectangleShape = require('./RectangleShape');
-var constants = require('../constants');
-
-var getValue = utils.getValue;
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-
-module.exports = RectangleShape.extend({
-
-    imageSize: constants.DEFAULT_IMAGESIZE,
-    spacing: 2,
-    indicatorSize: 10,
-    indicatorSpacing: 2,
-
-
-    constructor: function Label(bounds, fill, stroke, strokeWidth) {
-        this.constructor.superclass.constructor.call(this, bounds, fill, stroke, strokeWidth);
-    },
-
-    init: function (container) {
-        this.constructor.superclass.prototype.init.apply(this, arguments);
-
-        if (this.indicatorShape) {
-            this.indicator = new this.indicatorShape();
-            this.indicator.dialect = this.dialect;
-            this.indicator.init(this.node);
-        }
-    },
-
-    redraw: function () {
-        if (this.indicator) {
-            this.indicator.fill = this.indicatorColor;
-            this.indicator.stroke = this.indicatorStrokeColor;
-            this.indicator.gradient = this.indicatorGradientColor;
-            this.indicator.direction = this.indicatorDirection;
-        }
-
-        this.constructor.superclass.prototype.redraw.apply(this, arguments);
-    },
-
-    isHtmlAllowed: function () {
-
-        return this.constructor.superclass.prototype.isHtmlAllowed.apply(this, arguments) &&
-            this.indicatorColor == null && this.indicatorShape == null;
-    },
-
-    paintForeground: function (c, x, y, w, h) {
-
-        this.paintImage(c, x, y, w, h);
-        this.paintIndicator(c, x, y, w, h);
-
-        this.constructor.superclass.prototype.paintForeground.apply(this, arguments);
-    },
-
-    paintImage: function (c, x, y, w, h) {
-        if (this.image != null) {
-            var bounds = this.getImageBounds(x, y, w, h);
-            c.image(bounds.x, bounds.y, bounds.width, bounds.height, this.image, false, false, false);
-        }
-    },
-
-    getImageBounds: function (x, y, w, h) {
-        var align = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_ALIGN, mxConstants.ALIGN_LEFT);
-        var valign = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
-        var width = mxUtils.getNumber(this.style, mxConstants.STYLE_IMAGE_WIDTH, mxConstants.DEFAULT_IMAGESIZE);
-        var height = mxUtils.getNumber(this.style, mxConstants.STYLE_IMAGE_HEIGHT, mxConstants.DEFAULT_IMAGESIZE);
-        var spacing = mxUtils.getNumber(this.style, mxConstants.STYLE_SPACING, this.spacing) + 5;
-
-        if (align == mxConstants.ALIGN_CENTER) {
-            x += (w - width) / 2;
-        }
-        else if (align == mxConstants.ALIGN_RIGHT) {
-            x += w - width - spacing;
-        }
-        else // default is left
-        {
-            x += spacing;
-        }
-
-        if (valign == mxConstants.ALIGN_TOP) {
-            y += spacing;
-        }
-        else if (valign == mxConstants.ALIGN_BOTTOM) {
-            y += h - height - spacing;
-        }
-        else // default is middle
-        {
-            y += (h - height) / 2;
-        }
-
-        return new mxRectangle(x, y, width, height);
-    },
-
-    paintIndicator: function (c, x, y, w, h) {
-        if (this.indicator != null) {
-            this.indicator.bounds = this.getIndicatorBounds(x, y, w, h);
-            this.indicator.paint(c);
-        }
-        else if (this.indicatorImage != null) {
-            var bounds = this.getIndicatorBounds(x, y, w, h);
-            c.image(bounds.x, bounds.y, bounds.width, bounds.height, this.indicatorImage, false, false, false);
-        }
-    },
-
-    getIndicatorBounds: function (x, y, w, h) {
-        var align = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_ALIGN, mxConstants.ALIGN_LEFT);
-        var valign = mxUtils.getValue(this.style, mxConstants.STYLE_IMAGE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
-        var width = mxUtils.getNumber(this.style, mxConstants.STYLE_INDICATOR_WIDTH, this.indicatorSize);
-        var height = mxUtils.getNumber(this.style, mxConstants.STYLE_INDICATOR_HEIGHT, this.indicatorSize);
-        var spacing = this.spacing + 5;
-
-        if (align == mxConstants.ALIGN_RIGHT) {
-            x += w - width - spacing;
-        }
-        else if (align == mxConstants.ALIGN_CENTER) {
-            x += (w - width) / 2;
-        }
-        else // default is left
-        {
-            x += spacing;
-        }
-
-        if (valign == mxConstants.ALIGN_BOTTOM) {
-            y += h - height - spacing;
-        }
-        else if (valign == mxConstants.ALIGN_TOP) {
-            y += spacing;
-        }
-        else // default is middle
-        {
-            y += (h - height) / 2;
-        }
-
-        return new mxRectangle(x, y, width, height);
-    },
-
-    redrawHtmlShape: function () {
-        mxRectangleShape.prototype.redrawHtmlShape.apply(this, arguments);
-
-        // Removes all children
-        while (this.node.hasChildNodes()) {
-            this.node.removeChild(this.node.lastChild);
-        }
-
-        if (this.image != null) {
-            var node = document.createElement('img');
-            node.style.position = 'relative';
-            node.setAttribute('border', '0');
-
-            var bounds = this.getImageBounds(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
-            bounds.x -= this.bounds.x;
-            bounds.y -= this.bounds.y;
-
-            node.style.left = Math.round(bounds.x) + 'px';
-            node.style.top = Math.round(bounds.y) + 'px';
-            node.style.width = Math.round(bounds.width) + 'px';
-            node.style.height = Math.round(bounds.height) + 'px';
-
-            node.src = this.image;
-
-            this.node.appendChild(node);
-        }
-    }
-});
-
-
-});
-define('PaneJS/Graph',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/events/Event','PaneJS/events/EventObject','PaneJS/constants','PaneJS/View','PaneJS/Model','PaneJS/Cell','PaneJS/Geometry','PaneJS/Point','PaneJS/CellRenderer','PaneJS/Stylesheet','PaneJS/changes/RootChange','PaneJS/changes/ChildChange'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define('PaneJS/Graph',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/events/Event','PaneJS/events/EventObject','PaneJS/events/eventNames','PaneJS/constants','PaneJS/View','PaneJS/Model','PaneJS/Cell','PaneJS/Geometry','PaneJS/Rectangle','PaneJS/Point','PaneJS/CellRenderer','PaneJS/Stylesheet','PaneJS/edgeStyle','PaneJS/ConnectionConstraint','PaneJS/changes/RootChange','PaneJS/changes/ChildChange','PaneJS/changes/TerminalChange','PaneJS/changes/GeometryChange'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('PaneJS/common/class');
 var utils = require('PaneJS/common/utils');
 var Event = require('PaneJS/events/Event');
 var EventObject = require('PaneJS/events/EventObject');
+var eventNames = require('PaneJS/events/eventNames');
 var constants = require('PaneJS/constants');
 var View = require('PaneJS/View');
 var Model = require('PaneJS/Model');
 var Cell = require('PaneJS/Cell');
 var Geometry = require('PaneJS/Geometry');
+var Rectangle = require('PaneJS/Rectangle');
 var Point = require('PaneJS/Point');
 var CellRenderer = require('PaneJS/CellRenderer');
 var Stylesheet = require('PaneJS/Stylesheet');
+var edgeStyle = require('PaneJS/edgeStyle');
+
+var ConnectionConstraint = require('PaneJS/ConnectionConstraint');
+
 var RootChange = require('PaneJS/changes/RootChange');
 var ChildChange = require('PaneJS/changes/ChildChange');
+var TerminalChange = require('PaneJS/changes/TerminalChange');
+var GeometryChange = require('PaneJS/changes/GeometryChange');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
+var getValue = utils.getValue;
 
 module.exports = Class.create({
     Implements: Event,
@@ -8577,45 +11599,45 @@ module.exports = Class.create({
 
     constructor: function Graph(container, model, stylesheet) {
 
-        var graph = this;
+        var that = this;
 
-        graph.mouseListeners = null;
-        graph.model = model ? model : new Model();
-        graph.multiplicities = [];
-        graph.imageBundles = [];
-        graph.cellRenderer = graph.createCellRenderer();
-        graph.setSelectionModel(graph.createSelectionModel());
-        graph.setStylesheet(stylesheet ? stylesheet : graph.createStylesheet());
-        graph.view = graph.createView();
+        that.mouseListeners = null;
+        that.model = model ? model : new Model();
+        that.multiplicities = [];
+        that.imageBundles = [];
+        that.cellRenderer = that.createCellRenderer();
+        that.setSelectionModel(that.createSelectionModel());
+        that.setStylesheet(stylesheet ? stylesheet : that.createStylesheet());
+        that.view = that.createView();
 
-        graph.model.on('change', function (evt) {
-            graph.graphModelChanged(evt.getData('edit').changes);
+        that.model.on('change', function (evt) {
+            that.graphModelChanged(evt.getData('edit').changes);
         });
 
         if (container) {
-            graph.init(container);
+            that.init(container);
         }
 
-        graph.view.revalidate();
+        that.view.revalidate();
     },
 
     init: function (container) {
 
-        var graph = this;
+        var that = this;
 
-        graph.container = container;
+        that.container = container;
 
         // Initializes the in-place editor
         this.cellEditor = this.createCellEditor();
 
         // Initializes the container using the view
-        graph.view.init();
+        that.view.init();
 
         // Updates the size of the container for the current graph
-        graph.sizeDidChange();
+        that.sizeDidChange();
 
         // Hides tooltips and resets tooltip timer if mouse leaves container
-        //mxEvent.addListener(container, 'mouseleave', mxUtils.bind(this, function () {
+        //mxEvent.addListener(container, 'mouseleave', utils.bind(this, function () {
         //    if (this.tooltipHandler != null) {
         //        this.tooltipHandler.hide();
         //    }
@@ -8695,6 +11717,11 @@ module.exports = Class.create({
                     this.view.invalidate(change.previous, false, false);
                 }
             }
+        } else if (change instanceof TerminalChange || change instanceof GeometryChange) {
+            if (change instanceof TerminalChange || ((change.previous == null && change.geometry != null) ||
+                (change.previous != null && !change.previous.equals(change.geometry)))) {
+                this.view.invalidate(change.cell);
+            }
         }
 
     },
@@ -8744,9 +11771,184 @@ module.exports = Class.create({
     createPanningManager: function () {},
     getBorderSizes: function () {},
     getPreferredPageSize: function (bounds, width, height) {},
-    sizeDidChange: function () {},
-    doResizeContainer: function (width, height) {},
-    updatePageBreaks: function (visible, width, height) {},
+    sizeDidChange: function () {
+        var bounds = this.getGraphBounds();
+
+        if (this.container) {
+            var border = this.getBorder();
+
+            var width = Math.max(0, bounds.x + bounds.width + 1 + border);
+            var height = Math.max(0, bounds.y + bounds.height + 1 + border);
+
+            if (this.minimumContainerSize) {
+                width = Math.max(width, this.minimumContainerSize.width);
+                height = Math.max(height, this.minimumContainerSize.height);
+            }
+
+            if (this.resizeContainer) {
+                this.doResizeContainer(width, height);
+            }
+
+            //if (this.preferPageSize || (!mxClient.IS_IE && this.pageVisible)) {
+            if (this.preferPageSize || this.pageVisible) {
+                var size = this.getPreferredPageSize(bounds, width, height);
+
+                if (size != null) {
+                    width = size.width;
+                    height = size.height;
+                }
+            }
+
+            if (this.minimumGraphSize != null) {
+                width = Math.max(width, this.minimumGraphSize.width * this.view.scale);
+                height = Math.max(height, this.minimumGraphSize.height * this.view.scale);
+            }
+
+            width = Math.ceil(width - 1);
+            height = Math.ceil(height - 1);
+
+            //if (this.dialect == mxConstants.DIALECT_SVG) {
+            var root = this.view.getDrawPane().ownerSVGElement;
+
+            root.style.minWidth = Math.max(1, width) + 'px';
+            root.style.minHeight = Math.max(1, height) + 'px';
+            root.style.width = '100%';
+            root.style.height = '100%';
+            //}
+            //else {
+            //    if (mxClient.IS_QUIRKS) {
+            // Quirks mode has no minWidth/minHeight support
+            //this.view.updateHtmlCanvasSize(Math.max(1, width), Math.max(1, height));
+            //}
+            //else {
+            //    this.view.canvas.style.minWidth = Math.max(1, width) + 'px';
+            //    this.view.canvas.style.minHeight = Math.max(1, height) + 'px';
+            //}
+            //}
+
+            return;
+
+            this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
+        }
+
+        //this.fireEvent(new mxEventObject(mxEvent.SIZE, 'bounds', bounds));
+    },
+    doResizeContainer: function (width, height) {
+        // Fixes container size for different box models
+        //if (mxClient.IS_IE) {
+        //    if (mxClient.IS_QUIRKS) {
+        //        var borders = this.getBorderSizes();
+        //
+        //        // max(2, ...) required for native IE8 in quirks mode
+        //        width += Math.max(2, borders.x + borders.width + 1);
+        //        height += Math.max(2, borders.y + borders.height + 1);
+        //    }
+        //    else if (document.documentMode >= 9) {
+        //        width += 3;
+        //        height += 5;
+        //    }
+        //    else {
+        //        width += 1;
+        //        height += 1;
+        //    }
+        //}
+        //else {
+        height += 1;
+        //}
+
+        if (this.maximumContainerSize != null) {
+            width = Math.min(this.maximumContainerSize.width, width);
+            height = Math.min(this.maximumContainerSize.height, height);
+        }
+
+        this.container.style.width = Math.ceil(width) + 'px';
+        this.container.style.height = Math.ceil(height) + 'px';
+    },
+    updatePageBreaks: function (visible, width, height) {
+        var scale = this.view.scale;
+        var tr = this.view.translate;
+        var fmt = this.pageFormat;
+        var ps = scale * this.pageScale;
+        var bounds = new Rectangle(scale * tr.x, scale * tr.y, fmt.width * ps, fmt.height * ps);
+
+        // Does not show page breaks if the scale is too small
+        visible = visible && Math.min(bounds.width, bounds.height) > this.minPageBreakDist;
+
+        // Draws page breaks independent of translate. To ignore
+        // the translate set bounds.x/y = 0. Note that modulo
+        // in JavaScript has a bug, so use utils instead.
+        bounds.x = utils.mod(bounds.x, bounds.width);
+        bounds.y = utils.mod(bounds.y, bounds.height);
+
+        var horizontalCount = (visible) ? Math.ceil((width - bounds.x) / bounds.width) : 0;
+        var verticalCount = (visible) ? Math.ceil((height - bounds.y) / bounds.height) : 0;
+        var right = width;
+        var bottom = height;
+
+        if (this.horizontalPageBreaks == null && horizontalCount > 0) {
+            this.horizontalPageBreaks = [];
+        }
+
+        if (this.horizontalPageBreaks != null) {
+            for (var i = 0; i <= horizontalCount; i++) {
+                var pts = [new mxPoint(bounds.x + i * bounds.width, 1),
+                    new mxPoint(bounds.x + i * bounds.width, bottom)];
+
+                if (this.horizontalPageBreaks[i] != null) {
+                    this.horizontalPageBreaks[i].points = pts;
+                    this.horizontalPageBreaks[i].redraw();
+                }
+                else {
+                    var pageBreak = new mxPolyline(pts, this.pageBreakColor);
+                    pageBreak.dialect = this.dialect;
+                    pageBreak.pointerEvents = false;
+                    pageBreak.isDashed = this.pageBreakDashed;
+                    pageBreak.init(this.view.backgroundPane);
+                    pageBreak.redraw();
+
+                    this.horizontalPageBreaks[i] = pageBreak;
+                }
+            }
+
+            for (var i = horizontalCount; i < this.horizontalPageBreaks.length; i++) {
+                this.horizontalPageBreaks[i].destroy();
+            }
+
+            this.horizontalPageBreaks.splice(horizontalCount, this.horizontalPageBreaks.length - horizontalCount);
+        }
+
+        if (this.verticalPageBreaks == null && verticalCount > 0) {
+            this.verticalPageBreaks = [];
+        }
+
+        if (this.verticalPageBreaks != null) {
+            for (var i = 0; i <= verticalCount; i++) {
+                var pts = [new Point(1, bounds.y + i * bounds.height),
+                    new Point(right, bounds.y + i * bounds.height)];
+
+                if (this.verticalPageBreaks[i] != null) {
+                    this.verticalPageBreaks[i].points = pts;
+                    this.verticalPageBreaks[i].redraw();
+                }
+                else {
+                    var pageBreak = new mxPolyline(pts, this.pageBreakColor);
+                    pageBreak.dialect = this.dialect;
+                    pageBreak.pointerEvents = false;
+                    pageBreak.isDashed = this.pageBreakDashed;
+                    pageBreak.init(this.view.backgroundPane);
+                    pageBreak.redraw();
+
+                    this.verticalPageBreaks[i] = pageBreak;
+                }
+            }
+
+            for (var i = verticalCount; i < this.verticalPageBreaks.length; i++) {
+                this.verticalPageBreaks[i].destroy();
+            }
+
+            this.verticalPageBreaks.splice(verticalCount, this.verticalPageBreaks.length - verticalCount);
+        }
+    },
 
 
     // Cell styles
@@ -8776,8 +11978,25 @@ module.exports = Class.create({
         return style;
     },
     postProcessCellStyle: function (style) {},
-    setCellStyle: function (style, cells) {},
-    setCellStyles: function (key, value, cells) {},
+    setCellStyle: function (style, cells) {
+        cells = cells || this.getSelectionCells();
+
+        if (cells) {
+            this.model.beginUpdate();
+            try {
+                for (var i = 0; i < cells.length; i++) {
+                    this.model.setStyle(cells[i], style);
+                }
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
+    setCellStyles: function (key, value, cells) {
+        cells = cells || this.getSelectionCells();
+        utils.setCellStyles(this.model, cells, key, value);
+    },
     toggleCellStyle: function (key, defaultValue, cell) {},
     toggleCellStyles: function (key, defaultValue, cells) {},
     toggleCellStyleFlags: function (key, flag, cells) {},
@@ -8831,7 +12050,9 @@ module.exports = Class.create({
         return vertex;
     },
     insertEdge: function (parent, id, value, source, target, style) {
+        var edge = this.createEdge(parent, id, value, source, target, style);
 
+        return this.addEdge(edge, parent, source, target);
     },
     createEdge: function (parent, id, value, source, target, style) {
         var geometry = new Geometry();
@@ -8843,7 +12064,9 @@ module.exports = Class.create({
 
         return edge;
     },
-    addEdge: function (edge, parent, source, target, index) {},
+    addEdge: function (edge, parent, source, target, index) {
+        return this.addCell(edge, parent, index, source, target);
+    },
     addCell: function (cell, parent, index, source, target) {
         return this.addCells([cell], parent, index, source, target)[0];
     },
@@ -9009,18 +12232,234 @@ module.exports = Class.create({
     getMaximumGraphBounds: function () {},
     constrainChild: function () {},
     resetEdges: function () {},
-    resetEdge: function () {},
+    resetEdge: function (edge) {
+        var geo = this.model.getGeometry(edge);
+
+        // Resets the control points
+        if (geo != null && geo.points != null && geo.points.length > 0) {
+            geo = geo.clone();
+            geo.points = [];
+            this.model.setGeometry(edge, geo);
+        }
+
+        return edge;
+    },
 
 
     // Cell connecting and connection constraints
     // ------------------------------------------
     getOutlineConstraint: function () {},
     getAllConnectionConstraints: function () {},
-    getConnectionConstraint: function () {},
-    setConnectionConstraint: function () {},
-    getConnectionPoint: function () {},
+
+    getConnectionConstraint: function (linkState, terminalState, isSource) {
+        var point = null;
+        var x = linkState.style[(isSource) ? constants.STYLE_EXIT_X : constants.STYLE_ENTRY_X];
+
+        if (x != null) {
+            var y = linkState.style[(isSource) ? constants.STYLE_EXIT_Y : constants.STYLE_ENTRY_Y];
+
+            if (y != null) {
+                point = new Point(parseFloat(x), parseFloat(y));
+            }
+        }
+
+        var perimeter = false;
+
+        if (point != null) {
+            perimeter = getValue(linkState.style, (isSource)
+                ? constants.STYLE_EXIT_PERIMETER
+                : constants.STYLE_ENTRY_PERIMETER, true);
+        }
+
+        return new ConnectionConstraint(point, perimeter);
+    },
+    setConnectionConstraint: function (edge, terminal, source, constraint) {
+        if (constraint) {
+            this.model.beginUpdate();
+
+            try {
+                if (constraint == null || constraint.point == null) {
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
+                        mxConstants.STYLE_ENTRY_X, null, [edge]);
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
+                        mxConstants.STYLE_ENTRY_Y, null, [edge]);
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
+                        mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                }
+                else if (constraint.point != null) {
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
+                        mxConstants.STYLE_ENTRY_X, constraint.point.x, [edge]);
+                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
+                        mxConstants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
+
+                    // Only writes 0 since 1 is default
+                    if (!constraint.perimeter) {
+                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
+                            mxConstants.STYLE_ENTRY_PERIMETER, '0', [edge]);
+                    }
+                    else {
+                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
+                            mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                    }
+                }
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
+    getConnectionPoint: function (vertex, constraint) {
+        var point = null;
+
+        if (vertex != null && constraint.point != null) {
+            var bounds = this.view.getPerimeterBounds(vertex);
+            var cx = new Point(bounds.getCenterX(), bounds.getCenterY());
+            var direction = vertex.style[constants.STYLE_DIRECTION];
+            var r1 = 0;
+
+            // Bounds need to be rotated by 90 degrees for further computation
+            if (direction != null) {
+                if (direction == mxConstants.DIRECTION_NORTH) {
+                    r1 += 270;
+                }
+                else if (direction == mxConstants.DIRECTION_WEST) {
+                    r1 += 180;
+                }
+                else if (direction == mxConstants.DIRECTION_SOUTH) {
+                    r1 += 90;
+                }
+
+                // Bounds need to be rotated by 90 degrees for further computation
+                if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
+                    bounds.rotate90();
+                }
+            }
+
+            if (constraint.point != null) {
+                var sx = 1;
+                var sy = 1;
+                var dx = 0;
+                var dy = 0;
+
+                // LATER: Add flipping support for image shapes
+                if (this.getModel().isVertex(vertex.cell)) {
+                    var flipH = vertex.style[mxConstants.STYLE_FLIPH];
+                    var flipV = vertex.style[mxConstants.STYLE_FLIPV];
+
+                    // Legacy support for stencilFlipH/V
+                    if (vertex.shape != null && vertex.shape.stencil != null) {
+                        flipH = utils.getValue(vertex.style, 'stencilFlipH', 0) == 1 || flipH;
+                        flipV = utils.getValue(vertex.style, 'stencilFlipV', 0) == 1 || flipV;
+                    }
+
+                    if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
+                        var tmp = flipH;
+                        flipH = flipV;
+                        flipV = tmp;
+                    }
+
+                    if (flipH) {
+                        sx = -1;
+                        dx = -bounds.width;
+                    }
+
+                    if (flipV) {
+                        sy = -1;
+                        dy = -bounds.height;
+                    }
+                }
+
+                point = new mxPoint(bounds.x + constraint.point.x * bounds.width * sx - dx,
+                    bounds.y + constraint.point.y * bounds.height * sy - dy);
+            }
+
+            // Rotation for direction before projection on perimeter
+            var r2 = vertex.style[mxConstants.STYLE_ROTATION] || 0;
+
+            if (constraint.perimeter) {
+                if (r1 != 0 && point != null) {
+                    // Only 90 degrees steps possible here so no trig needed
+                    var cos = 0;
+                    var sin = 0;
+
+                    if (r1 == 90) {
+                        sin = 1;
+                    }
+                    else if (r1 == 180) {
+                        cos = -1;
+                    }
+                    else if (r1 == 270) {
+                        sin = -1;
+                    }
+
+                    point = utils.getRotatedPoint(point, cos, sin, cx);
+                }
+
+                if (point != null && constraint.perimeter) {
+                    point = this.view.getPerimeterPoint(vertex, point, false);
+                }
+            }
+            else {
+                r2 += r1;
+            }
+
+            // Generic rotation after projection on perimeter
+            if (r2 != 0 && point != null) {
+                var rad = utils.toRadians(r2);
+                var cos = Math.cos(rad);
+                var sin = Math.sin(rad);
+
+                point = utils.getRotatedPoint(point, cos, sin, cx);
+            }
+        }
+
+        if (point != null) {
+            point.x = Math.round(point.x);
+            point.y = Math.round(point.y);
+        }
+
+        return point;
+    },
     connectCell: function () {},
-    cellConnected: function () {},
+    cellConnected: function (edge, terminal, source, constraint) {
+        if (edge) {
+            this.model.beginUpdate();
+            try {
+                var previous = this.model.getTerminal(edge, source);
+
+                // Updates the constraint
+                this.setConnectionConstraint(edge, terminal, source, constraint);
+
+                // Checks if the new terminal is a port, uses the ID of the port in the
+                // style and the parent of the port as the actual terminal of the edge.
+                if (this.isPortsEnabled()) {
+                    var id = null;
+
+                    if (this.isPort(terminal)) {
+                        id = terminal.getId();
+                        terminal = this.getTerminalForPort(terminal, source);
+                    }
+
+                    // Sets or resets all previous information for connecting to a child port
+                    var key = source ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+                    this.setCellStyles(key, id, [edge]);
+                }
+
+                this.model.setTerminal(edge, terminal, source);
+
+                if (this.resetEdgesOnConnect) {
+                    this.resetEdge(edge);
+                }
+
+                //this.fireEvent(new mxEventObject(mxEvent.CELL_CONNECTED,
+                //    'edge', edge, 'terminal', terminal, 'source', source,
+                //    'previous', previous));
+            }
+            finally {
+                this.model.endUpdate();
+            }
+        }
+    },
     disconnectGraph: function () {},
 
 
@@ -9030,7 +12469,9 @@ module.exports = Class.create({
         return this.view.currentRoot;
     },
     getTranslateForRoot: function () {},
-    isPort: function () {},
+    isPort: function (cell) {
+        return false;
+    },
     getTerminalForPort: function () {},
     getChildOffsetForCell: function (cell) {
         return null;
@@ -9043,7 +12484,9 @@ module.exports = Class.create({
 
     // Graph display
     // -------------
-    getGraphBounds: function () {},
+    getGraphBounds: function () {
+        return this.view.getGraphBounds();
+    },
     getCellBounds: function () {},
     getBoundingBoxFromGeometry: function () {},
     refresh: function () {},
@@ -9069,7 +12512,23 @@ module.exports = Class.create({
         return this.model.isCollapsed(cell);
     },
     isCellConnectable: function () {},
-    isOrthogonal: function () {},
+
+    isOrthogonal: function (edge) {
+        var orthogonal = edge.style[constants.STYLE_ORTHOGONAL];
+
+        if (orthogonal != null) {
+            return orthogonal;
+        }
+
+        var tmp = this.view.getEdgeStyle(edge);
+
+        return tmp == edgeStyle.SegmentConnector ||
+            tmp == edgeStyle.ElbowConnector ||
+            tmp == edgeStyle.SideToSide ||
+            tmp == edgeStyle.TopToBottom ||
+            tmp == edgeStyle.EntityRelation ||
+            tmp == edgeStyle.OrthConnector;
+    },
     isLoop: function () {},
     isCloneEvent: function () {},
     isToggleEvent: function () {},
@@ -9148,7 +12607,11 @@ module.exports = Class.create({
     getImage: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_IMAGE] : null;
     },
-    getVerticalAlign: function () {},
+    getVerticalAlign: function (state) {
+        return state && state.style
+            ? (state.style[constants.STYLE_VERTICAL_ALIGN] || constants.ALIGN_MIDDLE ) :
+            null;
+    },
     getIndicatorColor: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_COLOR] : null;
     },
@@ -9162,7 +12625,9 @@ module.exports = Class.create({
     getIndicatorImage: function (state) {
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_IMAGE] : null;
     },
-    getBorder: function () {},
+    getBorder: function () {
+        return this.border;
+    },
     setBorder: function () {},
     isSwimlane: function () {},
 
@@ -9205,7 +12670,9 @@ module.exports = Class.create({
     setCellsMovable: function () {},
     isGridEnabled: function () {},
     setGridEnabled: function () {},
-    isPortsEnabled: function () {},
+    isPortsEnabled: function () {
+        return this.portsEnabled;
+    },
     setPortsEnabled: function () {},
     getGridSize: function () {},
     setGridSize: function () {},
@@ -9299,7 +12766,41 @@ module.exports = Class.create({
     setDefaultParent: function () {},
     getSwimlane: function () {},
     getSwimlaneAt: function () {},
-    getCellAt: function () {},
+    getCellAt: function (x, y, parent, vertices, edges) {
+        vertices = (vertices != null) ? vertices : true;
+        edges = (edges != null) ? edges : true;
+
+        if (parent == null) {
+            parent = this.getCurrentRoot();
+
+            if (parent == null) {
+                parent = this.getModel().getRoot();
+            }
+        }
+
+        if (parent != null) {
+            var childCount = this.model.getChildCount(parent);
+
+            for (var i = childCount - 1; i >= 0; i--) {
+                var cell = this.model.getChildAt(parent, i);
+                var result = this.getCellAt(x, y, cell, vertices, edges);
+
+                if (result != null) {
+                    return result;
+                }
+                else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) ||
+                    vertices && this.model.isVertex(cell))) {
+                    var state = this.view.getState(cell);
+
+                    if (this.intersects(state, x, y)) {
+                        return cell;
+                    }
+                }
+            }
+        }
+
+        return null;
+    },
     intersects: function () {},
     hitsSwimlaneContent: function () {},
     getChildVertices: function () {},
@@ -9359,17 +12860,62 @@ module.exports = Class.create({
     // ------------
     addMouseListener: function () {},
     removeMouseListener: function () {},
-    updateMouseEvent: function () {},
+    updateMouseEvent: function (me) {
+        if (me.graphX == null || me.graphY == null) {
+            //var pt = utils.convertPoint(this.container, me.getX(), me.getY());
+
+            //me.graphX = pt.x - this.panDx;
+            //me.graphY = pt.y - this.panDy;
+        }
+
+        return me;
+    },
     getStateForTouchEvent: function () {},
     isEventIgnored: function () {},
     isSyntheticEventIgnored: function () {},
-    isEventSourceIgnored: function () {},
-    fireMouseEvent: function () {},
+    isEventSourceIgnored: function (evtName, me) {
+        var source = me.getSource();
+        var name = (source.nodeName != null) ? source.nodeName.toLowerCase() : '';
+        var candidate = !domEvent.isMouseEvent(me.getEvent()) || domEvent.isLeftMouseButton(me.getEvent());
+
+        return evtName == mxEvent.MOUSE_DOWN && candidate && (name == 'select' || name == 'option' ||
+            (name == 'input' && source.type != 'checkbox' && source.type != 'radio' &&
+            source.type != 'button' && source.type != 'submit' && source.type != 'file'));
+    },
+
+    fireMouseEvent: function (evtName, me, sender) {
+    },
+
     consumeMouseEvent: function () {},
-    fireGestureEvent: function () {},
+
+    fireGestureEvent: function (evt, cell) {
+        // Resets double tap event handling when gestures take place
+        this.lastTouchTime = 0;
+        this.emit(new EventObject(eventNames.GESTURE, {
+            event: evt,
+            cell: cell
+        }));
+    },
 
     destroy: function () {}
 });
 
+
+});
+define('PaneJS/index',['require','exports','module','PaneJS/Canvas2D','PaneJS/Cell','PaneJS/CellRenderer','PaneJS/CellState','PaneJS/events/EventObject','PaneJS/Geometry','PaneJS/Graph','PaneJS/Model','PaneJS/Point','PaneJS/Rectangle','PaneJS/shapes/Shape','PaneJS/View','PaneJS/constants'],function (require, exports, module) {window.zGraph = module.exports = {
+    Canvas2D: require('PaneJS/Canvas2D'),
+    Cell: require('PaneJS/Cell'),
+    CellRenderer: require('PaneJS/CellRenderer'),
+    CellState: require('PaneJS/CellState'),
+    EventObject: require('PaneJS/events/EventObject'),
+    Geometry: require('PaneJS/Geometry'),
+    Graph: require('PaneJS/Graph'),
+    Model: require('PaneJS/Model'),
+    Point: require('PaneJS/Point'),
+    Rectangle: require('PaneJS/Rectangle'),
+    Shape: require('PaneJS/shapes/Shape'),
+    View: require('PaneJS/View'),
+    constants: require('PaneJS/constants')
+};
 
 });
