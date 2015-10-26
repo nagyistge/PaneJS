@@ -952,11 +952,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
 	exports['default'] = _Cell2['default'].extend({
+	
 	    constructor: function Node(value, geometry, style) {
 	
 	        var that = this;
 	
-	        Node['super'].constructor.call(that, value, geometry, style);
+	        Node.superclass.constructor.call(that, value, geometry, style);
 	
 	        that.isNode = true;
 	        that.connectAble = true;
@@ -999,7 +1000,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (child) {
 	
 	            // fix index
-	            if (isNullOrUndefined(index)) {
+	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
 	                index = that.getChildrenCount();
 	
 	                if (child.parent === that) {
@@ -1289,48 +1290,131 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
+	'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(10), __webpack_require__(14), __webpack_require__(18), __webpack_require__(19), __webpack_require__(16), __webpack_require__(20)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Base, Root, Layer, Group, Node, Link) {
-	    'use strict';
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
 	
-	    return Base.extend({
-	        constructor: function Model(root) {
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	            var that = this;
+	var _libBase = __webpack_require__(10);
 	
-	            if (root) {
-	                that.setRoot(root);
-	            } else {
-	                that.clear();
-	            }
-	        },
+	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	        clear: function clear() {
-	            var that = this;
-	            that.setRoot(that.createRoot());
-	            return that;
-	        },
+	var _cellsNode = __webpack_require__(16);
 	
-	        createRoot: function createRoot() {
-	            var root = new Root();
+	var _cellsNode2 = _interopRequireDefault(_cellsNode);
 	
-	            root.insert(new Layer());
+	var _changesRootChange = __webpack_require__(22);
 	
-	            return root;
-	        },
+	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	        getRoot: function getRoot() {},
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Model(root) {
 	
-	        setRoot: function setRoot(root) {
-	            this.execute(new RootChange(this, root));
+	        var that = this;
 	
-	            return root;
-	        },
+	        if (root) {
+	            that.setRoot(root);
+	        } else {
+	            that.clear();
+	        }
+	    },
 	
-	        changeRoot: function changeRoot(root) {}
-	    });
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    clear: function clear() {
+	        var that = this;
+	        that.setRoot(that.createRoot());
+	        return that;
+	    },
+	
+	    createRoot: function createRoot() {
+	        var root = new _cellsNode2['default']();
+	
+	        root.insertChild(new _cellsNode2['default']());
+	
+	        return root;
+	    },
+	
+	    createLayer: function createLayer(value) {
+	        var layer = new _cellsNode2['default'](value);
+	    },
+	
+	    getRoot: function getRoot() {},
+	
+	    setRoot: function setRoot(root) {
+	        this.execute(new _changesRootChange2['default'](this, root));
+	
+	        return root;
+	    },
+	
+	    changeRoot: function changeRoot(root) {}
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(23);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function RootChange(model, root) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.root = root;
+	        that.previous = root;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var model = that.model;
+	        var previous = that.previous;
+	
+	        that.root = previous;
+	        that.previous = model.rootChanged(previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(10);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Change() {},
+	    digest: function digest() {
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

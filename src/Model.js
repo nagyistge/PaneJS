@@ -1,58 +1,48 @@
-define([
-    './lib/Base',
-    './cells/Root',
-    './cells/Layer',
-    './cells/Group',
-    './cells/Node',
-    './cells/Link'
-], function (
-    Base,
-    Root,
-    Layer,
-    Group,
-    Node,
-    Link
-) {
-    'use strict';
+import Base from './lib/Base';
+import Node from './cells/Node';
+import RootChange from './changes/RootChange';
 
-    return Base.extend({
-        constructor: function Model(root) {
+export default Base.extend({
+    constructor: function Model(root) {
 
-            var that = this;
+        var that = this;
 
-            if (root) {
-                that.setRoot(root);
-            } else {
-                that.clear();
-            }
-        },
+        if (root) {
+            that.setRoot(root);
+        } else {
+            that.clear();
+        }
+    },
 
-        clear: function () {
-            var that = this;
-            that.setRoot(that.createRoot());
-            return that;
-        },
+    clear: function () {
+        var that = this;
+        that.setRoot(that.createRoot());
+        return that;
+    },
 
-        createRoot: function () {
-            var root = new Root();
+    createRoot: function () {
+        var root = new Node();
 
-            root.insert(new Layer());
+        root.insertChild(new Node());
 
-            return root;
-        },
+        return root;
+    },
 
-        getRoot: function () {
+    createLayer: function (value) {
+        var layer = new Node(value);
+    },
 
-        },
+    getRoot: function () {
 
-        setRoot: function (root) {
-            this.execute(new RootChange(this, root));
+    },
 
-            return root;
-        },
+    setRoot: function (root) {
+        this.execute(new RootChange(this, root));
 
-        changeRoot: function (root) {
+        return root;
+    },
 
-        },
-    });
+    changeRoot: function (root) {
+
+    }
 });

@@ -1,13 +1,14 @@
-import { each, indexOf } from '../common/utils';
+import { each, indexOf, isNullOrUndefined } from '../common/utils';
 import Cell from './Cell';
 
 
 export default Cell.extend({
+
     constructor: function Node(value, geometry, style) {
 
         var that = this;
 
-        Node.super.constructor.call(that, value, geometry, style);
+        Node.superclass.constructor.call(that, value, geometry, style);
 
         that.isNode = true;
         that.connectAble = true;
