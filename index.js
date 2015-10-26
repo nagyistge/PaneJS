@@ -1,5 +1,5 @@
-const pane = {
-    utils: require('./src/common/utils1')
+var pane = {
+    utils: require('./src/common/utils'),
 };
 
-module.exports = pane;
+export default pane;

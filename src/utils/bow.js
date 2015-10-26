@@ -1,32 +1,25 @@
-define([
-    './lang'
-], function (
-    lang
-) {
-    'use strict';
+import { isNullOrUndefined } from './lang'
 
-    var isNullOrUndefined = lang.isNullOrUndefined;
 
-    function isNode(node, nodeName, attributeName, attributeValue) {
-        var ret = node && !isNaN(node.nodeType);
+function isNode(node, nodeName, attributeName, attributeValue) {
+    var ret = node && !isNaN(node.nodeType);
 
-        if (ret) {
-            ret = isNullOrUndefined(nodeName) || node.nodeName.toLowerCase() === nodeName.toLowerCase();
-        }
-
-        if (ret) {
-            ret = isNullOrUndefined(attributeName) || node.getAttribute(attributeName) === attributeValue;
-        }
-
-        return ret;
+    if (ret) {
+        ret = isNullOrUndefined(nodeName) || node.nodeName.toLowerCase() === nodeName.toLowerCase();
     }
 
-    function getCurrentStyle(node) {
-        return node.currentStyle || window.getComputedStyle(node, null);
+    if (ret) {
+        ret = isNullOrUndefined(attributeName) || node.getAttribute(attributeName) === attributeValue;
     }
 
-    return {
-        isNode: isNode,
-        getCurrentStyle: getCurrentStyle
-    };
-});
+    return ret;
+}
+
+function getCurrentStyle(node) {
+    return node.currentStyle || window.getComputedStyle(node, null);
+}
+
+export {
+    isNode,
+    getCurrentStyle
+};

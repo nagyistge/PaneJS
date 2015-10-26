@@ -12,15 +12,12 @@ function runCmd(cmd, args, fn) {
 }
 
 runCmd('which', ['tnpm'], function (code) {
-  var npm = 'npm';
-  if (!code) {
-    npm = 'tnpm';
-  }
+
+  var npm = code ? 'npm' : 'tnpm';
 
   console.log(npm + ' installing...');
 
   runCmd(npm, ['install'], function () {
     console.log(npm + ' install end.');
   });
-
 });

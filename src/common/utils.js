@@ -1,26 +1,7 @@
-define([
-    '../utils/lang',
-    '../utils/string',
-    '../utils/number',
-    '../utils/object',
-    '../utils/array',
-    '../utils/function',
-    '../utils/bow',
-], function (
-    lang,
-    string,
-    number,
-    object,
-    array,
-    func,
-    bow
-) {
-    'use strict';
-
-    var sources = array.toArray(arguments);
-
-    sources.unshift({});
-
-    return object.extend.apply(null, sources);
-
-});
+export * from '../utils/lang';
+export * from '../utils/string';
+export * from '../utils/number';
+export * from '../utils/object';
+export * from '../utils/array';
+export * from '../utils/function';
+export * from '../utils/bow';

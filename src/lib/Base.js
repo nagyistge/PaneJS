@@ -1,35 +1,27 @@
-define([
-    '../common/class',
-    '../common/utils'
-], function (
-    Class,
-    utils
-) {
-    'use strict';
+import { forIn, getFunctionName } from '../common/utils';
+import Class from '../common/class';
 
-    var forin = utils.forin;
-    var getFunctionName = utils.getFuncName;
+var Base = Class.create({
+    constructor: function Base() {},
 
-    return Class.create({
-        constructor: function Base() {},
+    toString: function () {
+        return '[Class ' + getFunctionName(this.constructor) + ']';
+    },
 
-        toString: function () {
-            return '[Class ' + getFunctionName(this.constructor) + ']';
-        },
+    getValue: function () {
+        return this.toString();
+    },
 
-        getValue: function () {
-            return this.toString();
-        },
+    destroy: function () {
 
-        destroy: function () {
+        var that = this;
 
-            var that = this;
+        forIn(that, function (val, key) {
+            delete that[key];
+        });
 
-            forin(that, function (val, key) {
-                delete that[key];
-            });
-
-            that.destroyed = true;
-        }
-    });
+        that.destroyed = true;
+    }
 });
+
+export default Base;

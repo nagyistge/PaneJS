@@ -1,14 +1,8 @@
-define([
-    '../lib/Base'
-], function (
-    Base
-) {
-    'use strict';
+import Base from '../lib/Base';
 
-    return Base.extend({
-        constructor: function Change() {},
-        digest: function () {
-            return this;
-        }
-    });
+export default Base.extend({
+    constructor: function Change() {},
+    digest: function () {
+        return this;
+    }
 });
