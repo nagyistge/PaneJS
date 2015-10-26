@@ -41,8 +41,5 @@
     "validate": "npm ls"
   },
   "pre-commit": [
-    "lint",
-    "validate",
-    "test"
   ]
 }
