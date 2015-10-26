@@ -102,4 +102,7 @@ var Rectangle = Base.extend({
     }
 });
 
+
+console.log(new Rectangle(1, 2, 3, 4));
+
 export default Rectangle;

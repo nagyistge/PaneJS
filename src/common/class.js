@@ -19,21 +19,9 @@ Class.create = function (parent, properties) {
     parent || (parent = properties.Extends || Class);
     properties.Extends = parent;
 
-    // The created class constructor.
-    //function SubClass() {
-    //    // Call the parent constructor.
-    //    parent.apply(this, arguments);
-    //
-    //    // Only call initialize in self constructor.
-    //    if (this.constructor === SubClass && this.initialize) {
-    //        this.initialize.apply(this, arguments);
-    //    }
-    //}
-
     var SubClass = properties.constructor;
-    // unspecified constructor
     if (SubClass === Object.prototype.constructor) {
-        SubClass = function Class() {};
+        SubClass = function Superclass() {};
     }
 
     // Inherit class (static) properties from parent.
@@ -70,26 +58,19 @@ Class.Mutators = {
         // Enforce the constructor to be what we expect.
         proto.constructor = this;
 
-        // Set the prototype chain to inherit from `parent`.
         this.prototype = proto;
-
-        // Set a convenience property in case the parent's prototype is
-        // needed later.
         this.superclass = parentProto;
     },
 
     'Implements': function (items) {
 
-        if (!isArray(items)) {
-            items = [items];
-        }
-
+        var list = isArray(items) ? items : [items];
         var proto = this.prototype;
-        var item;
 
-        while (item = items.shift()) {
+        each(list, function (item) {
             mix(proto, item.prototype || item);
-        }
+        });
+
     },
 
     'Statics': function (staticProperties) {
@@ -108,7 +89,7 @@ function implement(properties) {
     var that = this;
     var mutators = Class.Mutators;
 
-    each(properties, function (value, key) {
+    forIn(properties, function (value, key) {
         if (hasKey(mutators, key)) {
             mutators[key].call(that, value);
         } else {
@@ -134,7 +115,7 @@ var createProto = Object.__proto__ ?
 
 function mix(receiver, supplier, whiteList) {
 
-    each(supplier, function (value, key) {
+    forIn(supplier, function (value, key) {
         if (whiteList && indexOf(whiteList, key) === -1) {
             return;
         }

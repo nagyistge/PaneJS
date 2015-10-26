@@ -13,23 +13,25 @@
 <script>
     window.onload = function () {
 
-        console.log(pane);
+        //        console.log(pane);
+        //        console.log(pane.Graph);
+        //        console.log(new pane.Model());
 
-//        var container = document.getElementById('graphContainer');
-//
-//        console.log(zGraph);
-//
-//        var graph = new zGraph.Graph(container);
-//        var parent = graph.getDefaultParent();
-//
-//        graph.getModel().beginUpdate();
-//
-//        try {
-//            graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
-//        }
-//        finally {
-//            graph.getModel().endUpdate();
-//        }
+        var container = document.getElementById('graphContainer');
+        var graph = new pane.Graph(container);
+
+        console.log(graph);
+
+        //        var parent = graph.getDefaultParent();
+        //
+        //        graph.getModel().beginUpdate();
+        //
+        //        try {
+        //            graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
+        //        }
+        //        finally {
+        //            graph.getModel().endUpdate();
+        //        }
 
     };
 </script>

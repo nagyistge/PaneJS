@@ -1,6 +1,6 @@
 import Base from './lib/Base';
-import Model from './Model';
 import View from './View';
+import Model from './Model';
 
 export default Base.extend({
     constructor: function Graph(container, model, stylesheet) {

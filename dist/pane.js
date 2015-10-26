@@ -57,8 +57,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var pane = {
 	    utils: __webpack_require__(1),
 	    Graph: __webpack_require__(9),
-	    Model: __webpack_require__(12),
-	    View: __webpack_require__(20)
+	    Model: __webpack_require__(21),
+	    View: __webpack_require__(12)
 	};
 	
 	module.exports = pane;
@@ -485,13 +485,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _Model = __webpack_require__(12);
-	
-	var _Model2 = _interopRequireDefault(_Model);
-	
-	var _View = __webpack_require__(20);
+	var _View = __webpack_require__(12);
 	
 	var _View2 = _interopRequireDefault(_View);
+	
+	var _Model = __webpack_require__(21);
+	
+	var _Model2 = _interopRequireDefault(_Model);
 	
 	exports['default'] = _libBase2['default'].extend({
 	    constructor: function Graph(container, model, stylesheet) {
@@ -601,21 +601,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    parent || (parent = properties.Extends || Class);
 	    properties.Extends = parent;
 	
-	    // The created class constructor.
-	    //function SubClass() {
-	    //    // Call the parent constructor.
-	    //    parent.apply(this, arguments);
-	    //
-	    //    // Only call initialize in self constructor.
-	    //    if (this.constructor === SubClass && this.initialize) {
-	    //        this.initialize.apply(this, arguments);
-	    //    }
-	    //}
-	
 	    var SubClass = properties.constructor;
-	    // unspecified constructor
 	    if (SubClass === Object.prototype.constructor) {
-	        SubClass = function Class() {};
+	        SubClass = function Superclass() {};
 	    }
 	
 	    // Inherit class (static) properties from parent.
@@ -652,26 +640,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Enforce the constructor to be what we expect.
 	        proto.constructor = this;
 	
-	        // Set the prototype chain to inherit from `parent`.
 	        this.prototype = proto;
-	
-	        // Set a convenience property in case the parent's prototype is
-	        // needed later.
 	        this.superclass = parentProto;
 	    },
 	
 	    'Implements': function Implements(items) {
 	
-	        if (!(0, _utils.isArray)(items)) {
-	            items = [items];
-	        }
-	
+	        var list = (0, _utils.isArray)(items) ? items : [items];
 	        var proto = this.prototype;
-	        var item;
 	
-	        while (item = items.shift()) {
+	        (0, _utils.each)(list, function (item) {
 	            mix(proto, item.prototype || item);
-	        }
+	        });
 	    },
 	
 	    'Statics': function Statics(staticProperties) {
@@ -690,7 +670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var that = this;
 	    var mutators = Class.Mutators;
 	
-	    (0, _utils.each)(properties, function (value, key) {
+	    (0, _utils.forIn)(properties, function (value, key) {
 	        if ((0, _utils.hasKey)(mutators, key)) {
 	            mutators[key].call(that, value);
 	        } else {
@@ -713,7 +693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function mix(receiver, supplier, whiteList) {
 	
-	    (0, _utils.each)(supplier, function (value, key) {
+	    (0, _utils.forIn)(supplier, function (value, key) {
 	        if (whiteList && indexOf(whiteList, key) === -1) {
 	            return;
 	        }
@@ -731,54 +711,125 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(10), __webpack_require__(13), __webpack_require__(17), __webpack_require__(18), __webpack_require__(15), __webpack_require__(19)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Base, Root, Layer, Group, Node, Link) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(13), __webpack_require__(10), __webpack_require__(14), __webpack_require__(18), __webpack_require__(19), __webpack_require__(16), __webpack_require__(20)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, detector, Base, Root, Layer, Group, Node, Link) {
 	    'use strict';
 	
 	    return Base.extend({
-	        constructor: function Model(root) {
+	        constructor: function View(graph) {
+	            this.graph = graph;
+	            this.translate = new Point();
+	            this.graphBounds = new Rectangle();
+	            this.states = new mxDictionary();
+	        },
+	
+	        init: function init() {
 	
 	            var that = this;
+	            var root = document.createElementNS(mxConstants.NS_SVG, 'svg');
+	            var canvas = document.createElementNS(mxConstants.NS_SVG, 'g');
+	            var backgroundPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	            var drawPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	            var overlayPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	            var decoratorPane = document.createElementNS(mxConstants.NS_SVG, 'g');
 	
-	            if (root) {
-	                that.setRoot(root);
-	            } else {
-	                that.clear();
+	            canvas.appendChild(backgroundPane);
+	            canvas.appendChild(drawPane);
+	            canvas.appendChild(overlayPane);
+	            canvas.appendChild(decoratorPane);
+	            root.appendChild(canvas);
+	
+	            root.style.width = '100%';
+	            root.style.height = '100%';
+	            root.style.display = 'block';
+	
+	            that.canvas = canvas;
+	            that.backgroundPane = backgroundPane;
+	            that.drawPane = drawPane;
+	            that.overlayPane = overlayPane;
+	            that.decoratorPane = decoratorPane;
+	
+	            var container = that.graph.container;
+	            if (container) {
+	                container.appendChild(root);
+	                that.updateContainerStyle(container);
 	            }
+	
+	            that.installListeners();
 	        },
 	
-	        clear: function clear() {
-	            var that = this;
-	            that.setRoot(that.createRoot());
-	            return that;
-	        },
+	        installListeners: function installListeners() {},
 	
-	        createRoot: function createRoot() {
-	            var root = new Root();
+	        updateContainerStyle: function updateContainerStyle(container) {
+	            var style = utils.getCurrentStyle(container);
 	
-	            root.insert(new Layer());
+	            if (style.position === 'static') {
+	                container.style.position = 'relative';
+	            }
 	
-	            return root;
-	        },
+	            // 禁用默认的平移和缩放
+	            // Disables built-in pan and zoom in IE10 and later
+	            if (detector.IS_POINTER) {
+	                container.style.msTouchAction = 'none';
+	            }
+	        }
 	
-	        getRoot: function getRoot() {},
-	
-	        setRoot: function setRoot(root) {
-	            this.execute(new RootChange(this, root));
-	
-	            return root;
-	        },
-	
-	        changeRoot: function changeRoot(root) {}
 	    });
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
 /* 13 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	var ua = navigator.userAgent;
+	var av = navigator.appVersion;
+	
+	var client = {
+	    // IE
+	    IS_IE: ua.indexOf('MSIE') >= 0,
+	
+	    IS_IE11: !!ua.match(/Trident\/7\./),
+	
+	    // Netscape
+	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
+	
+	    // Firefox
+	    IS_FF: ua.indexOf('Firefox/') >= 0,
+	
+	    // Chrome
+	    IS_GC: ua.indexOf('Chrome/') >= 0,
+	
+	    // Safari
+	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
+	
+	    // Opera
+	    IS_OP: ua.indexOf('Opera/') >= 0,
+	
+	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
+	
+	    IS_WIN: av.indexOf('Win') > 0,
+	
+	    IS_MAC: av.indexOf('Mac') > 0,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement,
+	
+	    IS_POINTER: window.navigator.msPointerEnabled || false
+	};
+	
+	exports['default'] = client;
+	module.exports = exports['default'];
+
+/***/ },
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(14)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Vessel) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Vessel) {
 	    'use strict';
 	
 	    return Vessel.extend({
@@ -795,12 +846,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, Node) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(16)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, Node) {
 	    'use strict';
 	
 	    var _each = utils.each;
@@ -883,7 +934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -896,7 +947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Cell = __webpack_require__(16);
+	var _Cell = __webpack_require__(17);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
@@ -1064,7 +1115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1130,12 +1181,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(14)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Vessel) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Vessel) {
 	    'use strict';
 	
 	    return Vessel.extend({
@@ -1152,12 +1203,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(14)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, Vessel) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, Vessel) {
 	    'use strict';
 	
 	    var indexOf = utils.indexOf;
@@ -1180,7 +1231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1191,7 +1242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Cell = __webpack_require__(16);
+	var _Cell = __webpack_require__(17);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
@@ -1235,122 +1286,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(21), __webpack_require__(10), __webpack_require__(13), __webpack_require__(17), __webpack_require__(18), __webpack_require__(15), __webpack_require__(19)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, detector, Base, Root, Layer, Group, Node, Link) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(10), __webpack_require__(14), __webpack_require__(18), __webpack_require__(19), __webpack_require__(16), __webpack_require__(20)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Base, Root, Layer, Group, Node, Link) {
 	    'use strict';
 	
 	    return Base.extend({
-	        constructor: function View(graph) {
-	            this.graph = graph;
-	            this.translate = new Point();
-	            this.graphBounds = new Rectangle();
-	            this.states = new mxDictionary();
-	        },
-	
-	        init: function init() {
+	        constructor: function Model(root) {
 	
 	            var that = this;
-	            var root = document.createElementNS(mxConstants.NS_SVG, 'svg');
-	            var canvas = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var backgroundPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var drawPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var overlayPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var decoratorPane = document.createElementNS(mxConstants.NS_SVG, 'g');
 	
-	            canvas.appendChild(backgroundPane);
-	            canvas.appendChild(drawPane);
-	            canvas.appendChild(overlayPane);
-	            canvas.appendChild(decoratorPane);
-	            root.appendChild(canvas);
-	
-	            root.style.width = '100%';
-	            root.style.height = '100%';
-	            root.style.display = 'block';
-	
-	            that.canvas = canvas;
-	            that.backgroundPane = backgroundPane;
-	            that.drawPane = drawPane;
-	            that.overlayPane = overlayPane;
-	            that.decoratorPane = decoratorPane;
-	
-	            var container = that.graph.container;
-	            if (container) {
-	                container.appendChild(root);
-	                that.updateContainerStyle(container);
+	            if (root) {
+	                that.setRoot(root);
+	            } else {
+	                that.clear();
 	            }
-	
-	            that.installListeners();
 	        },
 	
-	        installListeners: function installListeners() {},
+	        clear: function clear() {
+	            var that = this;
+	            that.setRoot(that.createRoot());
+	            return that;
+	        },
 	
-	        updateContainerStyle: function updateContainerStyle(container) {
-	            var style = utils.getCurrentStyle(container);
+	        createRoot: function createRoot() {
+	            var root = new Root();
 	
-	            if (style.position === 'static') {
-	                container.style.position = 'relative';
-	            }
+	            root.insert(new Layer());
 	
-	            // 禁用默认的平移和缩放
-	            // Disables built-in pan and zoom in IE10 and later
-	            if (detector.IS_POINTER) {
-	                container.style.msTouchAction = 'none';
-	            }
-	        }
+	            return root;
+	        },
 	
+	        getRoot: function getRoot() {},
+	
+	        setRoot: function setRoot(root) {
+	            this.execute(new RootChange(this, root));
+	
+	            return root;
+	        },
+	
+	        changeRoot: function changeRoot(root) {}
 	    });
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
-/* 21 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	var ua = navigator.userAgent;
-	var av = navigator.appVersion;
-	
-	var client = {
-	    // IE
-	    IS_IE: ua.indexOf('MSIE') >= 0,
-	
-	    IS_IE11: !!ua.match(/Trident\/7\./),
-	
-	    // Netscape
-	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
-	
-	    // Firefox
-	    IS_FF: ua.indexOf('Firefox/') >= 0,
-	
-	    // Chrome
-	    IS_GC: ua.indexOf('Chrome/') >= 0,
-	
-	    // Safari
-	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
-	
-	    // Opera
-	    IS_OP: ua.indexOf('Opera/') >= 0,
-	
-	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
-	
-	    IS_WIN: av.indexOf('Win') > 0,
-	
-	    IS_MAC: av.indexOf('Mac') > 0,
-	
-	    IS_TOUCH: 'ontouchstart' in document.documentElement,
-	
-	    IS_POINTER: window.navigator.msPointerEnabled || false
-	};
-	
-	exports['default'] = client;
-	module.exports = exports['default'];
 
 /***/ }
 /******/ ])
