@@ -1,15 +1,17 @@
 import Cell from './Cell';
 
 export default Cell.extend({
+
     constructor: function Link(value, geometry, style) {
 
         var that = this;
 
-        Link.super.constructor.call(that, value, geometry, style);
+        Link.superclass.constructor.call(that, value, geometry, style);
 
         that.isLink = true;
-        that.source = null;
-        that.target = null;
+        // lazy
+        // that.source = null;
+        // that.target = null;
     },
 
     getNode: function (isSource) {

@@ -380,6 +380,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var arrProto = Array.prototype;
 	var slice = arrProto.slice;
 	
+	function toArray(obj) {
+	    return (0, _lang.isArrayLike)(obj) ? slice.call(obj) : [];
+	}
+	
 	var indexOf = arrProto.indexOf ? function (arr, item) {
 	    return arr.indexOf(item);
 	} : function (arr, item) {
@@ -391,31 +395,132 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return -1;
 	};
 	
-	function each(list, iteratee, context) {
-	    for (var i = 0, l = list.length; i < l; i++) {
-	        iteratee.call(context, list[i], i, list);
+	var lastIndexOf = arrProto.lastIndexOf ? function (arr, item) {
+	    return arr.lastIndexOf(item);
+	} : function (arr, item) {
+	    for (var i = arr.length - 1; i >= 0; i--) {
+	        if (arr[i] === item) {
+	            return i;
+	        }
 	    }
+	    return -1;
+	};
 	
-	    return list;
-	}
+	var each = arrProto.forEach ? function (arr, iterator, context) {
+	    arr.forEach(iterator, context);
+	} : function (arr, iterator, context) {
+	    for (var i = 0, l = arr.length; i < l; i++) {
+	        iterator.call(context, arr[i], i, arr);
+	    }
+	};
 	
-	function toArray(obj) {
-	    return (0, _lang.isArrayLike)(obj) ? slice.call(obj) : [];
-	}
+	var forEach = each;
 	
-	exports.indexOf = indexOf;
-	exports.each = each;
+	var map = arrProto.map ? function (arr, iterator, context) {
+	    return arr.map(iterator, context);
+	} : function (arr, iterator, context) {
+	    var res = [];
+	    each(arr, function (value, index) {
+	        res.push(iterator.call(context, value, index, arr));
+	    });
+	    return res;
+	};
+	
+	var filter = arrProto.filter ? function (arr, iterator, context) {
+	    return arr.filter(iterator, context);
+	} : function (arr, iterator, context) {
+	    var res = [];
+	    each(arr, function (value, index) {
+	        if (iterator.call(context, value, index, arr)) {
+	            res.push(value);
+	        }
+	    });
+	    return res;
+	};
+	
+	var some = arrProto.some ? function (arr, iterator, context) {
+	    return arr.some(iterator, context);
+	} : function (arr, iterator, context) {
+	    for (var i = 0, l = arr.length; i < l; i++) {
+	        if (iterator.call(context, arr[i], i, arr)) {
+	            return true;
+	        }
+	    }
+	    return false;
+	};
+	
+	var every = arrProto.every ? function (arr, iterator, context) {
+	    return arr.every(iterator, context);
+	} : function (arr, iterator, context) {
+	    for (var i = 0, l = arr.length; i < l; i++) {
+	        if (!iterator.call(context, arr[i], i, arr)) {
+	            return false;
+	        }
+	    }
+	    return true;
+	};
+	
+	var reduce = arrProto.reduce ? function (arr, iterator, context) {} : function (arr, iterator, context) {};
+	
+	var reduceRight = arrProto.reduceRight ? function (arr, iterator, context) {} : function (arr, iterator, context) {};
+	
 	exports.toArray = toArray;
+	exports.indexOf = indexOf;
+	exports.lastIndexOf = lastIndexOf;
+	exports.forEach = forEach;
+	exports.each = each;
+	exports.map = map;
+	exports.filter = filter;
+	exports.some = some;
+	exports.every = every;
+	exports.reduce = reduce;
+	exports.reduceRight = reduceRight;
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
+	
+	var _lang = __webpack_require__(2);
+	
+	function invoke(method, args, context) {
+	    if (!method || !(0, _lang.isFunction)(method)) {
+	        return;
+	    }
+	
+	    args = (0, _lang.isArray)(args) ? args : args ? [args] : [];
+	
+	    var ret;
+	    var a1 = args[0];
+	    var a2 = args[1];
+	    var a3 = args[2];
+	
+	    switch (args.length) {
+	        case 0:
+	            ret = method.call(context);
+	            break;
+	        case 1:
+	            ret = method.call(context, a1);
+	            break;
+	        case 2:
+	            ret = method.call(context, a1, a2);
+	            break;
+	        case 3:
+	            ret = method.call(context, a1, a2, a3);
+	            break;
+	        default:
+	            ret = method.apply(context, args);
+	            break;
+	    }
+	
+	    return ret;
+	}
+	
 	function getFunctionName(fn) {
 	    var str = fn && fn.name || '';
 	
@@ -434,6 +539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return str;
 	}
 	
+	exports.invoke = invoke;
 	exports.getFunctionName = getFunctionName;
 
 /***/ },
@@ -481,9 +587,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(10);
+	var _commonClass = __webpack_require__(24);
 	
-	var _libBase2 = _interopRequireDefault(_libBase);
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	var _eventsEventSource = __webpack_require__(25);
+	
+	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
 	
 	var _View = __webpack_require__(12);
 	
@@ -493,7 +603,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	exports['default'] = _libBase2['default'].extend({
+	exports['default'] = _commonClass2['default'].create({
+	
+	    Extends: _eventsEventSource2['default'],
+	
 	    constructor: function Graph(container, model, stylesheet) {
 	
 	        var that = this;
@@ -709,72 +822,86 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
+	'use strict';
 	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(13), __webpack_require__(10), __webpack_require__(14), __webpack_require__(18), __webpack_require__(19), __webpack_require__(16), __webpack_require__(20)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, detector, Base, Root, Layer, Group, Node, Link) {
-	    'use strict';
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
 	
-	    return Base.extend({
-	        constructor: function View(graph) {
-	            this.graph = graph;
-	            this.translate = new Point();
-	            this.graphBounds = new Rectangle();
-	            this.states = new mxDictionary();
-	        },
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	        init: function init() {
+	var _commonUtils = __webpack_require__(1);
 	
-	            var that = this;
-	            var root = document.createElementNS(mxConstants.NS_SVG, 'svg');
-	            var canvas = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var backgroundPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var drawPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var overlayPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-	            var decoratorPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	var _commonDetector = __webpack_require__(13);
 	
-	            canvas.appendChild(backgroundPane);
-	            canvas.appendChild(drawPane);
-	            canvas.appendChild(overlayPane);
-	            canvas.appendChild(decoratorPane);
-	            root.appendChild(canvas);
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
-	            root.style.width = '100%';
-	            root.style.height = '100%';
-	            root.style.display = 'block';
+	var _libBase = __webpack_require__(10);
 	
-	            that.canvas = canvas;
-	            that.backgroundPane = backgroundPane;
-	            that.drawPane = drawPane;
-	            that.overlayPane = overlayPane;
-	            that.decoratorPane = decoratorPane;
+	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	            var container = that.graph.container;
-	            if (container) {
-	                container.appendChild(root);
-	                that.updateContainerStyle(container);
-	            }
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function View(graph) {
 	
-	            that.installListeners();
-	        },
+	        var that = this;
+	        that.graph = graph;
+	        that.translate = new Point();
+	        that.graphBounds = new Rectangle();
+	        that.states = new mxDictionary();
+	    },
 	
-	        installListeners: function installListeners() {},
+	    init: function init() {
 	
-	        updateContainerStyle: function updateContainerStyle(container) {
-	            var style = utils.getCurrentStyle(container);
+	        var that = this;
+	        var root = document.createElementNS(mxConstants.NS_SVG, 'svg');
+	        var canvas = document.createElementNS(mxConstants.NS_SVG, 'g');
+	        var backgroundPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	        var drawPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	        var overlayPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+	        var decoratorPane = document.createElementNS(mxConstants.NS_SVG, 'g');
 	
-	            if (style.position === 'static') {
-	                container.style.position = 'relative';
-	            }
+	        canvas.appendChild(backgroundPane);
+	        canvas.appendChild(drawPane);
+	        canvas.appendChild(overlayPane);
+	        canvas.appendChild(decoratorPane);
+	        root.appendChild(canvas);
 	
-	            // 禁用默认的平移和缩放
-	            // Disables built-in pan and zoom in IE10 and later
-	            if (detector.IS_POINTER) {
-	                container.style.msTouchAction = 'none';
-	            }
+	        root.style.width = '100%';
+	        root.style.height = '100%';
+	        root.style.display = 'block';
+	
+	        that.canvas = canvas;
+	        that.backgroundPane = backgroundPane;
+	        that.drawPane = drawPane;
+	        that.overlayPane = overlayPane;
+	        that.decoratorPane = decoratorPane;
+	
+	        var container = that.graph.container;
+	        if (container) {
+	            container.appendChild(root);
+	            that.updateContainerStyle(container);
 	        }
 	
-	    });
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	        that.installListeners();
+	    },
+	
+	    installListeners: function installListeners() {},
+	
+	    updateContainerStyle: function updateContainerStyle(container) {
+	        var style = (0, _commonUtils.getCurrentStyle)(container);
+	
+	        if (style.position === 'static') {
+	            container.style.position = 'relative';
+	        }
+	
+	        // 禁用默认的平移和缩放
+	        // Disables built-in pan and zoom in IE10 and later
+	        if (_commonDetector2['default'].IS_POINTER) {
+	            container.style.msTouchAction = 'none';
+	        }
+	    }
+	});
+	module.exports = exports['default'];
 
 /***/ },
 /* 13 */
@@ -824,116 +951,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
-	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Vessel) {
-	    'use strict';
-	
-	    return Vessel.extend({
-	        constructor: function Root(value) {
-	
-	            var that = this;
-	
-	            Root['super'].constructor.call(that, value);
-	
-	            that.isRoot = true;
-	            that.connectAble = false;
-	        }
-	    });
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
-	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(16)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, Node) {
-	    'use strict';
-	
-	    var _each = utils.each;
-	    var _indexOf = utils.indexOf;
-	    var isNullOrUndefined = utils.isNullOrUndefined;
-	
-	    return Node.extend({
-	        constructor: function Vessel(value, geometry, style) {
-	
-	            var that = this;
-	
-	            Vessel['super'].constructor.call(that, value, geometry, style);
-	
-	            that.parent = null;
-	            that.children = [];
-	        },
-	
-	        each: function each(iterator, context) {
-	
-	            var that = this;
-	
-	            _each(that.children, iterator, context);
-	
-	            return that;
-	        },
-	
-	        indexOf: function indexOf(child) {
-	            return _indexOf(this.children, child);
-	        },
-	
-	        childAt: function childAt(index) {
-	            return this.children[index];
-	        },
-	
-	        insert: function insert(child, index) {
-	            var that = this;
-	            var children = that.children;
-	
-	            if (child && that.canInsert(child, index)) {
-	
-	                if (isNullOrUndefined(index)) {
-	                    index = children.length;
-	
-	                    if (child.parent === that) {
-	                        index--;
-	                    }
-	                }
-	
-	                // 从旧的 parent 移除
-	                child.removeFromParent();
-	                // 设置新的 parent
-	                child.parent = that;
-	
-	                children.splice(index, 0, child);
-	            }
-	
-	            return that;
-	        },
-	
-	        remove: function remove(child) {
-	            return this.removeAt(this.indexOf(child));
-	        },
-	
-	        removeAt: function removeAt(index) {
-	            var children = this.children;
-	            var child = index >= 0 ? children[index] : null;
-	
-	            if (child) {
-	                children.splice(index, 1);
-	                child.parent = null;
-	            }
-	
-	            return child;
-	        },
-	
-	        canInsert: function canInsert() {
-	            return true;
-	        }
-	    });
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+/* 14 */,
+/* 15 */,
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1182,111 +1201,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
-	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Vessel) {
-	    'use strict';
-	
-	    return Vessel.extend({
-	        constructor: function Layer(value) {
-	
-	            var that = this;
-	
-	            Layer['super'].constructor.call(that, value);
-	
-	            that.isLayer = true;
-	            that.connectAble = false;
-	        }
-	    });
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
-	
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(15)], __WEBPACK_AMD_DEFINE_RESULT__ = function (utils, Vessel) {
-	    'use strict';
-	
-	    var indexOf = utils.indexOf;
-	
-	    var Group = Vessel.extend({
-	        constructor: function Group(value, geometry, style) {
-	
-	            var that = this;
-	
-	            Group['super'].constructor.call(that, value, geometry, style);
-	
-	            that.isGroup = true;
-	            that.collapsed = false;
-	        },
-	
-	        cloneValue: function cloneValue() {},
-	
-	        clone: function clone() {}
-	    });
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Cell = __webpack_require__(17);
-	
-	var _Cell2 = _interopRequireDefault(_Cell);
-	
-	exports['default'] = _Cell2['default'].extend({
-	    constructor: function Link(value, geometry, style) {
-	
-	        var that = this;
-	
-	        Link['super'].constructor.call(that, value, geometry, style);
-	
-	        that.isLink = true;
-	        that.source = null;
-	        that.target = null;
-	    },
-	
-	    getNode: function getNode(isSource) {
-	        return isSource ? this.source : this.target;
-	    },
-	
-	    setNode: function setNode(node, isSource) {
-	        if (isSource) {
-	            this.source = node;
-	        } else {
-	            this.target = node;
-	        }
-	
-	        return node;
-	    },
-	
-	    removeFromNode: function removeFromNode(isSource) {
-	
-	        var that = this;
-	
-	        var node = that.getNode(isSource);
-	
-	        node && node.removeLink(that, isSource);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
+/* 18 */,
+/* 19 */,
+/* 20 */,
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1298,9 +1215,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(10);
+	var _commonClass = __webpack_require__(24);
 	
-	var _libBase2 = _interopRequireDefault(_libBase);
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	var _eventsEventSource = __webpack_require__(25);
+	
+	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
 	
 	var _cellsNode = __webpack_require__(16);
 	
@@ -1310,10 +1231,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	exports['default'] = _libBase2['default'].extend({
+	exports['default'] = _commonClass2['default'].create({
+	
+	    Extends: _eventsEventSource2['default'],
+	
 	    constructor: function Model(root) {
 	
 	        var that = this;
+	
+	        that.updateLevel = 0;
+	        that.endingUpdate = false;
 	
 	        if (root) {
 	            that.setRoot(root);
@@ -1336,19 +1263,101 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return root;
 	    },
 	
-	    createLayer: function createLayer(value) {
-	        var layer = new _cellsNode2['default'](value);
-	    },
+	    getRoot: function getRoot(cell) {
 	
-	    getRoot: function getRoot() {},
+	        var root = cell || this.root;
 	
-	    setRoot: function setRoot(root) {
-	        this.execute(new _changesRootChange2['default'](this, root));
+	        if (cell) {
+	            while (cell) {
+	                root = cell;
+	                cell = cell.parent;
+	            }
+	        }
 	
 	        return root;
 	    },
 	
-	    changeRoot: function changeRoot(root) {}
+	    setRoot: function setRoot(root) {
+	        this.digest(new _changesRootChange2['default'](this, root));
+	
+	        return root;
+	    },
+	
+	    changeRoot: function changeRoot(root) {},
+	
+	    isRoot: function isRoot(cell) {
+	        return cell && this.root === cell;
+	    },
+	
+	    isLayer: function isLayer(cell) {
+	        return cell && this.isRoot(cell.parent);
+	    },
+	
+	    isAncestor: function isAncestor(parent, child) {
+	        while (child && child !== parent) {
+	            child = child.parent;
+	        }
+	
+	        return child === parent;
+	    },
+	
+	    contains: function contains(cell) {
+	        return this.isAncestor(this.root, cell);
+	    },
+	
+	    add: function add(parent, child, index) {},
+	
+	    cellAdded: function cellAdded() {},
+	
+	    digest: function digest(change) {
+	
+	        change.digest();
+	
+	        var that = this;
+	
+	        that.beginUpdate();
+	        that.emit();
+	        that.endUpdate();
+	    },
+	
+	    beginUpdate: function beginUpdate() {
+	
+	        var that = this;
+	        that.updateLevel++;
+	        that.emit(new mxEventObject(mxEvent.BEGIN_UPDATE));
+	
+	        if (that.updateLevel === 1) {
+	            that.emit(new mxEventObject(mxEvent.START_EDIT));
+	        }
+	    },
+	
+	    endUpdate: function endUpdate() {
+	
+	        var that = this;
+	
+	        that.updateLevel--;
+	
+	        if (that.updateLevel === 0) {
+	            this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
+	        }
+	
+	        if (!that.endingUpdate) {
+	            that.endingUpdate = that.updateLevel === 0;
+	            this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
+	
+	            try {
+	                if (that.endingUpdate && !this.currentEdit.isEmpty()) {
+	                    this.fireEvent(new mxEventObject(mxEvent.BEFORE_UNDO, 'edit', this.currentEdit));
+	                    var tmp = this.currentEdit;
+	                    this.currentEdit = this.createUndoableEdit();
+	                    tmp.notify();
+	                    this.fireEvent(new mxEventObject(mxEvent.UNDO, 'edit', tmp));
+	                }
+	            } finally {
+	                that.endingUpdate = false;
+	            }
+	        }
+	    }
 	});
 	module.exports = exports['default'];
 
@@ -1412,6 +1421,338 @@ return /******/ (function(modules) { // webpackBootstrap
 	    constructor: function Change() {},
 	    digest: function digest() {
 	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// ref: https://github.com/aralejs/class
+	
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	function Class(fn) {
+	    if (!(this instanceof Class) && (0, _utils.isFunction)(fn)) {
+	        return classify(fn);
+	    }
+	}
+	
+	Class.create = function (parent, properties) {
+	    if (!(0, _utils.isFunction)(parent)) {
+	        properties = parent;
+	        parent = null;
+	    }
+	
+	    properties || (properties = {});
+	    parent || (parent = properties.Extends || Class);
+	    properties.Extends = parent;
+	
+	    var SubClass = properties.constructor;
+	    if (SubClass === Object.prototype.constructor) {
+	        SubClass = function Superclass() {};
+	    }
+	
+	    // Inherit class (static) properties from parent.
+	    if (parent !== Class) {
+	        mix(SubClass, parent, parent.StaticsWhiteList);
+	    }
+	
+	    // Add instance properties to the subclass.
+	    implement.call(SubClass, properties);
+	
+	    // Make subclass extendable.
+	    return classify(SubClass);
+	};
+	
+	// Create a sub Class based on `Class`.
+	Class.extend = function (properties) {
+	    properties || (properties = {});
+	    properties.Extends = this;
+	
+	    return Class.create(properties);
+	};
+	
+	// define special properties.
+	Class.Mutators = {
+	
+	    'Extends': function Extends(parent) {
+	        var existed = this.prototype;
+	        var parentProto = parent.prototype;
+	        var proto = createProto(parentProto);
+	
+	        // Keep existed properties.
+	        mix(proto, existed);
+	
+	        // Enforce the constructor to be what we expect.
+	        proto.constructor = this;
+	
+	        this.prototype = proto;
+	        this.superclass = parentProto;
+	    },
+	
+	    'Implements': function Implements(items) {
+	
+	        var list = (0, _utils.isArray)(items) ? items : [items];
+	        var proto = this.prototype;
+	
+	        (0, _utils.each)(list, function (item) {
+	            mix(proto, item.prototype || item);
+	        });
+	    },
+	
+	    'Statics': function Statics(staticProperties) {
+	        mix(this, staticProperties);
+	    }
+	};
+	
+	function classify(cls) {
+	    cls.extend = Class.extend;
+	    cls.implement = implement;
+	    return cls;
+	}
+	
+	function implement(properties) {
+	
+	    var that = this;
+	    var mutators = Class.Mutators;
+	
+	    (0, _utils.forIn)(properties, function (value, key) {
+	        if ((0, _utils.hasKey)(mutators, key)) {
+	            mutators[key].call(that, value);
+	        } else {
+	            that.prototype[key] = value;
+	        }
+	    });
+	}
+	
+	// Helpers
+	// -------
+	
+	var createProto = Object.__proto__ ? function (proto) {
+	    return { __proto__: proto };
+	} : function (proto) {
+	    function Ctor() {}
+	
+	    Ctor.prototype = proto;
+	    return new Ctor();
+	};
+	
+	function mix(receiver, supplier, whiteList) {
+	
+	    (0, _utils.forIn)(supplier, function (value, key) {
+	        if (whiteList && indexOf(whiteList, key) === -1) {
+	            return;
+	        }
+	
+	        receiver[key] = value;
+	    });
+	}
+	
+	exports['default'] = Class;
+	module.exports = exports['default'];
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(10);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _EventObject = __webpack_require__(26);
+	
+	var _EventObject2 = _interopRequireDefault(_EventObject);
+	
+	var eventSplitter = /\s+/;
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    constructor: function EventSource() {
+	        this.eventEnabled = true;
+	        // lazy
+	        // this.eventListeners = null;
+	    },
+	
+	    enableEvent: function enableEvent() {
+	        this.eventsEnabled = true;
+	        return this;
+	    },
+	
+	    disableEvent: function disableEvent() {
+	        this.eventsEnabled = false;
+	        return this;
+	    },
+	
+	    on: function on(events, callback, context) {
+	        var that = this;
+	
+	        if (!callback) {
+	            return that;
+	        }
+	
+	        var listeners = that.eventListeners || (that.eventListeners = {});
+	
+	        events = events.split(eventSplitter);
+	
+	        (0, _commonUtils.each)(events, function (event) {
+	            var list = listeners[event] || (listeners[event] = []);
+	            list.push(callback, context);
+	        });
+	
+	        return that;
+	    },
+	
+	    once: function once(events, callback, context) {
+	
+	        var that = this;
+	        var cb = function cb() {
+	            that.off(events, cb);
+	            callback.apply(context || that, arguments);
+	        };
+	
+	        return that.on(events, cb, context);
+	    },
+	
+	    off: function off(events, callback, context) {
+	
+	        var that = this;
+	        var listeners = that.eventListeners;
+	
+	        // No events.
+	        if (!listeners) {
+	            return that;
+	        }
+	
+	        // removing *all* events.
+	        if (!(events || callback || context)) {
+	            delete that.eventListeners;
+	            return that;
+	        }
+	
+	        events = events ? events.split(eventSplitter) : (0, _commonUtils.keys)(listeners);
+	
+	        (0, _commonUtils.each)(events, function (event) {
+	
+	            var list = listeners[event];
+	
+	            if (!list) {
+	                return;
+	            }
+	
+	            // remove all event.
+	            if (!(callback || context)) {
+	                delete listeners[event];
+	                return;
+	            }
+	
+	            for (var i = list.length - 2; i >= 0; i -= 2) {
+	                if (!(callback && list[i] !== callback || context && list[i + 1] !== context)) {
+	                    list.splice(i, 2);
+	                }
+	            }
+	        });
+	
+	        return that;
+	    },
+	
+	    emit: function emit(eventObj, sender) {
+	        var that = this;
+	        var listeners = that.eventListeners;
+	        var returned = null;
+	
+	        // No events.
+	        if (!listeners || !that.eventEnabled) {
+	            return returned;
+	        }
+	
+	        eventObj = eventObj || new _EventObject2['default']();
+	
+	        var eventName = eventObj.name;
+	
+	        if (!eventName) {
+	            return returned;
+	        }
+	
+	        sender = sender || that;
+	        returned = []; // 返回每个回调函数返回值组成的数组
+	
+	        var list = listeners[eventName];
+	        var length = list ? list.length : 0;
+	        var ret;
+	
+	        for (var i = 0; i < length; i += 2) {
+	            ret = list[i].call(list[i + 1] || that, eventObj, sender);
+	            returned.push(ret);
+	        }
+	
+	        return returned;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(10);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function EventObject(name, eventData) {
+	
+	        var that = this;
+	        var data = that.data = {};
+	
+	        that.name = name;
+	        that.consumed = false;
+	
+	        eventData && (0, _commonUtils.extend)(data, eventData);
+	    },
+	
+	    getName: function getName() {
+	        return this.name;
+	    },
+	
+	    getData: function getData(key) {
+	        var data = this.data;
+	        return key ? data[key] : data;
+	    },
+	
+	    isConsumed: function isConsumed() {
+	        return this.consumed;
+	    },
+	
+	    consume: function consume() {
+	        this.consumed = true;
 	    }
 	});
 	module.exports = exports['default'];

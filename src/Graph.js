@@ -1,8 +1,12 @@
-import Base from './lib/Base';
+import Class from './common/Class';
+import EventSource from './events/EventSource';
 import View from './View';
 import Model from './Model';
 
-export default Base.extend({
+export default Class.create({
+
+    Extends: EventSource,
+
     constructor: function Graph(container, model, stylesheet) {
 
         var that = this;

@@ -169,4 +169,3 @@ export default Cell.extend({
         return link;
     }
 });
-
