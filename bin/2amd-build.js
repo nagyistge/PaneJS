@@ -13,6 +13,7 @@ function walk(pathname, root) {
         stat = fsExtraPromise.statSync(pathname);
     } catch(e) {
         // because there might be links
+        return;
     }
     if (stat.isDirectory()) {
         arrayUtils.each(fsExtraPromise.readdirSync(pathname), function(filename) {
