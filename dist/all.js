@@ -3901,27 +3901,27 @@ module.exports = Class.create({
 
             try {
                 if (constraint == null || constraint.point == null) {
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
-                        mxConstants.STYLE_ENTRY_X, null, [edge]);
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
-                        mxConstants.STYLE_ENTRY_Y, null, [edge]);
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
-                        mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_X :
+                        constants.STYLE_ENTRY_X, null, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_Y :
+                        constants.STYLE_ENTRY_Y, null, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_PERIMETER :
+                        constants.STYLE_ENTRY_PERIMETER, null, [edge]);
                 }
                 else if (constraint.point != null) {
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
-                        mxConstants.STYLE_ENTRY_X, constraint.point.x, [edge]);
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
-                        mxConstants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_X :
+                        constants.STYLE_ENTRY_X, constraint.point.x, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_Y :
+                        constants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
 
                     // Only writes 0 since 1 is default
                     if (!constraint.perimeter) {
-                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
-                            mxConstants.STYLE_ENTRY_PERIMETER, '0', [edge]);
+                        this.setCellStyles((source) ? constants.STYLE_EXIT_PERIMETER :
+                            constants.STYLE_ENTRY_PERIMETER, '0', [edge]);
                     }
                     else {
-                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
-                            mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                        this.setCellStyles((source) ? constants.STYLE_EXIT_PERIMETER :
+                            constants.STYLE_ENTRY_PERIMETER, null, [edge]);
                     }
                 }
             }
@@ -4297,7 +4297,9 @@ module.exports = Class.create({
     isPortsEnabled: function () {
         return this.portsEnabled;
     },
-    setPortsEnabled: function () {},
+    setPortsEnabled: function (value) {
+        this.portsEnabled = value;
+    },
     getGridSize: function () {},
     setGridSize: function () {},
     getTolerance: function () {},
