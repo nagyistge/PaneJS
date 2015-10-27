@@ -462,9 +462,9 @@ utils.setCellStyles = function (model, cells, key, value) {
 };
 
 utils.setStyle = function (style, key, value) {
-    var isValue = value !== null && (typeof(value.length) === 'undefined' || value.length > 0);
+    var isValue = value != null && (typeof(value.length) == 'undefined' || value.length > 0);
 
-    if (style === null || style.length === 0) {
+    if (style == null || style.length == 0) {
         if (isValue) {
             style = key + '=' + value;
         }

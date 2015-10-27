@@ -1,27 +1,26 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
+var Cell = require('./Cell');
+var CellRenderer = require('./CellRenderer');
+var ChildChange = require('./changes/ChildChange');
 var Class = require('./common/class');
-var utils = require('./common/utils');
+var ConnectionConstraint = require('./ConnectionConstraint');
+var ConnectionHandler = require('./handler/ConnectionHandler');
 var Event = require('./events/Event');
 var EventObject = require('./events/EventObject');
-var eventNames = require('./events/eventNames');
-var constants = require('./constants');
-var View = require('./View');
-var Model = require('./Model');
-var Cell = require('./Cell');
 var Geometry = require('./Geometry');
-var Rectangle = require('./Rectangle');
-var Point = require('./Point');
-var CellRenderer = require('./CellRenderer');
-var Stylesheet = require('./Stylesheet');
-var edgeStyle = require('./edgeStyle');
-
-var ConnectionConstraint = require('./ConnectionConstraint');
-
-var RootChange = require('./changes/RootChange');
-var ChildChange = require('./changes/ChildChange');
-var TerminalChange = require('./changes/TerminalChange');
 var GeometryChange = require('./changes/GeometryChange');
+var Model = require('./Model');
+var Point = require('./Point');
+var Rectangle = require('./Rectangle');
+var RootChange = require('./changes/RootChange');
+var Stylesheet = require('./Stylesheet');
+var TerminalChange = require('./changes/TerminalChange');
+var View = require('./View');
+var constants = require('./constants');
+var edgeStyle = require('./edgeStyle');
+var eventNames = require('./events/eventNames');
+var utils = require('./common/utils');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getValue = utils.getValue;
@@ -162,6 +161,8 @@ module.exports = Class.create({
         that.model.on('change', function (evt) {
             that.graphModelChanged(evt.getData('edit').changes);
         });
+
+        that.createHandlers(); // create handlers
 
         if (container) {
             that.init(container);

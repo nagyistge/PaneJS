@@ -31,7 +31,7 @@ var ConstraintHandler = Class.create({
     },
 
     reset: function () {
-        if (this.focusIcons !== null) {
+        if (this.focusIcons != null) {
             for (var i = 0; i < this.focusIcons.length; i++) {
                 this.focusIcons[i].destroy();
             }
@@ -39,7 +39,7 @@ var ConstraintHandler = Class.create({
             this.focusIcons = null;
         }
 
-        if (this.focusHighlight !== null) {
+        if (this.focusHighlight != null) {
             this.focusHighlight.destroy();
             this.focusHighlight = null;
         }
@@ -68,7 +68,7 @@ var ConstraintHandler = Class.create({
     },
 
     destroyIcons: function () {
-        if (this.focusIcons !== null) {
+        if (this.focusIcons != null) {
             for (var i = 0; i < this.focusIcons.length; i++) {
                 this.focusIcons[i].destroy();
             }
@@ -79,7 +79,7 @@ var ConstraintHandler = Class.create({
     },
 
     destroyFocusHighlight: function () {
-        if (this.focusHighlight !== null) {
+        if (this.focusHighlight != null) {
             this.focusHighlight.destroy();
             this.focusHighlight = null;
         }
@@ -93,23 +93,23 @@ var ConstraintHandler = Class.create({
         if (this.isEnabled() && !this.isEventIgnored(me)) {
             var tol = this.getTolerance(me);
             var mouse = new Rectangle(me.getGraphX() - tol, me.getGraphY() - tol, 2 * tol, 2 * tol);
-            var cst = (me.getState() !== null && !this.isStateIgnored(me.getState(), source)) ?
+            var cst = (me.getState() != null && !this.isStateIgnored(me.getState(), source)) ?
                 this.graph.getAllConnectionConstraints(me.getState(), source) : null;
 
             // Keeps focus icons visible while over vertex bounds and no other cell under mouse or shift is pressed
             if (!this.isKeepFocusEvent(me) && (this.currentFocusArea === null || this.currentFocus === null ||
-                (me.getState() !== null && cst !== null) || !this.graph.getModel().isVertex(this.currentFocus.cell) || !utils.intersects(this.currentFocusArea, mouse)) && (me.getState() !== this.currentFocus &&
+                (me.getState() != null && cst != null) || !this.graph.getModel().isVertex(this.currentFocus.cell) || !utils.intersects(this.currentFocusArea, mouse)) && (me.getState() != this.currentFocus &&
                 (me.getCell() === null || this.graph.isCellConnectable(me.getCell())))) {
                 this.currentFocusArea = null;
                 this.currentFocus = null;
                 this.constraints = cst;
 
                 // Only uses cells which have constraints
-                if (this.constraints !== null) {
+                if (this.constraints != null) {
                     this.currentFocus = me.getState();
                     this.currentFocusArea = new Rectangle(me.getState().x, me.getState().y, me.getState().width, me.getState().height);
 
-                    if (this.focusIcons !== null) {
+                    if (this.focusIcons != null) {
                         for (var i = 0; i < this.focusIcons.length; i++) {
                             this.focusIcons[i].destroy();
                         }
@@ -129,7 +129,7 @@ var ConstraintHandler = Class.create({
                         var bounds = new Rectangle(cp.x - img.width / 2,
                             cp.y - img.height / 2, img.width, img.height);
                         var icon = new ImageShape(bounds, src);
-                        icon.dialect = (this.graph.dialect !== constants.DIALECT_SVG) ?
+                        icon.dialect = (this.graph.dialect != constants.DIALECT_SVG) ?
                             constants.DIALECT_MIXEDHTML : constants.DIALECT_SVG;
                         icon.preserveImageAspect = false;
                         icon.init(this.graph.getView().getDecoratorPane());
@@ -144,12 +144,12 @@ var ConstraintHandler = Class.create({
                         }
 
                         // Move the icon behind all other overlays
-                        if (icon.node.previousSibling !== null) {
+                        if (icon.node.previousSibling != null) {
                             icon.node.parentNode.insertBefore(icon.node, icon.node.parentNode.firstChild);
                         }
 
                         var getState = utils.bind(this, function () {
-                            return (this.currentFocus !== null) ? this.currentFocus : me.getState();
+                            return (this.currentFocus != null) ? this.currentFocus : me.getState();
                         });
 
                         icon.redraw();
@@ -172,7 +172,7 @@ var ConstraintHandler = Class.create({
             this.currentPoint = null;
             var minDistSq = null;
 
-            if (this.focusIcons !== null && this.constraints !== null &&
+            if (this.focusIcons != null && this.constraints != null &&
                 (me.getState() === null || this.currentFocus === me.getState())) {
                 for (var k = 0; k < this.focusIcons.length; k++) {
                     var dx = me.getGraphX() - this.focusIcons[k].bounds.getCenterX();
@@ -202,7 +202,7 @@ var ConstraintHandler = Class.create({
                             this.focusHighlight = hl;
 
                             var getState1 = utils.bind(this, function () {
-                                return (this.currentFocus !== null) ? this.currentFocus : me.getState();
+                                return (this.currentFocus != null) ? this.currentFocus : me.getState();
                             });
 
                             domEvent.redirectMouseEvents(hl.node, this.graph, getState1);

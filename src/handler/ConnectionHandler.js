@@ -13,14 +13,16 @@ var Point = require('../Point');
 var Polyline = require('../shapes/Polyline');
 var Rectangle = require('../Rectangle');
 var constants = require('../constants');
-var domEvent = require('../events/Event');
-var utils = require('./common/utils');
+var domEvent = require('../events/domEvent');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
 
 var ConnectionHandler = EventSource.extend({
     constructor: function ConnectionHandler(graph, factoryMethod) {
         var that = this;
         EventSource.call(that);
-        if (graph !== null) {
+        if (graph != null) {
             this.graph = graph;
             this.factoryMethod = factoryMethod;
             this.init();
@@ -94,7 +96,7 @@ var ConnectionHandler = EventSource.extend({
     createShape: function () {
         // Creates the edge preview
         var shape = new Polyline([], constants.INVALID_COLOR);
-        shape.dialect = (this.graph.dialect !== constants.DIALECT_SVG) ?
+        shape.dialect = (this.graph.dialect != constants.DIALECT_SVG) ?
             constants.DIALECT_VML : constants.DIALECT_SVG;
         shape.pointerEvents = false;
         shape.isDashed = true;
@@ -111,11 +113,11 @@ var ConnectionHandler = EventSource.extend({
 
         // Redraws the icons if the graph changes
         this.changeHandler = utils.bind(this, function (/*sender*/) {
-            if (this.iconState !== null) {
+            if (!isNullOrUndefined(this.iconState)) {
                 this.iconState = this.graph.getView().getState(this.iconState.cell);
             }
 
-            if (this.iconState !== null) {
+            if (!isNullOrUndefined(this.iconState)) {
                 this.redrawIcons(this.icons, this.iconState);
                 this.constraintHandler.reset();
             }
@@ -165,12 +167,12 @@ var ConnectionHandler = EventSource.extend({
                 cell = null;
             }
 
-            if (cell !== null) {
+            if (cell != null) {
                 if (this.isConnecting()) {
-                    if (this.previous !== null) {
+                    if (this.previous != null) {
                         this.error = this.validateConnection(this.previous.cell, cell);
 
-                        if (this.error !== null && this.error.length === 0) {
+                        if (this.error != null && this.error.length === 0) {
                             cell = null;
 
                             // Enables create target inside groups
@@ -212,7 +214,7 @@ var ConnectionHandler = EventSource.extend({
         // Overrides to use hotspot only for source selection otherwise
         // intersects always returns true when over a cell
         marker.intersects = utils.bind(this, function (/*state, evt*/) {
-            if (this.connectImage !== null || this.isConnecting()) {
+            if (this.connectImage != null || this.isConnecting()) {
                 return true;
             }
 
@@ -225,7 +227,7 @@ var ConnectionHandler = EventSource.extend({
     start: function (state, x, y, edgeState) {
         this.previous = state;
         this.first = new Point(x, y);
-        this.edgeState = (edgeState !== null) ? edgeState : this.createEdgeState(null);
+        this.edgeState = (edgeState != null) ? edgeState : this.createEdgeState(null);
 
         // Marks the source state
         this.marker.currentColor = this.marker.validColor;
@@ -240,7 +242,7 @@ var ConnectionHandler = EventSource.extend({
     },
 
     isConnecting: function () {
-        return this.first !== null && this.shape !== null;
+        return this.first != null && this.shape != null;
     },
 
     isValidSource: function (cell/*, me*/) {
@@ -264,7 +266,7 @@ var ConnectionHandler = EventSource.extend({
     },
 
     isMoveIconToFrontForState: function (state) {
-        if (state.text !== null && state.text.node.parentNode === this.graph.container) {
+        if (state.text != null && state.text.node.parentNode === this.graph.container) {
             return true;
         }
 
@@ -274,7 +276,7 @@ var ConnectionHandler = EventSource.extend({
     createIcons: function (state) {
         var image = this.getConnectImage(state);
 
-        if (image !== null && state !== null) {
+        if (image != null && state != null) {
             this.iconState = state;
             var icons = [];
 
@@ -296,7 +298,7 @@ var ConnectionHandler = EventSource.extend({
                 icon.init(this.graph.getView().getOverlayPane());
 
                 // Move the icon back in the overlay pane
-                if (this.moveIconBack && icon.node.previousSibling !== null) {
+                if (this.moveIconBack && icon.node.previousSibling != null) {
                     icon.node.parentNode.insertBefore(icon.node, icon.node.parentNode.firstChild);
                 }
             }
@@ -305,7 +307,7 @@ var ConnectionHandler = EventSource.extend({
 
             // Events transparency
             var getState = utils.bind(this, function () {
-                return (this.currentState !== null) ? this.currentState : state;
+                return (this.currentState != null) ? this.currentState : state;
             });
 
             // Updates the local icon before firing the mouse down event.
@@ -329,7 +331,7 @@ var ConnectionHandler = EventSource.extend({
     },
 
     redrawIcons: function (icons, state) {
-        if (icons !== null && icons[0] !== null && state !== null) {
+        if (icons != null && icons[0] != null && state != null) {
             var pos = this.getIconPosition(icons[0], state);
             icons[0].bounds.x = pos.x;
             icons[0].bounds.y = pos.y;
@@ -345,12 +347,12 @@ var ConnectionHandler = EventSource.extend({
         if (this.graph.isSwimlane(state.cell)) {
             var size = this.graph.getStartSize(state.cell);
 
-            cx = (size.width !== 0) ? state.x + size.width * scale / 2 : cx;
-            cy = (size.height !== 0) ? state.y + size.height * scale / 2 : cy;
+            cx = (size.width != 0) ? state.x + size.width * scale / 2 : cx;
+            cy = (size.height != 0) ? state.y + size.height * scale / 2 : cy;
 
             var alpha = utils.toRadians(utils.getValue(state.style, constants.STYLE_ROTATION) || 0);
 
-            if (alpha !== 0) {
+            if (alpha != 0) {
                 var cos = Math.cos(alpha);
                 var sin = Math.sin(alpha);
                 var ct = new Point(state.getCenterX(), state.getCenterY());
@@ -365,7 +367,7 @@ var ConnectionHandler = EventSource.extend({
     },
 
     destroyIcons: function () {
-        if (this.icons !== null) {
+        if (this.icons != null) {
             for (var i = 0; i < this.icons.length; i++) {
                 this.icons[i].destroy();
             }
@@ -378,18 +380,18 @@ var ConnectionHandler = EventSource.extend({
     },
 
     isStartEvent: function (/*me*/) {
-        return ((this.constraintHandler.currentFocus !== null && this.constraintHandler.currentConstraint !== null) ||
-        (this.previous !== null && this.error === null && (this.icons === null || (this.icons !== null &&
-        this.icon !== null))));
+        return ((this.constraintHandler.currentFocus != null && this.constraintHandler.currentConstraint != null) ||
+        (this.previous != null && this.error === null && (this.icons === null || (this.icons != null &&
+        this.icon != null))));
     },
 
     mouseDown: function (sender, me) {
         this.mouseDownCounter++;
 
         if (this.isEnabled() && this.graph.isEnabled() && !me.isConsumed() && !this.isConnecting() && this.isStartEvent(me)) {
-            if (this.constraintHandler.currentConstraint !== null &&
-                this.constraintHandler.currentFocus !== null &&
-                this.constraintHandler.currentPoint !== null) {
+            if (this.constraintHandler.currentConstraint != null &&
+                this.constraintHandler.currentFocus != null &&
+                this.constraintHandler.currentPoint != null) {
                 this.sourceConstraint = this.constraintHandler.currentConstraint;
                 this.previous = this.constraintHandler.currentFocus;
                 this.first = this.constraintHandler.currentPoint.clone();
@@ -406,13 +408,13 @@ var ConnectionHandler = EventSource.extend({
                 this.waypoints = null;
                 this.shape = this.createShape();
 
-                if (this.edgeState !== null) {
+                if (this.edgeState != null) {
                     this.shape.apply(this.edgeState);
                 }
             }
 
             // Stores the starting point in the geometry of the preview
-            if (this.previous === null && this.edgeState !== null) {
+            if (this.previous === null && this.edgeState != null) {
                 var pt = this.graph.getPointForEvent(me.getEvent());
                 this.edgeState.cell.geometry.setTerminalPoint(pt, true);
             }
@@ -442,11 +444,11 @@ var ConnectionHandler = EventSource.extend({
     updateCurrentState: function (me, point) {
         this.constraintHandler.update(me, this.first === null);
 
-        if (this.constraintHandler.currentFocus !== null && this.constraintHandler.currentConstraint !== null) {
+        if (this.constraintHandler.currentFocus != null && this.constraintHandler.currentConstraint != null) {
             this.marker.reset();
 
             // Updates validation state
-            if (this.previous !== null) {
+            if (this.previous != null) {
                 this.error = this.validateConnection(this.previous.cell, this.constraintHandler.currentFocus.cell);
 
                 if (this.error === null) {
@@ -461,7 +463,7 @@ var ConnectionHandler = EventSource.extend({
             this.marker.process(me);
             this.currentState = this.marker.getValidState();
 
-            if (this.currentState !== null && this.isOutlineConnectEvent(me)) {
+            if (this.currentState != null && this.isOutlineConnectEvent(me)) {
                 var constraint = this.graph.getOutlineConstraint(point, this.currentState, me);
                 this.constraintHandler.currentConstraint = constraint;
                 this.constraintHandler.currentFocus = this.currentState;
@@ -470,9 +472,9 @@ var ConnectionHandler = EventSource.extend({
         }
 
         if (this.outlineConnect) {
-            if (this.marker.highlight !== null && this.marker.highlight.shape !== null) {
-                if (this.constraintHandler.currentConstraint !== null &&
-                    this.constraintHandler.currentFocus !== null) {
+            if (this.marker.highlight != null && this.marker.highlight.shape != null) {
+                if (this.constraintHandler.currentConstraint != null &&
+                    this.constraintHandler.currentFocus != null) {
                     this.marker.highlight.shape.stroke = constants.OUTLINE_HIGHLIGHT_COLOR;
                     this.marker.highlight.shape.strokewidth = constants.OUTLINE_HIGHLIGHT_STROKEWIDTH / this.graph.view.scale / this.graph.view.scale;
                     this.marker.highlight.repaint();
@@ -495,9 +497,9 @@ var ConnectionHandler = EventSource.extend({
     },
 
     mouseMove: function (sender, me) {
-        if (!me.isConsumed() && (this.ignoreMouseDown || this.first !== null || !this.graph.isMouseDown)) {
+        if (!me.isConsumed() && (this.ignoreMouseDown || this.first != null || !this.graph.isMouseDown)) {
             // Handles special case when handler is disabled during highlight
-            if (!this.isEnabled() && this.currentState !== null) {
+            if (!this.isEnabled() && this.currentState != null) {
                 this.destroyIcons();
                 this.currentState = null;
             }
@@ -515,22 +517,22 @@ var ConnectionHandler = EventSource.extend({
 
             this.currentPoint = point;
 
-            if (this.first !== null || (this.isEnabled() && this.graph.isEnabled())) {
+            if (this.first != null || (this.isEnabled() && this.graph.isEnabled())) {
                 this.updateCurrentState(me, point);
             }
 
-            if (this.first !== null) {
+            if (this.first != null) {
                 var constraint = null;
                 var current = point;
 
                 // Uses the current point from the constraint handler if available
-                if (this.constraintHandler.currentConstraint !== null &&
-                    this.constraintHandler.currentFocus !== null &&
-                    this.constraintHandler.currentPoint !== null) {
+                if (this.constraintHandler.currentConstraint != null &&
+                    this.constraintHandler.currentFocus != null &&
+                    this.constraintHandler.currentPoint != null) {
                     constraint = this.constraintHandler.currentConstraint;
                     current = this.constraintHandler.currentPoint.clone();
                 }
-                else if (this.previous !== null && domEvent.isShiftDown(me.getEvent())) {
+                else if (this.previous != null && domEvent.isShiftDown(me.getEvent())) {
                     if (Math.abs(this.previous.getCenterX() - point.x) < Math.abs(this.previous.getCenterY() - point.y)) {
                         point.x = this.previous.getCenterX();
                     }
@@ -542,11 +544,11 @@ var ConnectionHandler = EventSource.extend({
                 var pt2 = this.first;
 
                 // Moves the connect icon with the mouse
-                if (this.selectedIcon !== null) {
+                if (this.selectedIcon != null) {
                     var w = this.selectedIcon.bounds.width;
                     var h = this.selectedIcon.bounds.height;
 
-                    if (this.currentState !== null && this.targetConnectImage) {
+                    if (this.currentState != null && this.targetConnectImage) {
                         var pos = this.getIconPosition(this.selectedIcon, this.currentState);
                         this.selectedIcon.bounds.x = pos.x;
                         this.selectedIcon.bounds.y = pos.y;
@@ -561,11 +563,11 @@ var ConnectionHandler = EventSource.extend({
                 }
 
                 // Uses edge state to compute the terminal points
-                if (this.edgeState !== null) {
-                    this.edgeState.absolutePoints = [null, (this.currentState !== null) ? null : current];
+                if (this.edgeState != null) {
+                    this.edgeState.absolutePoints = [null, (this.currentState != null) ? null : current];
                     this.graph.view.updateFixedTerminalPoint(this.edgeState, this.previous, true, this.sourceConstraint);
 
-                    if (this.currentState !== null) {
+                    if (this.currentState != null) {
                         if (constraint === null) {
                             constraint = this.graph.getConnectionConstraint(this.edgeState, this.previous, false);
                         }
@@ -577,7 +579,7 @@ var ConnectionHandler = EventSource.extend({
                     // Scales and translates the waypoints to the model
                     var realPoints = null;
 
-                    if (this.waypoints !== null) {
+                    if (this.waypoints != null) {
                         realPoints = [];
 
                         for (var i = 0; i < this.waypoints.length; i++) {
@@ -593,23 +595,23 @@ var ConnectionHandler = EventSource.extend({
                     pt2 = this.edgeState.absolutePoints[0];
                 }
                 else {
-                    if (this.currentState !== null) {
+                    if (this.currentState != null) {
                         if (this.constraintHandler.currentConstraint === null) {
                             var tmp = this.getTargetPerimeterPoint(this.currentState, me);
 
-                            if (tmp !== null) {
+                            if (tmp != null) {
                                 current = tmp;
                             }
                         }
                     }
 
                     // Computes the source perimeter point
-                    if (this.sourceConstraint === null && this.previous !== null) {
-                        var next = (this.waypoints !== null && this.waypoints.length > 0) ?
+                    if (this.sourceConstraint === null && this.previous != null) {
+                        var next = (this.waypoints != null && this.waypoints.length > 0) ?
                             this.waypoints[0] : current;
                         var _tmp = this.getSourcePerimeterPoint(this.previous, next, me);
 
-                        if (_tmp !== null) {
+                        if (_tmp != null) {
                             pt2 = _tmp;
                         }
                     }
@@ -622,10 +624,10 @@ var ConnectionHandler = EventSource.extend({
                 if (this.currentState === null && this.movePreviewAway) {
                     var tmp1 = pt2;
 
-                    if (this.edgeState !== null && this.edgeState.absolutePoints.length > 2) {
+                    if (this.edgeState != null && this.edgeState.absolutePoints.length > 2) {
                         var tmp2 = this.edgeState.absolutePoints[this.edgeState.absolutePoints.length - 2];
 
-                        if (tmp2 !== null) {
+                        if (tmp2 != null) {
                             tmp1 = tmp2;
                         }
                     }
@@ -651,7 +653,7 @@ var ConnectionHandler = EventSource.extend({
                     if (_dx > this.graph.tolerance || _dy > this.graph.tolerance) {
                         this.shape = this.createShape();
 
-                        if (this.edgeState !== null) {
+                        if (this.edgeState != null) {
                             this.shape.apply(this.edgeState);
                         }
 
@@ -661,14 +663,14 @@ var ConnectionHandler = EventSource.extend({
                 }
 
                 // Updates the points in the preview edge
-                if (this.shape !== null) {
-                    if (this.edgeState !== null) {
+                if (this.shape != null) {
+                    if (this.edgeState != null) {
                         this.shape.points = this.edgeState.absolutePoints;
                     }
                     else {
                         var pts = [pt2];
 
-                        if (this.waypoints !== null) {
+                        if (this.waypoints != null) {
                             pts = pts.concat(this.waypoints);
                         }
 
@@ -685,11 +687,11 @@ var ConnectionHandler = EventSource.extend({
             else if (!this.isEnabled() || !this.graph.isEnabled()) {
                 this.constraintHandler.reset();
             }
-            else if (this.previous !== this.currentState && this.edgeState === null) {
+            else if (this.previous != this.currentState && this.edgeState === null) {
                 this.destroyIcons();
 
                 // Sets the cursor on the current shape
-                if (this.currentState !== null && this.error === null && this.constraintHandler.currentConstraint === null) {
+                if (this.currentState != null && this.error === null && this.constraintHandler.currentConstraint === null) {
                     this.icons = this.createIcons(this.currentState);
 
                     if (this.icons === null) {
@@ -700,12 +702,12 @@ var ConnectionHandler = EventSource.extend({
 
                 this.previous = this.currentState;
             }
-            else if (this.previous === this.currentState && this.currentState !== null && this.icons === null && !this.graph.isMouseDown) {
+            else if (this.previous === this.currentState && this.currentState != null && this.icons === null && !this.graph.isMouseDown) {
                 // Makes sure that no cursors are changed
                 me.consume();
             }
 
-            if (!this.graph.isMouseDown && this.currentState !== null && this.icons !== null) {
+            if (!this.graph.isMouseDown && this.currentState != null && this.icons != null) {
                 var hitsIcon = false;
                 var target = me.getSource();
 
@@ -728,14 +730,14 @@ var ConnectionHandler = EventSource.extend({
         var view = state.view;
         var targetPerimeter = view.getPerimeterFunction(state);
 
-        if (targetPerimeter !== null) {
-            var next = (this.waypoints !== null && this.waypoints.length > 0) ?
+        if (targetPerimeter != null) {
+            var next = (this.waypoints != null && this.waypoints.length > 0) ?
                 this.waypoints[this.waypoints.length - 1] :
                 new Point(this.previous.getCenterX(), this.previous.getCenterY());
             var tmp = targetPerimeter(view.getPerimeterBounds(state),
                 this.edgeState, next, false);
 
-            if (tmp !== null) {
+            if (tmp != null) {
                 result = tmp;
             }
         }
@@ -752,18 +754,18 @@ var ConnectionHandler = EventSource.extend({
         var sourcePerimeter = view.getPerimeterFunction(state);
         var c = new Point(state.getCenterX(), state.getCenterY());
 
-        if (sourcePerimeter !== null) {
+        if (sourcePerimeter != null) {
             var theta = utils.getValue(state.style, constants.STYLE_ROTATION, 0);
             var rad = -theta * (Math.PI / 180);
 
-            if (theta !== 0) {
+            if (theta != 0) {
                 next = Point.getRotatedPoint(new Point(next.x, next.y), Math.cos(rad), Math.sin(rad), c);
             }
 
             var tmp = sourcePerimeter(view.getPerimeterBounds(state), state, next, false);
 
-            if (tmp !== null) {
-                if (theta !== 0) {
+            if (tmp != null) {
+                if (theta != 0) {
                     tmp = Point.getRotatedPoint(new Point(tmp.x, tmp.y), Math.cos(-rad), Math.sin(-rad), c);
                 }
 
@@ -783,14 +785,14 @@ var ConnectionHandler = EventSource.extend({
     },
 
     isStopEvent: function (me) {
-        return me.getState() !== null;
+        return me.getState() != null;
     },
 
     addWaypointForEvent: function (me) {
         var point = Point.convertPoint(this.graph.container, me.getX(), me.getY());
         var dx = Math.abs(point.x - this.first.x);
         var dy = Math.abs(point.y - this.first.y);
-        var addPoint = this.waypoints !== null || (this.mouseDownCounter > 1 &&
+        var addPoint = this.waypoints != null || (this.mouseDownCounter > 1 &&
             (dx > this.graph.tolerance || dy > this.graph.tolerance));
 
         if (addPoint) {
@@ -816,11 +818,11 @@ var ConnectionHandler = EventSource.extend({
 
             // Inserts the edge if no validation error exists
             if (this.error === null) {
-                var source = (this.previous !== null) ? this.previous.cell : null;
+                var source = (this.previous != null) ? this.previous.cell : null;
                 var target = null;
 
-                if (this.constraintHandler.currentConstraint !== null &&
-                    this.constraintHandler.currentFocus !== null) {
+                if (this.constraintHandler.currentConstraint != null &&
+                    this.constraintHandler.currentFocus != null) {
                     target = this.constraintHandler.currentFocus.cell;
                 }
 
@@ -832,7 +834,7 @@ var ConnectionHandler = EventSource.extend({
             }
             else {
                 // Selects the source terminal for self-references
-                if (this.previous !== null && this.marker.validState !== null &&
+                if (this.previous != null && this.marker.validState != null &&
                     this.previous.cell === this.marker.validState.cell) {
                     this.graph.selectCellForEvent(this.marker.source/*, evt*/);
                 }
@@ -849,7 +851,7 @@ var ConnectionHandler = EventSource.extend({
             me.consume();
         }
 
-        if (this.first !== null) {
+        if (this.first != null) {
             this.reset();
         }
     },
@@ -860,7 +862,7 @@ var ConnectionHandler = EventSource.extend({
      * Resets the state of this handler.
      */
     reset: function () {
-        if (this.shape !== null) {
+        if (!isNullOrUndefined(this.shape)) {
             this.shape.destroy();
             this.shape = null;
         }
@@ -937,7 +939,7 @@ var ConnectionHandler = EventSource.extend({
      * released.
      */
     connect: function (source, target, evt, dropTarget) {
-        if (target !== null || this.isCreateTarget() || this.graph.allowDanglingEdges) {
+        if (target != null || this.isCreateTarget() || this.graph.allowDanglingEdges) {
             // Uses the common parent of source and target or
             // the default parent to insert the edge
             var model = this.graph.getModel();
@@ -946,10 +948,10 @@ var ConnectionHandler = EventSource.extend({
 
             model.beginUpdate();
             try {
-                if (source !== null && target === null && this.isCreateTarget()) {
+                if (source != null && target === null && this.isCreateTarget()) {
                     target = this.createTargetVertex(evt, source);
 
-                    if (target !== null) {
+                    if (target != null) {
                         dropTarget = this.graph.getDropTarget([target], evt, dropTarget);
                         terminalInserted = true;
 
@@ -958,7 +960,7 @@ var ConnectionHandler = EventSource.extend({
                         if (dropTarget === null || !this.graph.getModel().isEdge(dropTarget)) {
                             var pstate = this.graph.getView().getState(dropTarget);
 
-                            if (pstate !== null) {
+                            if (pstate != null) {
                                 var tmp = model.getGeometry(target);
                                 tmp.x -= pstate.origin.x;
                                 tmp.y -= pstate.origin.y;
@@ -974,13 +976,13 @@ var ConnectionHandler = EventSource.extend({
 
                 var parent = this.graph.getDefaultParent();
 
-                if (source !== null && target !== null &&
+                if (source != null && target != null &&
                     model.getParent(source) === model.getParent(target) &&
-                    model.getParent(model.getParent(source)) !== model.getRoot()) {
+                    model.getParent(model.getParent(source)) != model.getRoot()) {
                     parent = model.getParent(source);
 
-                    if ((source.geometry !== null && source.geometry.relative) &&
-                        (target.geometry !== null && target.geometry.relative)) {
+                    if ((source.geometry != null && source.geometry.relative) &&
+                        (target.geometry != null && target.geometry.relative)) {
                         parent = model.getParent(parent);
                     }
                 }
@@ -990,20 +992,20 @@ var ConnectionHandler = EventSource.extend({
                 var value = null;
                 var style = null;
 
-                if (this.edgeState !== null) {
+                if (this.edgeState != null) {
                     value = this.edgeState.cell.value;
                     style = this.edgeState.cell.style;
                 }
 
                 edge = this.insertEdge(parent, null, value, source, target, style);
 
-                if (edge !== null) {
+                if (edge != null) {
                     // Updates the connection constraints
                     this.graph.setConnectionConstraint(edge, source, true, this.sourceConstraint);
                     this.graph.setConnectionConstraint(edge, target, false, this.constraintHandler.currentConstraint);
 
                     // Uses geometry of the preview edge state
-                    if (this.edgeState !== null) {
+                    if (this.edgeState != null) {
                         model.setGeometry(edge, this.edgeState.cell.geometry);
                     }
 
@@ -1018,7 +1020,7 @@ var ConnectionHandler = EventSource.extend({
                     }
 
                     // Uses scaled waypoints in geometry
-                    if (this.waypoints !== null && this.waypoints.length > 0) {
+                    if (this.waypoints != null && this.waypoints.length > 0) {
                         var s = this.graph.view.scale;
                         var tr = this.graph.view.translate;
                         geo.points = [];
@@ -1075,7 +1077,7 @@ var ConnectionHandler = EventSource.extend({
         // Uses the first non-relative source
         var geo = this.graph.getCellGeometry(source);
 
-        while (geo !== null && geo.relative) {
+        while (geo != null && geo.relative) {
             source = this.graph.getModel().getParent(source);
             geo = this.graph.getCellGeometry(source);
         }
@@ -1083,7 +1085,7 @@ var ConnectionHandler = EventSource.extend({
         var clone = this.graph.cloneCells([source])[0];
         geo = this.graph.getModel().getGeometry(clone);
 
-        if (geo !== null) {
+        if (geo != null) {
             var t = this.graph.view.translate;
             var s = this.graph.view.scale;
             var point = new Point(this.currentPoint.x / s - t.x, this.currentPoint.y / s - t.y);
@@ -1096,7 +1098,7 @@ var ConnectionHandler = EventSource.extend({
             if (tol > 0) {
                 var sourceState = this.graph.view.getState(source);
 
-                if (sourceState !== null) {
+                if (sourceState != null) {
                     var x = sourceState.x / s - t.x;
                     var y = sourceState.y / s - t.y;
 
@@ -1122,7 +1124,7 @@ var ConnectionHandler = EventSource.extend({
         var edge = null;
 
         // Creates a new edge using the factoryMethod
-        if (this.factoryMethod !== null) {
+        if (this.factoryMethod != null) {
             edge = this.factoryMethod(source, target, style);
         }
 
@@ -1142,34 +1144,34 @@ var ConnectionHandler = EventSource.extend({
     destroy: function () {
         this.graph.removeMouseListener(this);
 
-        if (this.shape !== null) {
+        if (this.shape != null) {
             this.shape.destroy();
             this.shape = null;
         }
 
-        if (this.marker !== null) {
+        if (this.marker != null) {
             this.marker.destroy();
             this.marker = null;
         }
 
-        if (this.constraintHandler !== null) {
+        if (this.constraintHandler != null) {
             this.constraintHandler.destroy();
             this.constraintHandler = null;
         }
 
-        if (this.changeHandler !== null) {
+        if (this.changeHandler != null) {
             this.graph.getModel().removeListener(this.changeHandler);
             this.graph.getView().removeListener(this.changeHandler);
             this.changeHandler = null;
         }
 
-        if (this.drillHandler !== null) {
+        if (this.drillHandler != null) {
             this.graph.removeListener(this.drillHandler);
             this.graph.getView().removeListener(this.drillHandler);
             this.drillHandler = null;
         }
 
-        if (this.escapeHandler !== null) {
+        if (this.escapeHandler != null) {
             this.graph.removeListener(this.escapeHandler);
             this.escapeHandler = null;
         }

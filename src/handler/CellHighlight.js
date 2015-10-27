@@ -33,18 +33,18 @@ var CellHighlight = Class.create({
                 }
             });
 
-            this.graph.getView().addListener(domEvent.SCALE, this.repaintHandler);
-            this.graph.getView().addListener(domEvent.TRANSLATE, this.repaintHandler);
-            this.graph.getView().addListener(domEvent.SCALE_AND_TRANSLATE, this.repaintHandler);
-            this.graph.getModel().addListener(domEvent.CHANGE, this.repaintHandler);
+            this.graph.getView().on(domEvent.SCALE, this.repaintHandler);
+            this.graph.getView().on(domEvent.TRANSLATE, this.repaintHandler);
+            this.graph.getView().on(domEvent.SCALE_AND_TRANSLATE, this.repaintHandler);
+            this.graph.getModel().on(domEvent.CHANGE, this.repaintHandler);
 
             // Hides the marker if the current root changes
             this.resetHandler = utils.bind(this, function () {
                 this.hide();
             });
 
-            this.graph.getView().addListener(domEvent.DOWN, this.resetHandler);
-            this.graph.getView().addListener(domEvent.UP, this.resetHandler);
+            this.graph.getView().on(domEvent.DOWN, this.resetHandler);
+            this.graph.getView().on(domEvent.UP, this.resetHandler);
         }
     },
 
