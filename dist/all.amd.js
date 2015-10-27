@@ -15681,7 +15681,9 @@ module.exports = Class.create({
     isPort: function (cell) {
         return false;
     },
-    getTerminalForPort: function () {},
+    getTerminalForPort: function (cell, source) {
+        return this.model.getParent(cell);
+    },
     getChildOffsetForCell: function (cell) {
         return null;
     },

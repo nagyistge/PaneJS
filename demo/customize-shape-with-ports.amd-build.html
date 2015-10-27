@@ -13,23 +13,49 @@
 <script>
     window.onload = function () {
         require([
+            '../build/Point',
             '../build/Graph'
-        ], function (Graph) {
-
+        ], function (
+            Point,
+            Graph
+        ) {
             var container = document.getElementById('graphContainer');
 
             var graph = new Graph(container);
 
             graph.setConnectable(true);
+            graph.isPort = function (cell) {
+                var geo = this.getCellGeometry(cell);
+                return (geo != null) ? geo.relative : false;
+            };
+
+            graph.isCellFoldable = function(cell){
+                return true;
+            };
 
             var parent = graph.getDefaultParent();
 
             graph.getModel().beginUpdate();
 
             try {
-                var v1 = graph.insertVertex(parent, null, 'Hello', 20, 20, 80, 30);
-                var v2 = graph.insertVertex(parent, null, 'PaneJS', 200, 150, 80, 30);
-                var e1 = graph.insertEdge(parent, null, '', v1, v2);
+                var v1 = graph.insertVertex(parent, null, 'Hello', 20, 80, 80, 30);
+                v1.setConnectable(false);
+
+                var v11 = graph.insertVertex(v1, null, '', 1, 1, 10, 10);
+                v11.geometry.offset = new Point(-5, -5);
+                v11.geometry.relative = true;
+
+                var v12 = graph.insertVertex(v1, null, '', 1, 0, 10, 10);
+                v12.geometry.offset = new Point(-5, -5);
+                v12.geometry.relative = true;
+
+                var v2 = graph.insertVertex(parent, null, 'World!', 200, 150, 80, 30);
+                var v3 = graph.insertVertex(parent, null, 'World2', 200, 20, 80, 30);
+
+                var e1 = graph.insertEdge(parent, null, '', v11, v2);
+                var e2 = graph.insertEdge(parent, null, '', v12, v3);
+
+                //var e3 = graph.insertEdge(parent, null, '', v1, v2);
             }
             finally {
                 graph.getModel().endUpdate();
