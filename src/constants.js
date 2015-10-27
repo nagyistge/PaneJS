@@ -1,4 +1,6 @@
-var Rectangle = require('./Rectangle');
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+//var Rectangle = require('./Rectangle');
 
 module.exports = {
     //----------------------
@@ -106,11 +108,6 @@ module.exports = {
     ARROW_SPACING: 10,
     ARROW_WIDTH: 30,
     ARROW_SIZE: 30,
-
-    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
-    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
-    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
-    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
 
     NONE: 'none',
 

@@ -948,7 +948,7 @@ module.exports = Class.create({
                         sin = -1;
                     }
 
-                    point = utils.getRotatedPoint(point, cos, sin, cx);
+                    point = Point.getRotatedPoint(point, cos, sin, cx);
                 }
 
                 if (point != null && constraint.perimeter) {
@@ -965,7 +965,7 @@ module.exports = Class.create({
                 var cos = Math.cos(rad);
                 var sin = Math.sin(rad);
 
-                point = utils.getRotatedPoint(point, cos, sin, cx);
+                point = Point.getRotatedPoint(point, cos, sin, cx);
             }
         }
 
@@ -1422,7 +1422,7 @@ module.exports = Class.create({
     removeMouseListener: function () {},
     updateMouseEvent: function (me) {
         if (me.graphX == null || me.graphY == null) {
-            //var pt = utils.convertPoint(this.container, me.getX(), me.getY());
+            //var pt = Point.convertPoint(this.container, me.getX(), me.getY());
 
             //me.graphX = pt.x - this.panDx;
             //me.graphY = pt.y - this.panDy;

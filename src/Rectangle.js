@@ -2,6 +2,8 @@
 
 var Klass = require('./common/class');
 var Point = require('./Point');
+var utils = require('./common/utils');
+var constants = require('./constants');
 
 var Rectangle = Klass.create({
 
@@ -10,7 +12,58 @@ var Rectangle = Klass.create({
     Statics: {
         fromRectangle: function (rect) {
             return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-        }
+        },
+
+        intersectsHotspot: function (state, x, y, hotspot, min, max) {
+            hotspot = (hotspot !== null) ? hotspot : 1;
+            min = (min !== null) ? min : 0;
+            max = (max !== null) ? max : 0;
+
+            if (hotspot > 0) {
+                var cx = state.getCenterX();
+                var cy = state.getCenterY();
+                var w = state.width;
+                var h = state.height;
+
+                var start = utils.getValue(state.style, constants.STYLE_STARTSIZE) * state.view.scale;
+
+                if (start > 0) {
+                    if (utils.getValue(state.style, constants.STYLE_HORIZONTAL, true)) {
+                        cy = state.y + start / 2;
+                        h = start;
+                    }
+                    else {
+                        cx = state.x + start / 2;
+                        w = start;
+                    }
+                }
+
+                w = Math.max(min, w * hotspot);
+                h = Math.max(min, h * hotspot);
+
+                if (max > 0) {
+                    w = Math.min(w, max);
+                    h = Math.min(h, max);
+                }
+
+                var rect = new Rectangle(cx - w / 2, cy - h / 2, w, h);
+                var alpha = utils.toRadians(utils.getValue(state.style, constants.STYLE_ROTATION) || 0);
+
+                if (alpha !== 0) {
+                    var cos = Math.cos(-alpha);
+                    var sin = Math.sin(-alpha);
+                    var cx1 = new Point(state.getCenterX(), state.getCenterY());
+                    var pt = Point.getRotatedPoint(new Point(x, y), cos, sin, cx1);
+                    x = pt.x;
+                    y = pt.y;
+                }
+
+                return utils.contains(rect, x, y);
+            }
+
+            return true;
+        },
+
     },
 
     constructor: function Rectangle(x, y, width, height) {
@@ -109,6 +162,13 @@ var Rectangle = Klass.create({
         var rect = this;
         return new Rectangle(rect.x, rect.y, rect.width, rect.height);
     }
+});
+
+utils.extend(constants, {
+    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
+    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
+    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
+    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
 });
 
 module.exports = Rectangle;

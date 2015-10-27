@@ -1,4 +1,5 @@
-'use strict';
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('../common/class');
 

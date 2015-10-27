@@ -61,7 +61,7 @@ module.exports = Rectangle.extend({
         // Rotates the geometry
         if (!this.relative) {
             var ct = new Point(this.getCenterX(), this.getCenterY());
-            var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+            var pt = Point.getRotatedPoint(ct, cos, sin, cx);
 
             this.x = Math.round(pt.x - this.width / 2);
             this.y = Math.round(pt.y - this.height / 2);
@@ -69,14 +69,14 @@ module.exports = Rectangle.extend({
 
         // Rotates the source point
         if (this.sourcePoint) {
-            var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
+            var pt = Point.getRotatedPoint(this.sourcePoint, cos, sin, cx);
             this.sourcePoint.x = Math.round(pt.x);
             this.sourcePoint.y = Math.round(pt.y);
         }
 
         // Translates the target point
         if (this.targetPoint) {
-            var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
+            var pt = Point.getRotatedPoint(this.targetPoint, cos, sin, cx);
             this.targetPoint.x = Math.round(pt.x);
             this.targetPoint.y = Math.round(pt.y);
         }
@@ -85,7 +85,7 @@ module.exports = Rectangle.extend({
         if (this.points != null) {
             for (var i = 0; i < this.points.length; i++) {
                 if (this.points[i] != null) {
-                    var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
+                    var pt = Point.getRotatedPoint(this.points[i], cos, sin, cx);
                     this.points[i].x = Math.round(pt.x);
                     this.points[i].y = Math.round(pt.y);
                 }

@@ -354,7 +354,7 @@ var ConnectionHandler = EventSource.extend({
                 var cos = Math.cos(alpha);
                 var sin = Math.sin(alpha);
                 var ct = new Point(state.getCenterX(), state.getCenterY());
-                var pt = utils.getRotatedPoint(new Point(cx, cy), cos, sin, ct);
+                var pt = Point.getRotatedPoint(new Point(cx, cy), cos, sin, ct);
                 cx = pt.x;
                 cy = pt.y;
             }
@@ -757,14 +757,14 @@ var ConnectionHandler = EventSource.extend({
             var rad = -theta * (Math.PI / 180);
 
             if (theta !== 0) {
-                next = utils.getRotatedPoint(new Point(next.x, next.y), Math.cos(rad), Math.sin(rad), c);
+                next = Point.getRotatedPoint(new Point(next.x, next.y), Math.cos(rad), Math.sin(rad), c);
             }
 
             var tmp = sourcePerimeter(view.getPerimeterBounds(state), state, next, false);
 
             if (tmp !== null) {
                 if (theta !== 0) {
-                    tmp = utils.getRotatedPoint(new Point(tmp.x, tmp.y), Math.cos(-rad), Math.sin(-rad), c);
+                    tmp = Point.getRotatedPoint(new Point(tmp.x, tmp.y), Math.cos(-rad), Math.sin(-rad), c);
                 }
 
                 result = tmp;
@@ -787,7 +787,7 @@ var ConnectionHandler = EventSource.extend({
     },
 
     addWaypointForEvent: function (me) {
-        var point = utils.convertPoint(this.graph.container, me.getX(), me.getY());
+        var point = Point.convertPoint(this.graph.container, me.getX(), me.getY());
         var dx = Math.abs(point.x - this.first.x);
         var dy = Math.abs(point.y - this.first.y);
         var addPoint = this.waypoints !== null || (this.mouseDownCounter > 1 &&

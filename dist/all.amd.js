@@ -6,14 +6,153 @@ define('PaneJS/ConnectionConstraint',['require','exports','module'],function (re
 module.exports = ConnectionConstraint;
 
 });
+/**
+ * Copyright (c) 2006-2013, JGraph Ltd
+ */
+/**
+ * Class: mxImage
+ *
+ * Encapsulates the URL, width and height of an image.
+ *
+ * Constructor: mxImage
+ *
+ * Constructs a new image.
+ */
+function mxImage(src, width, height) {
+    this.src = src;
+    this.width = width;
+    this.height = height;
+}
+
+/**
+ * Variable: src
+ *
+ * String that specifies the URL of the image.
+ */
+mxImage.prototype.src = null;
+
+/**
+ * Variable: width
+ *
+ * Integer that specifies the width of the image.
+ */
+mxImage.prototype.width = null;
+
+/**
+ * Variable: height
+ *
+ * Integer that specifies the height of the image.
+ */
+mxImage.prototype.height = null;
+define('PaneJS/cellPath',['require','exports','module'],function (require, exports, module) {
+var cellPath = {
+
+    PATH_SEPARATOR: '.',
+
+    create: function (cell) {
+        var result = '';
+
+        if (cell !== null) {
+            var parent = cell.getParent();
+
+            while (parent !== null) {
+                var index = parent.getIndex(cell);
+                result = index + mxCellPath.PATH_SEPARATOR + result;
+
+                cell = parent;
+                parent = cell.getParent();
+            }
+        }
+
+        // Removes trailing separator
+        var n = result.length;
+
+        if (n > 1) {
+            result = result.substring(0, n - 1);
+        }
+
+        return result;
+    },
+
+    getParentPath: function (path) {
+        if (path !== null) {
+            var index = path.lastIndexOf(mxCellPath.PATH_SEPARATOR);
+
+            if (index >= 0) {
+                return path.substring(0, index);
+            }
+            else if (path.length > 0) {
+                return '';
+            }
+        }
+
+        return null;
+    },
+
+    resolve: function (root, path) {
+        var parent = root;
+
+        if (path !== null) {
+            var tokens = path.split(mxCellPath.PATH_SEPARATOR);
+
+            for (var i = 0; i < tokens.length; i++) {
+                parent = parent.getChildAt(parseInt(tokens[i]));
+            }
+        }
+
+        return parent;
+    },
+
+    compare: function (p1, p2) {
+        var min = Math.min(p1.length, p2.length);
+        var comp = 0;
+
+        for (var i = 0; i < min; i++) {
+            if (p1[i] !== p2[i]) {
+                if (p1[i].length === 0 ||
+                    p2[i].length === 0) {
+                    comp = (p1[i] === p2[i]) ? 0 : ((p1[i] > p2[i]) ? 1 : -1);
+                }
+                else {
+                    var t1 = parseInt(p1[i]);
+                    var t2 = parseInt(p2[i]);
+
+                    comp = (t1 === t2) ? 0 : ((t1 > t2) ? 1 : -1);
+                }
+
+                break;
+            }
+        }
+
+        // Compares path length if both paths are equal to this point
+        if (comp === 0) {
+            var t11 = p1.length;
+            var t21 = p2.length;
+
+            if (t11 !== t21) {
+                comp = (t11 > t21) ? 1 : -1;
+            }
+        }
+
+        return comp;
+    }
+};
+
+module.exports = cellPath;
 
 
-define('PaneJS/common/detector',['require','exports','module'],function (require, exports, module) {var ua = navigator.userAgent;
+});
+
+
+define('PaneJS/common/detector',['require','exports','module'],function (require, exports, module) {
+var ua = navigator.userAgent;
 var av = navigator.appVersion;
 
 module.exports = {
     // IE
     IS_IE: ua.indexOf('MSIE') >= 0,
+
+    IS_QUIRKS: navigator.userAgent.indexOf('MSIE') >= 0 && (document.documentMode === null || document.documentMode === 5),
 
     IS_IE11: !!ua.match(/Trident\/7\./),
 
@@ -40,519 +179,315 @@ module.exports = {
 
     IS_TOUCH: 'ontouchstart' in document.documentElement,
 
-    IS_POINTER: window.navigator.msPointerEnabled || false
+    IS_POINTER: window.navigator.msPointerEnabled || false,
+
+    IS_OT: navigator.userAgent.indexOf('Presto/2.4.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.3.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.2.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.1.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.0.') < 0 &&
+    navigator.userAgent.indexOf('Presto/1.') < 0,
+
+    /**
+     * Variable: IS_MT
+     *
+     * True if -moz-transform is available as a CSS style. This is the case
+     * for all Firefox-based browsers newer than or equal 3, such as Camino,
+     * Iceweasel, Seamonkey and Iceape.
+     */
+    IS_MT: (navigator.userAgent.indexOf('Firefox/') >= 0 &&
+    navigator.userAgent.indexOf('Firefox/1.') < 0 &&
+    navigator.userAgent.indexOf('Firefox/2.') < 0) ||
+    (navigator.userAgent.indexOf('Iceweasel/') >= 0 &&
+    navigator.userAgent.indexOf('Iceweasel/1.') < 0 &&
+    navigator.userAgent.indexOf('Iceweasel/2.') < 0) ||
+    (navigator.userAgent.indexOf('SeaMonkey/') >= 0 &&
+    navigator.userAgent.indexOf('SeaMonkey/1.') < 0) ||
+    (navigator.userAgent.indexOf('Iceape/') >= 0 &&
+    navigator.userAgent.indexOf('Iceape/1.') < 0),
+
 };
+
 
 });
-define('PaneJS/common/utils',['require','exports','module'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-/* global window */
+define('PaneJS/constants',['require','exports','module'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+//var Rectangle = require('PaneJS/Rectangle');
 
-var utils = {};
-
-var arrProto = Array.prototype;
-var objProto = Object.prototype;
-var slice = arrProto.slice;
-var toString = objProto.toString;
-var hasOwn = objProto.hasOwnProperty;
+module.exports = {
+    //----------------------
+    EVENT_SPLITTER: /\s+/,
+    OBJECT_ID: 'objectId',
+    //----------------------
 
 
-// Lang
-// ----
+    DEFAULT_HOTSPOT: 0.3,
+    MIN_HOTSPOT_SIZE: 8,
+    MAX_HOTSPOT_SIZE: 0,
 
-function isType(obj, type) {
-    return toString.call(obj) === '[object ' + type + ']';
-}
+    RENDERING_HINT_EXACT: 'exact',
+    RENDERING_HINT_FASTER: 'faster',
+    RENDERING_HINT_FASTEST: 'fastest',
 
-function isObject(obj) {
-    var type = typeof obj;
-    return type === 'function' || type === 'object' && !!obj;
-}
+    DIALECT_SVG: 'svg',
+    DIALECT_VML: 'vml',
+    DIALECT_MIXEDHTML: 'mixedHtml',
+    DIALECT_PREFERHTML: 'preferHtml',
+    DIALECT_STRICTHTML: 'strictHtml',
 
-function isFunction(obj) {
-    return isType(obj, 'Function');
-}
+    NS_SVG: 'http://www.w3.org/2000/svg',
+    NS_XHTML: 'http://www.w3.org/1999/xhtml',
+    NS_XLINK: 'http://www.w3.org/1999/xlink',
 
-function isNull(obj) {
-    return obj === null;
-}
+    SHADOW_COLOR: 'gray',
+    SHADOWCOLOR: 'gray',
+    SHADOW_OFFSET_X: 2,
+    SHADOW_OFFSET_Y: 3,
+    SHADOW_OPACITY: 1,
 
-function isUndefined(obj) {
-    return typeof obj === 'undefined';
-}
+    NODETYPE_ELEMENT: 1,
+    NODETYPE_ATTRIBUTE: 2,
+    NODETYPE_TEXT: 3,
+    NODETYPE_CDATA: 4,
+    NODETYPE_ENTITY_REFERENCE: 5,
+    NODETYPE_ENTITY: 6,
+    NODETYPE_PROCESSING_INSTRUCTION: 7,
+    NODETYPE_COMMENT: 8,
+    NODETYPE_DOCUMENT: 9,
+    NODETYPE_DOCUMENTTYPE: 10,
+    NODETYPE_DOCUMENT_FRAGMENT: 11,
+    NODETYPE_NOTATION: 12,
 
-function isNullOrUndefined(obj) {
-    return isUndefined(obj) || isNull(obj);
-}
+    TOOLTIP_VERTICAL_OFFSET: 16,
 
-function isWindow(obj) {
-    return obj !== null && obj === obj.window;
-}
+    DEFAULT_VALID_COLOR: '#00FF00',
+    DEFAULT_INVALID_COLOR: '#FF0000',
+    OUTLINE_HIGHLIGHT_COLOR: '#00FF00',
+    OUTLINE_HIGHLIGHT_STROKEWIDTH: 5,
+    HIGHLIGHT_STROKEWIDTH: 3,
 
-var isArray = Array.isArray || function (obj) {
-        return isType(obj, 'Array');
-    };
+    CURSOR_MOVABLE_VERTEX: 'move',
+    CURSOR_MOVABLE_EDGE: 'move',
+    CURSOR_LABEL_HANDLE: 'default',
+    CURSOR_TERMINAL_HANDLE: 'pointer',
+    CURSOR_BEND_HANDLE: 'crosshair',
+    CURSOR_VIRTUAL_BEND_HANDLE: 'crosshair',
+    CURSOR_CONNECT: 'pointer',
 
-function isArrayLike(obj) {
-    if (isArray(obj)) {
-        return true;
-    }
+    HIGHLIGHT_COLOR: '#00FF00',
+    CONNECT_TARGET_COLOR: '#0000FF',
+    INVALID_CONNECT_TARGET_COLOR: '#FF0000',
+    DROP_TARGET_COLOR: '#0000FF',
+    VALID_COLOR: '#00FF00',
+    INVALID_COLOR: '#FF0000',
+    EDGE_SELECTION_COLOR: '#00FF00',
+    VERTEX_SELECTION_COLOR: '#00FF00',
 
-    if (isFunction(obj) || isWindow(obj)) {
-        return false;
-    }
+    VERTEX_SELECTION_STROKEWIDTH: 1,
+    EDGE_SELECTION_STROKEWIDTH: 1,
+    VERTEX_SELECTION_DASHED: true,
+    EDGE_SELECTION_DASHED: true,
+    GUIDE_COLOR: '#FF0000',
+    GUIDE_STROKEWIDTH: 1,
+    OUTLINE_COLOR: '#0099FF',
+    OUTLINE_STROKEWIDTH: 3,//(mxClient.IS_IE) ? 2 : 3,
+    HANDLE_SIZE: 7,
+    LABEL_HANDLE_SIZE: 4,
+    HANDLE_FILLCOLOR: '#00FF00',
+    HANDLE_STROKECOLOR: 'black',
+    LABEL_HANDLE_FILLCOLOR: 'yellow',
+    CONNECT_HANDLE_FILLCOLOR: '#0000FF',
+    LOCKED_HANDLE_FILLCOLOR: '#FF0000',
+    OUTLINE_HANDLE_FILLCOLOR: '#00FFFF',
+    OUTLINE_HANDLE_STROKECOLOR: '#0033FF',
 
-    var length = !!obj && 'length' in obj && obj.length;
+    //--------------------------------------
+    DEFAULT_FONT_FAMILY: 'Arial,Helvetica',
+    DEFAULT_FONTFAMILY: 'Arial,Helvetica',
+    DEFAULT_FONT_SIZE: 11,
+    DEFAULT_FONTSIZE: 11,
+    //--------------------------------------
 
-    return length === 0 ||
-        typeof length === 'number' && length > 0 && (length - 1) in obj;
-}
+    LINE_HEIGHT: 1.2,
+    ABSOLUTE_LINE_HEIGHT: false,
+    DEFAULT_FONTSTYLE: 0,
+    DEFAULT_STARTSIZE: 40,
+    DEFAULT_MARKERSIZE: 6,
+    DEFAULT_IMAGESIZE: 24,
+    ENTITY_SEGMENT: 30,
+    RECTANGLE_ROUNDING_FACTOR: 0.15,
+    LINE_ARCSIZE: 20,
+    ARROW_SPACING: 10,
+    ARROW_WIDTH: 30,
+    ARROW_SIZE: 30,
 
-function isNumeric(obj) {
-    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-}
+    NONE: 'none',
 
-utils.isType = isType;
-utils.isNull = isNull;
-utils.isArray = isArray;
-utils.isObject = isObject;
-utils.isWindow = isWindow;
-utils.isNumeric = isNumeric;
-utils.isFunction = isFunction;
-utils.isUndefined = isUndefined;
-utils.isArrayLike = isArrayLike;
-utils.isNullOrUndefined = isNullOrUndefined;
 
-// String
-// ------
+    STYLE_PERIMETER: 'perimeter',
+    STYLE_SOURCE_PORT: 'sourcePort',
+    STYLE_TARGET_PORT: 'targetPort',
+    STYLE_PORT_CONSTRAINT: 'portConstraint',
+    STYLE_PORT_CONSTRAINT_ROTATION: 'portConstraintRotation',
+    STYLE_OPACITY: 'opacity',
+    STYLE_TEXT_OPACITY: 'textOpacity',
+    STYLE_OVERFLOW: 'overflow',
+    STYLE_ORTHOGONAL: 'orthogonal',
+    STYLE_EXIT_X: 'exitX',
+    STYLE_EXIT_Y: 'exitY',
+    STYLE_EXIT_PERIMETER: 'exitPerimeter',
+    STYLE_ENTRY_X: 'entryX',
+    STYLE_ENTRY_Y: 'entryY',
+    STYLE_ENTRY_PERIMETER: 'entryPerimeter',
+    STYLE_WHITE_SPACE: 'whiteSpace',
+    STYLE_ROTATION: 'rotation',
+    STYLE_FILLCOLOR: 'fillColor',
+    STYLE_SWIMLANE_FILLCOLOR: 'swimlaneFillColor',
+    STYLE_MARGIN: 'margin',
+    STYLE_GRADIENTCOLOR: 'gradientColor',
+    STYLE_GRADIENT_DIRECTION: 'gradientDirection',
+    STYLE_STROKECOLOR: 'strokeColor',
+    STYLE_SEPARATORCOLOR: 'separatorColor',
+    STYLE_STROKEWIDTH: 'strokeWidth',
+    STYLE_ALIGN: 'align',
+    STYLE_VERTICAL_ALIGN: 'verticalAlign',
+    STYLE_LABEL_WIDTH: 'labelWidth',
+    STYLE_LABEL_POSITION: 'labelPosition',
+    STYLE_VERTICAL_LABEL_POSITION: 'verticalLabelPosition',
+    STYLE_IMAGE_ASPECT: 'imageAspect',
+    STYLE_IMAGE_ALIGN: 'imageAlign',
+    STYLE_IMAGE_VERTICAL_ALIGN: 'imageVerticalAlign',
+    STYLE_GLASS: 'glass',
+    STYLE_IMAGE: 'image',
+    STYLE_IMAGE_WIDTH: 'imageWidth',
+    STYLE_IMAGE_HEIGHT: 'imageHeight',
+    STYLE_IMAGE_BACKGROUND: 'imageBackground',
+    STYLE_IMAGE_BORDER: 'imageBorder',
+    STYLE_FLIPH: 'flipH',
+    STYLE_FLIPV: 'flipV',
+    STYLE_NOLABEL: 'noLabel',
+    STYLE_NOEDGESTYLE: 'noEdgeStyle',
+    STYLE_LABEL_BACKGROUNDCOLOR: 'labelBackgroundColor',
+    STYLE_LABEL_BORDERCOLOR: 'labelBorderColor',
+    STYLE_LABEL_PADDING: 'labelPadding',
+    STYLE_INDICATOR_SHAPE: 'indicatorShape',
+    STYLE_INDICATOR_IMAGE: 'indicatorImage',
+    STYLE_INDICATOR_COLOR: 'indicatorColor',
+    STYLE_INDICATOR_STROKECOLOR: 'indicatorStrokeColor',
+    STYLE_INDICATOR_GRADIENTCOLOR: 'indicatorGradientColor',
+    STYLE_INDICATOR_SPACING: 'indicatorSpacing',
+    STYLE_INDICATOR_WIDTH: 'indicatorWidth',
+    STYLE_INDICATOR_HEIGHT: 'indicatorHeight',
+    STYLE_INDICATOR_DIRECTION: 'indicatorDirection',
+    STYLE_SHADOW: 'shadow',
+    STYLE_SEGMENT: 'segment',
+    STYLE_ENDARROW: 'endArrow',
+    STYLE_STARTARROW: 'startArrow',
+    STYLE_ENDSIZE: 'endSize',
+    STYLE_STARTSIZE: 'startSize',
+    STYLE_SWIMLANE_LINE: 'swimlaneLine',
+    STYLE_ENDFILL: 'endFill',
+    STYLE_STARTFILL: 'startFill',
+    STYLE_DASHED: 'dashed',
+    STYLE_DASH_PATTERN: 'dashPattern',
+    STYLE_ROUNDED: 'rounded',
+    STYLE_CURVED: 'curved',
+    STYLE_ARCSIZE: 'arcSize',
+    STYLE_SMOOTH: 'smooth',
+    STYLE_SOURCE_PERIMETER_SPACING: 'sourcePerimeterSpacing',
+    STYLE_TARGET_PERIMETER_SPACING: 'targetPerimeterSpacing',
+    STYLE_PERIMETER_SPACING: 'perimeterSpacing',
+    STYLE_SPACING: 'spacing',
+    STYLE_SPACING_TOP: 'spacingTop',
+    STYLE_SPACING_LEFT: 'spacingLeft',
+    STYLE_SPACING_BOTTOM: 'spacingBottom',
+    STYLE_SPACING_RIGHT: 'spacingRight',
+    STYLE_HORIZONTAL: 'horizontal',
+    STYLE_DIRECTION: 'direction',
+    STYLE_ELBOW: 'elbow',
+    STYLE_FONTCOLOR: 'fontColor',
+    STYLE_FONTFAMILY: 'fontFamily',
+    STYLE_FONTSIZE: 'fontSize',
+    STYLE_FONTSTYLE: 'fontStyle',
+    STYLE_ASPECT: 'aspect',
+    STYLE_AUTOSIZE: 'autosize',
+    STYLE_FOLDABLE: 'foldable',
+    STYLE_EDITABLE: 'editable',
+    STYLE_BENDABLE: 'bendable',
+    STYLE_MOVABLE: 'movable',
+    STYLE_RESIZABLE: 'resizable',
+    STYLE_ROTATABLE: 'rotatable',
+    STYLE_CLONEABLE: 'cloneable',
+    STYLE_DELETABLE: 'deletable',
+    STYLE_SHAPE: 'shape',
+    STYLE_EDGE: 'edgeStyle',
+    STYLE_LOOP: 'loopStyle',
+    STYLE_ROUTING_CENTER_X: 'routingCenterX',
+    STYLE_ROUTING_CENTER_Y: 'routingCenterY',
 
-utils.toString = function (str) {
-    return '' + str;
+    FONT_BOLD: 1,
+    FONT_ITALIC: 2,
+    FONT_UNDERLINE: 4,
+    FONT_SHADOW: 8,
+
+    SHAPE_RECTANGLE: 'rectangle',
+    SHAPE_ELLIPSE: 'ellipse',
+    SHAPE_DOUBLE_ELLIPSE: 'doubleEllipse',
+    SHAPE_RHOMBUS: 'rhombus',
+    SHAPE_LINE: 'line',
+    SHAPE_IMAGE: 'image',
+    SHAPE_ARROW: 'arrow',
+    SHAPE_LABEL: 'label',
+    SHAPE_CYLINDER: 'cylinder',
+    SHAPE_SWIMLANE: 'swimlane',
+    SHAPE_CONNECTOR: 'connector',
+    SHAPE_ACTOR: 'actor',
+    SHAPE_CLOUD: 'cloud',
+    SHAPE_TRIANGLE: 'triangle',
+    SHAPE_HEXAGON: 'hexagon',
+
+    ARROW_CLASSIC: 'classic',
+    ARROW_BLOCK: 'block',
+    ARROW_OPEN: 'open',
+    ARROW_OVAL: 'oval',
+    ARROW_DIAMOND: 'diamond',
+    ARROW_DIAMOND_THIN: 'diamondThin',
+
+    ALIGN_LEFT: 'left',
+    ALIGN_CENTER: 'center',
+    ALIGN_RIGHT: 'right',
+    ALIGN_TOP: 'top',
+    ALIGN_MIDDLE: 'middle',
+    ALIGN_BOTTOM: 'bottom',
+
+    DIRECTION_NORTH: 'north',
+    DIRECTION_SOUTH: 'south',
+    DIRECTION_EAST: 'east',
+    DIRECTION_WEST: 'west',
+
+    DIRECTION_MASK_NONE: 0,
+    DIRECTION_MASK_WEST: 1,
+    DIRECTION_MASK_NORTH: 2,
+    DIRECTION_MASK_SOUTH: 4,
+    DIRECTION_MASK_EAST: 8,
+    DIRECTION_MASK_ALL: 15,
+
+    ELBOW_VERTICAL: 'vertical',
+    ELBOW_HORIZONTAL: 'horizontal',
+
+    EDGESTYLE_ELBOW: 'elbowEdgeStyle',
+    EDGESTYLE_ENTITY_RELATION: 'entityRelationEdgeStyle',
+    EDGESTYLE_LOOP: 'loopEdgeStyle',
+    EDGESTYLE_SIDETOSIDE: 'sideToSideEdgeStyle',
+    EDGESTYLE_TOPTOBOTTOM: 'topToBottomEdgeStyle',
+    EDGESTYLE_ORTHOGONAL: 'orthogonalEdgeStyle',
+    EDGESTYLE_SEGMENT: 'segmentEdgeStyle',
+    PERIMETER_ELLIPSE: 'ellipsePerimeter',
+    PERIMETER_RECTANGLE: 'rectanglePerimeter',
+    PERIMETER_RHOMBUS: 'rhombusPerimeter',
+    PERIMETER_HEXAGON: 'hexagonPerimeter',
+    PERIMETER_TRIANGLE: 'trianglePerimeter'
 };
-
-utils.lcFirst = function (str) {
-    str = str + '';
-    return str.charAt(0).toLowerCase() + str.substr(1);
-};
-
-utils.ucFirst = function (str) {
-    str = str + '';
-    return str.charAt(0).toUpperCase() + str.substr(1);
-};
-
-utils.ltrim = function (str, chars) {
-    chars = chars || "\\s";
-
-    return str.replace(new RegExp("^[" + chars + "]+", "g"), "");
-};
-
-utils.rtrim = function (str, chars) {
-    chars = chars || "\\s";
-
-    return str.replace(new RegExp("[" + chars + "]+$", "g"), "");
-};
-
-utils.trim = function (str, chars) {
-    return utils.ltrim(utils.rtrim(str, chars), chars);
-};
-
-// Number
-// ------
-utils.toFixed = function (value, precision) {
-    var power = Math.pow(10, precision);
-    return (Math.round(value * power) / power).toFixed(precision);
-};
-
-utils.mod = function (n, m) {
-    return ((n % m) + m) % m;
-};
-
-
-// Object
-// ------
-
-function hasKey(obj, key) {
-    return obj !== null && hasOwn.call(obj, key);
-}
-
-function clone(obj, transients, shallow) {
-
-    shallow = (shallow != null) ? shallow : false;
-    var cloned = null;
-
-    if (obj && isFunction(obj.constructor)) {
-        cloned = new obj.constructor();
-
-        for (var i in obj) {
-            //if (i != mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
-            if (i !== 'objectId' && (!transients || indexOf(transients, i) < 0)) {
-                if (!shallow && typeof(obj[i]) == 'object') {
-                    cloned[i] = clone(obj[i]);
-                } else {
-                    cloned[i] = obj[i];
-                }
-            }
-        }
-    }
-
-    return cloned;
-}
-
-utils.keys = Object.keys || function (obj) {
-
-        if (!isObject(obj)) {
-            return [];
-        }
-
-        var keys = [];
-        for (var key in obj) {
-            if (hasKey(obj, key)) {
-                keys.push(key);
-            }
-        }
-
-        // ie < 9 不考虑
-    };
-
-utils.hasKey = hasKey;
-utils.clone = clone;
-
-utils.getValue = function (obj, key, defaultValue) {
-    var value = obj ? obj[key] : null;
-
-    if (isNullOrUndefined(value)) {
-        value = defaultValue;
-    }
-
-    return value;
-};
-
-utils.getNumber = function (obj, key, defaultValue) {
-    var value = obj ? obj[key] : null;
-
-    if (isNullOrUndefined(value)) {
-        value = defaultValue || 0;
-    }
-
-    return Number(value);
-};
-
-utils.extend = function (dist) {
-    each(slice.call(arguments, 1), function (source) {
-        if (source) {
-            for (var prop in source) {
-                dist[prop] = source[prop];
-            }
-        }
-    });
-    return dist;
-};
-
-utils.equalEntries = function (a, b) {
-    if ((a == null && b != null) || (a != null && b == null) ||
-        (a != null && b != null && a.length != b.length)) {
-        return false;
-    }
-    else if (a && b) {
-        for (var key in a) {
-            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] != b[key]) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
-utils.equalPoints = function (points1, points2) {
-    if ((!points1 && points2) || (points1 && !points2) ||
-        (points1 && points2 && points1.length !== points2.length)) {
-        return false;
-    } else if (points1 && points2) {
-        for (var i = 0; i < points1.length; i++) {
-            var p1 = points1[i];
-            var p2 = points2[i];
-
-            if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
-// Array
-// -----
-
-utils.indexOf = arrProto.indexOf ?
-    function (arr, item) {
-        return arr.indexOf(item);
-    } :
-    function (arr, item) {
-        for (var i = 0, len = arr.length; i < len; i++) {
-            if (arr[i] === item) {
-                return i;
-            }
-        }
-        return -1;
-    };
-
-// TODO: 改为 forIn 和 each 两个方法
-var each = utils.each = function (list, iteratee, context) {
-    var i;
-
-    if (isArrayLike(list)) {
-        var length = list.length;
-        for (i = 0; i < length; i++) {
-            iteratee.call(context, list[i], i, list);
-        }
-    } else {
-        for (i in list) {
-            if (hasKey(list, i)) {
-                iteratee.call(context, list[i], i, list);
-            }
-        }
-    }
-
-    return list;
-};
-
-utils.toArray = function (obj) {
-    return isArrayLike(obj) ? slice.call(obj) : [];
-};
-
-
-// Function
-// --------
-
-utils.invoke = function (method, args, context) {
-    if (!method || !isFunction(method)) {
-        return;
-    }
-
-    args = isArray(args) ? args : args ? [args] : [];
-
-    var ret;
-    var a1 = args[0];
-    var a2 = args[1];
-    var a3 = args[2];
-
-    // call is faster than apply, optimize less than 3 argu
-    // http://blog.csdn.net/zhengyinhui100/article/details/7837127
-    switch (args.length) {
-        case 0:
-            ret = method.call(context);
-            break;
-        case 1:
-            ret = method.call(context, a1);
-            break;
-        case 2:
-            ret = method.call(context, a1, a2);
-            break;
-        case 3:
-            ret = method.call(context, a1, a2, a3);
-            break;
-        default:
-            ret = method.apply(context, args);
-            break;
-    }
-
-    return ret;
-};
-
-utils.getFunctionName = function (fn) {
-    var str = '';
-
-    if (!isNullOrUndefined(fn)) {
-        if (!isNullOrUndefined(fn.name)) {
-            str = fn.name;
-        } else {
-
-            var tmp = fn.toString();
-            var idx1 = 9;
-
-            while (tmp.charAt(idx1) === ' ') {
-                idx1++;
-            }
-
-            var idx2 = tmp.indexOf('(', idx1);
-            str = tmp.substring(idx1, idx2);
-        }
-    }
-
-    return str;
-};
-
-// BOW
-// ---
-utils.isNode = function (node, nodeName, attributeName, attributeValue) {
-
-    var ret = node && !isNaN(node.nodeType);
-
-    if (ret) {
-        ret = isNullOrUndefined(nodeName) || node.nodeName.toLowerCase() === nodeName.toLowerCase();
-    }
-
-    if (ret) {
-        ret = isNullOrUndefined(attributeName) || node.getAttribute(attributeName) === attributeValue;
-    }
-
-    return ret;
-};
-
-utils.getOffset = function (container, scrollOffset) {
-    var offsetLeft = 0;
-    var offsetTop = 0;
-
-    if (scrollOffset != null && scrollOffset) {
-        var offset = utils.getDocumentScrollOrigin(container.ownerDocument);
-        offsetLeft += offset.left;
-        offsetTop += offset.top;
-    }
-
-    while (container.offsetParent) {
-        offsetLeft += container.offsetLeft;
-        offsetTop += container.offsetTop;
-
-        container = container.offsetParent;
-    }
-
-    return {
-        left: offsetLeft,
-        top: offsetTop
-    };
-};
-
-utils.getDocumentScrollOrigin = function (doc) {
-    var wnd = doc.defaultView || doc.parentWindow;
-
-    var x = (wnd && window.pageXOffset !== undefined)
-        ? window.pageXOffset
-        : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-
-    var y = (wnd && window.pageYOffset !== undefined)
-        ? window.pageYOffset
-        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-    return {
-        left: x,
-        top: y
-    };
-};
-
-utils.getScrollOrigin = function (node) {
-    var b = document.body;
-    var d = document.documentElement;
-    var result = utils.getDocumentScrollOrigin(node ? node.ownerDocument : document);
-
-    while (node && node !== b && node !== d) {
-        if (!isNaN(node.scrollLeft) && !isNaN(node.scrollTop)) {
-            result.left += node.scrollLeft;
-            result.top += node.scrollTop;
-        }
-
-        node = node.parentNode;
-    }
-
-    return result;
-};
-
-utils.convertPoint = function (container, x, y) {
-    var origin = utils.getScrollOrigin(container);
-    var offset = utils.getOffset(container);
-
-    offset.left -= origin.left;
-    offset.top -= origin.top;
-
-    return {
-        left: x - offset.left,
-        top: y - offset.top
-    };
-};
-
-utils.createSvgGroup = function () {};
-
-utils.write = function (parent, text) {
-
-    var node = null;
-
-    if (parent) {
-        var doc = parent.ownerDocument;
-
-        node = doc.createTextNode(text);
-        parent.appendChild(node);
-    }
-
-    return node;
-};
-
-//
-utils.getBaseUrl = function () {
-    var href = window.location.href;
-    var hash = href.lastIndexOf('#');
-
-    if (hash > 0) {
-        href = href.substring(0, hash);
-    }
-
-    return href;
-};
-
-utils.toRadians = function (deg) {
-    return Math.PI * deg / 180;
-};
-
-utils.setCellStyles = function (model, cells, key, value) {
-    if (cells && cells.length) {
-        model.beginUpdate();
-        try {
-            for (var i = 0; i < cells.length; i++) {
-                if (cells[i] != null) {
-                    var style = utils.setStyle(model.getStyle(cells[i]), key, value);
-                    model.setStyle(cells[i], style);
-                }
-            }
-        }
-        finally {
-            model.endUpdate();
-        }
-    }
-};
-
-utils.setStyle = function (style, key, value) {
-    var isValue = value != null && (typeof(value.length) == 'undefined' || value.length > 0);
-
-    if (style == null || style.length == 0) {
-        if (isValue) {
-            style = key + '=' + value;
-        }
-    }
-    else {
-        var index = style.indexOf(key + '=');
-
-        if (index < 0) {
-            if (isValue) {
-                var sep = (style.charAt(style.length - 1) == ';') ? '' : ';';
-                style = style + sep + key + '=' + value;
-            }
-        }
-        else {
-            var tmp = (isValue) ? (key + '=' + value) : '';
-            var cont = style.indexOf(';', index);
-
-            if (!isValue) {
-                cont++;
-            }
-
-            style = style.substring(0, index) + tmp +
-                ((cont > index) ? style.substring(cont) : '');
-        }
-    }
-
-    return style;
-};
-
-module.exports = utils;
 
 
 });
@@ -1934,6 +1869,198 @@ define('PaneJS/events/eventNames',['require','exports','module'],function (requi
 };
 
 });
+define('PaneJS/resources',['require','exports','module'],function (require, exports, module) {
+var resources = {
+    resources: [],
+
+    extension: mxResourceExtension,
+    loadDefaultBundle: true,
+    loadSpecialBundle: true,
+    resourcesEncoded: false,
+
+    isLanguageSupported: function (lan) {
+        if (mxClient.languages !== null) {
+            return mxUtils.indexOf(mxClient.languages, lan) >= 0;
+        }
+
+        return true;
+    },
+
+    getDefaultBundle: function (basename, lan) {
+        if (mxResources.loadDefaultBundle || !mxResources.isLanguageSupported(lan)) {
+            return basename + mxResources.extension;
+        }
+        else {
+            return null;
+        }
+    },
+
+    getSpecialBundle: function (basename, lan) {
+        if (mxClient.languages === null || !this.isLanguageSupported(lan)) {
+            var dash = lan.indexOf('-');
+
+            if (dash > 0) {
+                lan = lan.substring(0, dash);
+            }
+        }
+
+        if (mxResources.loadSpecialBundle && mxResources.isLanguageSupported(lan) && lan !== mxClient.defaultLanguage) {
+            return basename + '_' + lan + mxResources.extension;
+        }
+        else {
+            return null;
+        }
+    },
+
+    add: function (basename, lan) {
+        lan = (lan !== null) ? lan : mxClient.language.toLowerCase();
+
+        if (lan !== mxConstants.NONE) {
+            // Loads the common language file (no extension)
+            var defaultBundle = mxResources.getDefaultBundle(basename, lan);
+
+            if (defaultBundle !== null) {
+                try {
+                    var req = mxUtils.load(defaultBundle);
+
+                    if (req.isReady()) {
+                        mxResources.parse(req.getText());
+                    }
+                }
+                catch (e) {
+                    // ignore
+                }
+            }
+
+            // Overlays the language specific file (_lan-extension)
+            var specialBundle = mxResources.getSpecialBundle(basename, lan);
+
+            if (specialBundle !== null) {
+                try {
+                    var req1 = mxUtils.load(specialBundle);
+
+                    if (req1.isReady()) {
+                        mxResources.parse(req1.getText());
+                    }
+                }
+                catch (e) {
+                    // ignore
+                }
+            }
+        }
+    },
+
+    parse: function (text) {
+        if (text !== null) {
+            var lines = text.split('\n');
+
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i].charAt(0) !== '#') {
+                    var index = lines[i].indexOf('=');
+
+                    if (index > 0) {
+                        var key = lines[i].substring(0, index);
+                        var idx = lines[i].length;
+
+                        if (lines[i].charCodeAt(idx - 1) === 13) {
+                            idx--;
+                        }
+
+                        var value = lines[i].substring(index + 1, idx);
+
+                        if (this.resourcesEncoded) {
+                            value = value.replace(/\\(?=u[a-fA-F\d]{4})/g, "%");
+                            mxResources.resources[key] = unescape(value);
+                        }
+                        else {
+                            mxResources.resources[key] = value;
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    get: function (key, params, defaultValue) {
+        var value = mxResources.resources[key];
+
+        // Applies the default value if no resource was found
+        if (value === null) {
+            value = defaultValue;
+        }
+
+        // Replaces the placeholders with the values in the array
+        if (value !== null &&
+            params !== null) {
+            var result = [];
+            var index = null;
+
+            for (var i = 0; i < value.length; i++) {
+                var c = value.charAt(i);
+
+                if (c === '{') {
+                    index = '';
+                }
+                else if (index !== null && c === '}') {
+                    index = parseInt(index) - 1;
+
+                    if (index >= 0 && index < params.length) {
+                        result.push(params[index]);
+                    }
+
+                    index = null;
+                }
+                else if (index !== null) {
+                    index += c;
+                }
+                else {
+                    result.push(c);
+                }
+            }
+
+            value = result.join('');
+        }
+
+        return value;
+    }
+};
+
+module.exports = resources;
+
+});
+define('PaneJS/shapes/stencilRegistry',['require','exports','module'],function (require, exports, module) {
+var stencilRegistry = {
+    /**
+     * Class: StencilRegistry
+     *
+     * A singleton class that provides a registry for stencils and the methods
+     * for painting those stencils onto a canvas or into a DOM.
+     */
+    stencils: [],
+
+    /**
+     * Function: addStencil
+     *
+     * Adds the given <Stencil>.
+     */
+    addStencil: function (name, stencil) {
+        StencilRegistry.stencils[name] = stencil;
+    },
+
+    /**
+     * Function: getStencil
+     *
+     * Returns the <Stencil> for the given name.
+     */
+    getStencil: function (name) {
+        return stencilRegistry.stencils[name];
+    }
+};
+
+module.exports = stencilRegistry;
+
+
+});
 
 
 
@@ -2006,6 +2133,680 @@ exports.isNumeric = function (obj) {
 });
 
 
+define('PaneJS/common/utils',['require','exports','module','./detector'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+/* global window, document */
+
+var detector = require('./detector');
+
+var utils = {};
+
+var arrProto = Array.prototype;
+var objProto = Object.prototype;
+var slice = arrProto.slice;
+var toString = objProto.toString;
+var hasOwn = objProto.hasOwnProperty;
+
+//var Point = require('../Point');
+//var Rectangle = require('../Rectangle');
+//var constants = require('../constants');
+
+
+// Lang
+// ----
+
+function isType(obj, type) {
+    return toString.call(obj) === '[object ' + type + ']';
+}
+
+function isObject(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+}
+
+function isFunction(obj) {
+    return isType(obj, 'Function');
+}
+
+function isNull(obj) {
+    return obj === null;
+}
+
+function isUndefined(obj) {
+    return typeof obj === 'undefined';
+}
+
+function isNullOrUndefined(obj) {
+    return isUndefined(obj) || isNull(obj);
+}
+
+function isWindow(obj) {
+    return obj !== null && obj === obj.window;
+}
+
+var isArray = Array.isArray || function (obj) {
+        return isType(obj, 'Array');
+    };
+
+function isArrayLike(obj) {
+    if (isArray(obj)) {
+        return true;
+    }
+
+    if (isFunction(obj) || isWindow(obj)) {
+        return false;
+    }
+
+    var length = !!obj && 'length' in obj && obj.length;
+
+    return length === 0 ||
+        typeof length === 'number' && length > 0 && (length - 1) in obj;
+}
+
+function isNumeric(obj) {
+    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+}
+
+utils.isType = isType;
+utils.isNull = isNull;
+utils.isArray = isArray;
+utils.isObject = isObject;
+utils.isWindow = isWindow;
+utils.isNumeric = isNumeric;
+utils.isFunction = isFunction;
+utils.isUndefined = isUndefined;
+utils.isArrayLike = isArrayLike;
+utils.isNullOrUndefined = isNullOrUndefined;
+
+// String
+// ------
+
+utils.toString = function (str) {
+    return '' + str;
+};
+
+utils.lcFirst = function (str) {
+    str = str + '';
+    return str.charAt(0).toLowerCase() + str.substr(1);
+};
+
+utils.ucFirst = function (str) {
+    str = str + '';
+    return str.charAt(0).toUpperCase() + str.substr(1);
+};
+
+utils.ltrim = function (str, chars) {
+    chars = chars || "\\s";
+
+    return str.replace(new RegExp("^[" + chars + "]+", "g"), "");
+};
+
+utils.rtrim = function (str, chars) {
+    chars = chars || "\\s";
+
+    return str.replace(new RegExp("[" + chars + "]+$", "g"), "");
+};
+
+utils.trim = function (str, chars) {
+    return utils.ltrim(utils.rtrim(str, chars), chars);
+};
+
+// Number
+// ------
+utils.toFixed = function (value, precision) {
+    var power = Math.pow(10, precision);
+    return (Math.round(value * power) / power).toFixed(precision);
+};
+
+utils.mod = function (n, m) {
+    return ((n % m) + m) % m;
+};
+
+
+// Object
+// ------
+
+function hasKey(obj, key) {
+    return obj !== null && hasOwn.call(obj, key);
+}
+
+function clone(obj, transients, shallow) {
+
+    shallow = (shallow !== null) ? shallow : false;
+    var cloned = null;
+
+    if (obj && isFunction(obj.constructor)) {
+        cloned = new obj.constructor();
+
+        for (var i in obj) {
+            //if (i !== mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
+            if (i !== 'objectId' && (!transients || utils.indexOf(transients, i) < 0)) {
+                if (!shallow && typeof(obj[i]) === 'object') {
+                    cloned[i] = clone(obj[i]);
+                } else {
+                    cloned[i] = obj[i];
+                }
+            }
+        }
+    }
+
+    return cloned;
+}
+
+utils.keys = Object.keys || function (obj) {
+
+        if (!isObject(obj)) {
+            return [];
+        }
+
+        var keys = [];
+        for (var key in obj) {
+            if (hasKey(obj, key)) {
+                keys.push(key);
+            }
+        }
+
+        // ie < 9 不考虑
+    };
+
+utils.hasKey = hasKey;
+utils.clone = clone;
+
+utils.getValue = function (obj, key, defaultValue) {
+    var value = obj ? obj[key] : null;
+
+    if (isNullOrUndefined(value)) {
+        value = defaultValue;
+    }
+
+    return value;
+};
+
+utils.getNumber = function (obj, key, defaultValue) {
+    var value = obj ? obj[key] : null;
+
+    if (isNullOrUndefined(value)) {
+        value = defaultValue || 0;
+    }
+
+    return Number(value);
+};
+
+utils.extend = function (dist) {
+    each(slice.call(arguments, 1), function (source) {
+        if (source) {
+            for (var prop in source) {
+                dist[prop] = source[prop];
+            }
+        }
+    });
+    return dist;
+};
+
+utils.equalEntries = function (a, b) {
+    if ((a === null && b !== null) || (a !== null && b === null) ||
+        (a !== null && b !== null && a.length !== b.length)) {
+        return false;
+    }
+    else if (a && b) {
+        for (var key in a) {
+            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] !== b[key]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
+// Array
+// -----
+
+utils.indexOf = arrProto.indexOf ?
+    function (arr, item) {
+        return arr.indexOf(item);
+    } :
+    function (arr, item) {
+        for (var i = 0, len = arr.length; i < len; i++) {
+            if (arr[i] === item) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
+// TODO: 改为 forIn 和 each 两个方法
+var each = utils.each = function (list, iteratee, context) {
+    var i;
+
+    if (isArrayLike(list)) {
+        var length = list.length;
+        for (i = 0; i < length; i++) {
+            iteratee.call(context, list[i], i, list);
+        }
+    } else {
+        for (i in list) {
+            if (hasKey(list, i)) {
+                iteratee.call(context, list[i], i, list);
+            }
+        }
+    }
+
+    return list;
+};
+
+utils.toArray = function (obj) {
+    return isArrayLike(obj) ? slice.call(obj) : [];
+};
+
+
+// Function
+// --------
+
+utils.invoke = function (method, args, context) {
+    if (!method || !isFunction(method)) {
+        return;
+    }
+
+    args = isArray(args) ? args : args ? [args] : [];
+
+    var ret;
+    var a1 = args[0];
+    var a2 = args[1];
+    var a3 = args[2];
+
+    // call is faster than apply, optimize less than 3 argu
+    // http://blog.csdn.net/zhengyinhui100/article/details/7837127
+    switch (args.length) {
+        case 0:
+            ret = method.call(context);
+            break;
+        case 1:
+            ret = method.call(context, a1);
+            break;
+        case 2:
+            ret = method.call(context, a1, a2);
+            break;
+        case 3:
+            ret = method.call(context, a1, a2, a3);
+            break;
+        default:
+            ret = method.apply(context, args);
+            break;
+    }
+
+    return ret;
+};
+
+utils.getFunctionName = function (fn) {
+    var str = '';
+
+    if (!isNullOrUndefined(fn)) {
+        if (!isNullOrUndefined(fn.name)) {
+            str = fn.name;
+        } else {
+
+            var tmp = fn.toString();
+            var idx1 = 9;
+
+            while (tmp.charAt(idx1) === ' ') {
+                idx1++;
+            }
+
+            var idx2 = tmp.indexOf('(', idx1);
+            str = tmp.substring(idx1, idx2);
+        }
+    }
+
+    return str;
+};
+
+/**
+ * Function: bind
+ *
+ * Returns a wrapper function that locks the execution scope of the given
+ * function to the specified scope. Inside funct, the "this" keyword
+ * becomes a reference to that scope.
+ */
+utils.bind = function(scope, funct) {
+    return function () {
+        return funct.apply(scope, arguments);
+    };
+};
+
+// BOW
+// ---
+utils.isNode = function (node, nodeName, attributeName, attributeValue) {
+
+    var ret = node && !isNaN(node.nodeType);
+
+    if (ret) {
+        ret = isNullOrUndefined(nodeName) || node.nodeName.toLowerCase() === nodeName.toLowerCase();
+    }
+
+    if (ret) {
+        ret = isNullOrUndefined(attributeName) || node.getAttribute(attributeName) === attributeValue;
+    }
+
+    return ret;
+};
+
+utils.getOffset = function (container, scrollOffset) {
+    var offsetLeft = 0;
+    var offsetTop = 0;
+
+    if (scrollOffset !== null && scrollOffset) {
+        var offset = utils.getDocumentScrollOrigin(container.ownerDocument);
+        offsetLeft += offset.left;
+        offsetTop += offset.top;
+    }
+
+    while (container.offsetParent) {
+        offsetLeft += container.offsetLeft;
+        offsetTop += container.offsetTop;
+
+        container = container.offsetParent;
+    }
+
+    return {
+        left: offsetLeft,
+        top: offsetTop
+    };
+};
+
+utils.getDocumentScrollOrigin = function (doc) {
+    var wnd = doc.defaultView || doc.parentWindow;
+
+    var x = (wnd && window.pageXOffset !== undefined) ?
+        window.pageXOffset :
+        (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+
+    var y = (wnd && window.pageYOffset !== undefined) ?
+        window.pageYOffset :
+        (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+    return {
+        left: x,
+        top: y
+    };
+};
+
+utils.getScrollOrigin = function (node) {
+    var b = document.body;
+    var d = document.documentElement;
+    var result = utils.getDocumentScrollOrigin(node ? node.ownerDocument : document);
+
+    while (node && node !== b && node !== d) {
+        if (!isNaN(node.scrollLeft) && !isNaN(node.scrollTop)) {
+            result.left += node.scrollLeft;
+            result.top += node.scrollTop;
+        }
+
+        node = node.parentNode;
+    }
+
+    return result;
+};
+
+utils.createSvgGroup = function () {};
+
+utils.write = function (parent, text) {
+
+    var node = null;
+
+    if (parent) {
+        var doc = parent.ownerDocument;
+
+        node = doc.createTextNode(text);
+        parent.appendChild(node);
+    }
+
+    return node;
+};
+
+//
+utils.getBaseUrl = function () {
+    var href = window.location.href;
+    var hash = href.lastIndexOf('#');
+
+    if (hash > 0) {
+        href = href.substring(0, hash);
+    }
+
+    return href;
+};
+
+utils.toRadians = function (deg) {
+    return Math.PI * deg / 180;
+};
+
+utils.setCellStyles = function (model, cells, key, value) {
+    if (cells && cells.length) {
+        model.beginUpdate();
+        try {
+            for (var i = 0; i < cells.length; i++) {
+                if (cells[i] !== null) {
+                    var style = utils.setStyle(model.getStyle(cells[i]), key, value);
+                    model.setStyle(cells[i], style);
+                }
+            }
+        }
+        finally {
+            model.endUpdate();
+        }
+    }
+};
+
+utils.setStyle = function (style, key, value) {
+    var isValue = value !== null && (typeof(value.length) === 'undefined' || value.length > 0);
+
+    if (style === null || style.length === 0) {
+        if (isValue) {
+            style = key + '=' + value;
+        }
+    }
+    else {
+        var index = style.indexOf(key + '=');
+
+        if (index < 0) {
+            if (isValue) {
+                var sep = (style.charAt(style.length - 1) === ';') ? '' : ';';
+                style = style + sep + key + '=' + value;
+            }
+        }
+        else {
+            var tmp = (isValue) ? (key + '=' + value) : '';
+            var cont = style.indexOf(';', index);
+
+            if (!isValue) {
+                cont++;
+            }
+
+            style = style.substring(0, index) + tmp +
+                ((cont > index) ? style.substring(cont) : '');
+        }
+    }
+
+    return style;
+};
+
+utils.setPrefixedStyle = function () {
+    var prefix = null;
+
+    if (detector.IS_OP && detector.IS_OT) {
+        prefix = 'O';
+    }
+    else if (detector.IS_SF || detector.IS_GC) {
+        prefix = 'Webkit';
+    }
+    else if (detector.IS_MT) {
+        prefix = 'Moz';
+    }
+    else if (detector.IS_IE && document.documentMode >= 9 && document.documentMode < 10) {
+        prefix = 'ms';
+    }
+
+    return function (style, name, value) {
+        style[name] = value;
+
+        if (prefix !== null && name.length > 0) {
+            name = prefix + name.substring(0, 1).toUpperCase() + name.substring(1);
+            style[name] = value;
+        }
+    };
+}();
+
+module.exports = utils;
+
+
+});
+define('PaneJS/marker',['require','exports','module','PaneJS/constants'],function (require, exports, module) {var constants = require('PaneJS/constants');
+
+var marker = {
+    markers: [],
+    addMarker: function (type, fn) {
+        marker.markers[type] = fn;
+    },
+    createMarker: function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+        var fn = marker.markers[type];
+
+        return fn ? fn(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) : null;
+    }
+};
+
+function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    // The angle of the forward facing arrow sides against the x axis is
+    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+    // only half the strokewidth is processed ).
+    var endOffsetX = unitX * sw * 1.118;
+    var endOffsetY = unitY * sw * 1.118;
+
+    unitX = unitX * (size + sw);
+    unitY = unitY * (size + sw);
+
+    var pt = pe.clone();
+    pt.x -= endOffsetX;
+    pt.y -= endOffsetY;
+
+    var f = (type != constants.ARROW_CLASSIC) ? 1 : 3 / 4;
+    pe.x += -unitX * f - endOffsetX;
+    pe.y += -unitY * f - endOffsetY;
+
+    return function () {
+        canvas.begin();
+        canvas.moveTo(pt.x, pt.y);
+        canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+
+        if (type == constants.ARROW_CLASSIC) {
+            canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+        }
+
+        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+        canvas.close();
+
+        if (filled) {
+            canvas.fillAndStroke();
+        }
+        else {
+            canvas.stroke();
+        }
+    };
+}
+
+marker.addMarker('classic', arrow);
+marker.addMarker('block', arrow);
+
+marker.addMarker('open', function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    // The angle of the forward facing arrow sides against the x axis is
+    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+    // only half the strokewidth is processed ).
+    var endOffsetX = unitX * sw * 1.118;
+    var endOffsetY = unitY * sw * 1.118;
+
+    unitX = unitX * (size + sw);
+    unitY = unitY * (size + sw);
+
+    var pt = pe.clone();
+    pt.x -= endOffsetX;
+    pt.y -= endOffsetY;
+
+    pe.x += -endOffsetX * 2;
+    pe.y += -endOffsetY * 2;
+
+    return function () {
+        canvas.begin();
+        canvas.moveTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+        canvas.lineTo(pt.x, pt.y);
+        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+        canvas.stroke();
+    };
+});
+
+marker.addMarker('oval', function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    var a = size / 2;
+
+    var pt = pe.clone();
+    pe.x -= unitX * a;
+    pe.y -= unitY * a;
+
+    return function () {
+        canvas.ellipse(pt.x - a, pt.y - a, size, size);
+
+        if (filled) {
+            canvas.fillAndStroke();
+        }
+        else {
+            canvas.stroke();
+        }
+    };
+});
+
+function diamond(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+    // The angle of the forward facing arrow sides against the x axis is
+    // 45 degrees, 1/sin(45) = 1.4142 / 2 = 0.7071 ( / 2 allows for
+    // only half the strokewidth is processed ). Or 0.9862 for thin diamond.
+    // Note these values and the tk variable below are dependent, update
+    // both together (saves trig hard coding it).
+    var swFactor = (type == constants.ARROW_DIAMOND) ? 0.7071 : 0.9862;
+    var endOffsetX = unitX * sw * swFactor;
+    var endOffsetY = unitY * sw * swFactor;
+
+    unitX = unitX * (size + sw);
+    unitY = unitY * (size + sw);
+
+    var pt = pe.clone();
+    pt.x -= endOffsetX;
+    pt.y -= endOffsetY;
+
+    pe.x += -unitX - endOffsetX;
+    pe.y += -unitY - endOffsetY;
+
+    // thickness factor for diamond
+    var tk = ((type == constants.ARROW_DIAMOND) ? 2 : 3.4);
+
+    return function () {
+        canvas.begin();
+        canvas.moveTo(pt.x, pt.y);
+        canvas.lineTo(pt.x - unitX / 2 - unitY / tk, pt.y + unitX / tk - unitY / 2);
+        canvas.lineTo(pt.x - unitX, pt.y - unitY);
+        canvas.lineTo(pt.x - unitX / 2 + unitY / tk, pt.y - unitY / 2 - unitX / tk);
+        canvas.close();
+
+        if (filled) {
+            canvas.fillAndStroke();
+        }
+        else {
+            canvas.stroke();
+        }
+    };
+}
+
+marker.addMarker('diamond', diamond);
+marker.addMarker('diamondThin', diamond);
+
+
+module.exports = marker;
+
+});
 define('PaneJS/common/class',['require','exports','module','./utils'],function (require, exports, module) {
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 // ref: https://github.com/aralejs/class
@@ -2270,310 +3071,6 @@ exports.around = function (methodName, callback, context) {
 
 
 });
-define('PaneJS/events/domEvent',['require','exports','module','../common/utils','../common/detector'],function (require, exports, module) {var utils = require('../common/utils');
-var detector = require('../common/detector');
-
-var each = utils.each;
-var indexOf = utils.indexOf;
-
-var IS_TOUCH = detector.IS_TOUCH;
-var IS_POINTER = detector.IS_POINTER;
-
-var domEvent = {
-
-    // 保存已经绑定事件的元素
-    cache: [],
-
-    on: function () {
-
-        var update = function (element, eventName, callback) {
-
-            var list = element.eventListeners;
-
-            if (!list) {
-                list = element.eventListeners = [];
-                domEvent.cache.push(element);
-            }
-
-            list.push({
-                eventName: eventName,
-                callback: callback
-            });
-        };
-
-        if (window.addEventListener) {
-            return function (element, eventName, callback) {
-                element.addEventListener(eventName, callback, false);
-                update(element, eventName, callback);
-            };
-        } else {
-            return function (element, eventName, callback) {
-                element.attachEvent('on' + eventName, callback);
-                update(element, eventName, callback);
-            };
-        }
-    }(),
-
-    off: function () {
-        var updateListener = function (element, eventName, callback) {
-
-            var list = element.eventListeners;
-
-            if (list) {
-                for (var i = list.length - 1; i >= 0; i--) {
-                    var entry = list[i];
-
-                    if (entry.eventName === eventName && entry.callback === callback) {
-                        list.splice(i, 1);
-                    }
-                }
-
-                if (list.length === 0) {
-                    delete element.eventListeners;
-
-                    var idx = indexOf(domEvent.cache, element);
-                    if (idx >= 0) {
-                        domEvent.cache.splice(idx, 1);
-                    }
-                }
-            }
-        };
-
-        if (window.removeEventListener) {
-            return function (element, eventName, callback) {
-                element.removeEventListener(eventName, callback, false);
-                updateListener(element, eventName, callback);
-            };
-        }
-        else {
-            return function (element, eventName, callback) {
-                element.detachEvent('on' + eventName, callback);
-                updateListener(element, eventName, callback);
-            };
-        }
-    }(),
-
-    clear: function (element) {
-
-        var list = element.eventListeners;
-
-        list && each(list, function (entry) {
-            domEvent.off(element, entry.eventName, entry.callback);
-
-        });
-    },
-
-    release: function (element) {
-        if (element) {
-            domEvent.clear(element);
-
-            var children = element.childNodes;
-
-            if (children) {
-                for (var i = 0, l = children.length; i < l; i += 1) {
-                    domEvent.release(children[i]);
-                }
-            }
-        }
-    },
-
-    onGesture: function (element, startListener, moveListener, endListener) {
-        if (startListener) {
-            domEvent.on(element, IS_POINTER ? 'MSPointerDown' : 'mousedown', startListener);
-        }
-
-        if (moveListener) {
-            domEvent.on(element, IS_POINTER ? 'MSPointerMove' : 'mousemove', moveListener);
-        }
-
-        if (endListener) {
-            domEvent.on(element, IS_POINTER ? 'MSPointerUp' : 'mouseup', endListener);
-        }
-
-        if (IS_TOUCH && !IS_POINTER) {
-            if (startListener) {
-                domEvent.on(element, 'touchstart', startListener);
-            }
-
-            if (moveListener) {
-                domEvent.on(element, 'touchmove', moveListener);
-            }
-
-            if (endListener) {
-                domEvent.on(element, 'touchend', endListener);
-            }
-        }
-    },
-
-    offGesture: function (element, startListener, moveListener, endListener) {
-        if (startListener) {
-            domEvent.off(element, (IS_POINTER) ? 'MSPointerDown' : 'mousedown', startListener);
-        }
-
-        if (moveListener) {
-            domEvent.off(element, (IS_POINTER) ? 'MSPointerMove' : 'mousemove', moveListener);
-        }
-
-        if (endListener) {
-            domEvent.off(element, (IS_POINTER) ? 'MSPointerUp' : 'mouseup', endListener);
-        }
-
-        if (IS_TOUCH && !IS_POINTER) {
-            if (startListener) {
-                domEvent.off(element, 'touchstart', startListener);
-            }
-
-            if (moveListener) {
-                domEvent.off(element, 'touchmove', moveListener);
-            }
-
-            if (endListener) {
-                domEvent.off(element, 'touchend', endListener);
-            }
-        }
-    },
-
-    onMouseWheel: function (callback) {
-        if (!callback) {
-            return;
-        }
-
-        var wheelHandler = function (evt) {
-
-            // IE does not give an event object but the
-            // global event object is the mousewheel event
-            // at this point in time.
-            evt = evt || window.event;
-
-            var delta = 0;
-
-            if (detector.IS_FF) {
-                delta = -evt.detail / 2;
-            } else {
-                delta = evt.wheelDelta / 120;
-            }
-
-            // Handles the event using the given function
-            if (delta !== 0) {
-                callback(evt, delta > 0);
-            }
-        };
-
-        // Webkit has NS event API, but IE event name and details
-        if (detector.IS_NS && !document.documentMode) {
-            var eventName = (detector.IS_SF || detector.IS_GC) ? 'mousewheel' : 'DOMMouseScroll';
-            domEvent.on(window, eventName, wheelHandler);
-        } else {
-            domEvent.on(document, 'mousewheel', wheelHandler);
-        }
-
-    },
-
-    getSource: function (evt) {
-        return evt.srcElement || evt.target;
-    },
-
-    getMainEvent: function (e) {
-        if ((e.type === 'touchstart' || e.type === 'touchmove') && e.touches && e.touches[0]) {
-            e = e.touches[0];
-        } else if (e.type === 'touchend' && e.changedTouches && e.changedTouches[0]) {
-            e = e.changedTouches[0];
-        }
-
-        return e;
-    },
-
-    getClientX: function (e) {
-        return domEvent.getMainEvent(e).clientX;
-    },
-
-    /**
-     * Function: getClientY
-     *
-     * Returns true if the meta key is pressed for the given event.
-     */
-    getClientY: function (e) {
-        return domEvent.getMainEvent(e).clientY;
-    },
-
-    consume: function (evt, preventDefault, stopPropagation) {
-        preventDefault = preventDefault ? preventDefault : true;
-        stopPropagation = stopPropagation ? stopPropagation : true;
-
-        if (preventDefault) {
-            if (evt.preventDefault) {
-                evt.preventDefault();
-            } else {
-                evt.returnValue = false;
-            }
-        }
-
-        if (stopPropagation) {
-            if (evt.stopPropagation) {
-                evt.stopPropagation();
-            } else {
-                evt.cancelBubble = true;
-            }
-        }
-
-        evt.consumed = true;
-    },
-
-    isTouchEvent: function (evt) {
-        return evt.pointerType
-            ? (evt.pointerType === 'touch' || evt.pointerType === evt.MSPOINTER_TYPE_TOUCH)
-            : (evt.mozInputSource ? evt.mozInputSource === 5 : evt.type.indexOf('touch') === 0);
-    },
-
-    isMultiTouchEvent: function (evt) {
-        return evt.type
-            && evt.type.indexOf('touch') === 0
-            && evt.touches
-            && evt.touches.length > 1;
-    },
-
-    isMouseEvent: function (evt) {
-        return evt.pointerType
-            ? (evt.pointerType === 'mouse' || evt.pointerType === evt.MSPOINTER_TYPE_MOUSE)
-            : (evt.mozInputSource ? evt.mozInputSource === 1 : evt.type.indexOf('mouse') === 0);
-    },
-
-    isLeftMouseButton: function (evt) {
-        return evt.button === ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 1 : 0);
-    },
-
-    isMiddleMouseButton: function (evt) {
-        return evt.button == ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 4 : 1);
-    },
-
-    isRightMouseButton: function (evt) {
-        return evt.button === 2;
-    },
-
-    isPopupTrigger: function (evt) {
-        return mxEvent.isRightMouseButton(evt) || (mxClient.IS_MAC && mxEvent.isControlDown(evt) && !mxEvent.isShiftDown(evt) && !mxEvent.isMetaDown(evt) && !mxEvent.isAltDown(evt));
-    },
-
-    isShiftDown: function (evt) {
-        return evt ? evt.shiftKey : false;
-    },
-
-    isAltDown: function (evt) {
-        return evt ? evt.altKey : false;
-    },
-
-    isControlDown: function (evt) {
-        return evt ? evt.ctrlKey : false;
-    },
-
-    isMetaDown: function (evt) {
-        return evt ? evt.metaKey : false;
-    }
-};
-
-module.exports = domEvent;
-
-});
 define('PaneJS/Base',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {// 全局基类
 
 var Class = require('PaneJS/common/class');
@@ -2593,2042 +3090,6 @@ module.exports = Class.create({
         that.destroyed = true;
     }
 });
-
-});
-define('PaneJS/Point',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-var Point = Class.create({
-
-    constructor: function Point(x, y) {
-        this.x = !isNullOrUndefined(x) ? x : 0;
-        this.y = !isNullOrUndefined(y) ? y : 0;
-    },
-
-    equals: function (point) {
-        return point &&
-            point instanceof Point &&
-            point.x === this.x &&
-            point.y === this.y;
-    },
-
-    clone: function () {
-        return new Point(this.x, this.y);
-    }
-});
-
-module.exports = Point;
-
-
-});
-define('PaneJS/UndoableEdit',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Class.create({
-    constructor: function UndoableEdit(source, significant) {
-
-        var that = this;
-
-        that.source = source;
-        that.changes = [];
-        that.significant = !isNullOrUndefined(significant) ? significant : true;
-        that.undone = false;
-        that.redone = false;
-
-    },
-
-    isEmpty: function () {
-        return this.changes.length === 0;
-    },
-
-    isSignificant: function () {
-        return this.significant;
-    },
-
-    add: function (change) {
-        this.changes.push(change);
-    },
-
-    notify: function () {},
-    die: function () {},
-    undo: function () {},
-    redo: function () {}
-});
-
-});
-define('PaneJS/changes/Change',['require','exports','module','../common/class'],function (require, exports, module) {'use strict';
-
-var Class = require('../common/class');
-
-module.exports = Class.create({
-
-    constructor: function Change(model) {
-        this.model = model;
-    },
-
-    digest: function () { }
-});
-
-
-});
-define('PaneJS/common/Dictionary',['require','exports','module','./class','./utils','./objectIdentity'],function (require, exports, module) {'use strict';
-
-var Class = require('./class');
-var utils = require('./utils');
-var objectIdentity = require('./objectIdentity');
-
-var isObject = utils.isObject;
-var keys = utils.keys;
-var each = utils.each;
-
-function getId(key) {
-
-    if (isObject(key)) {
-        return objectIdentity.get(key);
-    }
-
-    return '' + key;
-}
-
-module.exports = Class.create({
-
-    constructor: function Dictionary() {
-        return this.clear();
-    },
-
-    clear: function () {
-        var dic = this;
-
-        dic.map = {};
-
-        return dic;
-    },
-
-    get: function (key) {
-        var id = getId(key);
-        return this.map[id];
-    },
-
-    set: function (key, value) {
-
-        var map = this.map;
-        var id = getId(key);
-        var previous = map[id];
-
-        map[id] = value;
-
-        return previous;
-    },
-
-    remove: function (key) {
-
-        var map = this.map;
-        var id = getId(key);
-        var previous = map[id];
-
-        delete map[id];
-
-        return previous;
-    },
-
-    getKeys: function () {
-        return keys(this.map);
-    },
-
-    getValues: function () {
-
-        var result = [];
-
-        each(this.map, function (value) {
-            result.push(value);
-        });
-
-        return result;
-    },
-
-    visit: function (visitor) {
-
-        var dic = this;
-
-        each(dic.map, visitor);
-
-        return dic;
-    }
-});
-
-});
-define('PaneJS/events/EventObject',['require','exports','module','../common/class','../common/utils'],function (require, exports, module) {var Class = require('../common/class');
-var utils = require('../common/utils');
-
-var isObject = utils.isObject;
-var extend = utils.extend;
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Class.create({
-    constructor: function EventObject(name, eventData) {
-
-        var that = this;
-        var data = that.data = {};
-
-        that.name = name;
-        that.consumed = false;
-
-        isObject(eventData) && extend(data, eventData);
-    },
-
-    getName: function () {
-        return this.name;
-    },
-
-    addData: function (key, value) {
-
-        var evtObj = this;
-        var data = evtObj.data;
-
-        if (isObject(key)) {
-            extend(data, key);
-        } else {
-            data[key] = value;
-        }
-
-        return evtObj;
-    },
-
-    getData: function (key) {
-        var data = this.data;
-        return isNullOrUndefined(key) ? data : data[key];
-    },
-
-    isConsumed: function () {
-        return this.consumed;
-    },
-
-    consume: function () {
-        this.consumed = true;
-    }
-});
-
-});
-define('PaneJS/events/MouseEvent',['require','exports','module','../common/class','../common/utils'],function (require, exports, module) {var Class = require('../common/class');
-var utils = require('../common/utils');
-
-module.exports = Class.create({
-    constructor: function MouseEvent(evt, state) {
-        var that = this;
-
-        that.evt = evt;
-        that.state = state;
-        that.consumed = false;
-        that.graphX = null;
-        that.graphY = null;
-
-    },
-
-    getEvent:function(){
-        return this.evt;
-    },
-
-
-});
-
-});
-define('PaneJS/Rectangle',['require','exports','module','PaneJS/common/class','PaneJS/Point'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Klass = require('PaneJS/common/class');
-var Point = require('PaneJS/Point');
-
-var Rectangle = Klass.create({
-
-    Extends: Point,
-
-    Statics: {
-        fromRectangle: function (rect) {
-            return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-        }
-    },
-
-    constructor: function Rectangle(x, y, width, height) {
-
-        var rect = this;
-
-        Rectangle.superclass.constructor.call(rect, x, y);
-
-        rect.width = width ? width : 0;
-        rect.height = height ? height : 0;
-    },
-
-    setRect: function (x, y, width, height) {
-
-        var rect = this;
-
-        rect.x = x;
-        rect.y = y;
-        rect.width = width;
-        rect.height = height;
-
-        return rect;
-    },
-
-    getCenterX: function () {
-        return this.x + this.width / 2;
-    },
-
-    getCenterY: function () {
-        return this.y + this.height / 2;
-    },
-
-    getCenter: function () {
-        return new Point(this.getCenterX(), this.getCenterY());
-    },
-
-    add: function (rect) {
-
-        if (!rect) {
-            return;
-        }
-
-        var that = this;
-        var minX = Math.min(that.x, rect.x);
-        var minY = Math.min(that.y, rect.y);
-        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
-        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
-
-        that.x = minX;
-        that.y = minY;
-        that.width = maxX - minX;
-        that.height = maxY - minY;
-
-        return that;
-    },
-
-
-    grow: function (amount) {
-
-        var rect = this;
-
-        rect.x -= amount;
-        rect.y -= amount;
-        rect.width += 2 * amount;
-        rect.height += 2 * amount;
-
-        return rect;
-    },
-
-    rotate90: function () {
-
-        var rect = this;
-        var w = rect.width;
-        var h = rect.height;
-        var t = (w - h) / 2;
-
-        rect.x += t;
-        rect.y -= t;
-        rect.width = h;
-        rect.height = w;
-
-        return rect;
-    },
-
-    equals: function (rect) {
-
-        var that = this;
-
-        return Rectangle.superclass.equals.call(that, rect) &&
-            rect instanceof Rectangle &&
-            rect.width === that.width &&
-            rect.height === that.height;
-    },
-
-    clone: function () {
-        var rect = this;
-        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-    }
-});
-
-module.exports = Rectangle;
-
-
-});
-define('PaneJS/cells/Cell',['require','exports','module','../Base'],function (require, exports, module) {var Base = require('../Base');
-
-module.exports = Base.extend({
-
-    id: null,
-    value: null,
-    geometry: null,
-    style: null,
-
-    //vertex: false,
-    //edge: false,
-    //connectable: true,
-    visible: true,
-    //collapsed: false,
-
-    //source: null,
-    //target: null,
-
-    parent: null,
-    children: null,
-    //edges: null,
-
-    constructor: function Cell(value, geometry, style) {
-
-        var that = this;
-
-        that.value = value;
-        that.setGeometry(geometry);
-        that.setStyle(style);
-
-        that.onInit && that.onInit();
-    },
-
-
-
-});
-
-});
-define('PaneJS/changes/ChildChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-///* global document */
-
-var Change = require('./Change');
-var utils = require('../common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Change.extend({
-
-    constructor: function ChildChange(model, parent, child, index) {
-
-        var change = this;
-
-        ChildChange.superclass.constructor.call(change, model);
-
-        change.parent = parent;
-        change.child = child;
-        change.index = index;
-        change.previous = parent;
-        change.previousIndex = index;
-    },
-
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var child = change.child;
-        var previous = change.previous;
-        var previousIndex = change.previousIndex;
-
-        var oldParent = model.getParent(child);
-        var oldIndex = oldParent ? oldParent.getIndex(child) : 0;
-
-        if (previous) {
-            change.connect(child, false);
-        }
-
-        oldParent = model.parentForCellChanged(child, previous, previousIndex);
-
-        if (previous) {
-            change.connect(child, true);
-        }
-
-        change.parent = previous;
-        change.index = previousIndex;
-        change.previous = oldParent;
-        change.previousIndex = oldIndex;
-
-        return change;
-    },
-
-    connect: function (cell, isConnect) {
-
-        var change = this;
-        var model = change.model;
-
-        isConnect = isNullOrUndefined(isConnect) ? true : isConnect;
-
-        var source = cell.getTerminal(true);
-        var target = cell.getTerminal(false);
-
-        if (source) {
-            if (isConnect) {
-                model.terminalForCellChanged(cell, source, true);
-            }
-            else {
-                model.terminalForCellChanged(cell, null, true);
-            }
-        }
-
-        if (target) {
-            if (isConnect) {
-                model.terminalForCellChanged(cell, target, false);
-            }
-            else {
-                model.terminalForCellChanged(cell, null, false);
-            }
-        }
-
-        cell.setTerminal(source, true);
-        cell.setTerminal(target, false);
-
-        var childCount = model.getChildCount(cell);
-
-        for (var i = 0; i < childCount; i++) {
-            change.connect(model.getChildAt(cell, i), isConnect);
-        }
-
-        return change;
-    }
-});
-
-});
-define('PaneJS/changes/CurrentRootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
-var Change = require('./Change');
-
-module.exports = Change.extend({
-
-    constructor: function CurrentRootChange(model, root) {
-
-        var change = this;
-
-        RootChange.superclass.constructor.call(change, model);
-
-        change.root = root;
-        change.previous = root;
-    },
-
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var previous = change.previous;
-
-        change.root = previous;
-        change.previous = model.rootChanged(previous);
-
-        return change;
-    }
-});
-
-
-});
-define('PaneJS/changes/RootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
-
-var Change = require('./Change');
-
-module.exports = Change.extend({
-
-    constructor: function RootChange(model, root) {
-
-        var change = this;
-
-        RootChange.superclass.constructor.call(change, model);
-
-        change.root = root;
-        change.previous = root;
-    },
-
-    digest: function () {
-
-        var change = this;
-        var model = change.model;
-        var previous = change.previous;
-
-        change.root = previous;
-        change.previous = model.rootChanged(previous);
-
-        return change;
-    }
-});
-
-
-});
-define('PaneJS/changes/TerminalChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {var Change = require('./Change');
-var utils = require('../common/utils');
-
-var isNullOrUndefined = utils.isNullOrUndefined;
-
-module.exports = Change.extend({
-
-    constructor: function TerminalChange(model, cell, terminal, source) {
-
-        var that = this;
-
-        TerminalChange.superclass.constructor.call(that, model);
-
-        that.cell = cell;
-        that.terminal = terminal;
-        that.previous = terminal;
-        that.source = source;
-
-    },
-
-    digest: function () {
-
-        this.terminal = this.previous;
-        this.previous = this.model.terminalForCellChanged(this.cell, this.previous, this.source);
-    }
-});
-
-});
-define('PaneJS/events/Event',['require','exports','module','../common/utils','../common/class','./EventObject'],function (require, exports, module) {var utils = require('../common/utils');
-var Class = require('../common/class');
-var EventObject = require('./EventObject');
-
-var keys = utils.keys;
-var each = utils.each;
-// TODO: constants
-var eventSplitter = /\s+/;
-
-
-module.exports = Class.create({
-
-    eventListeners: null,
-    eventEnabled: true,
-    eventSource: null,
-
-    constructor: function Events() {},
-
-    isEventEnabled: function () {
-        return this.eventEnabled;
-    },
-
-    setIsEventEnabled: function (enabled) {
-        var that = this;
-        that.eventEnabled = enabled;
-        return that;
-    },
-
-    enableEvent: function () {
-        return this.setIsEventEnabled(true);
-    },
-
-    disableEvent: function () {
-        return this.setIsEventEnabled(false);
-    },
-
-    getEventSource: function () {
-        return this.eventSource;
-    },
-
-    setEventSource: function (value) {
-        var that = this;
-        that.eventSource = value;
-        return that;
-    },
-
-    on: function (events, callback, context) {
-
-        var that = this;
-
-        if (!callback) {
-            return that;
-        }
-
-        var listeners = that.eventListeners || (that.eventListeners = {});
-
-        events = events.split(eventSplitter);
-
-        each(events, function (event) {
-            var list = listeners[event] || (listeners[event] = []);
-            list.push(callback, context);
-        });
-
-        return that;
-    },
-
-    once: function (events, callback, context) {
-
-        var that = this;
-        var cb = function () {
-            that.off(events, cb);
-            callback.apply(context || that, arguments);
-        };
-
-        return that.on(events, cb, context);
-    },
-
-    off: function (events, callback, context) {
-
-        var that = this;
-        var listeners = that.eventListeners;
-
-        // No events.
-        if (!listeners) {
-            return that;
-        }
-
-        // removing *all* events.
-        if (!(events || callback || context)) {
-            delete that.eventListeners;
-            return that;
-        }
-
-        events = events ? events.split(eventSplitter) : keys(listeners);
-
-        each(events, function (event) {
-
-            var list = listeners[event];
-
-            if (!list) {
-                return;
-            }
-
-            // remove all event.
-            if (!(callback || context)) {
-                delete listeners[event];
-                return;
-            }
-
-            for (var i = list.length - 2; i >= 0; i -= 2) {
-                if (!(callback && list[i] !== callback ||
-                    context && list[i + 1] !== context)) {
-                    list.splice(i, 2);
-                }
-            }
-        });
-
-        return that;
-    },
-
-    emit: function (eventObj, sender) {
-        var that = this;
-        var returned = [];
-        var listeners = that.eventListeners;
-
-        // No events.
-        if (!listeners || !that.isEventEnabled()) {
-            return returned;
-        }
-
-        eventObj = eventObj || new EventObject();
-
-        var eventName = eventObj.getName();
-
-        if (!eventName) {
-            return returned;
-        }
-
-        // fix sender
-        sender = sender || that.getEventSource();
-        sender = sender || that;
-
-
-        var list = listeners[eventName];
-        var length = list ? list.length : 0;
-        var ret;
-
-        for (var i = 0; i < length; i += 2) {
-            ret = list[i].call(list[i + 1] || that, eventObj, sender);
-            if (length > 2) {
-                returned.push(ret); // result as array
-            } else {
-                returned = ret;
-            }
-        }
-
-        return returned;
-    }
-});
-
-});
-define('PaneJS/perimeter',['require','exports','module','PaneJS/Point'],function (require, exports, module) {var Point = require('PaneJS/Point');
-
-module.exports =
-{
-    RectanglePerimeter: function (bounds, vertex, next, orthogonal) {
-        var cx = bounds.getCenterX();
-        var cy = bounds.getCenterY();
-        var dx = next.x - cx;
-        var dy = next.y - cy;
-        var alpha = Math.atan2(dy, dx);
-        var p = new Point(0, 0);
-        var pi = Math.PI;
-        var pi2 = Math.PI / 2;
-        var beta = pi2 - alpha;
-        var t = Math.atan2(bounds.height, bounds.width);
-
-        if (alpha < -pi + t || alpha > pi - t) {
-            // Left edge
-            p.x = bounds.x;
-            p.y = cy - bounds.width * Math.tan(alpha) / 2;
-        }
-        else if (alpha < -t) {
-            // Top Edge
-            p.y = bounds.y;
-            p.x = cx - bounds.height * Math.tan(beta) / 2;
-        }
-        else if (alpha < t) {
-            // Right Edge
-            p.x = bounds.x + bounds.width;
-            p.y = cy + bounds.width * Math.tan(alpha) / 2;
-        }
-        else {
-            // Bottom Edge
-            p.y = bounds.y + bounds.height;
-            p.x = cx + bounds.height * Math.tan(beta) / 2;
-        }
-
-        if (orthogonal) {
-            if (next.x >= bounds.x &&
-                next.x <= bounds.x + bounds.width) {
-                p.x = next.x;
-            }
-            else if (next.y >= bounds.y &&
-                next.y <= bounds.y + bounds.height) {
-                p.y = next.y;
-            }
-            if (next.x < bounds.x) {
-                p.x = bounds.x;
-            }
-            else if (next.x > bounds.x + bounds.width) {
-                p.x = bounds.x + bounds.width;
-            }
-            if (next.y < bounds.y) {
-                p.y = bounds.y;
-            }
-            else if (next.y > bounds.y + bounds.height) {
-                p.y = bounds.y + bounds.height;
-            }
-        }
-
-        return p;
-    },
-    EllipsePerimeter: function (bounds, vertex, next, orthogonal) {
-        var x = bounds.x;
-        var y = bounds.y;
-        var a = bounds.width / 2;
-        var b = bounds.height / 2;
-        var cx = x + a;
-        var cy = y + b;
-        var px = next.x;
-        var py = next.y;
-
-        // Calculates straight line equation through
-        // point and ellipse center y = d * x + h
-        var dx = parseInt(px - cx);
-        var dy = parseInt(py - cy);
-
-        if (dx == 0 && dy != 0) {
-            return new mxPoint(cx, cy + b * dy / Math.abs(dy));
-        }
-        else if (dx == 0 && dy == 0) {
-            return new mxPoint(px, py);
-        }
-
-        if (orthogonal) {
-            if (py >= y && py <= y + bounds.height) {
-                var ty = py - cy;
-                var tx = Math.sqrt(a * a * (1 - (ty * ty) / (b * b))) || 0;
-
-                if (px <= x) {
-                    tx = -tx;
-                }
-
-                return new mxPoint(cx + tx, py);
-            }
-
-            if (px >= x && px <= x + bounds.width) {
-                var tx = px - cx;
-                var ty = Math.sqrt(b * b * (1 - (tx * tx) / (a * a))) || 0;
-
-                if (py <= y) {
-                    ty = -ty;
-                }
-
-                return new mxPoint(px, cy + ty);
-            }
-        }
-
-        // Calculates intersection
-        var d = dy / dx;
-        var h = cy - d * cx;
-        var e = a * a * d * d + b * b;
-        var f = -2 * cx * e;
-        var g = a * a * d * d * cx * cx +
-            b * b * cx * cx -
-            a * a * b * b;
-        var det = Math.sqrt(f * f - 4 * e * g);
-
-        // Two solutions (perimeter points)
-        var xout1 = (-f + det) / (2 * e);
-        var xout2 = (-f - det) / (2 * e);
-        var yout1 = d * xout1 + h;
-        var yout2 = d * xout2 + h;
-        var dist1 = Math.sqrt(Math.pow((xout1 - px), 2)
-            + Math.pow((yout1 - py), 2));
-        var dist2 = Math.sqrt(Math.pow((xout2 - px), 2)
-            + Math.pow((yout2 - py), 2));
-
-        // Correct solution
-        var xout = 0;
-        var yout = 0;
-
-        if (dist1 < dist2) {
-            xout = xout1;
-            yout = yout1;
-        }
-        else {
-            xout = xout2;
-            yout = yout2;
-        }
-
-        return new mxPoint(xout, yout);
-    },
-    RhombusPerimeter: function (bounds, vertex, next, orthogonal) {
-        var x = bounds.x;
-        var y = bounds.y;
-        var w = bounds.width;
-        var h = bounds.height;
-
-        var cx = x + w / 2;
-        var cy = y + h / 2;
-
-        var px = next.x;
-        var py = next.y;
-
-        // Special case for intersecting the diamond's corners
-        if (cx == px) {
-            if (cy > py) {
-                return new mxPoint(cx, y); // top
-            }
-            else {
-                return new mxPoint(cx, y + h); // bottom
-            }
-        }
-        else if (cy == py) {
-            if (cx > px) {
-                return new mxPoint(x, cy); // left
-            }
-            else {
-                return new mxPoint(x + w, cy); // right
-            }
-        }
-
-        var tx = cx;
-        var ty = cy;
-
-        if (orthogonal) {
-            if (px >= x && px <= x + w) {
-                tx = px;
-            }
-            else if (py >= y && py <= y + h) {
-                ty = py;
-            }
-        }
-
-        // In which quadrant will the intersection be?
-        // set the slope and offset of the border line accordingly
-        if (px < cx) {
-            if (py < cy) {
-                return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
-            }
-            else {
-                return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
-            }
-        }
-        else if (py < cy) {
-            return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
-        }
-        else {
-            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
-        }
-    },
-    TrianglePerimeter: function (bounds, vertex, next, orthogonal) {
-        var direction = (vertex != null) ?
-            vertex.style[mxConstants.STYLE_DIRECTION] : null;
-        var vertical = direction == mxConstants.DIRECTION_NORTH ||
-            direction == mxConstants.DIRECTION_SOUTH;
-
-        var x = bounds.x;
-        var y = bounds.y;
-        var w = bounds.width;
-        var h = bounds.height;
-
-        var cx = x + w / 2;
-        var cy = y + h / 2;
-
-        var start = new mxPoint(x, y);
-        var corner = new mxPoint(x + w, cy);
-        var end = new mxPoint(x, y + h);
-
-        if (direction == mxConstants.DIRECTION_NORTH) {
-            start = end;
-            corner = new mxPoint(cx, y);
-            end = new mxPoint(x + w, y + h);
-        }
-        else if (direction == mxConstants.DIRECTION_SOUTH) {
-            corner = new mxPoint(cx, y + h);
-            end = new mxPoint(x + w, y);
-        }
-        else if (direction == mxConstants.DIRECTION_WEST) {
-            start = new mxPoint(x + w, y);
-            corner = new mxPoint(x, cy);
-            end = new mxPoint(x + w, y + h);
-        }
-
-        var dx = next.x - cx;
-        var dy = next.y - cy;
-
-        var alpha = (vertical) ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
-        var t = (vertical) ? Math.atan2(w, h) : Math.atan2(h, w);
-
-        var base = false;
-
-        if (direction == mxConstants.DIRECTION_NORTH ||
-            direction == mxConstants.DIRECTION_WEST) {
-            base = alpha > -t && alpha < t;
-        }
-        else {
-            base = alpha < -Math.PI + t || alpha > Math.PI - t;
-        }
-
-        var result = null;
-
-        if (base) {
-            if (orthogonal && ((vertical && next.x >= start.x && next.x <= end.x) ||
-                (!vertical && next.y >= start.y && next.y <= end.y))) {
-                if (vertical) {
-                    result = new mxPoint(next.x, start.y);
-                }
-                else {
-                    result = new mxPoint(start.x, next.y);
-                }
-            }
-            else {
-                if (direction == mxConstants.DIRECTION_NORTH) {
-                    result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2,
-                        y + h);
-                }
-                else if (direction == mxConstants.DIRECTION_SOUTH) {
-                    result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2,
-                        y);
-                }
-                else if (direction == mxConstants.DIRECTION_WEST) {
-                    result = new mxPoint(x + w, y + h / 2 +
-                        w * Math.tan(alpha) / 2);
-                }
-                else {
-                    result = new mxPoint(x, y + h / 2 -
-                        w * Math.tan(alpha) / 2);
-                }
-            }
-        }
-        else {
-            if (orthogonal) {
-                var pt = new mxPoint(cx, cy);
-
-                if (next.y >= y && next.y <= y + h) {
-                    pt.x = (vertical) ? cx : (
-                        (direction == mxConstants.DIRECTION_WEST) ?
-                        x + w : x);
-                    pt.y = next.y;
-                }
-                else if (next.x >= x && next.x <= x + w) {
-                    pt.x = next.x;
-                    pt.y = (!vertical) ? cy : (
-                        (direction == mxConstants.DIRECTION_NORTH) ?
-                        y + h : y);
-                }
-
-                // Compute angle
-                dx = next.x - pt.x;
-                dy = next.y - pt.y;
-
-                cx = pt.x;
-                cy = pt.y;
-            }
-
-            if ((vertical && next.x <= x + w / 2) ||
-                (!vertical && next.y <= y + h / 2)) {
-                result = mxUtils.intersection(next.x, next.y, cx, cy,
-                    start.x, start.y, corner.x, corner.y);
-            }
-            else {
-                result = mxUtils.intersection(next.x, next.y, cx, cy,
-                    corner.x, corner.y, end.x, end.y);
-            }
-        }
-
-        if (result == null) {
-            result = new mxPoint(cx, cy);
-        }
-
-        return result;
-    },
-    HexagonPerimeter: function (bounds, vertex, next, orthogonal) {
-        var x = bounds.x;
-        var y = bounds.y;
-        var w = bounds.width;
-        var h = bounds.height;
-
-        var cx = bounds.getCenterX();
-        var cy = bounds.getCenterY();
-        var px = next.x;
-        var py = next.y;
-        var dx = px - cx;
-        var dy = py - cy;
-        var alpha = -Math.atan2(dy, dx);
-        var pi = Math.PI;
-        var pi2 = Math.PI / 2;
-
-        var result = new mxPoint(cx, cy);
-
-        var direction = (vertex != null) ? mxUtils.getValue(
-            vertex.style, mxConstants.STYLE_DIRECTION,
-            mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-        var vertical = direction == mxConstants.DIRECTION_NORTH
-            || direction == mxConstants.DIRECTION_SOUTH;
-        var a = new mxPoint();
-        var b = new mxPoint();
-
-        //Only consider corrects quadrants for the orthogonal case.
-        if ((px < x) && (py < y) || (px < x) && (py > y + h)
-            || (px > x + w) && (py < y) || (px > x + w) && (py > y + h)) {
-            orthogonal = false;
-        }
-
-        if (orthogonal) {
-            if (vertical) {
-                //Special cases where intersects with hexagon corners
-                if (px == cx) {
-                    if (py <= y) {
-                        return new mxPoint(cx, y);
-                    }
-                    else if (py >= y + h) {
-                        return new mxPoint(cx, y + h);
-                    }
-                }
-                else if (px < x) {
-                    if (py == y + h / 4) {
-                        return new mxPoint(x, y + h / 4);
-                    }
-                    else if (py == y + 3 * h / 4) {
-                        return new mxPoint(x, y + 3 * h / 4);
-                    }
-                }
-                else if (px > x + w) {
-                    if (py == y + h / 4) {
-                        return new mxPoint(x + w, y + h / 4);
-                    }
-                    else if (py == y + 3 * h / 4) {
-                        return new mxPoint(x + w, y + 3 * h / 4);
-                    }
-                }
-                else if (px == x) {
-                    if (py < cy) {
-                        return new mxPoint(x, y + h / 4);
-                    }
-                    else if (py > cy) {
-                        return new mxPoint(x, y + 3 * h / 4);
-                    }
-                }
-                else if (px == x + w) {
-                    if (py < cy) {
-                        return new mxPoint(x + w, y + h / 4);
-                    }
-                    else if (py > cy) {
-                        return new mxPoint(x + w, y + 3 * h / 4);
-                    }
-                }
-                if (py == y) {
-                    return new mxPoint(cx, y);
-                }
-                else if (py == y + h) {
-                    return new mxPoint(cx, y + h);
-                }
-
-                if (px < cx) {
-                    if ((py > y + h / 4) && (py < y + 3 * h / 4)) {
-                        a = new mxPoint(x, y);
-                        b = new mxPoint(x, y + h);
-                    }
-                    else if (py < y + h / 4) {
-                        a = new mxPoint(x - Math.floor(0.5 * w), y
-                            + Math.floor(0.5 * h));
-                        b = new mxPoint(x + w, y - Math.floor(0.25 * h));
-                    }
-                    else if (py > y + 3 * h / 4) {
-                        a = new mxPoint(x - Math.floor(0.5 * w), y
-                            + Math.floor(0.5 * h));
-                        b = new mxPoint(x + w, y + Math.floor(1.25 * h));
-                    }
-                }
-                else if (px > cx) {
-                    if ((py > y + h / 4) && (py < y + 3 * h / 4)) {
-                        a = new mxPoint(x + w, y);
-                        b = new mxPoint(x + w, y + h);
-                    }
-                    else if (py < y + h / 4) {
-                        a = new mxPoint(x, y - Math.floor(0.25 * h));
-                        b = new mxPoint(x + Math.floor(1.5 * w), y
-                            + Math.floor(0.5 * h));
-                    }
-                    else if (py > y + 3 * h / 4) {
-                        a = new mxPoint(x + Math.floor(1.5 * w), y
-                            + Math.floor(0.5 * h));
-                        b = new mxPoint(x, y + Math.floor(1.25 * h));
-                    }
-                }
-
-            }
-            else {
-                //Special cases where intersects with hexagon corners
-                if (py == cy) {
-                    if (px <= x) {
-                        return new mxPoint(x, y + h / 2);
-                    }
-                    else if (px >= x + w) {
-                        return new mxPoint(x + w, y + h / 2);
-                    }
-                }
-                else if (py < y) {
-                    if (px == x + w / 4) {
-                        return new mxPoint(x + w / 4, y);
-                    }
-                    else if (px == x + 3 * w / 4) {
-                        return new mxPoint(x + 3 * w / 4, y);
-                    }
-                }
-                else if (py > y + h) {
-                    if (px == x + w / 4) {
-                        return new mxPoint(x + w / 4, y + h);
-                    }
-                    else if (px == x + 3 * w / 4) {
-                        return new mxPoint(x + 3 * w / 4, y + h);
-                    }
-                }
-                else if (py == y) {
-                    if (px < cx) {
-                        return new mxPoint(x + w / 4, y);
-                    }
-                    else if (px > cx) {
-                        return new mxPoint(x + 3 * w / 4, y);
-                    }
-                }
-                else if (py == y + h) {
-                    if (px < cx) {
-                        return new mxPoint(x + w / 4, y + h);
-                    }
-                    else if (py > cy) {
-                        return new mxPoint(x + 3 * w / 4, y + h);
-                    }
-                }
-                if (px == x) {
-                    return new mxPoint(x, cy);
-                }
-                else if (px == x + w) {
-                    return new mxPoint(x + w, cy);
-                }
-
-                if (py < cy) {
-                    if ((px > x + w / 4) && (px < x + 3 * w / 4)) {
-                        a = new mxPoint(x, y);
-                        b = new mxPoint(x + w, y);
-                    }
-                    else if (px < x + w / 4) {
-                        a = new mxPoint(x - Math.floor(0.25 * w), y + h);
-                        b = new mxPoint(x + Math.floor(0.5 * w), y
-                            - Math.floor(0.5 * h));
-                    }
-                    else if (px > x + 3 * w / 4) {
-                        a = new mxPoint(x + Math.floor(0.5 * w), y
-                            - Math.floor(0.5 * h));
-                        b = new mxPoint(x + Math.floor(1.25 * w), y + h);
-                    }
-                }
-                else if (py > cy) {
-                    if ((px > x + w / 4) && (px < x + 3 * w / 4)) {
-                        a = new mxPoint(x, y + h);
-                        b = new mxPoint(x + w, y + h);
-                    }
-                    else if (px < x + w / 4) {
-                        a = new mxPoint(x - Math.floor(0.25 * w), y);
-                        b = new mxPoint(x + Math.floor(0.5 * w), y
-                            + Math.floor(1.5 * h));
-                    }
-                    else if (px > x + 3 * w / 4) {
-                        a = new mxPoint(x + Math.floor(0.5 * w), y
-                            + Math.floor(1.5 * h));
-                        b = new mxPoint(x + Math.floor(1.25 * w), y);
-                    }
-                }
-            }
-
-            var tx = cx;
-            var ty = cy;
-
-            if (px >= x && px <= x + w) {
-                tx = px;
-
-                if (py < cy) {
-                    ty = y + h;
-                }
-                else {
-                    ty = y;
-                }
-            }
-            else if (py >= y && py <= y + h) {
-                ty = py;
-
-                if (px < cx) {
-                    tx = x + w;
-                }
-                else {
-                    tx = x;
-                }
-            }
-
-            result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
-        }
-        else {
-            if (vertical) {
-                var beta = Math.atan2(h / 4, w / 2);
-
-                //Special cases where intersects with hexagon corners
-                if (alpha == beta) {
-                    return new mxPoint(x + w, y + Math.floor(0.25 * h));
-                }
-                else if (alpha == pi2) {
-                    return new mxPoint(x + Math.floor(0.5 * w), y);
-                }
-                else if (alpha == (pi - beta)) {
-                    return new mxPoint(x, y + Math.floor(0.25 * h));
-                }
-                else if (alpha == -beta) {
-                    return new mxPoint(x + w, y + Math.floor(0.75 * h));
-                }
-                else if (alpha == (-pi2)) {
-                    return new mxPoint(x + Math.floor(0.5 * w), y + h);
-                }
-                else if (alpha == (-pi + beta)) {
-                    return new mxPoint(x, y + Math.floor(0.75 * h));
-                }
-
-                if ((alpha < beta) && (alpha > -beta)) {
-                    a = new mxPoint(x + w, y);
-                    b = new mxPoint(x + w, y + h);
-                }
-                else if ((alpha > beta) && (alpha < pi2)) {
-                    a = new mxPoint(x, y - Math.floor(0.25 * h));
-                    b = new mxPoint(x + Math.floor(1.5 * w), y
-                        + Math.floor(0.5 * h));
-                }
-                else if ((alpha > pi2) && (alpha < (pi - beta))) {
-                    a = new mxPoint(x - Math.floor(0.5 * w), y
-                        + Math.floor(0.5 * h));
-                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
-                }
-                else if (((alpha > (pi - beta)) && (alpha <= pi))
-                    || ((alpha < (-pi + beta)) && (alpha >= -pi))) {
-                    a = new mxPoint(x, y);
-                    b = new mxPoint(x, y + h);
-                }
-                else if ((alpha < -beta) && (alpha > -pi2)) {
-                    a = new mxPoint(x + Math.floor(1.5 * w), y
-                        + Math.floor(0.5 * h));
-                    b = new mxPoint(x, y + Math.floor(1.25 * h));
-                }
-                else if ((alpha < -pi2) && (alpha > (-pi + beta))) {
-                    a = new mxPoint(x - Math.floor(0.5 * w), y
-                        + Math.floor(0.5 * h));
-                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
-                }
-            }
-            else {
-                var beta = Math.atan2(h / 2, w / 4);
-
-                //Special cases where intersects with hexagon corners
-                if (alpha == beta) {
-                    return new mxPoint(x + Math.floor(0.75 * w), y);
-                }
-                else if (alpha == (pi - beta)) {
-                    return new mxPoint(x + Math.floor(0.25 * w), y);
-                }
-                else if ((alpha == pi) || (alpha == -pi)) {
-                    return new mxPoint(x, y + Math.floor(0.5 * h));
-                }
-                else if (alpha == 0) {
-                    return new mxPoint(x + w, y + Math.floor(0.5 * h));
-                }
-                else if (alpha == -beta) {
-                    return new mxPoint(x + Math.floor(0.75 * w), y + h);
-                }
-                else if (alpha == (-pi + beta)) {
-                    return new mxPoint(x + Math.floor(0.25 * w), y + h);
-                }
-
-                if ((alpha > 0) && (alpha < beta)) {
-                    a = new mxPoint(x + Math.floor(0.5 * w), y
-                        - Math.floor(0.5 * h));
-                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
-                }
-                else if ((alpha > beta) && (alpha < (pi - beta))) {
-                    a = new mxPoint(x, y);
-                    b = new mxPoint(x + w, y);
-                }
-                else if ((alpha > (pi - beta)) && (alpha < pi)) {
-                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
-                    b = new mxPoint(x + Math.floor(0.5 * w), y
-                        - Math.floor(0.5 * h));
-                }
-                else if ((alpha < 0) && (alpha > -beta)) {
-                    a = new mxPoint(x + Math.floor(0.5 * w), y
-                        + Math.floor(1.5 * h));
-                    b = new mxPoint(x + Math.floor(1.25 * w), y);
-                }
-                else if ((alpha < -beta) && (alpha > (-pi + beta))) {
-                    a = new mxPoint(x, y + h);
-                    b = new mxPoint(x + w, y + h);
-                }
-                else if ((alpha < (-pi + beta)) && (alpha > -pi)) {
-                    a = new mxPoint(x - Math.floor(0.25 * w), y);
-                    b = new mxPoint(x + Math.floor(0.5 * w), y
-                        + Math.floor(1.5 * h));
-                }
-            }
-
-            result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
-        }
-
-        if (result == null) {
-            return new mxPoint(cx, cy);
-        }
-
-        return result;
-    }
-};
-
-
-});
-define('PaneJS/CellState',['require','exports','module','PaneJS/Point','PaneJS/Rectangle'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Point = require('PaneJS/Point');
-var Rectangle = require('PaneJS/Rectangle');
-
-module.exports = Rectangle.extend({
-
-    view: null,
-    cell: null,
-    style: null,    // cellStyle
-    shape: null,    // 图形
-    text: null,     // 文本
-    invalid: true,  // 默认为无效，需要重绘
-    origin: null,
-    absolutePoints: null, // 连线的关键点
-    absoluteOffset: null, // 对于连线，表示连线上 label 的绝对位置
-                          // 对于节点，表示节点中 label 相对于节点左上角的位置
-
-    segments: null,       // 连线每个片段的长度
-    //length: 0, // FIXME: length 导致 isArrayLike 判断出错，用下面的 edgeLength 代替
-    edgeLength: 0,        // 连线的长度
-    terminalDistance: 0,  // 连线起点和终点之间的直线距离
-    visibleSourceState: null,
-    visibleTargetState: null,
-
-    // 构造函数
-    constructor: function CellState(view, cell, style) {
-
-        var that = this;
-
-        that.view = view;
-        that.cell = cell;
-        that.style = style;
-
-        that.origin = new Point();
-        that.absoluteOffset = new Point();
-    },
-
-    getPerimeterBounds: function (border, bounds) {
-
-        var that = this;
-        var shape = that.shape;
-
-        border = border || 0;
-        bounds = bounds ? bounds : new Rectangle(that.x, that.y, that.width, that.height);
-
-
-        if (shape && shape.stencil) {
-            var aspect = shape.stencil.computeAspect(that.style, bounds.x, bounds.y, bounds.width, bounds.height);
-
-            bounds.x = aspect.x;
-            bounds.y = aspect.y;
-            bounds.width = shape.stencil.w0 * aspect.width;
-            bounds.height = shape.stencil.h0 * aspect.height;
-        }
-
-        border && bounds.grow(border);
-
-        return bounds;
-    },
-
-    // 设置连线起点或终点的位置
-    setAbsoluteTerminalPoint: function (point, isSource) {
-
-        var that = this;
-        var points = that.absolutePoints;
-
-        if (!points) {
-            points = that.absolutePoints = [];
-        }
-
-        var length = points.length;
-
-        if (isSource) {
-            length
-                ? points[0] = point
-                : points.push(point);
-        } else {
-            if (length === 0) {
-                points.push(null);
-                points.push(point);
-            } else if (length === 1) {
-                points.push(point);
-            } else {
-                points[length - 1] = point;
-            }
-        }
-
-        return that;
-    },
-
-    setCursor: function (cursor) {
-
-        var that = this;
-        var shape = that.shape;
-        var text = that.text;
-
-        shape && shape.setCursor(cursor);
-        text && text.setCursor(cursor);
-
-        return that;
-    },
-
-    getVisibleTerminal: function (isSource) {
-        var state = this.getVisibleTerminalState(isSource);
-
-        return state ? state.cell : null;
-    },
-
-    getVisibleTerminalState: function (isSource) {
-        return isSource ? this.visibleSourceState : this.visibleTargetState;
-    },
-
-    setVisibleTerminalState: function (terminalState, isSource) {
-        if (isSource) {
-            this.visibleSourceState = terminalState;
-        } else {
-            this.visibleTargetState = terminalState;
-        }
-    },
-
-    getCellBounds: function () {
-        return this.cellBounds;
-    },
-
-    getPaintBounds: function () {
-        return this.paintBounds;
-    },
-
-    updateCachedBounds: function () {
-
-        var that = this;
-        var view = that.view;
-        var shape = that.shape;
-        var ts = view.translate;
-        var scale = view.scale;
-
-        // 计算 translate 和 scale 之前的 bound
-        that.cellBounds = new Rectangle(that.x / scale - ts.x, that.y / scale - ts.y, that.width / scale, that.height / scale);
-        that.paintBounds = Rectangle.fromRectangle(that.cellBounds);
-
-        if (shape && shape.isPaintBoundsInverted()) {
-            that.paintBounds.rotate90();
-        }
-    },
-
-    clone: function () {
-
-    },
-
-    destroy: function () {
-        this.view.graph.cellRenderer.destroy(this);
-    }
-});
-
-
-});
-define('PaneJS/Geometry',['require','exports','module','PaneJS/Rectangle'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
-
-var Rectangle = require('PaneJS/Rectangle');
-
-module.exports = Rectangle.extend({
-
-    TRANSLATE_CONTROL_POINTS: true,
-    alternateBounds: null,
-    sourcePoint: null,
-    targetPoint: null,
-    points: null,
-    offset: null,
-    relative: false,
-
-    constructor: function Geometry(x, y, width, height) {
-        Geometry.superclass.constructor.call(this, x, y, width, height);
-    },
-
-    swap: function () {
-
-        var that = this;
-        var alternateBounds = that.alternateBounds;
-
-        if (alternateBounds) {
-            var old = new Rectangle(that.x, that.y, that.width, that.height);
-
-            that.x = alternateBounds.x;
-            that.y = alternateBounds.y;
-            that.width = alternateBounds.width;
-            that.height = alternateBounds.height;
-
-            that.alternateBounds = old;
-        }
-
-        return that;
-    },
-
-    getTerminalPoint: function (isSource) {
-        return isSource ? this.sourcePoint : this.targetPoint;
-    },
-
-    setTerminalPoint: function (point, isSource) {
-        var that = this;
-        if (isSource) {
-            that.sourcePoint = point;
-        } else {
-            that.targetPoint = point;
-        }
-
-        return point;
-    },
-
-    rotate: function (angle, cx) {
-
-        var that = this;
-
-        var rad = utils.toRadians(angle);
-        var cos = Math.cos(rad);
-        var sin = Math.sin(rad);
-
-        // Rotates the geometry
-        if (!this.relative) {
-            var ct = new Point(this.getCenterX(), this.getCenterY());
-            var pt = utils.getRotatedPoint(ct, cos, sin, cx);
-
-            this.x = Math.round(pt.x - this.width / 2);
-            this.y = Math.round(pt.y - this.height / 2);
-        }
-
-        // Rotates the source point
-        if (this.sourcePoint) {
-            var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
-            this.sourcePoint.x = Math.round(pt.x);
-            this.sourcePoint.y = Math.round(pt.y);
-        }
-
-        // Translates the target point
-        if (this.targetPoint) {
-            var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
-            this.targetPoint.x = Math.round(pt.x);
-            this.targetPoint.y = Math.round(pt.y);
-        }
-
-        // Translate the control points
-        if (this.points != null) {
-            for (var i = 0; i < this.points.length; i++) {
-                if (this.points[i] != null) {
-                    var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
-                    this.points[i].x = Math.round(pt.x);
-                    this.points[i].y = Math.round(pt.y);
-                }
-            }
-        }
-    },
-    translate: function (dx, dy) {
-        dx = parseFloat(dx);
-        dy = parseFloat(dy);
-
-        // Translates the geometry
-        if (!this.relative) {
-            this.x = parseFloat(this.x) + dx;
-            this.y = parseFloat(this.y) + dy;
-        }
-
-        // Translates the source point
-        if (this.sourcePoint != null) {
-            this.sourcePoint.x = parseFloat(this.sourcePoint.x) + dx;
-            this.sourcePoint.y = parseFloat(this.sourcePoint.y) + dy;
-        }
-
-        // Translates the target point
-        if (this.targetPoint != null) {
-            this.targetPoint.x = parseFloat(this.targetPoint.x) + dx;
-            this.targetPoint.y = parseFloat(this.targetPoint.y) + dy;
-        }
-
-        // Translate the control points
-        if (this.TRANSLATE_CONTROL_POINTS && this.points != null) {
-            for (var i = 0; i < this.points.length; i++) {
-                if (this.points[i] != null) {
-                    this.points[i].x = parseFloat(this.points[i].x) + dx;
-                    this.points[i].y = parseFloat(this.points[i].y) + dy;
-                }
-            }
-        }
-    },
-    scale: function (sx, sy, fixedAspect) {
-        sx = parseFloat(sx);
-        sy = parseFloat(sy);
-
-        // Translates the source point
-        if (this.sourcePoint != null) {
-            this.sourcePoint.x = parseFloat(this.sourcePoint.x) * sx;
-            this.sourcePoint.y = parseFloat(this.sourcePoint.y) * sy;
-        }
-
-        // Translates the target point
-        if (this.targetPoint != null) {
-            this.targetPoint.x = parseFloat(this.targetPoint.x) * sx;
-            this.targetPoint.y = parseFloat(this.targetPoint.y) * sy;
-        }
-
-        // Translate the control points
-        if (this.points != null) {
-            for (var i = 0; i < this.points.length; i++) {
-                if (this.points[i] != null) {
-                    this.points[i].x = parseFloat(this.points[i].x) * sx;
-                    this.points[i].y = parseFloat(this.points[i].y) * sy;
-                }
-            }
-        }
-
-        // Translates the geometry
-        if (!this.relative) {
-            this.x = parseFloat(this.x) * sx;
-            this.y = parseFloat(this.y) * sy;
-
-            if (fixedAspect) {
-                sy = sx = Math.min(sx, sy);
-            }
-
-            this.width = parseFloat(this.width) * sx;
-            this.height = parseFloat(this.height) * sy;
-        }
-    },
-
-    equals: function (/*obj*/) {
-
-    }
-});
-
-});
-define('PaneJS/cells/Node',['require','exports','module','PaneJS/Cell'],function (require, exports, module) {var Cell = require('PaneJS/Cell');
-
-module.exports = Cell.extend({
-
-    isNode: true,
-
-    constructor: function Node(value, geometry, style) {
-        this.getSupclass().constructor.call(this, value, geometry, style);
-    }
-});
-
-});
-define('PaneJS/constants',['require','exports','module','PaneJS/Rectangle'],function (require, exports, module) {var Rectangle = require('PaneJS/Rectangle');
-
-module.exports = {
-    //----------------------
-    EVENT_SPLITTER: /\s+/,
-    OBJECT_ID: 'objectId',
-    //----------------------
-
-
-    DEFAULT_HOTSPOT: 0.3,
-    MIN_HOTSPOT_SIZE: 8,
-    MAX_HOTSPOT_SIZE: 0,
-
-    RENDERING_HINT_EXACT: 'exact',
-    RENDERING_HINT_FASTER: 'faster',
-    RENDERING_HINT_FASTEST: 'fastest',
-
-    DIALECT_SVG: 'svg',
-    DIALECT_VML: 'vml',
-    DIALECT_MIXEDHTML: 'mixedHtml',
-    DIALECT_PREFERHTML: 'preferHtml',
-    DIALECT_STRICTHTML: 'strictHtml',
-
-    NS_SVG: 'http://www.w3.org/2000/svg',
-    NS_XHTML: 'http://www.w3.org/1999/xhtml',
-    NS_XLINK: 'http://www.w3.org/1999/xlink',
-
-    SHADOW_COLOR: 'gray',
-    SHADOWCOLOR: 'gray',
-    SHADOW_OFFSET_X: 2,
-    SHADOW_OFFSET_Y: 3,
-    SHADOW_OPACITY: 1,
-
-    NODETYPE_ELEMENT: 1,
-    NODETYPE_ATTRIBUTE: 2,
-    NODETYPE_TEXT: 3,
-    NODETYPE_CDATA: 4,
-    NODETYPE_ENTITY_REFERENCE: 5,
-    NODETYPE_ENTITY: 6,
-    NODETYPE_PROCESSING_INSTRUCTION: 7,
-    NODETYPE_COMMENT: 8,
-    NODETYPE_DOCUMENT: 9,
-    NODETYPE_DOCUMENTTYPE: 10,
-    NODETYPE_DOCUMENT_FRAGMENT: 11,
-    NODETYPE_NOTATION: 12,
-
-    TOOLTIP_VERTICAL_OFFSET: 16,
-
-    DEFAULT_VALID_COLOR: '#00FF00',
-    DEFAULT_INVALID_COLOR: '#FF0000',
-    OUTLINE_HIGHLIGHT_COLOR: '#00FF00',
-    OUTLINE_HIGHLIGHT_STROKEWIDTH: 5,
-    HIGHLIGHT_STROKEWIDTH: 3,
-
-    CURSOR_MOVABLE_VERTEX: 'move',
-    CURSOR_MOVABLE_EDGE: 'move',
-    CURSOR_LABEL_HANDLE: 'default',
-    CURSOR_TERMINAL_HANDLE: 'pointer',
-    CURSOR_BEND_HANDLE: 'crosshair',
-    CURSOR_VIRTUAL_BEND_HANDLE: 'crosshair',
-    CURSOR_CONNECT: 'pointer',
-
-    HIGHLIGHT_COLOR: '#00FF00',
-    CONNECT_TARGET_COLOR: '#0000FF',
-    INVALID_CONNECT_TARGET_COLOR: '#FF0000',
-    DROP_TARGET_COLOR: '#0000FF',
-    VALID_COLOR: '#00FF00',
-    INVALID_COLOR: '#FF0000',
-    EDGE_SELECTION_COLOR: '#00FF00',
-    VERTEX_SELECTION_COLOR: '#00FF00',
-
-    VERTEX_SELECTION_STROKEWIDTH: 1,
-    EDGE_SELECTION_STROKEWIDTH: 1,
-    VERTEX_SELECTION_DASHED: true,
-    EDGE_SELECTION_DASHED: true,
-    GUIDE_COLOR: '#FF0000',
-    GUIDE_STROKEWIDTH: 1,
-    OUTLINE_COLOR: '#0099FF',
-    OUTLINE_STROKEWIDTH: 3,//(mxClient.IS_IE) ? 2 : 3,
-    HANDLE_SIZE: 7,
-    LABEL_HANDLE_SIZE: 4,
-    HANDLE_FILLCOLOR: '#00FF00',
-    HANDLE_STROKECOLOR: 'black',
-    LABEL_HANDLE_FILLCOLOR: 'yellow',
-    CONNECT_HANDLE_FILLCOLOR: '#0000FF',
-    LOCKED_HANDLE_FILLCOLOR: '#FF0000',
-    OUTLINE_HANDLE_FILLCOLOR: '#00FFFF',
-    OUTLINE_HANDLE_STROKECOLOR: '#0033FF',
-
-    //--------------------------------------
-    DEFAULT_FONT_FAMILY: 'Arial,Helvetica',
-    DEFAULT_FONTFAMILY: 'Arial,Helvetica',
-    DEFAULT_FONT_SIZE: 11,
-    DEFAULT_FONTSIZE: 11,
-    //--------------------------------------
-
-    LINE_HEIGHT: 1.2,
-    ABSOLUTE_LINE_HEIGHT: false,
-    DEFAULT_FONTSTYLE: 0,
-    DEFAULT_STARTSIZE: 40,
-    DEFAULT_MARKERSIZE: 6,
-    DEFAULT_IMAGESIZE: 24,
-    ENTITY_SEGMENT: 30,
-    RECTANGLE_ROUNDING_FACTOR: 0.15,
-    LINE_ARCSIZE: 20,
-    ARROW_SPACING: 10,
-    ARROW_WIDTH: 30,
-    ARROW_SIZE: 30,
-
-    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
-    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
-    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
-    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
-
-    NONE: 'none',
-
-
-    STYLE_PERIMETER: 'perimeter',
-    STYLE_SOURCE_PORT: 'sourcePort',
-    STYLE_TARGET_PORT: 'targetPort',
-    STYLE_PORT_CONSTRAINT: 'portConstraint',
-    STYLE_PORT_CONSTRAINT_ROTATION: 'portConstraintRotation',
-    STYLE_OPACITY: 'opacity',
-    STYLE_TEXT_OPACITY: 'textOpacity',
-    STYLE_OVERFLOW: 'overflow',
-    STYLE_ORTHOGONAL: 'orthogonal',
-    STYLE_EXIT_X: 'exitX',
-    STYLE_EXIT_Y: 'exitY',
-    STYLE_EXIT_PERIMETER: 'exitPerimeter',
-    STYLE_ENTRY_X: 'entryX',
-    STYLE_ENTRY_Y: 'entryY',
-    STYLE_ENTRY_PERIMETER: 'entryPerimeter',
-    STYLE_WHITE_SPACE: 'whiteSpace',
-    STYLE_ROTATION: 'rotation',
-    STYLE_FILLCOLOR: 'fillColor',
-    STYLE_SWIMLANE_FILLCOLOR: 'swimlaneFillColor',
-    STYLE_MARGIN: 'margin',
-    STYLE_GRADIENTCOLOR: 'gradientColor',
-    STYLE_GRADIENT_DIRECTION: 'gradientDirection',
-    STYLE_STROKECOLOR: 'strokeColor',
-    STYLE_SEPARATORCOLOR: 'separatorColor',
-    STYLE_STROKEWIDTH: 'strokeWidth',
-    STYLE_ALIGN: 'align',
-    STYLE_VERTICAL_ALIGN: 'verticalAlign',
-    STYLE_LABEL_WIDTH: 'labelWidth',
-    STYLE_LABEL_POSITION: 'labelPosition',
-    STYLE_VERTICAL_LABEL_POSITION: 'verticalLabelPosition',
-    STYLE_IMAGE_ASPECT: 'imageAspect',
-    STYLE_IMAGE_ALIGN: 'imageAlign',
-    STYLE_IMAGE_VERTICAL_ALIGN: 'imageVerticalAlign',
-    STYLE_GLASS: 'glass',
-    STYLE_IMAGE: 'image',
-    STYLE_IMAGE_WIDTH: 'imageWidth',
-    STYLE_IMAGE_HEIGHT: 'imageHeight',
-    STYLE_IMAGE_BACKGROUND: 'imageBackground',
-    STYLE_IMAGE_BORDER: 'imageBorder',
-    STYLE_FLIPH: 'flipH',
-    STYLE_FLIPV: 'flipV',
-    STYLE_NOLABEL: 'noLabel',
-    STYLE_NOEDGESTYLE: 'noEdgeStyle',
-    STYLE_LABEL_BACKGROUNDCOLOR: 'labelBackgroundColor',
-    STYLE_LABEL_BORDERCOLOR: 'labelBorderColor',
-    STYLE_LABEL_PADDING: 'labelPadding',
-    STYLE_INDICATOR_SHAPE: 'indicatorShape',
-    STYLE_INDICATOR_IMAGE: 'indicatorImage',
-    STYLE_INDICATOR_COLOR: 'indicatorColor',
-    STYLE_INDICATOR_STROKECOLOR: 'indicatorStrokeColor',
-    STYLE_INDICATOR_GRADIENTCOLOR: 'indicatorGradientColor',
-    STYLE_INDICATOR_SPACING: 'indicatorSpacing',
-    STYLE_INDICATOR_WIDTH: 'indicatorWidth',
-    STYLE_INDICATOR_HEIGHT: 'indicatorHeight',
-    STYLE_INDICATOR_DIRECTION: 'indicatorDirection',
-    STYLE_SHADOW: 'shadow',
-    STYLE_SEGMENT: 'segment',
-    STYLE_ENDARROW: 'endArrow',
-    STYLE_STARTARROW: 'startArrow',
-    STYLE_ENDSIZE: 'endSize',
-    STYLE_STARTSIZE: 'startSize',
-    STYLE_SWIMLANE_LINE: 'swimlaneLine',
-    STYLE_ENDFILL: 'endFill',
-    STYLE_STARTFILL: 'startFill',
-    STYLE_DASHED: 'dashed',
-    STYLE_DASH_PATTERN: 'dashPattern',
-    STYLE_ROUNDED: 'rounded',
-    STYLE_CURVED: 'curved',
-    STYLE_ARCSIZE: 'arcSize',
-    STYLE_SMOOTH: 'smooth',
-    STYLE_SOURCE_PERIMETER_SPACING: 'sourcePerimeterSpacing',
-    STYLE_TARGET_PERIMETER_SPACING: 'targetPerimeterSpacing',
-    STYLE_PERIMETER_SPACING: 'perimeterSpacing',
-    STYLE_SPACING: 'spacing',
-    STYLE_SPACING_TOP: 'spacingTop',
-    STYLE_SPACING_LEFT: 'spacingLeft',
-    STYLE_SPACING_BOTTOM: 'spacingBottom',
-    STYLE_SPACING_RIGHT: 'spacingRight',
-    STYLE_HORIZONTAL: 'horizontal',
-    STYLE_DIRECTION: 'direction',
-    STYLE_ELBOW: 'elbow',
-    STYLE_FONTCOLOR: 'fontColor',
-    STYLE_FONTFAMILY: 'fontFamily',
-    STYLE_FONTSIZE: 'fontSize',
-    STYLE_FONTSTYLE: 'fontStyle',
-    STYLE_ASPECT: 'aspect',
-    STYLE_AUTOSIZE: 'autosize',
-    STYLE_FOLDABLE: 'foldable',
-    STYLE_EDITABLE: 'editable',
-    STYLE_BENDABLE: 'bendable',
-    STYLE_MOVABLE: 'movable',
-    STYLE_RESIZABLE: 'resizable',
-    STYLE_ROTATABLE: 'rotatable',
-    STYLE_CLONEABLE: 'cloneable',
-    STYLE_DELETABLE: 'deletable',
-    STYLE_SHAPE: 'shape',
-    STYLE_EDGE: 'edgeStyle',
-    STYLE_LOOP: 'loopStyle',
-    STYLE_ROUTING_CENTER_X: 'routingCenterX',
-    STYLE_ROUTING_CENTER_Y: 'routingCenterY',
-
-    FONT_BOLD: 1,
-    FONT_ITALIC: 2,
-    FONT_UNDERLINE: 4,
-    FONT_SHADOW: 8,
-
-    SHAPE_RECTANGLE: 'rectangle',
-    SHAPE_ELLIPSE: 'ellipse',
-    SHAPE_DOUBLE_ELLIPSE: 'doubleEllipse',
-    SHAPE_RHOMBUS: 'rhombus',
-    SHAPE_LINE: 'line',
-    SHAPE_IMAGE: 'image',
-    SHAPE_ARROW: 'arrow',
-    SHAPE_LABEL: 'label',
-    SHAPE_CYLINDER: 'cylinder',
-    SHAPE_SWIMLANE: 'swimlane',
-    SHAPE_CONNECTOR: 'connector',
-    SHAPE_ACTOR: 'actor',
-    SHAPE_CLOUD: 'cloud',
-    SHAPE_TRIANGLE: 'triangle',
-    SHAPE_HEXAGON: 'hexagon',
-
-    ARROW_CLASSIC: 'classic',
-    ARROW_BLOCK: 'block',
-    ARROW_OPEN: 'open',
-    ARROW_OVAL: 'oval',
-    ARROW_DIAMOND: 'diamond',
-    ARROW_DIAMOND_THIN: 'diamondThin',
-
-    ALIGN_LEFT: 'left',
-    ALIGN_CENTER: 'center',
-    ALIGN_RIGHT: 'right',
-    ALIGN_TOP: 'top',
-    ALIGN_MIDDLE: 'middle',
-    ALIGN_BOTTOM: 'bottom',
-
-    DIRECTION_NORTH: 'north',
-    DIRECTION_SOUTH: 'south',
-    DIRECTION_EAST: 'east',
-    DIRECTION_WEST: 'west',
-
-    DIRECTION_MASK_NONE: 0,
-    DIRECTION_MASK_WEST: 1,
-    DIRECTION_MASK_NORTH: 2,
-    DIRECTION_MASK_SOUTH: 4,
-    DIRECTION_MASK_EAST: 8,
-    DIRECTION_MASK_ALL: 15,
-
-    ELBOW_VERTICAL: 'vertical',
-    ELBOW_HORIZONTAL: 'horizontal',
-
-    EDGESTYLE_ELBOW: 'elbowEdgeStyle',
-    EDGESTYLE_ENTITY_RELATION: 'entityRelationEdgeStyle',
-    EDGESTYLE_LOOP: 'loopEdgeStyle',
-    EDGESTYLE_SIDETOSIDE: 'sideToSideEdgeStyle',
-    EDGESTYLE_TOPTOBOTTOM: 'topToBottomEdgeStyle',
-    EDGESTYLE_ORTHOGONAL: 'orthogonalEdgeStyle',
-    EDGESTYLE_SEGMENT: 'segmentEdgeStyle',
-    PERIMETER_ELLIPSE: 'ellipsePerimeter',
-    PERIMETER_RECTANGLE: 'rectanglePerimeter',
-    PERIMETER_RHOMBUS: 'rhombusPerimeter',
-    PERIMETER_HEXAGON: 'hexagonPerimeter',
-    PERIMETER_TRIANGLE: 'trianglePerimeter'
-};
-
 
 });
 define('PaneJS/Canvas2D',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/constants'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
@@ -4802,7 +3263,7 @@ var proto = {
     rotatePoint: function (x, y, theta, cx, cy) {
         var rad = toRadians(theta);
 
-        //return mxUtils.getRotatedPoint(new Point(x, y), Math.cos(rad),
+        //return Point.getRotatedPoint(new Point(x, y), Math.cos(rad),
         //    Math.sin(rad), new Point(cx, cy));
     },
 
@@ -6445,1723 +4906,2550 @@ module.exports = Class.create({
 });
 
 });
-define('PaneJS/Stylesheet',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/constants','PaneJS/perimeter'],function (require, exports, module) {'use strict';
+define('PaneJS/Point',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('PaneJS/common/class');
 var utils = require('PaneJS/common/utils');
-var constants = require('PaneJS/constants');
-var perimeter = require('PaneJS/perimeter');
 
+var Point = Class.create({
 
-module.exports = Class.create({
-
-
-    constructor: function Stylesheet() {
-        this.styles = {};
-
-        this.putDefaultVertexStyle(this.createDefaultVertexStyle());
-        this.putDefaultEdgeStyle(this.createDefaultEdgeStyle());
+    constructor: function Point(x, y) {
+        this.x = x ? x : 0;
+        this.y = y ? y : 0;
     },
 
-    createDefaultVertexStyle: function () {
-        var style = {};
 
-        style[constants.STYLE_SHAPE] = constants.SHAPE_RECTANGLE;
-        style[constants.STYLE_PERIMETER] = perimeter.RectanglePerimeter;
-        style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
-        style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
-        style[constants.STYLE_FILLCOLOR] = '#e3f4ff';
-        style[constants.STYLE_STROKECOLOR] = '#289de9';
-        style[constants.STYLE_FONTCOLOR] = '#774400';
+    Statics: {
+        equalPoints: function (points1, points2) {
+            if ((!points1 && points2) || (points1 && !points2) ||
+                (points1 && points2 && points1.length !== points2.length)) {
+                return false;
+            } else if (points1 && points2) {
+                for (var i = 0; i < points1.length; i++) {
+                    var p1 = points1[i];
+                    var p2 = points2[i];
 
-        return style;
-    },
-
-    createDefaultEdgeStyle: function () {
-        var style = {};
-
-        style[constants.STYLE_SHAPE] = constants.SHAPE_CONNECTOR;
-        style[constants.STYLE_ENDARROW] = constants.ARROW_CLASSIC;
-        style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
-        style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
-        style[constants.STYLE_STROKECOLOR] = '#289de9';
-        style[constants.STYLE_FONTCOLOR] = '#446299';
-
-        return style;
-    },
-
-    putDefaultVertexStyle: function (style) {
-        this.putCellStyle('defaultVertex', style);
-    },
-
-    putDefaultEdgeStyle: function (style) {
-        this.putCellStyle('defaultEdge', style);
-    },
-
-    getDefaultVertexStyle: function () {
-        return this.styles['defaultVertex'];
-    },
-
-    getDefaultEdgeStyle: function () {
-        return this.styles['defaultEdge'];
-    },
-
-    putCellStyle: function (name, style) {
-        this.styles[name] = style;
-    },
-
-    getCellStyle: function (name, defaultStyle) {
-        var style = defaultStyle;
-
-        if (name != null && name.length > 0) {
-            var pairs = name.split(';');
-
-            if (style && name.charAt(0) != ';') {
-                style = mxUtils.clone(style);
-            }
-            else {
-                style = {};
-            }
-
-            // Parses each key, value pair into the existing style
-            for (var i = 0; i < pairs.length; i++) {
-                var tmp = pairs[i];
-                var pos = tmp.indexOf('=');
-
-                if (pos >= 0) {
-                    var key = tmp.substring(0, pos);
-                    var value = tmp.substring(pos + 1);
-
-                    if (value == constants.NONE) {
-                        delete style[key];
-                    }
-                    else if (utils.isNumeric(value)) {
-                        style[key] = parseFloat(value);
-                    }
-                    else {
-                        style[key] = value;
-                    }
-                }
-                else {
-                    // Merges the entries from a named style
-                    var tmpStyle = this.styles[tmp];
-
-                    if (tmpStyle != null) {
-                        for (var key in tmpStyle) {
-                            style[key] = tmpStyle[key];
-                        }
+                    if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
+                        return false;
                     }
                 }
             }
-        }
 
-        return style;
+            return true;
+        },
+        convertPoint: function (container, x, y) {
+            var origin = utils.getScrollOrigin(container);
+            var offset = utils.getOffset(container);
+
+            offset.left -= origin.left;
+            offset.top -= origin.top;
+
+            return {
+                left: x - offset.left,
+                top: y - offset.top
+            };
+        },
+        getRotatedPoint: function (pt, cos, sin, c) {
+            c = (c !== null) ? c : new Point();
+            var x = pt.x - c.x;
+            var y = pt.y - c.y;
+
+            var x1 = x * cos - y * sin;
+            var y1 = y * cos + x * sin;
+
+            return new Point(x1 + c.x, y1 + c.y);
+        },
+    },
+
+    equals: function (point) {
+        return point &&
+            point instanceof Point &&
+            point.x === this.x &&
+            point.y === this.y;
+    },
+
+    clone: function () {
+        return new Point(this.x, this.y);
     }
 });
 
+module.exports = Point;
+
+
 });
-define('PaneJS/View',['require','exports','module','PaneJS/common/class','PaneJS/events/Event','PaneJS/common/Dictionary','PaneJS/common/utils','PaneJS/common/detector','PaneJS/constants','PaneJS/Point','PaneJS/Rectangle','PaneJS/CellState','PaneJS/events/MouseEvent','PaneJS/events/domEvent','PaneJS/events/eventNames'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: false */
-/* global document */
-
-'use strict';
-
-var Class = require('PaneJS/common/class');
-var Event = require('PaneJS/events/Event');
-var Dictionary = require('PaneJS/common/Dictionary');
+define('PaneJS/UndoableEdit',['require','exports','module','PaneJS/common/class','PaneJS/common/utils'],function (require, exports, module) {var Class = require('PaneJS/common/class');
 var utils = require('PaneJS/common/utils');
-var detector = require('PaneJS/common/detector');
-var constants = require('PaneJS/constants');
-var Point = require('PaneJS/Point');
-var Rectangle = require('PaneJS/Rectangle');
-var CellState = require('PaneJS/CellState');
-var MouseEvent = require('PaneJS/events/MouseEvent');
-var domEvent = require('PaneJS/events/domEvent');
-var eventNames = require('PaneJS/events/eventNames');
 
-var each = utils.each;
 var isNullOrUndefined = utils.isNullOrUndefined;
-var getValue = utils.getValue;
+
+module.exports = Class.create({
+    constructor: function UndoableEdit(source, significant) {
+
+        var that = this;
+
+        that.source = source;
+        that.changes = [];
+        that.significant = !isNullOrUndefined(significant) ? significant : true;
+        that.undone = false;
+        that.redone = false;
+
+    },
+
+    isEmpty: function () {
+        return this.changes.length === 0;
+    },
+
+    isSignificant: function () {
+        return this.significant;
+    },
+
+    add: function (change) {
+        this.changes.push(change);
+    },
+
+    notify: function () {},
+    die: function () {},
+    undo: function () {},
+    redo: function () {}
+});
+
+});
+define('PaneJS/changes/Change',['require','exports','module','../common/class'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Class = require('../common/class');
 
 module.exports = Class.create({
 
-    Implements: Event,
-
-    // 属性
-    // ----
-
-    graph: null,
-
-    EMPTY_POINT: new Point(),
-    // 国际化
-    doneResource: '',
-    updatingDocumentResource: '',
-
-    allowEval: true,
-    captureDocumentGesture: true,
-    optimizeVmlReflows: true,
-
-    rendering: true,
-    currentRoot: null,
-    graphBounds: null,
-    scale: 1,
-    translate: null,
-    updateStyle: false,
-    lastNode: null,
-    lastHtmlNode: null,
-    lastForegroundNode: null,
-    lastForegroundHtmlNode: null,
-
-    constructor: function View(graph) {
-
-        var that = this;
-
-        that.graph = graph || null;
-        that.translate = new Point();
-        that.graphBounds = new Rectangle();
-        that.states = new Dictionary();
+    constructor: function Change(model) {
+        this.model = model;
     },
 
-    init: function () {
-        return this.installListeners().createSvg();
+    digest: function () { }
+});
+
+
+});
+define('PaneJS/changes/StyleChange',['require','exports','module','../common/class'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Class = require('../common/class');
+
+module.exports = Class.create({
+    constructor: function mxStyleChange(model, cell, style) {
+        this.model = model;
+        this.cell = cell;
+        this.style = style;
+        this.previous = style;
     },
 
-    getGraphBounds: function () {
-        return this.graphBounds;
+    execute: function () {
+        this.style = this.previous;
+        this.previous = this.model.styleForCellChanged(
+            this.cell, this.previous);
+    },
+});
+
+
+
+});
+define('PaneJS/common/Dictionary',['require','exports','module','./class','./utils','./objectIdentity'],function (require, exports, module) {'use strict';
+
+var Class = require('./class');
+var utils = require('./utils');
+var objectIdentity = require('./objectIdentity');
+
+var isObject = utils.isObject;
+var keys = utils.keys;
+var each = utils.each;
+
+function getId(key) {
+
+    if (isObject(key)) {
+        return objectIdentity.get(key);
+    }
+
+    return '' + key;
+}
+
+module.exports = Class.create({
+
+    constructor: function Dictionary() {
+        return this.clear();
     },
 
-    setGraphBounds: function (value) {
-        this.graphBounds = value;
+    clear: function () {
+        var dic = this;
+
+        dic.map = {};
+
+        return dic;
     },
 
-    getBounds: function (cells) {
+    get: function (key) {
+        var id = getId(key);
+        return this.map[id];
+    },
 
-        var that = this;
-        var result = null;
+    set: function (key, value) {
 
-        if (!cells || !cells.length) {
-            return result;
-        }
+        var map = this.map;
+        var id = getId(key);
+        var previous = map[id];
 
-        var model = that.graph.getModel();
+        map[id] = value;
 
-        each(cells, function (cell) {
+        return previous;
+    },
 
-            if (model.isVertex(cell) || model.isEdge(cell)) {
+    remove: function (key) {
 
-                var state = that.getState(cell);
+        var map = this.map;
+        var id = getId(key);
+        var previous = map[id];
 
-                if (state) {
+        delete map[id];
 
-                    var rect = new Rectangle(state.x, state.y, state.width, state.height);
+        return previous;
+    },
 
-                    if (result) {
-                        result.add(rect);
-                    } else {
-                        result = rect;
-                    }
-                }
-            }
+    getKeys: function () {
+        return keys(this.map);
+    },
+
+    getValues: function () {
+
+        var result = [];
+
+        each(this.map, function (value) {
+            result.push(value);
         });
 
         return result;
     },
 
-    setCurrentRoot: function (root) {
-        if (this.currentRoot !== root) {
-            var change = new CurrentRootChange(this, root);
-            change.execute();
-            var edit = new mxUndoableEdit(this, false);
-            edit.add(change);
-            this.fireEvent(new EventObject(mxEvent.UNDO, 'edit', edit));
-            this.graph.sizeDidChange();
-        }
+    visit: function (visitor) {
 
-        return root;
-    },
+        var dic = this;
 
-    scaleAndTranslate: function (scale, dx, dy) {
+        each(dic.map, visitor);
 
-        var that = this;
-        var ts = that.translate;
-        var previousScale = that.scale;
-        var previousTranslate = new Point(ts.x, ts.y);
+        return dic;
+    }
+});
 
-        if (previousScale !== scale || ts.x !== dx || ts.y !== dy) {
+});
+define('PaneJS/events/EventObject',['require','exports','module','../common/class','../common/utils'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-            that.scale = scale;
+var Class = require('../common/class');
+var utils = require('../common/utils');
 
-            that.translate.x = dx;
-            that.translate.y = dy;
+var isObject = utils.isObject;
+var extend = utils.extend;
+var isNullOrUndefined = utils.isNullOrUndefined;
 
-            if (that.isEventEnabled()) {
-                that.revalidate();
-                that.graph.sizeDidChange();
-            }
-        }
-
-        that.fireEvent(new EventObject(mxEvent.SCALE_AND_TRANSLATE,
-            'scale', scale, 'previousScale', previousScale,
-            'translate', that.translate, 'previousTranslate', previousTranslate));
-    },
-
-    getScale: function () {
-        return this.scale;
-    },
-
-    setScale: function (scale) {
+module.exports = Class.create({
+    constructor: function EventObject(name, eventData) {
 
         var that = this;
-        var previousScale = that.scale;
+        var data = that.data = {};
 
-        if (previousScale !== scale) {
-            that.scale = scale;
+        that.name = name;
+        that.consumed = false;
 
-            if (that.isEventEnabled()) {
-                that.revalidate();
-                that.graph.sizeDidChange();
-            }
-        }
-
-        //that.fireEvent(new EventObject('scale',
-        //    'scale', scale, 'previousScale', previousScale));
+        isObject(eventData) && extend(data, eventData);
     },
 
-    getTranslate: function () {
-        return this.translate;
+    getName: function () {
+        return this.name;
     },
 
-    setTranslate: function (dx, dy) {
+    addData: function (key, value) {
 
-        var that = this;
-        var translate = that.translate;
-        var previousTranslate = new Point(translate.x, translate.y);
+        var evtObj = this;
+        var data = evtObj.data;
 
-        if (translate.x !== dx || translate.y !== dy) {
-            translate.x = dx;
-            translate.y = dy;
-
-            if (that.isEventEnabled()) {
-                that.revalidate();
-                that.graph.sizeDidChange();
-            }
-        }
-
-        //that.fireEvent(new EventObject(mxEvent.TRANSLATE,
-        //    'translate', translate, 'previousTranslate', previousTranslate));
-    },
-
-    refresh: function () {
-
-        var that = this;
-
-        if (that.currentRoot) {
-            that.clear();
-        }
-
-        that.revalidate();
-
-        return that;
-    },
-
-    revalidate: function () {
-
-        var that = this;
-
-        that.invalidate();
-        that.validate();
-
-        return that;
-    },
-
-    clear: function (cell, force, recurse) {
-
-        var that = this;
-        var model = that.graph.getModel();
-
-        cell = cell || model.getRoot();
-        force = !isNullOrUndefined(force) ? force : false;
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-
-        that.removeState(cell);
-
-        if (recurse && (force || cell !== that.currentRoot)) {
-
-            var childCount = model.getChildCount(cell);
-
-            for (var i = 0; i < childCount; i++) {
-                that.clear(model.getChildAt(cell, i), force);
-            }
+        if (isObject(key)) {
+            extend(data, key);
         } else {
-            that.invalidate(cell);
+            data[key] = value;
         }
+
+        return evtObj;
     },
 
-    invalidate: function (cell, recurse, includeEdges) {
-
-        var that = this;
-        var model = that.graph.getModel();
-
-        cell = cell || model.getRoot();
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-        includeEdges = !isNullOrUndefined(includeEdges) ? includeEdges : true;
-
-        var state = that.getState(cell);
-
-        if (state) {
-            state.invalid = true;
-        }
-
-        // Avoids infinite loops for invalid graphs
-        if (!cell.invalidating) {
-            cell.invalidating = true;
-
-            if (recurse) {
-                var childCount = model.getChildCount(cell);
-
-                for (var i = 0; i < childCount; i++) {
-                    var child = model.getChildAt(cell, i);
-                    that.invalidate(child, recurse, includeEdges);
-                }
-            }
-
-            if (includeEdges) {
-                var edgeCount = model.getEdgeCount(cell);
-
-                for (var i = 0; i < edgeCount; i++) {
-                    that.invalidate(model.getEdgeAt(cell, i), recurse, includeEdges);
-                }
-            }
-
-            delete cell.invalidating;
-        }
+    getData: function (key) {
+        var data = this.data;
+        return isNullOrUndefined(key) ? data : data[key];
     },
 
-    //
-    validate: function (cell) {
+    isConsumed: function () {
+        return this.consumed;
+    },
 
+    consume: function () {
+        this.consumed = true;
+    }
+});
+
+});
+define('PaneJS/events/MouseEvent',['require','exports','module','../common/class','../common/detector'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Class = require('../common/class');
+var detector = require('../common/detector');
+
+module.exports = Class.create({
+    constructor: function MouseEvent(evt, state) {
         var that = this;
 
-        if (!cell) {
-            cell = that.currentRoot || that.graph.getModel().getRoot();
-        }
-
-        that.resetValidationState();
-
-        that.validateCell(cell);
-        var state = that.validateCellState(cell);
-        var graphBounds = that.getBoundingBox(state);
-
-        that.setGraphBounds(graphBounds || that.getEmptyBounds());
-        that.validateBackground();
-        that.resetValidationState();
-    },
-
-    // 创建或移除 cell 对应的 state
-    validateCell: function (cell, visible) {
-
-        var that = this;
-
-        if (!cell) {
-            return cell;
-        }
-
-        visible = !isNullOrUndefined(visible) ? visible : true;
-        visible = visible && that.graph.isCellVisible(cell);
-
-        var state = that.getState(cell, visible);
-
-        if (state && !visible) {
-            that.removeState(cell);
-        } else {
-
-            var model = that.graph.getModel();
-            var childCount = model.getChildCount(cell);
-
-            for (var i = 0; i < childCount; i++) {
-                this.validateCell(model.getChildAt(cell, i), visible &&
-                    (!this.isCellCollapsed(cell) || cell == this.currentRoot));
-            }
-        }
-
-        return cell;
-    },
-
-    validateCellState: function (cell, recurse) {
-
-        var view = this;
-        var state = null;
-
-        if (!cell) {
-            return state;
-        }
-
-        state = view.getState(cell);
-
-        if (!state) {
-            return state;
-        }
-
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-
-        var model = view.graph.getModel();
-
-        if (state.invalid) {
-            state.invalid = false;
-
-            if (cell !== this.currentRoot) {
-                this.validateCellState(model.getParent(cell), false);
-            }
-
-            // 连线
-            var source = this.getVisibleTerminal(cell, true);
-            var target = this.getVisibleTerminal(cell, false);
-            var sourceState = this.validateCellState(source, false);
-            var targetState = this.validateCellState(target, false);
-            state.setVisibleTerminalState(sourceState, true);
-            state.setVisibleTerminalState(targetState, false);
-
-            // 关键代码，更新 state 的大小、位置信息
-            this.updateCellState(state);
-
-            // Repaint happens immediately after the cell is validated
-            if (cell !== this.currentRoot) {
-                this.graph.cellRenderer.redraw(state, false, this.isRendering());
-            }
-        }
-
-        if (recurse) {
-            state.updateCachedBounds();
-
-            // Updates order in DOM if recursively traversing
-            if (state.shape) {
-                this.stateValidated(state);
-            }
-
-            var childCount = model.getChildCount(cell);
-
-            for (var i = 0; i < childCount; i++) {
-                this.validateCellState(model.getChildAt(cell, i));
-            }
-        }
-
-        return state;
-    },
-
-    getBoundingBox: function (state, recurse) {
-
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-
-        var bbox = null;
-
-        if (isNullOrUndefined(state)) {
-            return bbox;
-        }
-
-        if (state.shape && state.shape.boundingBox) {
-            bbox = state.shape.boundingBox.clone();
-        }
-
-        // Adds label bounding box to graph bounds
-        if (state.text && state.text.boundingBox) {
-            if (bbox) {
-                bbox.add(state.text.boundingBox);
-            } else {
-                bbox = state.text.boundingBox.clone();
-            }
-        }
-
-        if (recurse) {
-            var model = this.graph.getModel();
-            var childCount = model.getChildCount(state.cell);
-
-            for (var i = 0; i < childCount; i++) {
-                var bounds = this.getBoundingBox(this.getState(model.getChildAt(state.cell, i)));
-
-                if (bounds != null) {
-                    if (bbox == null) {
-                        bbox = bounds;
-                    }
-                    else {
-                        bbox.add(bounds);
-                    }
-                }
-            }
-        }
-
-        return bbox;
-    },
-
-    getEmptyBounds: function () {
-        var view = this;
-        var translate = view.translate;
-        var scale = view.scale;
-
-        return new Rectangle(translate.x * scale, translate.y * scale);
-    },
-
-    // BackgroundPage
-    // ---------------
-    createBackgroundPageShape: function (bounds) {
-        return new RectangleShape(bounds, 'white', 'black');
-    },
-
-    validateBackground: function () {
-        this.validateBackgroundImage();
-        this.validateBackgroundPage();
-    },
-
-    validateBackgroundImage: function () {
-        var bg = this.graph.getBackgroundImage();
-
-        if (bg) {
-            if (this.backgroundImage == null || this.backgroundImage.image != bg.src) {
-                if (this.backgroundImage) {
-                    this.backgroundImage.destroy();
-                }
-
-                var bounds = new Rectangle(0, 0, 1, 1);
-
-                this.backgroundImage = new ImageShape(bounds, bg.src);
-                this.backgroundImage.dialect = this.graph.dialect;
-                this.backgroundImage.init(this.backgroundPane);
-                this.backgroundImage.redraw();
-
-                // Workaround for ignored event on background in IE8 standards mode
-                if (document.documentMode == 8 && !mxClient.IS_EM) {
-                    mxEvent.addGestureListeners(this.backgroundImage.node,
-                        utils.bind(this, function (evt) {
-                            this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
-                        }),
-                        utils.bind(this, function (evt) {
-                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
-                        }),
-                        utils.bind(this, function (evt) {
-                            this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
-                        })
-                    );
-                }
-            }
-
-            this.redrawBackgroundImage(this.backgroundImage, bg);
-        }
-        else if (this.backgroundImage != null) {
-            this.backgroundImage.destroy();
-            this.backgroundImage = null;
-        }
-    },
-
-    validateBackgroundPage: function () {},
-
-    getBackgroundPageBounds: function () {
-        var view = this;
-        var scale = view.scale;
-        var translate = view.translate;
-        var fmt = view.graph.pageFormat;
-        var ps = scale * view.graph.pageScale;
-
-        return new Rectangle(scale * translate.x, scale * translate.y, fmt.width * ps, fmt.height * ps);
-    },
-
-    redrawBackgroundImage: function (backgroundImage, bg) {
-        backgroundImage.scale = this.scale;
-        backgroundImage.bounds.x = this.scale * this.translate.x;
-        backgroundImage.bounds.y = this.scale * this.translate.y;
-        backgroundImage.bounds.width = this.scale * bg.width;
-        backgroundImage.bounds.height = this.scale * bg.height;
-
-        backgroundImage.redraw();
-    },
-
-
-    // update cell state
-    // -----------------
-    updateCellState: function (state) {
-        state.absoluteOffset.x = 0;
-        state.absoluteOffset.y = 0;
-        state.origin.x = 0;
-        state.origin.y = 0;
-        state.length = 0;
-
-        if (state.cell !== this.currentRoot) {
-            var model = this.graph.getModel();
-            var pState = this.getState(model.getParent(state.cell));
-
-            if (pState != null && pState.cell != this.currentRoot) {
-                state.origin.x += pState.origin.x;
-                state.origin.y += pState.origin.y;
-            }
-
-            var offset = this.graph.getChildOffsetForCell(state.cell);
-
-            if (offset != null) {
-                state.origin.x += offset.x;
-                state.origin.y += offset.y;
-            }
-
-            var geo = this.graph.getCellGeometry(state.cell);
-
-            if (geo) {
-                if (!model.isEdge(state.cell)) {
-                    offset = geo.offset || this.EMPTY_POINT;
-
-                    if (geo.relative && pState != null) {
-                        if (model.isEdge(pState.cell)) {
-                            var origin = this.getPoint(pState, geo);
-
-                            if (origin != null) {
-                                state.origin.x += (origin.x / this.scale) - pState.origin.x - this.translate.x;
-                                state.origin.y += (origin.y / this.scale) - pState.origin.y - this.translate.y;
-                            }
-                        }
-                        else {
-                            state.origin.x += geo.x * pState.width / this.scale + offset.x;
-                            state.origin.y += geo.y * pState.height / this.scale + offset.y;
-                        }
-                    }
-                    else {
-                        state.absoluteOffset.x = this.scale * offset.x;
-                        state.absoluteOffset.y = this.scale * offset.y;
-                        state.origin.x += geo.x;
-                        state.origin.y += geo.y;
-                    }
-                }
-
-                // 设置 scale 和 translate 之后的 x, y, w, h
-                state.x = this.scale * (this.translate.x + state.origin.x);
-                state.y = this.scale * (this.translate.y + state.origin.y);
-                state.width = this.scale * geo.width;
-                state.height = this.scale * geo.height;
-
-                if (model.isVertex(state.cell)) {
-                    this.updateVertexState(state, geo);
-                }
-
-                if (model.isEdge(state.cell)) {
-                    this.updateEdgeState(state, geo);
-                }
-            }
-        }
-    },
-
-    isCellCollapsed: function (cell) {
-        return this.graph.isCellCollapsed(cell);
-    },
-
-    updateVertexState: function (state, geo) {
-        var model = this.graph.getModel();
-        var pState = this.getState(model.getParent(state.cell));
-
-        if (geo.relative && pState && !model.isEdge(pState.cell)) {
-            var alpha = utils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
-
-            if (alpha != 0) {
-                var cos = Math.cos(alpha);
-                var sin = Math.sin(alpha);
-
-                var ct = new Point(state.getCenterX(), state.getCenterY());
-                var cx = new Point(pState.getCenterX(), pState.getCenterY());
-                var pt = utils.getRotatedPoint(ct, cos, sin, cx);
-                state.x = pt.x - state.width / 2;
-                state.y = pt.y - state.height / 2;
-            }
-        }
-
-        this.updateVertexLabelOffset(state);
-    },
-
-    updateEdgeState: function (linkState, geo) {
-        var sourceState = linkState.getVisibleTerminalState(true);
-        var targetState = linkState.getVisibleTerminalState(false);
-
-        // This will remove edges with no terminals and no terminal points
-        // as such edges are invalid and produce NPEs in the edge styles.
-        // Also removes connected edges that have no visible terminals.
-        if ((this.graph.model.getTerminal(linkState.cell, true) && sourceState == null) ||
-            (sourceState == null && geo.getTerminalPoint(true) == null) ||
-            (this.graph.model.getTerminal(linkState.cell, false) && targetState == null) ||
-            (targetState == null && geo.getTerminalPoint(false) == null)) {
-            this.clear(linkState.cell, true);
-        }
-        else {
-            this.updateFixedTerminalPoints(linkState, sourceState, targetState);
-            this.updatePoints(linkState, geo.points, sourceState, targetState);
-            this.updateFloatingTerminalPoints(linkState, sourceState, targetState);
-
-            var pts = linkState.absolutePoints;
-
-            if (linkState.cell != this.currentRoot && (pts == null || pts.length < 2 ||
-                pts[0] == null || pts[pts.length - 1] == null)) {
-                // This will remove edges with invalid points from the list of states in the view.
-                // Happens if the one of the terminals and the corresponding terminal point is null.
-                this.clear(linkState.cell, true);
-            }
-            else {
-                this.updateEdgeBounds(linkState);
-                this.updateEdgeLabelOffset(linkState);
-            }
-        }
-    },
-
-    // 更新 state.absoluteOffset
-    updateVertexLabelOffset: function (state) {
-        var h = getValue(state.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER);
-
-        if (h == constants.ALIGN_LEFT) {
-            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
-
-            if (lw != null) {
-                lw *= this.scale;
-            }
-            else {
-                lw = state.width;
-            }
-
-            state.absoluteOffset.x -= lw;
-        }
-        else if (h == constants.ALIGN_RIGHT) {
-            state.absoluteOffset.x += state.width;
-        }
-        else if (h == constants.ALIGN_CENTER) {
-            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
-
-            if (lw != null) {
-                // Aligns text block with given width inside the vertex width
-                var align = getValue(state.style, constants.STYLE_ALIGN, constants.ALIGN_CENTER);
-                var dx = 0;
-
-                if (align == constants.ALIGN_CENTER) {
-                    dx = 0.5;
-                }
-                else if (align == constants.ALIGN_RIGHT) {
-                    dx = 1;
-                }
-
-                if (dx != 0) {
-                    state.absoluteOffset.x -= (lw * this.scale - state.width) * dx;
-                }
-            }
-        }
-
-        var v = getValue(state.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE);
-
-        if (v == constants.ALIGN_TOP) {
-            state.absoluteOffset.y -= state.height;
-        }
-        else if (v == constants.ALIGN_BOTTOM) {
-            state.absoluteOffset.y += state.height;
-        }
-    },
-
-    resetValidationState: function () {
-        this.lastNode = null;
-        this.lastHtmlNode = null;
-        this.lastForegroundNode = null;
-        this.lastForegroundHtmlNode = null;
-    },
-
-    stateValidated: function (state) {
+        that.evt = evt;
+        that.state = state;
 
     },
 
-    updateFixedTerminalPoints: function (linkState, sourceState, targetState) {
-        this.updateFixedTerminalPoint(linkState, sourceState, true, this.graph.getConnectionConstraint(linkState, sourceState, true));
-        this.updateFixedTerminalPoint(linkState, targetState, false, this.graph.getConnectionConstraint(linkState, targetState, false));
+    consumed: false,
+    graphX: null,
+    graphY: null,
+
+    getEvent:function(){
+        return this.evt;
     },
 
-    updateFixedTerminalPoint: function (linkState, terminalState, isSource, constraint) {
-        var pt = null;
-
-        if (constraint) {
-            pt = this.graph.getConnectionPoint(terminalState, constraint);
-        }
-
-        if (pt == null && terminalState == null) {
-            var origin = linkState.origin;
-            var scale = this.scale;
-            var translate = this.translate;
-            var geo = this.graph.getCellGeometry(linkState.cell);
-            pt = geo.getTerminalPoint(isSource);
-
-            if (pt != null) {
-                pt = new Point(scale * (translate.x + pt.x + origin.x),
-                    scale * (translate.y + pt.y + origin.y));
-            }
-        }
-
-        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    getGraphX: function () {
+        return this.graphX;
     },
 
-    updatePoints: function (linkState, points, sourceState, targetState) {
-        if (linkState != null) {
-            var pts = [];
-            pts.push(linkState.absolutePoints[0]);
-            var edgeStyle = this.getEdgeStyle(linkState, points, sourceState, targetState);
-
-            if (edgeStyle != null) {
-                var src = this.getTerminalPort(linkState, sourceState, true);
-                var trg = this.getTerminalPort(linkState, targetState, false);
-
-                edgeStyle(linkState, src, trg, points, pts);
-            }
-            else if (points != null) {
-                for (var i = 0; i < points.length; i++) {
-                    if (points[i] != null) {
-                        var pt = utils.clone(points[i]);
-                        pts.push(this.transformControlPoint(linkState, pt));
-                    }
-                }
-            }
-
-            var tmp = linkState.absolutePoints;
-            pts.push(tmp[tmp.length - 1]);
-
-            linkState.absolutePoints = pts;
-        }
+    getGraphY: function () {
+        return this.graphY;
     },
 
-    transformControlPoint: function (state, pt) {},
+    getState: function () {
+        return this.state;
+    },
 
-    getEdgeStyle: function (linkState, points, sourceState, targetState) {
-        var edgeStyle = (sourceState && sourceState === targetState)
-            ? getValue(linkState.style, constants.STYLE_LOOP, this.graph.defaultLoopStyle)
-            : (!getValue(linkState.style, constants.STYLE_NOEDGESTYLE, false) ? linkState.style[constants.STYLE_EDGE] : null);
+    getCell: function () {
+        var state = this.getState();
 
-        // Converts string values to objects
-        if (typeof(edgeStyle) == "string") {
-            var tmp = mxStyleRegistry.getValue(edgeStyle);
-
-            if (tmp == null && this.isAllowEval()) {
-                tmp = utils.eval(edgeStyle);
-            }
-
-            edgeStyle = tmp;
-        }
-
-        if (typeof(edgeStyle) == "function") {
-            return edgeStyle;
+        if (state !== null) {
+            return state.cell;
         }
 
         return null;
     },
 
-    updateFloatingTerminalPoints: function (linkState, sourceState, targetState) {
-        var pts = linkState.absolutePoints;
-        var p0 = pts[0];
-        var pe = pts[pts.length - 1];
-
-        if (pe == null && targetState != null) {
-            this.updateFloatingTerminalPoint(linkState, targetState, sourceState, false);
-        }
-
-        if (p0 == null && sourceState != null) {
-            this.updateFloatingTerminalPoint(linkState, sourceState, targetState, true);
-        }
+    isConsumed: function () {
+        return this.consumed;
     },
 
-    // 获取连线与节点的连接点
-    updateFloatingTerminalPoint: function (linkState, start, end, isSource) {
-        start = this.getTerminalPort(linkState, start, isSource);
-        var next = this.getNextPoint(linkState, end, isSource);
+    consume: function (preventDefault) {
+        preventDefault = (preventDefault !== null) ? preventDefault : true;
 
-        var orth = this.graph.isOrthogonal(linkState);
-        var alpha = utils.toRadians(Number(start.style[constants.STYLE_ROTATION] || '0'));
-        var center = new Point(start.getCenterX(), start.getCenterY());
-
-        if (alpha != 0) {
-            var cos = Math.cos(-alpha);
-            var sin = Math.sin(-alpha);
-            next = utils.getRotatedPoint(next, cos, sin, center);
+        if (preventDefault && this.evt.preventDefault) {
+            this.evt.preventDefault();
         }
 
-        var border = parseFloat(linkState.style[constants.STYLE_PERIMETER_SPACING] || 0);
-        border += parseFloat(linkState.style[(isSource) ?
-                constants.STYLE_SOURCE_PERIMETER_SPACING :
-                constants.STYLE_TARGET_PERIMETER_SPACING] || 0);
-        var pt = this.getPerimeterPoint(start, next, alpha == 0 && orth, border);
-
-        if (alpha != 0) {
-            var cos = Math.cos(alpha);
-            var sin = Math.sin(alpha);
-            pt = utils.getRotatedPoint(pt, cos, sin, center);
+        // Workaround for images being dragged in IE
+        // Does not change returnValue in Opera
+        if (detector.IS_IE) {
+            this.evt.returnValue = true;
         }
 
-        linkState.setAbsoluteTerminalPoint(pt, isSource);
+        // Sets local consumed state
+        this.consumed = true;
     },
+});
 
-    getTerminalPort: function (linkState, terminalState, isSource) {
-        var key = (isSource) ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
-        var id = getValue(linkState.style, key);
 
-        if (id != null) {
-            var tmp = this.getState(this.graph.getModel().getCell(id));
+});
+define('PaneJS/Rectangle',['require','exports','module','PaneJS/common/class','PaneJS/Point','PaneJS/common/utils','PaneJS/constants'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
-            // Only uses ports where a cell state exists
-            if (tmp != null) {
-                terminalState = tmp;
-            }
-        }
+var Klass = require('PaneJS/common/class');
+var Point = require('PaneJS/Point');
+var utils = require('PaneJS/common/utils');
+var constants = require('PaneJS/constants');
 
-        return terminalState;
-    },
+var Rectangle = Klass.create({
 
-    // 获取周长路径上的点
-    getPerimeterPoint: function (terminal, next, orthogonal, border) {
-        var point = null;
+    Extends: Point,
 
-        if (terminal != null) {
-            var perimeter = this.getPerimeterFunction(terminal);
+    Statics: {
+        fromRectangle: function (rect) {
+            return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+        },
 
-            if (perimeter != null && next != null) {
-                var bounds = this.getPerimeterBounds(terminal, border);
+        intersectsHotspot: function (state, x, y, hotspot, min, max) {
+            hotspot = (hotspot !== null) ? hotspot : 1;
+            min = (min !== null) ? min : 0;
+            max = (max !== null) ? max : 0;
 
-                if (bounds.width > 0 || bounds.height > 0) {
-                    point = perimeter(bounds, terminal, next, orthogonal);
+            if (hotspot > 0) {
+                var cx = state.getCenterX();
+                var cy = state.getCenterY();
+                var w = state.width;
+                var h = state.height;
 
-                    if (point != null) {
-                        point.x = Math.round(point.x);
-                        point.y = Math.round(point.y);
+                var start = utils.getValue(state.style, constants.STYLE_STARTSIZE) * state.view.scale;
+
+                if (start > 0) {
+                    if (utils.getValue(state.style, constants.STYLE_HORIZONTAL, true)) {
+                        cy = state.y + start / 2;
+                        h = start;
                     }
-                }
-            }
-
-            if (point == null) {
-                point = this.getPoint(terminal);
-            }
-        }
-
-        return point;
-    },
-
-    getRoutingCenterX: function (state) {
-        var f = (state.style != null) ? parseFloat(state.style
-            [mxConstants.STYLE_ROUTING_CENTER_X]) || 0 : 0;
-
-        return state.getCenterX() + f * state.width;
-    },
-
-    getRoutingCenterY: function (state) {
-        var f = (state.style != null) ? parseFloat(state.style
-            [mxConstants.STYLE_ROUTING_CENTER_Y]) || 0 : 0;
-
-        return state.getCenterY() + f * state.height;
-    },
-
-    getPerimeterBounds: function (terminal, border) {
-        border = (border != null) ? border : 0;
-
-        if (terminal != null) {
-            border += parseFloat(terminal.style[constants.STYLE_PERIMETER_SPACING] || 0);
-        }
-
-        return terminal.getPerimeterBounds(border * this.scale);
-
-    },
-
-    getPerimeterFunction: function (state) {
-        var perimeter = state.style[constants.STYLE_PERIMETER];
-
-        // Converts string values to objects
-        if (typeof(perimeter) == "string") {
-            var tmp = mxStyleRegistry.getValue(perimeter);
-
-            if (tmp == null && this.isAllowEval()) {
-                tmp = utils.eval(perimeter);
-            }
-
-            perimeter = tmp;
-        }
-
-        if (typeof(perimeter) == "function") {
-            return perimeter;
-        }
-
-        return null;
-    },
-
-    getNextPoint: function (edge, opposite, source) {
-        var pts = edge.absolutePoints;
-        var point = null;
-
-        if (pts != null && pts.length >= 2) {
-            var count = pts.length;
-            point = pts[(source) ? Math.min(1, count - 1) : Math.max(0, count - 2)];
-        }
-
-        if (point == null && opposite != null) {
-            point = new Point(opposite.getCenterX(), opposite.getCenterY());
-        }
-
-        return point;
-    },
-    getVisibleTerminal: function (edge, source) {
-        var model = this.graph.getModel();
-        var result = model.getTerminal(edge, source);
-        var best = result;
-
-        while (result && result != this.currentRoot) {
-            if (!this.graph.isCellVisible(best) || this.isCellCollapsed(result)) {
-                best = result;
-            }
-
-            result = model.getParent(result);
-        }
-
-        // Checks if the result is not a layer
-        if (model.getParent(best) == model.getRoot()) {
-            best = null;
-        }
-
-        return best;
-    },
-    updateEdgeBounds: function (state) {
-        var points = state.absolutePoints;
-        var p0 = points[0];
-        var pe = points[points.length - 1];
-
-        if (p0.x != pe.x || p0.y != pe.y) {
-            var dx = pe.x - p0.x;
-            var dy = pe.y - p0.y;
-            state.terminalDistance = Math.sqrt(dx * dx + dy * dy);
-        }
-        else {
-            state.terminalDistance = 0;
-        }
-
-        var length = 0;
-        var segments = [];
-        var pt = p0;
-
-        if (pt != null) {
-            var minX = pt.x;
-            var minY = pt.y;
-            var maxX = minX;
-            var maxY = minY;
-
-            for (var i = 1; i < points.length; i++) {
-                var tmp = points[i];
-
-                if (tmp != null) {
-                    var dx = pt.x - tmp.x;
-                    var dy = pt.y - tmp.y;
-
-                    var segment = Math.sqrt(dx * dx + dy * dy);
-                    segments.push(segment);
-                    length += segment;
-
-                    pt = tmp;
-
-                    minX = Math.min(pt.x, minX);
-                    minY = Math.min(pt.y, minY);
-                    maxX = Math.max(pt.x, maxX);
-                    maxY = Math.max(pt.y, maxY);
-                }
-            }
-
-            state.length = length;
-            state.segments = segments;
-
-            var markerSize = 1; // TODO: include marker size
-
-            state.x = minX;
-            state.y = minY;
-            state.width = Math.max(markerSize, maxX - minX);
-            state.height = Math.max(markerSize, maxY - minY);
-        }
-    },
-    getPoint: function (state, geometry) {
-        var x = state.getCenterX();
-        var y = state.getCenterY();
-
-        if (state.segments != null && (geometry == null || geometry.relative)) {
-            var gx = (geometry != null) ? geometry.x / 2 : 0;
-            var pointCount = state.absolutePoints.length;
-            var dist = (gx + 0.5) * state.length;
-            var segment = state.segments[0];
-            var length = 0;
-            var index = 1;
-
-            while (dist > length + segment && index < pointCount - 1) {
-                length += segment;
-                segment = state.segments[index++];
-            }
-
-            var factor = (segment == 0) ? 0 : (dist - length) / segment;
-            var p0 = state.absolutePoints[index - 1];
-            var pe = state.absolutePoints[index];
-
-            if (p0 != null && pe != null) {
-                var gy = 0;
-                var offsetX = 0;
-                var offsetY = 0;
-
-                if (geometry != null) {
-                    gy = geometry.y;
-                    var offset = geometry.offset;
-
-                    if (offset != null) {
-                        offsetX = offset.x;
-                        offsetY = offset.y;
+                    else {
+                        cx = state.x + start / 2;
+                        w = start;
                     }
                 }
 
-                var dx = pe.x - p0.x;
-                var dy = pe.y - p0.y;
-                var nx = (segment == 0) ? 0 : dy / segment;
-                var ny = (segment == 0) ? 0 : dx / segment;
+                w = Math.max(min, w * hotspot);
+                h = Math.max(min, h * hotspot);
 
-                x = p0.x + dx * factor + (nx * gy + offsetX) * this.scale;
-                y = p0.y + dy * factor - (ny * gy - offsetY) * this.scale;
-            }
-        }
-        else if (geometry != null) {
-            var offset = geometry.offset;
-
-            if (offset != null) {
-                x += offset.x;
-                y += offset.y;
-            }
-        }
-
-        return new Point(x, y);
-    },
-    getRelativePoint: function (edgeState, x, y) {
-        var model = this.graph.getModel();
-        var geometry = model.getGeometry(edgeState.cell);
-
-        if (geometry != null) {
-            var pointCount = edgeState.absolutePoints.length;
-
-            if (geometry.relative && pointCount > 1) {
-                var totalLength = edgeState.length;
-                var segments = edgeState.segments;
-
-                // Works which line segment the point of the label is closest to
-                var p0 = edgeState.absolutePoints[0];
-                var pe = edgeState.absolutePoints[1];
-                var minDist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
-
-                var index = 0;
-                var tmp = 0;
-                var length = 0;
-
-                for (var i = 2; i < pointCount; i++) {
-                    tmp += segments[i - 2];
-                    pe = edgeState.absolutePoints[i];
-                    var dist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
-
-                    if (dist <= minDist) {
-                        minDist = dist;
-                        index = i - 1;
-                        length = tmp;
-                    }
-
-                    p0 = pe;
+                if (max > 0) {
+                    w = Math.min(w, max);
+                    h = Math.min(h, max);
                 }
 
-                var seg = segments[index];
-                p0 = edgeState.absolutePoints[index];
-                pe = edgeState.absolutePoints[index + 1];
+                var rect = new Rectangle(cx - w / 2, cy - h / 2, w, h);
+                var alpha = utils.toRadians(utils.getValue(state.style, constants.STYLE_ROTATION) || 0);
 
-                var x2 = p0.x;
-                var y2 = p0.y;
-
-                var x1 = pe.x;
-                var y1 = pe.y;
-
-                var px = x;
-                var py = y;
-
-                var xSegment = x2 - x1;
-                var ySegment = y2 - y1;
-
-                px -= x1;
-                py -= y1;
-                var projlenSq = 0;
-
-                px = xSegment - px;
-                py = ySegment - py;
-                var dotprod = px * xSegment + py * ySegment;
-
-                if (dotprod <= 0.0) {
-                    projlenSq = 0;
-                }
-                else {
-                    projlenSq = dotprod * dotprod
-                        / (xSegment * xSegment + ySegment * ySegment);
+                if (alpha !== 0) {
+                    var cos = Math.cos(-alpha);
+                    var sin = Math.sin(-alpha);
+                    var cx1 = new Point(state.getCenterX(), state.getCenterY());
+                    var pt = Point.getRotatedPoint(new Point(x, y), cos, sin, cx1);
+                    x = pt.x;
+                    y = pt.y;
                 }
 
-                var projlen = Math.sqrt(projlenSq);
-
-                if (projlen > seg) {
-                    projlen = seg;
-                }
-
-                var yDistance = Math.sqrt(utils.ptSegDistSq(p0.x, p0.y, pe
-                    .x, pe.y, x, y));
-                var direction = utils.relativeCcw(p0.x, p0.y, pe.x, pe.y, x, y);
-
-                if (direction == -1) {
-                    yDistance = -yDistance;
-                }
-
-                // Constructs the relative point for the label
-                return new Point(((totalLength / 2 - length - projlen) / totalLength) * -2,
-                    yDistance / this.scale);
-            }
-        }
-
-        return new Point();
-    },
-    updateEdgeLabelOffset: function (state) {
-        var points = state.absolutePoints;
-
-        state.absoluteOffset.x = state.getCenterX();
-        state.absoluteOffset.y = state.getCenterY();
-
-        if (points != null && points.length > 0 && state.segments != null) {
-            var geometry = this.graph.getCellGeometry(state.cell);
-
-            if (geometry.relative) {
-                var offset = this.getPoint(state, geometry);
-
-                if (offset != null) {
-                    state.absoluteOffset = offset;
-                }
-            }
-            else {
-                var p0 = points[0];
-                var pe = points[points.length - 1];
-
-                if (p0 != null && pe != null) {
-                    var dx = pe.x - p0.x;
-                    var dy = pe.y - p0.y;
-                    var x0 = 0;
-                    var y0 = 0;
-
-                    var off = geometry.offset;
-
-                    if (off != null) {
-                        x0 = off.x;
-                        y0 = off.y;
-                    }
-
-                    var x = p0.x + dx / 2 + x0 * this.scale;
-                    var y = p0.y + dy / 2 + y0 * this.scale;
-
-                    state.absoluteOffset.x = x;
-                    state.absoluteOffset.y = y;
-                }
-            }
-        }
-    },
-
-    getState: function (cell, create) {
-
-        var that = this;
-        var state = null;
-
-        if (!cell) {
-            return state;
-        }
-
-        create = create || false;
-
-        state = that.states.get(cell);
-
-        if (create && (!state || that.updateStyle) && that.graph.isCellVisible(cell)) {
-            if (!state) {
-                state = that.createState(cell);
-                that.states.set(cell, state);
-            } else { // updateStyle
-                state.style = that.graph.getCellStyle(cell);
-            }
-        }
-
-        return state;
-    },
-
-    createState: function (cell) {
-        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
-        var model = this.graph.getModel();
-
-        if (state.view.graph.container != null && state.cell != state.view.currentRoot &&
-            (model.isVertex(state.cell) || model.isEdge(state.cell))) {
-            // 根据 state 中的样式，初始化 state 对应的 shape
-            this.graph.cellRenderer.createShape(state);
-        }
-
-        return state;
-    },
-
-    isRendering: function () {
-        return this.rendering;
-    },
-
-    setRendering: function (value) {
-        this.rendering = value;
-    },
-
-    isAllowEval: function () {
-        return this.allowEval;
-    },
-
-    setAllowEval: function (value) {
-        this.allowEval = value;
-    },
-
-    getStates: function () {
-        return this.states;
-    },
-
-    setStates: function (value) {
-        this.states = value;
-    },
-
-    getCellStates: function (cells) {
-        if (isNullOrUndefined(cells)) {
-            return this.states;
-        } else {
-            var result = [];
-
-            for (var i = 0; i < cells.length; i++) {
-                var state = this.getState(cells[i]);
-
-                if (state != null) {
-                    result.push(state);
-                }
+                return utils.contains(rect, x, y);
             }
 
-            return result;
-        }
-    },
-
-    removeState: function (cell) {
-
-        var state = null;
-
-        if (cell != null) {
-            state = this.states.remove(cell);
-
-            if (state != null) {
-                this.graph.cellRenderer.destroy(state);
-                state.destroy();
-            }
-        }
-
-        return state;
-    },
-
-    getCanvas: function () {
-        return this.canvas;
-    },
-
-    getBackgroundPane: function () {
-        return this.backgroundPane;
-    },
-
-    getDrawPane: function () {
-        return this.drawPane;
-    },
-
-    getOverlayPane: function () {
-        return this.overlayPane;
-    },
-
-    getDecoratorPane: function () {
-        return this.decoratorPane;
-    },
-
-    isScrollEvent: function (evt) {
-        var that = this;
-        var container = that.graph.container;
-
-        var offset = utils.getOffset(container);
-        var pt = new Point(evt.clientX - offset.left, evt.clientY - offset.top);
-
-        var outWidth = container.offsetWidth;
-        var inWidth = container.clientWidth;
-
-        if (outWidth > inWidth && pt.x > inWidth + 2 && pt.x <= outWidth) {
             return true;
+        },
+
+    },
+
+    constructor: function Rectangle(x, y, width, height) {
+
+        var rect = this;
+
+        Rectangle.superclass.constructor.call(rect, x, y);
+
+        rect.width = width ? width : 0;
+        rect.height = height ? height : 0;
+    },
+
+    setRect: function (x, y, width, height) {
+
+        var rect = this;
+
+        rect.x = x;
+        rect.y = y;
+        rect.width = width;
+        rect.height = height;
+
+        return rect;
+    },
+
+    getCenterX: function () {
+        return this.x + this.width / 2;
+    },
+
+    getCenterY: function () {
+        return this.y + this.height / 2;
+    },
+
+    getCenter: function () {
+        return new Point(this.getCenterX(), this.getCenterY());
+    },
+
+    add: function (rect) {
+
+        if (!rect) {
+            return;
         }
 
-        var outHeight = container.offsetHeight;
-        var inHeight = container.clientHeight;
+        var that = this;
+        var minX = Math.min(that.x, rect.x);
+        var minY = Math.min(that.y, rect.y);
+        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
+        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
 
-        return outHeight > inHeight && pt.y > inHeight + 2 && pt.y <= outHeight;
+        that.x = minX;
+        that.y = minY;
+        that.width = maxX - minX;
+        that.height = maxY - minY;
+
+        return that;
     },
 
-    isContainerEvent: function (evt) {
-        var that = this;
-        var source = domEvent.getSource(evt);
 
-        return (source === that.graph.container ||
-        source.parentNode == that.backgroundPane ||
-        (source.parentNode && source.parentNode.parentNode === that.backgroundPane) ||
-        source === that.canvas.parentNode ||
-        source === that.canvas ||
-        source === that.backgroundPane ||
-        source === that.drawPane ||
-        source === that.overlayPane ||
-        source === that.decoratorPane);
+    grow: function (amount) {
+
+        var rect = this;
+
+        rect.x -= amount;
+        rect.y -= amount;
+        rect.width += 2 * amount;
+        rect.height += 2 * amount;
+
+        return rect;
     },
 
-    installListeners: function () {
+    rotate90: function () {
+
+        var rect = this;
+        var w = rect.width;
+        var h = rect.height;
+        var t = (w - h) / 2;
+
+        rect.x += t;
+        rect.y -= t;
+        rect.width = h;
+        rect.height = w;
+
+        return rect;
+    },
+
+    equals: function (rect) {
 
         var that = this;
-        var graph = that.graph;
-        var container = graph.container;
 
-        if (container) {
+        return Rectangle.superclass.equals.call(that, rect) &&
+            rect instanceof Rectangle &&
+            rect.width === that.width &&
+            rect.height === that.height;
+    },
 
-            // Support for touch device gestures (eg. pinch to zoom)
-            // Double-tap handling is implemented in graph.fireMouseEvent
-            if (detector.IS_TOUCH) {
+    clone: function () {
+        var rect = this;
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+    }
+});
 
-                var handler = function (evt) {
-                    graph.fireGestureEvent(evt);
-                    domEvent.consume(evt);
-                };
+utils.extend(constants, {
+    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
+    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
+    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
+    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
+});
 
-                domEvent.on(container, 'gesturestart', handler);
-                domEvent.on(container, 'gesturechange', handler);
-                domEvent.on(container, 'gestureend', handler);
+module.exports = Rectangle;
+
+
+});
+define('PaneJS/cells/Cell',['require','exports','module','../Base'],function (require, exports, module) {var Base = require('../Base');
+
+module.exports = Base.extend({
+
+    id: null,
+    value: null,
+    geometry: null,
+    style: null,
+
+    //vertex: false,
+    //edge: false,
+    //connectable: true,
+    visible: true,
+    //collapsed: false,
+
+    //source: null,
+    //target: null,
+
+    parent: null,
+    children: null,
+    //edges: null,
+
+    constructor: function Cell(value, geometry, style) {
+
+        var that = this;
+
+        that.value = value;
+        that.setGeometry(geometry);
+        that.setStyle(style);
+
+        that.onInit && that.onInit();
+    },
+
+
+
+});
+
+});
+define('PaneJS/changes/ChildChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
+var Change = require('./Change');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Change.extend({
+
+    constructor: function ChildChange(model, parent, child, index) {
+
+        var change = this;
+
+        ChildChange.superclass.constructor.call(change, model);
+
+        change.parent = parent;
+        change.child = child;
+        change.index = index;
+        change.previous = parent;
+        change.previousIndex = index;
+    },
+
+    digest: function () {
+
+        var change = this;
+        var model = change.model;
+        var child = change.child;
+        var previous = change.previous;
+        var previousIndex = change.previousIndex;
+
+        var oldParent = model.getParent(child);
+        var oldIndex = oldParent ? oldParent.getIndex(child) : 0;
+
+        if (previous) {
+            change.connect(child, false);
+        }
+
+        oldParent = model.parentForCellChanged(child, previous, previousIndex);
+
+        if (previous) {
+            change.connect(child, true);
+        }
+
+        change.parent = previous;
+        change.index = previousIndex;
+        change.previous = oldParent;
+        change.previousIndex = oldIndex;
+
+        return change;
+    },
+
+    connect: function (cell, isConnect) {
+
+        var change = this;
+        var model = change.model;
+
+        isConnect = isNullOrUndefined(isConnect) ? true : isConnect;
+
+        var source = cell.getTerminal(true);
+        var target = cell.getTerminal(false);
+
+        if (source) {
+            if (isConnect) {
+                model.terminalForCellChanged(cell, source, true);
+            }
+            else {
+                model.terminalForCellChanged(cell, null, true);
+            }
+        }
+
+        if (target) {
+            if (isConnect) {
+                model.terminalForCellChanged(cell, target, false);
+            }
+            else {
+                model.terminalForCellChanged(cell, null, false);
+            }
+        }
+
+        cell.setTerminal(source, true);
+        cell.setTerminal(target, false);
+
+        var childCount = model.getChildCount(cell);
+
+        for (var i = 0; i < childCount; i++) {
+            change.connect(model.getChildAt(cell, i), isConnect);
+        }
+
+        return change;
+    }
+});
+
+});
+define('PaneJS/changes/CurrentRootChange',['require','exports','module','./Change'],function (require, exports, module) {'use strict';
+var Change = require('./Change');
+
+module.exports = Change.extend({
+
+    constructor: function CurrentRootChange(model, root) {
+
+        var change = this;
+
+        RootChange.superclass.constructor.call(change, model);
+
+        change.root = root;
+        change.previous = root;
+    },
+
+    digest: function () {
+
+        var change = this;
+        var model = change.model;
+        var previous = change.previous;
+
+        change.root = previous;
+        change.previous = model.rootChanged(previous);
+
+        return change;
+    }
+});
+
+
+});
+define('PaneJS/changes/RootChange',['require','exports','module','./Change'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Change = require('./Change');
+
+module.exports = Change.extend({
+
+    constructor: function RootChange(model, root) {
+
+        var change = this;
+
+        Change.call(change, model);
+
+        change.root = root;
+        change.previous = root;
+    },
+
+    digest: function () {
+
+        var change = this;
+        var model = change.model;
+        var previous = change.previous;
+
+        change.root = previous;
+        change.previous = model.rootChanged(previous);
+
+        return change;
+    }
+});
+
+
+});
+define('PaneJS/changes/TerminalChange',['require','exports','module','./Change','../common/utils'],function (require, exports, module) {var Change = require('./Change');
+var utils = require('../common/utils');
+
+var isNullOrUndefined = utils.isNullOrUndefined;
+
+module.exports = Change.extend({
+
+    constructor: function TerminalChange(model, cell, terminal, source) {
+
+        var that = this;
+
+        TerminalChange.superclass.constructor.call(that, model);
+
+        that.cell = cell;
+        that.terminal = terminal;
+        that.previous = terminal;
+        that.source = source;
+
+    },
+
+    digest: function () {
+
+        this.terminal = this.previous;
+        this.previous = this.model.terminalForCellChanged(this.cell, this.previous, this.source);
+    }
+});
+
+});
+define('PaneJS/events/Event',['require','exports','module','../common/utils','../common/class','./EventObject'],function (require, exports, module) {var utils = require('../common/utils');
+var Class = require('../common/class');
+var EventObject = require('./EventObject');
+
+var keys = utils.keys;
+var each = utils.each;
+// TODO: constants
+var eventSplitter = /\s+/;
+
+
+module.exports = Class.create({
+    eventListeners: null,
+    eventEnabled: true,
+    eventSource: null,
+
+    constructor: function Events() {},
+
+    isEventEnabled: function () {
+        return this.eventEnabled;
+    },
+
+    setIsEventEnabled: function (enabled) {
+        var that = this;
+        that.eventEnabled = enabled;
+        return that;
+    },
+
+    enableEvent: function () {
+        return this.setIsEventEnabled(true);
+    },
+
+    disableEvent: function () {
+        return this.setIsEventEnabled(false);
+    },
+
+    getEventSource: function () {
+        return this.eventSource;
+    },
+
+    setEventSource: function (value) {
+        var that = this;
+        that.eventSource = value;
+        return that;
+    },
+
+    on: function (events, callback, context) {
+
+        var that = this;
+
+        if (!callback) {
+            return that;
+        }
+
+        var listeners = that.eventListeners || (that.eventListeners = {});
+
+        events = events.split(eventSplitter);
+
+        each(events, function (event) {
+            var list = listeners[event] || (listeners[event] = []);
+            list.push(callback, context);
+        });
+
+        return that;
+    },
+
+    once: function (events, callback, context) {
+
+        var that = this;
+        var cb = function () {
+            that.off(events, cb);
+            callback.apply(context || that, arguments);
+        };
+
+        return that.on(events, cb, context);
+    },
+
+    off: function (events, callback, context) {
+
+        var that = this;
+        var listeners = that.eventListeners;
+
+        // No events.
+        if (!listeners) {
+            return that;
+        }
+
+        // removing *all* events.
+        if (!(events || callback || context)) {
+            delete that.eventListeners;
+            return that;
+        }
+
+        events = events ? events.split(eventSplitter) : keys(listeners);
+
+        each(events, function (event) {
+
+            var list = listeners[event];
+
+            if (!list) {
+                return;
             }
 
-            domEvent.onGesture(container,
-                function (evt) {
-                    // Condition to avoid scrollbar events starting a rubberband selection
-                    if (that.isContainerEvent(evt) &&
-                        ((!detector.IS_IE && !detector.IS_IE11 && !detector.IS_GC && !detector.IS_OP && !detector.IS_SF) || !that.isScrollEvent(evt))) {
-                        graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt));
-                    }
-                },
-                function (evt) {
-                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_MOVE, new MouseEvent(evt));
-                },
-                function (evt) {
-                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt));
-                });
+            // remove all event.
+            if (!(callback || context)) {
+                delete listeners[event];
+                return;
+            }
 
-            // double click
-            domEvent.on(container, 'dblclick', function (evt) {
-                if (that.isContainerEvent(evt)) {
-                    graph.dblClick(evt);
+            for (var i = list.length - 2; i >= 0; i -= 2) {
+                if (!(callback && list[i] !== callback ||
+                    context && list[i + 1] !== context)) {
+                    list.splice(i, 2);
+                }
+            }
+        });
+
+        return that;
+    },
+
+    emit: function (eventObj, sender) {
+        var that = this;
+        var returned = [];
+        var listeners = that.eventListeners;
+
+        // No events.
+        if (!listeners || !that.isEventEnabled()) {
+            return returned;
+        }
+
+        eventObj = eventObj || new EventObject();
+
+        var eventName = eventObj.getName();
+
+        if (!eventName) {
+            return returned;
+        }
+
+        // fix sender
+        sender = sender || that.getEventSource();
+        sender = sender || that;
+
+
+        var list = listeners[eventName];
+        var length = list ? list.length : 0;
+        var ret;
+
+        for (var i = 0; i < length; i += 2) {
+            ret = list[i].call(list[i + 1] || that, eventObj, sender);
+            if (length > 2) {
+                returned.push(ret); // result as array
+            } else {
+                returned = ret;
+            }
+        }
+
+        return returned;
+    },
+});
+
+});
+define('PaneJS/events/EventSource',['require','exports','module','../common/class','./EventObject'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Class = require('../common/class');
+//var utils = require('../common/utils');
+var EventObject = require('./EventObject');
+
+var EventSource = Class.create({
+    constructor: function EventSource(eventSource) {
+        this.setEventSource(eventSource);
+    },
+    /**
+     * Variable: eventListeners
+     *
+     * Holds the event names and associated listeners in an array. The array
+     * contains the event name followed by the respective listener for each
+     * registered listener.
+     */
+    eventListeners: null,
+
+    /**
+     * Variable: eventsEnabled
+     *
+     * Specifies if events can be fired. Default is true.
+     */
+    eventsEnabled: true,
+
+    /**
+     * Variable: eventSource
+     *
+     * Optional source for events. Default is null.
+     */
+    eventSource: null,
+
+    /**
+     * Function: isEventsEnabled
+     *
+     * Returns <eventsEnabled>.
+     */
+    isEventsEnabled: function () {
+        return this.eventsEnabled;
+    },
+
+    /**
+     * Function: setEventsEnabled
+     *
+     * Sets <eventsEnabled>.
+     */
+    setEventsEnabled: function (value) {
+        this.eventsEnabled = value;
+    },
+
+    /**
+     * Function: getEventSource
+     *
+     * Returns <eventSource>.
+     */
+    getEventSource: function () {
+        return this.eventSource;
+    },
+
+    /**
+     * Function: setEventSource
+     *
+     * Sets <eventSource>.
+     */
+    setEventSource: function (value) {
+        this.eventSource = value;
+    },
+
+    /**
+     * Function: addListener
+     *
+     * Binds the specified function to the given event name. If no event name
+     * is given, then the listener is registered for all events.
+     *
+     * The parameters of the listener are the sender and an <mxEventObject>.
+     */
+    addListener: function (name, funct) {
+        if (this.eventListeners === null) {
+            this.eventListeners = [];
+        }
+
+        this.eventListeners.push(name);
+        this.eventListeners.push(funct);
+    },
+
+    /**
+     * Function: removeListener
+     *
+     * Removes all occurrences of the given listener from <eventListeners>.
+     */
+    removeListener: function (funct) {
+        if (this.eventListeners !== null) {
+            var i = 0;
+
+            while (i < this.eventListeners.length) {
+                if (this.eventListeners[i + 1] == funct) {
+                    this.eventListeners.splice(i, 2);
+                } else {
+                    i += 2;
+                }
+            }
+        }
+    },
+
+    /**
+     * Function: fireEvent
+     *
+     * Dispatches the given event to the listeners which are registered for
+     * the event. The sender argument is optional. The current execution scope
+     * ("this") is used for the listener invocation (see <mxUtils.bind>).
+     *
+     * Example:
+     *
+     * (code)
+     * fireEvent(new mxEventObject("eventName", key1, val1, .., keyN, valN))
+     * (end)
+     *
+     * Parameters:
+     *
+     * evt - <mxEventObject> that represents the event.
+     * sender - Optional sender to be passed to the listener. Default value is
+     * the return value of <getEventSource>.
+     */
+    fireEvent: function (evt, sender) {
+        if (this.eventListeners !== null && this.isEventsEnabled()) {
+            if (evt === null) {
+                evt = new EventObject();
+            }
+
+            if (sender === null) {
+                sender = this.getEventSource();
+            }
+
+            if (sender === null) {
+                sender = this;
+            }
+
+            var args = [sender, evt];
+
+            for (var i = 0; i < this.eventListeners.length; i += 2) {
+                var listen = this.eventListeners[i];
+
+                if (listen === null || listen == evt.getName()) {
+                    this.eventListeners[i + 1].apply(this, args);
+                }
+            }
+        }
+    },
+});
+
+module.exports = EventSource;
+
+
+});
+define('PaneJS/events/domEvent',['require','exports','module','../common/utils','../common/detector','./MouseEvent'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+/* global document, window */
+
+var utils = require('../common/utils');
+var detector = require('../common/detector');
+var MouseEvent = require('./MouseEvent');
+
+var each = utils.each;
+var indexOf = utils.indexOf;
+
+var IS_TOUCH = detector.IS_TOUCH;
+var IS_POINTER = detector.IS_POINTER;
+
+var domEvent = {
+    ACTIVATE: 'activate',
+    ADD: 'add',
+    ADD_CELLS: 'addCells',
+    ADD_OVERLAY: 'addOverlay',
+    ADD_VERTEX: 'addVertex',
+    AFTER_ADD_VERTEX: 'afterAddVertex',
+    ALIGN_CELLS: 'alignCells',
+    BEFORE_ADD_VERTEX: 'beforeAddVertex',
+    BEFORE_UNDO: 'beforeUndo',
+    BEGIN_UPDATE: 'beginUpdate',
+    CELLS_ADDED: 'cellsAdded',
+    CELLS_FOLDED: 'cellsFolded',
+    CELLS_MOVED: 'cellsMoved',
+    CELLS_ORDERED: 'cellsOrdered',
+    CELLS_REMOVED: 'cellsRemoved',
+    CELLS_RESIZED: 'cellsResized',
+    CELLS_TOGGLED: 'cellsToggled',
+    CELL_CONNECTED: 'cellConnected',
+    CHANGE: 'change',
+    CLEAR: 'clear',
+    CLICK: 'click',
+    CLOSE: 'close',
+    CONNECT: 'connect',
+    CONNECT_CELL: 'connectCell',
+    CUSTOM_HANDLE: -100,
+    DESTROY: 'destroy',
+    DISCONNECT: 'disconnect',
+    DONE: 'done',
+    DOUBLE_CLICK: 'doubleClick',
+    DOWN: 'down',
+    EDITING_STARTED: 'editingStarted',
+    EDITING_STOPPED: 'editingStopped',
+    END_EDIT: 'endEdit',
+    END_UPDATE: 'endUpdate',
+    ESCAPE: 'escape',
+    EXECUTE: 'execute',
+    EXECUTED: 'executed',
+    FIRED: 'fired',
+    FIRE_MOUSE_EVENT: 'fireMouseEvent',
+    FLIP_EDGE: 'flipEdge',
+    FOLD_CELLS: 'foldCells',
+    GESTURE: 'gesture',
+    GET: 'get',
+    GROUP_CELLS: 'groupCells',
+    HIDE: 'hide',
+    LABEL_CHANGED: 'labelChanged',
+    LABEL_HANDLE: -1,
+    LAYOUT_CELLS: 'layoutCells',
+    MARK: 'mark',
+    MAXIMIZE: 'maximize',
+    MINIMIZE: 'minimize',
+    MOUSE_DOWN: 'mouseDown',
+    MOUSE_MOVE: 'mouseMove',
+    MOUSE_UP: 'mouseUp',
+    MOVE: 'move',
+    MOVE_CELLS: 'moveCells',
+    MOVE_END: 'moveEnd',
+    MOVE_START: 'moveStart',
+    NORMALIZE: 'normalize',
+    NOTIFY: 'notify',
+    ORDER_CELLS: 'orderCells',
+    PAN: 'pan',
+    PAN_END: 'panEnd',
+    PAN_START: 'panStart',
+    POST: 'post',
+    RECEIVE: 'receive',
+    REDO: 'redo',
+    REFRESH: 'refresh',
+    REMOVE: 'remove',
+    REMOVE_CELLS: 'removeCells',
+    REMOVE_CELLS_FROM_PARENT: 'removeCellsFromParent',
+    REMOVE_OVERLAY: 'removeOverlay',
+    RESET: 'reset',
+    RESIZE: 'resize',
+    RESIZE_CELLS: 'resizeCells',
+    RESIZE_END: 'resizeEnd',
+    RESIZE_START: 'resizeStart',
+    RESUME: 'resume',
+    ROOT: 'root',
+    ROTATION_HANDLE: -2,
+    SAVE: 'save',
+    SCALE: 'scale',
+    SCALE_AND_TRANSLATE: 'scaleAndTranslate',
+    SELECT: 'select',
+    SHOW: 'show',
+    SIZE: 'size',
+    SPLIT_EDGE: 'splitEdge',
+    START: 'start',
+    START_EDIT: 'startEdit',
+    START_EDITING: 'startEditing',
+    SUSPEND: 'suspend',
+    TAP_AND_HOLD: 'tapAndHold',
+    TOGGLE_CELLS: 'toggleCells',
+    TRANSLATE: 'translate',
+    UNDO: 'undo',
+    UNGROUP_CELLS: 'ungroupCells',
+    UP: 'up',
+    UPDATE_CELL_SIZE: 'updateCellSize',
+
+
+    // 保存已经绑定事件的元素
+    cache: [],
+
+    on: function () {
+
+        var update = function (element, eventName, callback) {
+
+            var list = element.eventListeners;
+
+            if (!list) {
+                list = element.eventListeners = [];
+                domEvent.cache.push(element);
+            }
+
+            list.push({
+                eventName: eventName,
+                callback: callback
+            });
+        };
+
+        if (window.addEventListener) {
+            return function (element, eventName, callback) {
+                element.addEventListener(eventName, callback, false);
+                update(element, eventName, callback);
+            };
+        } else {
+            return function (element, eventName, callback) {
+                element.attachEvent('on' + eventName, callback);
+                update(element, eventName, callback);
+            };
+        }
+    }(),
+
+    off: function () {
+        var updateListener = function (element, eventName, callback) {
+
+            var list = element.eventListeners;
+
+            if (list) {
+                for (var i = list.length - 1; i >= 0; i--) {
+                    var entry = list[i];
+
+                    if (entry.eventName === eventName && entry.callback === callback) {
+                        list.splice(i, 1);
+                    }
+                }
+
+                if (list.length === 0) {
+                    delete element.eventListeners;
+
+                    var idx = indexOf(domEvent.cache, element);
+                    if (idx >= 0) {
+                        domEvent.cache.splice(idx, 1);
+                    }
+                }
+            }
+        };
+
+        if (window.removeEventListener) {
+            return function (element, eventName, callback) {
+                element.removeEventListener(eventName, callback, false);
+                updateListener(element, eventName, callback);
+            };
+        }
+        else {
+            return function (element, eventName, callback) {
+                element.detachEvent('on' + eventName, callback);
+                updateListener(element, eventName, callback);
+            };
+        }
+    }(),
+
+    clear: function (element) {
+
+        var list = element.eventListeners;
+
+        if (list) {
+            each(list, function (entry) {
+                domEvent.off(element, entry.eventName, entry.callback);
+            });
+        }
+    },
+
+    release: function (element) {
+        if (element) {
+            domEvent.clear(element);
+
+            var children = element.childNodes;
+
+            if (children) {
+                for (var i = 0, l = children.length; i < l; i += 1) {
+                    domEvent.release(children[i]);
+                }
+            }
+        }
+    },
+
+    onGesture: function (element, startListener, moveListener, endListener) {
+        if (startListener) {
+            domEvent.on(element, IS_POINTER ? 'MSPointerDown' : 'mousedown', startListener);
+        }
+
+        if (moveListener) {
+            domEvent.on(element, IS_POINTER ? 'MSPointerMove' : 'mousemove', moveListener);
+        }
+
+        if (endListener) {
+            domEvent.on(element, IS_POINTER ? 'MSPointerUp' : 'mouseup', endListener);
+        }
+
+        if (IS_TOUCH && !IS_POINTER) {
+            if (startListener) {
+                domEvent.on(element, 'touchstart', startListener);
+            }
+
+            if (moveListener) {
+                domEvent.on(element, 'touchmove', moveListener);
+            }
+
+            if (endListener) {
+                domEvent.on(element, 'touchend', endListener);
+            }
+        }
+    },
+
+    offGesture: function (element, startListener, moveListener, endListener) {
+        if (startListener) {
+            domEvent.off(element, (IS_POINTER) ? 'MSPointerDown' : 'mousedown', startListener);
+        }
+
+        if (moveListener) {
+            domEvent.off(element, (IS_POINTER) ? 'MSPointerMove' : 'mousemove', moveListener);
+        }
+
+        if (endListener) {
+            domEvent.off(element, (IS_POINTER) ? 'MSPointerUp' : 'mouseup', endListener);
+        }
+
+        if (IS_TOUCH && !IS_POINTER) {
+            if (startListener) {
+                domEvent.off(element, 'touchstart', startListener);
+            }
+
+            if (moveListener) {
+                domEvent.off(element, 'touchmove', moveListener);
+            }
+
+            if (endListener) {
+                domEvent.off(element, 'touchend', endListener);
+            }
+        }
+    },
+
+    redirectMouseEvents: function (node, graph, state, down, move, up, dblClick) {
+        var getState = function (evt) {
+            return (typeof(state) == 'function') ? state(evt) : state;
+        };
+
+        domEvent.onGesture(node,
+            function (evt) {
+                if (down !== null) {
+                    down(evt);
+                } else if (!domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_DOWN, new MouseEvent(evt, getState(evt)));
+                }
+            },
+            function (evt) {
+                if (move !== null) {
+                    move(evt);
+                } else if (!domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_MOVE, new MouseEvent(evt, getState(evt)));
+                }
+            },
+            function (evt) {
+                if (up !== null) {
+                    up(evt);
+                } else if (!domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_UP, new MouseEvent(evt, getState(evt)));
                 }
             });
 
+        domEvent.on(node, 'dblclick', function (evt) {
+            if (dblClick !== null) {
+                dblClick(evt);
+            } else if (!domEvent.isConsumed(evt)) {
+                var tmp = getState(evt);
+                graph.dblClick(evt, (tmp !== null) ? tmp.cell : null);
+            }
+        });
+    },
 
+    onMouseWheel: function (callback) {
+        if (!callback) {
+            return;
         }
 
+        var wheelHandler = function (evt) {
+
+            // IE does not give an event object but the
+            // global event object is the mousewheel event
+            // at this point in time.
+            evt = evt || window.event;
+
+            var delta = 0;
+
+            if (detector.IS_FF) {
+                delta = -evt.detail / 2;
+            } else {
+                delta = evt.wheelDelta / 120;
+            }
+
+            // Handles the event using the given function
+            if (delta !== 0) {
+                callback(evt, delta > 0);
+            }
+        };
+
+        // Webkit has NS event API, but IE event name and details
+        if (detector.IS_NS && !document.documentMode) {
+            var eventName = (detector.IS_SF || detector.IS_GC) ? 'mousewheel' : 'DOMMouseScroll';
+            domEvent.on(window, eventName, wheelHandler);
+        } else {
+            domEvent.on(document, 'mousewheel', wheelHandler);
+        }
+
+    },
+
+    getSource: function (evt) {
+        return evt.srcElement || evt.target;
+    },
+
+    getMainEvent: function (e) {
+        if ((e.type === 'touchstart' || e.type === 'touchmove') && e.touches && e.touches[0]) {
+            e = e.touches[0];
+        } else if (e.type === 'touchend' && e.changedTouches && e.changedTouches[0]) {
+            e = e.changedTouches[0];
+        }
+
+        return e;
+    },
+
+    getClientX: function (e) {
+        return domEvent.getMainEvent(e).clientX;
+    },
+
+    /**
+     * Function: getClientY
+     *
+     * Returns true if the meta key is pressed for the given event.
+     */
+    getClientY: function (e) {
+        return domEvent.getMainEvent(e).clientY;
+    },
+
+    consume: function (evt, preventDefault, stopPropagation) {
+        preventDefault = preventDefault ? preventDefault : true;
+        stopPropagation = stopPropagation ? stopPropagation : true;
+
+        if (preventDefault) {
+            if (evt.preventDefault) {
+                evt.preventDefault();
+            } else {
+                evt.returnValue = false;
+            }
+        }
+
+        if (stopPropagation) {
+            if (evt.stopPropagation) {
+                evt.stopPropagation();
+            } else {
+                evt.cancelBubble = true;
+            }
+        }
+
+        evt.consumed = true;
+    },
+
+    isTouchEvent: function (evt) {
+        return evt.pointerType ?
+            (evt.pointerType === 'touch' || evt.pointerType === evt.MSPOINTER_TYPE_TOUCH) :
+            (evt.mozInputSource ? evt.mozInputSource === 5 : evt.type.indexOf('touch') === 0);
+    },
+
+    isMultiTouchEvent: function (evt) {
+        return evt.type &&
+            evt.type.indexOf('touch') === 0 &&
+            evt.touches &&
+            evt.touches.length > 1;
+    },
+
+    isMouseEvent: function (evt) {
+        return evt.pointerType ?
+            (evt.pointerType === 'mouse' || evt.pointerType === evt.MSPOINTER_TYPE_MOUSE) :
+            (evt.mozInputSource ? evt.mozInputSource === 1 : evt.type.indexOf('mouse') === 0);
+    },
+
+    isLeftMouseButton: function (evt) {
+        return evt.button === ((detector.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 1 : 0);
+    },
+
+    isMiddleMouseButton: function (evt) {
+        return evt.button === ((
+            detector.IS_IE && (
+                typeof(document.documentMode) === 'undefined' ||
+                document.documentMode < 9
+            )) ? 4 : 1);
+    },
+
+    isRightMouseButton: function (evt) {
+        return evt.button === 2;
+    },
+
+    isPopupTrigger: function (evt) {
+        return domEvent.isRightMouseButton(evt) || (
+            detector.IS_MAC &&
+            domEvent.isControlDown(evt) &&
+            !domEvent.isShiftDown(evt) &&
+            !domEvent.isMetaDown(evt) &&
+            !domEvent.isAltDown(evt)
+        );
+    },
+
+    isShiftDown: function (evt) {
+        return evt ? evt.shiftKey : false;
+    },
+
+    isAltDown: function (evt) {
+        return evt ? evt.altKey : false;
+    },
+
+    isControlDown: function (evt) {
+        return evt ? evt.ctrlKey : false;
+    },
+
+    isMetaDown: function (evt) {
+        return evt ? evt.metaKey : false;
+    },
+
+    isConsumed: function (evt) {
+        return evt.isConsumed !== null && evt.isConsumed;
+    },
+};
+
+module.exports = domEvent;
+
+});
+define('PaneJS/perimeter',['require','exports','module','PaneJS/Point'],function (require, exports, module) {var Point = require('PaneJS/Point');
+
+module.exports =
+{
+    RectanglePerimeter: function (bounds, vertex, next, orthogonal) {
+        var cx = bounds.getCenterX();
+        var cy = bounds.getCenterY();
+        var dx = next.x - cx;
+        var dy = next.y - cy;
+        var alpha = Math.atan2(dy, dx);
+        var p = new Point(0, 0);
+        var pi = Math.PI;
+        var pi2 = Math.PI / 2;
+        var beta = pi2 - alpha;
+        var t = Math.atan2(bounds.height, bounds.width);
+
+        if (alpha < -pi + t || alpha > pi - t) {
+            // Left edge
+            p.x = bounds.x;
+            p.y = cy - bounds.width * Math.tan(alpha) / 2;
+        }
+        else if (alpha < -t) {
+            // Top Edge
+            p.y = bounds.y;
+            p.x = cx - bounds.height * Math.tan(beta) / 2;
+        }
+        else if (alpha < t) {
+            // Right Edge
+            p.x = bounds.x + bounds.width;
+            p.y = cy + bounds.width * Math.tan(alpha) / 2;
+        }
+        else {
+            // Bottom Edge
+            p.y = bounds.y + bounds.height;
+            p.x = cx + bounds.height * Math.tan(beta) / 2;
+        }
+
+        if (orthogonal) {
+            if (next.x >= bounds.x &&
+                next.x <= bounds.x + bounds.width) {
+                p.x = next.x;
+            }
+            else if (next.y >= bounds.y &&
+                next.y <= bounds.y + bounds.height) {
+                p.y = next.y;
+            }
+            if (next.x < bounds.x) {
+                p.x = bounds.x;
+            }
+            else if (next.x > bounds.x + bounds.width) {
+                p.x = bounds.x + bounds.width;
+            }
+            if (next.y < bounds.y) {
+                p.y = bounds.y;
+            }
+            else if (next.y > bounds.y + bounds.height) {
+                p.y = bounds.y + bounds.height;
+            }
+        }
+
+        return p;
+    },
+    EllipsePerimeter: function (bounds, vertex, next, orthogonal) {
+        var x = bounds.x;
+        var y = bounds.y;
+        var a = bounds.width / 2;
+        var b = bounds.height / 2;
+        var cx = x + a;
+        var cy = y + b;
+        var px = next.x;
+        var py = next.y;
+
+        // Calculates straight line equation through
+        // point and ellipse center y = d * x + h
+        var dx = parseInt(px - cx);
+        var dy = parseInt(py - cy);
+
+        if (dx == 0 && dy != 0) {
+            return new mxPoint(cx, cy + b * dy / Math.abs(dy));
+        }
+        else if (dx == 0 && dy == 0) {
+            return new mxPoint(px, py);
+        }
+
+        if (orthogonal) {
+            if (py >= y && py <= y + bounds.height) {
+                var ty = py - cy;
+                var tx = Math.sqrt(a * a * (1 - (ty * ty) / (b * b))) || 0;
+
+                if (px <= x) {
+                    tx = -tx;
+                }
+
+                return new mxPoint(cx + tx, py);
+            }
+
+            if (px >= x && px <= x + bounds.width) {
+                var tx = px - cx;
+                var ty = Math.sqrt(b * b * (1 - (tx * tx) / (a * a))) || 0;
+
+                if (py <= y) {
+                    ty = -ty;
+                }
+
+                return new mxPoint(px, cy + ty);
+            }
+        }
+
+        // Calculates intersection
+        var d = dy / dx;
+        var h = cy - d * cx;
+        var e = a * a * d * d + b * b;
+        var f = -2 * cx * e;
+        var g = a * a * d * d * cx * cx +
+            b * b * cx * cx -
+            a * a * b * b;
+        var det = Math.sqrt(f * f - 4 * e * g);
+
+        // Two solutions (perimeter points)
+        var xout1 = (-f + det) / (2 * e);
+        var xout2 = (-f - det) / (2 * e);
+        var yout1 = d * xout1 + h;
+        var yout2 = d * xout2 + h;
+        var dist1 = Math.sqrt(Math.pow((xout1 - px), 2)
+            + Math.pow((yout1 - py), 2));
+        var dist2 = Math.sqrt(Math.pow((xout2 - px), 2)
+            + Math.pow((yout2 - py), 2));
+
+        // Correct solution
+        var xout = 0;
+        var yout = 0;
+
+        if (dist1 < dist2) {
+            xout = xout1;
+            yout = yout1;
+        }
+        else {
+            xout = xout2;
+            yout = yout2;
+        }
+
+        return new mxPoint(xout, yout);
+    },
+    RhombusPerimeter: function (bounds, vertex, next, orthogonal) {
+        var x = bounds.x;
+        var y = bounds.y;
+        var w = bounds.width;
+        var h = bounds.height;
+
+        var cx = x + w / 2;
+        var cy = y + h / 2;
+
+        var px = next.x;
+        var py = next.y;
+
+        // Special case for intersecting the diamond's corners
+        if (cx == px) {
+            if (cy > py) {
+                return new mxPoint(cx, y); // top
+            }
+            else {
+                return new mxPoint(cx, y + h); // bottom
+            }
+        }
+        else if (cy == py) {
+            if (cx > px) {
+                return new mxPoint(x, cy); // left
+            }
+            else {
+                return new mxPoint(x + w, cy); // right
+            }
+        }
+
+        var tx = cx;
+        var ty = cy;
+
+        if (orthogonal) {
+            if (px >= x && px <= x + w) {
+                tx = px;
+            }
+            else if (py >= y && py <= y + h) {
+                ty = py;
+            }
+        }
+
+        // In which quadrant will the intersection be?
+        // set the slope and offset of the border line accordingly
+        if (px < cx) {
+            if (py < cy) {
+                return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
+            }
+            else {
+                return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
+            }
+        }
+        else if (py < cy) {
+            return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
+        }
+        else {
+            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
+        }
+    },
+    TrianglePerimeter: function (bounds, vertex, next, orthogonal) {
+        var direction = (vertex != null) ?
+            vertex.style[mxConstants.STYLE_DIRECTION] : null;
+        var vertical = direction == mxConstants.DIRECTION_NORTH ||
+            direction == mxConstants.DIRECTION_SOUTH;
+
+        var x = bounds.x;
+        var y = bounds.y;
+        var w = bounds.width;
+        var h = bounds.height;
+
+        var cx = x + w / 2;
+        var cy = y + h / 2;
+
+        var start = new mxPoint(x, y);
+        var corner = new mxPoint(x + w, cy);
+        var end = new mxPoint(x, y + h);
+
+        if (direction == mxConstants.DIRECTION_NORTH) {
+            start = end;
+            corner = new mxPoint(cx, y);
+            end = new mxPoint(x + w, y + h);
+        }
+        else if (direction == mxConstants.DIRECTION_SOUTH) {
+            corner = new mxPoint(cx, y + h);
+            end = new mxPoint(x + w, y);
+        }
+        else if (direction == mxConstants.DIRECTION_WEST) {
+            start = new mxPoint(x + w, y);
+            corner = new mxPoint(x, cy);
+            end = new mxPoint(x + w, y + h);
+        }
+
+        var dx = next.x - cx;
+        var dy = next.y - cy;
+
+        var alpha = (vertical) ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
+        var t = (vertical) ? Math.atan2(w, h) : Math.atan2(h, w);
+
+        var base = false;
+
+        if (direction == mxConstants.DIRECTION_NORTH ||
+            direction == mxConstants.DIRECTION_WEST) {
+            base = alpha > -t && alpha < t;
+        }
+        else {
+            base = alpha < -Math.PI + t || alpha > Math.PI - t;
+        }
+
+        var result = null;
+
+        if (base) {
+            if (orthogonal && ((vertical && next.x >= start.x && next.x <= end.x) ||
+                (!vertical && next.y >= start.y && next.y <= end.y))) {
+                if (vertical) {
+                    result = new mxPoint(next.x, start.y);
+                }
+                else {
+                    result = new mxPoint(start.x, next.y);
+                }
+            }
+            else {
+                if (direction == mxConstants.DIRECTION_NORTH) {
+                    result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2,
+                        y + h);
+                }
+                else if (direction == mxConstants.DIRECTION_SOUTH) {
+                    result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2,
+                        y);
+                }
+                else if (direction == mxConstants.DIRECTION_WEST) {
+                    result = new mxPoint(x + w, y + h / 2 +
+                        w * Math.tan(alpha) / 2);
+                }
+                else {
+                    result = new mxPoint(x, y + h / 2 -
+                        w * Math.tan(alpha) / 2);
+                }
+            }
+        }
+        else {
+            if (orthogonal) {
+                var pt = new mxPoint(cx, cy);
+
+                if (next.y >= y && next.y <= y + h) {
+                    pt.x = (vertical) ? cx : (
+                        (direction == mxConstants.DIRECTION_WEST) ?
+                        x + w : x);
+                    pt.y = next.y;
+                }
+                else if (next.x >= x && next.x <= x + w) {
+                    pt.x = next.x;
+                    pt.y = (!vertical) ? cy : (
+                        (direction == mxConstants.DIRECTION_NORTH) ?
+                        y + h : y);
+                }
+
+                // Compute angle
+                dx = next.x - pt.x;
+                dy = next.y - pt.y;
+
+                cx = pt.x;
+                cy = pt.y;
+            }
+
+            if ((vertical && next.x <= x + w / 2) ||
+                (!vertical && next.y <= y + h / 2)) {
+                result = mxUtils.intersection(next.x, next.y, cx, cy,
+                    start.x, start.y, corner.x, corner.y);
+            }
+            else {
+                result = mxUtils.intersection(next.x, next.y, cx, cy,
+                    corner.x, corner.y, end.x, end.y);
+            }
+        }
+
+        if (result == null) {
+            result = new mxPoint(cx, cy);
+        }
+
+        return result;
+    },
+    HexagonPerimeter: function (bounds, vertex, next, orthogonal) {
+        var x = bounds.x;
+        var y = bounds.y;
+        var w = bounds.width;
+        var h = bounds.height;
+
+        var cx = bounds.getCenterX();
+        var cy = bounds.getCenterY();
+        var px = next.x;
+        var py = next.y;
+        var dx = px - cx;
+        var dy = py - cy;
+        var alpha = -Math.atan2(dy, dx);
+        var pi = Math.PI;
+        var pi2 = Math.PI / 2;
+
+        var result = new mxPoint(cx, cy);
+
+        var direction = (vertex != null) ? mxUtils.getValue(
+            vertex.style, mxConstants.STYLE_DIRECTION,
+            mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
+        var vertical = direction == mxConstants.DIRECTION_NORTH
+            || direction == mxConstants.DIRECTION_SOUTH;
+        var a = new mxPoint();
+        var b = new mxPoint();
+
+        //Only consider corrects quadrants for the orthogonal case.
+        if ((px < x) && (py < y) || (px < x) && (py > y + h)
+            || (px > x + w) && (py < y) || (px > x + w) && (py > y + h)) {
+            orthogonal = false;
+        }
+
+        if (orthogonal) {
+            if (vertical) {
+                //Special cases where intersects with hexagon corners
+                if (px == cx) {
+                    if (py <= y) {
+                        return new mxPoint(cx, y);
+                    }
+                    else if (py >= y + h) {
+                        return new mxPoint(cx, y + h);
+                    }
+                }
+                else if (px < x) {
+                    if (py == y + h / 4) {
+                        return new mxPoint(x, y + h / 4);
+                    }
+                    else if (py == y + 3 * h / 4) {
+                        return new mxPoint(x, y + 3 * h / 4);
+                    }
+                }
+                else if (px > x + w) {
+                    if (py == y + h / 4) {
+                        return new mxPoint(x + w, y + h / 4);
+                    }
+                    else if (py == y + 3 * h / 4) {
+                        return new mxPoint(x + w, y + 3 * h / 4);
+                    }
+                }
+                else if (px == x) {
+                    if (py < cy) {
+                        return new mxPoint(x, y + h / 4);
+                    }
+                    else if (py > cy) {
+                        return new mxPoint(x, y + 3 * h / 4);
+                    }
+                }
+                else if (px == x + w) {
+                    if (py < cy) {
+                        return new mxPoint(x + w, y + h / 4);
+                    }
+                    else if (py > cy) {
+                        return new mxPoint(x + w, y + 3 * h / 4);
+                    }
+                }
+                if (py == y) {
+                    return new mxPoint(cx, y);
+                }
+                else if (py == y + h) {
+                    return new mxPoint(cx, y + h);
+                }
+
+                if (px < cx) {
+                    if ((py > y + h / 4) && (py < y + 3 * h / 4)) {
+                        a = new mxPoint(x, y);
+                        b = new mxPoint(x, y + h);
+                    }
+                    else if (py < y + h / 4) {
+                        a = new mxPoint(x - Math.floor(0.5 * w), y
+                            + Math.floor(0.5 * h));
+                        b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+                    }
+                    else if (py > y + 3 * h / 4) {
+                        a = new mxPoint(x - Math.floor(0.5 * w), y
+                            + Math.floor(0.5 * h));
+                        b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+                    }
+                }
+                else if (px > cx) {
+                    if ((py > y + h / 4) && (py < y + 3 * h / 4)) {
+                        a = new mxPoint(x + w, y);
+                        b = new mxPoint(x + w, y + h);
+                    }
+                    else if (py < y + h / 4) {
+                        a = new mxPoint(x, y - Math.floor(0.25 * h));
+                        b = new mxPoint(x + Math.floor(1.5 * w), y
+                            + Math.floor(0.5 * h));
+                    }
+                    else if (py > y + 3 * h / 4) {
+                        a = new mxPoint(x + Math.floor(1.5 * w), y
+                            + Math.floor(0.5 * h));
+                        b = new mxPoint(x, y + Math.floor(1.25 * h));
+                    }
+                }
+
+            }
+            else {
+                //Special cases where intersects with hexagon corners
+                if (py == cy) {
+                    if (px <= x) {
+                        return new mxPoint(x, y + h / 2);
+                    }
+                    else if (px >= x + w) {
+                        return new mxPoint(x + w, y + h / 2);
+                    }
+                }
+                else if (py < y) {
+                    if (px == x + w / 4) {
+                        return new mxPoint(x + w / 4, y);
+                    }
+                    else if (px == x + 3 * w / 4) {
+                        return new mxPoint(x + 3 * w / 4, y);
+                    }
+                }
+                else if (py > y + h) {
+                    if (px == x + w / 4) {
+                        return new mxPoint(x + w / 4, y + h);
+                    }
+                    else if (px == x + 3 * w / 4) {
+                        return new mxPoint(x + 3 * w / 4, y + h);
+                    }
+                }
+                else if (py == y) {
+                    if (px < cx) {
+                        return new mxPoint(x + w / 4, y);
+                    }
+                    else if (px > cx) {
+                        return new mxPoint(x + 3 * w / 4, y);
+                    }
+                }
+                else if (py == y + h) {
+                    if (px < cx) {
+                        return new mxPoint(x + w / 4, y + h);
+                    }
+                    else if (py > cy) {
+                        return new mxPoint(x + 3 * w / 4, y + h);
+                    }
+                }
+                if (px == x) {
+                    return new mxPoint(x, cy);
+                }
+                else if (px == x + w) {
+                    return new mxPoint(x + w, cy);
+                }
+
+                if (py < cy) {
+                    if ((px > x + w / 4) && (px < x + 3 * w / 4)) {
+                        a = new mxPoint(x, y);
+                        b = new mxPoint(x + w, y);
+                    }
+                    else if (px < x + w / 4) {
+                        a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+                        b = new mxPoint(x + Math.floor(0.5 * w), y
+                            - Math.floor(0.5 * h));
+                    }
+                    else if (px > x + 3 * w / 4) {
+                        a = new mxPoint(x + Math.floor(0.5 * w), y
+                            - Math.floor(0.5 * h));
+                        b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+                    }
+                }
+                else if (py > cy) {
+                    if ((px > x + w / 4) && (px < x + 3 * w / 4)) {
+                        a = new mxPoint(x, y + h);
+                        b = new mxPoint(x + w, y + h);
+                    }
+                    else if (px < x + w / 4) {
+                        a = new mxPoint(x - Math.floor(0.25 * w), y);
+                        b = new mxPoint(x + Math.floor(0.5 * w), y
+                            + Math.floor(1.5 * h));
+                    }
+                    else if (px > x + 3 * w / 4) {
+                        a = new mxPoint(x + Math.floor(0.5 * w), y
+                            + Math.floor(1.5 * h));
+                        b = new mxPoint(x + Math.floor(1.25 * w), y);
+                    }
+                }
+            }
+
+            var tx = cx;
+            var ty = cy;
+
+            if (px >= x && px <= x + w) {
+                tx = px;
+
+                if (py < cy) {
+                    ty = y + h;
+                }
+                else {
+                    ty = y;
+                }
+            }
+            else if (py >= y && py <= y + h) {
+                ty = py;
+
+                if (px < cx) {
+                    tx = x + w;
+                }
+                else {
+                    tx = x;
+                }
+            }
+
+            result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
+        }
+        else {
+            if (vertical) {
+                var beta = Math.atan2(h / 4, w / 2);
+
+                //Special cases where intersects with hexagon corners
+                if (alpha == beta) {
+                    return new mxPoint(x + w, y + Math.floor(0.25 * h));
+                }
+                else if (alpha == pi2) {
+                    return new mxPoint(x + Math.floor(0.5 * w), y);
+                }
+                else if (alpha == (pi - beta)) {
+                    return new mxPoint(x, y + Math.floor(0.25 * h));
+                }
+                else if (alpha == -beta) {
+                    return new mxPoint(x + w, y + Math.floor(0.75 * h));
+                }
+                else if (alpha == (-pi2)) {
+                    return new mxPoint(x + Math.floor(0.5 * w), y + h);
+                }
+                else if (alpha == (-pi + beta)) {
+                    return new mxPoint(x, y + Math.floor(0.75 * h));
+                }
+
+                if ((alpha < beta) && (alpha > -beta)) {
+                    a = new mxPoint(x + w, y);
+                    b = new mxPoint(x + w, y + h);
+                }
+                else if ((alpha > beta) && (alpha < pi2)) {
+                    a = new mxPoint(x, y - Math.floor(0.25 * h));
+                    b = new mxPoint(x + Math.floor(1.5 * w), y
+                        + Math.floor(0.5 * h));
+                }
+                else if ((alpha > pi2) && (alpha < (pi - beta))) {
+                    a = new mxPoint(x - Math.floor(0.5 * w), y
+                        + Math.floor(0.5 * h));
+                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+                }
+                else if (((alpha > (pi - beta)) && (alpha <= pi))
+                    || ((alpha < (-pi + beta)) && (alpha >= -pi))) {
+                    a = new mxPoint(x, y);
+                    b = new mxPoint(x, y + h);
+                }
+                else if ((alpha < -beta) && (alpha > -pi2)) {
+                    a = new mxPoint(x + Math.floor(1.5 * w), y
+                        + Math.floor(0.5 * h));
+                    b = new mxPoint(x, y + Math.floor(1.25 * h));
+                }
+                else if ((alpha < -pi2) && (alpha > (-pi + beta))) {
+                    a = new mxPoint(x - Math.floor(0.5 * w), y
+                        + Math.floor(0.5 * h));
+                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+                }
+            }
+            else {
+                var beta = Math.atan2(h / 2, w / 4);
+
+                //Special cases where intersects with hexagon corners
+                if (alpha == beta) {
+                    return new mxPoint(x + Math.floor(0.75 * w), y);
+                }
+                else if (alpha == (pi - beta)) {
+                    return new mxPoint(x + Math.floor(0.25 * w), y);
+                }
+                else if ((alpha == pi) || (alpha == -pi)) {
+                    return new mxPoint(x, y + Math.floor(0.5 * h));
+                }
+                else if (alpha == 0) {
+                    return new mxPoint(x + w, y + Math.floor(0.5 * h));
+                }
+                else if (alpha == -beta) {
+                    return new mxPoint(x + Math.floor(0.75 * w), y + h);
+                }
+                else if (alpha == (-pi + beta)) {
+                    return new mxPoint(x + Math.floor(0.25 * w), y + h);
+                }
+
+                if ((alpha > 0) && (alpha < beta)) {
+                    a = new mxPoint(x + Math.floor(0.5 * w), y
+                        - Math.floor(0.5 * h));
+                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+                }
+                else if ((alpha > beta) && (alpha < (pi - beta))) {
+                    a = new mxPoint(x, y);
+                    b = new mxPoint(x + w, y);
+                }
+                else if ((alpha > (pi - beta)) && (alpha < pi)) {
+                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+                    b = new mxPoint(x + Math.floor(0.5 * w), y
+                        - Math.floor(0.5 * h));
+                }
+                else if ((alpha < 0) && (alpha > -beta)) {
+                    a = new mxPoint(x + Math.floor(0.5 * w), y
+                        + Math.floor(1.5 * h));
+                    b = new mxPoint(x + Math.floor(1.25 * w), y);
+                }
+                else if ((alpha < -beta) && (alpha > (-pi + beta))) {
+                    a = new mxPoint(x, y + h);
+                    b = new mxPoint(x + w, y + h);
+                }
+                else if ((alpha < (-pi + beta)) && (alpha > -pi)) {
+                    a = new mxPoint(x - Math.floor(0.25 * w), y);
+                    b = new mxPoint(x + Math.floor(0.5 * w), y
+                        + Math.floor(1.5 * h));
+                }
+            }
+
+            result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
+        }
+
+        if (result == null) {
+            return new mxPoint(cx, cy);
+        }
+
+        return result;
+    }
+};
+
+
+});
+define('PaneJS/CellState',['require','exports','module','PaneJS/Point','PaneJS/Rectangle'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Point = require('PaneJS/Point');
+var Rectangle = require('PaneJS/Rectangle');
+
+module.exports = Rectangle.extend({
+
+    view: null,
+    cell: null,
+    style: null,    // cellStyle
+    shape: null,    // 图形
+    text: null,     // 文本
+    invalid: true,  // 默认为无效，需要重绘
+    origin: null,
+    absolutePoints: null, // 连线的关键点
+    absoluteOffset: null, // 对于连线，表示连线上 label 的绝对位置
+                          // 对于节点，表示节点中 label 相对于节点左上角的位置
+
+    segments: null,       // 连线每个片段的长度
+    //length: 0, // FIXME: length 导致 isArrayLike 判断出错，用下面的 edgeLength 代替
+    edgeLength: 0,        // 连线的长度
+    terminalDistance: 0,  // 连线起点和终点之间的直线距离
+    visibleSourceState: null,
+    visibleTargetState: null,
+
+    // 构造函数
+    constructor: function CellState(view, cell, style) {
+
+        var that = this;
+
+        that.view = view;
+        that.cell = cell;
+        that.style = style;
+
+        that.origin = new Point();
+        that.absoluteOffset = new Point();
+    },
+
+    getPerimeterBounds: function (border, bounds) {
+
+        var that = this;
+        var shape = that.shape;
+
+        border = border || 0;
+        bounds = bounds ? bounds : new Rectangle(that.x, that.y, that.width, that.height);
+
+
+        if (shape && shape.stencil) {
+            var aspect = shape.stencil.computeAspect(that.style, bounds.x, bounds.y, bounds.width, bounds.height);
+
+            bounds.x = aspect.x;
+            bounds.y = aspect.y;
+            bounds.width = shape.stencil.w0 * aspect.width;
+            bounds.height = shape.stencil.h0 * aspect.height;
+        }
+
+        border && bounds.grow(border);
+
+        return bounds;
+    },
+
+    // 设置连线起点或终点的位置
+    setAbsoluteTerminalPoint: function (point, isSource) {
+
+        var that = this;
+        var points = that.absolutePoints;
+
+        if (!points) {
+            points = that.absolutePoints = [];
+        }
+
+        var length = points.length;
+
+        if (isSource) {
+            length
+                ? points[0] = point
+                : points.push(point);
+        } else {
+            if (length === 0) {
+                points.push(null);
+                points.push(point);
+            } else if (length === 1) {
+                points.push(point);
+            } else {
+                points[length - 1] = point;
+            }
+        }
 
         return that;
     },
 
-    createSvg: function () {
+    setCursor: function (cursor) {
 
-        var view = this;
+        var that = this;
+        var shape = that.shape;
+        var text = that.text;
 
-        view.canvas = document.createElementNS(constants.NS_SVG, 'g');
+        shape && shape.setCursor(cursor);
+        text && text.setCursor(cursor);
 
-        view.backgroundPane = document.createElementNS(constants.NS_SVG, 'g');
-        view.canvas.appendChild(view.backgroundPane);
+        return that;
+    },
 
-        view.drawPane = document.createElementNS(constants.NS_SVG, 'g');
-        view.canvas.appendChild(view.drawPane);
+    getVisibleTerminal: function (isSource) {
+        var state = this.getVisibleTerminalState(isSource);
 
-        view.overlayPane = document.createElementNS(constants.NS_SVG, 'g');
-        view.canvas.appendChild(view.overlayPane);
+        return state ? state.cell : null;
+    },
 
-        view.decoratorPane = document.createElementNS(constants.NS_SVG, 'g');
-        view.canvas.appendChild(view.decoratorPane);
+    getVisibleTerminalState: function (isSource) {
+        return isSource ? this.visibleSourceState : this.visibleTargetState;
+    },
 
-        var root = document.createElementNS(constants.NS_SVG, 'svg');
-        root.style.width = '100%';
-        root.style.height = '100%';
-
-        // NOTE: In standards mode, the SVG must have block layout
-        // in order for the container DIV to not show scrollbars.
-        root.style.display = 'block';
-        root.appendChild(view.canvas);
-
-
-        var container = view.graph.container;
-
-        if (container !== null) {
-            container.appendChild(root);
-            view.updateContainerStyle(container);
+    setVisibleTerminalState: function (terminalState, isSource) {
+        if (isSource) {
+            this.visibleSourceState = terminalState;
+        } else {
+            this.visibleTargetState = terminalState;
         }
-
-        return this;
     },
 
-    // 更新容器的样式
-    updateContainerStyle: function (container) {},
-
-    destroy: function () {}
-});
-
-
-});
-define('PaneJS/marker',['require','exports','module','PaneJS/constants'],function (require, exports, module) {var constants = require('PaneJS/constants');
-
-var marker = {
-    markers: [],
-    addMarker: function (type, fn) {
-        marker.markers[type] = fn;
+    getCellBounds: function () {
+        return this.cellBounds;
     },
-    createMarker: function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
-        var fn = marker.markers[type];
 
-        return fn ? fn(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) : null;
+    getPaintBounds: function () {
+        return this.paintBounds;
+    },
+
+    updateCachedBounds: function () {
+
+        var that = this;
+        var view = that.view;
+        var shape = that.shape;
+        var ts = view.translate;
+        var scale = view.scale;
+
+        // 计算 translate 和 scale 之前的 bound
+        that.cellBounds = new Rectangle(that.x / scale - ts.x, that.y / scale - ts.y, that.width / scale, that.height / scale);
+        that.paintBounds = Rectangle.fromRectangle(that.cellBounds);
+
+        if (shape && shape.isPaintBoundsInverted()) {
+            that.paintBounds.rotate90();
+        }
+    },
+
+    clone: function () {
+
+    },
+
+    destroy: function () {
+        this.view.graph.cellRenderer.destroy(this);
     }
-};
-
-function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
-    // The angle of the forward facing arrow sides against the x axis is
-    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
-    // only half the strokewidth is processed ).
-    var endOffsetX = unitX * sw * 1.118;
-    var endOffsetY = unitY * sw * 1.118;
-
-    unitX = unitX * (size + sw);
-    unitY = unitY * (size + sw);
-
-    var pt = pe.clone();
-    pt.x -= endOffsetX;
-    pt.y -= endOffsetY;
-
-    var f = (type != constants.ARROW_CLASSIC) ? 1 : 3 / 4;
-    pe.x += -unitX * f - endOffsetX;
-    pe.y += -unitY * f - endOffsetY;
-
-    return function () {
-        canvas.begin();
-        canvas.moveTo(pt.x, pt.y);
-        canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
-
-        if (type == constants.ARROW_CLASSIC) {
-            canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
-        }
-
-        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-        canvas.close();
-
-        if (filled) {
-            canvas.fillAndStroke();
-        }
-        else {
-            canvas.stroke();
-        }
-    };
-}
-
-marker.addMarker('classic', arrow);
-marker.addMarker('block', arrow);
-
-marker.addMarker('open', function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
-    // The angle of the forward facing arrow sides against the x axis is
-    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
-    // only half the strokewidth is processed ).
-    var endOffsetX = unitX * sw * 1.118;
-    var endOffsetY = unitY * sw * 1.118;
-
-    unitX = unitX * (size + sw);
-    unitY = unitY * (size + sw);
-
-    var pt = pe.clone();
-    pt.x -= endOffsetX;
-    pt.y -= endOffsetY;
-
-    pe.x += -endOffsetX * 2;
-    pe.y += -endOffsetY * 2;
-
-    return function () {
-        canvas.begin();
-        canvas.moveTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
-        canvas.lineTo(pt.x, pt.y);
-        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-        canvas.stroke();
-    };
 });
 
-marker.addMarker('oval', function (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
-    var a = size / 2;
-
-    var pt = pe.clone();
-    pe.x -= unitX * a;
-    pe.y -= unitY * a;
-
-    return function () {
-        canvas.ellipse(pt.x - a, pt.y - a, size, size);
-
-        if (filled) {
-            canvas.fillAndStroke();
-        }
-        else {
-            canvas.stroke();
-        }
-    };
-});
-
-function diamond(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
-    // The angle of the forward facing arrow sides against the x axis is
-    // 45 degrees, 1/sin(45) = 1.4142 / 2 = 0.7071 ( / 2 allows for
-    // only half the strokewidth is processed ). Or 0.9862 for thin diamond.
-    // Note these values and the tk variable below are dependent, update
-    // both together (saves trig hard coding it).
-    var swFactor = (type == constants.ARROW_DIAMOND) ? 0.7071 : 0.9862;
-    var endOffsetX = unitX * sw * swFactor;
-    var endOffsetY = unitY * sw * swFactor;
-
-    unitX = unitX * (size + sw);
-    unitY = unitY * (size + sw);
-
-    var pt = pe.clone();
-    pt.x -= endOffsetX;
-    pt.y -= endOffsetY;
-
-    pe.x += -unitX - endOffsetX;
-    pe.y += -unitY - endOffsetY;
-
-    // thickness factor for diamond
-    var tk = ((type == constants.ARROW_DIAMOND) ? 2 : 3.4);
-
-    return function () {
-        canvas.begin();
-        canvas.moveTo(pt.x, pt.y);
-        canvas.lineTo(pt.x - unitX / 2 - unitY / tk, pt.y + unitX / tk - unitY / 2);
-        canvas.lineTo(pt.x - unitX, pt.y - unitY);
-        canvas.lineTo(pt.x - unitX / 2 + unitY / tk, pt.y - unitY / 2 - unitX / tk);
-        canvas.close();
-
-        if (filled) {
-            canvas.fillAndStroke();
-        }
-        else {
-            canvas.stroke();
-        }
-    };
-}
-
-marker.addMarker('diamond', diamond);
-marker.addMarker('diamondThin', diamond);
-
-
-module.exports = marker;
 
 });
-define('PaneJS/Model',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/events/Event','PaneJS/events/EventObject','PaneJS/changes/RootChange','PaneJS/changes/ChildChange','PaneJS/changes/TerminalChange','PaneJS/Cell','PaneJS/UndoableEdit'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define('PaneJS/Geometry',['require','exports','module','PaneJS/Rectangle'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
+var Rectangle = require('PaneJS/Rectangle');
+
+module.exports = Rectangle.extend({
+
+    TRANSLATE_CONTROL_POINTS: true,
+    alternateBounds: null,
+    sourcePoint: null,
+    targetPoint: null,
+    points: null,
+    offset: null,
+    relative: false,
+
+    constructor: function Geometry(x, y, width, height) {
+        Geometry.superclass.constructor.call(this, x, y, width, height);
+    },
+
+    swap: function () {
+
+        var that = this;
+        var alternateBounds = that.alternateBounds;
+
+        if (alternateBounds) {
+            var old = new Rectangle(that.x, that.y, that.width, that.height);
+
+            that.x = alternateBounds.x;
+            that.y = alternateBounds.y;
+            that.width = alternateBounds.width;
+            that.height = alternateBounds.height;
+
+            that.alternateBounds = old;
+        }
+
+        return that;
+    },
+
+    getTerminalPoint: function (isSource) {
+        return isSource ? this.sourcePoint : this.targetPoint;
+    },
+
+    setTerminalPoint: function (point, isSource) {
+        var that = this;
+        if (isSource) {
+            that.sourcePoint = point;
+        } else {
+            that.targetPoint = point;
+        }
+
+        return point;
+    },
+
+    rotate: function (angle, cx) {
+
+        var that = this;
+
+        var rad = utils.toRadians(angle);
+        var cos = Math.cos(rad);
+        var sin = Math.sin(rad);
+
+        // Rotates the geometry
+        if (!this.relative) {
+            var ct = new Point(this.getCenterX(), this.getCenterY());
+            var pt = Point.getRotatedPoint(ct, cos, sin, cx);
+
+            this.x = Math.round(pt.x - this.width / 2);
+            this.y = Math.round(pt.y - this.height / 2);
+        }
+
+        // Rotates the source point
+        if (this.sourcePoint) {
+            var pt = Point.getRotatedPoint(this.sourcePoint, cos, sin, cx);
+            this.sourcePoint.x = Math.round(pt.x);
+            this.sourcePoint.y = Math.round(pt.y);
+        }
+
+        // Translates the target point
+        if (this.targetPoint) {
+            var pt = Point.getRotatedPoint(this.targetPoint, cos, sin, cx);
+            this.targetPoint.x = Math.round(pt.x);
+            this.targetPoint.y = Math.round(pt.y);
+        }
+
+        // Translate the control points
+        if (this.points != null) {
+            for (var i = 0; i < this.points.length; i++) {
+                if (this.points[i] != null) {
+                    var pt = Point.getRotatedPoint(this.points[i], cos, sin, cx);
+                    this.points[i].x = Math.round(pt.x);
+                    this.points[i].y = Math.round(pt.y);
+                }
+            }
+        }
+    },
+    translate: function (dx, dy) {
+        dx = parseFloat(dx);
+        dy = parseFloat(dy);
+
+        // Translates the geometry
+        if (!this.relative) {
+            this.x = parseFloat(this.x) + dx;
+            this.y = parseFloat(this.y) + dy;
+        }
+
+        // Translates the source point
+        if (this.sourcePoint != null) {
+            this.sourcePoint.x = parseFloat(this.sourcePoint.x) + dx;
+            this.sourcePoint.y = parseFloat(this.sourcePoint.y) + dy;
+        }
+
+        // Translates the target point
+        if (this.targetPoint != null) {
+            this.targetPoint.x = parseFloat(this.targetPoint.x) + dx;
+            this.targetPoint.y = parseFloat(this.targetPoint.y) + dy;
+        }
+
+        // Translate the control points
+        if (this.TRANSLATE_CONTROL_POINTS && this.points != null) {
+            for (var i = 0; i < this.points.length; i++) {
+                if (this.points[i] != null) {
+                    this.points[i].x = parseFloat(this.points[i].x) + dx;
+                    this.points[i].y = parseFloat(this.points[i].y) + dy;
+                }
+            }
+        }
+    },
+    scale: function (sx, sy, fixedAspect) {
+        sx = parseFloat(sx);
+        sy = parseFloat(sy);
+
+        // Translates the source point
+        if (this.sourcePoint != null) {
+            this.sourcePoint.x = parseFloat(this.sourcePoint.x) * sx;
+            this.sourcePoint.y = parseFloat(this.sourcePoint.y) * sy;
+        }
+
+        // Translates the target point
+        if (this.targetPoint != null) {
+            this.targetPoint.x = parseFloat(this.targetPoint.x) * sx;
+            this.targetPoint.y = parseFloat(this.targetPoint.y) * sy;
+        }
+
+        // Translate the control points
+        if (this.points != null) {
+            for (var i = 0; i < this.points.length; i++) {
+                if (this.points[i] != null) {
+                    this.points[i].x = parseFloat(this.points[i].x) * sx;
+                    this.points[i].y = parseFloat(this.points[i].y) * sy;
+                }
+            }
+        }
+
+        // Translates the geometry
+        if (!this.relative) {
+            this.x = parseFloat(this.x) * sx;
+            this.y = parseFloat(this.y) * sy;
+
+            if (fixedAspect) {
+                sy = sx = Math.min(sx, sy);
+            }
+
+            this.width = parseFloat(this.width) * sx;
+            this.height = parseFloat(this.height) * sy;
+        }
+    },
+
+    equals: function (/*obj*/) {
+
+    }
+});
+
+});
+define('PaneJS/Model',['require','exports','module','PaneJS/Cell','PaneJS/changes/ChildChange','PaneJS/common/class','PaneJS/events/Event','PaneJS/events/EventObject','PaneJS/changes/RootChange','PaneJS/changes/StyleChange','PaneJS/changes/TerminalChange','PaneJS/UndoableEdit','PaneJS/common/utils','PaneJS/Point','PaneJS/cellPath'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Cell = require('PaneJS/Cell');
+var ChildChange = require('PaneJS/changes/ChildChange');
 var Class = require('PaneJS/common/class');
-var utils = require('PaneJS/common/utils');
 var Event = require('PaneJS/events/Event');
 var EventObject = require('PaneJS/events/EventObject');
 var RootChange = require('PaneJS/changes/RootChange');
-var ChildChange = require('PaneJS/changes/ChildChange');
+var StyleChange = require('PaneJS/changes/StyleChange');
 var TerminalChange = require('PaneJS/changes/TerminalChange');
-var Cell = require('PaneJS/Cell');
 var UndoableEdit = require('PaneJS/UndoableEdit');
+var utils = require('PaneJS/common/utils');
+var Point = require('PaneJS/Point');
+var cellPath = require('PaneJS/cellPath');
 
 var each = utils.each;
 var isNumeric = utils.isNumeric;
@@ -8186,7 +7474,11 @@ module.exports = Class.create({
 
         this.currentEdit = model.createUndoableEdit();
 
-        root ? model.setRoot(root) : model.clear();
+        if (root) {
+            model.setRoot(root);
+        } else {
+            model.clear();
+        }
     },
 
     // 清理并创建一个默认的 root
@@ -8240,7 +7532,7 @@ module.exports = Class.create({
     filterCells: function (cells, filter) {
         var result = [];
 
-        if (cells != null) {
+        if (cells !== null) {
             for (var i = 0; i < cells.length; i++) {
                 if (filter(cells[i])) {
                     result.push(cells[i]);
@@ -8414,12 +7706,12 @@ module.exports = Class.create({
         var edgeCount = this.getEdgeCount(cell);
         var edges = [];
 
-        for (var i = 0; i < edgeCount; i++) {
-            edges.push(this.getEdgeAt(cell, i));
+        for (var j = 0; j < edgeCount; j++) {
+            edges.push(this.getEdgeAt(cell, j));
         }
 
-        for (var i = 0; i < edges.length; i++) {
-            var edge = edges[i];
+        for (var k = 0; k < edges.length; k++) {
+            var edge = edges[k];
 
             // Updates edge parent if edge and child have
             // a common root node (does not need to be the
@@ -8448,18 +7740,18 @@ module.exports = Class.create({
         }
 
         if (this.isAncestor(root, sourceNode) && this.isAncestor(root, targetNode)) {
-            if (sourceNode == targetNode) {
+            if (sourceNode === targetNode) {
                 cell = this.getParent(sourceNode);
             }
             else {
                 //cell = this.getNearestCommonAncestor(sourceNode, targetNode);
             }
 
-            if (cell != null && (this.getParent(cell) != this.root ||
-                this.isAncestor(cell, edge)) && this.getParent(edge) != cell) {
+            if (cell !== null && (this.getParent(cell) !== this.root ||
+                this.isAncestor(cell, edge)) && this.getParent(edge) !== cell) {
                 var geo = this.getGeometry(edge);
 
-                if (geo != null) {
+                if (geo !== null) {
                     var origin1 = this.getOrigin(this.getParent(edge));
                     var origin2 = this.getOrigin(cell);
 
@@ -8502,13 +7794,13 @@ module.exports = Class.create({
     getNearestCommonAncestor: function (cell1, cell2) {
         if (cell1 && cell2) {
             // Creates the cell path for the second cell
-            var path = mxCellPath.create(cell2);
+            var path = cellPath.create(cell2);
 
             if (path && path.length > 0) {
                 // Bubbles through the ancestors of the first
                 // cell to find the nearest common ancestor.
                 var cell = cell1;
-                var current = mxCellPath.create(cell);
+                var current = cellPath.create(cell);
 
                 // Inverts arguments
                 if (path.length < current.length) {
@@ -8518,15 +7810,15 @@ module.exports = Class.create({
                     path = tmp;
                 }
 
-                while (cell != null) {
+                while (cell !== null) {
                     var parent = this.getParent(cell);
 
                     // Checks if the cell path is equal to the beginning of the given cell path
-                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+                    if (path.indexOf(current + cellPath.PATH_SEPARATOR) === 0 && parent !== null) {
                         return cell;
                     }
 
-                    current = mxCellPath.getParentPath(current);
+                    current = cellPath.getParentPath(current);
                     cell = parent;
                 }
             }
@@ -8581,7 +7873,7 @@ module.exports = Class.create({
         // model and avoids calling cellAdded if it was.
         if (!this.contains(previous) && parent) {
             this.cellAdded(cell);
-        } else if (parent == null) {
+        } else if (parent === null) {
             this.cellRemoved(cell);
         }
 
@@ -8629,7 +7921,7 @@ module.exports = Class.create({
         return edge ? edge.getTerminal(isSource) : null;
     },
     setTerminal: function (edge, terminal, isSource) {
-        var terminalChanged = terminal != this.getTerminal(edge, isSource);
+        var terminalChanged = terminal !== this.getTerminal(edge, isSource);
         this.execute(new TerminalChange(this, edge, terminal, isSource));
 
         if (this.maintainEdgeParent && terminalChanged) {
@@ -8679,7 +7971,7 @@ module.exports = Class.create({
         for (var i = 0; i < edgeCount; i++) {
             var edge = this.getEdgeAt(cell, i);
 
-            if (edge != ignoredEdge && this.getTerminal(edge, outgoing) == cell) {
+            if (edge !== ignoredEdge && this.getTerminal(edge, outgoing) === cell) {
                 count++;
             }
         }
@@ -8729,7 +8021,7 @@ module.exports = Class.create({
     },
 
     setGeometry: function (cell, geometry) {
-        if (geometry != this.getGeometry(cell)) {
+        if (geometry !== this.getGeometry(cell)) {
             this.execute(new GeometryChange(this, cell, geometry));
         }
 
@@ -8743,7 +8035,7 @@ module.exports = Class.create({
     },
 
     setStyle: function (cell, style) {
-        if (style != this.getStyle(cell)) {
+        if (style !== this.getStyle(cell)) {
             this.execute(new StyleChange(this, cell, style));
         }
 
@@ -8788,7 +8080,7 @@ module.exports = Class.create({
         //this.fireEvent(new mxEventObject(mxEvent.BEGIN_UPDATE));
         this.emit(new EventObject('beginUpdate'));
 
-        if (this.updateLevel == 1) {
+        if (this.updateLevel === 1) {
             //this.fireEvent(new mxEventObject(mxEvent.START_EDIT));
             this.emit(new EventObject('startEdit'));
         }
@@ -8797,13 +8089,13 @@ module.exports = Class.create({
     endUpdate: function () {
         this.updateLevel--;
 
-        if (this.updateLevel == 0) {
+        if (this.updateLevel === 0) {
             //this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
             this.emit(new EventObject('endEdit'));
         }
 
         if (!this.endingUpdate) {
-            this.endingUpdate = this.updateLevel == 0;
+            this.endingUpdate = this.updateLevel === 0;
             //this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
             this.emit(new EventObject('endUpdate', {edit: this.currentEdit}));
 
@@ -8868,6 +8160,133 @@ module.exports = Class.create({
     destroy: function () {}
 });
 
+
+});
+define('PaneJS/Stylesheet',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/constants','PaneJS/perimeter'],function (require, exports, module) {'use strict';
+
+var Class = require('PaneJS/common/class');
+var utils = require('PaneJS/common/utils');
+var constants = require('PaneJS/constants');
+var perimeter = require('PaneJS/perimeter');
+
+
+module.exports = Class.create({
+
+
+    constructor: function Stylesheet() {
+        this.styles = {};
+
+        this.putDefaultVertexStyle(this.createDefaultVertexStyle());
+        this.putDefaultEdgeStyle(this.createDefaultEdgeStyle());
+    },
+
+    createDefaultVertexStyle: function () {
+        var style = {};
+
+        style[constants.STYLE_SHAPE] = constants.SHAPE_RECTANGLE;
+        style[constants.STYLE_PERIMETER] = perimeter.RectanglePerimeter;
+        style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
+        style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
+        style[constants.STYLE_FILLCOLOR] = '#e3f4ff';
+        style[constants.STYLE_STROKECOLOR] = '#289de9';
+        style[constants.STYLE_FONTCOLOR] = '#774400';
+
+        return style;
+    },
+
+    createDefaultEdgeStyle: function () {
+        var style = {};
+
+        style[constants.STYLE_SHAPE] = constants.SHAPE_CONNECTOR;
+        style[constants.STYLE_ENDARROW] = constants.ARROW_CLASSIC;
+        style[constants.STYLE_VERTICAL_ALIGN] = constants.ALIGN_MIDDLE;
+        style[constants.STYLE_ALIGN] = constants.ALIGN_CENTER;
+        style[constants.STYLE_STROKECOLOR] = '#289de9';
+        style[constants.STYLE_FONTCOLOR] = '#446299';
+
+        return style;
+    },
+
+    putDefaultVertexStyle: function (style) {
+        this.putCellStyle('defaultVertex', style);
+    },
+
+    putDefaultEdgeStyle: function (style) {
+        this.putCellStyle('defaultEdge', style);
+    },
+
+    getDefaultVertexStyle: function () {
+        return this.styles['defaultVertex'];
+    },
+
+    getDefaultEdgeStyle: function () {
+        return this.styles['defaultEdge'];
+    },
+
+    putCellStyle: function (name, style) {
+        this.styles[name] = style;
+    },
+
+    getCellStyle: function (name, defaultStyle) {
+        var style = defaultStyle;
+
+        if (name != null && name.length > 0) {
+            var pairs = name.split(';');
+
+            if (style && name.charAt(0) != ';') {
+                style = mxUtils.clone(style);
+            }
+            else {
+                style = {};
+            }
+
+            // Parses each key, value pair into the existing style
+            for (var i = 0; i < pairs.length; i++) {
+                var tmp = pairs[i];
+                var pos = tmp.indexOf('=');
+
+                if (pos >= 0) {
+                    var key = tmp.substring(0, pos);
+                    var value = tmp.substring(pos + 1);
+
+                    if (value == constants.NONE) {
+                        delete style[key];
+                    }
+                    else if (utils.isNumeric(value)) {
+                        style[key] = parseFloat(value);
+                    }
+                    else {
+                        style[key] = value;
+                    }
+                }
+                else {
+                    // Merges the entries from a named style
+                    var tmpStyle = this.styles[tmp];
+
+                    if (tmpStyle != null) {
+                        for (var key in tmpStyle) {
+                            style[key] = tmpStyle[key];
+                        }
+                    }
+                }
+            }
+        }
+
+        return style;
+    }
+});
+
+});
+define('PaneJS/cells/Node',['require','exports','module','PaneJS/Cell'],function (require, exports, module) {var Cell = require('PaneJS/Cell');
+
+module.exports = Cell.extend({
+
+    isNode: true,
+
+    constructor: function Node(value, geometry, style) {
+        this.getSupclass().constructor.call(this, value, geometry, style);
+    }
+});
 
 });
 define('PaneJS/shapes/Shape',['require','exports','module','../Base','../common/utils','../constants','../Point','../Rectangle','../Canvas2D'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
@@ -9527,6 +8946,2015 @@ var Shape = Base.extend({
 module.exports = Shape;
 
 });
+define('PaneJS/shapes/Stencil',['require','exports','module','../common/class','../ConnectionConstraint','../Point','../Rectangle','../constants','../resources','./stencilRegistry','../common/utils'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
+var Class = require('../common/class');
+var ConnectionConstraint = require('../ConnectionConstraint');
+var Point = require('../Point');
+var Rectangle = require('../Rectangle');
+var constants = require('../constants');
+var resources = require('../resources');
+var stencilRegistry = require('./stencilRegistry');
+var utils = require('../common/utils');
+
+var Stencil = Class.create({
+    constructor: function Stencil(desc) {
+        this.desc = desc;
+        this.parseDescription();
+        this.parseConstraints();
+    },
+
+    aspect      : null,
+    bgNode      : null,
+    constraints : null,
+    desc        : null,
+    fgNode      : null,
+    h0          : null,
+    strokewidth : null,
+    w0          : null,
+
+    parseDescription: function () {
+        // LATER: Preprocess nodes for faster painting
+        this.fgNode = this.desc.getElementsByTagName('foreground')[0];
+        this.bgNode = this.desc.getElementsByTagName('background')[0];
+        this.w0 = Number(this.desc.getAttribute('w') || 100);
+        this.h0 = Number(this.desc.getAttribute('h') || 100);
+
+        // Possible values for aspect are: variable and fixed where
+        // variable means fill the available space and fixed means
+        // use w0 and h0 to compute the aspect.
+        var aspect = this.desc.getAttribute('aspect');
+        this.aspect = (aspect !== null) ? aspect : 'variable';
+
+        // Possible values for strokewidth are all numbers and "inherit"
+        // where the inherit means take the value from the style (ie. the
+        // user-defined stroke-width). Note that the strokewidth is scaled
+        // by the minimum scaling that is used to draw the shape (sx, sy).
+        var sw = this.desc.getAttribute('strokewidth');
+        this.strokewidth = (sw !== null) ? sw : '1';
+    },
+
+    parseConstraints: function () {
+        var conns = this.desc.getElementsByTagName('connections')[0];
+
+        if (conns !== null) {
+            var tmp = utils.getChildNodes(conns);
+
+            if (tmp !== null && tmp.length > 0) {
+                this.constraints = [];
+
+                for (var i = 0; i < tmp.length; i++) {
+                    this.constraints.push(this.parseConstraint(tmp[i]));
+                }
+            }
+        }
+    },
+
+    parseConstraint: function (node) {
+        var x = Number(node.getAttribute('x'));
+        var y = Number(node.getAttribute('y'));
+        var perimeter = node.getAttribute('perimeter') === '1';
+
+        return new ConnectionConstraint(new Point(x, y), perimeter);
+    },
+
+    evaluateTextAttribute: function (node, attribute, state) {
+        var result = this.evaluateAttribute(node, attribute, state);
+        var loc = node.getAttribute('localized');
+
+        if ((Stencil.defaultLocalized && loc === null) || loc === '1') {
+            result = resources.get(result);
+        }
+
+        return result;
+    },
+
+    evaluateAttribute: function (node, attribute, shape) {
+        var result = node.getAttribute(attribute);
+
+        if (result === null) {
+            var text = utils.getTextContent(node);
+
+            if (text !== null && Stencil.allowEval) {
+                var funct = utils.eval(text);
+
+                if (typeof(funct) === 'function') {
+                    result = funct(shape);
+                }
+            }
+        }
+
+        return result;
+    },
+
+    drawShape: function (canvas, shape, x, y, w, h) {
+        // TODO: Internal structure (array of special structs?), relative and absolute
+        // coordinates (eg. note shape, process vs star, actor etc.), text rendering
+        // and non-proportional scaling, how to implement pluggable edge shapes
+        // (start, segment, end blocks), pluggable markers, how to implement
+        // swimlanes (title area) with this API, add icon, horizontal/vertical
+        // label, indicator for all shapes, rotation
+        this.drawChildren(canvas, shape, x, y, w, h, this.bgNode, false);
+        this.drawChildren(canvas, shape, x, y, w, h, this.fgNode, true);
+    },
+
+    drawChildren: function (canvas, shape, x, y, w, h, node, disableShadow) {
+        if (node !== null && w > 0 && h > 0) {
+            var direction = utils.getValue(shape.style, constants.STYLE_DIRECTION, null);
+            var aspect = this.computeAspect(shape.style, x, y, w, h, direction);
+            var minScale = Math.min(aspect.width, aspect.height);
+            var sw = (this.strokewidth === 'inherit') ?
+                Number(utils.getNumber(shape.style, constants.STYLE_STROKEWIDTH, 1)) :
+            Number(this.strokewidth) * minScale;
+            canvas.setStrokeWidth(sw);
+
+            var tmp = node.firstChild;
+
+            while (tmp !== null) {
+                if (tmp.nodeType === constants.NODETYPE_ELEMENT) {
+                    this.drawNode(canvas, shape, tmp, aspect, disableShadow);
+                }
+
+                tmp = tmp.nextSibling;
+            }
+        }
+    },
+
+    computeAspect: function (shape, x, y, w, h, direction) {
+        var x0 = x;
+        var y0 = y;
+        var sx = w / this.w0;
+        var sy = h / this.h0;
+
+        var inverse = (direction === constants.DIRECTION_NORTH || direction === constants.DIRECTION_SOUTH);
+
+        if (inverse) {
+            sy = w / this.h0;
+            sx = h / this.w0;
+
+            var delta = (w - h) / 2;
+
+            x0 += delta;
+            y0 -= delta;
+        }
+
+        if (this.aspect === 'fixed') {
+            sy = Math.min(sx, sy);
+            sx = sy;
+
+            // Centers the shape inside the available space
+            if (inverse) {
+                x0 += (h - this.w0 * sx) / 2;
+                y0 += (w - this.h0 * sy) / 2;
+            }
+            else {
+                x0 += (w - this.w0 * sx) / 2;
+                y0 += (h - this.h0 * sy) / 2;
+            }
+        }
+
+        return new Rectangle(x0, y0, sx, sy);
+    },
+
+    drawNode: function (canvas, shape, node, aspect, disableShadow) {
+        var name = node.nodeName;
+        var x0 = aspect.x;
+        var y0 = aspect.y;
+        var sx = aspect.width;
+        var sy = aspect.height;
+        var minScale = Math.min(sx, sy);
+
+        if (name === 'save') {
+            canvas.save();
+        }
+        else if (name === 'restore') {
+            canvas.restore();
+        }
+        else if (name === 'path') {
+            canvas.begin();
+
+            // Renders the elements inside the given path
+            var childNode = node.firstChild;
+
+            while (childNode !== null) {
+                if (childNode.nodeType === constants.NODETYPE_ELEMENT) {
+                    this.drawNode(canvas, shape, childNode, aspect, disableShadow);
+                }
+
+                childNode = childNode.nextSibling;
+            }
+        }
+        else if (name === 'close') {
+            canvas.close();
+        }
+        else if (name === 'move') {
+            canvas.moveTo(x0 + Number(node.getAttribute('x')) * sx, y0 + Number(node.getAttribute('y')) * sy);
+        }
+        else if (name === 'line') {
+            canvas.lineTo(x0 + Number(node.getAttribute('x')) * sx, y0 + Number(node.getAttribute('y')) * sy);
+        }
+        else if (name === 'quad') {
+            canvas.quadTo(x0 + Number(node.getAttribute('x1')) * sx,
+                y0 + Number(node.getAttribute('y1')) * sy,
+                x0 + Number(node.getAttribute('x2')) * sx,
+                y0 + Number(node.getAttribute('y2')) * sy);
+        }
+        else if (name === 'curve') {
+            canvas.curveTo(x0 + Number(node.getAttribute('x1')) * sx,
+                y0 + Number(node.getAttribute('y1')) * sy,
+                x0 + Number(node.getAttribute('x2')) * sx,
+                y0 + Number(node.getAttribute('y2')) * sy,
+                x0 + Number(node.getAttribute('x3')) * sx,
+                y0 + Number(node.getAttribute('y3')) * sy);
+        }
+        else if (name === 'arc') {
+            canvas.arcTo(Number(node.getAttribute('rx')) * sx,
+                Number(node.getAttribute('ry')) * sy,
+                Number(node.getAttribute('x-axis-rotation')),
+                Number(node.getAttribute('large-arc-flag')),
+                Number(node.getAttribute('sweep-flag')),
+                x0 + Number(node.getAttribute('x')) * sx,
+                y0 + Number(node.getAttribute('y')) * sy);
+        }
+        else if (name === 'rect') {
+            canvas.rect(x0 + Number(node.getAttribute('x')) * sx,
+                y0 + Number(node.getAttribute('y')) * sy,
+                Number(node.getAttribute('w')) * sx,
+                Number(node.getAttribute('h')) * sy);
+        }
+        else if (name === 'roundrect') {
+            var arcsize = Number(node.getAttribute('arcsize'));
+
+            if (arcsize === 0) {
+                arcsize = constants.RECTANGLE_ROUNDING_FACTOR * 100;
+            }
+
+            var w = Number(node.getAttribute('w')) * sx;
+            var h = Number(node.getAttribute('h')) * sy;
+            var factor = Number(arcsize) / 100;
+            var r = Math.min(w * factor, h * factor);
+
+            canvas.roundrect(x0 + Number(node.getAttribute('x')) * sx,
+                y0 + Number(node.getAttribute('y')) * sy,
+                w, h, r, r);
+        }
+        else if (name === 'ellipse') {
+            canvas.ellipse(x0 + Number(node.getAttribute('x')) * sx,
+                y0 + Number(node.getAttribute('y')) * sy,
+                Number(node.getAttribute('w')) * sx,
+                Number(node.getAttribute('h')) * sy);
+        }
+        else if (name === 'image') {
+            if (!shape.outline) {
+                var src = this.evaluateAttribute(node, 'src', shape);
+
+                canvas.image(x0 + Number(node.getAttribute('x')) * sx,
+                    y0 + Number(node.getAttribute('y')) * sy,
+                    Number(node.getAttribute('w')) * sx,
+                    Number(node.getAttribute('h')) * sy,
+                    src, false, node.getAttribute('flipH') === '1',
+                    node.getAttribute('flipV') === '1');
+            }
+        }
+        else if (name === 'text') {
+            if (!shape.outline) {
+                var str = this.evaluateTextAttribute(node, 'str', shape);
+                var rotation = node.getAttribute('vertical') === '1' ? -90 : 0;
+
+                if (node.getAttribute('align-shape') === '0') {
+                    var dr = shape.rotation;
+
+                    // Depends on flipping
+                    var flipH = utils.getValue(shape.style, constants.STYLE_FLIPH, 0) === 1;
+                    var flipV = utils.getValue(shape.style, constants.STYLE_FLIPV, 0) === 1;
+
+                    if (flipH && flipV) {
+                        rotation -= dr;
+                    }
+                    else if (flipH || flipV) {
+                        rotation += dr;
+                    }
+                    else {
+                        rotation -= dr;
+                    }
+                }
+
+                rotation -= node.getAttribute('rotation');
+
+                canvas.text(x0 + Number(node.getAttribute('x')) * sx,
+                    y0 + Number(node.getAttribute('y')) * sy,
+                    0, 0, str, node.getAttribute('align') || 'left',
+                    node.getAttribute('valign') || 'top', false, '',
+                    null, false, rotation);
+            }
+        }
+        else if (name === 'include-shape') {
+            var stencil = stencilRegistry.getStencil(node.getAttribute('name'));
+
+            if (stencil !== null) {
+                var x = x0 + Number(node.getAttribute('x')) * sx;
+                var y = y0 + Number(node.getAttribute('y')) * sy;
+                var w1 = Number(node.getAttribute('w')) * sx;
+                var h1 = Number(node.getAttribute('h')) * sy;
+
+                stencil.drawShape(canvas, shape, x, y, w1, h1);
+            }
+        }
+        else if (name === 'fillstroke') {
+            canvas.fillAndStroke();
+        }
+        else if (name === 'fill') {
+            canvas.fill();
+        }
+        else if (name === 'stroke') {
+            canvas.stroke();
+        }
+        else if (name === 'strokewidth') {
+            var s = (node.getAttribute('fixed') === '1') ? 1 : minScale;
+            canvas.setStrokeWidth(Number(node.getAttribute('width')) * s);
+        }
+        else if (name === 'dashed') {
+            canvas.setDashed(node.getAttribute('dashed') === '1');
+        }
+        else if (name === 'dashpattern') {
+            var value = node.getAttribute('pattern');
+
+            if (value !== null) {
+                var tmp = value.split(' ');
+                var pat = [];
+
+                for (var i = 0; i < tmp.length; i++) {
+                    if (tmp[i].length > 0) {
+                        pat.push(Number(tmp[i]) * minScale);
+                    }
+                }
+
+                value = pat.join(' ');
+                canvas.setDashPattern(value);
+            }
+        }
+        else if (name === 'strokecolor') {
+            canvas.setStrokeColor(node.getAttribute('color'));
+        }
+        else if (name === 'linecap') {
+            canvas.setLineCap(node.getAttribute('cap'));
+        }
+        else if (name === 'linejoin') {
+            canvas.setLineJoin(node.getAttribute('join'));
+        }
+        else if (name === 'miterlimit') {
+            canvas.setMiterLimit(Number(node.getAttribute('limit')));
+        }
+        else if (name === 'fillcolor') {
+            canvas.setFillColor(node.getAttribute('color'));
+        }
+        else if (name === 'alpha') {
+            canvas.setAlpha(node.getAttribute('alpha'));
+        }
+        else if (name === 'fontcolor') {
+            canvas.setFontColor(node.getAttribute('color'));
+        }
+        else if (name === 'fontstyle') {
+            canvas.setFontStyle(node.getAttribute('style'));
+        }
+        else if (name === 'fontfamily') {
+            canvas.setFontFamily(node.getAttribute('family'));
+        }
+        else if (name === 'fontsize') {
+            canvas.setFontSize(Number(node.getAttribute('size')) * minScale);
+        }
+
+        if (disableShadow && (name === 'fillstroke' || name === 'fill' || name === 'stroke')) {
+            disableShadow = false;
+            canvas.setShadow(false);
+        }
+    },
+
+});
+
+Stencil.allowEval = true;
+Stencil.defaultLocalized = false;
+
+module.exports = Stencil;
+
+
+});
+define('PaneJS/View',['require','exports','module','PaneJS/common/class','PaneJS/events/Event','PaneJS/common/Dictionary','PaneJS/common/utils','PaneJS/common/detector','PaneJS/constants','PaneJS/Point','PaneJS/Rectangle','PaneJS/CellState','PaneJS/events/MouseEvent','PaneJS/events/domEvent','PaneJS/events/eventNames'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: false */
+/* global document */
+
+'use strict';
+
+var Class = require('PaneJS/common/class');
+var Event = require('PaneJS/events/Event');
+var Dictionary = require('PaneJS/common/Dictionary');
+var utils = require('PaneJS/common/utils');
+var detector = require('PaneJS/common/detector');
+var constants = require('PaneJS/constants');
+var Point = require('PaneJS/Point');
+var Rectangle = require('PaneJS/Rectangle');
+var CellState = require('PaneJS/CellState');
+var MouseEvent = require('PaneJS/events/MouseEvent');
+var domEvent = require('PaneJS/events/domEvent');
+var eventNames = require('PaneJS/events/eventNames');
+
+var each = utils.each;
+var isNullOrUndefined = utils.isNullOrUndefined;
+var getValue = utils.getValue;
+
+module.exports = Class.create({
+
+    Implements: Event,
+
+    // 属性
+    // ----
+
+    graph: null,
+
+    EMPTY_POINT: new Point(),
+    // 国际化
+    doneResource: '',
+    updatingDocumentResource: '',
+
+    allowEval: true,
+    captureDocumentGesture: true,
+    optimizeVmlReflows: true,
+
+    rendering: true,
+    currentRoot: null,
+    graphBounds: null,
+    scale: 1,
+    translate: null,
+    updateStyle: false,
+    lastNode: null,
+    lastHtmlNode: null,
+    lastForegroundNode: null,
+    lastForegroundHtmlNode: null,
+
+    constructor: function View(graph) {
+
+        var that = this;
+
+        that.graph = graph || null;
+        that.translate = new Point();
+        that.graphBounds = new Rectangle();
+        that.states = new Dictionary();
+    },
+
+    init: function () {
+        return this.installListeners().createSvg();
+    },
+
+    getGraphBounds: function () {
+        return this.graphBounds;
+    },
+
+    setGraphBounds: function (value) {
+        this.graphBounds = value;
+    },
+
+    getBounds: function (cells) {
+
+        var that = this;
+        var result = null;
+
+        if (!cells || !cells.length) {
+            return result;
+        }
+
+        var model = that.graph.getModel();
+
+        each(cells, function (cell) {
+
+            if (model.isVertex(cell) || model.isEdge(cell)) {
+
+                var state = that.getState(cell);
+
+                if (state) {
+
+                    var rect = new Rectangle(state.x, state.y, state.width, state.height);
+
+                    if (result) {
+                        result.add(rect);
+                    } else {
+                        result = rect;
+                    }
+                }
+            }
+        });
+
+        return result;
+    },
+
+    setCurrentRoot: function (root) {
+        if (this.currentRoot !== root) {
+            var change = new CurrentRootChange(this, root);
+            change.execute();
+            var edit = new mxUndoableEdit(this, false);
+            edit.add(change);
+            this.fireEvent(new EventObject(mxEvent.UNDO, 'edit', edit));
+            this.graph.sizeDidChange();
+        }
+
+        return root;
+    },
+
+    scaleAndTranslate: function (scale, dx, dy) {
+
+        var that = this;
+        var ts = that.translate;
+        var previousScale = that.scale;
+        var previousTranslate = new Point(ts.x, ts.y);
+
+        if (previousScale !== scale || ts.x !== dx || ts.y !== dy) {
+
+            that.scale = scale;
+
+            that.translate.x = dx;
+            that.translate.y = dy;
+
+            if (that.isEventEnabled()) {
+                that.revalidate();
+                that.graph.sizeDidChange();
+            }
+        }
+
+        that.fireEvent(new EventObject(mxEvent.SCALE_AND_TRANSLATE,
+            'scale', scale, 'previousScale', previousScale,
+            'translate', that.translate, 'previousTranslate', previousTranslate));
+    },
+
+    getScale: function () {
+        return this.scale;
+    },
+
+    setScale: function (scale) {
+
+        var that = this;
+        var previousScale = that.scale;
+
+        if (previousScale !== scale) {
+            that.scale = scale;
+
+            if (that.isEventEnabled()) {
+                that.revalidate();
+                that.graph.sizeDidChange();
+            }
+        }
+
+        //that.fireEvent(new EventObject('scale',
+        //    'scale', scale, 'previousScale', previousScale));
+    },
+
+    getTranslate: function () {
+        return this.translate;
+    },
+
+    setTranslate: function (dx, dy) {
+
+        var that = this;
+        var translate = that.translate;
+        var previousTranslate = new Point(translate.x, translate.y);
+
+        if (translate.x !== dx || translate.y !== dy) {
+            translate.x = dx;
+            translate.y = dy;
+
+            if (that.isEventEnabled()) {
+                that.revalidate();
+                that.graph.sizeDidChange();
+            }
+        }
+
+        //that.fireEvent(new EventObject(mxEvent.TRANSLATE,
+        //    'translate', translate, 'previousTranslate', previousTranslate));
+    },
+
+    refresh: function () {
+
+        var that = this;
+
+        if (that.currentRoot) {
+            that.clear();
+        }
+
+        that.revalidate();
+
+        return that;
+    },
+
+    revalidate: function () {
+
+        var that = this;
+
+        that.invalidate();
+        that.validate();
+
+        return that;
+    },
+
+    clear: function (cell, force, recurse) {
+
+        var that = this;
+        var model = that.graph.getModel();
+
+        cell = cell || model.getRoot();
+        force = !isNullOrUndefined(force) ? force : false;
+        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+
+        that.removeState(cell);
+
+        if (recurse && (force || cell !== that.currentRoot)) {
+
+            var childCount = model.getChildCount(cell);
+
+            for (var i = 0; i < childCount; i++) {
+                that.clear(model.getChildAt(cell, i), force);
+            }
+        } else {
+            that.invalidate(cell);
+        }
+    },
+
+    invalidate: function (cell, recurse, includeEdges) {
+
+        var that = this;
+        var model = that.graph.getModel();
+
+        cell = cell || model.getRoot();
+        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+        includeEdges = !isNullOrUndefined(includeEdges) ? includeEdges : true;
+
+        var state = that.getState(cell);
+
+        if (state) {
+            state.invalid = true;
+        }
+
+        // Avoids infinite loops for invalid graphs
+        if (!cell.invalidating) {
+            cell.invalidating = true;
+
+            if (recurse) {
+                var childCount = model.getChildCount(cell);
+
+                for (var i = 0; i < childCount; i++) {
+                    var child = model.getChildAt(cell, i);
+                    that.invalidate(child, recurse, includeEdges);
+                }
+            }
+
+            if (includeEdges) {
+                var edgeCount = model.getEdgeCount(cell);
+
+                for (var i = 0; i < edgeCount; i++) {
+                    that.invalidate(model.getEdgeAt(cell, i), recurse, includeEdges);
+                }
+            }
+
+            delete cell.invalidating;
+        }
+    },
+
+    //
+    validate: function (cell) {
+
+        var that = this;
+
+        if (!cell) {
+            cell = that.currentRoot || that.graph.getModel().getRoot();
+        }
+
+        that.resetValidationState();
+
+        that.validateCell(cell);
+        var state = that.validateCellState(cell);
+        var graphBounds = that.getBoundingBox(state);
+
+        that.setGraphBounds(graphBounds || that.getEmptyBounds());
+        that.validateBackground();
+        that.resetValidationState();
+    },
+
+    // 创建或移除 cell 对应的 state
+    validateCell: function (cell, visible) {
+
+        var that = this;
+
+        if (!cell) {
+            return cell;
+        }
+
+        visible = !isNullOrUndefined(visible) ? visible : true;
+        visible = visible && that.graph.isCellVisible(cell);
+
+        var state = that.getState(cell, visible);
+
+        if (state && !visible) {
+            that.removeState(cell);
+        } else {
+
+            var model = that.graph.getModel();
+            var childCount = model.getChildCount(cell);
+
+            for (var i = 0; i < childCount; i++) {
+                this.validateCell(model.getChildAt(cell, i), visible &&
+                    (!this.isCellCollapsed(cell) || cell == this.currentRoot));
+            }
+        }
+
+        return cell;
+    },
+
+    validateCellState: function (cell, recurse) {
+
+        var view = this;
+        var state = null;
+
+        if (!cell) {
+            return state;
+        }
+
+        state = view.getState(cell);
+
+        if (!state) {
+            return state;
+        }
+
+        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+
+        var model = view.graph.getModel();
+
+        if (state.invalid) {
+            state.invalid = false;
+
+            if (cell !== this.currentRoot) {
+                this.validateCellState(model.getParent(cell), false);
+            }
+
+            // 连线
+            var source = this.getVisibleTerminal(cell, true);
+            var target = this.getVisibleTerminal(cell, false);
+            var sourceState = this.validateCellState(source, false);
+            var targetState = this.validateCellState(target, false);
+            state.setVisibleTerminalState(sourceState, true);
+            state.setVisibleTerminalState(targetState, false);
+
+            // 关键代码，更新 state 的大小、位置信息
+            this.updateCellState(state);
+
+            // Repaint happens immediately after the cell is validated
+            if (cell !== this.currentRoot) {
+                this.graph.cellRenderer.redraw(state, false, this.isRendering());
+            }
+        }
+
+        if (recurse) {
+            state.updateCachedBounds();
+
+            // Updates order in DOM if recursively traversing
+            if (state.shape) {
+                this.stateValidated(state);
+            }
+
+            var childCount = model.getChildCount(cell);
+
+            for (var i = 0; i < childCount; i++) {
+                this.validateCellState(model.getChildAt(cell, i));
+            }
+        }
+
+        return state;
+    },
+
+    getBoundingBox: function (state, recurse) {
+
+        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+
+        var bbox = null;
+
+        if (isNullOrUndefined(state)) {
+            return bbox;
+        }
+
+        if (state.shape && state.shape.boundingBox) {
+            bbox = state.shape.boundingBox.clone();
+        }
+
+        // Adds label bounding box to graph bounds
+        if (state.text && state.text.boundingBox) {
+            if (bbox) {
+                bbox.add(state.text.boundingBox);
+            } else {
+                bbox = state.text.boundingBox.clone();
+            }
+        }
+
+        if (recurse) {
+            var model = this.graph.getModel();
+            var childCount = model.getChildCount(state.cell);
+
+            for (var i = 0; i < childCount; i++) {
+                var bounds = this.getBoundingBox(this.getState(model.getChildAt(state.cell, i)));
+
+                if (bounds != null) {
+                    if (bbox == null) {
+                        bbox = bounds;
+                    }
+                    else {
+                        bbox.add(bounds);
+                    }
+                }
+            }
+        }
+
+        return bbox;
+    },
+
+    getEmptyBounds: function () {
+        var view = this;
+        var translate = view.translate;
+        var scale = view.scale;
+
+        return new Rectangle(translate.x * scale, translate.y * scale);
+    },
+
+    // BackgroundPage
+    // ---------------
+    createBackgroundPageShape: function (bounds) {
+        return new RectangleShape(bounds, 'white', 'black');
+    },
+
+    validateBackground: function () {
+        this.validateBackgroundImage();
+        this.validateBackgroundPage();
+    },
+
+    validateBackgroundImage: function () {
+        var bg = this.graph.getBackgroundImage();
+
+        if (bg) {
+            if (this.backgroundImage == null || this.backgroundImage.image != bg.src) {
+                if (this.backgroundImage) {
+                    this.backgroundImage.destroy();
+                }
+
+                var bounds = new Rectangle(0, 0, 1, 1);
+
+                this.backgroundImage = new ImageShape(bounds, bg.src);
+                this.backgroundImage.dialect = this.graph.dialect;
+                this.backgroundImage.init(this.backgroundPane);
+                this.backgroundImage.redraw();
+
+                // Workaround for ignored event on background in IE8 standards mode
+                if (document.documentMode == 8 && !mxClient.IS_EM) {
+                    mxEvent.addGestureListeners(this.backgroundImage.node,
+                        utils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
+                        }),
+                        utils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
+                        }),
+                        utils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
+                        })
+                    );
+                }
+            }
+
+            this.redrawBackgroundImage(this.backgroundImage, bg);
+        }
+        else if (this.backgroundImage != null) {
+            this.backgroundImage.destroy();
+            this.backgroundImage = null;
+        }
+    },
+
+    validateBackgroundPage: function () {},
+
+    getBackgroundPageBounds: function () {
+        var view = this;
+        var scale = view.scale;
+        var translate = view.translate;
+        var fmt = view.graph.pageFormat;
+        var ps = scale * view.graph.pageScale;
+
+        return new Rectangle(scale * translate.x, scale * translate.y, fmt.width * ps, fmt.height * ps);
+    },
+
+    redrawBackgroundImage: function (backgroundImage, bg) {
+        backgroundImage.scale = this.scale;
+        backgroundImage.bounds.x = this.scale * this.translate.x;
+        backgroundImage.bounds.y = this.scale * this.translate.y;
+        backgroundImage.bounds.width = this.scale * bg.width;
+        backgroundImage.bounds.height = this.scale * bg.height;
+
+        backgroundImage.redraw();
+    },
+
+
+    // update cell state
+    // -----------------
+    updateCellState: function (state) {
+        state.absoluteOffset.x = 0;
+        state.absoluteOffset.y = 0;
+        state.origin.x = 0;
+        state.origin.y = 0;
+        state.length = 0;
+
+        if (state.cell !== this.currentRoot) {
+            var model = this.graph.getModel();
+            var pState = this.getState(model.getParent(state.cell));
+
+            if (pState != null && pState.cell != this.currentRoot) {
+                state.origin.x += pState.origin.x;
+                state.origin.y += pState.origin.y;
+            }
+
+            var offset = this.graph.getChildOffsetForCell(state.cell);
+
+            if (offset != null) {
+                state.origin.x += offset.x;
+                state.origin.y += offset.y;
+            }
+
+            var geo = this.graph.getCellGeometry(state.cell);
+
+            if (geo) {
+                if (!model.isEdge(state.cell)) {
+                    offset = geo.offset || this.EMPTY_POINT;
+
+                    if (geo.relative && pState != null) {
+                        if (model.isEdge(pState.cell)) {
+                            var origin = this.getPoint(pState, geo);
+
+                            if (origin != null) {
+                                state.origin.x += (origin.x / this.scale) - pState.origin.x - this.translate.x;
+                                state.origin.y += (origin.y / this.scale) - pState.origin.y - this.translate.y;
+                            }
+                        }
+                        else {
+                            state.origin.x += geo.x * pState.width / this.scale + offset.x;
+                            state.origin.y += geo.y * pState.height / this.scale + offset.y;
+                        }
+                    }
+                    else {
+                        state.absoluteOffset.x = this.scale * offset.x;
+                        state.absoluteOffset.y = this.scale * offset.y;
+                        state.origin.x += geo.x;
+                        state.origin.y += geo.y;
+                    }
+                }
+
+                // 设置 scale 和 translate 之后的 x, y, w, h
+                state.x = this.scale * (this.translate.x + state.origin.x);
+                state.y = this.scale * (this.translate.y + state.origin.y);
+                state.width = this.scale * geo.width;
+                state.height = this.scale * geo.height;
+
+                if (model.isVertex(state.cell)) {
+                    this.updateVertexState(state, geo);
+                }
+
+                if (model.isEdge(state.cell)) {
+                    this.updateEdgeState(state, geo);
+                }
+            }
+        }
+    },
+
+    isCellCollapsed: function (cell) {
+        return this.graph.isCellCollapsed(cell);
+    },
+
+    updateVertexState: function (state, geo) {
+        var model = this.graph.getModel();
+        var pState = this.getState(model.getParent(state.cell));
+
+        if (geo.relative && pState && !model.isEdge(pState.cell)) {
+            var alpha = utils.toRadians(pState.style[constants.STYLE_ROTATION] || '0');
+
+            if (alpha != 0) {
+                var cos = Math.cos(alpha);
+                var sin = Math.sin(alpha);
+
+                var ct = new Point(state.getCenterX(), state.getCenterY());
+                var cx = new Point(pState.getCenterX(), pState.getCenterY());
+                var pt = Point.getRotatedPoint(ct, cos, sin, cx);
+                state.x = pt.x - state.width / 2;
+                state.y = pt.y - state.height / 2;
+            }
+        }
+
+        this.updateVertexLabelOffset(state);
+    },
+
+    updateEdgeState: function (linkState, geo) {
+        var sourceState = linkState.getVisibleTerminalState(true);
+        var targetState = linkState.getVisibleTerminalState(false);
+
+        // This will remove edges with no terminals and no terminal points
+        // as such edges are invalid and produce NPEs in the edge styles.
+        // Also removes connected edges that have no visible terminals.
+        if ((this.graph.model.getTerminal(linkState.cell, true) && sourceState == null) ||
+            (sourceState == null && geo.getTerminalPoint(true) == null) ||
+            (this.graph.model.getTerminal(linkState.cell, false) && targetState == null) ||
+            (targetState == null && geo.getTerminalPoint(false) == null)) {
+            this.clear(linkState.cell, true);
+        }
+        else {
+            this.updateFixedTerminalPoints(linkState, sourceState, targetState);
+            this.updatePoints(linkState, geo.points, sourceState, targetState);
+            this.updateFloatingTerminalPoints(linkState, sourceState, targetState);
+
+            var pts = linkState.absolutePoints;
+
+            if (linkState.cell != this.currentRoot && (pts == null || pts.length < 2 ||
+                pts[0] == null || pts[pts.length - 1] == null)) {
+                // This will remove edges with invalid points from the list of states in the view.
+                // Happens if the one of the terminals and the corresponding terminal point is null.
+                this.clear(linkState.cell, true);
+            }
+            else {
+                this.updateEdgeBounds(linkState);
+                this.updateEdgeLabelOffset(linkState);
+            }
+        }
+    },
+
+    // 更新 state.absoluteOffset
+    updateVertexLabelOffset: function (state) {
+        var h = getValue(state.style, constants.STYLE_LABEL_POSITION, constants.ALIGN_CENTER);
+
+        if (h == constants.ALIGN_LEFT) {
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+
+            if (lw != null) {
+                lw *= this.scale;
+            }
+            else {
+                lw = state.width;
+            }
+
+            state.absoluteOffset.x -= lw;
+        }
+        else if (h == constants.ALIGN_RIGHT) {
+            state.absoluteOffset.x += state.width;
+        }
+        else if (h == constants.ALIGN_CENTER) {
+            var lw = getValue(state.style, constants.STYLE_LABEL_WIDTH, null);
+
+            if (lw != null) {
+                // Aligns text block with given width inside the vertex width
+                var align = getValue(state.style, constants.STYLE_ALIGN, constants.ALIGN_CENTER);
+                var dx = 0;
+
+                if (align == constants.ALIGN_CENTER) {
+                    dx = 0.5;
+                }
+                else if (align == constants.ALIGN_RIGHT) {
+                    dx = 1;
+                }
+
+                if (dx != 0) {
+                    state.absoluteOffset.x -= (lw * this.scale - state.width) * dx;
+                }
+            }
+        }
+
+        var v = getValue(state.style, constants.STYLE_VERTICAL_LABEL_POSITION, constants.ALIGN_MIDDLE);
+
+        if (v == constants.ALIGN_TOP) {
+            state.absoluteOffset.y -= state.height;
+        }
+        else if (v == constants.ALIGN_BOTTOM) {
+            state.absoluteOffset.y += state.height;
+        }
+    },
+
+    resetValidationState: function () {
+        this.lastNode = null;
+        this.lastHtmlNode = null;
+        this.lastForegroundNode = null;
+        this.lastForegroundHtmlNode = null;
+    },
+
+    stateValidated: function (state) {
+
+    },
+
+    updateFixedTerminalPoints: function (linkState, sourceState, targetState) {
+        this.updateFixedTerminalPoint(linkState, sourceState, true, this.graph.getConnectionConstraint(linkState, sourceState, true));
+        this.updateFixedTerminalPoint(linkState, targetState, false, this.graph.getConnectionConstraint(linkState, targetState, false));
+    },
+
+    updateFixedTerminalPoint: function (linkState, terminalState, isSource, constraint) {
+        var pt = null;
+
+        if (constraint) {
+            pt = this.graph.getConnectionPoint(terminalState, constraint);
+        }
+
+        if (pt == null && terminalState == null) {
+            var origin = linkState.origin;
+            var scale = this.scale;
+            var translate = this.translate;
+            var geo = this.graph.getCellGeometry(linkState.cell);
+            pt = geo.getTerminalPoint(isSource);
+
+            if (pt != null) {
+                pt = new Point(scale * (translate.x + pt.x + origin.x),
+                    scale * (translate.y + pt.y + origin.y));
+            }
+        }
+
+        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    },
+
+    updatePoints: function (linkState, points, sourceState, targetState) {
+        if (linkState != null) {
+            var pts = [];
+            pts.push(linkState.absolutePoints[0]);
+            var edgeStyle = this.getEdgeStyle(linkState, points, sourceState, targetState);
+
+            if (edgeStyle != null) {
+                var src = this.getTerminalPort(linkState, sourceState, true);
+                var trg = this.getTerminalPort(linkState, targetState, false);
+
+                edgeStyle(linkState, src, trg, points, pts);
+            }
+            else if (points != null) {
+                for (var i = 0; i < points.length; i++) {
+                    if (points[i] != null) {
+                        var pt = utils.clone(points[i]);
+                        pts.push(this.transformControlPoint(linkState, pt));
+                    }
+                }
+            }
+
+            var tmp = linkState.absolutePoints;
+            pts.push(tmp[tmp.length - 1]);
+
+            linkState.absolutePoints = pts;
+        }
+    },
+
+    transformControlPoint: function (state, pt) {},
+
+    getEdgeStyle: function (linkState, points, sourceState, targetState) {
+        var edgeStyle = (sourceState && sourceState === targetState)
+            ? getValue(linkState.style, constants.STYLE_LOOP, this.graph.defaultLoopStyle)
+            : (!getValue(linkState.style, constants.STYLE_NOEDGESTYLE, false) ? linkState.style[constants.STYLE_EDGE] : null);
+
+        // Converts string values to objects
+        if (typeof(edgeStyle) == "string") {
+            var tmp = mxStyleRegistry.getValue(edgeStyle);
+
+            if (tmp == null && this.isAllowEval()) {
+                tmp = utils.eval(edgeStyle);
+            }
+
+            edgeStyle = tmp;
+        }
+
+        if (typeof(edgeStyle) == "function") {
+            return edgeStyle;
+        }
+
+        return null;
+    },
+
+    updateFloatingTerminalPoints: function (linkState, sourceState, targetState) {
+        var pts = linkState.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (pe == null && targetState != null) {
+            this.updateFloatingTerminalPoint(linkState, targetState, sourceState, false);
+        }
+
+        if (p0 == null && sourceState != null) {
+            this.updateFloatingTerminalPoint(linkState, sourceState, targetState, true);
+        }
+    },
+
+    // 获取连线与节点的连接点
+    updateFloatingTerminalPoint: function (linkState, start, end, isSource) {
+        start = this.getTerminalPort(linkState, start, isSource);
+        var next = this.getNextPoint(linkState, end, isSource);
+
+        var orth = this.graph.isOrthogonal(linkState);
+        var alpha = utils.toRadians(Number(start.style[constants.STYLE_ROTATION] || '0'));
+        var center = new Point(start.getCenterX(), start.getCenterY());
+
+        if (alpha != 0) {
+            var cos = Math.cos(-alpha);
+            var sin = Math.sin(-alpha);
+            next = Point.getRotatedPoint(next, cos, sin, center);
+        }
+
+        var border = parseFloat(linkState.style[constants.STYLE_PERIMETER_SPACING] || 0);
+        border += parseFloat(linkState.style[(isSource) ?
+                constants.STYLE_SOURCE_PERIMETER_SPACING :
+                constants.STYLE_TARGET_PERIMETER_SPACING] || 0);
+        var pt = this.getPerimeterPoint(start, next, alpha == 0 && orth, border);
+
+        if (alpha != 0) {
+            var cos = Math.cos(alpha);
+            var sin = Math.sin(alpha);
+            pt = Point.getRotatedPoint(pt, cos, sin, center);
+        }
+
+        linkState.setAbsoluteTerminalPoint(pt, isSource);
+    },
+
+    getTerminalPort: function (linkState, terminalState, isSource) {
+        var key = (isSource) ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+        var id = getValue(linkState.style, key);
+
+        if (id != null) {
+            var tmp = this.getState(this.graph.getModel().getCell(id));
+
+            // Only uses ports where a cell state exists
+            if (tmp != null) {
+                terminalState = tmp;
+            }
+        }
+
+        return terminalState;
+    },
+
+    // 获取周长路径上的点
+    getPerimeterPoint: function (terminal, next, orthogonal, border) {
+        var point = null;
+
+        if (terminal != null) {
+            var perimeter = this.getPerimeterFunction(terminal);
+
+            if (perimeter != null && next != null) {
+                var bounds = this.getPerimeterBounds(terminal, border);
+
+                if (bounds.width > 0 || bounds.height > 0) {
+                    point = perimeter(bounds, terminal, next, orthogonal);
+
+                    if (point != null) {
+                        point.x = Math.round(point.x);
+                        point.y = Math.round(point.y);
+                    }
+                }
+            }
+
+            if (point == null) {
+                point = this.getPoint(terminal);
+            }
+        }
+
+        return point;
+    },
+
+    getRoutingCenterX: function (state) {
+        var f = (state.style != null) ? parseFloat(state.style
+            [mxConstants.STYLE_ROUTING_CENTER_X]) || 0 : 0;
+
+        return state.getCenterX() + f * state.width;
+    },
+
+    getRoutingCenterY: function (state) {
+        var f = (state.style != null) ? parseFloat(state.style
+            [mxConstants.STYLE_ROUTING_CENTER_Y]) || 0 : 0;
+
+        return state.getCenterY() + f * state.height;
+    },
+
+    getPerimeterBounds: function (terminal, border) {
+        border = (border != null) ? border : 0;
+
+        if (terminal != null) {
+            border += parseFloat(terminal.style[constants.STYLE_PERIMETER_SPACING] || 0);
+        }
+
+        return terminal.getPerimeterBounds(border * this.scale);
+
+    },
+
+    getPerimeterFunction: function (state) {
+        var perimeter = state.style[constants.STYLE_PERIMETER];
+
+        // Converts string values to objects
+        if (typeof(perimeter) == "string") {
+            var tmp = mxStyleRegistry.getValue(perimeter);
+
+            if (tmp == null && this.isAllowEval()) {
+                tmp = utils.eval(perimeter);
+            }
+
+            perimeter = tmp;
+        }
+
+        if (typeof(perimeter) == "function") {
+            return perimeter;
+        }
+
+        return null;
+    },
+
+    getNextPoint: function (edge, opposite, source) {
+        var pts = edge.absolutePoints;
+        var point = null;
+
+        if (pts != null && pts.length >= 2) {
+            var count = pts.length;
+            point = pts[(source) ? Math.min(1, count - 1) : Math.max(0, count - 2)];
+        }
+
+        if (point == null && opposite != null) {
+            point = new Point(opposite.getCenterX(), opposite.getCenterY());
+        }
+
+        return point;
+    },
+    getVisibleTerminal: function (edge, source) {
+        var model = this.graph.getModel();
+        var result = model.getTerminal(edge, source);
+        var best = result;
+
+        while (result && result != this.currentRoot) {
+            if (!this.graph.isCellVisible(best) || this.isCellCollapsed(result)) {
+                best = result;
+            }
+
+            result = model.getParent(result);
+        }
+
+        // Checks if the result is not a layer
+        if (model.getParent(best) == model.getRoot()) {
+            best = null;
+        }
+
+        return best;
+    },
+    updateEdgeBounds: function (state) {
+        var points = state.absolutePoints;
+        var p0 = points[0];
+        var pe = points[points.length - 1];
+
+        if (p0.x != pe.x || p0.y != pe.y) {
+            var dx = pe.x - p0.x;
+            var dy = pe.y - p0.y;
+            state.terminalDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+        else {
+            state.terminalDistance = 0;
+        }
+
+        var length = 0;
+        var segments = [];
+        var pt = p0;
+
+        if (pt != null) {
+            var minX = pt.x;
+            var minY = pt.y;
+            var maxX = minX;
+            var maxY = minY;
+
+            for (var i = 1; i < points.length; i++) {
+                var tmp = points[i];
+
+                if (tmp != null) {
+                    var dx = pt.x - tmp.x;
+                    var dy = pt.y - tmp.y;
+
+                    var segment = Math.sqrt(dx * dx + dy * dy);
+                    segments.push(segment);
+                    length += segment;
+
+                    pt = tmp;
+
+                    minX = Math.min(pt.x, minX);
+                    minY = Math.min(pt.y, minY);
+                    maxX = Math.max(pt.x, maxX);
+                    maxY = Math.max(pt.y, maxY);
+                }
+            }
+
+            state.length = length;
+            state.segments = segments;
+
+            var markerSize = 1; // TODO: include marker size
+
+            state.x = minX;
+            state.y = minY;
+            state.width = Math.max(markerSize, maxX - minX);
+            state.height = Math.max(markerSize, maxY - minY);
+        }
+    },
+    getPoint: function (state, geometry) {
+        var x = state.getCenterX();
+        var y = state.getCenterY();
+
+        if (state.segments != null && (geometry == null || geometry.relative)) {
+            var gx = (geometry != null) ? geometry.x / 2 : 0;
+            var pointCount = state.absolutePoints.length;
+            var dist = (gx + 0.5) * state.length;
+            var segment = state.segments[0];
+            var length = 0;
+            var index = 1;
+
+            while (dist > length + segment && index < pointCount - 1) {
+                length += segment;
+                segment = state.segments[index++];
+            }
+
+            var factor = (segment == 0) ? 0 : (dist - length) / segment;
+            var p0 = state.absolutePoints[index - 1];
+            var pe = state.absolutePoints[index];
+
+            if (p0 != null && pe != null) {
+                var gy = 0;
+                var offsetX = 0;
+                var offsetY = 0;
+
+                if (geometry != null) {
+                    gy = geometry.y;
+                    var offset = geometry.offset;
+
+                    if (offset != null) {
+                        offsetX = offset.x;
+                        offsetY = offset.y;
+                    }
+                }
+
+                var dx = pe.x - p0.x;
+                var dy = pe.y - p0.y;
+                var nx = (segment == 0) ? 0 : dy / segment;
+                var ny = (segment == 0) ? 0 : dx / segment;
+
+                x = p0.x + dx * factor + (nx * gy + offsetX) * this.scale;
+                y = p0.y + dy * factor - (ny * gy - offsetY) * this.scale;
+            }
+        }
+        else if (geometry != null) {
+            var offset = geometry.offset;
+
+            if (offset != null) {
+                x += offset.x;
+                y += offset.y;
+            }
+        }
+
+        return new Point(x, y);
+    },
+    getRelativePoint: function (edgeState, x, y) {
+        var model = this.graph.getModel();
+        var geometry = model.getGeometry(edgeState.cell);
+
+        if (geometry != null) {
+            var pointCount = edgeState.absolutePoints.length;
+
+            if (geometry.relative && pointCount > 1) {
+                var totalLength = edgeState.length;
+                var segments = edgeState.segments;
+
+                // Works which line segment the point of the label is closest to
+                var p0 = edgeState.absolutePoints[0];
+                var pe = edgeState.absolutePoints[1];
+                var minDist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                var index = 0;
+                var tmp = 0;
+                var length = 0;
+
+                for (var i = 2; i < pointCount; i++) {
+                    tmp += segments[i - 2];
+                    pe = edgeState.absolutePoints[i];
+                    var dist = utils.ptSegDistSq(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                    if (dist <= minDist) {
+                        minDist = dist;
+                        index = i - 1;
+                        length = tmp;
+                    }
+
+                    p0 = pe;
+                }
+
+                var seg = segments[index];
+                p0 = edgeState.absolutePoints[index];
+                pe = edgeState.absolutePoints[index + 1];
+
+                var x2 = p0.x;
+                var y2 = p0.y;
+
+                var x1 = pe.x;
+                var y1 = pe.y;
+
+                var px = x;
+                var py = y;
+
+                var xSegment = x2 - x1;
+                var ySegment = y2 - y1;
+
+                px -= x1;
+                py -= y1;
+                var projlenSq = 0;
+
+                px = xSegment - px;
+                py = ySegment - py;
+                var dotprod = px * xSegment + py * ySegment;
+
+                if (dotprod <= 0.0) {
+                    projlenSq = 0;
+                }
+                else {
+                    projlenSq = dotprod * dotprod
+                        / (xSegment * xSegment + ySegment * ySegment);
+                }
+
+                var projlen = Math.sqrt(projlenSq);
+
+                if (projlen > seg) {
+                    projlen = seg;
+                }
+
+                var yDistance = Math.sqrt(utils.ptSegDistSq(p0.x, p0.y, pe
+                    .x, pe.y, x, y));
+                var direction = utils.relativeCcw(p0.x, p0.y, pe.x, pe.y, x, y);
+
+                if (direction == -1) {
+                    yDistance = -yDistance;
+                }
+
+                // Constructs the relative point for the label
+                return new Point(((totalLength / 2 - length - projlen) / totalLength) * -2,
+                    yDistance / this.scale);
+            }
+        }
+
+        return new Point();
+    },
+    updateEdgeLabelOffset: function (state) {
+        var points = state.absolutePoints;
+
+        state.absoluteOffset.x = state.getCenterX();
+        state.absoluteOffset.y = state.getCenterY();
+
+        if (points != null && points.length > 0 && state.segments != null) {
+            var geometry = this.graph.getCellGeometry(state.cell);
+
+            if (geometry.relative) {
+                var offset = this.getPoint(state, geometry);
+
+                if (offset != null) {
+                    state.absoluteOffset = offset;
+                }
+            }
+            else {
+                var p0 = points[0];
+                var pe = points[points.length - 1];
+
+                if (p0 != null && pe != null) {
+                    var dx = pe.x - p0.x;
+                    var dy = pe.y - p0.y;
+                    var x0 = 0;
+                    var y0 = 0;
+
+                    var off = geometry.offset;
+
+                    if (off != null) {
+                        x0 = off.x;
+                        y0 = off.y;
+                    }
+
+                    var x = p0.x + dx / 2 + x0 * this.scale;
+                    var y = p0.y + dy / 2 + y0 * this.scale;
+
+                    state.absoluteOffset.x = x;
+                    state.absoluteOffset.y = y;
+                }
+            }
+        }
+    },
+
+    getState: function (cell, create) {
+
+        var that = this;
+        var state = null;
+
+        if (!cell) {
+            return state;
+        }
+
+        create = create || false;
+
+        state = that.states.get(cell);
+
+        if (create && (!state || that.updateStyle) && that.graph.isCellVisible(cell)) {
+            if (!state) {
+                state = that.createState(cell);
+                that.states.set(cell, state);
+            } else { // updateStyle
+                state.style = that.graph.getCellStyle(cell);
+            }
+        }
+
+        return state;
+    },
+
+    createState: function (cell) {
+        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
+        var model = this.graph.getModel();
+
+        if (state.view.graph.container != null && state.cell != state.view.currentRoot &&
+            (model.isVertex(state.cell) || model.isEdge(state.cell))) {
+            // 根据 state 中的样式，初始化 state 对应的 shape
+            this.graph.cellRenderer.createShape(state);
+        }
+
+        return state;
+    },
+
+    isRendering: function () {
+        return this.rendering;
+    },
+
+    setRendering: function (value) {
+        this.rendering = value;
+    },
+
+    isAllowEval: function () {
+        return this.allowEval;
+    },
+
+    setAllowEval: function (value) {
+        this.allowEval = value;
+    },
+
+    getStates: function () {
+        return this.states;
+    },
+
+    setStates: function (value) {
+        this.states = value;
+    },
+
+    getCellStates: function (cells) {
+        if (isNullOrUndefined(cells)) {
+            return this.states;
+        } else {
+            var result = [];
+
+            for (var i = 0; i < cells.length; i++) {
+                var state = this.getState(cells[i]);
+
+                if (state != null) {
+                    result.push(state);
+                }
+            }
+
+            return result;
+        }
+    },
+
+    removeState: function (cell) {
+
+        var state = null;
+
+        if (cell != null) {
+            state = this.states.remove(cell);
+
+            if (state != null) {
+                this.graph.cellRenderer.destroy(state);
+                state.destroy();
+            }
+        }
+
+        return state;
+    },
+
+    getCanvas: function () {
+        return this.canvas;
+    },
+
+    getBackgroundPane: function () {
+        return this.backgroundPane;
+    },
+
+    getDrawPane: function () {
+        return this.drawPane;
+    },
+
+    getOverlayPane: function () {
+        return this.overlayPane;
+    },
+
+    getDecoratorPane: function () {
+        return this.decoratorPane;
+    },
+
+    isScrollEvent: function (evt) {
+        var that = this;
+        var container = that.graph.container;
+
+        var offset = utils.getOffset(container);
+        var pt = new Point(evt.clientX - offset.left, evt.clientY - offset.top);
+
+        var outWidth = container.offsetWidth;
+        var inWidth = container.clientWidth;
+
+        if (outWidth > inWidth && pt.x > inWidth + 2 && pt.x <= outWidth) {
+            return true;
+        }
+
+        var outHeight = container.offsetHeight;
+        var inHeight = container.clientHeight;
+
+        return outHeight > inHeight && pt.y > inHeight + 2 && pt.y <= outHeight;
+    },
+
+    isContainerEvent: function (evt) {
+        var that = this;
+        var source = domEvent.getSource(evt);
+
+        return (source === that.graph.container ||
+        source.parentNode == that.backgroundPane ||
+        (source.parentNode && source.parentNode.parentNode === that.backgroundPane) ||
+        source === that.canvas.parentNode ||
+        source === that.canvas ||
+        source === that.backgroundPane ||
+        source === that.drawPane ||
+        source === that.overlayPane ||
+        source === that.decoratorPane);
+    },
+
+    installListeners: function () {
+
+        var that = this;
+        var graph = that.graph;
+        var container = graph.container;
+
+        if (container) {
+
+            // Support for touch device gestures (eg. pinch to zoom)
+            // Double-tap handling is implemented in graph.fireMouseEvent
+            if (detector.IS_TOUCH) {
+
+                var handler = function (evt) {
+                    graph.fireGestureEvent(evt);
+                    domEvent.consume(evt);
+                };
+
+                domEvent.on(container, 'gesturestart', handler);
+                domEvent.on(container, 'gesturechange', handler);
+                domEvent.on(container, 'gestureend', handler);
+            }
+
+            domEvent.onGesture(container,
+                function (evt) {
+                    // Condition to avoid scrollbar events starting a rubberband selection
+                    if (that.isContainerEvent(evt) &&
+                        ((!detector.IS_IE && !detector.IS_IE11 && !detector.IS_GC && !detector.IS_OP && !detector.IS_SF) || !that.isScrollEvent(evt))) {
+                        graph.fireMouseEvent(eventNames.MOUSE_DOWN, new MouseEvent(evt));
+                    }
+                },
+                function (evt) {
+                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_MOVE, new MouseEvent(evt));
+                },
+                function (evt) {
+                    that.isContainerEvent(evt) && graph.fireMouseEvent(eventNames.MOUSE_UP, new MouseEvent(evt));
+                });
+
+            // double click
+            domEvent.on(container, 'dblclick', function (evt) {
+                if (that.isContainerEvent(evt)) {
+                    graph.dblClick(evt);
+                }
+            });
+
+
+        }
+
+
+        return that;
+    },
+
+    createSvg: function () {
+
+        var view = this;
+
+        view.canvas = document.createElementNS(constants.NS_SVG, 'g');
+
+        view.backgroundPane = document.createElementNS(constants.NS_SVG, 'g');
+        view.canvas.appendChild(view.backgroundPane);
+
+        view.drawPane = document.createElementNS(constants.NS_SVG, 'g');
+        view.canvas.appendChild(view.drawPane);
+
+        view.overlayPane = document.createElementNS(constants.NS_SVG, 'g');
+        view.canvas.appendChild(view.overlayPane);
+
+        view.decoratorPane = document.createElementNS(constants.NS_SVG, 'g');
+        view.canvas.appendChild(view.decoratorPane);
+
+        var root = document.createElementNS(constants.NS_SVG, 'svg');
+        root.style.width = '100%';
+        root.style.height = '100%';
+
+        // NOTE: In standards mode, the SVG must have block layout
+        // in order for the container DIV to not show scrollbars.
+        root.style.display = 'block';
+        root.appendChild(view.canvas);
+
+
+        var container = view.graph.container;
+
+        if (container !== null) {
+            container.appendChild(root);
+            view.updateContainerStyle(container);
+        }
+
+        return this;
+    },
+
+    // 更新容器的样式
+    updateContainerStyle: function (container) {},
+
+    destroy: function () {}
+});
+
+
+});
+define('PaneJS/handler/CellHighlight',['require','exports','module','../common/class','../common/utils','../events/domEvent','../constants','../shapes/Shape','../Rectangle'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
+var Class = require('../common/class');
+var utils = require('../common/utils');
+var domEvent = require('../events/domEvent');
+var constants = require('../constants');
+var Shape = require('../shapes/Shape');
+var Rectangle = require('../Rectangle');
+
+var CellHighlight = Class.create({
+    constructor: function CellHighlight(graph, highlightColor, strokeWidth, dashed) {
+        if (graph !== null) {
+            this.graph = graph;
+            this.highlightColor = (highlightColor !== null) ? highlightColor : constants.DEFAULT_VALID_COLOR;
+            this.strokeWidth = (strokeWidth !== null) ? strokeWidth : constants.HIGHLIGHT_STROKEWIDTH;
+            this.dashed = (dashed !== null) ? dashed : false;
+
+            // Updates the marker if the graph changes
+            this.repaintHandler = utils.bind(this, function () {
+                // Updates reference to state
+                if (this.state !== null) {
+                    var tmp = this.graph.view.getState(this.state.cell);
+
+                    if (tmp === null) {
+                        this.hide();
+                    }
+                    else {
+                        this.state = tmp;
+                        this.repaint();
+                    }
+                }
+            });
+
+            this.graph.getView().addListener(domEvent.SCALE, this.repaintHandler);
+            this.graph.getView().addListener(domEvent.TRANSLATE, this.repaintHandler);
+            this.graph.getView().addListener(domEvent.SCALE_AND_TRANSLATE, this.repaintHandler);
+            this.graph.getModel().addListener(domEvent.CHANGE, this.repaintHandler);
+
+            // Hides the marker if the current root changes
+            this.resetHandler = utils.bind(this, function () {
+                this.hide();
+            });
+
+            this.graph.getView().addListener(domEvent.DOWN, this.resetHandler);
+            this.graph.getView().addListener(domEvent.UP, this.resetHandler);
+        }
+    },
+
+    keepOnTop: false,
+
+    graph: true,
+
+    state: null,
+
+    spacing: 2,
+
+    resetHandler: null,
+
+    setHighlightColor: function (color) {
+        this.highlightColor = color;
+
+        if (this.shape !== null) {
+            this.shape.stroke = color;
+        }
+    },
+
+    drawHighlight: function () {
+        this.shape = this.createShape();
+        this.repaint();
+
+        if (!this.keepOnTop && this.shape.node.parentNode.firstChild !== this.shape.node) {
+            this.shape.node.parentNode.insertBefore(this.shape.node, this.shape.node.parentNode.firstChild);
+        }
+    },
+
+    createShape: function () {
+        var key = this.state.style[constants.STYLE_SHAPE];
+        var stencil = mxStencilRegistry.getStencil(key);
+        var shape = null;
+
+        if (stencil !== null) {
+            shape = new Shape(stencil);
+        }
+        else {
+            shape = new this.state.shape.constructor();
+        }
+
+        shape.scale = this.state.view.scale;
+        shape.outline = true;
+        shape.points = this.state.absolutePoints;
+        shape.apply(this.state);
+        shape.strokewidth = this.strokeWidth / this.state.view.scale / this.state.view.scale;
+        shape.arrowStrokewidth = this.strokeWidth;
+        shape.stroke = this.highlightColor;
+        shape.isDashed = this.dashed;
+        shape.isShadow = false;
+
+        shape.dialect = (this.graph.dialect !== constants.DIALECT_SVG) ? constants.DIALECT_VML : constants.DIALECT_SVG;
+        shape.init(this.graph.getView().getOverlayPane());
+        domEvent.redirectMouseEvents(shape.node, this.graph, this.state);
+
+        if (this.graph.dialect !== constants.DIALECT_SVG) {
+            shape.pointerEvents = false;
+        }
+        else {
+            shape.svgPointerEvents = 'stroke';
+        }
+
+        return shape;
+    },
+
+
+    repaint: function () {
+        if (this.state !== null && this.shape !== null) {
+            if (this.graph.model.isEdge(this.state.cell)) {
+                this.shape.points = this.state.absolutePoints;
+            }
+            else {
+                this.shape.bounds = new Rectangle(this.state.x - this.spacing, this.state.y - this.spacing,
+                    this.state.width + 2 * this.spacing, this.state.height + 2 * this.spacing);
+                this.shape.rotation = Number(this.state.style[constants.STYLE_ROTATION] || '0');
+            }
+
+            // Uses cursor from shape in highlight
+            if (this.state.shape !== null) {
+                this.shape.setCursor(this.state.shape.getCursor());
+            }
+
+            this.shape.redraw();
+        }
+    },
+
+    hide: function () {
+        this.highlight(null);
+    },
+
+    highlight: function (state) {
+        if (this.state !== state) {
+            if (this.shape !== null) {
+                this.shape.destroy();
+                this.shape = null;
+            }
+
+            this.state = state;
+
+            if (this.state !== null) {
+                this.drawHighlight();
+            }
+        }
+    },
+
+    destroy: function () {
+        this.graph.getView().removeListener(this.resetHandler);
+        this.graph.getView().removeListener(this.repaintHandler);
+        this.graph.getModel().removeListener(this.repaintHandler);
+
+        if (this.shape !== null) {
+            this.shape.destroy();
+            this.shape = null;
+        }
+    },
+
+});
+
+module.exports = CellHighlight;
+
+
+
+});
 define('PaneJS/shapes/Polyline',['require','exports','module','../common/utils','./Shape','../constants'],function (require, exports, module) {var utils = require('../common/utils');
 var Shape = require('./Shape');
 var constants = require('../constants');
@@ -9610,7 +11038,7 @@ module.exports = Shape.extend({
 
         var shape = this;
 
-        shape.constructor.superclass.constructor.call(shape);
+        Shape.call(shape);
 
         shape.bounds = bounds;
         shape.fill = fill;
@@ -10299,6 +11727,190 @@ module.exports = Shape.extend({
 
 
 });
+define('PaneJS/handler/CellMarker',['require','exports','module','../events/EventObject','../events/EventSource','../events/domEvent','../constants','./CellHighlight','../events/EventSource','../Rectangle'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
+var EventObject = require('../events/EventObject');
+var EventSource = require('../events/EventSource');
+var domEvent = require('../events/domEvent');
+var constants = require('../constants');
+var CellHighlight = require('./CellHighlight');
+var EventSource = require('../events/EventSource');
+//var utils = require('../common/utils');
+var Rectangle = require('../Rectangle');
+
+var CellMarker = EventSource.extend({
+    constructor: function CellMarker(graph, validColor, invalidColor, hotspot) {
+        EventSource.call(this);
+
+        if (graph !== null) {
+            this.graph = graph;
+            this.validColor = (validColor !== null) ? validColor : constants.DEFAULT_VALID_COLOR;
+            this.invalidColor = (validColor !== null) ? invalidColor : constants.DEFAULT_INVALID_COLOR;
+            this.hotspot = (hotspot !== null) ? hotspot : constants.DEFAULT_HOTSPOT;
+
+            this.highlight = new CellHighlight(graph);
+        }
+    },
+
+    currentColor   : null,
+    enabled        : true,
+    graph          : null,
+    invalidColor   : null,
+    markedState    : null,
+    validColor     : null,
+    validState     : null,
+    hotspotEnabled : false,
+    hotspot        : constants.DEFAULT_HOTSPOT,
+
+    setEnabled: function (enabled) {
+        this.enabled = enabled;
+    },
+
+    isEnabled: function () {
+        return this.enabled;
+    },
+
+    setHotspot: function (hotspot) {
+        this.hotspot = hotspot;
+    },
+
+    getHotspot: function () {
+        return this.hotspot;
+    },
+
+    setHotspotEnabled: function (enabled) {
+        this.hotspotEnabled = enabled;
+    },
+
+    isHotspotEnabled: function () {
+        return this.hotspotEnabled;
+    },
+
+    hasValidState: function () {
+        return this.validState !== null;
+    },
+
+    getValidState: function () {
+        return this.validState;
+    },
+
+    getMarkedState: function () {
+        return this.markedState;
+    },
+
+    reset: function () {
+        this.validState = null;
+
+        if (this.markedState !== null) {
+            this.markedState = null;
+            this.unmark();
+        }
+    },
+
+    process: function (me) {
+        var state = null;
+
+        if (this.isEnabled()) {
+            state = this.getState(me);
+            this.setCurrentState(state, me);
+        }
+
+        return state;
+    },
+
+    setCurrentState: function (state, me, color) {
+        var isValid = (state !== null) ? this.isValidState(state) : false;
+        color = (color !== null) ? color : this.getMarkerColor(me.getEvent(), state, isValid);
+
+        if (isValid) {
+            this.validState = state;
+        }
+        else {
+            this.validState = null;
+        }
+
+        if (state !== this.markedState || color !== this.currentColor) {
+            this.currentColor = color;
+
+            if (state !== null && this.currentColor !== null) {
+                this.markedState = state;
+                this.mark();
+            }
+            else if (this.markedState !== null) {
+                this.markedState = null;
+                this.unmark();
+            }
+        }
+    },
+
+    markCell: function (cell, color) {
+        var state = this.graph.getView().getState(cell);
+
+        if (state !== null) {
+            this.currentColor = (color !== null) ? color : this.validColor;
+            this.markedState = state;
+            this.mark();
+        }
+    },
+
+    mark: function () {
+        this.highlight.setHighlightColor(this.currentColor);
+        this.highlight.highlight(this.markedState);
+        this.fireEvent(new EventObject(domEvent.MARK, 'state', this.markedState));
+    },
+
+    unmark: function () {
+        this.mark();
+    },
+
+    isValidState: function (/*state*/) {
+        return true;
+    },
+
+    getMarkerColor: function (evt, state, isValid) {
+        return (isValid) ? this.validColor : this.invalidColor;
+    },
+
+    getState: function (me) {
+        var view = this.graph.getView();
+        var cell = this.getCell(me);
+        var state = this.getStateToMark(view.getState(cell));
+
+        return (state !== null && this.intersects(state, me)) ? state : null;
+    },
+
+    getCell: function (me) {
+        return me.getCell();
+    },
+
+    getStateToMark: function (state) {
+        return state;
+    },
+
+    intersects: function (state, me) {
+        if (this.hotspotEnabled) {
+            return Rectangle.intersectsHotspot(state, me.getGraphX(), me.getGraphY(),
+                this.hotspot, constants.MIN_HOTSPOT_SIZE,
+                constants.MAX_HOTSPOT_SIZE);
+        }
+
+        return true;
+    },
+
+    destroy: function () {
+        this.graph.getView().removeListener(this.resetHandler);
+        this.graph.getModel().removeListener(this.resetHandler);
+        this.highlight.destroy();
+    },
+});
+
+module.exports = CellMarker;
+
+
+
+});
 define('PaneJS/shapes/Connector',['require','exports','module','../common/utils','../marker','./Polyline','../constants'],function (require, exports, module) {var utils = require('../common/utils');
 var marker = require('../marker');
 var Polyline = require('./Polyline');
@@ -10387,6 +11999,146 @@ var Connector = module.exports = Polyline.extend({
         bbox.grow(Math.ceil(size * this.scale));
     }
 });
+
+});
+define('PaneJS/shapes/ImageShape',['require','exports','module','./Shape','../common/detector','../common/utils','../constants','../shapes/RectangleShape'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+/* global document */
+
+var Shape = require('./Shape');
+var detector = require('../common/detector');
+var utils = require('../common/utils');
+var constants = require('../constants');
+var RectangleShape = require('../shapes/RectangleShape');
+
+var ImageShape = Shape.extend({
+    constructor: function ImageShape(bounds, image, fill, stroke, strokewidth) {
+        var that = this;
+        Shape.call(that);
+        that.bounds = bounds;
+        that.image = image;
+        that.fill = fill;
+        that.stroke = stroke;
+        that.strokewidth = (strokewidth !== null) ? strokewidth : 1;
+        that.shadow = false;
+    },
+    preserveImageAspect: true,
+    getSvgScreenOffset: function () {
+        return (!detector.IS_IE) ? 0.5 : 0;
+    },
+    apply: function (/*state*/) {
+        Shape.prototype.apply.apply(this, arguments);
+
+        this.fill = null;
+        this.stroke = null;
+        this.gradient = null;
+
+        if (this.style !== null) {
+            this.preserveImageAspect = utils.getNumber(this.style, constants.STYLE_IMAGE_ASPECT, 1) === 1;
+
+            // Legacy support for imageFlipH/V
+            this.flipH = this.flipH || utils.getValue(this.style, 'imageFlipH', 0) === 1;
+            this.flipV = this.flipV || utils.getValue(this.style, 'imageFlipV', 0) === 1;
+        }
+    },
+    isHtmlAllowed: function () {
+        return !this.preserveImageAspect;
+    },
+    createHtml: function () {
+        var node = document.createElement('div');
+        node.style.position = 'absolute';
+
+        return node;
+    },
+    paintVertexShape: function (c, x, y, w, h) {
+        if (this.image !== null) {
+            var fill = utils.getValue(this.style, constants.STYLE_IMAGE_BACKGROUND, null);
+            var stroke = utils.getValue(this.style, constants.STYLE_IMAGE_BORDER, null);
+
+            if (fill !== null) {
+                // Stroke rendering required for shadow
+                c.setFillColor(fill);
+                c.setStrokeColor(stroke);
+                c.rect(x, y, w, h);
+                c.fillAndStroke();
+            }
+
+            // FlipH/V are implicit via mxShape.updateTransform
+            c.image(x, y, w, h, this.image, this.preserveImageAspect, false, false);
+
+            //var stroke = utils.getValue(this.style, constants.STYLE_IMAGE_BORDER, null);
+
+            if (stroke !== null) {
+                c.setShadow(false);
+                c.setStrokeColor(stroke);
+                c.rect(x, y, w, h);
+                c.stroke();
+            }
+        }
+        else {
+            RectangleShape.prototype.paintBackground.apply(this, arguments);
+        }
+    },
+    redrawHtmlShape: function () {
+        this.node.style.left = Math.round(this.bounds.x) + 'px';
+        this.node.style.top = Math.round(this.bounds.y) + 'px';
+        this.node.style.width = Math.max(0, Math.round(this.bounds.width)) + 'px';
+        this.node.style.height = Math.max(0, Math.round(this.bounds.height)) + 'px';
+        this.node.innerHTML = '';
+
+        if (this.image !== null) {
+            var fill = utils.getValue(this.style, constants.STYLE_IMAGE_BACKGROUND, '');
+            var stroke = utils.getValue(this.style, constants.STYLE_IMAGE_BORDER, '');
+            this.node.style.backgroundColor = fill;
+            this.node.style.borderColor = stroke;
+
+            var img = document.createElement('img');
+            img.style.position = 'absolute';
+            img.src = this.image;
+
+            var filter = (this.opacity < 100) ? 'alpha(opacity=' + this.opacity + ')' : '';
+            this.node.style.filter = filter;
+
+            if (this.flipH && this.flipV) {
+                filter += 'progid:DXImageTransform.Microsoft.BasicImage(rotation=2)';
+            }
+            else if (this.flipH) {
+                filter += 'progid:DXImageTransform.Microsoft.BasicImage(mirror=1)';
+            }
+            else if (this.flipV) {
+                filter += 'progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)';
+            }
+
+            if (img.style.filter !== filter) {
+                img.style.filter = filter;
+            }
+
+            if (img.nodeName === 'image') {
+                img.style.rotation = this.rotation;
+            }
+            else if (this.rotation !== 0) {
+                // LATER: Add flipV/H support
+                utils.setPrefixedStyle(img.style, 'transform', 'rotate(' + this.rotation + 'deg)');
+            }
+            else {
+                utils.setPrefixedStyle(img.style, 'transform', '');
+            }
+
+            // Known problem: IE clips top line of image for certain angles
+            img.style.width = this.node.style.width;
+            img.style.height = this.node.style.height;
+
+            this.node.style.backgroundImage = '';
+            this.node.appendChild(img);
+        }
+        else {
+            this.setTransparentBackgroundImage(this.node);
+        }
+    },
+});
+
+module.exports = ImageShape;
+
 
 });
 define('PaneJS/shapes/Label',['require','exports','module','../common/utils','./RectangleShape','../constants'],function (require, exports, module) {var utils = require('../common/utils');
@@ -10557,7 +12309,7 @@ module.exports = RectangleShape.extend({
 
 
 });
-define('PaneJS/CellRenderer',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/common/detector','PaneJS/common/Dictionary','PaneJS/Rectangle','PaneJS/Point','PaneJS/constants','PaneJS/shapes/Shape','PaneJS/shapes/RectangleShape','PaneJS/shapes/Text','PaneJS/shapes/Connector','PaneJS/events/MouseEvent','PaneJS/events/domEvent','PaneJS/events/eventNames'],function (require, exports, module) {'use strict';
+define('PaneJS/CellRenderer',['require','exports','module','PaneJS/common/class','PaneJS/common/utils','PaneJS/common/detector','PaneJS/common/Dictionary','PaneJS/Rectangle','PaneJS/Point','PaneJS/constants','PaneJS/shapes/Shape','PaneJS/shapes/RectangleShape','PaneJS/shapes/Text','PaneJS/shapes/Connector','PaneJS/events/MouseEvent','PaneJS/events/domEvent','PaneJS/events/eventNames'],function (require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('PaneJS/common/class');
 var utils = require('PaneJS/common/utils');
@@ -10765,7 +12517,7 @@ var CellRenderer = Class.create({
 
                     // Dispatches the drop event to the graph which
                     // consumes and executes the source function
-                    var pt = mxUtils.convertPoint(graph.container, x, y);
+                    var pt = Point.convertPoint(graph.container, x, y);
                     result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
                 }
 
@@ -10989,7 +12741,7 @@ var CellRenderer = Class.create({
 
                 // Dispatches the drop event to the graph which
                 // consumes and executes the source function
-                var pt = utils.convertPoint(graph.container, x, y);
+                var pt = Point.convertPoint(graph.container, x, y);
                 result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
             }
 
@@ -11172,7 +12924,7 @@ var CellRenderer = Class.create({
 
             if (bounds.x != cx || bounds.y != cy) {
                 var rad = theta * (Math.PI / 180);
-                var pt = mxUtils.getRotatedPoint(new Point(bounds.x, bounds.y),
+                var pt = Point.getRotatedPoint(new Point(bounds.x, bounds.y),
                     Math.cos(rad), Math.sin(rad), new Point(cx, cy));
 
                 bounds.x = pt.x;
@@ -11198,7 +12950,7 @@ var CellRenderer = Class.create({
                         var cx = bounds.getCenterX();
                         var cy = bounds.getCenterY();
 
-                        var point = mxUtils.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
+                        var point = Point.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
                             new mxPoint(state.getCenterX(), state.getCenterY()));
 
                         cx = point.x;
@@ -11268,7 +13020,7 @@ var CellRenderer = Class.create({
                         var cos = Math.cos(rad);
                         var sin = Math.sin(rad);
 
-                        var point = mxUtils.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
+                        var point = Point.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
                             new mxPoint(state.getCenterX(), state.getCenterY()));
                         cx = point.x;
                         cy = point.y;
@@ -11375,7 +13127,7 @@ var CellRenderer = Class.create({
             // defined as the bounds are updated for the given points inside the shape
             if (force || !state.shape.bounds || state.shape.scale != state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
-                (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
+                (state.absolutePoints != null && !Point.equalPoints(state.shape.points, state.absolutePoints))) {
                 if (state.absolutePoints) {
                     state.shape.points = state.absolutePoints.slice();
                     state.shape.bounds = null;
@@ -11446,6 +13198,244 @@ registerShape(constants.SHAPE_RECTANGLE, RectangleShape);
 
 
 module.exports = CellRenderer;
+
+
+});
+define('PaneJS/handler/ConstraintHandler',['require','exports','module','../common/class','../constants','../events/domEvent','../Rectangle','../shapes/RectangleShape','../shapes/ImageShape','../common/utils','../common/detector'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+/* global document */
+
+var Class = require('../common/class');
+//var Image = require('../Image');
+var constants = require('../constants');
+var domEvent = require('../events/domEvent');
+var Rectangle = require('../Rectangle');
+var RectangleShape = require('../shapes/RectangleShape');
+var ImageShape = require('../shapes/ImageShape');
+var utils = require('../common/utils');
+var detector = require('../common/detector');
+
+var ConstraintHandler = Class.create({
+    constructor: function ConstraintHandler(graph) {
+        this.graph = graph;
+    },
+
+    enabled        : true,
+    graph          : null,
+    highlightColor : constants.DEFAULT_VALID_COLOR,
+    //pointImage     : new Image(mxClient.imageBasePath + '/point.gif', 5, 5),
+
+    isEnabled: function () {
+        return this.enabled;
+    },
+
+    setEnabled: function (enabled) {
+        this.enabled = enabled;
+    },
+
+    reset: function () {
+        if (this.focusIcons !== null) {
+            for (var i = 0; i < this.focusIcons.length; i++) {
+                this.focusIcons[i].destroy();
+            }
+
+            this.focusIcons = null;
+        }
+
+        if (this.focusHighlight !== null) {
+            this.focusHighlight.destroy();
+            this.focusHighlight = null;
+        }
+
+        this.currentConstraint = null;
+        this.currentFocusArea = null;
+        this.currentPoint = null;
+        this.currentFocus = null;
+        this.focusPoints = null;
+    },
+
+    getTolerance: function (/*me*/) {
+        return this.graph.getTolerance();
+    },
+
+    getImageForConstraint: function (/*state, constraint, point*/) {
+        return this.pointImage;
+    },
+
+    isEventIgnored: function (/*me, source*/) {
+        return false;
+    },
+
+    isStateIgnored: function (/*state, source*/) {
+        return false;
+    },
+
+    destroyIcons: function () {
+        if (this.focusIcons !== null) {
+            for (var i = 0; i < this.focusIcons.length; i++) {
+                this.focusIcons[i].destroy();
+            }
+
+            this.focusIcons = null;
+            this.focusPoints = null;
+        }
+    },
+
+    destroyFocusHighlight: function () {
+        if (this.focusHighlight !== null) {
+            this.focusHighlight.destroy();
+            this.focusHighlight = null;
+        }
+    },
+
+    isKeepFocusEvent: function (me) {
+        return domEvent.isShiftDown(me.getEvent());
+    },
+
+    update: function (me, source) {
+        if (this.isEnabled() && !this.isEventIgnored(me)) {
+            var tol = this.getTolerance(me);
+            var mouse = new Rectangle(me.getGraphX() - tol, me.getGraphY() - tol, 2 * tol, 2 * tol);
+            var cst = (me.getState() !== null && !this.isStateIgnored(me.getState(), source)) ?
+                this.graph.getAllConnectionConstraints(me.getState(), source) : null;
+
+            // Keeps focus icons visible while over vertex bounds and no other cell under mouse or shift is pressed
+            if (!this.isKeepFocusEvent(me) && (this.currentFocusArea === null || this.currentFocus === null ||
+                (me.getState() !== null && cst !== null) || !this.graph.getModel().isVertex(this.currentFocus.cell) || !utils.intersects(this.currentFocusArea, mouse)) && (me.getState() !== this.currentFocus &&
+                (me.getCell() === null || this.graph.isCellConnectable(me.getCell())))) {
+                this.currentFocusArea = null;
+                this.currentFocus = null;
+                this.constraints = cst;
+
+                // Only uses cells which have constraints
+                if (this.constraints !== null) {
+                    this.currentFocus = me.getState();
+                    this.currentFocusArea = new Rectangle(me.getState().x, me.getState().y, me.getState().width, me.getState().height);
+
+                    if (this.focusIcons !== null) {
+                        for (var i = 0; i < this.focusIcons.length; i++) {
+                            this.focusIcons[i].destroy();
+                        }
+
+                        this.focusIcons = null;
+                        this.focusPoints = null;
+                    }
+
+                    this.focusIcons = [];
+                    this.focusPoints = [];
+
+                    for (var j = 0; j < this.constraints.length; j++) {
+                        var cp = this.graph.getConnectionPoint(me.getState(), this.constraints[j]);
+                        var img = this.getImageForConstraint(me.getState(), this.constraints[j], cp);
+
+                        var src = img.src;
+                        var bounds = new Rectangle(cp.x - img.width / 2,
+                            cp.y - img.height / 2, img.width, img.height);
+                        var icon = new ImageShape(bounds, src);
+                        icon.dialect = (this.graph.dialect !== constants.DIALECT_SVG) ?
+                            constants.DIALECT_MIXEDHTML : constants.DIALECT_SVG;
+                        icon.preserveImageAspect = false;
+                        icon.init(this.graph.getView().getDecoratorPane());
+
+                        // Fixes lost event tracking for images in quirks / IE8 standards
+                        if (detector.IS_QUIRKS || document.documentMode === 8) {
+                            domEvent.on(icon.node, 'dragstart', function (evt) {
+                                domEvent.consume(evt);
+
+                                return false;
+                            });
+                        }
+
+                        // Move the icon behind all other overlays
+                        if (icon.node.previousSibling !== null) {
+                            icon.node.parentNode.insertBefore(icon.node, icon.node.parentNode.firstChild);
+                        }
+
+                        var getState = utils.bind(this, function () {
+                            return (this.currentFocus !== null) ? this.currentFocus : me.getState();
+                        });
+
+                        icon.redraw();
+
+                        domEvent.redirectMouseEvents(icon.node, this.graph, getState);
+                        this.currentFocusArea.add(icon.bounds);
+                        this.focusIcons.push(icon);
+                        this.focusPoints.push(cp);
+                    }
+
+                    this.currentFocusArea.grow(tol);
+                }
+                else {
+                    this.destroyIcons();
+                    this.destroyFocusHighlight();
+                }
+            }
+
+            this.currentConstraint = null;
+            this.currentPoint = null;
+            var minDistSq = null;
+
+            if (this.focusIcons !== null && this.constraints !== null &&
+                (me.getState() === null || this.currentFocus === me.getState())) {
+                for (var k = 0; k < this.focusIcons.length; k++) {
+                    var dx = me.getGraphX() - this.focusIcons[k].bounds.getCenterX();
+                    var dy = me.getGraphY() - this.focusIcons[k].bounds.getCenterY();
+                    var tmp = dx * dx + dy * dy;
+
+                    if (utils.intersects(this.focusIcons[k].bounds, mouse) && (minDistSq === null || tmp < minDistSq)) {
+                        this.currentConstraint = this.constraints[k];
+                        this.currentPoint = this.focusPoints[k];
+                        minDistSq = tmp;
+
+                        tmp = this.focusIcons[k].bounds.clone();
+                        tmp.grow((detector.IS_IE) ? 3 : 2);
+
+                        if (detector.IS_IE) {
+                            tmp.width -= 1;
+                            tmp.height -= 1;
+                        }
+
+                        if (this.focusHighlight === null) {
+                            var hl = new RectangleShape(tmp, null, this.highlightColor, 3);
+                            hl.pointerEvents = false;
+
+                            hl.dialect = (this.graph.dialect === constants.DIALECT_SVG) ?
+                                constants.DIALECT_SVG : constants.DIALECT_VML;
+                            hl.init(this.graph.getView().getOverlayPane());
+                            this.focusHighlight = hl;
+
+                            var getState1 = utils.bind(this, function () {
+                                return (this.currentFocus !== null) ? this.currentFocus : me.getState();
+                            });
+
+                            domEvent.redirectMouseEvents(hl.node, this.graph, getState1);
+                        }
+                        else {
+                            this.focusHighlight.bounds = tmp;
+                            this.focusHighlight.redraw();
+                        }
+                    }
+                }
+            }
+
+            if (this.currentConstraint === null) {
+                this.destroyFocusHighlight();
+            }
+        }
+        else {
+            this.currentConstraint = null;
+            this.currentFocus = null;
+            this.currentPoint = null;
+        }
+    },
+
+    destroy: function () {
+        this.reset();
+    },
+
+});
+
+module.exports = ConstraintHandler;
 
 
 });
@@ -11645,9 +13635,16 @@ module.exports = Class.create({
     },
 
 
-    createHandlers: function () {},
-    //
-    //
+    createHandlers: function () {
+        var that = this;
+        that.connectionHandler = that.createConnectionHandler();
+        that.connectionHandler.setEnabled(false);
+    },
+
+    createConnectionHandler: function () {
+        return new ConnectionHandler(this);
+    },
+
     createSelectionModel: function () {},
     createStylesheet: function () {
         return new Stylesheet();
@@ -12392,7 +14389,7 @@ module.exports = Class.create({
                         sin = -1;
                     }
 
-                    point = utils.getRotatedPoint(point, cos, sin, cx);
+                    point = Point.getRotatedPoint(point, cos, sin, cx);
                 }
 
                 if (point != null && constraint.perimeter) {
@@ -12409,7 +14406,7 @@ module.exports = Class.create({
                 var cos = Math.cos(rad);
                 var sin = Math.sin(rad);
 
-                point = utils.getRotatedPoint(point, cos, sin, cx);
+                point = Point.getRotatedPoint(point, cos, sin, cx);
             }
         }
 
@@ -12718,8 +14715,12 @@ module.exports = Class.create({
     isValidSource: function () {},
     isValidTarget: function () {},
     isValidConnection: function () {},
-    setConnectable: function () {},
-    isConnectable: function () {},
+    setConnectable: function (connectable) {
+        this.connectionHandler.setEnabled(connectable);
+    },
+    isConnectable: function () {
+        return this.connectionHandler.isEnabled();
+    },
     setTooltips: function () {},
     setPanning: function () {},
     isEditing: function () {},
@@ -12862,7 +14863,7 @@ module.exports = Class.create({
     removeMouseListener: function () {},
     updateMouseEvent: function (me) {
         if (me.graphX == null || me.graphY == null) {
-            //var pt = utils.convertPoint(this.container, me.getX(), me.getY());
+            //var pt = Point.convertPoint(this.container, me.getX(), me.getY());
 
             //me.graphX = pt.x - this.panDx;
             //me.graphY = pt.y - this.panDy;

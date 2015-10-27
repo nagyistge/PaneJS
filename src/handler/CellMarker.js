@@ -8,7 +8,8 @@ var domEvent = require('../events/domEvent');
 var constants = require('../constants');
 var CellHighlight = require('./CellHighlight');
 var EventSource = require('../events/EventSource');
-var utils = require('../common/utils');
+//var utils = require('../common/utils');
+var Rectangle = require('../Rectangle');
 
 var CellMarker = EventSource.extend({
     constructor: function CellMarker(graph, validColor, invalidColor, hotspot) {
@@ -161,7 +162,7 @@ var CellMarker = EventSource.extend({
 
     intersects: function (state, me) {
         if (this.hotspotEnabled) {
-            return utils.intersectsHotspot(state, me.getGraphX(), me.getGraphY(),
+            return Rectangle.intersectsHotspot(state, me.getGraphX(), me.getGraphY(),
                 this.hotspot, constants.MIN_HOTSPOT_SIZE,
                 constants.MAX_HOTSPOT_SIZE);
         }

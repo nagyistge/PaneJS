@@ -598,7 +598,7 @@ module.exports = Class.create({
 
                 var ct = new Point(state.getCenterX(), state.getCenterY());
                 var cx = new Point(pState.getCenterX(), pState.getCenterY());
-                var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+                var pt = Point.getRotatedPoint(ct, cos, sin, cx);
                 state.x = pt.x - state.width / 2;
                 state.y = pt.y - state.height / 2;
             }
@@ -808,7 +808,7 @@ module.exports = Class.create({
         if (alpha != 0) {
             var cos = Math.cos(-alpha);
             var sin = Math.sin(-alpha);
-            next = utils.getRotatedPoint(next, cos, sin, center);
+            next = Point.getRotatedPoint(next, cos, sin, center);
         }
 
         var border = parseFloat(linkState.style[constants.STYLE_PERIMETER_SPACING] || 0);
@@ -820,7 +820,7 @@ module.exports = Class.create({
         if (alpha != 0) {
             var cos = Math.cos(alpha);
             var sin = Math.sin(alpha);
-            pt = utils.getRotatedPoint(pt, cos, sin, center);
+            pt = Point.getRotatedPoint(pt, cos, sin, center);
         }
 
         linkState.setAbsoluteTerminalPoint(pt, isSource);

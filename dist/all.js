@@ -19,7 +19,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./common/class":21,"./common/utils":24}],2:[function(require,module,exports){
+},{"./common/class":23,"./common/utils":26}],2:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
@@ -191,7 +191,7 @@ var proto = {
     rotatePoint: function (x, y, theta, cx, cy) {
         var rad = toRadians(theta);
 
-        //return mxUtils.getRotatedPoint(new Point(x, y), Math.cos(rad),
+        //return Point.getRotatedPoint(new Point(x, y), Math.cos(rad),
         //    Math.sin(rad), new Point(cx, cy));
     },
 
@@ -1531,7 +1531,7 @@ each([
 
 module.exports = Class.create(proto);
 
-},{"./common/class":21,"./common/utils":24,"./constants":25}],3:[function(require,module,exports){
+},{"./common/class":23,"./common/utils":26,"./constants":27}],3:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 /*jshint -W030 */
@@ -1833,8 +1833,8 @@ module.exports = Class.create({
     }
 });
 
-},{"./common/class":21,"./common/utils":24,"./constants":25}],4:[function(require,module,exports){
-'use strict';
+},{"./common/class":23,"./common/utils":26,"./constants":27}],4:[function(require,module,exports){
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./common/class');
 var utils = require('./common/utils');
@@ -2042,7 +2042,7 @@ var CellRenderer = Class.create({
 
                     // Dispatches the drop event to the graph which
                     // consumes and executes the source function
-                    var pt = mxUtils.convertPoint(graph.container, x, y);
+                    var pt = Point.convertPoint(graph.container, x, y);
                     result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
                 }
 
@@ -2266,7 +2266,7 @@ var CellRenderer = Class.create({
 
                 // Dispatches the drop event to the graph which
                 // consumes and executes the source function
-                var pt = utils.convertPoint(graph.container, x, y);
+                var pt = Point.convertPoint(graph.container, x, y);
                 result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
             }
 
@@ -2449,7 +2449,7 @@ var CellRenderer = Class.create({
 
             if (bounds.x != cx || bounds.y != cy) {
                 var rad = theta * (Math.PI / 180);
-                var pt = mxUtils.getRotatedPoint(new Point(bounds.x, bounds.y),
+                var pt = Point.getRotatedPoint(new Point(bounds.x, bounds.y),
                     Math.cos(rad), Math.sin(rad), new Point(cx, cy));
 
                 bounds.x = pt.x;
@@ -2475,7 +2475,7 @@ var CellRenderer = Class.create({
                         var cx = bounds.getCenterX();
                         var cy = bounds.getCenterY();
 
-                        var point = mxUtils.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
+                        var point = Point.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
                             new mxPoint(state.getCenterX(), state.getCenterY()));
 
                         cx = point.x;
@@ -2545,7 +2545,7 @@ var CellRenderer = Class.create({
                         var cos = Math.cos(rad);
                         var sin = Math.sin(rad);
 
-                        var point = mxUtils.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
+                        var point = Point.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
                             new mxPoint(state.getCenterX(), state.getCenterY()));
                         cx = point.x;
                         cy = point.y;
@@ -2652,7 +2652,7 @@ var CellRenderer = Class.create({
             // defined as the bounds are updated for the given points inside the shape
             if (force || !state.shape.bounds || state.shape.scale != state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
-                (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
+                (state.absolutePoints != null && !Point.equalPoints(state.shape.points, state.absolutePoints))) {
                 if (state.absolutePoints) {
                     state.shape.points = state.absolutePoints.slice();
                     state.shape.bounds = null;
@@ -2725,7 +2725,7 @@ registerShape(constants.SHAPE_RECTANGLE, RectangleShape);
 module.exports = CellRenderer;
 
 
-},{"./Point":10,"./Rectangle":11,"./common/Dictionary":20,"./common/class":21,"./common/detector":22,"./common/utils":24,"./constants":25,"./events/MouseEvent":29,"./events/domEvent":30,"./events/eventNames":31,"./shapes/Connector":35,"./shapes/RectangleShape":37,"./shapes/Shape":38,"./shapes/Text":39}],5:[function(require,module,exports){
+},{"./Point":10,"./Rectangle":11,"./common/Dictionary":22,"./common/class":23,"./common/detector":24,"./common/utils":26,"./constants":27,"./events/MouseEvent":31,"./events/domEvent":32,"./events/eventNames":33,"./shapes/Connector":37,"./shapes/RectangleShape":39,"./shapes/Shape":40,"./shapes/Text":41}],5:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Point = require('./Point');
@@ -2954,7 +2954,7 @@ module.exports = Rectangle.extend({
         // Rotates the geometry
         if (!this.relative) {
             var ct = new Point(this.getCenterX(), this.getCenterY());
-            var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+            var pt = Point.getRotatedPoint(ct, cos, sin, cx);
 
             this.x = Math.round(pt.x - this.width / 2);
             this.y = Math.round(pt.y - this.height / 2);
@@ -2962,14 +2962,14 @@ module.exports = Rectangle.extend({
 
         // Rotates the source point
         if (this.sourcePoint) {
-            var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
+            var pt = Point.getRotatedPoint(this.sourcePoint, cos, sin, cx);
             this.sourcePoint.x = Math.round(pt.x);
             this.sourcePoint.y = Math.round(pt.y);
         }
 
         // Translates the target point
         if (this.targetPoint) {
-            var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
+            var pt = Point.getRotatedPoint(this.targetPoint, cos, sin, cx);
             this.targetPoint.x = Math.round(pt.x);
             this.targetPoint.y = Math.round(pt.y);
         }
@@ -2978,7 +2978,7 @@ module.exports = Rectangle.extend({
         if (this.points != null) {
             for (var i = 0; i < this.points.length; i++) {
                 if (this.points[i] != null) {
-                    var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
+                    var pt = Point.getRotatedPoint(this.points[i], cos, sin, cx);
                     this.points[i].x = Math.round(pt.x);
                     this.points[i].y = Math.round(pt.y);
                 }
@@ -3259,9 +3259,16 @@ module.exports = Class.create({
     },
 
 
-    createHandlers: function () {},
-    //
-    //
+    createHandlers: function () {
+        var that = this;
+        that.connectionHandler = that.createConnectionHandler();
+        that.connectionHandler.setEnabled(false);
+    },
+
+    createConnectionHandler: function () {
+        return new ConnectionHandler(this);
+    },
+
     createSelectionModel: function () {},
     createStylesheet: function () {
         return new Stylesheet();
@@ -4006,7 +4013,7 @@ module.exports = Class.create({
                         sin = -1;
                     }
 
-                    point = utils.getRotatedPoint(point, cos, sin, cx);
+                    point = Point.getRotatedPoint(point, cos, sin, cx);
                 }
 
                 if (point != null && constraint.perimeter) {
@@ -4023,7 +4030,7 @@ module.exports = Class.create({
                 var cos = Math.cos(rad);
                 var sin = Math.sin(rad);
 
-                point = utils.getRotatedPoint(point, cos, sin, cx);
+                point = Point.getRotatedPoint(point, cos, sin, cx);
             }
         }
 
@@ -4332,8 +4339,12 @@ module.exports = Class.create({
     isValidSource: function () {},
     isValidTarget: function () {},
     isValidConnection: function () {},
-    setConnectable: function () {},
-    isConnectable: function () {},
+    setConnectable: function (connectable) {
+        this.connectionHandler.setEnabled(connectable);
+    },
+    isConnectable: function () {
+        return this.connectionHandler.isEnabled();
+    },
     setTooltips: function () {},
     setPanning: function () {},
     isEditing: function () {},
@@ -4476,7 +4487,7 @@ module.exports = Class.create({
     removeMouseListener: function () {},
     updateMouseEvent: function (me) {
         if (me.graphX == null || me.graphY == null) {
-            //var pt = utils.convertPoint(this.container, me.getX(), me.getY());
+            //var pt = Point.convertPoint(this.container, me.getX(), me.getY());
 
             //me.graphX = pt.x - this.panDx;
             //me.graphY = pt.y - this.panDy;
@@ -4515,18 +4526,21 @@ module.exports = Class.create({
 });
 
 
-},{"./Cell":3,"./CellRenderer":4,"./ConnectionConstraint":6,"./Geometry":7,"./Model":9,"./Point":10,"./Rectangle":11,"./Stylesheet":12,"./View":14,"./changes/ChildChange":16,"./changes/GeometryChange":17,"./changes/RootChange":18,"./changes/TerminalChange":19,"./common/class":21,"./common/utils":24,"./constants":25,"./edgeStyle":26,"./events/Event":27,"./events/EventObject":28,"./events/eventNames":31}],9:[function(require,module,exports){
+},{"./Cell":3,"./CellRenderer":4,"./ConnectionConstraint":6,"./Geometry":7,"./Model":9,"./Point":10,"./Rectangle":11,"./Stylesheet":12,"./View":14,"./changes/ChildChange":17,"./changes/GeometryChange":18,"./changes/RootChange":19,"./changes/TerminalChange":21,"./common/class":23,"./common/utils":26,"./constants":27,"./edgeStyle":28,"./events/Event":29,"./events/EventObject":30,"./events/eventNames":33}],9:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
+var Cell = require('./Cell');
+var ChildChange = require('./changes/ChildChange');
 var Class = require('./common/class');
-var utils = require('./common/utils');
 var Event = require('./events/Event');
 var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
-var ChildChange = require('./changes/ChildChange');
+var StyleChange = require('./changes/StyleChange');
 var TerminalChange = require('./changes/TerminalChange');
-var Cell = require('./Cell');
 var UndoableEdit = require('./UndoableEdit');
+var utils = require('./common/utils');
+var Point = require('./Point');
+var cellPath = require('./cellPath');
 
 var each = utils.each;
 var isNumeric = utils.isNumeric;
@@ -4551,7 +4565,11 @@ module.exports = Class.create({
 
         this.currentEdit = model.createUndoableEdit();
 
-        root ? model.setRoot(root) : model.clear();
+        if (root) {
+            model.setRoot(root);
+        } else {
+            model.clear();
+        }
     },
 
     // 清理并创建一个默认的 root
@@ -4605,7 +4623,7 @@ module.exports = Class.create({
     filterCells: function (cells, filter) {
         var result = [];
 
-        if (cells != null) {
+        if (cells !== null) {
             for (var i = 0; i < cells.length; i++) {
                 if (filter(cells[i])) {
                     result.push(cells[i]);
@@ -4779,12 +4797,12 @@ module.exports = Class.create({
         var edgeCount = this.getEdgeCount(cell);
         var edges = [];
 
-        for (var i = 0; i < edgeCount; i++) {
-            edges.push(this.getEdgeAt(cell, i));
+        for (var j = 0; j < edgeCount; j++) {
+            edges.push(this.getEdgeAt(cell, j));
         }
 
-        for (var i = 0; i < edges.length; i++) {
-            var edge = edges[i];
+        for (var k = 0; k < edges.length; k++) {
+            var edge = edges[k];
 
             // Updates edge parent if edge and child have
             // a common root node (does not need to be the
@@ -4813,18 +4831,18 @@ module.exports = Class.create({
         }
 
         if (this.isAncestor(root, sourceNode) && this.isAncestor(root, targetNode)) {
-            if (sourceNode == targetNode) {
+            if (sourceNode === targetNode) {
                 cell = this.getParent(sourceNode);
             }
             else {
                 //cell = this.getNearestCommonAncestor(sourceNode, targetNode);
             }
 
-            if (cell != null && (this.getParent(cell) != this.root ||
-                this.isAncestor(cell, edge)) && this.getParent(edge) != cell) {
+            if (cell !== null && (this.getParent(cell) !== this.root ||
+                this.isAncestor(cell, edge)) && this.getParent(edge) !== cell) {
                 var geo = this.getGeometry(edge);
 
-                if (geo != null) {
+                if (geo !== null) {
                     var origin1 = this.getOrigin(this.getParent(edge));
                     var origin2 = this.getOrigin(cell);
 
@@ -4867,13 +4885,13 @@ module.exports = Class.create({
     getNearestCommonAncestor: function (cell1, cell2) {
         if (cell1 && cell2) {
             // Creates the cell path for the second cell
-            var path = mxCellPath.create(cell2);
+            var path = cellPath.create(cell2);
 
             if (path && path.length > 0) {
                 // Bubbles through the ancestors of the first
                 // cell to find the nearest common ancestor.
                 var cell = cell1;
-                var current = mxCellPath.create(cell);
+                var current = cellPath.create(cell);
 
                 // Inverts arguments
                 if (path.length < current.length) {
@@ -4883,15 +4901,15 @@ module.exports = Class.create({
                     path = tmp;
                 }
 
-                while (cell != null) {
+                while (cell !== null) {
                     var parent = this.getParent(cell);
 
                     // Checks if the cell path is equal to the beginning of the given cell path
-                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+                    if (path.indexOf(current + cellPath.PATH_SEPARATOR) === 0 && parent !== null) {
                         return cell;
                     }
 
-                    current = mxCellPath.getParentPath(current);
+                    current = cellPath.getParentPath(current);
                     cell = parent;
                 }
             }
@@ -4946,7 +4964,7 @@ module.exports = Class.create({
         // model and avoids calling cellAdded if it was.
         if (!this.contains(previous) && parent) {
             this.cellAdded(cell);
-        } else if (parent == null) {
+        } else if (parent === null) {
             this.cellRemoved(cell);
         }
 
@@ -4994,7 +5012,7 @@ module.exports = Class.create({
         return edge ? edge.getTerminal(isSource) : null;
     },
     setTerminal: function (edge, terminal, isSource) {
-        var terminalChanged = terminal != this.getTerminal(edge, isSource);
+        var terminalChanged = terminal !== this.getTerminal(edge, isSource);
         this.execute(new TerminalChange(this, edge, terminal, isSource));
 
         if (this.maintainEdgeParent && terminalChanged) {
@@ -5044,7 +5062,7 @@ module.exports = Class.create({
         for (var i = 0; i < edgeCount; i++) {
             var edge = this.getEdgeAt(cell, i);
 
-            if (edge != ignoredEdge && this.getTerminal(edge, outgoing) == cell) {
+            if (edge !== ignoredEdge && this.getTerminal(edge, outgoing) === cell) {
                 count++;
             }
         }
@@ -5094,7 +5112,7 @@ module.exports = Class.create({
     },
 
     setGeometry: function (cell, geometry) {
-        if (geometry != this.getGeometry(cell)) {
+        if (geometry !== this.getGeometry(cell)) {
             this.execute(new GeometryChange(this, cell, geometry));
         }
 
@@ -5108,7 +5126,7 @@ module.exports = Class.create({
     },
 
     setStyle: function (cell, style) {
-        if (style != this.getStyle(cell)) {
+        if (style !== this.getStyle(cell)) {
             this.execute(new StyleChange(this, cell, style));
         }
 
@@ -5153,7 +5171,7 @@ module.exports = Class.create({
         //this.fireEvent(new mxEventObject(mxEvent.BEGIN_UPDATE));
         this.emit(new EventObject('beginUpdate'));
 
-        if (this.updateLevel == 1) {
+        if (this.updateLevel === 1) {
             //this.fireEvent(new mxEventObject(mxEvent.START_EDIT));
             this.emit(new EventObject('startEdit'));
         }
@@ -5162,13 +5180,13 @@ module.exports = Class.create({
     endUpdate: function () {
         this.updateLevel--;
 
-        if (this.updateLevel == 0) {
+        if (this.updateLevel === 0) {
             //this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
             this.emit(new EventObject('endEdit'));
         }
 
         if (!this.endingUpdate) {
-            this.endingUpdate = this.updateLevel == 0;
+            this.endingUpdate = this.updateLevel === 0;
             //this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
             this.emit(new EventObject('endUpdate', {edit: this.currentEdit}));
 
@@ -5234,19 +5252,60 @@ module.exports = Class.create({
 });
 
 
-},{"./Cell":3,"./UndoableEdit":13,"./changes/ChildChange":16,"./changes/RootChange":18,"./changes/TerminalChange":19,"./common/class":21,"./common/utils":24,"./events/Event":27,"./events/EventObject":28}],10:[function(require,module,exports){
+},{"./Cell":3,"./Point":10,"./UndoableEdit":13,"./cellPath":15,"./changes/ChildChange":17,"./changes/RootChange":19,"./changes/StyleChange":20,"./changes/TerminalChange":21,"./common/class":23,"./common/utils":26,"./events/Event":29,"./events/EventObject":30}],10:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./common/class');
 var utils = require('./common/utils');
 
-var isNullOrUndefined = utils.isNullOrUndefined;
-
 var Point = Class.create({
 
     constructor: function Point(x, y) {
-        this.x = !isNullOrUndefined(x) ? x : 0;
-        this.y = !isNullOrUndefined(y) ? y : 0;
+        this.x = x ? x : 0;
+        this.y = y ? y : 0;
+    },
+
+
+    Statics: {
+        equalPoints: function (points1, points2) {
+            if ((!points1 && points2) || (points1 && !points2) ||
+                (points1 && points2 && points1.length !== points2.length)) {
+                return false;
+            } else if (points1 && points2) {
+                for (var i = 0; i < points1.length; i++) {
+                    var p1 = points1[i];
+                    var p2 = points2[i];
+
+                    if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        },
+        convertPoint: function (container, x, y) {
+            var origin = utils.getScrollOrigin(container);
+            var offset = utils.getOffset(container);
+
+            offset.left -= origin.left;
+            offset.top -= origin.top;
+
+            return {
+                left: x - offset.left,
+                top: y - offset.top
+            };
+        },
+        getRotatedPoint: function (pt, cos, sin, c) {
+            c = (c !== null) ? c : new Point();
+            var x = pt.x - c.x;
+            var y = pt.y - c.y;
+
+            var x1 = x * cos - y * sin;
+            var y1 = y * cos + x * sin;
+
+            return new Point(x1 + c.x, y1 + c.y);
+        },
     },
 
     equals: function (point) {
@@ -5264,11 +5323,13 @@ var Point = Class.create({
 module.exports = Point;
 
 
-},{"./common/class":21,"./common/utils":24}],11:[function(require,module,exports){
+},{"./common/class":23,"./common/utils":26}],11:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Klass = require('./common/class');
 var Point = require('./Point');
+var utils = require('./common/utils');
+var constants = require('./constants');
 
 var Rectangle = Klass.create({
 
@@ -5277,7 +5338,58 @@ var Rectangle = Klass.create({
     Statics: {
         fromRectangle: function (rect) {
             return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-        }
+        },
+
+        intersectsHotspot: function (state, x, y, hotspot, min, max) {
+            hotspot = (hotspot !== null) ? hotspot : 1;
+            min = (min !== null) ? min : 0;
+            max = (max !== null) ? max : 0;
+
+            if (hotspot > 0) {
+                var cx = state.getCenterX();
+                var cy = state.getCenterY();
+                var w = state.width;
+                var h = state.height;
+
+                var start = utils.getValue(state.style, constants.STYLE_STARTSIZE) * state.view.scale;
+
+                if (start > 0) {
+                    if (utils.getValue(state.style, constants.STYLE_HORIZONTAL, true)) {
+                        cy = state.y + start / 2;
+                        h = start;
+                    }
+                    else {
+                        cx = state.x + start / 2;
+                        w = start;
+                    }
+                }
+
+                w = Math.max(min, w * hotspot);
+                h = Math.max(min, h * hotspot);
+
+                if (max > 0) {
+                    w = Math.min(w, max);
+                    h = Math.min(h, max);
+                }
+
+                var rect = new Rectangle(cx - w / 2, cy - h / 2, w, h);
+                var alpha = utils.toRadians(utils.getValue(state.style, constants.STYLE_ROTATION) || 0);
+
+                if (alpha !== 0) {
+                    var cos = Math.cos(-alpha);
+                    var sin = Math.sin(-alpha);
+                    var cx1 = new Point(state.getCenterX(), state.getCenterY());
+                    var pt = Point.getRotatedPoint(new Point(x, y), cos, sin, cx1);
+                    x = pt.x;
+                    y = pt.y;
+                }
+
+                return utils.contains(rect, x, y);
+            }
+
+            return true;
+        },
+
     },
 
     constructor: function Rectangle(x, y, width, height) {
@@ -5378,10 +5490,17 @@ var Rectangle = Klass.create({
     }
 });
 
+utils.extend(constants, {
+    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
+    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
+    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
+    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
+});
+
 module.exports = Rectangle;
 
 
-},{"./Point":10,"./common/class":21}],12:[function(require,module,exports){
+},{"./Point":10,"./common/class":23,"./common/utils":26,"./constants":27}],12:[function(require,module,exports){
 'use strict';
 
 var Class = require('./common/class');
@@ -5496,7 +5615,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./common/class":21,"./common/utils":24,"./constants":25,"./perimeter":34}],13:[function(require,module,exports){
+},{"./common/class":23,"./common/utils":26,"./constants":27,"./perimeter":36}],13:[function(require,module,exports){
 var Class = require('./common/class');
 var utils = require('./common/utils');
 
@@ -5533,7 +5652,7 @@ module.exports = Class.create({
     redo: function () {}
 });
 
-},{"./common/class":21,"./common/utils":24}],14:[function(require,module,exports){
+},{"./common/class":23,"./common/utils":26}],14:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: false */
 /* global document */
 
@@ -6134,7 +6253,7 @@ module.exports = Class.create({
 
                 var ct = new Point(state.getCenterX(), state.getCenterY());
                 var cx = new Point(pState.getCenterX(), pState.getCenterY());
-                var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+                var pt = Point.getRotatedPoint(ct, cos, sin, cx);
                 state.x = pt.x - state.width / 2;
                 state.y = pt.y - state.height / 2;
             }
@@ -6344,7 +6463,7 @@ module.exports = Class.create({
         if (alpha != 0) {
             var cos = Math.cos(-alpha);
             var sin = Math.sin(-alpha);
-            next = utils.getRotatedPoint(next, cos, sin, center);
+            next = Point.getRotatedPoint(next, cos, sin, center);
         }
 
         var border = parseFloat(linkState.style[constants.STYLE_PERIMETER_SPACING] || 0);
@@ -6356,7 +6475,7 @@ module.exports = Class.create({
         if (alpha != 0) {
             var cos = Math.cos(alpha);
             var sin = Math.sin(alpha);
-            pt = utils.getRotatedPoint(pt, cos, sin, center);
+            pt = Point.getRotatedPoint(pt, cos, sin, center);
         }
 
         linkState.setAbsoluteTerminalPoint(pt, isSource);
@@ -6976,8 +7095,107 @@ module.exports = Class.create({
 });
 
 
-},{"./CellState":5,"./Point":10,"./Rectangle":11,"./common/Dictionary":20,"./common/class":21,"./common/detector":22,"./common/utils":24,"./constants":25,"./events/Event":27,"./events/MouseEvent":29,"./events/domEvent":30,"./events/eventNames":31}],15:[function(require,module,exports){
-'use strict';
+},{"./CellState":5,"./Point":10,"./Rectangle":11,"./common/Dictionary":22,"./common/class":23,"./common/detector":24,"./common/utils":26,"./constants":27,"./events/Event":29,"./events/MouseEvent":31,"./events/domEvent":32,"./events/eventNames":33}],15:[function(require,module,exports){
+
+var cellPath = {
+
+    PATH_SEPARATOR: '.',
+
+    create: function (cell) {
+        var result = '';
+
+        if (cell !== null) {
+            var parent = cell.getParent();
+
+            while (parent !== null) {
+                var index = parent.getIndex(cell);
+                result = index + mxCellPath.PATH_SEPARATOR + result;
+
+                cell = parent;
+                parent = cell.getParent();
+            }
+        }
+
+        // Removes trailing separator
+        var n = result.length;
+
+        if (n > 1) {
+            result = result.substring(0, n - 1);
+        }
+
+        return result;
+    },
+
+    getParentPath: function (path) {
+        if (path !== null) {
+            var index = path.lastIndexOf(mxCellPath.PATH_SEPARATOR);
+
+            if (index >= 0) {
+                return path.substring(0, index);
+            }
+            else if (path.length > 0) {
+                return '';
+            }
+        }
+
+        return null;
+    },
+
+    resolve: function (root, path) {
+        var parent = root;
+
+        if (path !== null) {
+            var tokens = path.split(mxCellPath.PATH_SEPARATOR);
+
+            for (var i = 0; i < tokens.length; i++) {
+                parent = parent.getChildAt(parseInt(tokens[i]));
+            }
+        }
+
+        return parent;
+    },
+
+    compare: function (p1, p2) {
+        var min = Math.min(p1.length, p2.length);
+        var comp = 0;
+
+        for (var i = 0; i < min; i++) {
+            if (p1[i] !== p2[i]) {
+                if (p1[i].length === 0 ||
+                    p2[i].length === 0) {
+                    comp = (p1[i] === p2[i]) ? 0 : ((p1[i] > p2[i]) ? 1 : -1);
+                }
+                else {
+                    var t1 = parseInt(p1[i]);
+                    var t2 = parseInt(p2[i]);
+
+                    comp = (t1 === t2) ? 0 : ((t1 > t2) ? 1 : -1);
+                }
+
+                break;
+            }
+        }
+
+        // Compares path length if both paths are equal to this point
+        if (comp === 0) {
+            var t11 = p1.length;
+            var t21 = p2.length;
+
+            if (t11 !== t21) {
+                comp = (t11 > t21) ? 1 : -1;
+            }
+        }
+
+        return comp;
+    }
+};
+
+module.exports = cellPath;
+
+
+},{}],16:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('../common/class');
 
@@ -6991,7 +7209,7 @@ module.exports = Class.create({
 });
 
 
-},{"../common/class":21}],16:[function(require,module,exports){
+},{"../common/class":23}],17:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global document */
 
@@ -7085,11 +7303,12 @@ module.exports = Change.extend({
     }
 });
 
-},{"../common/utils":24,"./Change":15}],17:[function(require,module,exports){
+},{"../common/utils":26,"./Change":16}],18:[function(require,module,exports){
 
 
-},{}],18:[function(require,module,exports){
-'use strict';
+},{}],19:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Change = require('./Change');
 
@@ -7099,7 +7318,7 @@ module.exports = Change.extend({
 
         var change = this;
 
-        RootChange.superclass.constructor.call(change, model);
+        Change.call(change, model);
 
         change.root = root;
         change.previous = root;
@@ -7119,7 +7338,30 @@ module.exports = Change.extend({
 });
 
 
-},{"./Change":15}],19:[function(require,module,exports){
+},{"./Change":16}],20:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Class = require('../common/class');
+
+module.exports = Class.create({
+    constructor: function mxStyleChange(model, cell, style) {
+        this.model = model;
+        this.cell = cell;
+        this.style = style;
+        this.previous = style;
+    },
+
+    execute: function () {
+        this.style = this.previous;
+        this.previous = this.model.styleForCellChanged(
+            this.cell, this.previous);
+    },
+});
+
+
+
+},{"../common/class":23}],21:[function(require,module,exports){
 var Change = require('./Change');
 var utils = require('../common/utils');
 
@@ -7147,7 +7389,7 @@ module.exports = Change.extend({
     }
 });
 
-},{"../common/utils":24,"./Change":15}],20:[function(require,module,exports){
+},{"../common/utils":26,"./Change":16}],22:[function(require,module,exports){
 'use strict';
 
 var Class = require('./class');
@@ -7233,7 +7475,7 @@ module.exports = Class.create({
     }
 });
 
-},{"./class":21,"./objectIdentity":23,"./utils":24}],21:[function(require,module,exports){
+},{"./class":23,"./objectIdentity":25,"./utils":26}],23:[function(require,module,exports){
 
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 // ref: https://github.com/aralejs/class
@@ -7390,13 +7632,16 @@ function mix(receiver, supplier, whiteList) {
 module.exports = Class;
 
 
-},{"./utils":24}],22:[function(require,module,exports){
+},{"./utils":26}],24:[function(require,module,exports){
+
 var ua = navigator.userAgent;
 var av = navigator.appVersion;
 
 module.exports = {
     // IE
     IS_IE: ua.indexOf('MSIE') >= 0,
+
+    IS_QUIRKS: navigator.userAgent.indexOf('MSIE') >= 0 && (document.documentMode === null || document.documentMode === 5),
 
     IS_IE11: !!ua.match(/Trident\/7\./),
 
@@ -7423,10 +7668,37 @@ module.exports = {
 
     IS_TOUCH: 'ontouchstart' in document.documentElement,
 
-    IS_POINTER: window.navigator.msPointerEnabled || false
+    IS_POINTER: window.navigator.msPointerEnabled || false,
+
+    IS_OT: navigator.userAgent.indexOf('Presto/2.4.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.3.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.2.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.1.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.0.') < 0 &&
+    navigator.userAgent.indexOf('Presto/1.') < 0,
+
+    /**
+     * Variable: IS_MT
+     *
+     * True if -moz-transform is available as a CSS style. This is the case
+     * for all Firefox-based browsers newer than or equal 3, such as Camino,
+     * Iceweasel, Seamonkey and Iceape.
+     */
+    IS_MT: (navigator.userAgent.indexOf('Firefox/') >= 0 &&
+    navigator.userAgent.indexOf('Firefox/1.') < 0 &&
+    navigator.userAgent.indexOf('Firefox/2.') < 0) ||
+    (navigator.userAgent.indexOf('Iceweasel/') >= 0 &&
+    navigator.userAgent.indexOf('Iceweasel/1.') < 0 &&
+    navigator.userAgent.indexOf('Iceweasel/2.') < 0) ||
+    (navigator.userAgent.indexOf('SeaMonkey/') >= 0 &&
+    navigator.userAgent.indexOf('SeaMonkey/1.') < 0) ||
+    (navigator.userAgent.indexOf('Iceape/') >= 0 &&
+    navigator.userAgent.indexOf('Iceape/1.') < 0),
+
 };
 
-},{}],23:[function(require,module,exports){
+
+},{}],25:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 ///* global window */
 
@@ -7459,9 +7731,11 @@ exports.clear = function (obj) {
     }
 };
 
-},{"./utils":24}],24:[function(require,module,exports){
+},{"./utils":26}],26:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
-/* global window */
+/* global window, document */
+
+var detector = require('./detector');
 
 var utils = {};
 
@@ -7470,6 +7744,10 @@ var objProto = Object.prototype;
 var slice = arrProto.slice;
 var toString = objProto.toString;
 var hasOwn = objProto.hasOwnProperty;
+
+//var Point = require('../Point');
+//var Rectangle = require('../Rectangle');
+//var constants = require('../constants');
 
 
 // Lang
@@ -7592,16 +7870,16 @@ function hasKey(obj, key) {
 
 function clone(obj, transients, shallow) {
 
-    shallow = (shallow != null) ? shallow : false;
+    shallow = (shallow !== null) ? shallow : false;
     var cloned = null;
 
     if (obj && isFunction(obj.constructor)) {
         cloned = new obj.constructor();
 
         for (var i in obj) {
-            //if (i != mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
-            if (i !== 'objectId' && (!transients || indexOf(transients, i) < 0)) {
-                if (!shallow && typeof(obj[i]) == 'object') {
+            //if (i !== mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
+            if (i !== 'objectId' && (!transients || utils.indexOf(transients, i) < 0)) {
+                if (!shallow && typeof(obj[i]) === 'object') {
                     cloned[i] = clone(obj[i]);
                 } else {
                     cloned[i] = obj[i];
@@ -7664,31 +7942,13 @@ utils.extend = function (dist) {
 };
 
 utils.equalEntries = function (a, b) {
-    if ((a == null && b != null) || (a != null && b == null) ||
-        (a != null && b != null && a.length != b.length)) {
+    if ((a === null && b !== null) || (a !== null && b === null) ||
+        (a !== null && b !== null && a.length !== b.length)) {
         return false;
     }
     else if (a && b) {
         for (var key in a) {
-            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] != b[key]) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
-utils.equalPoints = function (points1, points2) {
-    if ((!points1 && points2) || (points1 && !points2) ||
-        (points1 && points2 && points1.length !== points2.length)) {
-        return false;
-    } else if (points1 && points2) {
-        for (var i = 0; i < points1.length; i++) {
-            var p1 = points1[i];
-            var p2 = points2[i];
-
-            if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
+            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] !== b[key]) {
                 return false;
             }
         }
@@ -7799,6 +8059,19 @@ utils.getFunctionName = function (fn) {
     return str;
 };
 
+/**
+ * Function: bind
+ *
+ * Returns a wrapper function that locks the execution scope of the given
+ * function to the specified scope. Inside funct, the "this" keyword
+ * becomes a reference to that scope.
+ */
+utils.bind = function(scope, funct) {
+    return function () {
+        return funct.apply(scope, arguments);
+    };
+};
+
 // BOW
 // ---
 utils.isNode = function (node, nodeName, attributeName, attributeValue) {
@@ -7820,7 +8093,7 @@ utils.getOffset = function (container, scrollOffset) {
     var offsetLeft = 0;
     var offsetTop = 0;
 
-    if (scrollOffset != null && scrollOffset) {
+    if (scrollOffset !== null && scrollOffset) {
         var offset = utils.getDocumentScrollOrigin(container.ownerDocument);
         offsetLeft += offset.left;
         offsetTop += offset.top;
@@ -7842,13 +8115,13 @@ utils.getOffset = function (container, scrollOffset) {
 utils.getDocumentScrollOrigin = function (doc) {
     var wnd = doc.defaultView || doc.parentWindow;
 
-    var x = (wnd && window.pageXOffset !== undefined)
-        ? window.pageXOffset
-        : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+    var x = (wnd && window.pageXOffset !== undefined) ?
+        window.pageXOffset :
+        (document.documentElement || document.body.parentNode || document.body).scrollLeft;
 
-    var y = (wnd && window.pageYOffset !== undefined)
-        ? window.pageYOffset
-        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+    var y = (wnd && window.pageYOffset !== undefined) ?
+        window.pageYOffset :
+        (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
     return {
         left: x,
@@ -7871,19 +8144,6 @@ utils.getScrollOrigin = function (node) {
     }
 
     return result;
-};
-
-utils.convertPoint = function (container, x, y) {
-    var origin = utils.getScrollOrigin(container);
-    var offset = utils.getOffset(container);
-
-    offset.left -= origin.left;
-    offset.top -= origin.top;
-
-    return {
-        left: x - offset.left,
-        top: y - offset.top
-    };
 };
 
 utils.createSvgGroup = function () {};
@@ -7923,7 +8183,7 @@ utils.setCellStyles = function (model, cells, key, value) {
         model.beginUpdate();
         try {
             for (var i = 0; i < cells.length; i++) {
-                if (cells[i] != null) {
+                if (cells[i] !== null) {
                     var style = utils.setStyle(model.getStyle(cells[i]), key, value);
                     model.setStyle(cells[i], style);
                 }
@@ -7936,9 +8196,9 @@ utils.setCellStyles = function (model, cells, key, value) {
 };
 
 utils.setStyle = function (style, key, value) {
-    var isValue = value != null && (typeof(value.length) == 'undefined' || value.length > 0);
+    var isValue = value !== null && (typeof(value.length) === 'undefined' || value.length > 0);
 
-    if (style == null || style.length == 0) {
+    if (style === null || style.length === 0) {
         if (isValue) {
             style = key + '=' + value;
         }
@@ -7948,7 +8208,7 @@ utils.setStyle = function (style, key, value) {
 
         if (index < 0) {
             if (isValue) {
-                var sep = (style.charAt(style.length - 1) == ';') ? '' : ';';
+                var sep = (style.charAt(style.length - 1) === ';') ? '' : ';';
                 style = style + sep + key + '=' + value;
             }
         }
@@ -7968,11 +8228,39 @@ utils.setStyle = function (style, key, value) {
     return style;
 };
 
+utils.setPrefixedStyle = function () {
+    var prefix = null;
+
+    if (detector.IS_OP && detector.IS_OT) {
+        prefix = 'O';
+    }
+    else if (detector.IS_SF || detector.IS_GC) {
+        prefix = 'Webkit';
+    }
+    else if (detector.IS_MT) {
+        prefix = 'Moz';
+    }
+    else if (detector.IS_IE && document.documentMode >= 9 && document.documentMode < 10) {
+        prefix = 'ms';
+    }
+
+    return function (style, name, value) {
+        style[name] = value;
+
+        if (prefix !== null && name.length > 0) {
+            name = prefix + name.substring(0, 1).toUpperCase() + name.substring(1);
+            style[name] = value;
+        }
+    };
+}();
+
 module.exports = utils;
 
 
-},{}],25:[function(require,module,exports){
-var Rectangle = require('./Rectangle');
+},{"./detector":24}],27:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+//var Rectangle = require('./Rectangle');
 
 module.exports = {
     //----------------------
@@ -8080,11 +8368,6 @@ module.exports = {
     ARROW_SPACING: 10,
     ARROW_WIDTH: 30,
     ARROW_SIZE: 30,
-
-    PAGE_FORMAT_A4_PORTRAIT: new Rectangle(0, 0, 826, 1169),
-    PAGE_FORMAT_A4_LANDSCAPE: new Rectangle(0, 0, 1169, 826),
-    PAGE_FORMAT_LETTER_PORTRAIT: new Rectangle(0, 0, 850, 1100),
-    PAGE_FORMAT_LETTER_LANDSCAPE: new Rectangle(0, 0, 1100, 850),
 
     NONE: 'none',
 
@@ -8255,7 +8538,7 @@ module.exports = {
 };
 
 
-},{"./Rectangle":11}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var edgeStyle = {
     EntityRelation: function (state, source, target, points, result) {
         var view = state.view;
@@ -9421,7 +9704,7 @@ var edgeStyle = {
 
 module.exports = edgeStyle;
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var utils = require('../common/utils');
 var Class = require('../common/class');
 var EventObject = require('./EventObject');
@@ -9433,7 +9716,6 @@ var eventSplitter = /\s+/;
 
 
 module.exports = Class.create({
-
     eventListeners: null,
     eventEnabled: true,
     eventSource: null,
@@ -9579,10 +9861,13 @@ module.exports = Class.create({
         }
 
         return returned;
-    }
+    },
 });
 
-},{"../common/class":21,"../common/utils":24,"./EventObject":28}],28:[function(require,module,exports){
+},{"../common/class":23,"../common/utils":26,"./EventObject":30}],30:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
 var Class = require('../common/class');
 var utils = require('../common/utils');
 
@@ -9634,9 +9919,12 @@ module.exports = Class.create({
     }
 });
 
-},{"../common/class":21,"../common/utils":24}],29:[function(require,module,exports){
+},{"../common/class":23,"../common/utils":26}],31:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
 var Class = require('../common/class');
-var utils = require('../common/utils');
+var detector = require('../common/detector');
 
 module.exports = Class.create({
     constructor: function MouseEvent(evt, state) {
@@ -9644,22 +9932,70 @@ module.exports = Class.create({
 
         that.evt = evt;
         that.state = state;
-        that.consumed = false;
-        that.graphX = null;
-        that.graphY = null;
 
     },
+
+    consumed: false,
+    graphX: null,
+    graphY: null,
 
     getEvent:function(){
         return this.evt;
     },
 
+    getGraphX: function () {
+        return this.graphX;
+    },
 
+    getGraphY: function () {
+        return this.graphY;
+    },
+
+    getState: function () {
+        return this.state;
+    },
+
+    getCell: function () {
+        var state = this.getState();
+
+        if (state !== null) {
+            return state.cell;
+        }
+
+        return null;
+    },
+
+    isConsumed: function () {
+        return this.consumed;
+    },
+
+    consume: function (preventDefault) {
+        preventDefault = (preventDefault !== null) ? preventDefault : true;
+
+        if (preventDefault && this.evt.preventDefault) {
+            this.evt.preventDefault();
+        }
+
+        // Workaround for images being dragged in IE
+        // Does not change returnValue in Opera
+        if (detector.IS_IE) {
+            this.evt.returnValue = true;
+        }
+
+        // Sets local consumed state
+        this.consumed = true;
+    },
 });
 
-},{"../common/class":21,"../common/utils":24}],30:[function(require,module,exports){
+
+},{"../common/class":23,"../common/detector":24}],32:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+/* global document, window */
+
 var utils = require('../common/utils');
 var detector = require('../common/detector');
+var MouseEvent = require('./MouseEvent');
 
 var each = utils.each;
 var indexOf = utils.indexOf;
@@ -9668,6 +10004,105 @@ var IS_TOUCH = detector.IS_TOUCH;
 var IS_POINTER = detector.IS_POINTER;
 
 var domEvent = {
+    ACTIVATE: 'activate',
+    ADD: 'add',
+    ADD_CELLS: 'addCells',
+    ADD_OVERLAY: 'addOverlay',
+    ADD_VERTEX: 'addVertex',
+    AFTER_ADD_VERTEX: 'afterAddVertex',
+    ALIGN_CELLS: 'alignCells',
+    BEFORE_ADD_VERTEX: 'beforeAddVertex',
+    BEFORE_UNDO: 'beforeUndo',
+    BEGIN_UPDATE: 'beginUpdate',
+    CELLS_ADDED: 'cellsAdded',
+    CELLS_FOLDED: 'cellsFolded',
+    CELLS_MOVED: 'cellsMoved',
+    CELLS_ORDERED: 'cellsOrdered',
+    CELLS_REMOVED: 'cellsRemoved',
+    CELLS_RESIZED: 'cellsResized',
+    CELLS_TOGGLED: 'cellsToggled',
+    CELL_CONNECTED: 'cellConnected',
+    CHANGE: 'change',
+    CLEAR: 'clear',
+    CLICK: 'click',
+    CLOSE: 'close',
+    CONNECT: 'connect',
+    CONNECT_CELL: 'connectCell',
+    CUSTOM_HANDLE: -100,
+    DESTROY: 'destroy',
+    DISCONNECT: 'disconnect',
+    DONE: 'done',
+    DOUBLE_CLICK: 'doubleClick',
+    DOWN: 'down',
+    EDITING_STARTED: 'editingStarted',
+    EDITING_STOPPED: 'editingStopped',
+    END_EDIT: 'endEdit',
+    END_UPDATE: 'endUpdate',
+    ESCAPE: 'escape',
+    EXECUTE: 'execute',
+    EXECUTED: 'executed',
+    FIRED: 'fired',
+    FIRE_MOUSE_EVENT: 'fireMouseEvent',
+    FLIP_EDGE: 'flipEdge',
+    FOLD_CELLS: 'foldCells',
+    GESTURE: 'gesture',
+    GET: 'get',
+    GROUP_CELLS: 'groupCells',
+    HIDE: 'hide',
+    LABEL_CHANGED: 'labelChanged',
+    LABEL_HANDLE: -1,
+    LAYOUT_CELLS: 'layoutCells',
+    MARK: 'mark',
+    MAXIMIZE: 'maximize',
+    MINIMIZE: 'minimize',
+    MOUSE_DOWN: 'mouseDown',
+    MOUSE_MOVE: 'mouseMove',
+    MOUSE_UP: 'mouseUp',
+    MOVE: 'move',
+    MOVE_CELLS: 'moveCells',
+    MOVE_END: 'moveEnd',
+    MOVE_START: 'moveStart',
+    NORMALIZE: 'normalize',
+    NOTIFY: 'notify',
+    ORDER_CELLS: 'orderCells',
+    PAN: 'pan',
+    PAN_END: 'panEnd',
+    PAN_START: 'panStart',
+    POST: 'post',
+    RECEIVE: 'receive',
+    REDO: 'redo',
+    REFRESH: 'refresh',
+    REMOVE: 'remove',
+    REMOVE_CELLS: 'removeCells',
+    REMOVE_CELLS_FROM_PARENT: 'removeCellsFromParent',
+    REMOVE_OVERLAY: 'removeOverlay',
+    RESET: 'reset',
+    RESIZE: 'resize',
+    RESIZE_CELLS: 'resizeCells',
+    RESIZE_END: 'resizeEnd',
+    RESIZE_START: 'resizeStart',
+    RESUME: 'resume',
+    ROOT: 'root',
+    ROTATION_HANDLE: -2,
+    SAVE: 'save',
+    SCALE: 'scale',
+    SCALE_AND_TRANSLATE: 'scaleAndTranslate',
+    SELECT: 'select',
+    SHOW: 'show',
+    SIZE: 'size',
+    SPLIT_EDGE: 'splitEdge',
+    START: 'start',
+    START_EDIT: 'startEdit',
+    START_EDITING: 'startEditing',
+    SUSPEND: 'suspend',
+    TAP_AND_HOLD: 'tapAndHold',
+    TOGGLE_CELLS: 'toggleCells',
+    TRANSLATE: 'translate',
+    UNDO: 'undo',
+    UNGROUP_CELLS: 'ungroupCells',
+    UP: 'up',
+    UPDATE_CELL_SIZE: 'updateCellSize',
+
 
     // 保存已经绑定事件的元素
     cache: [],
@@ -9745,10 +10180,11 @@ var domEvent = {
 
         var list = element.eventListeners;
 
-        list && each(list, function (entry) {
-            domEvent.off(element, entry.eventName, entry.callback);
-
-        });
+        if (list) {
+            each(list, function (entry) {
+                domEvent.off(element, entry.eventName, entry.callback);
+            });
+        }
     },
 
     release: function (element) {
@@ -9819,6 +10255,44 @@ var domEvent = {
                 domEvent.off(element, 'touchend', endListener);
             }
         }
+    },
+
+    redirectMouseEvents: function (node, graph, state, down, move, up, dblClick) {
+        var getState = function (evt) {
+            return (typeof(state) == 'function') ? state(evt) : state;
+        };
+
+        domEvent.onGesture(node,
+            function (evt) {
+                if (down !== null) {
+                    down(evt);
+                } else if (!domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_DOWN, new MouseEvent(evt, getState(evt)));
+                }
+            },
+            function (evt) {
+                if (move !== null) {
+                    move(evt);
+                } else if (!domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_MOVE, new MouseEvent(evt, getState(evt)));
+                }
+            },
+            function (evt) {
+                if (up !== null) {
+                    up(evt);
+                } else if (!domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_UP, new MouseEvent(evt, getState(evt)));
+                }
+            });
+
+        domEvent.on(node, 'dblclick', function (evt) {
+            if (dblClick !== null) {
+                dblClick(evt);
+            } else if (!domEvent.isConsumed(evt)) {
+                var tmp = getState(evt);
+                graph.dblClick(evt, (tmp !== null) ? tmp.cell : null);
+            }
+        });
     },
 
     onMouseWheel: function (callback) {
@@ -9908,30 +10382,34 @@ var domEvent = {
     },
 
     isTouchEvent: function (evt) {
-        return evt.pointerType
-            ? (evt.pointerType === 'touch' || evt.pointerType === evt.MSPOINTER_TYPE_TOUCH)
-            : (evt.mozInputSource ? evt.mozInputSource === 5 : evt.type.indexOf('touch') === 0);
+        return evt.pointerType ?
+            (evt.pointerType === 'touch' || evt.pointerType === evt.MSPOINTER_TYPE_TOUCH) :
+            (evt.mozInputSource ? evt.mozInputSource === 5 : evt.type.indexOf('touch') === 0);
     },
 
     isMultiTouchEvent: function (evt) {
-        return evt.type
-            && evt.type.indexOf('touch') === 0
-            && evt.touches
-            && evt.touches.length > 1;
+        return evt.type &&
+            evt.type.indexOf('touch') === 0 &&
+            evt.touches &&
+            evt.touches.length > 1;
     },
 
     isMouseEvent: function (evt) {
-        return evt.pointerType
-            ? (evt.pointerType === 'mouse' || evt.pointerType === evt.MSPOINTER_TYPE_MOUSE)
-            : (evt.mozInputSource ? evt.mozInputSource === 1 : evt.type.indexOf('mouse') === 0);
+        return evt.pointerType ?
+            (evt.pointerType === 'mouse' || evt.pointerType === evt.MSPOINTER_TYPE_MOUSE) :
+            (evt.mozInputSource ? evt.mozInputSource === 1 : evt.type.indexOf('mouse') === 0);
     },
 
     isLeftMouseButton: function (evt) {
-        return evt.button === ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 1 : 0);
+        return evt.button === ((detector.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 1 : 0);
     },
 
     isMiddleMouseButton: function (evt) {
-        return evt.button == ((mxClient.IS_IE && (typeof(document.documentMode) === 'undefined' || document.documentMode < 9)) ? 4 : 1);
+        return evt.button === ((
+            detector.IS_IE && (
+                typeof(document.documentMode) === 'undefined' ||
+                document.documentMode < 9
+            )) ? 4 : 1);
     },
 
     isRightMouseButton: function (evt) {
@@ -9939,7 +10417,13 @@ var domEvent = {
     },
 
     isPopupTrigger: function (evt) {
-        return mxEvent.isRightMouseButton(evt) || (mxClient.IS_MAC && mxEvent.isControlDown(evt) && !mxEvent.isShiftDown(evt) && !mxEvent.isMetaDown(evt) && !mxEvent.isAltDown(evt));
+        return domEvent.isRightMouseButton(evt) || (
+            detector.IS_MAC &&
+            domEvent.isControlDown(evt) &&
+            !domEvent.isShiftDown(evt) &&
+            !domEvent.isMetaDown(evt) &&
+            !domEvent.isAltDown(evt)
+        );
     },
 
     isShiftDown: function (evt) {
@@ -9956,12 +10440,16 @@ var domEvent = {
 
     isMetaDown: function (evt) {
         return evt ? evt.metaKey : false;
-    }
+    },
+
+    isConsumed: function (evt) {
+        return evt.isConsumed !== null && evt.isConsumed;
+    },
 };
 
 module.exports = domEvent;
 
-},{"../common/detector":22,"../common/utils":24}],31:[function(require,module,exports){
+},{"../common/detector":24,"../common/utils":26,"./MouseEvent":31}],33:[function(require,module,exports){
 module.exports = {
 
     MOUSE_DOWN: 'mouseDown',
@@ -9971,7 +10459,7 @@ module.exports = {
 
 };
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 window.zGraph = module.exports = {
     Canvas2D: require('./Canvas2D'),
     Cell: require('./Cell'),
@@ -9988,7 +10476,7 @@ window.zGraph = module.exports = {
     constants: require('./constants')
 };
 
-},{"./Canvas2D":2,"./Cell":3,"./CellRenderer":4,"./CellState":5,"./Geometry":7,"./Graph":8,"./Model":9,"./Point":10,"./Rectangle":11,"./View":14,"./constants":25,"./events/EventObject":28,"./shapes/Shape":38}],33:[function(require,module,exports){
+},{"./Canvas2D":2,"./Cell":3,"./CellRenderer":4,"./CellState":5,"./Geometry":7,"./Graph":8,"./Model":9,"./Point":10,"./Rectangle":11,"./View":14,"./constants":27,"./events/EventObject":30,"./shapes/Shape":40}],35:[function(require,module,exports){
 var constants = require('./constants');
 
 var marker = {
@@ -10136,7 +10624,7 @@ marker.addMarker('diamondThin', diamond);
 
 module.exports = marker;
 
-},{"./constants":25}],34:[function(require,module,exports){
+},{"./constants":27}],36:[function(require,module,exports){
 var Point = require('./Point');
 
 module.exports =
@@ -10805,7 +11293,7 @@ module.exports =
 };
 
 
-},{"./Point":10}],35:[function(require,module,exports){
+},{"./Point":10}],37:[function(require,module,exports){
 var utils = require('../common/utils');
 var marker = require('../marker');
 var Polyline = require('./Polyline');
@@ -10895,7 +11383,7 @@ var Connector = module.exports = Polyline.extend({
     }
 });
 
-},{"../common/utils":24,"../constants":25,"../marker":33,"./Polyline":36}],36:[function(require,module,exports){
+},{"../common/utils":26,"../constants":27,"../marker":35,"./Polyline":38}],38:[function(require,module,exports){
 var utils = require('../common/utils');
 var Shape = require('./Shape');
 var constants = require('../constants');
@@ -10966,7 +11454,7 @@ module.exports = Shape.extend({
 });
 
 
-},{"../common/utils":24,"../constants":25,"./Shape":38}],37:[function(require,module,exports){
+},{"../common/utils":26,"../constants":27,"./Shape":40}],39:[function(require,module,exports){
 var utils = require('../common/utils');
 var Shape = require('./Shape');
 
@@ -10979,7 +11467,7 @@ module.exports = Shape.extend({
 
         var shape = this;
 
-        shape.constructor.superclass.constructor.call(shape);
+        Shape.call(shape);
 
         shape.bounds = bounds;
         shape.fill = fill;
@@ -11021,7 +11509,7 @@ module.exports = Shape.extend({
     }
 });
 
-},{"../common/utils":24,"./Shape":38}],38:[function(require,module,exports){
+},{"../common/utils":26,"./Shape":40}],40:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
@@ -11678,7 +12166,7 @@ var Shape = Base.extend({
 
 module.exports = Shape;
 
-},{"../Base":1,"../Canvas2D":2,"../Point":10,"../Rectangle":11,"../common/utils":24,"../constants":25}],39:[function(require,module,exports){
+},{"../Base":1,"../Canvas2D":2,"../Point":10,"../Rectangle":11,"../common/utils":26,"../constants":27}],41:[function(require,module,exports){
 var utils = require('../common/utils');
 var Shape = require('./Shape');
 var Point = require('../Point');
@@ -12324,4 +12812,4 @@ module.exports = Shape.extend({
 });
 
 
-},{"../Point":10,"../Rectangle":11,"../common/utils":24,"../constants":25,"./Shape":38}]},{},[32]);
+},{"../Point":10,"../Rectangle":11,"../common/utils":26,"../constants":27,"./Shape":40}]},{},[34]);

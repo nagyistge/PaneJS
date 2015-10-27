@@ -11,9 +11,9 @@ var slice = arrProto.slice;
 var toString = objProto.toString;
 var hasOwn = objProto.hasOwnProperty;
 
-var Point = require('../Point');
-var Rectangle = require('../Rectangle');
-var constants = require('../constants');
+//var Point = require('../Point');
+//var Rectangle = require('../Rectangle');
+//var constants = require('../constants');
 
 
 // Lang
@@ -223,24 +223,6 @@ utils.equalEntries = function (a, b) {
     return true;
 };
 
-utils.equalPoints = function (points1, points2) {
-    if ((!points1 && points2) || (points1 && !points2) ||
-        (points1 && points2 && points1.length !== points2.length)) {
-        return false;
-    } else if (points1 && points2) {
-        for (var i = 0; i < points1.length; i++) {
-            var p1 = points1[i];
-            var p2 = points2[i];
-
-            if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
 // Array
 // -----
 
@@ -430,19 +412,6 @@ utils.getScrollOrigin = function (node) {
     return result;
 };
 
-utils.convertPoint = function (container, x, y) {
-    var origin = utils.getScrollOrigin(container);
-    var offset = utils.getOffset(container);
-
-    offset.left -= origin.left;
-    offset.top -= origin.top;
-
-    return {
-        left: x - offset.left,
-        top: y - offset.top
-    };
-};
-
 utils.createSvgGroup = function () {};
 
 utils.write = function (parent, text) {
@@ -525,17 +494,6 @@ utils.setStyle = function (style, key, value) {
     return style;
 };
 
-utils.getRotatedPoint = function (pt, cos, sin, c) {
-    c = (c !== null) ? c : new Point();
-    var x = pt.x - c.x;
-    var y = pt.y - c.y;
-
-    var x1 = x * cos - y * sin;
-    var y1 = y * cos + x * sin;
-
-    return new Point(x1 + c.x, y1 + c.y);
-};
-
 utils.setPrefixedStyle = function () {
     var prefix = null;
 
@@ -561,56 +519,6 @@ utils.setPrefixedStyle = function () {
         }
     };
 }();
-
-utils.intersectsHotspot = function (state, x, y, hotspot, min, max) {
-    hotspot = (hotspot !== null) ? hotspot : 1;
-    min = (min !== null) ? min : 0;
-    max = (max !== null) ? max : 0;
-
-    if (hotspot > 0) {
-        var cx = state.getCenterX();
-        var cy = state.getCenterY();
-        var w = state.width;
-        var h = state.height;
-
-        var start = utils.getValue(state.style, constants.STYLE_STARTSIZE) * state.view.scale;
-
-        if (start > 0) {
-            if (utils.getValue(state.style, constants.STYLE_HORIZONTAL, true)) {
-                cy = state.y + start / 2;
-                h = start;
-            }
-            else {
-                cx = state.x + start / 2;
-                w = start;
-            }
-        }
-
-        w = Math.max(min, w * hotspot);
-        h = Math.max(min, h * hotspot);
-
-        if (max > 0) {
-            w = Math.min(w, max);
-            h = Math.min(h, max);
-        }
-
-        var rect = new Rectangle(cx - w / 2, cy - h / 2, w, h);
-        var alpha = utils.toRadians(utils.getValue(state.style, constants.STYLE_ROTATION) || 0);
-
-        if (alpha !== 0) {
-            var cos = Math.cos(-alpha);
-            var sin = Math.sin(-alpha);
-            var cx1 = new Point(state.getCenterX(), state.getCenterY());
-            var pt = utils.getRotatedPoint(new Point(x, y), cos, sin, cx1);
-            x = pt.x;
-            y = pt.y;
-        }
-
-        return utils.contains(rect, x, y);
-    }
-
-    return true;
-};
 
 module.exports = utils;
 
