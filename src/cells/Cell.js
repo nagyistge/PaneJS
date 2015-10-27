@@ -10,14 +10,14 @@ import Base from '../lib/Base';
 export default Base.extend({
 
     // 属性访问器
-    Accessors: [
-        'id',
-        'value',
-        'style',
-        'parent',
-        'visible',
-        'geometry'
-    ],
+    //Accessors: [
+    //    'id',
+    //    'value',
+    //    'style',
+    //    'parent',
+    //    'visible',
+    //    'geometry'
+    //],
 
     // 原型链上的属性
     visible: true,

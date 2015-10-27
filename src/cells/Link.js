@@ -2,9 +2,8 @@ import Cell from './Cell';
 
 export default Cell.extend({
 
+    isLink: true,
     transients: ['id', 'value', 'parent', 'source', 'target'],
-
-    isLink:true,
 
     constructor: function Link(value, geometry, style) {
 

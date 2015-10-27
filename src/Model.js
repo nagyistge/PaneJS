@@ -18,6 +18,7 @@ export default Class.create({
 
     Extends: EventSource,
 
+    // 属性
     createIds: true,
     prefix: '',
     postfix: '',
@@ -184,7 +185,7 @@ export default Class.create({
         var that = this;
         var id = that.nextId;
 
-        that.nextId++;
+        that.nextId += 1;
 
         return that.prefix + id + that.postfix;
     },

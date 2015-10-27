@@ -460,9 +460,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return true;
 	};
 	
-	var reduce = arrProto.reduce ? function (arr, iterator, context) {} : function (arr, iterator, context) {};
-	
-	var reduceRight = arrProto.reduceRight ? function (arr, iterator, context) {} : function (arr, iterator, context) {};
+	//var reduce = arrProto.reduce ?
+	//    function (arr, iterator, context) {
+	//
+	//    } :
+	//    function (arr, iterator, context) {
+	//
+	//    };
+	//
+	//var reduceRight = arrProto.reduceRight ?
+	//    function (arr, iterator, context) {
+	//
+	//
+	//    } :
+	//    function (arr, iterator, context) {
+	//
+	//    };
 	
 	exports.toArray = toArray;
 	exports.indexOf = indexOf;
@@ -473,8 +486,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.filter = filter;
 	exports.some = some;
 	exports.every = every;
-	exports.reduce = reduce;
-	exports.reduceRight = reduceRight;
+	
+	//reduce,
+	//reduceRight
 
 /***/ },
 /* 7 */
@@ -552,13 +566,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
 	var _lang = __webpack_require__(2);
-	
-	var _enumsConstants = __webpack_require__(9);
-	
-	var _enumsConstants2 = _interopRequireDefault(_enumsConstants);
 	
 	var NS_SVG = 'http://www.w3.org/2000/svg';
 	
@@ -602,14 +610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.createSvgElement = createSvgElement;
 
 /***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	module.exports = {};
-
-/***/ },
+/* 9 */,
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1505,6 +1506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    Extends: _eventsEventSource2['default'],
 	
+	    // 属性
 	    createIds: true,
 	    prefix: '',
 	    postfix: '',
@@ -1662,7 +1664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var id = that.nextId;
 	
-	        that.nextId++;
+	        that.nextId += 1;
 	
 	        return that.prefix + id + that.postfix;
 	    },
@@ -1741,10 +1743,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _Cell2['default'].extend({
 	
-	    transients: ['id', 'value', 'parent', 'children', 'links'],
-	
 	    isNode: true,
 	    connectAble: true,
+	    transients: ['id', 'value', 'parent', 'children', 'links'],
 	
 	    constructor: function Node(value, geometry, style) {
 	
@@ -1926,7 +1927,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = _libBase2['default'].extend({
 	
 	    // 属性访问器
-	    Accessors: ['id', 'value', 'style', 'parent', 'visible', 'geometry'],
+	    //Accessors: [
+	    //    'id',
+	    //    'value',
+	    //    'style',
+	    //    'parent',
+	    //    'visible',
+	    //    'geometry'
+	    //],
 	
 	    // 原型链上的属性
 	    visible: true,
@@ -2280,9 +2288,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _Cell2['default'].extend({
 	
-	    transients: ['id', 'value', 'parent', 'source', 'target'],
-	
 	    isLink: true,
+	    transients: ['id', 'value', 'parent', 'source', 'target'],
 	
 	    constructor: function Link(value, geometry, style) {
 	

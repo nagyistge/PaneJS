@@ -9,10 +9,9 @@ import Cell from './Cell';
 
 export default Cell.extend({
 
-    transients: ['id', 'value', 'parent', 'children', 'links'],
-
     isNode: true,
     connectAble: true,
+    transients: ['id', 'value', 'parent', 'children', 'links'],
 
     constructor: function Node(value, geometry, style) {
 

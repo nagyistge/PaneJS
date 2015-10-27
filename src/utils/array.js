@@ -97,22 +97,22 @@ var every = arrProto.every ?
         return true;
     };
 
-var reduce = arrProto.reduce ?
-    function (arr, iterator, context) {
-
-    } :
-    function (arr, iterator, context) {
-
-    };
-
-var reduceRight = arrProto.reduceRight ?
-    function (arr, iterator, context) {
-
-
-    } :
-    function (arr, iterator, context) {
-
-    };
+//var reduce = arrProto.reduce ?
+//    function (arr, iterator, context) {
+//
+//    } :
+//    function (arr, iterator, context) {
+//
+//    };
+//
+//var reduceRight = arrProto.reduceRight ?
+//    function (arr, iterator, context) {
+//
+//
+//    } :
+//    function (arr, iterator, context) {
+//
+//    };
 
 
 export {
@@ -125,8 +125,8 @@ export {
     filter,
     some,
     every,
-    reduce,
-    reduceRight
+    //reduce,
+    //reduceRight
 };
 
 

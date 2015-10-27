@@ -3,7 +3,7 @@ import {
     each
 } from '../common/utils';
 
-import Base from '../lib/Base';
+import Base        from '../lib/Base';
 import EventObject from  './EventObject';
 
 var eventSplitter = /\s+/;
