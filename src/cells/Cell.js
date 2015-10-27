@@ -9,6 +9,7 @@ import Base from '../lib/Base';
 
 export default Base.extend({
 
+    // 属性访问器
     Accessors: [
         'id',
         'value',
@@ -18,6 +19,9 @@ export default Base.extend({
         'geometry'
     ],
 
+    // 原型链上的属性
+    visible: true,
+
     constructor: function Cell(value, geometry, style) {
 
         var that = this;
@@ -25,7 +29,6 @@ export default Base.extend({
         that.value = value;
         that.geometry = geometry;
         that.style = style;
-        that.visible = true;
     },
 
     removeFromParent: function () {

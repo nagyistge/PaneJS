@@ -11,14 +11,14 @@ export default Cell.extend({
 
     transients: ['id', 'value', 'parent', 'children', 'links'],
 
+    isNode: true,
+    connectAble: true,
+
     constructor: function Node(value, geometry, style) {
 
         var that = this;
 
         Node.superclass.constructor.call(that, value, geometry, style);
-
-        that.isNode = true;
-        that.connectAble = true;
 
         // lazy
         // that.parent = null;

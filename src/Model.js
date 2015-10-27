@@ -1,11 +1,16 @@
+import {
+    isNumeric
+} from './common/utils';
+
 import Class from './common/class';
 // cells
 import Node from './cells/Node';
+import Link from './cells/Link';
 // events
-import eventNames from './events/eventNames';
+import eventNames  from './events/eventNames';
 import EventSource from './events/EventSource';
 // changes
-import RootChange from './changes/RootChange';
+import RootChange       from './changes/RootChange';
 import ChangeCollection from './changes/ChangeCollection';
 
 
@@ -13,11 +18,18 @@ export default Class.create({
 
     Extends: EventSource,
 
+    createIds: true,
+    prefix: '',
+    postfix: '',
+    nextId: 0,
+
     constructor: function Model(root) {
 
         var that = this;
 
         that.changes = new ChangeCollection(that);
+
+
         that.updateLevel = 0;
         that.endingUpdate = false;
 
@@ -27,6 +39,8 @@ export default Class.create({
         } else {
             that.clear();
         }
+
+        console.log(that);
     },
 
     clear: function () {
@@ -47,6 +61,9 @@ export default Class.create({
         return this.isAncestor(this.root, cell);
     },
 
+    getCell: function (id) {
+        return this.cells ? this.cells[id] : null;
+    },
 
     // Root
     // ----
@@ -122,6 +139,54 @@ export default Class.create({
 
     cellAdded: function (cell) {
 
+        var that = this;
+
+        if (cell) {
+
+            var id = cell.id;
+
+            if (!id && that.createIds) {
+                id = that.createId(cell);
+            }
+
+            // 去重
+            if (id) {
+                var collision = that.getCell(id);
+
+                if (collision !== cell) {
+                    while (collision) {
+                        id = that.createId(cell);
+                        collision = that.getCell(id);
+                    }
+
+                    if (!that.cells) {
+                        that.cells = {};
+                    }
+
+                    cell.id = id;
+                    that.cells[id] = cell;
+                }
+            }
+
+            // 修正 nextId
+            if (isNumeric(id)) {
+                that.nextId = Math.max(that.nextId, id);
+            }
+
+            // 递归
+            if (cell.isNode) {
+                cell.eachChild(that.cellAdded, that);
+            }
+        }
+    },
+
+    createId: function () {
+        var that = this;
+        var id = that.nextId;
+
+        that.nextId++;
+
+        return that.prefix + id + that.postfix;
     },
 
     digest: function (change) {

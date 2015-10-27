@@ -1,4 +1,4 @@
-import Base from '../lib/Base';
+import Base       from '../lib/Base';
 import eventNames from '../events/eventNames';
 
 export default Base.extend({

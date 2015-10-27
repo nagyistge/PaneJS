@@ -20,8 +20,8 @@ var objectIdentity = {
 
             var ctorName = getFunctionName(obj.constructor);
 
-            if (!counterMap[ctorName]) {
-                counterMap[ctorName] = 1;
+            if (isUndefined(counterMap[ctorName])) {
+                counterMap[ctorName] = 0;
             } else {
                 counterMap[ctorName] += 1;
             }

@@ -1240,17 +1240,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var graph = that.graph;
 	
-	        // TODO: view.currentRoot
+	        // TODO: that.currentRoot
 	
-	        var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
-	        var model = this.graph.getModel();
+	        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
 	
-	        if (state.view.graph.container != null && state.cell != state.view.currentRoot && (model.isVertex(state.cell) || model.isEdge(state.cell))) {
+	        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
 	            this.graph.cellRenderer.createShape(state);
 	        }
 	
 	        return state;
 	    },
+	
+	    removeState: function removeState(cell) {},
 	
 	    destroy: function destroy() {}
 	});
@@ -1464,6 +1465,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
+	var _commonUtils = __webpack_require__(1);
+	
 	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
@@ -1473,6 +1476,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _cellsNode = __webpack_require__(20);
 	
 	var _cellsNode2 = _interopRequireDefault(_cellsNode);
+	
+	var _cellsLink = __webpack_require__(28);
+	
+	var _cellsLink2 = _interopRequireDefault(_cellsLink);
 	
 	// events
 	
@@ -1498,11 +1505,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    Extends: _eventsEventSource2['default'],
 	
+	    createIds: true,
+	    prefix: '',
+	    postfix: '',
+	    nextId: 0,
+	
 	    constructor: function Model(root) {
 	
 	        var that = this;
 	
 	        that.changes = new _changesChangeCollection2['default'](that);
+	
 	        that.updateLevel = 0;
 	        that.endingUpdate = false;
 	
@@ -1511,6 +1524,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	            that.clear();
 	        }
+	
+	        console.log(that);
 	    },
 	
 	    clear: function clear() {
@@ -1529,6 +1544,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    contains: function contains(cell) {
 	        return this.isAncestor(this.root, cell);
+	    },
+	
+	    getCell: function getCell(id) {
+	        return this.cells ? this.cells[id] : null;
 	    },
 	
 	    // Root
@@ -1596,7 +1615,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    add: function add(parent, child, index) {},
 	
-	    cellAdded: function cellAdded(cell) {},
+	    cellAdded: function cellAdded(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	
+	            var id = cell.id;
+	
+	            if (!id && that.createIds) {
+	                id = that.createId(cell);
+	            }
+	
+	            // 去重
+	            if (id) {
+	                var collision = that.getCell(id);
+	
+	                if (collision !== cell) {
+	                    while (collision) {
+	                        id = that.createId(cell);
+	                        collision = that.getCell(id);
+	                    }
+	
+	                    if (!that.cells) {
+	                        that.cells = {};
+	                    }
+	
+	                    cell.id = id;
+	                    that.cells[id] = cell;
+	                }
+	            }
+	
+	            // 修正 nextId
+	            if ((0, _commonUtils.isNumeric)(id)) {
+	                that.nextId = Math.max(that.nextId, id);
+	            }
+	
+	            // 递归
+	            if (cell.isNode) {
+	                cell.eachChild(that.cellAdded, that);
+	            }
+	        }
+	    },
+	
+	    createId: function createId() {
+	        var that = this;
+	        var id = that.nextId;
+	
+	        that.nextId++;
+	
+	        return that.prefix + id + that.postfix;
+	    },
 	
 	    digest: function digest(change) {
 	
@@ -1674,14 +1743,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    transients: ['id', 'value', 'parent', 'children', 'links'],
 	
+	    isNode: true,
+	    connectAble: true,
+	
 	    constructor: function Node(value, geometry, style) {
 	
 	        var that = this;
 	
 	        Node.superclass.constructor.call(that, value, geometry, style);
-	
-	        that.isNode = true;
-	        that.connectAble = true;
 	
 	        // lazy
 	        // that.parent = null;
@@ -1856,7 +1925,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
+	    // 属性访问器
 	    Accessors: ['id', 'value', 'style', 'parent', 'visible', 'geometry'],
+	
+	    // 原型链上的属性
+	    visible: true,
 	
 	    constructor: function Cell(value, geometry, style) {
 	
@@ -1865,7 +1938,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.value = value;
 	        that.geometry = geometry;
 	        that.style = style;
-	        that.visible = true;
 	    },
 	
 	    removeFromParent: function removeFromParent() {
@@ -2168,8 +2240,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var ctorName = (0, _utils.getFunctionName)(obj.constructor);
 	
-	            if (!counterMap[ctorName]) {
-	                counterMap[ctorName] = 1;
+	            if ((0, _utils.isUndefined)(counterMap[ctorName])) {
+	                counterMap[ctorName] = 0;
 	            } else {
 	                counterMap[ctorName] += 1;
 	            }
@@ -2188,6 +2260,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports['default'] = objectIdentity;
+	module.exports = exports['default'];
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Cell = __webpack_require__(21);
+	
+	var _Cell2 = _interopRequireDefault(_Cell);
+	
+	exports['default'] = _Cell2['default'].extend({
+	
+	    transients: ['id', 'value', 'parent', 'source', 'target'],
+	
+	    isLink: true,
+	
+	    constructor: function Link(value, geometry, style) {
+	
+	        var that = this;
+	
+	        Link.superclass.constructor.call(that, value, geometry, style);
+	
+	        // lazy
+	        // that.source = null;
+	        // that.target = null;
+	    },
+	
+	    getNode: function getNode(isSource) {
+	        return isSource ? this.source : this.target;
+	    },
+	
+	    setNode: function setNode(node, isSource) {
+	        if (isSource) {
+	            this.source = node;
+	        } else {
+	            this.target = node;
+	        }
+	
+	        return node;
+	    },
+	
+	    removeFromNode: function removeFromNode(isSource) {
+	
+	        var that = this;
+	
+	        var node = that.getNode(isSource);
+	
+	        node && node.removeLink(that, isSource);
+	
+	        return that;
+	    }
+	});
 	module.exports = exports['default'];
 
 /***/ }

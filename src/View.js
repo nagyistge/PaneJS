@@ -156,18 +156,19 @@ export default Base.extend({
         var that = this;
         var graph = that.graph;
 
+        // TODO: that.currentRoot
 
-        // TODO: view.currentRoot
+        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
 
-        var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
-        var model = this.graph.getModel();
-
-        if (state.view.graph.container != null && state.cell != state.view.currentRoot &&
-            (model.isVertex(state.cell) || model.isEdge(state.cell))) {
+        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
             this.graph.cellRenderer.createShape(state);
         }
 
         return state;
+    },
+
+    removeState:function(cell){
+
     },
 
     destroy: function () {

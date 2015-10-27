@@ -4,13 +4,14 @@ export default Cell.extend({
 
     transients: ['id', 'value', 'parent', 'source', 'target'],
 
+    isLink:true,
+
     constructor: function Link(value, geometry, style) {
 
         var that = this;
 
         Link.superclass.constructor.call(that, value, geometry, style);
 
-        that.isLink = true;
         // lazy
         // that.source = null;
         // that.target = null;
