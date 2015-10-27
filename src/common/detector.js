@@ -1,7 +1,7 @@
 var ua = navigator.userAgent;
 var av = navigator.appVersion;
 
-var client = {
+module.exports = {
     // IE
     IS_IE: ua.indexOf('MSIE') >= 0,
 
@@ -32,5 +32,3 @@ var client = {
 
     IS_POINTER: window.navigator.msPointerEnabled || false
 };
-
-export default client;

@@ -1,7 +1,13 @@
 import Class from './common/Class';
-import EventSource from './events/EventSource';
+// cells
 import Node from './cells/Node';
+// events
+import eventNames from './events/eventNames';
+import EventSource from './events/EventSource';
+// changes
 import RootChange from './changes/RootChange';
+import ChangeCollection from './changes/ChangeCollection';
+
 
 export default Class.create({
 
@@ -11,6 +17,7 @@ export default Class.create({
 
         var that = this;
 
+        that.changes = new ChangeCollection(that);
         that.updateLevel = 0;
         that.endingUpdate = false;
 
@@ -26,6 +33,26 @@ export default Class.create({
         var that = this;
         that.setRoot(that.createRoot());
         return that;
+    },
+
+    isAncestor: function (parent, child) {
+        while (child && child !== parent) {
+            child = child.parent;
+        }
+
+        return child === parent;
+    },
+
+    contains: function (cell) {
+        return this.isAncestor(this.root, cell);
+    },
+
+
+    // Root
+    // ----
+
+    isRoot: function (cell) {
+        return cell && this.root === cell;
     },
 
     createRoot: function () {
@@ -60,25 +87,26 @@ export default Class.create({
 
     },
 
-    isRoot: function (cell) {
-        return cell && this.root === cell;
-    },
 
+    // Layers
+    // ------
     isLayer: function (cell) {
         return cell && this.isRoot(cell.parent);
     },
 
-    isAncestor: function (parent, child) {
-        while (child && child !== parent) {
-            child = child.parent;
-        }
+    getLayers: function () {
 
-        return child === parent;
     },
 
-    contains: function (cell) {
-        return this.isAncestor(this.root, cell);
-    },
+    eachLayer: function (iterator, context) {},
+
+
+    // Changes
+    // -------
+
+
+    //
+    //
 
     add: function (parent, child, index) {
 
@@ -88,12 +116,14 @@ export default Class.create({
 
     digest: function (change) {
 
-        change.digest();
-
         var that = this;
 
+        that.emit(eventNames.BEFORE_DIGEST, {change: change});
+        change.digest();
+        that.emit(eventNames.AFTER_DIGEST, {change: change});
+
         that.beginUpdate();
-        that.emit();
+        that.changes.add(change);
         that.endUpdate();
 
     },
@@ -102,10 +132,10 @@ export default Class.create({
 
         var that = this;
         that.updateLevel++;
-        that.emit(new mxEventObject(mxEvent.BEGIN_UPDATE));
+        that.emit(eventNames.BEGIN_UPDATE);
 
         if (that.updateLevel === 1) {
-            that.emit(new mxEventObject(mxEvent.START_EDIT));
+            that.emit(eventNames.START_EDIT);
         }
     },
 
@@ -116,25 +146,24 @@ export default Class.create({
         that.updateLevel--;
 
         if (that.updateLevel === 0) {
-            this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
+            that.emit(eventNames.END_EDIT);
         }
 
         if (!that.endingUpdate) {
+
+            var changes = that.changes;
+
             that.endingUpdate = that.updateLevel === 0;
-            this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
+            that.emit(eventNames.END_UPDATE, {changes: changes.changes});
 
             try {
-                if (that.endingUpdate && !this.currentEdit.isEmpty()) {
-                    this.fireEvent(new mxEventObject(mxEvent.BEFORE_UNDO, 'edit', this.currentEdit));
-                    var tmp = this.currentEdit;
-                    this.currentEdit = this.createUndoableEdit();
-                    tmp.notify();
-                    this.fireEvent(new mxEventObject(mxEvent.UNDO, 'edit', tmp));
+                if (that.endingUpdate && changes.hasChange()) {
+                    changes.notify().clear();
                 }
-            }
-            finally {
+            } finally {
                 that.endingUpdate = false;
             }
         }
     },
+
 });

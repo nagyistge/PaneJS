@@ -909,13 +909,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
 	var ua = navigator.userAgent;
 	var av = navigator.appVersion;
 	
-	var client = {
+	module.exports = {
 	    // IE
 	    IS_IE: ua.indexOf('MSIE') >= 0,
 	
@@ -946,9 +943,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    IS_POINTER: window.navigator.msPointerEnabled || false
 	};
-	
-	exports['default'] = client;
-	module.exports = exports['default'];
 
 /***/ },
 /* 14 */,
@@ -1219,17 +1213,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _eventsEventSource = __webpack_require__(25);
-	
-	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
+	// cells
 	
 	var _cellsNode = __webpack_require__(16);
 	
 	var _cellsNode2 = _interopRequireDefault(_cellsNode);
 	
+	// events
+	
+	var _eventsEventNames = __webpack_require__(27);
+	
+	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
+	
+	var _eventsEventSource = __webpack_require__(25);
+	
+	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
+	
+	// changes
+	
 	var _changesRootChange = __webpack_require__(22);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
+	
+	var _changesChangeCollection = __webpack_require__(28);
+	
+	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
 	exports['default'] = _commonClass2['default'].create({
 	
@@ -1239,6 +1247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
+	        that.changes = new _changesChangeCollection2['default'](that);
 	        that.updateLevel = 0;
 	        that.endingUpdate = false;
 	
@@ -1253,6 +1262,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        that.setRoot(that.createRoot());
 	        return that;
+	    },
+	
+	    isAncestor: function isAncestor(parent, child) {
+	        while (child && child !== parent) {
+	            child = child.parent;
+	        }
+	
+	        return child === parent;
+	    },
+	
+	    contains: function contains(cell) {
+	        return this.isAncestor(this.root, cell);
+	    },
+	
+	    // Root
+	    // ----
+	
+	    isRoot: function isRoot(cell) {
+	        return cell && this.root === cell;
 	    },
 	
 	    createRoot: function createRoot() {
@@ -1285,25 +1313,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    changeRoot: function changeRoot(root) {},
 	
-	    isRoot: function isRoot(cell) {
-	        return cell && this.root === cell;
-	    },
-	
+	    // Layers
+	    // ------
 	    isLayer: function isLayer(cell) {
 	        return cell && this.isRoot(cell.parent);
 	    },
 	
-	    isAncestor: function isAncestor(parent, child) {
-	        while (child && child !== parent) {
-	            child = child.parent;
-	        }
+	    getLayers: function getLayers() {},
 	
-	        return child === parent;
-	    },
+	    eachLayer: function eachLayer(iterator, context) {},
 	
-	    contains: function contains(cell) {
-	        return this.isAncestor(this.root, cell);
-	    },
+	    // Changes
+	    // -------
+	
+	    //
+	    //
 	
 	    add: function add(parent, child, index) {},
 	
@@ -1311,12 +1335,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    digest: function digest(change) {
 	
-	        change.digest();
-	
 	        var that = this;
 	
+	        that.emit(_eventsEventNames2['default'].BEFORE_DIGEST, { change: change });
+	        change.digest();
+	        that.emit(_eventsEventNames2['default'].AFTER_DIGEST, { change: change });
+	
 	        that.beginUpdate();
-	        that.emit();
+	        that.changes.add(change);
 	        that.endUpdate();
 	    },
 	
@@ -1324,10 +1350,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        that.updateLevel++;
-	        that.emit(new mxEventObject(mxEvent.BEGIN_UPDATE));
+	        that.emit(_eventsEventNames2['default'].BEGIN_UPDATE);
 	
 	        if (that.updateLevel === 1) {
-	            that.emit(new mxEventObject(mxEvent.START_EDIT));
+	            that.emit(_eventsEventNames2['default'].START_EDIT);
 	        }
 	    },
 	
@@ -1338,26 +1364,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.updateLevel--;
 	
 	        if (that.updateLevel === 0) {
-	            this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
+	            that.emit(_eventsEventNames2['default'].END_EDIT);
 	        }
 	
 	        if (!that.endingUpdate) {
+	
+	            var changes = that.changes;
+	
 	            that.endingUpdate = that.updateLevel === 0;
-	            this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
+	            that.emit(_eventsEventNames2['default'].END_UPDATE, { changes: changes.changes });
 	
 	            try {
-	                if (that.endingUpdate && !this.currentEdit.isEmpty()) {
-	                    this.fireEvent(new mxEventObject(mxEvent.BEFORE_UNDO, 'edit', this.currentEdit));
-	                    var tmp = this.currentEdit;
-	                    this.currentEdit = this.createUndoableEdit();
-	                    tmp.notify();
-	                    this.fireEvent(new mxEventObject(mxEvent.UNDO, 'edit', tmp));
+	                if (that.endingUpdate && changes.hasChange()) {
+	                    changes.notify().clear();
 	                }
 	            } finally {
 	                that.endingUpdate = false;
 	            }
 	        }
 	    }
+	
 	});
 	module.exports = exports['default'];
 
@@ -1673,26 +1699,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    emit: function emit(eventObj, sender) {
+	    emit: function emit(eventName, data, sender) {
+	
 	        var that = this;
 	        var listeners = that.eventListeners;
-	        var returned = null;
 	
 	        // No events.
-	        if (!listeners || !that.eventEnabled) {
-	            return returned;
+	        if (!listeners || !eventName || !that.eventEnabled) {
+	            return null;
 	        }
 	
-	        eventObj = eventObj || new _EventObject2['default']();
-	
-	        var eventName = eventObj.name;
-	
-	        if (!eventName) {
-	            return returned;
-	        }
-	
+	        var returned = []; // 返回每个回调函数返回值组成的数组
+	        var eventObj = new _EventObject2['default'](eventName, data);
 	        sender = sender || that;
-	        returned = []; // 返回每个回调函数返回值组成的数组
 	
 	        var list = listeners[eventName];
 	        var length = list ? list.length : 0;
@@ -1735,7 +1754,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.name = name;
 	        that.consumed = false;
 	
-	        eventData && (0, _commonUtils.extend)(data, eventData);
+	        if ((0, _commonUtils.isObject)(eventData)) {
+	            (0, _commonUtils.extend)(data, eventData);
+	        } else {
+	            that.data = eventData;
+	        }
 	    },
 	
 	    getName: function getName() {
@@ -1754,6 +1777,89 @@ return /******/ (function(modules) { // webpackBootstrap
 	    consume: function consume() {
 	        this.consumed = true;
 	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    BEFORE_DIGEST: 'beforeDigest',
+	    AFTER_DIGEST: 'afterDigest',
+	
+	    BEGIN_UPDATE: 'beginUpdate',
+	    END_UPDATE: 'endUpdate',
+	
+	    START_EDIT: 'startEdit',
+	    END_EDIT: 'endEdit',
+	
+	    CHANGE: 'change'
+	};
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(10);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _eventsEventNames = __webpack_require__(27);
+	
+	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function ChangeCollection(model) {
+	
+	        var that = this;
+	        that.model = model;
+	    },
+	
+	    hasChange: function hasChange() {
+	        var changes = this.changes;
+	        return changes && changes.length;
+	    },
+	
+	    add: function add(change) {
+	
+	        var that = this;
+	        var changes = that.changes;
+	
+	        if (change) {
+	            if (!changes) {
+	                changes = that.changes = [];
+	            }
+	
+	            changes.push(change);
+	        }
+	
+	        return change;
+	    },
+	
+	    clear: function clear() {
+	        this.changes = null;
+	    },
+	
+	    notify: function notify() {
+	
+	        var that = this;
+	
+	        this.model.emit(_eventsEventNames2['default'].CHANGE, { changes: that.changes });
+	
+	        return that;
+	    }
+	
 	});
 	module.exports = exports['default'];
 

@@ -1,4 +1,4 @@
-import { extend } from '../common/utils';
+import { isObject, extend } from '../common/utils';
 import Base from '../lib/Base';
 
 export default Base.extend({
@@ -10,7 +10,11 @@ export default Base.extend({
         that.name = name;
         that.consumed = false;
 
-        eventData && extend(data, eventData);
+        if (isObject(eventData)) {
+            extend(data, eventData);
+        } else {
+            that.data = eventData;
+        }
     },
 
     getName: function () {

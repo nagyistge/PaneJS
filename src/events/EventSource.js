@@ -2,6 +2,7 @@ import {
     keys,
     each
 } from '../common/utils';
+
 import Base from '../lib/Base';
 import EventObject from  './EventObject';
 
@@ -98,26 +99,19 @@ export default Base.extend({
         return that;
     },
 
-    emit: function (eventObj, sender) {
+    emit: function (eventName, data, sender) {
+
         var that = this;
         var listeners = that.eventListeners;
-        var returned = null;
 
         // No events.
-        if (!listeners || !that.eventEnabled) {
-            return returned;
+        if (!listeners || !eventName || !that.eventEnabled) {
+            return null;
         }
 
-        eventObj = eventObj || new EventObject();
-
-        var eventName = eventObj.name;
-
-        if (!eventName) {
-            return returned;
-        }
-
+        var returned = []; // 返回每个回调函数返回值组成的数组
+        var eventObj = new EventObject(eventName, data);
         sender = sender || that;
-        returned = []; // 返回每个回调函数返回值组成的数组
 
         var list = listeners[eventName];
         var length = list ? list.length : 0;
