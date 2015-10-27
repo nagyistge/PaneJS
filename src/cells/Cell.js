@@ -1,9 +1,23 @@
-import { clone, isNode, isFunction } from '../common/utils';
+import {
+    clone,
+    isNode,
+    isFunction,
+    ucFirst
+} from '../common/utils';
+
 import Base from '../lib/Base';
 
-var transients = ['id', 'value', 'parent', 'source', 'target', 'children', 'links'];
-
 export default Base.extend({
+
+    Accessors: [
+        'id',
+        'value',
+        'style',
+        'parent',
+        'visible',
+        'geometry'
+    ],
+
     constructor: function Cell(value, geometry, style) {
 
         var that = this;
@@ -41,7 +55,7 @@ export default Base.extend({
 
     clone: function () {
         var that = this;
-        var cloned = clone(that, transients);
+        var cloned = clone(that, that.transients);
         cloned.value = that.cloneValue();
 
         return cloned;

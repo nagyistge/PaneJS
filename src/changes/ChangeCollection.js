@@ -31,13 +31,14 @@ export default Base.extend({
 
     clear: function () {
         this.changes = null;
+        return this;
     },
 
     notify: function () {
 
         var that = this;
 
-        this.model.emit(eventNames.CHANGE, {changes: that.changes});
+        that.model.emit(eventNames.CHANGE, {changes: that.changes});
 
         return that;
     }

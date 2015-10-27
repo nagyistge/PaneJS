@@ -1,4 +1,4 @@
-import Class from './common/Class';
+import Class from './common/class';
 import EventSource from './events/EventSource';
 import View from './View';
 import Model from './Model';

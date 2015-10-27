@@ -1,4 +1,4 @@
-import Class from './common/Class';
+import Class from './common/class';
 // cells
 import Node from './cells/Node';
 // events
@@ -79,12 +79,20 @@ export default Class.create({
 
     setRoot: function (root) {
         this.digest(new RootChange(this, root));
-
         return root;
     },
 
-    changeRoot: function (root) {
+    changeRoot: function (newRoot) {
 
+        var that = this;
+        var oldRoot = that.root;
+
+        that.root = newRoot;
+        that.nextId = 0;
+        that.cells = null;
+        that.cellAdded(root);
+
+        return oldRoot;
     },
 
 
@@ -112,7 +120,9 @@ export default Class.create({
 
     },
 
-    cellAdded: function () {},
+    cellAdded: function () {
+
+    },
 
     digest: function (change) {
 

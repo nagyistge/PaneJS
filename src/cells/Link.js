@@ -2,6 +2,8 @@ import Cell from './Cell';
 
 export default Cell.extend({
 
+    transients: ['id', 'value', 'parent', 'source', 'target'],
+
     constructor: function Link(value, geometry, style) {
 
         var that = this;

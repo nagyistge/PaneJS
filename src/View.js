@@ -1,6 +1,13 @@
-import { each, getCurrentStyle } from './common/utils';
+import {
+    each,
+    getCurrentStyle,
+    createSvgElement
+} from './common/utils';
+
 import detector from './common/detector';
 import Base from './lib/Base';
+import Point from './lib/Point';
+import Rectangle from './lib/Rectangle';
 
 export default Base.extend({
     constructor: function View(graph) {
@@ -9,18 +16,18 @@ export default Base.extend({
         that.graph = graph;
         that.translate = new Point();
         that.graphBounds = new Rectangle();
-        that.states = new mxDictionary();
+        //that.states = new mxDictionary();
     },
 
     init: function () {
 
         var that = this;
-        var root = document.createElementNS(mxConstants.NS_SVG, 'svg');
-        var canvas = document.createElementNS(mxConstants.NS_SVG, 'g');
-        var backgroundPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-        var drawPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-        var overlayPane = document.createElementNS(mxConstants.NS_SVG, 'g');
-        var decoratorPane = document.createElementNS(mxConstants.NS_SVG, 'g');
+        var root = createSvgElement('svg');
+        var canvas = createSvgElement('g');
+        var backgroundPane = createSvgElement('g');
+        var drawPane = createSvgElement('g');
+        var overlayPane = createSvgElement('g');
+        var decoratorPane = createSvgElement('g');
 
         canvas.appendChild(backgroundPane);
         canvas.appendChild(drawPane);
@@ -41,25 +48,23 @@ export default Base.extend({
         var container = that.graph.container;
         if (container) {
             container.appendChild(root);
-            that.updateContainerStyle(container);
+
+            // update container style
+            var style = getCurrentStyle(container);
+            if (style.position === 'static') {
+                container.style.position = 'relative';
+            }
+
+            // Disables built-in pan and zoom in IE10 and later
+            if (detector.IS_POINTER) {
+                container.style.msTouchAction = 'none';
+            }
         }
 
         that.installListeners();
     },
 
-    installListeners: function () {},
+    installListeners: function () {
 
-    updateContainerStyle: function (container) {
-        var style = getCurrentStyle(container);
-
-        if (style.position === 'static') {
-            container.style.position = 'relative';
-        }
-
-        // 禁用默认的平移和缩放
-        // Disables built-in pan and zoom in IE10 and later
-        if (detector.IS_POINTER) {
-            container.style.msTouchAction = 'none';
-        }
     }
 });

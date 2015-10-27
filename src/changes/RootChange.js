@@ -17,7 +17,7 @@ export default Change.extend({
         var previous = that.previous;
 
         that.root = previous;
-        that.previous = model.rootChanged(previous);
+        that.previous = model.changeRoot(previous);
 
         return that;
     }

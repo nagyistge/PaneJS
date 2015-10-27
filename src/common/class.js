@@ -1,6 +1,10 @@
-// ref: https://github.com/aralejs/class
-
-import { each, forIn, hasKey, isArray, isFunction } from './utils';
+import {
+    each,
+    forIn,
+    hasKey,
+    isArray,
+    isFunction
+} from './utils';
 
 
 function Class(fn) {
@@ -47,6 +51,7 @@ Class.extend = function (properties) {
 // define special properties.
 Class.Mutators = {
 
+    // 继承
     'Extends': function (parent) {
         var existed = this.prototype;
         var parentProto = parent.prototype;
@@ -62,6 +67,7 @@ Class.Mutators = {
         this.superclass = parentProto;
     },
 
+    // 实现
     'Implements': function (items) {
 
         var list = isArray(items) ? items : [items];
@@ -71,6 +77,27 @@ Class.Mutators = {
             mix(proto, item.prototype || item);
         });
 
+    },
+
+    // 属性访问器
+    'Accessors': function (propNames) {
+
+        var props = isArray(propNames) ? propNames : [propNames];
+        var proto = this.prototype;
+
+        each(props, function (prop) {
+
+            var uc = ucFirst(prop);
+
+            proto['set' + uc] = function (value) {
+                this[prop] = value;
+                return this;
+            };
+
+            proto['get' + uc] = function () {
+                return this[prop];
+            };
+        });
     },
 
     'Statics': function (staticProperties) {
