@@ -194,9 +194,16 @@ module.exports = Class.create({
     },
 
 
-    createHandlers: function () {},
-    //
-    //
+    createHandlers: function () {
+        var that = this;
+        that.connectionHandler = that.createConnectionHandler();
+        that.connectionHandler.setEnabled(false);
+    },
+
+    createConnectionHandler: function () {
+        return new ConnectionHandler(this);
+    },
+
     createSelectionModel: function () {},
     createStylesheet: function () {
         return new Stylesheet();
@@ -1267,8 +1274,12 @@ module.exports = Class.create({
     isValidSource: function () {},
     isValidTarget: function () {},
     isValidConnection: function () {},
-    setConnectable: function () {},
-    isConnectable: function () {},
+    setConnectable: function (connectable) {
+        this.connectionHandler.setEnabled(connectable);
+    },
+    isConnectable: function () {
+        return this.connectionHandler.isEnabled();
+    },
     setTooltips: function () {},
     setPanning: function () {},
     isEditing: function () {},

@@ -10,7 +10,7 @@ module.exports = Shape.extend({
 
         var shape = this;
 
-        shape.constructor.superclass.constructor.call(shape);
+        Shape.call(shape);
 
         shape.bounds = bounds;
         shape.fill = fill;

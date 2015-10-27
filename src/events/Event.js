@@ -9,7 +9,6 @@ var eventSplitter = /\s+/;
 
 
 module.exports = Class.create({
-
     eventListeners: null,
     eventEnabled: true,
     eventSource: null,
@@ -155,5 +154,5 @@ module.exports = Class.create({
         }
 
         return returned;
-    }
+    },
 });

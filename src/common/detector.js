@@ -1,9 +1,12 @@
+
 var ua = navigator.userAgent;
 var av = navigator.appVersion;
 
 module.exports = {
     // IE
     IS_IE: ua.indexOf('MSIE') >= 0,
+
+    IS_QUIRKS: navigator.userAgent.indexOf('MSIE') >= 0 && (document.documentMode === null || document.documentMode === 5),
 
     IS_IE11: !!ua.match(/Trident\/7\./),
 
@@ -30,5 +33,32 @@ module.exports = {
 
     IS_TOUCH: 'ontouchstart' in document.documentElement,
 
-    IS_POINTER: window.navigator.msPointerEnabled || false
+    IS_POINTER: window.navigator.msPointerEnabled || false,
+
+    IS_OT: navigator.userAgent.indexOf('Presto/2.4.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.3.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.2.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.1.') < 0 &&
+    navigator.userAgent.indexOf('Presto/2.0.') < 0 &&
+    navigator.userAgent.indexOf('Presto/1.') < 0,
+
+    /**
+     * Variable: IS_MT
+     *
+     * True if -moz-transform is available as a CSS style. This is the case
+     * for all Firefox-based browsers newer than or equal 3, such as Camino,
+     * Iceweasel, Seamonkey and Iceape.
+     */
+    IS_MT: (navigator.userAgent.indexOf('Firefox/') >= 0 &&
+    navigator.userAgent.indexOf('Firefox/1.') < 0 &&
+    navigator.userAgent.indexOf('Firefox/2.') < 0) ||
+    (navigator.userAgent.indexOf('Iceweasel/') >= 0 &&
+    navigator.userAgent.indexOf('Iceweasel/1.') < 0 &&
+    navigator.userAgent.indexOf('Iceweasel/2.') < 0) ||
+    (navigator.userAgent.indexOf('SeaMonkey/') >= 0 &&
+    navigator.userAgent.indexOf('SeaMonkey/1.') < 0) ||
+    (navigator.userAgent.indexOf('Iceape/') >= 0 &&
+    navigator.userAgent.indexOf('Iceape/1.') < 0),
+
 };
+

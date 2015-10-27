@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello, Graph</title>
+    <title>customize shape</title>
     <script src="../node_modules/requirejs/require.js"></script>
 </head>
 <body>
@@ -20,8 +20,7 @@
 
             var graph = new Graph(container);
 
-            graph.getView().setScale(1.5);
-            graph.getView().setTranslate(10, 20);
+            graph.setConnectable(true);
 
             var parent = graph.getDefaultParent();
 
