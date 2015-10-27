@@ -143,7 +143,6 @@ module.exports = cellPath;
 
 });
 
-
 define('PaneJS/common/detector',['require','exports','module'],function (require, exports, module) {
 var ua = navigator.userAgent;
 var av = navigator.appVersion;
@@ -2597,9 +2596,9 @@ utils.setCellStyles = function (model, cells, key, value) {
 };
 
 utils.setStyle = function (style, key, value) {
-    var isValue = value !== null && (typeof(value.length) === 'undefined' || value.length > 0);
+    var isValue = value != null && (typeof(value.length) == 'undefined' || value.length > 0);
 
-    if (style === null || style.length === 0) {
+    if (style == null || style.length == 0) {
         if (isValue) {
             style = key + '=' + value;
         }
@@ -5036,14 +5035,14 @@ define('PaneJS/changes/StyleChange',['require','exports','module','../common/cla
 var Class = require('../common/class');
 
 module.exports = Class.create({
-    constructor: function mxStyleChange(model, cell, style) {
+    constructor: function StyleChange(model, cell, style) {
         this.model = model;
         this.cell = cell;
         this.style = style;
         this.previous = style;
     },
 
-    execute: function () {
+    digest: function () {
         this.style = this.previous;
         this.previous = this.model.styleForCellChanged(
             this.cell, this.previous);
@@ -5596,6 +5595,34 @@ module.exports = Change.extend({
         change.root = previous;
         change.previous = model.rootChanged(previous);
 
+        return change;
+    }
+});
+
+
+});
+define('PaneJS/changes/GeometryChange',['require','exports','module','./Change'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+
+var Change = require('./Change');
+
+module.exports = Change.extend({
+
+    constructor: function RootChange(model, cell, geometry) {
+        var change = this;
+
+        Change.call(change, model);
+
+        change.cell = cell;
+        change.geometry = geometry;
+        change.previous = geometry;
+    },
+
+    digest: function () {
+        var change = this;
+        change.geometry = change.previous;
+        change.previous = change.model.geometryForCellChanged(
+            change.cell, change.previous);
         return change;
     }
 });
