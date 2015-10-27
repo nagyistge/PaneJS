@@ -1,10 +1,15 @@
-import { each, indexOf, isNullOrUndefined } from '../common/utils';
+import {
+    each,
+    indexOf,
+    isNullOrUndefined
+} from '../common/utils';
+
 import Cell from './Cell';
 
 
 export default Cell.extend({
 
-    transients : ['id', 'value', 'parent', 'children', 'links'],
+    transients: ['id', 'value', 'parent', 'children', 'links'],
 
     constructor: function Node(value, geometry, style) {
 

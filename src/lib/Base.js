@@ -1,4 +1,8 @@
-import { forIn, getFunctionName } from '../common/utils';
+import {
+    forIn,
+    getFunctionName
+} from '../common/utils';
+
 import Class from '../common/class';
 
 var Base = Class.create({

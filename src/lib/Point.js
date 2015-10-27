@@ -1,4 +1,7 @@
-import { isNullOrUndefined } from '../common/utils';
+import {
+    isNullOrUndefined
+} from '../common/utils';
+
 import Base from './Base';
 
 

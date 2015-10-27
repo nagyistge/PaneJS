@@ -3,7 +3,8 @@ import {
     forIn,
     hasKey,
     isArray,
-    isFunction
+    isFunction,
+    ucFirst
 } from './utils';
 
 

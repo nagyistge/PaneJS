@@ -305,7 +305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        cloned = new obj.constructor();
 	
 	        for (var key in obj) {
-	            if (key !== mxObjectIdentity.FIELD_NAME && (!transients || (0, _array.indexOf)(transients, key) < 0)) {
+	            if (key !== mxObjectIdentity.fieldName && (!transients || (0, _array.indexOf)(transients, key) < 0)) {
 	                if (!shallow && typeof obj[key] === 'object') {
 	                    cloned[key] = clone(obj[key]);
 	                } else {
@@ -587,7 +587,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    if (tagName) {
 	        if (doc.createElementNS) {
-	            doc.createElementNS(namespace || NS_SVG, tagName);
+	            ele = doc.createElementNS(namespace || NS_SVG, tagName);
 	        } else {
 	            ele = doc.createElement(tagName);
 	            namespace && ele.setAttribute('xmlns', namespace);
@@ -670,7 +670,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    insertLink: function insertLink() {},
 	
-	    createLink: function createLink() {}
+	    createLink: function createLink() {},
+	
+	    getCellStyle: function getCellStyle(cell) {}
 	});
 	module.exports = exports['default'];
 
@@ -765,7 +767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        (0, _utils.each)(props, function (prop) {
 	
-	            var uc = ucFirst(prop);
+	            var uc = (0, _utils.ucFirst)(prop);
 	
 	            proto['set' + uc] = function (value) {
 	                this[prop] = value;
@@ -1098,14 +1100,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
+	var _libDictionary = __webpack_require__(26);
+	
+	var _libDictionary2 = _interopRequireDefault(_libDictionary);
+	
 	exports['default'] = _libBase2['default'].extend({
 	    constructor: function View(graph) {
 	
 	        var that = this;
 	        that.graph = graph;
+	        that.states = new _libDictionary2['default']();
 	        that.translate = new _libPoint2['default']();
 	        that.graphBounds = new _libRectangle2['default']();
-	        //that.states = new mxDictionary();
 	    },
 	
 	    init: function init() {
@@ -1153,7 +1159,100 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.installListeners();
 	    },
 	
-	    installListeners: function installListeners() {}
+	    installListeners: function installListeners() {},
+	
+	    refresh: function refresh() {},
+	
+	    revalidate: function revalidate() {
+	        return this.invalidate().validate();
+	    },
+	
+	    invalidate: function invalidate(cell, recurse, includeLink) {
+	
+	        var that = this;
+	        var model = that.graph.model;
+	
+	        cell = cell || model.getRoot();
+	        recurse = !(0, _commonUtils.isUndefined)(recurse) ? recurse : true;
+	        includeLink = !(0, _commonUtils.isUndefined)(includeLink) ? includeLink : true;
+	
+	        var state = that.getState(cell);
+	
+	        if (state) {
+	            state.invalid = true;
+	        }
+	
+	        // 只有 node 才有递归的必要
+	        if (!cell.invalidating && cell.isNode) {
+	
+	            cell.invalidating = true;
+	
+	            if (recurse) {
+	
+	                cell.eachChild(function (child) {
+	                    that.invalidate(child, recurse, includeLink);
+	                });
+	            }
+	
+	            if (includeLink) {
+	
+	                cell.eachLink(function (link) {
+	                    that.invalidate(link, recurse, includeLink);
+	                });
+	            }
+	
+	            delete cell.invalidating;
+	        }
+	
+	        return that;
+	    },
+	
+	    validate: function validate() {},
+	
+	    // State
+	    // -----
+	    getState: function getState(cell, create) {
+	
+	        if (!cell) {
+	            return;
+	        }
+	
+	        var that = this;
+	        var states = that.states;
+	        var state = states.get(cell);
+	
+	        // TODO: that.updateStyle
+	        if (create && (!state || that.updateStyle) && cell.visible) {
+	
+	            if (!state) {
+	                state = that.createState(cell);
+	                states.put(cell, state);
+	            } else {
+	                state.style = that.graph.getCellStyle(cell);
+	            }
+	        }
+	
+	        return state;
+	    },
+	
+	    createState: function createState(cell) {
+	
+	        var that = this;
+	        var graph = that.graph;
+	
+	        // TODO: view.currentRoot
+	
+	        var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
+	        var model = this.graph.getModel();
+	
+	        if (state.view.graph.container != null && state.cell != state.view.currentRoot && (model.isVertex(state.cell) || model.isEdge(state.cell))) {
+	            this.graph.cellRenderer.createShape(state);
+	        }
+	
+	        return state;
+	    },
+	
+	    destroy: function destroy() {}
 	});
 	module.exports = exports['default'];
 
@@ -1350,8 +1449,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	});
 	
-	console.log(new Rectangle(1, 2, 3, 4));
-	
 	exports['default'] = Rectangle;
 	module.exports = exports['default'];
 
@@ -1476,7 +1573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.root = newRoot;
 	        that.nextId = 0;
 	        that.cells = null;
-	        that.cellAdded(root);
+	        that.cellAdded(newRoot);
 	
 	        return oldRoot;
 	    },
@@ -1499,7 +1596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    add: function add(parent, child, index) {},
 	
-	    cellAdded: function cellAdded() {},
+	    cellAdded: function cellAdded(cell) {},
 	
 	    digest: function digest(change) {
 	
@@ -1952,6 +2049,145 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Base = __webpack_require__(13);
+	
+	var _Base2 = _interopRequireDefault(_Base);
+	
+	var _commonObjectIdentity = __webpack_require__(27);
+	
+	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
+	
+	exports['default'] = _Base2['default'].extend({
+	
+	    constructor: function Dictionary() {
+	        this.clear();
+	    },
+	
+	    clear: function clear() {
+	        var that = this;
+	
+	        that.map = {};
+	
+	        return that;
+	    },
+	
+	    get: function get(key) {
+	        var id = _commonObjectIdentity2['default'].get(key);
+	        return this.map[id];
+	    },
+	
+	    put: function put(key, value) {
+	
+	        var map = this.map;
+	        var id = _commonObjectIdentity2['default'].get(key);
+	        var previous = map[id];
+	
+	        map[id] = value;
+	
+	        return previous;
+	    },
+	
+	    remove: function remove(key) {
+	
+	        var map = this.map;
+	        var id = _commonObjectIdentity2['default'].get(key);
+	        var previous = map[id];
+	
+	        delete map[id];
+	
+	        return previous;
+	    },
+	
+	    getKeys: function getKeys() {
+	        return (0, _commonUtils.keys)(this.map);
+	    },
+	
+	    getValues: function getValues() {
+	
+	        var result = [];
+	
+	        (0, _commonUtils.forIn)(this.map, function (value) {
+	            result.push(value);
+	        });
+	
+	        return result;
+	    },
+	
+	    each: function each(visitor, context) {
+	
+	        var that = this;
+	
+	        (0, _commonUtils.forIn)(that.map, visitor, context);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	// 用构造函数名作为计数器依据
+	var counterMap = {};
+	
+	var objectIdentity = {
+	
+	    fieldName: 'objectId',
+	
+	    get: function get(obj) {
+	
+	        var fieldName = objectIdentity.fieldName;
+	        var isObj = (0, _utils.isObject)(obj);
+	
+	        if (isObj && (0, _utils.isUndefined)(obj[fieldName])) {
+	
+	            var ctorName = (0, _utils.getFunctionName)(obj.constructor);
+	
+	            if (!counterMap[ctorName]) {
+	                counterMap[ctorName] = 1;
+	            } else {
+	                counterMap[ctorName] += 1;
+	            }
+	
+	            obj[fieldName] = ctorName + '#' + counterMap[ctorName];
+	        }
+	
+	        return isObj ? obj[fieldName] : '' + obj;
+	    },
+	
+	    clear: function clear(obj) {
+	        if ((0, _utils.isObject)(obj)) {
+	            delete obj[objectIdentity.fieldName];
+	        }
+	    }
+	};
+	
+	exports['default'] = objectIdentity;
 	module.exports = exports['default'];
 
 /***/ }

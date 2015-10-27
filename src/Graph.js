@@ -36,5 +36,9 @@ export default Class.create({
 
     insertLink: function () {},
 
-    createLink: function () {}
+    createLink: function () {},
+
+    getCellStyle: function (cell) {
+
+    }
 });

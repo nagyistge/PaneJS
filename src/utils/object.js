@@ -41,7 +41,7 @@ function clone(obj, transients, shallow) {
         cloned = new obj.constructor();
 
         for (var key in obj) {
-            if (key !== mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, key) < 0)) {
+            if (key !== mxObjectIdentity.fieldName && (!transients || indexOf(transients, key) < 0)) {
                 if (!shallow && typeof obj[key] === 'object') {
                     cloned[key] = clone(obj[key]);
                 } else {

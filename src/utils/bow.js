@@ -28,7 +28,7 @@ function createSvgElement(tagName, ownerDocument, namespace) {
 
     if (tagName) {
         if (doc.createElementNS) {
-            doc.createElementNS(namespace || NS_SVG, tagName);
+            ele = doc.createElementNS(namespace || NS_SVG, tagName);
         } else {
             ele = doc.createElement(tagName);
             namespace && ele.setAttribute('xmlns', namespace);

@@ -1,22 +1,25 @@
 import {
     each,
+    isUndefined,
+    isNullOrUndefined,
     getCurrentStyle,
     createSvgElement
 } from './common/utils';
 
-import detector from './common/detector';
-import Base from './lib/Base';
-import Point from './lib/Point';
-import Rectangle from './lib/Rectangle';
+import detector   from './common/detector';
+import Base       from './lib/Base';
+import Point      from './lib/Point';
+import Rectangle  from './lib/Rectangle';
+import Dictionary from './lib/Dictionary';
 
 export default Base.extend({
     constructor: function View(graph) {
 
         var that = this;
         that.graph = graph;
+        that.states = new Dictionary();
         that.translate = new Point();
         that.graphBounds = new Rectangle();
-        //that.states = new mxDictionary();
     },
 
     init: function () {
@@ -65,6 +68,109 @@ export default Base.extend({
     },
 
     installListeners: function () {
+
+    },
+
+    refresh: function () {},
+
+    revalidate: function () {
+        return this
+            .invalidate()
+            .validate();
+    },
+
+    invalidate: function (cell, recurse, includeLink) {
+
+        var that = this;
+        var model = that.graph.model;
+
+        cell = cell || model.getRoot();
+        recurse = !isUndefined(recurse) ? recurse : true;
+        includeLink = !isUndefined(includeLink) ? includeLink : true;
+
+
+        var state = that.getState(cell);
+
+        if (state) {
+            state.invalid = true;
+        }
+
+        // 只有 node 才有递归的必要
+        if (!cell.invalidating && cell.isNode) {
+
+            cell.invalidating = true;
+
+            if (recurse) {
+
+                cell.eachChild(function (child) {
+                    that.invalidate(child, recurse, includeLink);
+                });
+            }
+
+            if (includeLink) {
+
+                cell.eachLink(function (link) {
+                    that.invalidate(link, recurse, includeLink);
+                });
+            }
+
+            delete cell.invalidating;
+        }
+
+        return that;
+    },
+
+    validate: function () {
+
+    },
+
+
+    // State
+    // -----
+    getState: function (cell, create) {
+
+        if (!cell) {
+            return;
+        }
+
+        var that = this;
+        var states = that.states;
+        var state = states.get(cell);
+
+        // TODO: that.updateStyle
+        if (create && (!state || that.updateStyle) && cell.visible) {
+
+            if (!state) {
+                state = that.createState(cell);
+                states.put(cell, state);
+            } else {
+                state.style = that.graph.getCellStyle(cell);
+            }
+        }
+
+        return state;
+    },
+
+    createState: function (cell) {
+
+        var that = this;
+        var graph = that.graph;
+
+
+        // TODO: view.currentRoot
+
+        var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
+        var model = this.graph.getModel();
+
+        if (state.view.graph.container != null && state.cell != state.view.currentRoot &&
+            (model.isVertex(state.cell) || model.isEdge(state.cell))) {
+            this.graph.cellRenderer.createShape(state);
+        }
+
+        return state;
+    },
+
+    destroy: function () {
 
     }
 });

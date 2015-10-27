@@ -90,7 +90,7 @@ export default Class.create({
         that.root = newRoot;
         that.nextId = 0;
         that.cells = null;
-        that.cellAdded(root);
+        that.cellAdded(newRoot);
 
         return oldRoot;
     },
@@ -120,7 +120,7 @@ export default Class.create({
 
     },
 
-    cellAdded: function () {
+    cellAdded: function (cell) {
 
     },
 
