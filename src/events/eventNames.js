@@ -1,6 +1,6 @@
 module.exports = {
-    BEFORE_DIGEST: 'beforeDigest',
-    AFTER_DIGEST: 'afterDigest',
+    //BEFORE_DIGEST: 'beforeDigest',
+    //AFTER_DIGEST: 'afterDigest',
 
     BEGIN_UPDATE: 'beginUpdate',
     END_UPDATE: 'endUpdate',

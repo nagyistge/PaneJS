@@ -29,7 +29,7 @@ export default Cell.extend({
     // children
     // --------
 
-    getChildrenCount: function () {
+    getChildCount: function () {
         var children = this.children;
         return children ? children.length : 0;
     },
@@ -59,7 +59,7 @@ export default Cell.extend({
 
             // fix index
             if (isNullOrUndefined(index)) {
-                index = that.getChildrenCount();
+                index = that.getChildCount();
 
                 if (child.parent === that) {
                     index--;
@@ -110,7 +110,7 @@ export default Cell.extend({
     // links
     // ------
 
-    getLinksCount: function () {
+    getLinkCount: function () {
         var links = this.links;
         return links ? links.length : 0;
     },

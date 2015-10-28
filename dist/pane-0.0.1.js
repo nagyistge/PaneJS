@@ -620,6 +620,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
+	var _commonUtils = __webpack_require__(1);
+	
 	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
@@ -684,7 +686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var node = that.createNode(id, value, x, y, width, height, style, relative);
 	
-	        return that.addCell(node, parent);
+	        return that.addNode(node, parent);
 	    },
 	
 	    createNode: function createNode(id, value, x, y, width, height, style, relative) {
@@ -692,18 +694,85 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return new _cellsNode2['default'](id, value, geometry, style);
 	    },
 	
+	    addNode: function addNode(node, parent, index) {
+	        return this.addCells([node], parent, index)[0];
+	    },
+	
 	    insertLink: function insertLink() {},
 	
 	    createLink: function createLink() {},
 	
-	    addCell: function addCell(cell, parent) {},
+	    addLink: function addLink(cell, parent) {},
 	
-	    getModel: function getModel() {
-	        return this.model;
+	    addCells: function addCells(cells, parent, index, source, target) {
+	
+	        var that = this;
+	        var model = that.model;
+	
+	        parent = parent || that.getDefaultParent();
+	        index = (0, _commonUtils.isUndefined)(index) ? parent.getChildCount() : index;
+	
+	        model.beginUpdate();
+	        that.cellsAdded(cells, parent, index, source, target, false, true);
+	        model.endUpdate();
+	
+	        return cells;
 	    },
 	
-	    getView: function getView() {
-	        return this.view;
+	    cellsAdded: function cellsAdded(cells, parent, index, source, target, absolute, constrain) {
+	
+	        var that = this;
+	        var model = that.model;
+	
+	        if (cells && parent && !(0, _commonUtils.isUndefined)(index)) {
+	            model.beginUpdate();
+	
+	            var parentState = absolute ? this.view.getState(parent) : null;
+	            var parentOrigin = parentState ? parentState.origin : null;
+	
+	            (0, _commonUtils.each)(cells, function (cell, i) {
+	
+	                if (!cell) {
+	                    index -= 1;
+	                    return;
+	                }
+	
+	                var previous = cell.parent;
+	
+	                // TODO: Keeps the cell at its absolute location
+	                if (parentOrigin && cell !== parent && previous !== parent) {}
+	
+	                // TODO: Decrements all following indices if cell is already in parent
+	                if (previous === parent && index + i > parent.getChildCount()) {}
+	
+	                that.model.add(parent, cell, index + i);
+	
+	                if (that.autoSizeCellsOnAdd) {
+	                    that.autoSizeCell(cell, true);
+	                }
+	
+	                // TODO: Extends the parent or constrains the child
+	                //if (this.isExtendParentsOnAdd() && this.isExtendParent(cells[i])) {
+	                //    this.extendParent(cells[i]);
+	                //}
+	
+	                // TODO: Additionally constrains the child after extending the parent
+	                if (constrain) {}
+	                //this.constrainChild(cells[i]);
+	
+	                // Sets the source terminal
+	                //if (source) {
+	                //    this.cellConnected(cells[i], source, true);
+	                //}
+	
+	                // Sets the target terminal
+	                //if (target) {
+	                //    this.cellConnected(cells[i], target, false);
+	                //}
+	            });
+	
+	            model.endUpdate();
+	        }
 	    },
 	
 	    getCellStyle: function getCellStyle(cell) {},
@@ -717,6 +786,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	
 	        return that.getCurrentRoot() || that.defaultParent || that.model.getRoot().getChildAt(0);
+	    },
+	
+	    // 一些便利方法
+	    // ----------
+	
+	    getModel: function getModel() {
+	        return this.model;
+	    },
+	
+	    getView: function getView() {
+	        return this.view;
+	    },
+	
+	    beginUpdate: function beginUpdate() {
+	        this.model.beginUpdate();
+	        return this;
+	    },
+	
+	    endUpdate: function endUpdate() {
+	        this.model.endUpdate();
+	        return this;
 	    }
 	});
 	module.exports = exports['default'];
@@ -1149,7 +1239,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libDictionary2 = _interopRequireDefault(_libDictionary);
 	
+	var _changesChildChange = __webpack_require__(38);
+	
+	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
+	
 	exports['default'] = _libBase2['default'].extend({
+	
 	    constructor: function View(graph) {
 	
 	        var that = this;
@@ -1158,6 +1253,189 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.translate = new _libPoint2['default']();
 	        that.graphBounds = new _libRectangle2['default']();
 	    },
+	
+	    getBounds: function getBounds() {},
+	
+	    setCurrentRoot: function setCurrentRoot() {},
+	
+	    scaleAndTranslate: function scaleAndTranslate() {},
+	
+	    setScale: function setScale() {},
+	
+	    setTranslate: function setTranslate() {},
+	
+	    refresh: function refresh() {},
+	
+	    revalidate: function revalidate() {
+	        return this.invalidate().validate();
+	    },
+	
+	    clear: function clear() {},
+	
+	    invalidate: function invalidate(cell, recurse, includeLink) {
+	
+	        var that = this;
+	        var model = that.graph.model;
+	
+	        cell = cell || model.getRoot();
+	        recurse = !(0, _commonUtils.isUndefined)(recurse) ? recurse : true;
+	        includeLink = !(0, _commonUtils.isUndefined)(includeLink) ? includeLink : true;
+	
+	        var state = that.getState(cell);
+	
+	        if (state) {
+	            state.invalid = true;
+	        }
+	
+	        // 只有 node 才有递归的必要
+	        if (!cell.invalidating && cell.isNode) {
+	
+	            cell.invalidating = true;
+	
+	            if (recurse) {
+	                cell.eachChild(function (child) {
+	                    that.invalidate(child, recurse, includeLink);
+	                });
+	            }
+	
+	            if (includeLink) {
+	                cell.eachLink(function (link) {
+	                    that.invalidate(link, recurse, includeLink);
+	                });
+	            }
+	
+	            delete cell.invalidating;
+	        }
+	
+	        return that;
+	    },
+	
+	    validate: function validate() {},
+	
+	    getEmptyBounds: function getEmptyBounds() {},
+	
+	    getBoundingBox: function getBoundingBox() {},
+	
+	    validateCell: function validateCell() {},
+	
+	    validateCellState: function validateCellState() {},
+	
+	    updateCellState: function updateCellState() {},
+	
+	    updateVertexState: function updateVertexState() {},
+	
+	    updateEdgeState: function updateEdgeState() {},
+	
+	    updateVertexLabelOffset: function updateVertexLabelOffset() {},
+	
+	    resetValidationState: function resetValidationState() {
+	        this.lastNode = null;
+	        this.lastHtmlNode = null;
+	        this.lastForegroundNode = null;
+	        this.lastForegroundHtmlNode = null;
+	    },
+	
+	    stateValidated: function stateValidated(state) {},
+	
+	    updateFixedTerminalPoints: function updateFixedTerminalPoints() {},
+	    updateFixedTerminalPoint: function updateFixedTerminalPoint() {},
+	
+	    updatePoints: function updatePoints(edge, points, source, target) {},
+	
+	    transformControlPoint: function transformControlPoint(state, pt) {},
+	
+	    getEdgeStyle: function getEdgeStyle(edge, points, source, target) {},
+	
+	    updateFloatingTerminalPoints: function updateFloatingTerminalPoints(state, source, target) {},
+	
+	    updateFloatingTerminalPoint: function updateFloatingTerminalPoint(edge, start, end, source) {},
+	
+	    getTerminalPort: function getTerminalPort(state, terminal, source) {},
+	
+	    getPerimeterPoint: function getPerimeterPoint(terminal, next, orthogonal, border) {},
+	
+	    getRoutingCenterX: function getRoutingCenterX(state) {},
+	
+	    getRoutingCenterY: function getRoutingCenterY(state) {},
+	
+	    getPerimeterBounds: function getPerimeterBounds(terminal, border) {},
+	
+	    getPerimeterFunction: function getPerimeterFunction(state) {},
+	
+	    getNextPoint: function getNextPoint(edge, opposite, source) {},
+	
+	    getVisibleTerminal: function getVisibleTerminal(edge, source) {},
+	
+	    updateEdgeBounds: function updateEdgeBounds(state) {},
+	
+	    getPoint: function getPoint(state, geometry) {},
+	
+	    getRelativePoint: function getRelativePoint(edgeState, x, y) {},
+	
+	    updateEdgeLabelOffset: function updateEdgeLabelOffset(state) {},
+	
+	    // State
+	    // -----
+	    getState: function getState(cell, create) {
+	
+	        if (!cell) {
+	            return;
+	        }
+	
+	        var that = this;
+	        var states = that.states;
+	        var state = states.get(cell);
+	
+	        // TODO: that.updateStyle
+	        if (create && (!state || that.updateStyle) && cell.visible) {
+	
+	            if (!state) {
+	                state = that.createState(cell);
+	                states.put(cell, state);
+	            } else {
+	                state.style = that.graph.getCellStyle(cell);
+	            }
+	        }
+	
+	        return state;
+	    },
+	
+	    createState: function createState(cell) {
+	
+	        var that = this;
+	        var graph = that.graph;
+	
+	        // TODO: that.currentRoot
+	
+	        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
+	
+	        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
+	            this.graph.cellRenderer.createShape(state);
+	        }
+	
+	        return state;
+	    },
+	
+	    removeState: function removeState(cell) {
+	
+	        var that = this;
+	        var state = null;
+	
+	        if (cell) {
+	            state = that.states.remove(cell);
+	
+	            if (state) {
+	                that.graph.cellRenderer.destroy(state);
+	                state.destroy();
+	            }
+	        }
+	
+	        return state;
+	    },
+	
+	    isContainerEvent: function isContainerEvent(evt) {},
+	
+	    isScrollEvent: function isScrollEvent(evt) {},
 	
 	    init: function init() {
 	
@@ -1205,98 +1483,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    installListeners: function installListeners() {},
-	
-	    refresh: function refresh() {},
-	
-	    revalidate: function revalidate() {
-	        return this.invalidate().validate();
-	    },
-	
-	    invalidate: function invalidate(cell, recurse, includeLink) {
-	
-	        var that = this;
-	        var model = that.graph.model;
-	
-	        cell = cell || model.getRoot();
-	        recurse = !(0, _commonUtils.isUndefined)(recurse) ? recurse : true;
-	        includeLink = !(0, _commonUtils.isUndefined)(includeLink) ? includeLink : true;
-	
-	        var state = that.getState(cell);
-	
-	        if (state) {
-	            state.invalid = true;
-	        }
-	
-	        // 只有 node 才有递归的必要
-	        if (!cell.invalidating && cell.isNode) {
-	
-	            cell.invalidating = true;
-	
-	            if (recurse) {
-	
-	                cell.eachChild(function (child) {
-	                    that.invalidate(child, recurse, includeLink);
-	                });
-	            }
-	
-	            if (includeLink) {
-	
-	                cell.eachLink(function (link) {
-	                    that.invalidate(link, recurse, includeLink);
-	                });
-	            }
-	
-	            delete cell.invalidating;
-	        }
-	
-	        return that;
-	    },
-	
-	    validate: function validate() {},
-	
-	    // State
-	    // -----
-	    getState: function getState(cell, create) {
-	
-	        if (!cell) {
-	            return;
-	        }
-	
-	        var that = this;
-	        var states = that.states;
-	        var state = states.get(cell);
-	
-	        // TODO: that.updateStyle
-	        if (create && (!state || that.updateStyle) && cell.visible) {
-	
-	            if (!state) {
-	                state = that.createState(cell);
-	                states.put(cell, state);
-	            } else {
-	                state.style = that.graph.getCellStyle(cell);
-	            }
-	        }
-	
-	        return state;
-	    },
-	
-	    createState: function createState(cell) {
-	
-	        var that = this;
-	        var graph = that.graph;
-	
-	        // TODO: that.currentRoot
-	
-	        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
-	
-	        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
-	            this.graph.cellRenderer.createShape(state);
-	        }
-	
-	        return state;
-	    },
-	
-	    removeState: function removeState(cell) {},
 	
 	    destroy: function destroy() {}
 	});
@@ -1528,6 +1714,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// events
 	
+	var _eventsAspect = __webpack_require__(39);
+	
+	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
+	
 	var _eventsEventNames = __webpack_require__(22);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
@@ -1542,36 +1732,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
+	var _changesChildChange = __webpack_require__(38);
+	
+	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
+	
 	var _changesChangeCollection = __webpack_require__(25);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
 	exports['default'] = _commonClass2['default'].create({
 	
-	    Extends: _eventsEventSource2['default'],
+	    Extends: _eventsEventSource2['default'], // event
+	    Implements: _eventsAspect2['default'], // AOP
 	
-	    // 属性
+	    // 配置项
 	    createIds: true,
 	    prefix: '',
 	    postfix: '',
-	    nextId: 0,
+	    maintainEdgeParent: true,
 	
 	    constructor: function Model(root) {
 	
 	        var that = this;
 	
-	        that.changes = new _changesChangeCollection2['default'](that);
-	
+	        that.nextId = 0;
 	        that.updateLevel = 0;
 	        that.endingUpdate = false;
+	
+	        that.changeCollection = new _changesChangeCollection2['default'](that);
 	
 	        if (root) {
 	            that.setRoot(root);
 	        } else {
 	            that.clear();
 	        }
-	
-	        console.log(that);
 	    },
 	
 	    clear: function clear() {
@@ -1592,8 +1786,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.isAncestor(this.root, cell);
 	    },
 	
-	    getCell: function getCell(id) {
+	    getCellById: function getCellById(id) {
 	        return this.cells ? this.cells[id] : null;
+	    },
+	
+	    // 按照层级获取所有父节点
+	    getParents: function getParents(child) {
+	
+	        var that = this;
+	        var result = [];
+	        var parent = child ? child.parent : null;
+	
+	        if (parent) {
+	            result.push(parent);
+	            result = result.concat(that.getParents(parent));
+	        }
+	
+	        return result;
+	    },
+	
+	    // 获取子孙节点
+	    getDescendants: function getDescendants(parent) {
+	
+	        var that = this;
+	        var result = [];
+	
+	        parent = parent || that.getRoot();
+	        parent.eachChild(function (child) {
+	            result.push(child);
+	            result = result.concat(that.getDescendants(child));
+	        });
+	
+	        return result;
 	    },
 	
 	    // Root
@@ -1626,18 +1850,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    setRoot: function setRoot(root) {
-	        this.digest(new _changesRootChange2['default'](this, root));
-	        return root;
+	        var that = this;
+	        that.digest(new _changesRootChange2['default'](that, root));
+	        return that;
 	    },
 	
-	    changeRoot: function changeRoot(newRoot) {
+	    // RootChange 的回调处理
+	    rootChanged: function rootChanged(newRoot) {
 	
 	        var that = this;
 	        var oldRoot = that.root;
 	
 	        that.root = newRoot;
-	        that.nextId = 0;
 	        that.cells = null;
+	        that.nextId = 0;
 	        that.cellAdded(newRoot);
 	
 	        return oldRoot;
@@ -1649,9 +1875,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cell && this.isRoot(cell.parent);
 	    },
 	
-	    getLayers: function getLayers() {},
-	
-	    eachLayer: function eachLayer(iterator, context) {},
+	    // 获取所有图层
+	    getLayers: function getLayers() {
+	        // 根节点的所有子节点就是图层
+	        return this.getRoot().children || [];
+	    },
 	
 	    // Changes
 	    // -------
@@ -1659,8 +1887,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //
 	    //
 	
-	    add: function add(parent, child, index) {},
+	    add: function add(parent, child, index) {
 	
+	        var that = this;
+	
+	        if (parent && child && parent !== child) {
+	
+	            if ((0, _commonUtils.isUndefined)(index)) {
+	                index = parent.getChildCount();
+	            }
+	
+	            var parentChanged = parent !== child.parent;
+	
+	            that.digest(new _changesChildChange2['default'](that, parent, child, index));
+	
+	            // TODO: maintainEdgeParent
+	            if (that.maintainEdgeParent && parentChanged) {
+	                that.updateEdgeParents(child);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    remove: function remove(cell) {
+	        if (cell == this.root) {
+	            this.setRoot(null);
+	        } else if (this.getParent(cell) != null) {
+	            this.execute(new _changesChildChange2['default'](this, null, cell));
+	        }
+	
+	        return cell;
+	    },
+	
+	    // cell 添加到画布后的处理工作
 	    cellAdded: function cellAdded(cell) {
 	
 	        var that = this;
@@ -1704,6 +1964,73 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
+	    // cell 移除画布后的清理工作
+	    cellRemoved: function cellRemoved(cell) {
+	
+	        var that = this;
+	        var cells = that.cells;
+	
+	        if (cell && cells) {
+	
+	            if (cell.isNode) {
+	                cell.eachChild(function (child) {
+	                    that.cellRemoved(child);
+	                });
+	            }
+	
+	            var id = cell.id;
+	            if (cells && !(0, _commonUtils.isUndefined)(id)) {
+	                delete cells[id];
+	            }
+	        }
+	    },
+	
+	    updateEdgeParents: function updateEdgeParents(cell, root) {},
+	
+	    updateEdgeParent: function updateEdgeParent(edge, root) {},
+	
+	    getOrigin: function getOrigin(cell) {},
+	
+	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {},
+	
+	    // ChildChange 的回调处理
+	    childChanged: function childChanged(cell, newParent, newIndex) {
+	
+	        var that = this;
+	        var oldParent = cell.parent;
+	
+	        if (newParent) {
+	            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+	                newParent.insertChild(cell, newIndex);
+	            }
+	        } else if (oldParent) {
+	            oldParent.removeChild(cell);
+	        }
+	
+	        // Checks if the previous parent was already in the
+	        // model and avoids calling cellAdded if it was.
+	        if (newParent && !that.contains(oldParent)) {
+	            that.cellAdded(cell);
+	        } else if (!newParent) {
+	            that.cellRemoved(cell);
+	        }
+	
+	        return oldParent;
+	    },
+	
+	    // ChildChange 的回调处理，处理连线连接的节点
+	    linkChanged: function linkChanged(link, newNode, isSource) {
+	        var oldNode = link.getNode(isSource);
+	
+	        if (newNode) {
+	            newNode.insertLink(link, isSource);
+	        } else if (oldNode) {
+	            oldNode.removeLink(link, isSource);
+	        }
+	
+	        return oldNode;
+	    },
+	
 	    createId: function createId() {
 	        var that = this;
 	        var id = that.nextId;
@@ -1717,19 +2044,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        that.emit(_eventsEventNames2['default'].BEFORE_DIGEST, { change: change });
 	        change.digest();
-	        that.emit(_eventsEventNames2['default'].AFTER_DIGEST, { change: change });
 	
 	        that.beginUpdate();
-	        that.changes.add(change);
+	        that.changeCollection.add(change);
 	        that.endUpdate();
+	
+	        return that;
 	    },
 	
 	    beginUpdate: function beginUpdate() {
 	
 	        var that = this;
-	        that.updateLevel++;
+	        that.updateLevel += 1;
 	        that.emit(_eventsEventNames2['default'].BEGIN_UPDATE);
 	
 	        if (that.updateLevel === 1) {
@@ -1741,7 +2068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        that.updateLevel--;
+	        that.updateLevel -= 1;
 	
 	        if (that.updateLevel === 0) {
 	            that.emit(_eventsEventNames2['default'].END_EDIT);
@@ -1749,21 +2076,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (!that.endingUpdate) {
 	
-	            var changes = that.changes;
+	            var changeCollection = that.changeCollection;
 	
 	            that.endingUpdate = that.updateLevel === 0;
-	            that.emit(_eventsEventNames2['default'].END_UPDATE, { changes: changes.changes });
+	            that.emit(_eventsEventNames2['default'].END_UPDATE, { changes: changeCollection.changes });
 	
-	            try {
-	                if (that.endingUpdate && changes.hasChange()) {
-	                    changes.notify().clear();
-	                }
-	            } finally {
-	                that.endingUpdate = false;
+	            // 触发重绘
+	            if (that.endingUpdate && changeCollection.hasChange()) {
+	                changeCollection.notify().clear();
 	            }
+	
+	            that.endingUpdate = false;
 	        }
 	    }
-	
 	});
 	module.exports = exports['default'];
 
@@ -1806,7 +2131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // children
 	    // --------
 	
-	    getChildrenCount: function getChildrenCount() {
+	    getChildCount: function getChildCount() {
 	        var children = this.children;
 	        return children ? children.length : 0;
 	    },
@@ -1836,7 +2161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // fix index
 	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
-	                index = that.getChildrenCount();
+	                index = that.getChildCount();
 	
 	                if (child.parent === that) {
 	                    index--;
@@ -1883,7 +2208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // links
 	    // ------
 	
-	    getLinksCount: function getLinksCount() {
+	    getLinkCount: function getLinkCount() {
 	        var links = this.links;
 	        return links ? links.length : 0;
 	    },
@@ -2035,8 +2360,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	module.exports = {
-	    BEFORE_DIGEST: 'beforeDigest',
-	    AFTER_DIGEST: 'afterDigest',
+	    //BEFORE_DIGEST: 'beforeDigest',
+	    //AFTER_DIGEST: 'afterDigest',
 	
 	    BEGIN_UPDATE: 'beginUpdate',
 	    END_UPDATE: 'endUpdate',
@@ -2080,7 +2405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var previous = that.previous;
 	
 	        that.root = previous;
-	        that.previous = model.changeRoot(previous);
+	        that.previous = model.rootChanged(previous);
 	
 	        return that;
 	    }
@@ -3433,6 +3758,175 @@ return /******/ (function(modules) { // webpackBootstrap
 	    equals: function equals() /*obj*/{}
 	});
 	module.exports = exports['default'];
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(24);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	
+	    constructor: function ChildChange(model, parent, child, index) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.child = child;
+	        that.parent = parent;
+	        that.index = index;
+	        that.previous = parent;
+	        that.previousIndex = index;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var model = that.model;
+	        var child = that.child;
+	
+	        var isLink = child.isLink;
+	        var newParent = that.previous;
+	        var newIndex = that.previousIndex;
+	        var previousParent = child.parent;
+	        var previousIndex = previousParent ? previousParent.getChildIndex(child) : 0;
+	
+	        // 移除 link 上连接的 node
+	        if (isLink && !newParent) {
+	            that.connect(child, false);
+	        }
+	
+	        previousParent = model.childChanged(child, newParent, newIndex);
+	
+	        if (isLink && newParent) {
+	            that.connect(child, true);
+	        }
+	
+	        that.parent = newParent;
+	        that.index = newIndex;
+	        that.previous = previousParent;
+	        that.previousIndex = previousIndex;
+	
+	        return that;
+	    },
+	
+	    connect: function connect(link, isConnected) {
+	
+	        var that = this;
+	        var model = that.model;
+	        var sourceNode = link.getNode(true);
+	        var targetNode = link.getNode(false);
+	
+	        if (sourceNode) {
+	            model.linkChanged(link, isConnected ? sourceNode : null, true);
+	        }
+	
+	        if (targetNode) {
+	            model.linkChanged(link, isConnected ? targetNode : null, false);
+	        }
+	
+	        link.setNode(sourceNode, true);
+	        link.setNode(targetNode, false);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var eventSplitter = /\s+/;
+	
+	function weave(when, methodName, callback, context) {
+	
+	    var that = this;
+	    var names = methodName.split(eventSplitter);
+	
+	    (0, _commonUtils.each)(names, function (name) {
+	        var method = that[name];
+	
+	        if (!method || !(0, _commonUtils.isFunction)(method)) {
+	            throw new Error('Event handler must be function, event name: ' + name);
+	        }
+	
+	        if (!method.__isAspected) {
+	            wrap.call(that, name);
+	        }
+	
+	        that.on(when + ':' + name, callback, context);
+	    });
+	
+	    return that;
+	}
+	
+	function wrap(methodName) {
+	
+	    var that = this;
+	    var originMethod = that[methodName];
+	
+	    that[methodName] = function () {
+	        var that = this;
+	        var args = (0, _commonUtils.toArray)(arguments);
+	        var beforeArgs = ['before:' + methodName].concat(args);
+	
+	        // 检查每个回调的返回值，如果任何一个结果为 false，则直接返回
+	        var results = (0, _commonUtils.invoke)(that.emit, beforeArgs, that);
+	        var returned = (0, _commonUtils.some)(results || [], function (result) {
+	            return result === false;
+	        });
+	        if (returned) {
+	            return;
+	        }
+	
+	        // 调用原方法
+	        var ret = originMethod.apply(this, arguments);
+	        var afterArgs = ['after:' + methodName, ret].concat(args);
+	        //
+	        (0, _commonUtils.invoke)(that.emit, afterArgs, that);
+	
+	        return ret;
+	    };
+	
+	    that[methodName].__isAspected = true;
+	}
+	
+	function before(methodName, callback, context) {
+	    return weave.call(this, 'before', methodName, callback, context);
+	}
+	
+	function after(methodName, callback, context) {
+	    return weave.call(this, 'after', methodName, callback, context);
+	}
+	
+	function around(methodName, callback, context) {
+	    weave.call(this, 'before', methodName, callback, context);
+	    weave.call(this, 'after', methodName, callback, context);
+	    return this;
+	}
+	
+	exports.before = before;
+	exports.after = after;
+	exports.around = around;
 
 /***/ }
 /******/ ])
