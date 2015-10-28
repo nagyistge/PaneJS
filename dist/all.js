@@ -13592,8 +13592,13 @@ module.exports = Shape.extend({
 
 
 },{"../common/utils":26,"../constants":27,"./Shape":46}],45:[function(require,module,exports){
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
 var utils = require('../common/utils');
 var Shape = require('./Shape');
+var constants = require('../constants');
 
 var getValue = utils.getValue;
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -13622,7 +13627,7 @@ module.exports = Shape.extend({
         var shape = this;
 
         if (shape.isRounded) {
-            var f = getValue(shape.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
+            var f = getValue(shape.style, constants.STYLE_ARCSIZE, constants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
             var r = Math.min(w * f, h * f);
             canvas.rect(x, y, w, h, r, r);
         } else {
@@ -13646,7 +13651,7 @@ module.exports = Shape.extend({
     }
 });
 
-},{"../common/utils":26,"./Shape":46}],46:[function(require,module,exports){
+},{"../common/utils":26,"../constants":27,"./Shape":46}],46:[function(require,module,exports){
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global document */
 
@@ -13739,6 +13744,7 @@ var Shape = Base.extend({
             that.isShadow = getValue(that.style, constants.STYLE_SHADOW, that.isShadow) === 1;
             that.isDashed = getValue(that.style, constants.STYLE_DASHED, that.isDashed) === 1;
             that.isRounded = getValue(that.style, constants.STYLE_ROUNDED, that.isRounded) === 1;
+console.log(that.style, that.isRounded, getValue(that.style, constants.STYLE_ROUNDED, that.isRounded));
             that.glass = getValue(that.style, constants.STYLE_GLASS, that.glass) === 1;
 
             if (that.fill === constants.NONE) {

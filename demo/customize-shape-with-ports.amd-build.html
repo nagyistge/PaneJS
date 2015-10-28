@@ -13,13 +13,17 @@
 <script>
     window.onload = function () {
         require([
+            '../build/constants',
             '../build/Point',
             '../build/Graph'
         ], function (
+            constants,
             Point,
             Graph
         ) {
             var container = document.getElementById('graphContainer');
+
+            constants.RECTANGLE_ROUNDING_FACTOR = 0.5;
 
             var graph = new Graph(container);
 
@@ -37,23 +41,40 @@
 
             graph.getModel().beginUpdate();
 
+            var style = graph.getStylesheet().getDefaultVertexStyle();
+            style[constants.STYLE_SHAPE] = 'rectangle';
+            style.rounded = 1;
+
             try {
-                var v1 = graph.insertVertex(parent, null, 'Hello', 20, 80, 80, 30);
+                var v1 = graph.insertVertex(parent, null, 'Hello, PaneJS ports', 20, 80, 120, 30);
                 v1.setConnectable(false);
 
-                var v11 = graph.insertVertex(v1, null, '', 1, 1, 10, 10);
-                v11.geometry.offset = new Point(-5, -5);
+                var v11 = graph.insertVertex(v1, null, '', 0.5, 0, 10, 10);
+                v11.geometry.offset = new Point(-5, -10);
                 v11.geometry.relative = true;
 
-                var v12 = graph.insertVertex(v1, null, '', 1, 0, 10, 10);
-                v12.geometry.offset = new Point(-5, -5);
+                var v12 = graph.insertVertex(v1, null, '', 0.33, 1, 10, 10);
+                v12.geometry.offset = new Point(-5, 0);
                 v12.geometry.relative = true;
 
-                var v2 = graph.insertVertex(parent, null, 'World!', 200, 150, 80, 30);
-                var v3 = graph.insertVertex(parent, null, 'World2', 200, 20, 80, 30);
+                var v13 = graph.insertVertex(v1, null, '', 0.66, 1, 10, 10);
+                v13.geometry.offset = new Point(-5, 0);
+                v13.geometry.relative = true;
 
-                var e1 = graph.insertEdge(parent, null, '', v11, v2);
-                var e2 = graph.insertEdge(parent, null, '', v12, v3);
+                var v2 = graph.insertVertex(parent, null, 'World2', 200, 20, 80, 30);
+
+                var v21 = graph.insertVertex(v2, null, '', 0.5, 1, 10, 10);
+                v21.geometry.offset = new Point(-5, 0);
+                v21.geometry.relative = true;
+
+                var v3 = graph.insertVertex(parent, null, 'World!', 200, 150, 80, 30);
+
+                var v31 = graph.insertVertex(v3, null, '', 0.5, 0, 10, 10);
+                v31.geometry.offset = new Point(-5, -10);
+                v31.geometry.relative = true;
+
+                var e1 = graph.insertEdge(parent, null, '', v21, v11);
+                var e2 = graph.insertEdge(parent, null, '', v13, v31);
 
                 //var e3 = graph.insertEdge(parent, null, '', v1, v2);
             }

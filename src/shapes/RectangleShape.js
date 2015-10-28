@@ -1,5 +1,10 @@
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
 var utils = require('../common/utils');
 var Shape = require('./Shape');
+var constants = require('../constants');
 
 var getValue = utils.getValue;
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -28,7 +33,7 @@ module.exports = Shape.extend({
         var shape = this;
 
         if (shape.isRounded) {
-            var f = getValue(shape.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
+            var f = getValue(shape.style, constants.STYLE_ARCSIZE, constants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
             var r = Math.min(w * f, h * f);
             canvas.rect(x, y, w, h, r, r);
         } else {

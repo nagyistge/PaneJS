@@ -8425,6 +8425,7 @@ var Shape = Base.extend({
             that.isShadow = getValue(that.style, constants.STYLE_SHADOW, that.isShadow) === 1;
             that.isDashed = getValue(that.style, constants.STYLE_DASHED, that.isDashed) === 1;
             that.isRounded = getValue(that.style, constants.STYLE_ROUNDED, that.isRounded) === 1;
+console.log(that.style, that.isRounded, getValue(that.style, constants.STYLE_ROUNDED, that.isRounded));
             that.glass = getValue(that.style, constants.STYLE_GLASS, that.glass) === 1;
 
             if (that.fill === constants.NONE) {
@@ -11070,8 +11071,13 @@ module.exports = Shape.extend({
 
 
 });
-define('PaneJS/shapes/RectangleShape',['require','exports','module','../common/utils','./Shape'],function (require, exports, module) {var utils = require('../common/utils');
+define('PaneJS/shapes/RectangleShape',['require','exports','module','../common/utils','./Shape','../constants'],function (require, exports, module) {
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
+///* global document */
+
+var utils = require('../common/utils');
 var Shape = require('./Shape');
+var constants = require('../constants');
 
 var getValue = utils.getValue;
 var isNullOrUndefined = utils.isNullOrUndefined;
@@ -11100,7 +11106,7 @@ module.exports = Shape.extend({
         var shape = this;
 
         if (shape.isRounded) {
-            var f = getValue(shape.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
+            var f = getValue(shape.style, constants.STYLE_ARCSIZE, constants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
             var r = Math.min(w * f, h * f);
             canvas.rect(x, y, w, h, r, r);
         } else {
