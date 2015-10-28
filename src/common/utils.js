@@ -5,4 +5,4 @@ export * from '../utils/object';
 export * from '../utils/array';
 export * from '../utils/function';
 export * from '../utils/bow';
-export * from '../utils/geometry';
+export * from '../utils/geom';
