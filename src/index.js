@@ -1,8 +1,8 @@
 var pane = {
-    utils: require('./src/common/utils'),
-    Graph: require('./src/Graph'),
-    Model: require('./src/Model'),
-    View: require('./src/View')
+    utils: require('./common/utils'),
+    Graph: require('./core/Graph'),
+    Model: require('./core/Model'),
+    View: require('./core/View')
 };
 
 module.exports = pane;

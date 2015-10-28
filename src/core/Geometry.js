@@ -1,14 +1,12 @@
+import {
+    toRadians
+} from  '../common/utils'
+
 import Rectangle from './Rectangle';
 
 export default Rectangle.extend({
 
     //TRANSLATE_CONTROL_POINTS: true,
-    //alternateBounds: null,
-    //sourcePoint: null,
-    //targetPoint: null,
-    //points: null,
-    //offset: null,
-    //relative: false,
 
     constructor: function Geometry(x, y, width, height, relative) {
 
@@ -17,6 +15,17 @@ export default Rectangle.extend({
         Geometry.superclass.constructor.call(that, x, y, width, height);
 
         that.relative = !!relative;
+
+        // props
+        // -----
+        // that.alternateBounds = null; //
+        // that.sourcePoint = null;     // 连线的起点坐标。如果一个连线没有对应的起点
+        //                              // 节点，用该点来指定该连线的起点；否则，就忽
+        //                              // 略该点，连线的起点坐标将自动计算得到。
+        // that.targetPoint = null;     // 连线的终点坐标。
+        // that.points = null;          // 连线中的控制点坐标，这些点不包含连线的起点和终点的坐标。
+        // that.offset = null;          //
+
     },
 
     swap: function () {
@@ -45,25 +54,28 @@ export default Rectangle.extend({
     setTerminalPoint: function (point, isSource) {
 
         var that = this;
+
         if (isSource) {
             that.sourcePoint = point;
         } else {
             that.targetPoint = point;
         }
 
-        return point;
+        return that;
     },
 
+    // 根据给定的旋转中心旋转给定的角度。
+    //
     rotate: function (angle, cx) {
 
         var that = this;
 
-        var rad = utils.toRadians(angle);
+        var rad = toRadians(angle);
         var cos = Math.cos(rad);
         var sin = Math.sin(rad);
 
-        // Rotates the geometry
-        if (!this.relative) {
+        // 只有绝对定位时才旋转 x 和 y
+        if (!that.relative) {
             var ct = new Point(this.getCenterX(), this.getCenterY());
             var pt = utils.getRotatedPoint(ct, cos, sin, cx);
 
@@ -71,22 +83,20 @@ export default Rectangle.extend({
             this.y = Math.round(pt.y - this.height / 2);
         }
 
-        // Rotates the source point
-        if (this.sourcePoint) {
+        if (that.sourcePoint) {
             var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
             this.sourcePoint.x = Math.round(pt.x);
             this.sourcePoint.y = Math.round(pt.y);
         }
 
-        // Translates the target point
-        if (this.targetPoint) {
+        if (that.targetPoint) {
             var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
             this.targetPoint.x = Math.round(pt.x);
             this.targetPoint.y = Math.round(pt.y);
         }
 
         // Translate the control points
-        if (this.points != null) {
+        if (that.points) {
             for (var i = 0; i < this.points.length; i++) {
                 if (this.points[i] != null) {
                     var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
@@ -170,7 +180,7 @@ export default Rectangle.extend({
         }
     },
 
-    equals: function (/*obj*/) {
+    equals: function () {
 
     }
 });
