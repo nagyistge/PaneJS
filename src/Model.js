@@ -604,7 +604,11 @@ module.exports = Class.create({
         return style;
     },
 
-    styleForCellChanged: function (cell, style) {},
+    styleForCellChanged: function (cell, style) {
+        var previous = this.getStyle(cell);
+        cell.setStyle(style);
+        return previous;
+    },
 
     isCollapsed: function (cell) {},
 

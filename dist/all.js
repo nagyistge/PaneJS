@@ -3599,7 +3599,38 @@ module.exports = Class.create({
 
         return style;
     },
-    postProcessCellStyle: function (style) {},
+    postProcessCellStyle: function (style) {
+        if (style != null) {
+            var key = style[constants.STYLE_IMAGE];
+            var image = this.getImageFromBundles(key);
+
+            if (image != null) {
+                style[constants.STYLE_IMAGE] = image;
+            }
+            else {
+                image = key;
+            }
+
+            // Converts short data uris to normal data uris
+            if (image != null && image.substring(0, 11) == 'data:image/') {
+                if (image.substring(0, 20) == 'data:image/svg+xml,<') {
+                    // Required for FF and IE11
+                    image = image.substring(0, 19) + encodeURIComponent(image.substring(19));
+                }
+                else if (image.substring(0, 22) != 'data:image/svg+xml,%3C') {
+                    var comma = image.indexOf(',');
+
+                    if (comma > 0) {
+                        image = image.substring(0, comma) + ';base64,'
+                            + image.substring(comma + 1);
+                    }
+                }
+
+                style[constants.STYLE_IMAGE] = image;
+            }
+        }
+        return style;
+    },
     setCellStyle: function (style, cells) {
         cells = cells || this.getSelectionCells();
 
@@ -5138,7 +5169,11 @@ module.exports = Class.create({
         return style;
     },
 
-    styleForCellChanged: function (cell, style) {},
+    styleForCellChanged: function (cell, style) {
+        var previous = this.getStyle(cell);
+        cell.setStyle(style);
+        return previous;
+    },
 
     isCollapsed: function (cell) {},
 
@@ -5578,7 +5613,7 @@ module.exports = Class.create({
             var pairs = name.split(';');
 
             if (style && name.charAt(0) != ';') {
-                style = mxUtils.clone(style);
+                style = utils.clone(style);
             }
             else {
                 style = {};

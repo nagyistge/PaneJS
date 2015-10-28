@@ -21,7 +21,6 @@ module.exports = Base.extend({
     //edges: null,
 
     constructor: function Cell(value, geometry, style) {
-
         var that = this;
 
         that.value = value;
@@ -32,5 +31,19 @@ module.exports = Base.extend({
     },
 
 
+    setGeometry: function (geometry) {
+        this.geometry = geometry;
+    },
 
+    getGeometry: function () {
+        return this.geometry;
+    },
+
+    getStyle: function () {
+        return this.style;
+    },
+
+    setStyle: function (style) {
+        this.style = style;
+    },
 });
