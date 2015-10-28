@@ -22,17 +22,16 @@
 
         console.log(graph);
 
-        //        var parent = graph.getDefaultParent();
-        //
-        //        graph.getModel().beginUpdate();
-        //
-        //        try {
-        //            graph.insertVertex(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
-        //        }
-        //        finally {
-        //            graph.getModel().endUpdate();
-        //        }
+        var parent = graph.getDefaultParent();
 
+        graph.getModel().beginUpdate();
+
+        try {
+            graph.insertNode(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
+        }
+        finally {
+            graph.getModel().endUpdate();
+        }
     };
 </script>
 </body>

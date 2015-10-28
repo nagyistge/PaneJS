@@ -327,10 +327,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sources = slice.call(arguments, 1);
 	
 	    for (var i = 0, length = sources.length; i < length; i++) {
-	        var source = sources[i];
-	
-	        forIn(source, function () {
-	            dist[key] = source[key];
+	        forIn(sources[i], function (key, value) {
+	            dist[key] = value;
 	        });
 	    }
 	
@@ -630,6 +628,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
 	
+	var _stylesStylesheet = __webpack_require__(29);
+	
+	var _stylesStylesheet2 = _interopRequireDefault(_stylesStylesheet);
+	
 	var _View = __webpack_require__(15);
 	
 	var _View2 = _interopRequireDefault(_View);
@@ -637,6 +639,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Model = __webpack_require__(19);
 	
 	var _Model2 = _interopRequireDefault(_Model);
+	
+	var _cellsNode = __webpack_require__(20);
+	
+	var _cellsNode2 = _interopRequireDefault(_cellsNode);
+	
+	var _cellsLink = __webpack_require__(28);
+	
+	var _cellsLink2 = _interopRequireDefault(_cellsLink);
+	
+	var _libGeometry = __webpack_require__(37);
+	
+	var _libGeometry2 = _interopRequireDefault(_libGeometry);
 	
 	exports['default'] = _commonClass2['default'].create({
 	
@@ -648,7 +662,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.model = model || new _Model2['default']();
 	        that.view = new _View2['default'](that);
-	        //that.stylesheet = stylesheet || new Stylesheet();
+	        that.stylesheet = stylesheet || new _stylesStylesheet2['default']();
 	
 	        if (container) {
 	            that.init(container);
@@ -665,15 +679,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.view.init();
 	    },
 	
-	    insertNode: function insertNode() {},
+	    insertNode: function insertNode(parent, id, value, x, y, width, height, style, relative) {
 	
-	    createNode: function createNode() {},
+	        var that = this;
+	        var node = that.createNode(id, value, x, y, width, height, style, relative);
+	
+	        return that.addCell(node, parent);
+	    },
+	
+	    createNode: function createNode(id, value, x, y, width, height, style, relative) {
+	        var geometry = new _libGeometry2['default'](x, y, width, height, relative);
+	        return new _cellsNode2['default'](id, value, geometry, style);
+	    },
 	
 	    insertLink: function insertLink() {},
 	
 	    createLink: function createLink() {},
 	
-	    getCellStyle: function getCellStyle(cell) {}
+	    addCell: function addCell(cell, parent) {},
+	
+	    getModel: function getModel() {
+	        return this.model;
+	    },
+	
+	    getView: function getView() {
+	        return this.view;
+	    },
+	
+	    getCellStyle: function getCellStyle(cell) {},
+	
+	    getCurrentRoot: function getCurrentRoot() {
+	        return this.view.currentRoot;
+	    },
+	
+	    getDefaultParent: function getDefaultParent() {
+	
+	        var that = this;
+	
+	        return that.getCurrentRoot() || that.defaultParent || that.model.getRoot().getChildAt(0);
+	    }
 	});
 	module.exports = exports['default'];
 
@@ -1747,11 +1791,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    connectAble: true,
 	    transients: ['id', 'value', 'parent', 'children', 'links'],
 	
-	    constructor: function Node(value, geometry, style) {
+	    constructor: function Node(id, value, geometry, style) {
 	
 	        var that = this;
 	
-	        Node.superclass.constructor.call(that, value, geometry, style);
+	        Node.superclass.constructor.call(that, id, value, geometry, style);
 	
 	        // lazy
 	        // that.parent = null;
@@ -1939,10 +1983,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // 原型链上的属性
 	    visible: true,
 	
-	    constructor: function Cell(value, geometry, style) {
+	    constructor: function Cell(id, value, geometry, style) {
 	
 	        var that = this;
 	
+	        that.id = id;
 	        that.value = value;
 	        that.geometry = geometry;
 	        that.style = style;
@@ -2291,11 +2336,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    isLink: true,
 	    transients: ['id', 'value', 'parent', 'source', 'target'],
 	
-	    constructor: function Link(value, geometry, style) {
+	    constructor: function Link(id, value, geometry, style) {
 	
 	        var that = this;
 	
-	        Link.superclass.constructor.call(that, value, geometry, style);
+	        Link.superclass.constructor.call(that, id, value, geometry, style);
 	
 	        // lazy
 	        // that.source = null;
@@ -2326,6 +2371,1066 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return that;
 	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _defaultLinkStyle = __webpack_require__(30);
+	
+	var _defaultLinkStyle2 = _interopRequireDefault(_defaultLinkStyle);
+	
+	var _defaultNodeStyle = __webpack_require__(31);
+	
+	var _defaultNodeStyle2 = _interopRequireDefault(_defaultNodeStyle);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Stylesheet() {
+	        var that = this;
+	
+	        that.styles = {};
+	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, _defaultNodeStyle2['default']));
+	        that.setDefaultLinkStyle((0, _commonUtils.extend)({}, _defaultLinkStyle2['default']));
+	    },
+	
+	    getDefaultNodeStyle: function getDefaultNodeStyle() {
+	        return this.styles['defaultNode'];
+	    },
+	
+	    setDefaultNodeStyle: function setDefaultNodeStyle(style) {
+	        return this.setStyle('defaultNode', style);
+	    },
+	
+	    getDefaultLinkStyle: function getDefaultLinkStyle() {
+	        return this.styles['defaultLink'];
+	    },
+	
+	    setDefaultLinkStyle: function setDefaultLinkStyle(style) {
+	        return this.setStyle('defaultLink', style);
+	    },
+	
+	    getStyle: function getStyle() {},
+	
+	    setStyle: function setStyle(name, style) {
+	        this.styles[name] = style;
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _enumsStyleNames = __webpack_require__(32);
+	
+	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
+	
+	var _enumsShapeNames = __webpack_require__(33);
+	
+	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
+	
+	var _enumsAlignments = __webpack_require__(34);
+	
+	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
+	
+	var _enumsArrowTypes = __webpack_require__(36);
+	
+	var _enumsArrowTypes2 = _interopRequireDefault(_enumsArrowTypes);
+	
+	var style = {};
+	
+	style[_enumsStyleNames2['default'].SHAPE] = _enumsShapeNames2['default'].CONNECTOR;
+	style[_enumsStyleNames2['default'].END_ARROW] = _enumsArrowTypes2['default'].CLASSIC;
+	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
+	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
+	style[_enumsStyleNames2['default'].STROKE_COLOR] = '#289de9';
+	style[_enumsStyleNames2['default'].FONT_COLOR] = '#446299';
+	
+	exports['default'] = style;
+	module.exports = exports['default'];
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _enumsStyleNames = __webpack_require__(32);
+	
+	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
+	
+	var _enumsShapeNames = __webpack_require__(33);
+	
+	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
+	
+	var _enumsAlignments = __webpack_require__(34);
+	
+	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
+	
+	var _commonPerimeter = __webpack_require__(35);
+	
+	var style = {};
+	
+	style[_enumsStyleNames2['default'].SHAPE] = _enumsShapeNames2['default'].RECTANGLE;
+	style[_enumsStyleNames2['default'].PERIMETER] = _commonPerimeter.rectanglePerimeter;
+	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
+	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
+	style[_enumsStyleNames2['default'].FILL_COLOR] = '#e3f4ff';
+	style[_enumsStyleNames2['default'].STROKE_COLOR] = '#289de9';
+	style[_enumsStyleNames2['default'].FONT_COLOR] = '#774400';
+	
+	exports['default'] = style;
+	module.exports = exports['default'];
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    SHAPE: 'shape',
+	    PERIMETER: 'perimeter',
+	
+	    SOURCE_PORT: 'sourcePort',
+	    TARGET_PORT: 'targetPort',
+	    PORT_CONSTRAINT: 'portConstraint',
+	    PORT_CONSTRAINT_ROTATION: 'portConstraintRotation',
+	
+	    OPACITY: 'opacity',
+	    TEXT_OPACITY: 'textOpacity',
+	    OVERFLOW: 'overflow',
+	    ORTHOGONAL: 'orthogonal',
+	    EXIT_X: 'exitX',
+	    EXIT_Y: 'exitY',
+	    EXIT_PERIMETER: 'exitPerimeter',
+	    ENTRY_X: 'entryX',
+	    ENTRY_Y: 'entryY',
+	    ENTRY_PERIMETER: 'entryPerimeter',
+	    WHITE_SPACE: 'whiteSpace',
+	    ROTATION: 'rotation',
+	    FILL_COLOR: 'fillColor',
+	    SWIMLANE_FILL_COLOR: 'swimlaneFillColor',
+	    MARGIN: 'margin',
+	    GRADIENT_COLOR: 'gradientColor',
+	    GRADIENT_DIRECTION: 'gradientDirection',
+	    STROKE_COLOR: 'strokeColor',
+	    SEPARATOR_COLOR: 'separatorColor',
+	    STROKE_WIDTH: 'strokeWidth',
+	    ALIGN: 'align',
+	    VERTICAL_ALIGN: 'verticalAlign',
+	    LABEL_WIDTH: 'labelWidth',
+	    LABEL_POSITION: 'labelPosition',
+	    VERTICAL_LABEL_POSITION: 'verticalLabelPosition',
+	    IMAGE_ASPECT: 'imageAspect',
+	    IMAGE_ALIGN: 'imageAlign',
+	    IMAGE_VERTICAL_ALIGN: 'imageVerticalAlign',
+	    GLASS: 'glass',
+	    IMAGE: 'image',
+	    IMAGE_WIDTH: 'imageWidth',
+	    IMAGE_HEIGHT: 'imageHeight',
+	    IMAGE_BACKGROUND: 'imageBackground',
+	    IMAGE_BORDER: 'imageBorder',
+	    FLIPH: 'flipH',
+	    FLIPV: 'flipV',
+	    NO_LABEL: 'noLabel',
+	    NO_EDGE_STYLE: 'noEdgeStyle',
+	
+	    LABEL_BACKGROUND_COLOR: 'labelBackgroundColor',
+	    LABEL_BORDER_COLOR: 'labelBorderColor',
+	    LABEL_PADDING: 'labelPadding',
+	
+	    INDICATOR_SHAPE: 'indicatorShape',
+	    INDICATOR_IMAGE: 'indicatorImage',
+	    INDICATOR_COLOR: 'indicatorColor',
+	    INDICATOR_STROKE_COLOR: 'indicatorStrokeColor',
+	    INDICATOR_GRADIENT_COLOR: 'indicatorGradientColor',
+	    INDICATOR_SPACING: 'indicatorSpacing',
+	    INDICATOR_WIDTH: 'indicatorWidth',
+	    INDICATOR_HEIGHT: 'indicatorHeight',
+	    INDICATOR_DIRECTION: 'indicatorDirection',
+	
+	    SHADOW: 'shadow',
+	    SEGMENT: 'segment',
+	    END_ARROW: 'endArrow',
+	    START_ARROW: 'startArrow',
+	    END_SIZE: 'endSize',
+	    START_SIZE: 'startSize',
+	    SWIMLANE_LINE: 'swimlaneLine',
+	    END_FILL: 'endFill',
+	    START_FILL: 'startFill',
+	    DASHED: 'dashed',
+	    DASH_PATTERN: 'dashPattern',
+	    ROUNDED: 'rounded',
+	    CURVED: 'curved',
+	    ARCSIZE: 'arcSize',
+	    SMOOTH: 'smooth',
+	    SOURCE_PERIMETER_SPACING: 'sourcePerimeterSpacing',
+	    TARGET_PERIMETER_SPACING: 'targetPerimeterSpacing',
+	    PERIMETER_SPACING: 'perimeterSpacing',
+	    SPACING: 'spacing',
+	    SPACING_TOP: 'spacingTop',
+	    SPACING_LEFT: 'spacingLeft',
+	    SPACING_BOTTOM: 'spacingBottom',
+	    SPACING_RIGHT: 'spacingRight',
+	    HORIZONTAL: 'horizontal',
+	    DIRECTION: 'direction',
+	    ELBOW: 'elbow',
+	    FONTCOLOR: 'fontColor',
+	    FONTFAMILY: 'fontFamily',
+	    FONTSIZE: 'fontSize',
+	    FONTSTYLE: 'fontStyle',
+	    ASPECT: 'aspect',
+	    AUTOSIZE: 'autosize',
+	    FOLDABLE: 'foldable',
+	    EDITABLE: 'editable',
+	    BENDABLE: 'bendable',
+	    MOVABLE: 'movable',
+	    RESIZABLE: 'resizable',
+	    ROTATABLE: 'rotatable',
+	    CLONEABLE: 'cloneable',
+	    DELETABLE: 'deletable',
+	    EDGE: 'edgeStyle',
+	    LOOP: 'loopStyle',
+	    ROUTING_CENTER_X: 'routingCenterX',
+	    ROUTING_CENTER_Y: 'routingCenterY'
+	};
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    RECTANGLE: 'rectangle',
+	    ELLIPSE: 'ellipse',
+	    DOUBLE_ELLIPSE: 'doubleEllipse',
+	    RHOMBUS: 'rhombus',
+	    LINE: 'line',
+	    IMAGE: 'image',
+	    ARROW: 'arrow',
+	    LABEL: 'label',
+	    CYLINDER: 'cylinder',
+	    SWIMLANE: 'swimlane',
+	    CONNECTOR: 'connector',
+	    ACTOR: 'actor',
+	    CLOUD: 'cloud',
+	    TRIANGLE: 'triangle',
+	    HEXAGON: 'hexagon'
+	};
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    LEFT: 'left',
+	    CENTER: 'center',
+	    RIGHT: 'right',
+	    TOP: 'top',
+	    MIDDLE: 'middle',
+	    BOTTOM: 'bottom'
+	};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libPoint = __webpack_require__(17);
+	
+	var _libPoint2 = _interopRequireDefault(_libPoint);
+	
+	function rectanglePerimeter(bounds, vertex, next, orthogonal) {
+	    var cx = bounds.getCenterX();
+	    var cy = bounds.getCenterY();
+	    var dx = next.x - cx;
+	    var dy = next.y - cy;
+	    var alpha = Math.atan2(dy, dx);
+	    var p = new _libPoint2['default'](0, 0);
+	    var pi = Math.PI;
+	    var pi2 = Math.PI / 2;
+	    var beta = pi2 - alpha;
+	    var t = Math.atan2(bounds.height, bounds.width);
+	
+	    if (alpha < -pi + t || alpha > pi - t) {
+	        // Left edge
+	        p.x = bounds.x;
+	        p.y = cy - bounds.width * Math.tan(alpha) / 2;
+	    } else if (alpha < -t) {
+	        // Top Edge
+	        p.y = bounds.y;
+	        p.x = cx - bounds.height * Math.tan(beta) / 2;
+	    } else if (alpha < t) {
+	        // Right Edge
+	        p.x = bounds.x + bounds.width;
+	        p.y = cy + bounds.width * Math.tan(alpha) / 2;
+	    } else {
+	        // Bottom Edge
+	        p.y = bounds.y + bounds.height;
+	        p.x = cx + bounds.height * Math.tan(beta) / 2;
+	    }
+	
+	    if (orthogonal) {
+	        if (next.x >= bounds.x && next.x <= bounds.x + bounds.width) {
+	            p.x = next.x;
+	        } else if (next.y >= bounds.y && next.y <= bounds.y + bounds.height) {
+	            p.y = next.y;
+	        }
+	        if (next.x < bounds.x) {
+	            p.x = bounds.x;
+	        } else if (next.x > bounds.x + bounds.width) {
+	            p.x = bounds.x + bounds.width;
+	        }
+	        if (next.y < bounds.y) {
+	            p.y = bounds.y;
+	        } else if (next.y > bounds.y + bounds.height) {
+	            p.y = bounds.y + bounds.height;
+	        }
+	    }
+	
+	    return p;
+	}
+	
+	function ellipsePerimeter(bounds, vertex, next, orthogonal) {
+	    var x = bounds.x;
+	    var y = bounds.y;
+	    var a = bounds.width / 2;
+	    var b = bounds.height / 2;
+	    var cx = x + a;
+	    var cy = y + b;
+	    var px = next.x;
+	    var py = next.y;
+	
+	    // Calculates straight line equation through
+	    // point and ellipse center y = d * x + h
+	    var dx = parseInt(px - cx);
+	    var dy = parseInt(py - cy);
+	
+	    if (dx == 0 && dy != 0) {
+	        return new mxPoint(cx, cy + b * dy / Math.abs(dy));
+	    } else if (dx == 0 && dy == 0) {
+	        return new mxPoint(px, py);
+	    }
+	
+	    if (orthogonal) {
+	        if (py >= y && py <= y + bounds.height) {
+	            var ty = py - cy;
+	            var tx = Math.sqrt(a * a * (1 - ty * ty / (b * b))) || 0;
+	
+	            if (px <= x) {
+	                tx = -tx;
+	            }
+	
+	            return new mxPoint(cx + tx, py);
+	        }
+	
+	        if (px >= x && px <= x + bounds.width) {
+	            var tx = px - cx;
+	            var ty = Math.sqrt(b * b * (1 - tx * tx / (a * a))) || 0;
+	
+	            if (py <= y) {
+	                ty = -ty;
+	            }
+	
+	            return new mxPoint(px, cy + ty);
+	        }
+	    }
+	
+	    // Calculates intersection
+	    var d = dy / dx;
+	    var h = cy - d * cx;
+	    var e = a * a * d * d + b * b;
+	    var f = -2 * cx * e;
+	    var g = a * a * d * d * cx * cx + b * b * cx * cx - a * a * b * b;
+	    var det = Math.sqrt(f * f - 4 * e * g);
+	
+	    // Two solutions (perimeter points)
+	    var xout1 = (-f + det) / (2 * e);
+	    var xout2 = (-f - det) / (2 * e);
+	    var yout1 = d * xout1 + h;
+	    var yout2 = d * xout2 + h;
+	    var dist1 = Math.sqrt(Math.pow(xout1 - px, 2) + Math.pow(yout1 - py, 2));
+	    var dist2 = Math.sqrt(Math.pow(xout2 - px, 2) + Math.pow(yout2 - py, 2));
+	
+	    // Correct solution
+	    var xout = 0;
+	    var yout = 0;
+	
+	    if (dist1 < dist2) {
+	        xout = xout1;
+	        yout = yout1;
+	    } else {
+	        xout = xout2;
+	        yout = yout2;
+	    }
+	
+	    return new mxPoint(xout, yout);
+	}
+	
+	function rhombusPerimeter(bounds, vertex, next, orthogonal) {
+	    var x = bounds.x;
+	    var y = bounds.y;
+	    var w = bounds.width;
+	    var h = bounds.height;
+	
+	    var cx = x + w / 2;
+	    var cy = y + h / 2;
+	
+	    var px = next.x;
+	    var py = next.y;
+	
+	    // Special case for intersecting the diamond's corners
+	    if (cx == px) {
+	        if (cy > py) {
+	            return new mxPoint(cx, y); // top
+	        } else {
+	                return new mxPoint(cx, y + h); // bottom
+	            }
+	    } else if (cy == py) {
+	            if (cx > px) {
+	                return new mxPoint(x, cy); // left
+	            } else {
+	                    return new mxPoint(x + w, cy); // right
+	                }
+	        }
+	
+	    var tx = cx;
+	    var ty = cy;
+	
+	    if (orthogonal) {
+	        if (px >= x && px <= x + w) {
+	            tx = px;
+	        } else if (py >= y && py <= y + h) {
+	            ty = py;
+	        }
+	    }
+	
+	    // In which quadrant will the intersection be?
+	    // set the slope and offset of the border line accordingly
+	    if (px < cx) {
+	        if (py < cy) {
+	            return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
+	        } else {
+	            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
+	        }
+	    } else if (py < cy) {
+	        return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
+	    } else {
+	        return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
+	    }
+	}
+	
+	function trianglePerimeter(bounds, vertex, next, orthogonal) {
+	    var direction = vertex != null ? vertex.style[mxConstants.STYLE_DIRECTION] : null;
+	    var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
+	
+	    var x = bounds.x;
+	    var y = bounds.y;
+	    var w = bounds.width;
+	    var h = bounds.height;
+	
+	    var cx = x + w / 2;
+	    var cy = y + h / 2;
+	
+	    var start = new mxPoint(x, y);
+	    var corner = new mxPoint(x + w, cy);
+	    var end = new mxPoint(x, y + h);
+	
+	    if (direction == mxConstants.DIRECTION_NORTH) {
+	        start = end;
+	        corner = new mxPoint(cx, y);
+	        end = new mxPoint(x + w, y + h);
+	    } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	        corner = new mxPoint(cx, y + h);
+	        end = new mxPoint(x + w, y);
+	    } else if (direction == mxConstants.DIRECTION_WEST) {
+	        start = new mxPoint(x + w, y);
+	        corner = new mxPoint(x, cy);
+	        end = new mxPoint(x + w, y + h);
+	    }
+	
+	    var dx = next.x - cx;
+	    var dy = next.y - cy;
+	
+	    var alpha = vertical ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
+	    var t = vertical ? Math.atan2(w, h) : Math.atan2(h, w);
+	
+	    var base = false;
+	
+	    if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_WEST) {
+	        base = alpha > -t && alpha < t;
+	    } else {
+	        base = alpha < -Math.PI + t || alpha > Math.PI - t;
+	    }
+	
+	    var result = null;
+	
+	    if (base) {
+	        if (orthogonal && (vertical && next.x >= start.x && next.x <= end.x || !vertical && next.y >= start.y && next.y <= end.y)) {
+	            if (vertical) {
+	                result = new mxPoint(next.x, start.y);
+	            } else {
+	                result = new mxPoint(start.x, next.y);
+	            }
+	        } else {
+	            if (direction == mxConstants.DIRECTION_NORTH) {
+	                result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2, y + h);
+	            } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	                result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2, y);
+	            } else if (direction == mxConstants.DIRECTION_WEST) {
+	                result = new mxPoint(x + w, y + h / 2 + w * Math.tan(alpha) / 2);
+	            } else {
+	                result = new mxPoint(x, y + h / 2 - w * Math.tan(alpha) / 2);
+	            }
+	        }
+	    } else {
+	        if (orthogonal) {
+	            var pt = new mxPoint(cx, cy);
+	
+	            if (next.y >= y && next.y <= y + h) {
+	                pt.x = vertical ? cx : direction == mxConstants.DIRECTION_WEST ? x + w : x;
+	                pt.y = next.y;
+	            } else if (next.x >= x && next.x <= x + w) {
+	                pt.x = next.x;
+	                pt.y = !vertical ? cy : direction == mxConstants.DIRECTION_NORTH ? y + h : y;
+	            }
+	
+	            // Compute angle
+	            dx = next.x - pt.x;
+	            dy = next.y - pt.y;
+	
+	            cx = pt.x;
+	            cy = pt.y;
+	        }
+	
+	        if (vertical && next.x <= x + w / 2 || !vertical && next.y <= y + h / 2) {
+	            result = mxUtils.intersection(next.x, next.y, cx, cy, start.x, start.y, corner.x, corner.y);
+	        } else {
+	            result = mxUtils.intersection(next.x, next.y, cx, cy, corner.x, corner.y, end.x, end.y);
+	        }
+	    }
+	
+	    if (result == null) {
+	        result = new mxPoint(cx, cy);
+	    }
+	
+	    return result;
+	}
+	
+	function hexagonPerimeter(bounds, vertex, next, orthogonal) {
+	    var x = bounds.x;
+	    var y = bounds.y;
+	    var w = bounds.width;
+	    var h = bounds.height;
+	
+	    var cx = bounds.getCenterX();
+	    var cy = bounds.getCenterY();
+	    var px = next.x;
+	    var py = next.y;
+	    var dx = px - cx;
+	    var dy = py - cy;
+	    var alpha = -Math.atan2(dy, dx);
+	    var pi = Math.PI;
+	    var pi2 = Math.PI / 2;
+	
+	    var result = new mxPoint(cx, cy);
+	
+	    var direction = vertex != null ? mxUtils.getValue(vertex.style, mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
+	    var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
+	    var a = new mxPoint();
+	    var b = new mxPoint();
+	
+	    //Only consider corrects quadrants for the orthogonal case.
+	    if (px < x && py < y || px < x && py > y + h || px > x + w && py < y || px > x + w && py > y + h) {
+	        orthogonal = false;
+	    }
+	
+	    if (orthogonal) {
+	        if (vertical) {
+	            //Special cases where intersects with hexagon corners
+	            if (px == cx) {
+	                if (py <= y) {
+	                    return new mxPoint(cx, y);
+	                } else if (py >= y + h) {
+	                    return new mxPoint(cx, y + h);
+	                }
+	            } else if (px < x) {
+	                if (py == y + h / 4) {
+	                    return new mxPoint(x, y + h / 4);
+	                } else if (py == y + 3 * h / 4) {
+	                    return new mxPoint(x, y + 3 * h / 4);
+	                }
+	            } else if (px > x + w) {
+	                if (py == y + h / 4) {
+	                    return new mxPoint(x + w, y + h / 4);
+	                } else if (py == y + 3 * h / 4) {
+	                    return new mxPoint(x + w, y + 3 * h / 4);
+	                }
+	            } else if (px == x) {
+	                if (py < cy) {
+	                    return new mxPoint(x, y + h / 4);
+	                } else if (py > cy) {
+	                    return new mxPoint(x, y + 3 * h / 4);
+	                }
+	            } else if (px == x + w) {
+	                if (py < cy) {
+	                    return new mxPoint(x + w, y + h / 4);
+	                } else if (py > cy) {
+	                    return new mxPoint(x + w, y + 3 * h / 4);
+	                }
+	            }
+	            if (py == y) {
+	                return new mxPoint(cx, y);
+	            } else if (py == y + h) {
+	                return new mxPoint(cx, y + h);
+	            }
+	
+	            if (px < cx) {
+	                if (py > y + h / 4 && py < y + 3 * h / 4) {
+	                    a = new mxPoint(x, y);
+	                    b = new mxPoint(x, y + h);
+	                } else if (py < y + h / 4) {
+	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+	                } else if (py > y + 3 * h / 4) {
+	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+	                }
+	            } else if (px > cx) {
+	                if (py > y + h / 4 && py < y + 3 * h / 4) {
+	                    a = new mxPoint(x + w, y);
+	                    b = new mxPoint(x + w, y + h);
+	                } else if (py < y + h / 4) {
+	                    a = new mxPoint(x, y - Math.floor(0.25 * h));
+	                    b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                } else if (py > y + 3 * h / 4) {
+	                    a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x, y + Math.floor(1.25 * h));
+	                }
+	            }
+	        } else {
+	            //Special cases where intersects with hexagon corners
+	            if (py == cy) {
+	                if (px <= x) {
+	                    return new mxPoint(x, y + h / 2);
+	                } else if (px >= x + w) {
+	                    return new mxPoint(x + w, y + h / 2);
+	                }
+	            } else if (py < y) {
+	                if (px == x + w / 4) {
+	                    return new mxPoint(x + w / 4, y);
+	                } else if (px == x + 3 * w / 4) {
+	                    return new mxPoint(x + 3 * w / 4, y);
+	                }
+	            } else if (py > y + h) {
+	                if (px == x + w / 4) {
+	                    return new mxPoint(x + w / 4, y + h);
+	                } else if (px == x + 3 * w / 4) {
+	                    return new mxPoint(x + 3 * w / 4, y + h);
+	                }
+	            } else if (py == y) {
+	                if (px < cx) {
+	                    return new mxPoint(x + w / 4, y);
+	                } else if (px > cx) {
+	                    return new mxPoint(x + 3 * w / 4, y);
+	                }
+	            } else if (py == y + h) {
+	                if (px < cx) {
+	                    return new mxPoint(x + w / 4, y + h);
+	                } else if (py > cy) {
+	                    return new mxPoint(x + 3 * w / 4, y + h);
+	                }
+	            }
+	            if (px == x) {
+	                return new mxPoint(x, cy);
+	            } else if (px == x + w) {
+	                return new mxPoint(x + w, cy);
+	            }
+	
+	            if (py < cy) {
+	                if (px > x + w / 4 && px < x + 3 * w / 4) {
+	                    a = new mxPoint(x, y);
+	                    b = new mxPoint(x + w, y);
+	                } else if (px < x + w / 4) {
+	                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+	                    b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                } else if (px > x + 3 * w / 4) {
+	                    a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+	                }
+	            } else if (py > cy) {
+	                if (px > x + w / 4 && px < x + 3 * w / 4) {
+	                    a = new mxPoint(x, y + h);
+	                    b = new mxPoint(x + w, y + h);
+	                } else if (px < x + w / 4) {
+	                    a = new mxPoint(x - Math.floor(0.25 * w), y);
+	                    b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                } else if (px > x + 3 * w / 4) {
+	                    a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                    b = new mxPoint(x + Math.floor(1.25 * w), y);
+	                }
+	            }
+	        }
+	
+	        var tx = cx;
+	        var ty = cy;
+	
+	        if (px >= x && px <= x + w) {
+	            tx = px;
+	
+	            if (py < cy) {
+	                ty = y + h;
+	            } else {
+	                ty = y;
+	            }
+	        } else if (py >= y && py <= y + h) {
+	            ty = py;
+	
+	            if (px < cx) {
+	                tx = x + w;
+	            } else {
+	                tx = x;
+	            }
+	        }
+	
+	        result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
+	    } else {
+	        if (vertical) {
+	            var beta = Math.atan2(h / 4, w / 2);
+	
+	            //Special cases where intersects with hexagon corners
+	            if (alpha == beta) {
+	                return new mxPoint(x + w, y + Math.floor(0.25 * h));
+	            } else if (alpha == pi2) {
+	                return new mxPoint(x + Math.floor(0.5 * w), y);
+	            } else if (alpha == pi - beta) {
+	                return new mxPoint(x, y + Math.floor(0.25 * h));
+	            } else if (alpha == -beta) {
+	                return new mxPoint(x + w, y + Math.floor(0.75 * h));
+	            } else if (alpha == -pi2) {
+	                return new mxPoint(x + Math.floor(0.5 * w), y + h);
+	            } else if (alpha == -pi + beta) {
+	                return new mxPoint(x, y + Math.floor(0.75 * h));
+	            }
+	
+	            if (alpha < beta && alpha > -beta) {
+	                a = new mxPoint(x + w, y);
+	                b = new mxPoint(x + w, y + h);
+	            } else if (alpha > beta && alpha < pi2) {
+	                a = new mxPoint(x, y - Math.floor(0.25 * h));
+	                b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	            } else if (alpha > pi2 && alpha < pi - beta) {
+	                a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+	            } else if (alpha > pi - beta && alpha <= pi || alpha < -pi + beta && alpha >= -pi) {
+	                a = new mxPoint(x, y);
+	                b = new mxPoint(x, y + h);
+	            } else if (alpha < -beta && alpha > -pi2) {
+	                a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                b = new mxPoint(x, y + Math.floor(1.25 * h));
+	            } else if (alpha < -pi2 && alpha > -pi + beta) {
+	                a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+	            }
+	        } else {
+	            var beta = Math.atan2(h / 2, w / 4);
+	
+	            //Special cases where intersects with hexagon corners
+	            if (alpha == beta) {
+	                return new mxPoint(x + Math.floor(0.75 * w), y);
+	            } else if (alpha == pi - beta) {
+	                return new mxPoint(x + Math.floor(0.25 * w), y);
+	            } else if (alpha == pi || alpha == -pi) {
+	                return new mxPoint(x, y + Math.floor(0.5 * h));
+	            } else if (alpha == 0) {
+	                return new mxPoint(x + w, y + Math.floor(0.5 * h));
+	            } else if (alpha == -beta) {
+	                return new mxPoint(x + Math.floor(0.75 * w), y + h);
+	            } else if (alpha == -pi + beta) {
+	                return new mxPoint(x + Math.floor(0.25 * w), y + h);
+	            }
+	
+	            if (alpha > 0 && alpha < beta) {
+	                a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+	            } else if (alpha > beta && alpha < pi - beta) {
+	                a = new mxPoint(x, y);
+	                b = new mxPoint(x + w, y);
+	            } else if (alpha > pi - beta && alpha < pi) {
+	                a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+	                b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	            } else if (alpha < 0 && alpha > -beta) {
+	                a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                b = new mxPoint(x + Math.floor(1.25 * w), y);
+	            } else if (alpha < -beta && alpha > -pi + beta) {
+	                a = new mxPoint(x, y + h);
+	                b = new mxPoint(x + w, y + h);
+	            } else if (alpha < -pi + beta && alpha > -pi) {
+	                a = new mxPoint(x - Math.floor(0.25 * w), y);
+	                b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	            }
+	        }
+	
+	        result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
+	    }
+	
+	    if (result == null) {
+	        return new mxPoint(cx, cy);
+	    }
+	
+	    return result;
+	}
+	
+	exports.rectanglePerimeter = rectanglePerimeter;
+	exports.ellipsePerimeter = ellipsePerimeter;
+	exports.rhombusPerimeter = rhombusPerimeter;
+	exports.trianglePerimeter = trianglePerimeter;
+	exports.hexagonPerimeter = hexagonPerimeter;
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    CLASSIC: 'classic',
+	    BLOCK: 'block',
+	    OPEN: 'open',
+	    OVAL: 'oval',
+	    DIAMOND: 'diamond',
+	    DIAMOND_THIN: 'diamondThin'
+	};
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Rectangle = __webpack_require__(18);
+	
+	var _Rectangle2 = _interopRequireDefault(_Rectangle);
+	
+	exports['default'] = _Rectangle2['default'].extend({
+	
+	    //TRANSLATE_CONTROL_POINTS: true,
+	    //alternateBounds: null,
+	    //sourcePoint: null,
+	    //targetPoint: null,
+	    //points: null,
+	    //offset: null,
+	    //relative: false,
+	
+	    constructor: function Geometry(x, y, width, height, relative) {
+	
+	        var that = this;
+	
+	        Geometry.superclass.constructor.call(that, x, y, width, height);
+	
+	        that.relative = !!relative;
+	    },
+	
+	    swap: function swap() {
+	
+	        var that = this;
+	        var alternateBounds = that.alternateBounds;
+	
+	        if (alternateBounds) {
+	            var old = new _Rectangle2['default'](that.x, that.y, that.width, that.height);
+	
+	            that.x = alternateBounds.x;
+	            that.y = alternateBounds.y;
+	            that.width = alternateBounds.width;
+	            that.height = alternateBounds.height;
+	
+	            that.alternateBounds = old;
+	        }
+	
+	        return that;
+	    },
+	
+	    getTerminalPoint: function getTerminalPoint(isSource) {
+	        return isSource ? this.sourcePoint : this.targetPoint;
+	    },
+	
+	    setTerminalPoint: function setTerminalPoint(point, isSource) {
+	
+	        var that = this;
+	        if (isSource) {
+	            that.sourcePoint = point;
+	        } else {
+	            that.targetPoint = point;
+	        }
+	
+	        return point;
+	    },
+	
+	    rotate: function rotate(angle, cx) {
+	
+	        var that = this;
+	
+	        var rad = utils.toRadians(angle);
+	        var cos = Math.cos(rad);
+	        var sin = Math.sin(rad);
+	
+	        // Rotates the geometry
+	        if (!this.relative) {
+	            var ct = new Point(this.getCenterX(), this.getCenterY());
+	            var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+	
+	            this.x = Math.round(pt.x - this.width / 2);
+	            this.y = Math.round(pt.y - this.height / 2);
+	        }
+	
+	        // Rotates the source point
+	        if (this.sourcePoint) {
+	            var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
+	            this.sourcePoint.x = Math.round(pt.x);
+	            this.sourcePoint.y = Math.round(pt.y);
+	        }
+	
+	        // Translates the target point
+	        if (this.targetPoint) {
+	            var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
+	            this.targetPoint.x = Math.round(pt.x);
+	            this.targetPoint.y = Math.round(pt.y);
+	        }
+	
+	        // Translate the control points
+	        if (this.points != null) {
+	            for (var i = 0; i < this.points.length; i++) {
+	                if (this.points[i] != null) {
+	                    var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
+	                    this.points[i].x = Math.round(pt.x);
+	                    this.points[i].y = Math.round(pt.y);
+	                }
+	            }
+	        }
+	    },
+	
+	    translate: function translate(dx, dy) {
+	        dx = parseFloat(dx);
+	        dy = parseFloat(dy);
+	
+	        // Translates the geometry
+	        if (!this.relative) {
+	            this.x = parseFloat(this.x) + dx;
+	            this.y = parseFloat(this.y) + dy;
+	        }
+	
+	        // Translates the source point
+	        if (this.sourcePoint != null) {
+	            this.sourcePoint.x = parseFloat(this.sourcePoint.x) + dx;
+	            this.sourcePoint.y = parseFloat(this.sourcePoint.y) + dy;
+	        }
+	
+	        // Translates the target point
+	        if (this.targetPoint != null) {
+	            this.targetPoint.x = parseFloat(this.targetPoint.x) + dx;
+	            this.targetPoint.y = parseFloat(this.targetPoint.y) + dy;
+	        }
+	
+	        // Translate the control points
+	        if (this.TRANSLATE_CONTROL_POINTS && this.points != null) {
+	            for (var i = 0; i < this.points.length; i++) {
+	                if (this.points[i] != null) {
+	                    this.points[i].x = parseFloat(this.points[i].x) + dx;
+	                    this.points[i].y = parseFloat(this.points[i].y) + dy;
+	                }
+	            }
+	        }
+	    },
+	
+	    scale: function scale(sx, sy, fixedAspect) {
+	        sx = parseFloat(sx);
+	        sy = parseFloat(sy);
+	
+	        // Translates the source point
+	        if (this.sourcePoint != null) {
+	            this.sourcePoint.x = parseFloat(this.sourcePoint.x) * sx;
+	            this.sourcePoint.y = parseFloat(this.sourcePoint.y) * sy;
+	        }
+	
+	        // Translates the target point
+	        if (this.targetPoint != null) {
+	            this.targetPoint.x = parseFloat(this.targetPoint.x) * sx;
+	            this.targetPoint.y = parseFloat(this.targetPoint.y) * sy;
+	        }
+	
+	        // Translate the control points
+	        if (this.points != null) {
+	            for (var i = 0; i < this.points.length; i++) {
+	                if (this.points[i] != null) {
+	                    this.points[i].x = parseFloat(this.points[i].x) * sx;
+	                    this.points[i].y = parseFloat(this.points[i].y) * sy;
+	                }
+	            }
+	        }
+	
+	        // Translates the geometry
+	        if (!this.relative) {
+	            this.x = parseFloat(this.x) * sx;
+	            this.y = parseFloat(this.y) * sy;
+	
+	            if (fixedAspect) {
+	                sy = sx = Math.min(sx, sy);
+	            }
+	
+	            this.width = parseFloat(this.width) * sx;
+	            this.height = parseFloat(this.height) * sy;
+	        }
+	    },
+	
+	    equals: function equals() /*obj*/{}
 	});
 	module.exports = exports['default'];
 

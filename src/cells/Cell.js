@@ -22,10 +22,11 @@ export default Base.extend({
     // 原型链上的属性
     visible: true,
 
-    constructor: function Cell(value, geometry, style) {
+    constructor: function Cell(id, value, geometry, style) {
 
         var that = this;
 
+        that.id = id;
         that.value = value;
         that.geometry = geometry;
         that.style = style;

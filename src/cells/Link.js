@@ -5,11 +5,11 @@ export default Cell.extend({
     isLink: true,
     transients: ['id', 'value', 'parent', 'source', 'target'],
 
-    constructor: function Link(value, geometry, style) {
+    constructor: function Link(id, value, geometry, style) {
 
         var that = this;
 
-        Link.superclass.constructor.call(that, value, geometry, style);
+        Link.superclass.constructor.call(that, id, value, geometry, style);
 
         // lazy
         // that.source = null;

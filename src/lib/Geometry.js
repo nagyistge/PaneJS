@@ -1,19 +1,22 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
+import Rectangle from './Rectangle';
 
-var Rectangle = require('./Rectangle');
+export default Rectangle.extend({
 
-module.exports = Rectangle.extend({
+    //TRANSLATE_CONTROL_POINTS: true,
+    //alternateBounds: null,
+    //sourcePoint: null,
+    //targetPoint: null,
+    //points: null,
+    //offset: null,
+    //relative: false,
 
-    TRANSLATE_CONTROL_POINTS: true,
-    alternateBounds: null,
-    sourcePoint: null,
-    targetPoint: null,
-    points: null,
-    offset: null,
-    relative: false,
+    constructor: function Geometry(x, y, width, height, relative) {
 
-    constructor: function Geometry(x, y, width, height) {
-        Geometry.superclass.constructor.call(this, x, y, width, height);
+        var that = this;
+
+        Geometry.superclass.constructor.call(that, x, y, width, height);
+
+        that.relative = !!relative;
     },
 
     swap: function () {
