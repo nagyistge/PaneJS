@@ -1,4 +1,4 @@
-import { extend } from '../common/utils'
+import { extend }       from '../common/utils'
 import Base             from '../lib/Base';
 import defaultLinkStyle from './defaultLinkStyle';
 import defaultNodeStyle from './defaultNodeStyle';
