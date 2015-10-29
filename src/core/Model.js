@@ -237,10 +237,7 @@ export default Class.create({
                 that.nextId = Math.max(that.nextId, id);
             }
 
-            // 递归
-            if (cell.isNode) {
-                cell.eachChild(that.cellAdded, that);
-            }
+            cell.eachChild(that.cellAdded, that);
         }
     },
 

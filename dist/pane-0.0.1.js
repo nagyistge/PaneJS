@@ -2790,10 +2790,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    HORIZONTAL: 'horizontal',
 	    DIRECTION: 'direction',
 	    ELBOW: 'elbow',
-	    FONTCOLOR: 'fontColor',
-	    FONTFAMILY: 'fontFamily',
-	    FONTSIZE: 'fontSize',
-	    FONTSTYLE: 'fontStyle',
+	    FONT_COLOR: 'fontColor',
+	    FONT_FAMILY: 'fontFamily',
+	    FONT_SIZE: 'fontSize',
+	    FONT_STYLE: 'fontStyle',
 	    ASPECT: 'aspect',
 	    AUTOSIZE: 'autosize',
 	    FOLDABLE: 'foldable',
@@ -4205,10 +4205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                that.nextId = Math.max(that.nextId, id);
 	            }
 	
-	            // 递归
-	            if (cell.isNode) {
-	                cell.eachChild(that.cellAdded, that);
-	            }
+	            cell.eachChild(that.cellAdded, that);
 	        }
 	    },
 	
