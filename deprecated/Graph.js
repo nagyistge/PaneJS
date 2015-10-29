@@ -228,6 +228,7 @@ module.exports = Class.create({
         this.selectionModel = selectionModel;
     },
     getSelectionCellsForChanges: function () {},
+
     graphModelChanged: function (changes) {
         console.log(changes);
         for (var i = 0; i < changes.length; i++) {
@@ -239,6 +240,7 @@ module.exports = Class.create({
         this.view.validate();
         this.sizeDidChange();
     },
+
     processChange: function (change) {
         if (change instanceof RootChange) {
 

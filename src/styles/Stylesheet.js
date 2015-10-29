@@ -28,7 +28,9 @@ export default Base.extend({
         return this.setStyle('defaultLink', style);
     },
 
-    getStyle: function () {},
+    getStyle: function (name) {
+        return this.styles[name];
+    },
 
     setStyle: function (name, style) {
         this.styles[name] = style;

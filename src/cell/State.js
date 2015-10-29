@@ -15,7 +15,9 @@ var State = Rectangle.extend({
         that.cell = cell;
         that.style = style;
 
+        // cell 在画布上的原始（scale 和 translate）坐标，在 view.validateCellState() 过程中更新
         that.origin = new Point();
+        // 对于连线来说，这是 label 的绝对位置，对于节点来说，这是 label 相对于节点左上角的位置
         that.absoluteOffset = new Point();
 
 
@@ -26,8 +28,6 @@ var State = Rectangle.extend({
         // that.cellBounds = null;        // 缩放和平移之前的边界
         // that.paintBounds = null;       // 缩放和平移之前的绘图边界，cellBounds 或旋转 90° 之后的 cellBounds
         // that.absolutePoints = null;    // 连线关键点的坐标数组
-        // that.absoluteOffset = null;    // 对于连线来说，这是 label 的绝对位置
-        //                                // 对于节点来说，这是 label 相对于节点左上角的位置
         // that.visibleSourceState =null;
         // that.visibleTargetState =null;
         // that.terminalDistance = 0;     // 连线起点和终点之间的距离

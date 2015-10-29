@@ -54,15 +54,16 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+	
 	var pane = {
 	    utils: __webpack_require__(1),
 	    Graph: __webpack_require__(10),
-	    Model: __webpack_require__(19),
-	    View: __webpack_require__(15)
+	    Model: __webpack_require__(26),
+	    View: __webpack_require__(33)
 	};
 	
 	module.exports = pane;
-
 
 /***/ },
 /* 1 */
@@ -105,6 +106,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _utilsBow = __webpack_require__(8);
 	
 	_defaults(exports, _interopExportWildcard(_utilsBow, _defaults));
+	
+	var _utilsGeom = __webpack_require__(9);
+	
+	_defaults(exports, _interopExportWildcard(_utilsGeom, _defaults));
 
 /***/ },
 /* 2 */
@@ -244,11 +249,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (Math.round(value * power) / power).toFixed(precision);
 	}
 	
+	function toFloat(value) {
+	    return parseFloat(value);
+	}
+	
 	function mod(n, m) {
 	    return (n % m + m) % m;
 	}
 	
 	exports.toFixed = toFixed;
+	exports.toFloat = toFloat;
 	exports.mod = mod;
 
 /***/ },
@@ -327,7 +337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sources = slice.call(arguments, 1);
 	
 	    for (var i = 0, length = sources.length; i < length; i++) {
-	        forIn(sources[i], function (key, value) {
+	        forIn(sources[i], function (value, key) {
 	            dist[key] = value;
 	        });
 	    }
@@ -608,7 +618,90 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.createSvgElement = createSvgElement;
 
 /***/ },
-/* 9 */,
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _number = __webpack_require__(4);
+	
+	function toRadians(deg) {
+	    return Math.PI * deg / 180;
+	}
+	
+	function roundPoint(point) {
+	    point.x = Math.round(point.x);
+	    point.y = Math.round(point.y);
+	    return point;
+	}
+	
+	function rotatePoint(point, deg, center, rounded) {
+	    var rad = toRadians(deg);
+	    var cos = Math.cos(rad);
+	    var sin = Math.sin(rad);
+	
+	    return rotatePointEx(point, cos, sin, center, rounded);
+	}
+	
+	function rotatePointEx(point, cos, sin, center, rounded) {
+	    var centerX = center ? center.x : 0;
+	    var centerY = center ? center.y : 0;
+	    var dx = point.x - centerX;
+	    var dy = point.y - centerY;
+	
+	    var x1 = dx * cos - dy * sin;
+	    var y1 = dy * cos + dx * sin;
+	
+	    point.x = x1 + centerX;
+	    point.y = y1 + centerY;
+	
+	    return rounded ? roundPoint(point) : point;
+	}
+	
+	function translatePoint(point, dx, dy) {
+	    point.x = (0, _number.toFloat)(point.x) + dx;
+	    point.y = (0, _number.toFloat)(point.y) + dy;
+	    return point;
+	}
+	
+	function scalePoint(point, sx, sy) {
+	    point.x = (0, _number.toFloat)(point.x) * sx;
+	    point.y = (0, _number.toFloat)(point.y) * sy;
+	    return point;
+	}
+	
+	function isEqualEntity(o1, o2) {
+	    return !o1 && !o2 || o1 && o1.equals(o2);
+	}
+	
+	function isEqualEntities(arr1, arr2) {
+	    if (!arr1 && arr2 || !arr2 && arr1 || !arr1 && !arr2 && arr1.length != arr2.length) {
+	        return false;
+	    } else if (arr1 && arr2) {
+	        for (var i = 0, l = arr1.length; i < l; i++) {
+	            if (!isEqualEntity(arr1[i], arr2[i])) {
+	                return false;
+	            }
+	        }
+	    }
+	
+	    return true;
+	}
+	
+	exports.toRadians = toRadians;
+	exports.roundPoint = roundPoint;
+	exports.scalePoint = scalePoint;
+	exports.rotatePoint = rotatePoint;
+	exports.rotatePointEx = rotatePointEx;
+	exports.translatePoint = translatePoint;
+	exports.isEqualEntity = isEqualEntity;
+	exports.isEqualEntities = isEqualEntities;
+
+/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -630,33 +723,154 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
 	
-	var _stylesStylesheet = __webpack_require__(29);
+	var _stylesStylesheet = __webpack_require__(15);
 	
 	var _stylesStylesheet2 = _interopRequireDefault(_stylesStylesheet);
 	
-	var _View = __webpack_require__(15);
+	var _cellCell = __webpack_require__(24);
+	
+	var _cellCell2 = _interopRequireDefault(_cellCell);
+	
+	var _cellGeometry = __webpack_require__(25);
+	
+	var _cellGeometry2 = _interopRequireDefault(_cellGeometry);
+	
+	var _View = __webpack_require__(33);
 	
 	var _View2 = _interopRequireDefault(_View);
 	
-	var _Model = __webpack_require__(19);
+	var _Model = __webpack_require__(26);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _cellsNode = __webpack_require__(20);
+	var _changesRootChange = __webpack_require__(29);
 	
-	var _cellsNode2 = _interopRequireDefault(_cellsNode);
+	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _cellsLink = __webpack_require__(28);
+	var _changesChildChange = __webpack_require__(31);
 	
-	var _cellsLink2 = _interopRequireDefault(_cellsLink);
-	
-	var _libGeometry = __webpack_require__(37);
-	
-	var _libGeometry2 = _interopRequireDefault(_libGeometry);
+	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
 	exports['default'] = _commonClass2['default'].create({
 	
 	    Extends: _eventsEventSource2['default'],
+	
+	    EMPTY_ARRAY: [],
+	    mouseListeners: null,
+	    isMouseDown: false,
+	    model: null,
+	    view: null,
+	    stylesheet: null,
+	    selectionModel: null,
+	    cellEditor: null,
+	    cellRenderer: null,
+	    multiplicities: null,
+	
+	    gridSize: 10,
+	    gridEnabled: true,
+	    portsEnabled: true,
+	    nativeDblClickEnabled: true,
+	    doubleTapEnabled: true,
+	    doubleTapTimeout: 500,
+	    doubleTapTolerance: 25,
+	    lastTouchX: 0,
+	    lastTouchY: 0,
+	    lastTouchTime: 0,
+	    tapAndHoldEnabled: true,
+	    tapAndHoldDelay: 500,
+	    tapAndHoldInProgress: false,
+	    tapAndHoldValid: false,
+	    initialTouchX: 0,
+	    initialTouchY: 0,
+	    tolerance: 0,
+	    defaultOverlap: 0.5,
+	    defaultParent: null,
+	    alternateEdgeStyle: null,
+	    backgroundImage: null,
+	    pageVisible: false,
+	    pageBreaksVisible: false,
+	    pageBreakColor: 'gray',
+	    pageBreakDashed: true,
+	    minPageBreakDist: 20,
+	    preferPageSize: false,
+	    pageFormat: null, // constants.PAGE_FORMAT_A4_PORTRAIT;
+	    pageScale: 1.5,
+	    enabled: true,
+	
+	    escapeEnabled: true,
+	    invokesStopCellEditing: true,
+	    enterStopsCellEditing: false,
+	    useScrollbarsForPanning: true,
+	    exportEnabled: true,
+	    importEnabled: true,
+	    cellsLocked: false,
+	    cellsCloneable: true,
+	    foldingEnabled: true,
+	    cellsEditable: true,
+	    cellsDeletable: true,
+	    cellsMovable: true,
+	    edgeLabelsMovable: true,
+	    vertexLabelsMovable: false,
+	    dropEnabled: false,
+	    splitEnabled: true,
+	    cellsResizable: true,
+	    cellsBendable: true,
+	    cellsSelectable: true,
+	    cellsDisconnectable: true,
+	    autoSizeCells: false,
+	    autoSizeCellsOnAdd: false,
+	    autoScroll: true,
+	    timerAutoScroll: false,
+	    allowAutoPanning: false,
+	    ignoreScrollbars: false,
+	    autoExtend: true,
+	    maximumGraphBounds: null,
+	    minimumGraphSize: null,
+	    minimumContainerSize: null,
+	    maximumContainerSize: null,
+	    resizeContainer: false,
+	    border: 0,
+	    keepEdgesInForeground: false,
+	    keepEdgesInBackground: false,
+	    allowNegativeCoordinates: true,
+	    constrainChildren: true,
+	    constrainChildrenOnResize: false,
+	    extendParents: true,
+	    extendParentsOnAdd: true,
+	    extendParentsOnMove: false,
+	    recursiveResize: false,
+	    collapseToPreferredSize: true,
+	    zoomFactor: 1.2,
+	    keepSelectionVisibleOnZoom: false,
+	    centerZoom: true,
+	    resetViewOnRootChange: true,
+	    resetEdgesOnResize: false,
+	    resetEdgesOnMove: false,
+	    resetEdgesOnConnect: true,
+	    allowLoops: false,
+	    //defaultLoopStyle: mxEdgeStyle.Loop, // TODO
+	    multigraph: true,
+	    connectableEdges: false,
+	    allowDanglingEdges: true,
+	    cloneInvalidEdges: false,
+	    disconnectOnMove: true,
+	    labelsVisible: true,
+	    htmlLabels: false,
+	    swimlaneSelectionEnabled: true,
+	    swimlaneNesting: true,
+	    //swimlaneIndicatorColorAttribute: constants.STYLE_FILLCOLOR,
+	    imageBundles: null,
+	    minFitScale: 0.1,
+	    maxFitScale: 8,
+	    panDx: 0,
+	    panDy: 0,
+	
+	    collapsedImage: null,
+	    expandedImage: null,
+	    warningImage: null,
+	    alreadyConnectedResource: null,
+	    containsValidationErrorsResource: null,
+	    collapseExpandResource: null,
 	
 	    constructor: function Graph(container, model, stylesheet) {
 	
@@ -665,6 +879,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.model = model || new _Model2['default']();
 	        that.view = new _View2['default'](that);
 	        that.stylesheet = stylesheet || new _stylesStylesheet2['default']();
+	
+	        that.model.on('change', function (evt) {
+	            that.onModelChanged(evt.getData('changes'));
+	        });
 	
 	        if (container) {
 	            that.init(container);
@@ -679,30 +897,417 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.container = container;
 	        that.view.init();
+	
+	        return that;
 	    },
 	
-	    insertNode: function insertNode(parent, id, value, x, y, width, height, style, relative) {
+	    getModel: function getModel() {
+	        return this.model;
+	    },
+	
+	    getView: function getView() {
+	        return this.view;
+	    },
+	
+	    getSelectionCellsForChanges: function getSelectionCellsForChanges() {},
+	
+	    onModelChanged: function onModelChanged(changes) {
+	
+	        console.log(changes);
 	
 	        var that = this;
-	        var node = that.createNode(id, value, x, y, width, height, style, relative);
 	
-	        return that.addNode(node, parent);
+	        (0, _commonUtils.each)(changes, function (change) {
+	            that.processChange(change);
+	        });
+	
+	        that.removeSelectionCells(that.getRemovedCellsForChanges(changes));
+	
+	        that.view.validate();
+	        that.sizeDidChange();
+	    },
+	    processChange: function processChange(change) {
+	
+	        var that = this;
+	
+	        if (change instanceof _changesRootChange2['default']) {
+	            that.processRootChange(change);
+	        } else if (change instanceof _changesChildChange2['default']) {
+	            that.processChildChange(change);
+	        } else if (change instanceof TerminalChange || change instanceof GeometryChange) {
+	            if (change instanceof TerminalChange || (change.previous == null && change.geometry != null || change.previous != null && !change.previous.equals(change.geometry))) {
+	                this.view.invalidate(change.cell);
+	            }
+	        }
+	    },
+	
+	    processRootChange: function processRootChange(change) {
+	
+	        var that = this;
+	
+	        that.clearSelection();
+	        that.removeStateForCell(change.previous);
+	
+	        if (that.resetViewOnRootChange) {
+	            that.view.scale = 1;
+	            that.view.translate.x = 0;
+	            that.view.translate.y = 0;
+	        }
+	
+	        return that;
+	    },
+	
+	    processChildChange: function processChildChange(change) {
+	
+	        var that = this;
+	        var view = that.view;
+	        var child = change.child;
+	        var newParent = change.parent;
+	        var oldParent = change.previous;
+	
+	        view.invalidate(child, true, true);
+	
+	        if (!newParent || newParent.collapsed) {
+	            that.removeStateForCell(child);
+	
+	            if (view.currentRoot === child) {
+	                that.home();
+	            }
+	        }
+	
+	        if (newParent !== oldParent) {
+	            newParent && view.invalidate(newParent, false, false);
+	            oldParent && view.invalidate(oldParent, false, false);
+	        }
+	
+	        return that;
+	    },
+	
+	    getRemovedCellsForChanges: function getRemovedCellsForChanges() {},
+	    removeStateForCell: function removeStateForCell(cell) {
+	        var childCount = this.model.getChildCount(cell);
+	
+	        for (var i = 0; i < childCount; i++) {
+	            this.removeStateForCell(this.model.getChildAt(cell, i));
+	        }
+	
+	        this.view.invalidate(cell, false, true);
+	        this.view.removeState(cell);
+	    },
+	
+	    // Overlays
+	    // ---------
+	    addCellOverlay: function addCellOverlay(cell, overlay) {},
+	    getCellOverlays: function getCellOverlays(cell) {
+	        return cell.overlays;
+	    },
+	    removeCellOverlay: function removeCellOverlay(cell, overlay) {},
+	    removeCellOverlays: function removeCellOverlays(cell) {},
+	    clearCellOverlays: function clearCellOverlays(cell) {},
+	    setCellWarning: function setCellWarning() {},
+	
+	    // In-place editing
+	    // ----------------
+	    startEditing: function startEditing(evt) {},
+	    startEditingAtCell: function startEditingAtCell(cell, evt) {},
+	    getEditingValue: function getEditingValue(cell, evt) {},
+	    stopEditing: function stopEditing(cancel) {},
+	    labelChanged: function labelChanged(cell, value, evt) {},
+	    cellLabelChanged: function cellLabelChanged(cell, value, autoSize) {},
+	
+	    // Event processing
+	    // ----------------
+	    escape: function escape(evt) {},
+	    click: function click(me) {},
+	    dblClick: function dblClick(evt, cell) {},
+	    tapAndHold: function tapAndHold(me) {},
+	
+	    scrollPointToVisible: function scrollPointToVisible(x, y, extend, border) {},
+	    createPanningManager: function createPanningManager() {},
+	    getBorderSizes: function getBorderSizes() {},
+	    getPreferredPageSize: function getPreferredPageSize(bounds, width, height) {},
+	    sizeDidChange: function sizeDidChange() {
+	        var bounds = this.getGraphBounds();
+	
+	        if (this.container) {
+	            var border = this.getBorder();
+	
+	            var width = Math.max(0, bounds.x + bounds.width + 1 + border);
+	            var height = Math.max(0, bounds.y + bounds.height + 1 + border);
+	
+	            if (this.minimumContainerSize) {
+	                width = Math.max(width, this.minimumContainerSize.width);
+	                height = Math.max(height, this.minimumContainerSize.height);
+	            }
+	
+	            if (this.resizeContainer) {
+	                this.doResizeContainer(width, height);
+	            }
+	
+	            //if (this.preferPageSize || (!mxClient.IS_IE && this.pageVisible)) {
+	            if (this.preferPageSize || this.pageVisible) {
+	                var size = this.getPreferredPageSize(bounds, width, height);
+	
+	                if (size != null) {
+	                    width = size.width;
+	                    height = size.height;
+	                }
+	            }
+	
+	            if (this.minimumGraphSize != null) {
+	                width = Math.max(width, this.minimumGraphSize.width * this.view.scale);
+	                height = Math.max(height, this.minimumGraphSize.height * this.view.scale);
+	            }
+	
+	            width = Math.ceil(width - 1);
+	            height = Math.ceil(height - 1);
+	
+	            //if (this.dialect == mxConstants.DIALECT_SVG) {
+	            var root = this.view.getDrawPane().ownerSVGElement;
+	
+	            root.style.minWidth = Math.max(1, width) + 'px';
+	            root.style.minHeight = Math.max(1, height) + 'px';
+	            root.style.width = '100%';
+	            root.style.height = '100%';
+	            //}
+	            //else {
+	            //    if (mxClient.IS_QUIRKS) {
+	            // Quirks mode has no minWidth/minHeight support
+	            //this.view.updateHtmlCanvasSize(Math.max(1, width), Math.max(1, height));
+	            //}
+	            //else {
+	            //    this.view.canvas.style.minWidth = Math.max(1, width) + 'px';
+	            //    this.view.canvas.style.minHeight = Math.max(1, height) + 'px';
+	            //}
+	            //}
+	
+	            return;
+	
+	            this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
+	        }
+	
+	        //this.fireEvent(new mxEventObject(mxEvent.SIZE, 'bounds', bounds));
+	    },
+	    doResizeContainer: function doResizeContainer(width, height) {
+	        // Fixes container size for different box models
+	        //if (mxClient.IS_IE) {
+	        //    if (mxClient.IS_QUIRKS) {
+	        //        var borders = this.getBorderSizes();
+	        //
+	        //        // max(2, ...) required for native IE8 in quirks mode
+	        //        width += Math.max(2, borders.x + borders.width + 1);
+	        //        height += Math.max(2, borders.y + borders.height + 1);
+	        //    }
+	        //    else if (document.documentMode >= 9) {
+	        //        width += 3;
+	        //        height += 5;
+	        //    }
+	        //    else {
+	        //        width += 1;
+	        //        height += 1;
+	        //    }
+	        //}
+	        //else {
+	        height += 1;
+	        //}
+	
+	        if (this.maximumContainerSize != null) {
+	            width = Math.min(this.maximumContainerSize.width, width);
+	            height = Math.min(this.maximumContainerSize.height, height);
+	        }
+	
+	        this.container.style.width = Math.ceil(width) + 'px';
+	        this.container.style.height = Math.ceil(height) + 'px';
+	    },
+	    updatePageBreaks: function updatePageBreaks(visible, width, height) {
+	        var scale = this.view.scale;
+	        var tr = this.view.translate;
+	        var fmt = this.pageFormat;
+	        var ps = scale * this.pageScale;
+	        var bounds = new Rectangle(scale * tr.x, scale * tr.y, fmt.width * ps, fmt.height * ps);
+	
+	        // Does not show page breaks if the scale is too small
+	        visible = visible && Math.min(bounds.width, bounds.height) > this.minPageBreakDist;
+	
+	        // Draws page breaks independent of translate. To ignore
+	        // the translate set bounds.x/y = 0. Note that modulo
+	        // in JavaScript has a bug, so use mxUtils instead.
+	        bounds.x = utils.mod(bounds.x, bounds.width);
+	        bounds.y = utils.mod(bounds.y, bounds.height);
+	
+	        var horizontalCount = visible ? Math.ceil((width - bounds.x) / bounds.width) : 0;
+	        var verticalCount = visible ? Math.ceil((height - bounds.y) / bounds.height) : 0;
+	        var right = width;
+	        var bottom = height;
+	
+	        if (this.horizontalPageBreaks == null && horizontalCount > 0) {
+	            this.horizontalPageBreaks = [];
+	        }
+	
+	        if (this.horizontalPageBreaks != null) {
+	            for (var i = 0; i <= horizontalCount; i++) {
+	                var pts = [new mxPoint(bounds.x + i * bounds.width, 1), new mxPoint(bounds.x + i * bounds.width, bottom)];
+	
+	                if (this.horizontalPageBreaks[i] != null) {
+	                    this.horizontalPageBreaks[i].points = pts;
+	                    this.horizontalPageBreaks[i].redraw();
+	                } else {
+	                    var pageBreak = new mxPolyline(pts, this.pageBreakColor);
+	                    pageBreak.dialect = this.dialect;
+	                    pageBreak.pointerEvents = false;
+	                    pageBreak.isDashed = this.pageBreakDashed;
+	                    pageBreak.init(this.view.backgroundPane);
+	                    pageBreak.redraw();
+	
+	                    this.horizontalPageBreaks[i] = pageBreak;
+	                }
+	            }
+	
+	            for (var i = horizontalCount; i < this.horizontalPageBreaks.length; i++) {
+	                this.horizontalPageBreaks[i].destroy();
+	            }
+	
+	            this.horizontalPageBreaks.splice(horizontalCount, this.horizontalPageBreaks.length - horizontalCount);
+	        }
+	
+	        if (this.verticalPageBreaks == null && verticalCount > 0) {
+	            this.verticalPageBreaks = [];
+	        }
+	
+	        if (this.verticalPageBreaks != null) {
+	            for (var i = 0; i <= verticalCount; i++) {
+	                var pts = [new Point(1, bounds.y + i * bounds.height), new Point(right, bounds.y + i * bounds.height)];
+	
+	                if (this.verticalPageBreaks[i] != null) {
+	                    this.verticalPageBreaks[i].points = pts;
+	                    this.verticalPageBreaks[i].redraw();
+	                } else {
+	                    var pageBreak = new mxPolyline(pts, this.pageBreakColor);
+	                    pageBreak.dialect = this.dialect;
+	                    pageBreak.pointerEvents = false;
+	                    pageBreak.isDashed = this.pageBreakDashed;
+	                    pageBreak.init(this.view.backgroundPane);
+	                    pageBreak.redraw();
+	
+	                    this.verticalPageBreaks[i] = pageBreak;
+	                }
+	            }
+	
+	            for (var i = verticalCount; i < this.verticalPageBreaks.length; i++) {
+	                this.verticalPageBreaks[i].destroy();
+	            }
+	
+	            this.verticalPageBreaks.splice(verticalCount, this.verticalPageBreaks.length - verticalCount);
+	        }
+	    },
+	
+	    // Cell styles
+	    // -----------
+	    getCellStyle: function getCellStyle(cell) {
+	
+	        var that = this;
+	        var stylesheet = that.stylesheet;
+	        var style = cell.style;
+	        var defaultStyle = cell.isLink ? stylesheet.getDefaultLinkStyle() : stylesheet.getDefaultNodeStyle();
+	
+	        style = (0, _commonUtils.extend)({}, style || {}, defaultStyle);
+	
+	        that.postProcessCellStyle(style);
+	
+	        return style;
+	    },
+	    postProcessCellStyle: function postProcessCellStyle(style) {},
+	    setCellStyle: function setCellStyle(style, cells) {
+	        cells = cells || this.getSelectionCells();
+	
+	        if (cells) {
+	            this.model.beginUpdate();
+	            try {
+	                for (var i = 0; i < cells.length; i++) {
+	                    this.model.setStyle(cells[i], style);
+	                }
+	            } finally {
+	                this.model.endUpdate();
+	            }
+	        }
+	    },
+	    setCellStyles: function setCellStyles(key, value, cells) {
+	        cells = cells || this.getSelectionCells();
+	        utils.setCellStyles(this.model, cells, key, value);
+	    },
+	    toggleCellStyle: function toggleCellStyle(key, defaultValue, cell) {},
+	    toggleCellStyles: function toggleCellStyles(key, defaultValue, cells) {},
+	    toggleCellStyleFlags: function toggleCellStyleFlags(key, flag, cells) {},
+	    setCellStyleFlags: function setCellStyleFlags(key, flag, value, cells) {},
+	
+	    // Cell alignment and orientation
+	    // ------------------------------
+	    alignCells: function alignCells(align, cells, param) {},
+	    flipEdge: function flipEdge(edge) {},
+	    addImageBundle: function addImageBundle(bundle) {},
+	    removeImageBundle: function removeImageBundle(bundle) {},
+	    getImageFromBundles: function getImageFromBundles(key) {},
+	
+	    // Order
+	    // -----
+	    orderCells: function orderCells(back, cells) {},
+	    cellsOrdered: function cellsOrdered(cells, back) {},
+	
+	    // Grouping
+	    // --------
+	    groupCells: function groupCells(group, border, cells) {},
+	    getCellsForGroup: function getCellsForGroup(cells) {},
+	    getBoundsForGroup: function getBoundsForGroup(group, children, border) {},
+	    createGroupCell: function createGroupCell(cells) {},
+	    ungroupCells: function ungroupCells(cells) {},
+	    removeCellsFromParent: function removeCellsFromParent(cells) {},
+	    updateGroupBounds: function updateGroupBounds(cells, border, moveGroup, topBorder, rightBorder, bottomBorder, leftBorder) {},
+	
+	    // Cell cloning, insertion and removal
+	    // -----------------------------------
+	    cloneCells: function cloneCells(cells, allowInvalidEdges) {},
+	
+	    insertNode: function insertNode(parent, id, value, x, y, width, height, style, relative) {
+	        var node = this.createNode(id, value, x, y, width, height, style, relative);
+	        return this.addNode(node, parent);
 	    },
 	
 	    createNode: function createNode(id, value, x, y, width, height, style, relative) {
-	        var geometry = new _libGeometry2['default'](x, y, width, height, relative);
-	        return new _cellsNode2['default'](id, value, geometry, style);
+	        var geometry = new _cellGeometry2['default'](x, y, width, height, relative);
+	        var node = new _cellCell2['default'](id, value, geometry, style);
+	
+	        node.isNode = true;
+	        node.connectable = true;
+	
+	        return node;
 	    },
 	
 	    addNode: function addNode(node, parent, index) {
-	        return this.addCells([node], parent, index)[0];
+	        return this.addCell(node, parent, index);
 	    },
 	
-	    insertLink: function insertLink() {},
+	    insertLink: function insertLink(parent, id, value, source, target, style) {
+	        var edge = this.createEdge(parent, id, value, source, target, style);
+	        return this.addEdge(edge, parent, source, target);
+	    },
 	
-	    createLink: function createLink() {},
+	    createLink: function createLink(parent, id, value, source, target, style) {
 	
-	    addLink: function addLink(cell, parent) {},
+	        var geometry = new _cellGeometry2['default'](0, 0, 0, 0, true);
+	        var link = new _cellCell2['default'](id, value, geometry, style);
+	
+	        link.isLink = true;
+	
+	        return link;
+	    },
+	
+	    addLink: function addLink(link, parent, source, target, index) {
+	        return this.addCell(link, parent, index, source, target);
+	    },
+	
+	    addCell: function addCell(cell, parent, index, source, target) {
+	        return this.addCells([cell], parent, index, source, target)[0];
+	    },
 	
 	    addCells: function addCells(cells, parent, index, source, target) {
 	
@@ -710,7 +1315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var model = that.model;
 	
 	        parent = parent || that.getDefaultParent();
-	        index = (0, _commonUtils.isUndefined)(index) ? parent.getChildCount() : index;
+	        index = (0, _commonUtils.isNullOrUndefined)(index) ? parent.getChildCount() : index;
 	
 	        model.beginUpdate();
 	        that.cellsAdded(cells, parent, index, source, target, false, true);
@@ -724,7 +1329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var model = that.model;
 	
-	        if (cells && parent && !(0, _commonUtils.isUndefined)(index)) {
+	        if (cells && parent && !(0, _commonUtils.isNullOrUndefined)(index)) {
 	            model.beginUpdate();
 	
 	            var parentState = absolute ? this.view.getState(parent) : null;
@@ -775,39 +1380,825 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    getCellStyle: function getCellStyle(cell) {},
+	    autoSizeCell: function autoSizeCell(cell, recurse) {},
+	    removeCells: function removeCells(cells, includeEdges) {},
+	    cellsRemoved: function cellsRemoved(cells) {},
+	    splitEdge: function splitEdge(edge, cells, newEdge, dx, dy) {},
 	
+	    // Cell visibility
+	    // ---------------
+	    toggleCells: function toggleCells(show, cells, includeEdges) {},
+	    cellsToggled: function cellsToggled(cells, show) {},
+	
+	    // Folding
+	    // -------
+	    foldCells: function foldCells() {},
+	    cellsFolded: function cellsFolded() {},
+	    swapBounds: function swapBounds() {},
+	    updateAlternateBounds: function updateAlternateBounds() {},
+	    addAllEdges: function addAllEdges() {},
+	    getAllEdges: function getAllEdges() {},
+	
+	    // Cell sizing
+	    // -----------
+	    updateCellSize: function updateCellSize() {},
+	    cellSizeUpdated: function cellSizeUpdated() {},
+	    getPreferredSizeForCell: function getPreferredSizeForCell() {},
+	    resizeCell: function resizeCell() {},
+	    resizeCells: function resizeCells() {},
+	    cellsResized: function cellsResized() {},
+	    cellResized: function cellResized() {},
+	    resizeChildCells: function resizeChildCells() {},
+	    constrainChildCells: function constrainChildCells() {},
+	    scaleCell: function scaleCell() {},
+	    extendParent: function extendParent() {},
+	
+	    // Cell moving
+	    // -----------
+	    importCells: function importCells() {},
+	    moveCells: function moveCells() {},
+	    cellsMoved: function cellsMoved() {},
+	    translateCell: function translateCell() {},
+	    getCellContainmentArea: function getCellContainmentArea() {},
+	    getMaximumGraphBounds: function getMaximumGraphBounds() {},
+	    constrainChild: function constrainChild() {},
+	    resetEdges: function resetEdges() {},
+	    resetEdge: function resetEdge(edge) {
+	        var geo = this.model.getGeometry(edge);
+	
+	        // Resets the control points
+	        if (geo != null && geo.points != null && geo.points.length > 0) {
+	            geo = geo.clone();
+	            geo.points = [];
+	            this.model.setGeometry(edge, geo);
+	        }
+	
+	        return edge;
+	    },
+	
+	    // Cell connecting and connection constraints
+	    // ------------------------------------------
+	    getOutlineConstraint: function getOutlineConstraint() {},
+	    getAllConnectionConstraints: function getAllConnectionConstraints() {},
+	
+	    getConnectionConstraint: function getConnectionConstraint(linkState, terminalState, isSource) {
+	        var point = null;
+	        var x = linkState.style[isSource ? constants.STYLE_EXIT_X : constants.STYLE_ENTRY_X];
+	
+	        if (x != null) {
+	            var y = linkState.style[isSource ? constants.STYLE_EXIT_Y : constants.STYLE_ENTRY_Y];
+	
+	            if (y != null) {
+	                point = new Point(parseFloat(x), parseFloat(y));
+	            }
+	        }
+	
+	        var perimeter = false;
+	
+	        if (point != null) {
+	            perimeter = getValue(linkState.style, isSource ? constants.STYLE_EXIT_PERIMETER : constants.STYLE_ENTRY_PERIMETER, true);
+	        }
+	
+	        return new ConnectionConstraint(point, perimeter);
+	    },
+	    setConnectionConstraint: function setConnectionConstraint(edge, terminal, source, constraint) {
+	        if (constraint) {
+	            this.model.beginUpdate();
+	
+	            try {
+	                if (constraint == null || constraint.point == null) {
+	                    this.setCellStyles(source ? mxConstants.STYLE_EXIT_X : mxConstants.STYLE_ENTRY_X, null, [edge]);
+	                    this.setCellStyles(source ? mxConstants.STYLE_EXIT_Y : mxConstants.STYLE_ENTRY_Y, null, [edge]);
+	                    this.setCellStyles(source ? mxConstants.STYLE_EXIT_PERIMETER : mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+	                } else if (constraint.point != null) {
+	                    this.setCellStyles(source ? mxConstants.STYLE_EXIT_X : mxConstants.STYLE_ENTRY_X, constraint.point.x, [edge]);
+	                    this.setCellStyles(source ? mxConstants.STYLE_EXIT_Y : mxConstants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
+	
+	                    // Only writes 0 since 1 is default
+	                    if (!constraint.perimeter) {
+	                        this.setCellStyles(source ? mxConstants.STYLE_EXIT_PERIMETER : mxConstants.STYLE_ENTRY_PERIMETER, '0', [edge]);
+	                    } else {
+	                        this.setCellStyles(source ? mxConstants.STYLE_EXIT_PERIMETER : mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+	                    }
+	                }
+	            } finally {
+	                this.model.endUpdate();
+	            }
+	        }
+	    },
+	    getConnectionPoint: function getConnectionPoint(vertex, constraint) {
+	        var point = null;
+	
+	        if (vertex != null && constraint.point != null) {
+	            var bounds = this.view.getPerimeterBounds(vertex);
+	            var cx = new Point(bounds.getCenterX(), bounds.getCenterY());
+	            var direction = vertex.style[constants.STYLE_DIRECTION];
+	            var r1 = 0;
+	
+	            // Bounds need to be rotated by 90 degrees for further computation
+	            if (direction != null) {
+	                if (direction == mxConstants.DIRECTION_NORTH) {
+	                    r1 += 270;
+	                } else if (direction == mxConstants.DIRECTION_WEST) {
+	                    r1 += 180;
+	                } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	                    r1 += 90;
+	                }
+	
+	                // Bounds need to be rotated by 90 degrees for further computation
+	                if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
+	                    bounds.rotate90();
+	                }
+	            }
+	
+	            if (constraint.point != null) {
+	                var sx = 1;
+	                var sy = 1;
+	                var dx = 0;
+	                var dy = 0;
+	
+	                // LATER: Add flipping support for image shapes
+	                if (this.getModel().isVertex(vertex.cell)) {
+	                    var flipH = vertex.style[mxConstants.STYLE_FLIPH];
+	                    var flipV = vertex.style[mxConstants.STYLE_FLIPV];
+	
+	                    // Legacy support for stencilFlipH/V
+	                    if (vertex.shape != null && vertex.shape.stencil != null) {
+	                        flipH = mxUtils.getValue(vertex.style, 'stencilFlipH', 0) == 1 || flipH;
+	                        flipV = mxUtils.getValue(vertex.style, 'stencilFlipV', 0) == 1 || flipV;
+	                    }
+	
+	                    if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
+	                        var tmp = flipH;
+	                        flipH = flipV;
+	                        flipV = tmp;
+	                    }
+	
+	                    if (flipH) {
+	                        sx = -1;
+	                        dx = -bounds.width;
+	                    }
+	
+	                    if (flipV) {
+	                        sy = -1;
+	                        dy = -bounds.height;
+	                    }
+	                }
+	
+	                point = new mxPoint(bounds.x + constraint.point.x * bounds.width * sx - dx, bounds.y + constraint.point.y * bounds.height * sy - dy);
+	            }
+	
+	            // Rotation for direction before projection on perimeter
+	            var r2 = vertex.style[mxConstants.STYLE_ROTATION] || 0;
+	
+	            if (constraint.perimeter) {
+	                if (r1 != 0 && point != null) {
+	                    // Only 90 degrees steps possible here so no trig needed
+	                    var cos = 0;
+	                    var sin = 0;
+	
+	                    if (r1 == 90) {
+	                        sin = 1;
+	                    } else if (r1 == 180) {
+	                        cos = -1;
+	                    } else if (r1 == 270) {
+	                        sin = -1;
+	                    }
+	
+	                    point = mxUtils.getRotatedPoint(point, cos, sin, cx);
+	                }
+	
+	                if (point != null && constraint.perimeter) {
+	                    point = this.view.getPerimeterPoint(vertex, point, false);
+	                }
+	            } else {
+	                r2 += r1;
+	            }
+	
+	            // Generic rotation after projection on perimeter
+	            if (r2 != 0 && point != null) {
+	                var rad = mxUtils.toRadians(r2);
+	                var cos = Math.cos(rad);
+	                var sin = Math.sin(rad);
+	
+	                point = mxUtils.getRotatedPoint(point, cos, sin, cx);
+	            }
+	        }
+	
+	        if (point != null) {
+	            point.x = Math.round(point.x);
+	            point.y = Math.round(point.y);
+	        }
+	
+	        return point;
+	    },
+	    connectCell: function connectCell() {},
+	    cellConnected: function cellConnected(edge, terminal, source, constraint) {
+	        if (edge) {
+	            this.model.beginUpdate();
+	            try {
+	                var previous = this.model.getTerminal(edge, source);
+	
+	                // Updates the constraint
+	                this.setConnectionConstraint(edge, terminal, source, constraint);
+	
+	                // Checks if the new terminal is a port, uses the ID of the port in the
+	                // style and the parent of the port as the actual terminal of the edge.
+	                if (this.isPortsEnabled()) {
+	                    var id = null;
+	
+	                    if (this.isPort(terminal)) {
+	                        id = terminal.getId();
+	                        terminal = this.getTerminalForPort(terminal, source);
+	                    }
+	
+	                    // Sets or resets all previous information for connecting to a child port
+	                    var key = source ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+	                    this.setCellStyles(key, id, [edge]);
+	                }
+	
+	                this.model.setTerminal(edge, terminal, source);
+	
+	                if (this.resetEdgesOnConnect) {
+	                    this.resetEdge(edge);
+	                }
+	
+	                //this.fireEvent(new mxEventObject(mxEvent.CELL_CONNECTED,
+	                //    'edge', edge, 'terminal', terminal, 'source', source,
+	                //    'previous', previous));
+	            } finally {
+	                this.model.endUpdate();
+	            }
+	        }
+	    },
+	    disconnectGraph: function disconnectGraph() {},
+	
+	    // Drilldown
+	    // ---------
 	    getCurrentRoot: function getCurrentRoot() {
 	        return this.view.currentRoot;
 	    },
-	
-	    getDefaultParent: function getDefaultParent() {
-	
-	        var that = this;
-	
-	        return that.getCurrentRoot() || that.defaultParent || that.model.getRoot().getChildAt(0);
+	    getTranslateForRoot: function getTranslateForRoot() {},
+	    isPort: function isPort(cell) {
+	        return false;
 	    },
+	    getTerminalForPort: function getTerminalForPort() {},
+	    // 获取某个 cell 的 offset，用户可以直接覆盖这个实现
+	    getChildOffsetForCell: function getChildOffsetForCell(cell) {
+	        return null;
+	    },
+	    enterGroup: function enterGroup() {},
+	    exitGroup: function exitGroup() {},
+	    home: function home() {},
+	    isValidRoot: function isValidRoot() {},
 	
-	    // 一些便利方法
+	    // Graph display
+	    // -------------
+	    getGraphBounds: function getGraphBounds() {
+	        return this.view.getGraphBounds();
+	    },
+	    getCellBounds: function getCellBounds() {},
+	    getBoundingBoxFromGeometry: function getBoundingBoxFromGeometry() {},
+	    refresh: function refresh() {},
+	    snap: function snap() {},
+	    panGraph: function panGraph() {},
+	    zoomIn: function zoomIn() {},
+	    zoomOut: function zoomOut() {},
+	    zoomActual: function zoomActual() {},
+	    zoomTo: function zoomTo() {},
+	    center: function center() {},
+	    zoom: function zoom() {},
+	    zoomToRect: function zoomToRect() {},
+	    fit: function fit() {},
+	    scrollCellToVisible: function scrollCellToVisible() {},
+	    scrollRectToVisible: function scrollRectToVisible() {},
+	    getCellGeometry: function getCellGeometry(cell) {
+	        return this.model.getGeometry(cell);
+	    },
+	    isCellVisible: function isCellVisible(cell) {
+	        return this.model.isVisible(cell);
+	    },
+	    isCellCollapsed: function isCellCollapsed(cell) {
+	        return this.model.isCollapsed(cell);
+	    },
+	    isCellConnectable: function isCellConnectable() {},
+	
+	    isOrthogonal: function isOrthogonal(edge) {
+	        var orthogonal = edge.style[constants.STYLE_ORTHOGONAL];
+	
+	        if (orthogonal != null) {
+	            return orthogonal;
+	        }
+	
+	        var tmp = this.view.getEdgeStyle(edge);
+	
+	        return tmp == edgeStyle.SegmentConnector || tmp == edgeStyle.ElbowConnector || tmp == edgeStyle.SideToSide || tmp == edgeStyle.TopToBottom || tmp == edgeStyle.EntityRelation || tmp == edgeStyle.OrthConnector;
+	    },
+	    isLoop: function isLoop() {},
+	    isCloneEvent: function isCloneEvent() {},
+	    isToggleEvent: function isToggleEvent() {},
+	    isGridEnabledEvent: function isGridEnabledEvent() {},
+	    isConstrainedEvent: function isConstrainedEvent() {},
+	
+	    // Validation
 	    // ----------
 	
-	    getModel: function getModel() {
-	        return this.model;
+	    validationAlert: function validationAlert() {},
+	    isEdgeValid: function isEdgeValid() {},
+	    getEdgeValidationError: function getEdgeValidationError() {},
+	    validateEdge: function validateEdge() {},
+	    validateGraph: function validateGraph() {},
+	    getCellValidationError: function getCellValidationError() {},
+	    validateCell: function validateCell() {},
+	
+	    // Graph appearance
+	    // ----------------
+	    getBackgroundImage: function getBackgroundImage() {},
+	    setBackgroundImage: function setBackgroundImage() {},
+	    getFoldingImage: function getFoldingImage() {},
+	    convertValueToString: function convertValueToString(cell) {
+	        var value = this.model.getValue(cell);
+	
+	        if (value) {
+	            if (utils.isNode(value)) {
+	                return value.nodeName;
+	            } else if (utils.isFunction(value.toString)) {
+	                return value.toString();
+	            }
+	        }
+	
+	        return '';
+	    },
+	    getLabel: function getLabel(cell) {
+	        var result = '';
+	
+	        if (this.labelsVisible && cell) {
+	            var state = this.view.getState(cell);
+	            var style = state ? state.style : this.getCellStyle(cell);
+	
+	            if (!utils.getValue(style, constants.STYLE_NOLABEL, false)) {
+	                result = this.convertValueToString(cell);
+	            }
+	        }
+	
+	        return result;
+	    },
+	    isHtmlLabel: function isHtmlLabel() {
+	        return this.isHtmlLabels();
+	    },
+	    isHtmlLabels: function isHtmlLabels() {
+	        return this.htmlLabels;
+	    },
+	    setHtmlLabels: function setHtmlLabels() {},
+	    isWrapping: function isWrapping(cell) {
+	        var state = this.view.getState(cell);
+	        var style = state ? state.style : this.getCellStyle(cell);
+	
+	        return style ? style[constants.STYLE_WHITE_SPACE] == 'wrap' : false;
+	    },
+	    isLabelClipped: function isLabelClipped(cell) {
+	        var state = this.view.getState(cell);
+	        var style = state ? state.style : this.getCellStyle(cell);
+	
+	        return style ? style[constants.STYLE_OVERFLOW] == 'hidden' : false;
+	    },
+	    getTooltip: function getTooltip() {},
+	    getTooltipForCell: function getTooltipForCell() {},
+	    getCursorForMouseEvent: function getCursorForMouseEvent() {},
+	    getCursorForCell: function getCursorForCell() {},
+	    getStartSize: function getStartSize() {},
+	    getImage: function getImage(state) {
+	        return state && state.style ? state.style[constants.STYLE_IMAGE] : null;
+	    },
+	    getVerticalAlign: function getVerticalAlign(state) {
+	        return state && state.style ? state.style[constants.STYLE_VERTICAL_ALIGN] || constants.ALIGN_MIDDLE : null;
+	    },
+	    getIndicatorColor: function getIndicatorColor(state) {
+	        return state && state.style ? state.style[constants.STYLE_INDICATOR_COLOR] : null;
+	    },
+	    getIndicatorGradientColor: function getIndicatorGradientColor(state) {
+	        return state && state.style ? state.style[constants.STYLE_INDICATOR_GRADIENTCOLOR] : null;
+	    },
+	    getIndicatorShape: function getIndicatorShape(state) {
+	        return state && state.style ? state.style[constants.STYLE_INDICATOR_SHAPE] : null;
+	    },
+	    getIndicatorImage: function getIndicatorImage(state) {
+	        return state && state.style ? state.style[constants.STYLE_INDICATOR_IMAGE] : null;
+	    },
+	    getBorder: function getBorder() {
+	        return this.border;
+	    },
+	    setBorder: function setBorder() {},
+	    isSwimlane: function isSwimlane() {},
+	
+	    // Graph behaviour
+	    // ---------------
+	    isResizeContainer: function isResizeContainer() {},
+	    setResizeContainer: function setResizeContainer() {},
+	    isEnabled: function isEnabled() {},
+	    setEnabled: function setEnabled() {},
+	    isEscapeEnabled: function isEscapeEnabled() {},
+	    setEscapeEnabled: function setEscapeEnabled() {},
+	    isInvokesStopCellEditing: function isInvokesStopCellEditing() {},
+	    setInvokesStopCellEditing: function setInvokesStopCellEditing() {},
+	    isEnterStopsCellEditing: function isEnterStopsCellEditing() {},
+	    setEnterStopsCellEditing: function setEnterStopsCellEditing() {},
+	    isCellLocked: function isCellLocked() {},
+	    isCellsLocked: function isCellsLocked() {},
+	    setCellsLocked: function setCellsLocked() {},
+	    getCloneableCells: function getCloneableCells() {},
+	    isCellCloneable: function isCellCloneable() {},
+	    isCellsCloneable: function isCellsCloneable() {},
+	    setCellsCloneable: function setCellsCloneable() {},
+	    getExportableCells: function getExportableCells() {},
+	    canExportCell: function canExportCell() {},
+	    getImportableCells: function getImportableCells() {},
+	    canImportCell: function canImportCell() {},
+	    isCellSelectable: function isCellSelectable() {},
+	    isCellsSelectable: function isCellsSelectable() {},
+	    setCellsSelectable: function setCellsSelectable() {},
+	    getDeletableCells: function getDeletableCells() {},
+	    isCellDeletable: function isCellDeletable() {},
+	    isCellsDeletable: function isCellsDeletable() {},
+	    setCellsDeletable: function setCellsDeletable() {},
+	    isLabelMovable: function isLabelMovable() {},
+	    isCellRotatable: function isCellRotatable() {},
+	    getMovableCells: function getMovableCells() {},
+	    isCellMovable: function isCellMovable() {},
+	    isCellsMovable: function isCellsMovable() {},
+	    setCellsMovable: function setCellsMovable() {},
+	    isGridEnabled: function isGridEnabled() {},
+	    setGridEnabled: function setGridEnabled() {},
+	    isPortsEnabled: function isPortsEnabled() {
+	        return this.portsEnabled;
+	    },
+	    setPortsEnabled: function setPortsEnabled() {},
+	    getGridSize: function getGridSize() {},
+	    setGridSize: function setGridSize() {},
+	    getTolerance: function getTolerance() {},
+	    setTolerance: function setTolerance() {},
+	    isVertexLabelsMovable: function isVertexLabelsMovable() {},
+	    setVertexLabelsMovable: function setVertexLabelsMovable() {},
+	    isEdgeLabelsMovable: function isEdgeLabelsMovable() {},
+	    setEdgeLabelsMovable: function setEdgeLabelsMovable() {},
+	    isSwimlaneNesting: function isSwimlaneNesting() {},
+	    setSwimlaneNesting: function setSwimlaneNesting() {},
+	    isSwimlaneSelectionEnabled: function isSwimlaneSelectionEnabled() {},
+	    setSwimlaneSelectionEnabled: function setSwimlaneSelectionEnabled() {},
+	    isMultigraph: function isMultigraph() {},
+	    setMultigraph: function setMultigraph() {},
+	    isAllowLoops: function isAllowLoops() {},
+	    setAllowDanglingEdges: function setAllowDanglingEdges() {},
+	    isAllowDanglingEdges: function isAllowDanglingEdges() {},
+	    setConnectableEdges: function setConnectableEdges() {},
+	    isConnectableEdges: function isConnectableEdges() {},
+	    setCloneInvalidEdges: function setCloneInvalidEdges() {},
+	    isCloneInvalidEdges: function isCloneInvalidEdges() {},
+	    setAllowLoops: function setAllowLoops() {},
+	    isDisconnectOnMove: function isDisconnectOnMove() {},
+	    setDisconnectOnMove: function setDisconnectOnMove() {},
+	    isDropEnabled: function isDropEnabled() {},
+	    setDropEnabled: function setDropEnabled() {},
+	    isSplitEnabled: function isSplitEnabled() {},
+	    setSplitEnabled: function setSplitEnabled() {},
+	    isCellResizable: function isCellResizable() {},
+	    isCellsResizable: function isCellsResizable() {},
+	    setCellsResizable: function setCellsResizable() {},
+	    isTerminalPointMovable: function isTerminalPointMovable() {},
+	    isCellBendable: function isCellBendable() {},
+	    isCellsBendable: function isCellsBendable() {},
+	    setCellsBendable: function setCellsBendable() {},
+	    isCellEditable: function isCellEditable() {},
+	    isCellsEditable: function isCellsEditable() {},
+	    setCellsEditable: function setCellsEditable() {},
+	    isCellDisconnectable: function isCellDisconnectable() {},
+	    isCellsDisconnectable: function isCellsDisconnectable() {},
+	    setCellsDisconnectable: function setCellsDisconnectable() {},
+	    isValidSource: function isValidSource() {},
+	    isValidTarget: function isValidTarget() {},
+	    isValidConnection: function isValidConnection() {},
+	    setConnectable: function setConnectable() {},
+	    isConnectable: function isConnectable() {},
+	    setTooltips: function setTooltips() {},
+	    setPanning: function setPanning() {},
+	    isEditing: function isEditing() {},
+	    isAutoSizeCell: function isAutoSizeCell() {},
+	    isAutoSizeCells: function isAutoSizeCells() {},
+	    setAutoSizeCells: function setAutoSizeCells() {},
+	    isExtendParent: function isExtendParent() {},
+	    isExtendParents: function isExtendParents() {},
+	    setExtendParents: function setExtendParents() {},
+	    isExtendParentsOnAdd: function isExtendParentsOnAdd() {},
+	    setExtendParentsOnAdd: function setExtendParentsOnAdd() {},
+	    isExtendParentsOnMove: function isExtendParentsOnMove() {},
+	    setExtendParentsOnMove: function setExtendParentsOnMove() {},
+	    isRecursiveResize: function isRecursiveResize() {},
+	    setRecursiveResize: function setRecursiveResize() {},
+	    isConstrainChild: function isConstrainChild() {},
+	    isConstrainChildren: function isConstrainChildren() {},
+	    setConstrainChildren: function setConstrainChildren() {},
+	    setConstrainChildrenOnResize: function setConstrainChildrenOnResize() {},
+	    isConstrainChildrenOnResize: function isConstrainChildrenOnResize() {},
+	    isAllowNegativeCoordinates: function isAllowNegativeCoordinates() {},
+	    setAllowNegativeCoordinates: function setAllowNegativeCoordinates() {},
+	    getOverlap: function getOverlap() {},
+	    isAllowOverlapParent: function isAllowOverlapParent() {},
+	    getFoldableCells: function getFoldableCells() {},
+	    isCellFoldable: function isCellFoldable() {},
+	    isValidDropTarget: function isValidDropTarget() {},
+	    isSplitTarget: function isSplitTarget() {},
+	    getDropTarget: function getDropTarget() {},
+	
+	    // Cell retrieval
+	    // ---------------
+	    getDefaultParent: function getDefaultParent() {
+	        var that = this;
+	
+	        return that.getCurrentRoot() || that.defaultParent || that.model.getRoot().getChildAt(0); // 第一层
+	    },
+	    setDefaultParent: function setDefaultParent() {},
+	    getSwimlane: function getSwimlane() {},
+	    getSwimlaneAt: function getSwimlaneAt() {},
+	    getCellAt: function getCellAt(x, y, parent, vertices, edges) {
+	        vertices = vertices != null ? vertices : true;
+	        edges = edges != null ? edges : true;
+	
+	        if (parent == null) {
+	            parent = this.getCurrentRoot();
+	
+	            if (parent == null) {
+	                parent = this.getModel().getRoot();
+	            }
+	        }
+	
+	        if (parent != null) {
+	            var childCount = this.model.getChildCount(parent);
+	
+	            for (var i = childCount - 1; i >= 0; i--) {
+	                var cell = this.model.getChildAt(parent, i);
+	                var result = this.getCellAt(x, y, cell, vertices, edges);
+	
+	                if (result != null) {
+	                    return result;
+	                } else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) || vertices && this.model.isVertex(cell))) {
+	                    var state = this.view.getState(cell);
+	
+	                    if (this.intersects(state, x, y)) {
+	                        return cell;
+	                    }
+	                }
+	            }
+	        }
+	
+	        return null;
+	    },
+	    intersects: function intersects() {},
+	    hitsSwimlaneContent: function hitsSwimlaneContent() {},
+	    getChildVertices: function getChildVertices() {},
+	    getChildEdges: function getChildEdges() {},
+	    getChildCells: function getChildCells() {},
+	    getConnections: function getConnections() {},
+	    getIncomingEdges: function getIncomingEdges() {},
+	    getOutgoingEdges: function getOutgoingEdges() {},
+	    getEdges: function getEdges() {},
+	    isValidAncestor: function isValidAncestor() {},
+	    getOpposites: function getOpposites() {},
+	    getEdgesBetween: function getEdgesBetween() {},
+	    getPointForEvent: function getPointForEvent() {},
+	    getCells: function getCells() {},
+	    getCellsBeyond: function getCellsBeyond() {},
+	    findTreeRoots: function findTreeRoots() {},
+	    traverse: function traverse() {},
+	
+	    // Selection
+	    // ---------
+	    isCellSelected: function isCellSelected() {},
+	    isSelectionEmpty: function isSelectionEmpty() {},
+	    clearSelection: function clearSelection() {},
+	    getSelectionCount: function getSelectionCount() {},
+	    getSelectionCell: function getSelectionCell() {},
+	    getSelectionCells: function getSelectionCells() {},
+	    setSelectionCell: function setSelectionCell() {},
+	    setSelectionCells: function setSelectionCells() {},
+	    addSelectionCell: function addSelectionCell() {},
+	    addSelectionCells: function addSelectionCells() {},
+	    removeSelectionCell: function removeSelectionCell() {},
+	    removeSelectionCells: function removeSelectionCells() {},
+	    selectRegion: function selectRegion() {},
+	    selectNextCell: function selectNextCell() {},
+	    selectPreviousCell: function selectPreviousCell() {},
+	    selectParentCell: function selectParentCell() {},
+	    selectChildCell: function selectChildCell() {},
+	    selectCell: function selectCell() {},
+	    selectAll: function selectAll() {},
+	    selectVertices: function selectVertices() {},
+	    selectEdges: function selectEdges() {},
+	    selectCells: function selectCells() {},
+	    selectCellForEvent: function selectCellForEvent() {},
+	    selectCellsForEvent: function selectCellsForEvent() {},
+	
+	    // Selection state
+	    // ---------------
+	    createHandler: function createHandler() {},
+	    createVertexHandler: function createVertexHandler() {},
+	    createEdgeHandler: function createEdgeHandler() {},
+	    createEdgeSegmentHandler: function createEdgeSegmentHandler() {},
+	    createElbowEdgeHandler: function createElbowEdgeHandler() {},
+	
+	    // Graph events
+	    // ------------
+	    addMouseListener: function addMouseListener() {},
+	    removeMouseListener: function removeMouseListener() {},
+	    updateMouseEvent: function updateMouseEvent(me) {
+	        if (me.graphX == null || me.graphY == null) {
+	            var pt = mxUtils.convertPoint(this.container, me.getX(), me.getY());
+	
+	            me.graphX = pt.x - this.panDx;
+	            me.graphY = pt.y - this.panDy;
+	        }
+	
+	        return me;
+	    },
+	    getStateForTouchEvent: function getStateForTouchEvent() {},
+	    isEventIgnored: function isEventIgnored() {},
+	    isSyntheticEventIgnored: function isSyntheticEventIgnored() {},
+	    isEventSourceIgnored: function isEventSourceIgnored(evtName, me) {
+	        var source = me.getSource();
+	        var name = source.nodeName != null ? source.nodeName.toLowerCase() : '';
+	        var candidate = !domEvent.isMouseEvent(me.getEvent()) || domEvent.isLeftMouseButton(me.getEvent());
+	
+	        return evtName == mxEvent.MOUSE_DOWN && candidate && (name == 'select' || name == 'option' || name == 'input' && source.type != 'checkbox' && source.type != 'radio' && source.type != 'button' && source.type != 'submit' && source.type != 'file');
 	    },
 	
-	    getView: function getView() {
-	        return this.view;
+	    fireMouseEvent: function fireMouseEvent(evtName, me, sender) {
+	        //if (this.isEventSourceIgnored(evtName, me)) {
+	        //    if (this.tooltipHandler != null) {
+	        //        this.tooltipHandler.hide();
+	        //    }
+	        //
+	        //    return;
+	        //}
+	
+	        if (sender == null) {
+	            sender = this;
+	        }
+	
+	        // Updates the graph coordinates in the event
+	        me = this.updateMouseEvent(me);
+	
+	        // Stops editing for all events other than from cellEditor
+	        //if (evtName == mxEvent.MOUSE_DOWN && this.isEditing() && !this.cellEditor.isEventSource(me.getEvent())) {
+	        //    this.stopEditing(!this.isInvokesStopCellEditing());
+	        //}
+	
+	        // Detects and processes double taps for touch-based devices which do not have native double click events
+	        // or where detection of double click is not always possible (quirks, IE10+). Note that this can only handle
+	        // double clicks on cells because the sequence of events in IE prevents detection on the background, it fires
+	        // two mouse ups, one of which without a cell but no mousedown for the second click which means we cannot
+	        // detect which mouseup(s) are part of the first click, ie we do not know when the first click ends.
+	        if (!this.nativeDblClickEnabled && !mxEvent.isPopupTrigger(me.getEvent()) || this.doubleTapEnabled && mxClient.IS_TOUCH && mxEvent.isTouchEvent(me.getEvent())) {
+	            var currentTime = new Date().getTime();
+	
+	            // NOTE: Second mouseDown for double click missing in quirks mode
+	            if (!mxClient.IS_QUIRKS && evtName == mxEvent.MOUSE_DOWN || mxClient.IS_QUIRKS && evtName == mxEvent.MOUSE_UP && !this.fireDoubleClick) {
+	                if (this.lastTouchEvent != null && this.lastTouchEvent != me.getEvent() && currentTime - this.lastTouchTime < this.doubleTapTimeout && Math.abs(this.lastTouchX - me.getX()) < this.doubleTapTolerance && Math.abs(this.lastTouchY - me.getY()) < this.doubleTapTolerance && this.doubleClickCounter < 2) {
+	                    this.doubleClickCounter++;
+	                    var doubleClickFired = false;
+	
+	                    if (evtName == mxEvent.MOUSE_UP) {
+	                        if (me.getCell() == this.lastTouchCell && this.lastTouchCell != null) {
+	                            this.lastTouchTime = 0;
+	                            var cell = this.lastTouchCell;
+	                            this.lastTouchCell = null;
+	
+	                            // Fires native dblclick event via event source
+	                            // NOTE: This fires two double click events on edges in quirks mode. While
+	                            // trying to fix this, we realized that nativeDoubleClick can be disabled for
+	                            // quirks and IE10+ (or we didn't find the case mentioned above where it
+	                            // would not work), ie. all double clicks seem to be working without this.
+	                            if (mxClient.IS_QUIRKS) {
+	                                me.getSource().fireEvent('ondblclick');
+	                            }
+	
+	                            this.dblClick(me.getEvent(), cell);
+	                            doubleClickFired = true;
+	                        }
+	                    } else {
+	                        this.fireDoubleClick = true;
+	                        this.lastTouchTime = 0;
+	                    }
+	
+	                    // Do not ignore mouse up in quirks in this case
+	                    if (!mxClient.IS_QUIRKS || doubleClickFired) {
+	                        mxEvent.consume(me.getEvent());
+	                        return;
+	                    }
+	                } else if (this.lastTouchEvent == null || this.lastTouchEvent != me.getEvent()) {
+	                    this.lastTouchCell = me.getCell();
+	                    this.lastTouchX = me.getX();
+	                    this.lastTouchY = me.getY();
+	                    this.lastTouchTime = currentTime;
+	                    this.lastTouchEvent = me.getEvent();
+	                    this.doubleClickCounter = 0;
+	                }
+	            } else if ((this.isMouseDown || evtName == mxEvent.MOUSE_UP) && this.fireDoubleClick) {
+	                this.fireDoubleClick = false;
+	                var cell = this.lastTouchCell;
+	                this.lastTouchCell = null;
+	                this.isMouseDown = false;
+	
+	                // Workaround for Chrome/Safari not firing native double click events for double touch on background
+	                var valid = cell != null || mxEvent.isTouchEvent(me.getEvent()) && (mxClient.IS_GC || mxClient.IS_SF);
+	
+	                if (valid && Math.abs(this.lastTouchX - me.getX()) < this.doubleTapTolerance && Math.abs(this.lastTouchY - me.getY()) < this.doubleTapTolerance) {
+	                    this.dblClick(me.getEvent(), cell);
+	                } else {
+	                    mxEvent.consume(me.getEvent());
+	                }
+	
+	                return;
+	            }
+	        }
+	
+	        if (!this.isEventIgnored(evtName, me, sender)) {
+	            this.fireEvent(new mxEventObject(mxEvent.FIRE_MOUSE_EVENT, 'eventName', evtName, 'event', me));
+	
+	            if (mxClient.IS_OP || mxClient.IS_SF || mxClient.IS_GC || mxClient.IS_IE && mxClient.IS_SVG || me.getEvent().target != this.container) {
+	                if (evtName == mxEvent.MOUSE_MOVE && this.isMouseDown && this.autoScroll && !mxEvent.isMultiTouchEvent(me.getEvent)) {
+	                    this.scrollPointToVisible(me.getGraphX(), me.getGraphY(), this.autoExtend);
+	                }
+	
+	                if (this.mouseListeners != null) {
+	                    var args = [sender, me];
+	
+	                    // Does not change returnValue in Opera
+	                    if (!me.getEvent().preventDefault) {
+	                        me.getEvent().returnValue = true;
+	                    }
+	
+	                    for (var i = 0; i < this.mouseListeners.length; i++) {
+	                        var l = this.mouseListeners[i];
+	
+	                        if (evtName == mxEvent.MOUSE_DOWN) {
+	                            l.mouseDown.apply(l, args);
+	                        } else if (evtName == mxEvent.MOUSE_MOVE) {
+	                            l.mouseMove.apply(l, args);
+	                        } else if (evtName == mxEvent.MOUSE_UP) {
+	                            l.mouseUp.apply(l, args);
+	                        }
+	                    }
+	                }
+	
+	                // Invokes the click handler
+	                if (evtName == mxEvent.MOUSE_UP) {
+	                    this.click(me);
+	                }
+	            }
+	
+	            // Detects tapAndHold events using a timer
+	            if (mxEvent.isTouchEvent(me.getEvent()) && evtName == mxEvent.MOUSE_DOWN && this.tapAndHoldEnabled && !this.tapAndHoldInProgress) {
+	                this.tapAndHoldInProgress = true;
+	                this.initialTouchX = me.getGraphX();
+	                this.initialTouchY = me.getGraphY();
+	
+	                var handler = function handler() {
+	                    if (this.tapAndHoldValid) {
+	                        this.tapAndHold(me);
+	                    }
+	
+	                    this.tapAndHoldInProgress = false;
+	                    this.tapAndHoldValid = false;
+	                };
+	
+	                if (this.tapAndHoldThread) {
+	                    window.clearTimeout(this.tapAndHoldThread);
+	                }
+	
+	                this.tapAndHoldThread = window.setTimeout(mxUtils.bind(this, handler), this.tapAndHoldDelay);
+	                this.tapAndHoldValid = true;
+	            } else if (evtName == mxEvent.MOUSE_UP) {
+	                this.tapAndHoldInProgress = false;
+	                this.tapAndHoldValid = false;
+	            } else if (this.tapAndHoldValid) {
+	                this.tapAndHoldValid = Math.abs(this.initialTouchX - me.getGraphX()) < this.tolerance && Math.abs(this.initialTouchY - me.getGraphY()) < this.tolerance;
+	            }
+	
+	            this.consumeMouseEvent(evtName, me, sender);
+	        }
 	    },
 	
-	    beginUpdate: function beginUpdate() {
-	        this.model.beginUpdate();
-	        return this;
+	    consumeMouseEvent: function consumeMouseEvent() {},
+	
+	    fireGestureEvent: function fireGestureEvent(evt, cell) {
+	        // Resets double tap event handling when gestures take place
+	        this.lastTouchTime = 0;
+	        this.emit(new EventObject(eventNames.GESTURE, {
+	            event: evt,
+	            cell: cell
+	        }));
 	    },
 	
-	    endUpdate: function endUpdate() {
-	        this.model.endUpdate();
-	        return this;
-	    }
+	    destroy: function destroy() {}
 	});
 	module.exports = exports['default'];
 
@@ -992,11 +2383,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    constructor: function EventSource() {
-	        this.eventEnabled = true;
-	        // lazy
-	        // this.eventListeners = null;
-	    },
+	    eventEnabled: true,
+	
+	    constructor: function EventSource() {},
 	
 	    enableEvent: function enableEvent() {
 	        this.eventsEnabled = true;
@@ -1219,1509 +2608,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonDetector = __webpack_require__(16);
-	
-	var _commonDetector2 = _interopRequireDefault(_commonDetector);
-	
 	var _libBase = __webpack_require__(13);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _libPoint = __webpack_require__(17);
-	
-	var _libPoint2 = _interopRequireDefault(_libPoint);
-	
-	var _libRectangle = __webpack_require__(18);
-	
-	var _libRectangle2 = _interopRequireDefault(_libRectangle);
-	
-	var _libDictionary = __webpack_require__(26);
-	
-	var _libDictionary2 = _interopRequireDefault(_libDictionary);
-	
-	var _changesChildChange = __webpack_require__(38);
-	
-	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
-	
-	exports['default'] = _libBase2['default'].extend({
-	
-	    constructor: function View(graph) {
-	
-	        var that = this;
-	        that.graph = graph;
-	        that.states = new _libDictionary2['default']();
-	        that.translate = new _libPoint2['default']();
-	        that.graphBounds = new _libRectangle2['default']();
-	    },
-	
-	    getBounds: function getBounds() {},
-	
-	    setCurrentRoot: function setCurrentRoot() {},
-	
-	    scaleAndTranslate: function scaleAndTranslate() {},
-	
-	    setScale: function setScale() {},
-	
-	    setTranslate: function setTranslate() {},
-	
-	    refresh: function refresh() {},
-	
-	    revalidate: function revalidate() {
-	        return this.invalidate().validate();
-	    },
-	
-	    clear: function clear() {},
-	
-	    invalidate: function invalidate(cell, recurse, includeLink) {
-	
-	        var that = this;
-	        var model = that.graph.model;
-	
-	        cell = cell || model.getRoot();
-	        recurse = !(0, _commonUtils.isUndefined)(recurse) ? recurse : true;
-	        includeLink = !(0, _commonUtils.isUndefined)(includeLink) ? includeLink : true;
-	
-	        var state = that.getState(cell);
-	
-	        if (state) {
-	            state.invalid = true;
-	        }
-	
-	        // 只有 node 才有递归的必要
-	        if (!cell.invalidating && cell.isNode) {
-	
-	            cell.invalidating = true;
-	
-	            if (recurse) {
-	                cell.eachChild(function (child) {
-	                    that.invalidate(child, recurse, includeLink);
-	                });
-	            }
-	
-	            if (includeLink) {
-	                cell.eachLink(function (link) {
-	                    that.invalidate(link, recurse, includeLink);
-	                });
-	            }
-	
-	            delete cell.invalidating;
-	        }
-	
-	        return that;
-	    },
-	
-	    validate: function validate() {},
-	
-	    getEmptyBounds: function getEmptyBounds() {},
-	
-	    getBoundingBox: function getBoundingBox() {},
-	
-	    validateCell: function validateCell() {},
-	
-	    validateCellState: function validateCellState() {},
-	
-	    updateCellState: function updateCellState() {},
-	
-	    updateVertexState: function updateVertexState() {},
-	
-	    updateEdgeState: function updateEdgeState() {},
-	
-	    updateVertexLabelOffset: function updateVertexLabelOffset() {},
-	
-	    resetValidationState: function resetValidationState() {
-	        this.lastNode = null;
-	        this.lastHtmlNode = null;
-	        this.lastForegroundNode = null;
-	        this.lastForegroundHtmlNode = null;
-	    },
-	
-	    stateValidated: function stateValidated(state) {},
-	
-	    updateFixedTerminalPoints: function updateFixedTerminalPoints() {},
-	    updateFixedTerminalPoint: function updateFixedTerminalPoint() {},
-	
-	    updatePoints: function updatePoints(edge, points, source, target) {},
-	
-	    transformControlPoint: function transformControlPoint(state, pt) {},
-	
-	    getEdgeStyle: function getEdgeStyle(edge, points, source, target) {},
-	
-	    updateFloatingTerminalPoints: function updateFloatingTerminalPoints(state, source, target) {},
-	
-	    updateFloatingTerminalPoint: function updateFloatingTerminalPoint(edge, start, end, source) {},
-	
-	    getTerminalPort: function getTerminalPort(state, terminal, source) {},
-	
-	    getPerimeterPoint: function getPerimeterPoint(terminal, next, orthogonal, border) {},
-	
-	    getRoutingCenterX: function getRoutingCenterX(state) {},
-	
-	    getRoutingCenterY: function getRoutingCenterY(state) {},
-	
-	    getPerimeterBounds: function getPerimeterBounds(terminal, border) {},
-	
-	    getPerimeterFunction: function getPerimeterFunction(state) {},
-	
-	    getNextPoint: function getNextPoint(edge, opposite, source) {},
-	
-	    getVisibleTerminal: function getVisibleTerminal(edge, source) {},
-	
-	    updateEdgeBounds: function updateEdgeBounds(state) {},
-	
-	    getPoint: function getPoint(state, geometry) {},
-	
-	    getRelativePoint: function getRelativePoint(edgeState, x, y) {},
-	
-	    updateEdgeLabelOffset: function updateEdgeLabelOffset(state) {},
-	
-	    // State
-	    // -----
-	    getState: function getState(cell, create) {
-	
-	        if (!cell) {
-	            return;
-	        }
-	
-	        var that = this;
-	        var states = that.states;
-	        var state = states.get(cell);
-	
-	        // TODO: that.updateStyle
-	        if (create && (!state || that.updateStyle) && cell.visible) {
-	
-	            if (!state) {
-	                state = that.createState(cell);
-	                states.put(cell, state);
-	            } else {
-	                state.style = that.graph.getCellStyle(cell);
-	            }
-	        }
-	
-	        return state;
-	    },
-	
-	    createState: function createState(cell) {
-	
-	        var that = this;
-	        var graph = that.graph;
-	
-	        // TODO: that.currentRoot
-	
-	        var state = new CellState(this, cell, this.graph.getCellStyle(cell));
-	
-	        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
-	            this.graph.cellRenderer.createShape(state);
-	        }
-	
-	        return state;
-	    },
-	
-	    removeState: function removeState(cell) {
-	
-	        var that = this;
-	        var state = null;
-	
-	        if (cell) {
-	            state = that.states.remove(cell);
-	
-	            if (state) {
-	                that.graph.cellRenderer.destroy(state);
-	                state.destroy();
-	            }
-	        }
-	
-	        return state;
-	    },
-	
-	    isContainerEvent: function isContainerEvent(evt) {},
-	
-	    isScrollEvent: function isScrollEvent(evt) {},
-	
-	    init: function init() {
-	
-	        var that = this;
-	        var root = (0, _commonUtils.createSvgElement)('svg');
-	        var canvas = (0, _commonUtils.createSvgElement)('g');
-	        var backgroundPane = (0, _commonUtils.createSvgElement)('g');
-	        var drawPane = (0, _commonUtils.createSvgElement)('g');
-	        var overlayPane = (0, _commonUtils.createSvgElement)('g');
-	        var decoratorPane = (0, _commonUtils.createSvgElement)('g');
-	
-	        canvas.appendChild(backgroundPane);
-	        canvas.appendChild(drawPane);
-	        canvas.appendChild(overlayPane);
-	        canvas.appendChild(decoratorPane);
-	        root.appendChild(canvas);
-	
-	        root.style.width = '100%';
-	        root.style.height = '100%';
-	        root.style.display = 'block';
-	
-	        that.canvas = canvas;
-	        that.backgroundPane = backgroundPane;
-	        that.drawPane = drawPane;
-	        that.overlayPane = overlayPane;
-	        that.decoratorPane = decoratorPane;
-	
-	        var container = that.graph.container;
-	        if (container) {
-	            container.appendChild(root);
-	
-	            // update container style
-	            var style = (0, _commonUtils.getCurrentStyle)(container);
-	            if (style.position === 'static') {
-	                container.style.position = 'relative';
-	            }
-	
-	            // Disables built-in pan and zoom in IE10 and later
-	            if (_commonDetector2['default'].IS_POINTER) {
-	                container.style.msTouchAction = 'none';
-	            }
-	        }
-	
-	        that.installListeners();
-	    },
-	
-	    installListeners: function installListeners() {},
-	
-	    destroy: function destroy() {}
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var ua = navigator.userAgent;
-	var av = navigator.appVersion;
-	
-	module.exports = {
-	    // IE
-	    IS_IE: ua.indexOf('MSIE') >= 0,
-	
-	    IS_IE11: !!ua.match(/Trident\/7\./),
-	
-	    // Netscape
-	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
-	
-	    // Firefox
-	    IS_FF: ua.indexOf('Firefox/') >= 0,
-	
-	    // Chrome
-	    IS_GC: ua.indexOf('Chrome/') >= 0,
-	
-	    // Safari
-	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
-	
-	    // Opera
-	    IS_OP: ua.indexOf('Opera/') >= 0,
-	
-	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
-	
-	    IS_WIN: av.indexOf('Win') > 0,
-	
-	    IS_MAC: av.indexOf('Mac') > 0,
-	
-	    IS_TOUCH: 'ontouchstart' in document.documentElement,
-	
-	    IS_POINTER: window.navigator.msPointerEnabled || false
-	};
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Base = __webpack_require__(13);
-	
-	var _Base2 = _interopRequireDefault(_Base);
-	
-	var Point = _Base2['default'].extend({
-	
-	    constructor: function Point(x, y) {
-	        this.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
-	        this.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
-	    },
-	
-	    equals: function equals(point) {
-	        return point && point instanceof Point && point.x === this.x && point.y === this.y;
-	    },
-	
-	    clone: function clone() {
-	        return new Point(this.x, this.y);
-	    }
-	});
-	
-	exports['default'] = Point;
-	module.exports = exports['default'];
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Base = __webpack_require__(13);
-	
-	var _Base2 = _interopRequireDefault(_Base);
-	
-	var Rectangle = _Base2['default'].extend({
-	
-	    constructor: function Rectangle(x, y, width, height) {
-	
-	        var that = this;
-	
-	        that.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
-	        that.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
-	        that.width = width ? width : 0;
-	        that.height = height ? height : 0;
-	    },
-	
-	    setRect: function setRect(x, y, width, height) {
-	
-	        var that = this;
-	
-	        that.x = x;
-	        that.y = y;
-	        that.width = width;
-	        that.height = height;
-	
-	        return that;
-	    },
-	
-	    getCenterX: function getCenterX() {
-	        return this.x + this.width / 2;
-	    },
-	
-	    getCenterY: function getCenterY() {
-	        return this.y + this.height / 2;
-	    },
-	
-	    getCenter: function getCenter() {
-	        return new Point(this.getCenterX(), this.getCenterY());
-	    },
-	
-	    add: function add(rect) {
-	
-	        if (!rect) {
-	            return;
-	        }
-	
-	        var that = this;
-	
-	        var minX = Math.min(that.x, rect.x);
-	        var minY = Math.min(that.y, rect.y);
-	        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
-	        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
-	
-	        that.x = minX;
-	        that.y = minY;
-	        that.width = maxX - minX;
-	        that.height = maxY - minY;
-	
-	        return that;
-	    },
-	
-	    grow: function grow(amount) {
-	
-	        var rect = this;
-	
-	        rect.x -= amount;
-	        rect.y -= amount;
-	        rect.width += 2 * amount;
-	        rect.height += 2 * amount;
-	
-	        return rect;
-	    },
-	
-	    rotate90: function rotate90() {
-	
-	        var that = this;
-	        var w = that.width;
-	        var h = that.height;
-	        var t = (w - h) / 2;
-	
-	        that.x += t;
-	        that.y -= t;
-	        that.width = h;
-	        that.height = w;
-	
-	        return that;
-	    },
-	
-	    equals: function equals(rect) {
-	
-	        var that = this;
-	
-	        return rect instanceof Rectangle && rect.x === that.x && rect.y === that.y && rect.width === that.width && rect.height === that.height;
-	    },
-	
-	    clone: function clone() {
-	        var rect = this;
-	        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
-	    }
-	});
-	
-	exports['default'] = Rectangle;
-	module.exports = exports['default'];
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _commonClass = __webpack_require__(11);
-	
-	var _commonClass2 = _interopRequireDefault(_commonClass);
-	
-	// cells
-	
-	var _cellsNode = __webpack_require__(20);
-	
-	var _cellsNode2 = _interopRequireDefault(_cellsNode);
-	
-	var _cellsLink = __webpack_require__(28);
-	
-	var _cellsLink2 = _interopRequireDefault(_cellsLink);
-	
-	// events
-	
-	var _eventsAspect = __webpack_require__(39);
-	
-	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
-	
-	var _eventsEventNames = __webpack_require__(22);
-	
-	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
-	
-	var _eventsEventSource = __webpack_require__(12);
-	
-	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
-	
-	// changes
-	
-	var _changesRootChange = __webpack_require__(23);
-	
-	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
-	
-	var _changesChildChange = __webpack_require__(38);
-	
-	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
-	
-	var _changesChangeCollection = __webpack_require__(25);
-	
-	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
-	
-	exports['default'] = _commonClass2['default'].create({
-	
-	    Extends: _eventsEventSource2['default'], // event
-	    Implements: _eventsAspect2['default'], // AOP
-	
-	    // 配置项
-	    createIds: true,
-	    prefix: '',
-	    postfix: '',
-	    maintainEdgeParent: true,
-	
-	    constructor: function Model(root) {
-	
-	        var that = this;
-	
-	        that.nextId = 0;
-	        that.updateLevel = 0;
-	        that.endingUpdate = false;
-	
-	        that.changeCollection = new _changesChangeCollection2['default'](that);
-	
-	        if (root) {
-	            that.setRoot(root);
-	        } else {
-	            that.clear();
-	        }
-	    },
-	
-	    clear: function clear() {
-	        var that = this;
-	        that.setRoot(that.createRoot());
-	        return that;
-	    },
-	
-	    isAncestor: function isAncestor(parent, child) {
-	        while (child && child !== parent) {
-	            child = child.parent;
-	        }
-	
-	        return child === parent;
-	    },
-	
-	    contains: function contains(cell) {
-	        return this.isAncestor(this.root, cell);
-	    },
-	
-	    getCellById: function getCellById(id) {
-	        return this.cells ? this.cells[id] : null;
-	    },
-	
-	    // 按照层级获取所有父节点
-	    getParents: function getParents(child) {
-	
-	        var that = this;
-	        var result = [];
-	        var parent = child ? child.parent : null;
-	
-	        if (parent) {
-	            result.push(parent);
-	            result = result.concat(that.getParents(parent));
-	        }
-	
-	        return result;
-	    },
-	
-	    // 获取子孙节点
-	    getDescendants: function getDescendants(parent) {
-	
-	        var that = this;
-	        var result = [];
-	
-	        parent = parent || that.getRoot();
-	        parent.eachChild(function (child) {
-	            result.push(child);
-	            result = result.concat(that.getDescendants(child));
-	        });
-	
-	        return result;
-	    },
-	
-	    // Root
-	    // ----
-	
-	    isRoot: function isRoot(cell) {
-	        return cell && this.root === cell;
-	    },
-	
-	    createRoot: function createRoot() {
-	        var root = new _cellsNode2['default']();
-	
-	        root.insertChild(new _cellsNode2['default']());
-	
-	        return root;
-	    },
-	
-	    getRoot: function getRoot(cell) {
-	
-	        var root = cell || this.root;
-	
-	        if (cell) {
-	            while (cell) {
-	                root = cell;
-	                cell = cell.parent;
-	            }
-	        }
-	
-	        return root;
-	    },
-	
-	    setRoot: function setRoot(root) {
-	        var that = this;
-	        that.digest(new _changesRootChange2['default'](that, root));
-	        return that;
-	    },
-	
-	    // RootChange 的回调处理
-	    rootChanged: function rootChanged(newRoot) {
-	
-	        var that = this;
-	        var oldRoot = that.root;
-	
-	        that.root = newRoot;
-	        that.cells = null;
-	        that.nextId = 0;
-	        that.cellAdded(newRoot);
-	
-	        return oldRoot;
-	    },
-	
-	    // Layers
-	    // ------
-	    isLayer: function isLayer(cell) {
-	        return cell && this.isRoot(cell.parent);
-	    },
-	
-	    // 获取所有图层
-	    getLayers: function getLayers() {
-	        // 根节点的所有子节点就是图层
-	        return this.getRoot().children || [];
-	    },
-	
-	    // Changes
-	    // -------
-	
-	    //
-	    //
-	
-	    add: function add(parent, child, index) {
-	
-	        var that = this;
-	
-	        if (parent && child && parent !== child) {
-	
-	            if ((0, _commonUtils.isUndefined)(index)) {
-	                index = parent.getChildCount();
-	            }
-	
-	            var parentChanged = parent !== child.parent;
-	
-	            that.digest(new _changesChildChange2['default'](that, parent, child, index));
-	
-	            // TODO: maintainEdgeParent
-	            if (that.maintainEdgeParent && parentChanged) {
-	                that.updateEdgeParents(child);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    remove: function remove(cell) {
-	        if (cell == this.root) {
-	            this.setRoot(null);
-	        } else if (this.getParent(cell) != null) {
-	            this.execute(new _changesChildChange2['default'](this, null, cell));
-	        }
-	
-	        return cell;
-	    },
-	
-	    // cell 添加到画布后的处理工作
-	    cellAdded: function cellAdded(cell) {
-	
-	        var that = this;
-	
-	        if (cell) {
-	
-	            var id = cell.id;
-	
-	            if (!id && that.createIds) {
-	                id = that.createId(cell);
-	            }
-	
-	            // 去重
-	            if (id) {
-	                var collision = that.getCell(id);
-	
-	                if (collision !== cell) {
-	                    while (collision) {
-	                        id = that.createId(cell);
-	                        collision = that.getCell(id);
-	                    }
-	
-	                    if (!that.cells) {
-	                        that.cells = {};
-	                    }
-	
-	                    cell.id = id;
-	                    that.cells[id] = cell;
-	                }
-	            }
-	
-	            // 修正 nextId
-	            if ((0, _commonUtils.isNumeric)(id)) {
-	                that.nextId = Math.max(that.nextId, id);
-	            }
-	
-	            // 递归
-	            if (cell.isNode) {
-	                cell.eachChild(that.cellAdded, that);
-	            }
-	        }
-	    },
-	
-	    // cell 移除画布后的清理工作
-	    cellRemoved: function cellRemoved(cell) {
-	
-	        var that = this;
-	        var cells = that.cells;
-	
-	        if (cell && cells) {
-	
-	            if (cell.isNode) {
-	                cell.eachChild(function (child) {
-	                    that.cellRemoved(child);
-	                });
-	            }
-	
-	            var id = cell.id;
-	            if (cells && !(0, _commonUtils.isUndefined)(id)) {
-	                delete cells[id];
-	            }
-	        }
-	    },
-	
-	    updateEdgeParents: function updateEdgeParents(cell, root) {},
-	
-	    updateEdgeParent: function updateEdgeParent(edge, root) {},
-	
-	    getOrigin: function getOrigin(cell) {},
-	
-	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {},
-	
-	    // ChildChange 的回调处理
-	    childChanged: function childChanged(cell, newParent, newIndex) {
-	
-	        var that = this;
-	        var oldParent = cell.parent;
-	
-	        if (newParent) {
-	            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
-	                newParent.insertChild(cell, newIndex);
-	            }
-	        } else if (oldParent) {
-	            oldParent.removeChild(cell);
-	        }
-	
-	        // Checks if the previous parent was already in the
-	        // model and avoids calling cellAdded if it was.
-	        if (newParent && !that.contains(oldParent)) {
-	            that.cellAdded(cell);
-	        } else if (!newParent) {
-	            that.cellRemoved(cell);
-	        }
-	
-	        return oldParent;
-	    },
-	
-	    // ChildChange 的回调处理，处理连线连接的节点
-	    linkChanged: function linkChanged(link, newNode, isSource) {
-	        var oldNode = link.getNode(isSource);
-	
-	        if (newNode) {
-	            newNode.insertLink(link, isSource);
-	        } else if (oldNode) {
-	            oldNode.removeLink(link, isSource);
-	        }
-	
-	        return oldNode;
-	    },
-	
-	    createId: function createId() {
-	        var that = this;
-	        var id = that.nextId;
-	
-	        that.nextId += 1;
-	
-	        return that.prefix + id + that.postfix;
-	    },
-	
-	    digest: function digest(change) {
-	
-	        var that = this;
-	
-	        change.digest();
-	
-	        that.beginUpdate();
-	        that.changeCollection.add(change);
-	        that.endUpdate();
-	
-	        return that;
-	    },
-	
-	    beginUpdate: function beginUpdate() {
-	
-	        var that = this;
-	        that.updateLevel += 1;
-	        that.emit(_eventsEventNames2['default'].BEGIN_UPDATE);
-	
-	        if (that.updateLevel === 1) {
-	            that.emit(_eventsEventNames2['default'].START_EDIT);
-	        }
-	    },
-	
-	    endUpdate: function endUpdate() {
-	
-	        var that = this;
-	
-	        that.updateLevel -= 1;
-	
-	        if (that.updateLevel === 0) {
-	            that.emit(_eventsEventNames2['default'].END_EDIT);
-	        }
-	
-	        if (!that.endingUpdate) {
-	
-	            var changeCollection = that.changeCollection;
-	
-	            that.endingUpdate = that.updateLevel === 0;
-	            that.emit(_eventsEventNames2['default'].END_UPDATE, { changes: changeCollection.changes });
-	
-	            // 触发重绘
-	            if (that.endingUpdate && changeCollection.hasChange()) {
-	                changeCollection.notify().clear();
-	            }
-	
-	            that.endingUpdate = false;
-	        }
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Cell = __webpack_require__(21);
-	
-	var _Cell2 = _interopRequireDefault(_Cell);
-	
-	exports['default'] = _Cell2['default'].extend({
-	
-	    isNode: true,
-	    connectAble: true,
-	    transients: ['id', 'value', 'parent', 'children', 'links'],
-	
-	    constructor: function Node(id, value, geometry, style) {
-	
-	        var that = this;
-	
-	        Node.superclass.constructor.call(that, id, value, geometry, style);
-	
-	        // lazy
-	        // that.parent = null;
-	        // that.children = [];
-	        // that.links = [];
-	    },
-	
-	    // children
-	    // --------
-	
-	    getChildCount: function getChildCount() {
-	        var children = this.children;
-	        return children ? children.length : 0;
-	    },
-	
-	    getChildIndex: function getChildIndex(child) {
-	        return (0, _commonUtils.indexOf)(this.children || [], child);
-	    },
-	
-	    getChildAt: function getChildAt(index) {
-	        var children = this.children;
-	        return children ? children[index] : null;
-	    },
-	
-	    eachChild: function eachChild(iterator, context) {
-	
-	        var that = this;
-	
-	        (0, _commonUtils.each)(that.children || [], iterator, context);
-	
-	        return that;
-	    },
-	
-	    insertChild: function insertChild(child, index) {
-	        var that = this;
-	
-	        if (child) {
-	
-	            // fix index
-	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
-	                index = that.getChildCount();
-	
-	                if (child.parent === that) {
-	                    index--;
-	                }
-	            }
-	
-	            child.removeFromParent();
-	            child.parent = that;
-	
-	            var children = that.children;
-	
-	            if (children) {
-	                children.splice(index, 0, child);
-	            } else {
-	                children = that.children = [];
-	                children.push(child);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    removeChild: function removeChild(child) {
-	        return this.removeChildAt(this.getChildIndex(child));
-	    },
-	
-	    removeChildAt: function removeChildAt(index) {
-	        var that = this;
-	        var child = null;
-	        var children = that.children;
-	
-	        if (children && index >= 0) {
-	            child = that.getChildAt(index);
-	
-	            if (child) {
-	                children.splice(index, 1);
-	                child.parent = null;
-	            }
-	        }
-	
-	        return child;
-	    },
-	
-	    // links
-	    // ------
-	
-	    getLinkCount: function getLinkCount() {
-	        var links = this.links;
-	        return links ? links.length : 0;
-	    },
-	
-	    getLinkIndex: function getLinkIndex(link) {
-	        return (0, _commonUtils.indexOf)(this.links || [], link);
-	    },
-	
-	    getLinkAt: function getLinkAt(index) {
-	        var links = this.links;
-	        return links ? links[index] : null;
-	    },
-	
-	    eachLink: function eachLink(iterator, context) {
-	        var that = this;
-	
-	        (0, _commonUtils.each)(that.links || [], iterator, context);
-	
-	        return that;
-	    },
-	
-	    insertLink: function insertLink(link, outgoing) {
-	
-	        var that = this;
-	
-	        if (link) {
-	            link.removeFromNode(outgoing);
-	            link.setNode(that, outgoing);
-	
-	            var links = that.links;
-	
-	            if (!links || that.getLinkIndex(link) < 0 || link.getNode(!outgoing) !== that) {
-	                if (!links) {
-	                    links = that.links = [];
-	                }
-	
-	                links.push(link);
-	            }
-	        }
-	
-	        return link;
-	    },
-	
-	    removeLink: function removeLink(link, outgoing) {
-	
-	        var that = this;
-	        var links = that.links;
-	
-	        if (link) {
-	
-	            if (links && link.getNode(!outgoing) !== that) {
-	                var index = that.getLinkIndex(link);
-	
-	                if (index >= 0) {
-	                    links.splice(index, 1);
-	                }
-	            }
-	
-	            link.setNode(null, outgoing);
-	        }
-	
-	        return link;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	exports['default'] = _libBase2['default'].extend({
-	
-	    // 属性访问器
-	    //Accessors: [
-	    //    'id',
-	    //    'value',
-	    //    'style',
-	    //    'parent',
-	    //    'visible',
-	    //    'geometry'
-	    //],
-	
-	    // 原型链上的属性
-	    visible: true,
-	
-	    constructor: function Cell(id, value, geometry, style) {
-	
-	        var that = this;
-	
-	        that.id = id;
-	        that.value = value;
-	        that.geometry = geometry;
-	        that.style = style;
-	    },
-	
-	    removeFromParent: function removeFromParent() {
-	        var that = this;
-	        var parent = that.parent;
-	
-	        parent && parent.remove(that);
-	
-	        return that;
-	    },
-	
-	    cloneValue: function cloneValue() {
-	        var value = this.value;
-	
-	        if (value) {
-	            if (value.clone && (0, _commonUtils.isFunction)(value.clone)) {
-	                return value.clone();
-	            }
-	
-	            if ((0, _commonUtils.isNode)(value)) {
-	                return value.cloneNode(true);
-	            }
-	        }
-	
-	        return value;
-	    },
-	
-	    clone: function clone() {
-	        var that = this;
-	        var cloned = (0, _commonUtils.clone)(that, that.transients);
-	        cloned.value = that.cloneValue();
-	
-	        return cloned;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 22 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    //BEFORE_DIGEST: 'beforeDigest',
-	    //AFTER_DIGEST: 'afterDigest',
-	
-	    BEGIN_UPDATE: 'beginUpdate',
-	    END_UPDATE: 'endUpdate',
-	
-	    START_EDIT: 'startEdit',
-	    END_EDIT: 'endEdit',
-	
-	    CHANGE: 'change'
-	};
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(24);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function RootChange(model, root) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.root = root;
-	        that.previous = root;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	        var model = that.model;
-	        var previous = that.previous;
-	
-	        that.root = previous;
-	        that.previous = model.rootChanged(previous);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	exports['default'] = _libBase2['default'].extend({
-	    constructor: function Change() {},
-	    digest: function digest() {
-	        return this;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	var _eventsEventNames = __webpack_require__(22);
-	
-	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
-	
-	exports['default'] = _libBase2['default'].extend({
-	    constructor: function ChangeCollection(model) {
-	
-	        var that = this;
-	        that.model = model;
-	    },
-	
-	    hasChange: function hasChange() {
-	        var changes = this.changes;
-	        return changes && changes.length;
-	    },
-	
-	    add: function add(change) {
-	
-	        var that = this;
-	        var changes = that.changes;
-	
-	        if (change) {
-	            if (!changes) {
-	                changes = that.changes = [];
-	            }
-	
-	            changes.push(change);
-	        }
-	
-	        return change;
-	    },
-	
-	    clear: function clear() {
-	        this.changes = null;
-	        return this;
-	    },
-	
-	    notify: function notify() {
-	
-	        var that = this;
-	
-	        that.model.emit(_eventsEventNames2['default'].CHANGE, { changes: that.changes });
-	
-	        return that;
-	    }
-	
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Base = __webpack_require__(13);
-	
-	var _Base2 = _interopRequireDefault(_Base);
-	
-	var _commonObjectIdentity = __webpack_require__(27);
-	
-	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
-	
-	exports['default'] = _Base2['default'].extend({
-	
-	    constructor: function Dictionary() {
-	        this.clear();
-	    },
-	
-	    clear: function clear() {
-	        var that = this;
-	
-	        that.map = {};
-	
-	        return that;
-	    },
-	
-	    get: function get(key) {
-	        var id = _commonObjectIdentity2['default'].get(key);
-	        return this.map[id];
-	    },
-	
-	    put: function put(key, value) {
-	
-	        var map = this.map;
-	        var id = _commonObjectIdentity2['default'].get(key);
-	        var previous = map[id];
-	
-	        map[id] = value;
-	
-	        return previous;
-	    },
-	
-	    remove: function remove(key) {
-	
-	        var map = this.map;
-	        var id = _commonObjectIdentity2['default'].get(key);
-	        var previous = map[id];
-	
-	        delete map[id];
-	
-	        return previous;
-	    },
-	
-	    getKeys: function getKeys() {
-	        return (0, _commonUtils.keys)(this.map);
-	    },
-	
-	    getValues: function getValues() {
-	
-	        var result = [];
-	
-	        (0, _commonUtils.forIn)(this.map, function (value) {
-	            result.push(value);
-	        });
-	
-	        return result;
-	    },
-	
-	    each: function each(visitor, context) {
-	
-	        var that = this;
-	
-	        (0, _commonUtils.forIn)(that.map, visitor, context);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	// 用构造函数名作为计数器依据
-	var counterMap = {};
-	
-	var objectIdentity = {
-	
-	    fieldName: 'objectId',
-	
-	    get: function get(obj) {
-	
-	        var fieldName = objectIdentity.fieldName;
-	        var isObj = (0, _utils.isObject)(obj);
-	
-	        if (isObj && (0, _utils.isUndefined)(obj[fieldName])) {
-	
-	            var ctorName = (0, _utils.getFunctionName)(obj.constructor);
-	
-	            if ((0, _utils.isUndefined)(counterMap[ctorName])) {
-	                counterMap[ctorName] = 0;
-	            } else {
-	                counterMap[ctorName] += 1;
-	            }
-	
-	            obj[fieldName] = ctorName + '#' + counterMap[ctorName];
-	        }
-	
-	        return isObj ? obj[fieldName] : '' + obj;
-	    },
-	
-	    clear: function clear(obj) {
-	        if ((0, _utils.isObject)(obj)) {
-	            delete obj[objectIdentity.fieldName];
-	        }
-	    }
-	};
-	
-	exports['default'] = objectIdentity;
-	module.exports = exports['default'];
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Cell = __webpack_require__(21);
-	
-	var _Cell2 = _interopRequireDefault(_Cell);
-	
-	exports['default'] = _Cell2['default'].extend({
-	
-	    isLink: true,
-	    transients: ['id', 'value', 'parent', 'source', 'target'],
-	
-	    constructor: function Link(id, value, geometry, style) {
-	
-	        var that = this;
-	
-	        Link.superclass.constructor.call(that, id, value, geometry, style);
-	
-	        // lazy
-	        // that.source = null;
-	        // that.target = null;
-	    },
-	
-	    getNode: function getNode(isSource) {
-	        return isSource ? this.source : this.target;
-	    },
-	
-	    setNode: function setNode(node, isSource) {
-	        if (isSource) {
-	            this.source = node;
-	        } else {
-	            this.target = node;
-	        }
-	
-	        return node;
-	    },
-	
-	    removeFromNode: function removeFromNode(isSource) {
-	
-	        var that = this;
-	
-	        var node = that.getNode(isSource);
-	
-	        node && node.removeLink(that, isSource);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	var _defaultLinkStyle = __webpack_require__(30);
+	var _defaultLinkStyle = __webpack_require__(16);
 	
 	var _defaultLinkStyle2 = _interopRequireDefault(_defaultLinkStyle);
 	
-	var _defaultNodeStyle = __webpack_require__(31);
+	var _defaultNodeStyle = __webpack_require__(21);
 	
 	var _defaultNodeStyle2 = _interopRequireDefault(_defaultNodeStyle);
 	
@@ -2750,7 +2645,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.setStyle('defaultLink', style);
 	    },
 	
-	    getStyle: function getStyle() {},
+	    getStyle: function getStyle(name) {
+	        return this.styles[name];
+	    },
 	
 	    setStyle: function setStyle(name, style) {
 	        this.styles[name] = style;
@@ -2760,7 +2657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2771,19 +2668,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _enumsStyleNames = __webpack_require__(32);
+	var _enumsStyleNames = __webpack_require__(17);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsShapeNames = __webpack_require__(33);
+	var _enumsShapeNames = __webpack_require__(18);
 	
 	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
 	
-	var _enumsAlignments = __webpack_require__(34);
+	var _enumsAlignments = __webpack_require__(19);
 	
 	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
 	
-	var _enumsArrowTypes = __webpack_require__(36);
+	var _enumsArrowTypes = __webpack_require__(20);
 	
 	var _enumsArrowTypes2 = _interopRequireDefault(_enumsArrowTypes);
 	
@@ -2800,46 +2697,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _enumsStyleNames = __webpack_require__(32);
-	
-	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
-	
-	var _enumsShapeNames = __webpack_require__(33);
-	
-	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
-	
-	var _enumsAlignments = __webpack_require__(34);
-	
-	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
-	
-	var _commonPerimeter = __webpack_require__(35);
-	
-	var style = {};
-	
-	style[_enumsStyleNames2['default'].SHAPE] = _enumsShapeNames2['default'].RECTANGLE;
-	style[_enumsStyleNames2['default'].PERIMETER] = _commonPerimeter.rectanglePerimeter;
-	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
-	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
-	style[_enumsStyleNames2['default'].FILL_COLOR] = '#e3f4ff';
-	style[_enumsStyleNames2['default'].STROKE_COLOR] = '#289de9';
-	style[_enumsStyleNames2['default'].FONT_COLOR] = '#774400';
-	
-	exports['default'] = style;
-	module.exports = exports['default'];
-
-/***/ },
-/* 32 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2953,7 +2811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 33 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2977,7 +2835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 34 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2992,7 +2850,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 35 */
+/* 20 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    CLASSIC: 'classic',
+	    BLOCK: 'block',
+	    OPEN: 'open',
+	    OVAL: 'oval',
+	    DIAMOND: 'diamond',
+	    DIAMOND_THIN: 'diamondThin'
+	};
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _enumsStyleNames = __webpack_require__(17);
+	
+	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
+	
+	var _enumsShapeNames = __webpack_require__(18);
+	
+	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
+	
+	var _enumsAlignments = __webpack_require__(19);
+	
+	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
+	
+	var _commonPerimeter = __webpack_require__(22);
+	
+	var style = {};
+	
+	style[_enumsStyleNames2['default'].SHAPE] = _enumsShapeNames2['default'].RECTANGLE;
+	style[_enumsStyleNames2['default'].PERIMETER] = _commonPerimeter.rectanglePerimeter;
+	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
+	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
+	style[_enumsStyleNames2['default'].FILL_COLOR] = '#e3f4ff';
+	style[_enumsStyleNames2['default'].STROKE_COLOR] = '#289de9';
+	style[_enumsStyleNames2['default'].FONT_COLOR] = '#774400';
+	
+	exports['default'] = style;
+	module.exports = exports['default'];
+
+/***/ },
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3003,7 +2915,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libPoint = __webpack_require__(17);
+	var _libPoint = __webpack_require__(23);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
@@ -3555,22 +3467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.hexagonPerimeter = hexagonPerimeter;
 
 /***/ },
-/* 36 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    CLASSIC: 'classic',
-	    BLOCK: 'block',
-	    OPEN: 'open',
-	    OVAL: 'oval',
-	    DIAMOND: 'diamond',
-	    DIAMOND_THIN: 'diamondThin'
-	};
-
-/***/ },
-/* 37 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3581,19 +3478,314 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Rectangle = __webpack_require__(18);
+	var _commonUtils = __webpack_require__(1);
 	
-	var _Rectangle2 = _interopRequireDefault(_Rectangle);
+	var _Base = __webpack_require__(13);
 	
-	exports['default'] = _Rectangle2['default'].extend({
+	var _Base2 = _interopRequireDefault(_Base);
 	
-	    //TRANSLATE_CONTROL_POINTS: true,
-	    //alternateBounds: null,
-	    //sourcePoint: null,
-	    //targetPoint: null,
-	    //points: null,
-	    //offset: null,
-	    //relative: false,
+	var Point = _Base2['default'].extend({
+	
+	    constructor: function Point(x, y) {
+	        this.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
+	        this.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
+	    },
+	
+	    equals: function equals(point) {
+	        return point && point instanceof Point && point.x === this.x && point.y === this.y;
+	    },
+	
+	    clone: function clone() {
+	        return new Point(this.x, this.y);
+	    }
+	});
+	
+	exports['default'] = Point;
+	module.exports = exports['default'];
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    // 原型上的属性
+	    visible: true, // 默认可见
+	    transients: ['id', 'value', 'parent', 'source', 'target', 'children', 'links'],
+	
+	    constructor: function Cell(id, value, geometry, style) {
+	
+	        var that = this;
+	
+	        that.id = id;
+	        that.value = value;
+	        that.style = style;
+	        that.geometry = geometry;
+	
+	        // props
+	        // -----
+	        // that.parent = null;
+	        // that.source = null;
+	        // that.target = null;
+	        // that.children = [];
+	        // that.links = [];
+	    },
+	
+	    // link
+	    // ----
+	
+	    // 获取连线连接的节点
+	    getTerminal: function getTerminal(isSource) {
+	        return isSource ? this.source : this.target;
+	    },
+	
+	    // 设置连线连接的节点
+	    setTerminal: function setTerminal(node, isSource) {
+	        if (isSource) {
+	            this.source = node;
+	        } else {
+	            this.target = node;
+	        }
+	
+	        return node;
+	    },
+	
+	    // 将连线从节点移除
+	    removeFromTerminal: function removeFromTerminal(isSource) {
+	
+	        var that = this;
+	
+	        var node = that.getTerminal(isSource);
+	
+	        if (node) {
+	            node.removeLink(that, isSource);
+	        }
+	
+	        return that;
+	    },
+	
+	    // children
+	    // --------
+	
+	    getChildCount: function getChildCount() {
+	        var children = this.children;
+	        return children ? children.length : 0;
+	    },
+	
+	    getChildIndex: function getChildIndex(child) {
+	        return (0, _commonUtils.indexOf)(this.children || [], child);
+	    },
+	
+	    getChildAt: function getChildAt(index) {
+	        var children = this.children;
+	        return children ? children[index] : null;
+	    },
+	
+	    eachChild: function eachChild(iterator, context) {
+	
+	        var that = this;
+	
+	        (0, _commonUtils.each)(that.children || [], iterator, context);
+	
+	        return that;
+	    },
+	
+	    insertChild: function insertChild(child, index) {
+	        var that = this;
+	
+	        if (child) {
+	
+	            // fix index
+	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
+	                index = that.getChildCount();
+	
+	                if (child.parent === that) {
+	                    index--;
+	                }
+	            }
+	
+	            child.removeFromParent();
+	            child.parent = that;
+	
+	            var children = that.children;
+	
+	            if (children) {
+	                children.splice(index, 0, child);
+	            } else {
+	                children = that.children = [];
+	                children.push(child);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    removeChild: function removeChild(child) {
+	        return this.removeChildAt(this.getChildIndex(child));
+	    },
+	
+	    removeChildAt: function removeChildAt(index) {
+	        var that = this;
+	        var child = null;
+	        var children = that.children;
+	
+	        if (children && index >= 0) {
+	            child = that.getChildAt(index);
+	
+	            if (child) {
+	                children.splice(index, 1);
+	                child.parent = null;
+	            }
+	        }
+	
+	        return child;
+	    },
+	
+	    // links
+	    // -----
+	
+	    getLinkCount: function getLinkCount() {
+	        var links = this.links;
+	        return links ? links.length : 0;
+	    },
+	
+	    getLinkIndex: function getLinkIndex(link) {
+	        return (0, _commonUtils.indexOf)(this.links || [], link);
+	    },
+	
+	    getLinkAt: function getLinkAt(index) {
+	        var links = this.links;
+	        return links ? links[index] : null;
+	    },
+	
+	    eachLink: function eachLink(iterator, context) {
+	        var that = this;
+	
+	        (0, _commonUtils.each)(that.links || [], iterator, context);
+	
+	        return that;
+	    },
+	
+	    insertLink: function insertLink(link, outgoing) {
+	
+	        var that = this;
+	
+	        if (link) {
+	            link.removeFromTerminal(outgoing);
+	            link.setTerminal(that, outgoing);
+	
+	            var links = that.links;
+	
+	            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
+	            if (!links || that.getLinkIndex(link) < 0 || link.getNode(!outgoing) !== that) {
+	                if (!links) {
+	                    links = that.links = [];
+	                }
+	
+	                links.push(link);
+	            }
+	        }
+	
+	        return link;
+	    },
+	
+	    removeLink: function removeLink(link, outgoing) {
+	
+	        var that = this;
+	        var links = that.links;
+	
+	        if (link) {
+	
+	            // 连线的起点和终点是同一个节点时，不需要移除
+	            if (links && link.getTerminal(!outgoing) !== that) {
+	                var index = that.getLinkIndex(link);
+	
+	                if (index >= 0) {
+	                    links.splice(index, 1);
+	                }
+	            }
+	
+	            link.setTerminal(null, outgoing);
+	        }
+	
+	        return link;
+	    },
+	
+	    // common
+	    // ------
+	
+	    removeFromParent: function removeFromParent() {
+	        var that = this;
+	        var parent = that.parent;
+	
+	        if (parent) {
+	            parent.removeChild(that);
+	        }
+	
+	        return that;
+	    },
+	
+	    cloneValue: function cloneValue() {
+	        var value = this.value;
+	
+	        if (value) {
+	            if (value.clone && (0, _commonUtils.isFunction)(value.clone)) {
+	                return value.clone();
+	            }
+	
+	            if ((0, _commonUtils.isNode)(value)) {
+	                return value.cloneNode(true);
+	            }
+	        }
+	
+	        return value;
+	    },
+	
+	    clone: function clone() {
+	        var that = this;
+	        var cloned = (0, _commonUtils.clone)(that, that.transients);
+	        cloned.value = that.cloneValue();
+	
+	        return cloned;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libRectangle = __webpack_require__(35);
+	
+	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var Geometry = _libRectangle2['default'].extend({
+	
+	    TRANSLATE_CONTROL_POINTS: true, // 是否平移控制点，默认为 true
 	
 	    constructor: function Geometry(x, y, width, height, relative) {
 	
@@ -3601,7 +3793,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        Geometry.superclass.constructor.call(that, x, y, width, height);
 	
+	        // relative 为 true 时，即相对定位，x 和 y 是相对父节点 w 和 h 上的百分比；
+	        // 绝对定位时，x 和 y 是相对于父节点左上角的坐标
 	        that.relative = !!relative;
+	
+	        // props
+	        // -----
+	        // that.alternateBounds = null; //
+	        // that.sourcePoint = null;     // 连线的起点坐标。如果一个连线没有对应的起点
+	        //                              // 节点，用该点来指定该连线的起点；否则，就忽
+	        //                              // 略该点，连线的起点坐标将自动计算得到。
+	        // that.targetPoint = null;     // 连线的终点坐标。
+	        // that.points = null;          // 连线中的控制点坐标，这些点不包含连线的起点和终点的坐标。
+	        // that.offset = null;          // 对于连线，是相对于 x 和 y 的偏移量
+	        //                              // 对于节点，
 	    },
 	
 	    swap: function swap() {
@@ -3610,7 +3815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var alternateBounds = that.alternateBounds;
 	
 	        if (alternateBounds) {
-	            var old = new _Rectangle2['default'](that.x, that.y, that.width, that.height);
+	            var old = new _libRectangle2['default'](that.x, that.y, that.width, that.height);
 	
 	            that.x = alternateBounds.x;
 	            that.y = alternateBounds.y;
@@ -3630,137 +3835,111 @@ return /******/ (function(modules) { // webpackBootstrap
 	    setTerminalPoint: function setTerminalPoint(point, isSource) {
 	
 	        var that = this;
+	
 	        if (isSource) {
 	            that.sourcePoint = point;
 	        } else {
 	            that.targetPoint = point;
 	        }
 	
-	        return point;
+	        return that;
 	    },
 	
-	    rotate: function rotate(angle, cx) {
+	    // 根据给定的旋转中心旋转给定的角度
+	    rotate: function rotate(angle, center) {
 	
 	        var that = this;
 	
-	        var rad = utils.toRadians(angle);
+	        var rad = (0, _commonUtils.toRadians)(angle);
 	        var cos = Math.cos(rad);
 	        var sin = Math.sin(rad);
 	
-	        // Rotates the geometry
-	        if (!this.relative) {
-	            var ct = new Point(this.getCenterX(), this.getCenterY());
-	            var pt = utils.getRotatedPoint(ct, cos, sin, cx);
+	        // 只有绝对定位时才旋转 x 和 y
+	        if (!that.relative) {
+	            // 按照几何中心旋转
+	            var geoCenter = (0, _commonUtils.rotatePointEx)(that.getCenter(), cos, sin, center);
 	
-	            this.x = Math.round(pt.x - this.width / 2);
-	            this.y = Math.round(pt.y - this.height / 2);
+	            that.x = Math.round(geoCenter.x - that.width / 2);
+	            that.y = Math.round(geoCenter.y - that.height / 2);
 	        }
 	
-	        // Rotates the source point
-	        if (this.sourcePoint) {
-	            var pt = utils.getRotatedPoint(this.sourcePoint, cos, sin, cx);
-	            this.sourcePoint.x = Math.round(pt.x);
-	            this.sourcePoint.y = Math.round(pt.y);
-	        }
+	        that.sourcePoint && (0, _commonUtils.rotatePointEx)(that.sourcePoint, cos, sin, center, true);
+	        that.targetPoint && (0, _commonUtils.rotatePointEx)(that.targetPoint, cos, sin, center, true);
 	
-	        // Translates the target point
-	        if (this.targetPoint) {
-	            var pt = utils.getRotatedPoint(this.targetPoint, cos, sin, cx);
-	            this.targetPoint.x = Math.round(pt.x);
-	            this.targetPoint.y = Math.round(pt.y);
-	        }
-	
-	        // Translate the control points
-	        if (this.points != null) {
-	            for (var i = 0; i < this.points.length; i++) {
-	                if (this.points[i] != null) {
-	                    var pt = utils.getRotatedPoint(this.points[i], cos, sin, cx);
-	                    this.points[i].x = Math.round(pt.x);
-	                    this.points[i].y = Math.round(pt.y);
-	                }
-	            }
-	        }
+	        that.points && (0, _commonUtils.each)(that.points, function (point) {
+	            (0, _commonUtils.rotatePointEx)(point, cos, sin, center, true);
+	        });
 	    },
 	
+	    // 平移
 	    translate: function translate(dx, dy) {
-	        dx = parseFloat(dx);
-	        dy = parseFloat(dy);
 	
-	        // Translates the geometry
-	        if (!this.relative) {
-	            this.x = parseFloat(this.x) + dx;
-	            this.y = parseFloat(this.y) + dy;
+	        var that = this;
+	
+	        dx = (0, _commonUtils.toFloat)(dx);
+	        dy = (0, _commonUtils.toFloat)(dy);
+	
+	        if (!that.relative) {
+	            that.x = (0, _commonUtils.toFloat)(that.x) + dx;
+	            that.y = (0, _commonUtils.toFloat)(that.y) + dy;
 	        }
 	
-	        // Translates the source point
-	        if (this.sourcePoint != null) {
-	            this.sourcePoint.x = parseFloat(this.sourcePoint.x) + dx;
-	            this.sourcePoint.y = parseFloat(this.sourcePoint.y) + dy;
+	        that.sourcePoint && (0, _commonUtils.translatePoint)(that.sourcePoint, dx, dy);
+	        that.targetPoint && (0, _commonUtils.translatePoint)(that.targetPoint, dx, dy);
+	
+	        if (that.TRANSLATE_CONTROL_POINTS && that.points) {
+	            (0, _commonUtils.each)(that.points, function (point) {
+	                (0, _commonUtils.translatePoint)(point, dx, dy);
+	            });
 	        }
 	
-	        // Translates the target point
-	        if (this.targetPoint != null) {
-	            this.targetPoint.x = parseFloat(this.targetPoint.x) + dx;
-	            this.targetPoint.y = parseFloat(this.targetPoint.y) + dy;
-	        }
-	
-	        // Translate the control points
-	        if (this.TRANSLATE_CONTROL_POINTS && this.points != null) {
-	            for (var i = 0; i < this.points.length; i++) {
-	                if (this.points[i] != null) {
-	                    this.points[i].x = parseFloat(this.points[i].x) + dx;
-	                    this.points[i].y = parseFloat(this.points[i].y) + dy;
-	                }
-	            }
-	        }
+	        return that;
 	    },
 	
-	    scale: function scale(sx, sy, fixedAspect) {
-	        sx = parseFloat(sx);
-	        sy = parseFloat(sy);
+	    // 缩放
+	    scale: function scale(sx, sy, sameRatio) {
 	
-	        // Translates the source point
-	        if (this.sourcePoint != null) {
-	            this.sourcePoint.x = parseFloat(this.sourcePoint.x) * sx;
-	            this.sourcePoint.y = parseFloat(this.sourcePoint.y) * sy;
-	        }
+	        var that = this;
 	
-	        // Translates the target point
-	        if (this.targetPoint != null) {
-	            this.targetPoint.x = parseFloat(this.targetPoint.x) * sx;
-	            this.targetPoint.y = parseFloat(this.targetPoint.y) * sy;
-	        }
+	        sx = (0, _commonUtils.toFloat)(sx);
+	        sy = (0, _commonUtils.toFloat)(sy);
 	
-	        // Translate the control points
-	        if (this.points != null) {
-	            for (var i = 0; i < this.points.length; i++) {
-	                if (this.points[i] != null) {
-	                    this.points[i].x = parseFloat(this.points[i].x) * sx;
-	                    this.points[i].y = parseFloat(this.points[i].y) * sy;
-	                }
-	            }
-	        }
+	        that.sourcePoint && (0, _commonUtils.scalePoint)(that.sourcePoint, sx, sy);
+	        that.targetPoint && (0, _commonUtils.scalePoint)(that.targetPoint, sx, sy);
 	
-	        // Translates the geometry
-	        if (!this.relative) {
-	            this.x = parseFloat(this.x) * sx;
-	            this.y = parseFloat(this.y) * sy;
+	        that.points && (0, _commonUtils.each)(that.points, function (point) {
+	            (0, _commonUtils.scalePoint)(point, sx, sy);
+	        });
 	
-	            if (fixedAspect) {
+	        if (!that.relative) {
+	            that.x = (0, _commonUtils.toFloat)(that.x) * sx;
+	            that.y = (0, _commonUtils.toFloat)(that.y) * sy;
+	
+	            // 长宽按固定比例缩放
+	            if (sameRatio) {
 	                sy = sx = Math.min(sx, sy);
 	            }
 	
-	            this.width = parseFloat(this.width) * sx;
-	            this.height = parseFloat(this.height) * sy;
+	            that.width = (0, _commonUtils.toFloat)(that.width) * sx;
+	            that.height = (0, _commonUtils.toFloat)(that.height) * sy;
 	        }
+	
+	        return that;
 	    },
 	
-	    equals: function equals() /*obj*/{}
+	    equals: function equals(geom) {
+	
+	        var that = this;
+	
+	        return Geometry.superclass.equals.call(that, geo) && that.relative === geo.relative && (0, _commonUtils.isEqualEntity)(that.sourcePoint, geom.sourcePoint) && (0, _commonUtils.isEqualEntity)(that.targetPoint, geom.targetPoint) && (0, _commonUtils.isEqualEntity)(that.offset, geom.offset) && (0, _commonUtils.isEqualEntities)(that.points, geom.points) && (0, _commonUtils.isEqualEntity)(that.alternateBounds, geom.alternateBounds);
+	    }
 	});
+	
+	exports['default'] = Geometry;
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3771,80 +3950,398 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(24);
+	var _commonUtils = __webpack_require__(1);
 	
-	var _Change2 = _interopRequireDefault(_Change);
+	var _commonClass = __webpack_require__(11);
 	
-	exports['default'] = _Change2['default'].extend({
+	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	    constructor: function ChildChange(model, parent, child, index) {
+	var _cellCell = __webpack_require__(24);
+	
+	var _cellCell2 = _interopRequireDefault(_cellCell);
+	
+	// events
+	
+	var _eventsAspect = __webpack_require__(27);
+	
+	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
+	
+	var _eventsEventNames = __webpack_require__(28);
+	
+	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
+	
+	var _eventsEventSource = __webpack_require__(12);
+	
+	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
+	
+	// changes
+	
+	var _changesRootChange = __webpack_require__(29);
+	
+	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
+	
+	var _changesChildChange = __webpack_require__(31);
+	
+	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
+	
+	var _changesChangeCollection = __webpack_require__(32);
+	
+	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
+	
+	exports['default'] = _commonClass2['default'].create({
+	
+	    Extends: _eventsEventSource2['default'], // event
+	    Implements: _eventsAspect2['default'], // AOP
+	
+	    // 配置项
+	    createIds: true,
+	    prefix: '',
+	    postfix: '',
+	    maintainEdgeParent: true,
+	
+	    constructor: function Model(root) {
 	
 	        var that = this;
 	
-	        that.model = model;
-	        that.child = child;
-	        that.parent = parent;
-	        that.index = index;
-	        that.previous = parent;
-	        that.previousIndex = index;
+	        that.nextId = 0;
+	        that.updateLevel = 0;
+	        that.endingUpdate = false;
+	
+	        that.changeCollection = new _changesChangeCollection2['default'](that);
+	
+	        if (root) {
+	            that.setRoot(root);
+	        } else {
+	            that.clear();
+	        }
 	    },
 	
-	    digest: function digest() {
+	    clear: function clear() {
+	        var that = this;
+	        that.setRoot(that.createRoot());
+	        return that;
+	    },
+	
+	    isAncestor: function isAncestor(parent, child) {
+	        while (child && child !== parent) {
+	            child = child.parent;
+	        }
+	
+	        return child === parent;
+	    },
+	
+	    contains: function contains(cell) {
+	        return this.isAncestor(this.root, cell);
+	    },
+	
+	    getCellById: function getCellById(id) {
+	        return this.cells ? this.cells[id] : null;
+	    },
+	
+	    // 按照层级获取所有父节点
+	    getParents: function getParents(child) {
 	
 	        var that = this;
-	        var model = that.model;
-	        var child = that.child;
+	        var result = [];
+	        var parent = child ? child.parent : null;
 	
-	        var isLink = child.isLink;
-	        var newParent = that.previous;
-	        var newIndex = that.previousIndex;
-	        var previousParent = child.parent;
-	        var previousIndex = previousParent ? previousParent.getChildIndex(child) : 0;
-	
-	        // 移除 link 上连接的 node
-	        if (isLink && !newParent) {
-	            that.connect(child, false);
+	        if (parent) {
+	            result.push(parent);
+	            result = result.concat(that.getParents(parent));
 	        }
 	
-	        previousParent = model.childChanged(child, newParent, newIndex);
+	        return result;
+	    },
 	
-	        if (isLink && newParent) {
-	            that.connect(child, true);
+	    // 获取子孙节点
+	    getDescendants: function getDescendants(parent) {
+	
+	        var that = this;
+	        var result = [];
+	
+	        parent = parent || that.getRoot();
+	        parent.eachChild(function (child) {
+	            result.push(child);
+	            result = result.concat(that.getDescendants(child));
+	        });
+	
+	        return result;
+	    },
+	
+	    // Root
+	    // ----
+	
+	    isRoot: function isRoot(cell) {
+	        return cell && this.root === cell;
+	    },
+	
+	    createRoot: function createRoot() {
+	        var root = new _cellCell2['default']();
+	
+	        root.insertChild(new _cellCell2['default']());
+	
+	        return root;
+	    },
+	
+	    getRoot: function getRoot(cell) {
+	
+	        var root = cell || this.root;
+	
+	        if (cell) {
+	            while (cell) {
+	                root = cell;
+	                cell = cell.parent;
+	            }
 	        }
 	
-	        that.parent = newParent;
-	        that.index = newIndex;
-	        that.previous = previousParent;
-	        that.previousIndex = previousIndex;
+	        return root;
+	    },
+	
+	    setRoot: function setRoot(root) {
+	        var that = this;
+	        that.digest(new _changesRootChange2['default'](that, root));
+	        return that;
+	    },
+	
+	    // RootChange 的回调处理
+	    rootChanged: function rootChanged(newRoot) {
+	
+	        var that = this;
+	        var oldRoot = that.root;
+	
+	        that.root = newRoot;
+	        that.cells = null;
+	        that.nextId = 0;
+	        that.cellAdded(newRoot);
+	
+	        return oldRoot;
+	    },
+	
+	    // Layers
+	    // ------
+	    isLayer: function isLayer(cell) {
+	        return cell && this.isRoot(cell.parent);
+	    },
+	
+	    // 获取所有图层
+	    getLayers: function getLayers() {
+	        // 根节点的所有子节点就是图层
+	        return this.getRoot().children || [];
+	    },
+	
+	    // Changes
+	    // -------
+	
+	    //
+	    //
+	
+	    add: function add(parent, child, index) {
+	
+	        var that = this;
+	
+	        if (parent && child && parent !== child) {
+	
+	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
+	                index = parent.getChildCount();
+	            }
+	
+	            var parentChanged = parent !== child.parent;
+	
+	            that.digest(new _changesChildChange2['default'](that, parent, child, index));
+	
+	            // TODO: maintainEdgeParent
+	            if (that.maintainEdgeParent && parentChanged) {
+	                that.updateEdgeParents(child);
+	            }
+	        }
 	
 	        return that;
 	    },
 	
-	    connect: function connect(link, isConnected) {
+	    remove: function remove(cell) {
+	        if (cell == this.root) {
+	            this.setRoot(null);
+	        } else if (this.getParent(cell) != null) {
+	            this.execute(new _changesChildChange2['default'](this, null, cell));
+	        }
+	
+	        return cell;
+	    },
+	
+	    // cell 添加到画布后的处理工作
+	    cellAdded: function cellAdded(cell) {
 	
 	        var that = this;
-	        var model = that.model;
-	        var sourceNode = link.getNode(true);
-	        var targetNode = link.getNode(false);
 	
-	        if (sourceNode) {
-	            model.linkChanged(link, isConnected ? sourceNode : null, true);
+	        if (cell) {
+	
+	            var id = cell.id;
+	
+	            if (!id && that.createIds) {
+	                id = that.createId(cell);
+	            }
+	
+	            // 去重
+	            if (id) {
+	                var collision = that.getCellById(id);
+	
+	                if (collision !== cell) {
+	                    while (collision) {
+	                        id = that.createId(cell);
+	                        collision = that.getCellById(id);
+	                    }
+	
+	                    if (!that.cells) {
+	                        that.cells = {};
+	                    }
+	
+	                    cell.id = id;
+	                    that.cells[id] = cell;
+	                }
+	            }
+	
+	            // 修正 nextId
+	            if ((0, _commonUtils.isNumeric)(id)) {
+	                that.nextId = Math.max(that.nextId, id);
+	            }
+	
+	            // 递归
+	            if (cell.isNode) {
+	                cell.eachChild(that.cellAdded, that);
+	            }
+	        }
+	    },
+	
+	    // cell 移除画布后的清理工作
+	    cellRemoved: function cellRemoved(cell) {
+	
+	        var that = this;
+	        var cells = that.cells;
+	
+	        if (cell && cells) {
+	
+	            if (cell.isNode) {
+	                cell.eachChild(function (child) {
+	                    that.cellRemoved(child);
+	                });
+	            }
+	
+	            var id = cell.id;
+	            if (cells && !(0, _commonUtils.isUndefined)(id)) {
+	                delete cells[id];
+	            }
+	        }
+	    },
+	
+	    updateEdgeParents: function updateEdgeParents(cell, root) {},
+	
+	    updateEdgeParent: function updateEdgeParent(edge, root) {},
+	
+	    getOrigin: function getOrigin(cell) {},
+	
+	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {},
+	
+	    // ChildChange 的回调处理
+	    childChanged: function childChanged(cell, newParent, newIndex) {
+	
+	        var that = this;
+	        var oldParent = cell.parent;
+	
+	        if (newParent) {
+	            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+	                newParent.insertChild(cell, newIndex);
+	            }
+	        } else if (oldParent) {
+	            oldParent.removeChild(cell);
 	        }
 	
-	        if (targetNode) {
-	            model.linkChanged(link, isConnected ? targetNode : null, false);
+	        // Checks if the previous parent was already in the
+	        // model and avoids calling cellAdded if it was.
+	        if (newParent && !that.contains(oldParent)) {
+	            that.cellAdded(cell);
+	        } else if (!newParent) {
+	            that.cellRemoved(cell);
 	        }
 	
-	        link.setNode(sourceNode, true);
-	        link.setNode(targetNode, false);
+	        return oldParent;
+	    },
+	
+	    // ChildChange 的回调处理，处理连线连接的节点
+	    linkChanged: function linkChanged(link, newNode, isSource) {
+	        var oldNode = link.getNode(isSource);
+	
+	        if (newNode) {
+	            newNode.insertLink(link, isSource);
+	        } else if (oldNode) {
+	            oldNode.removeLink(link, isSource);
+	        }
+	
+	        return oldNode;
+	    },
+	
+	    createId: function createId() {
+	        var that = this;
+	        var id = that.nextId;
+	
+	        that.nextId += 1;
+	
+	        return that.prefix + id + that.postfix;
+	    },
+	
+	    digest: function digest(change) {
+	
+	        var that = this;
+	
+	        change.digest();
+	
+	        that.beginUpdate();
+	        that.changeCollection.add(change);
+	        that.endUpdate();
 	
 	        return that;
+	    },
+	
+	    beginUpdate: function beginUpdate() {
+	
+	        var that = this;
+	        that.updateLevel += 1;
+	        that.emit(_eventsEventNames2['default'].BEGIN_UPDATE);
+	
+	        if (that.updateLevel === 1) {
+	            that.emit(_eventsEventNames2['default'].START_EDIT);
+	        }
+	    },
+	
+	    endUpdate: function endUpdate() {
+	
+	        var that = this;
+	
+	        that.updateLevel -= 1;
+	
+	        if (that.updateLevel === 0) {
+	            that.emit(_eventsEventNames2['default'].END_EDIT);
+	        }
+	
+	        if (!that.endingUpdate) {
+	
+	            var changeCollection = that.changeCollection;
+	
+	            that.endingUpdate = that.updateLevel === 0;
+	            that.emit(_eventsEventNames2['default'].END_UPDATE, { changes: changeCollection.changes });
+	
+	            // 触发重绘
+	            if (that.endingUpdate && changeCollection.hasChange()) {
+	                changeCollection.notify().clear();
+	            }
+	
+	            that.endingUpdate = false;
+	        }
 	    }
 	});
 	module.exports = exports['default'];
 
 /***/ },
-/* 39 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3910,23 +4407,1446 @@ return /******/ (function(modules) { // webpackBootstrap
 	    that[methodName].__isAspected = true;
 	}
 	
-	function before(methodName, callback, context) {
-	    return weave.call(this, 'before', methodName, callback, context);
-	}
+	var aspect = {
+	    before: function before(methodName, callback, context) {
+	        return weave.call(this, 'before', methodName, callback, context);
+	    },
+	    after: function after(methodName, callback, context) {
+	        return weave.call(this, 'after', methodName, callback, context);
+	    },
+	    around: function around(methodName, callback, context) {
+	        weave.call(this, 'before', methodName, callback, context);
+	        weave.call(this, 'after', methodName, callback, context);
+	        return this;
+	    }
+	};
 	
-	function after(methodName, callback, context) {
-	    return weave.call(this, 'after', methodName, callback, context);
-	}
+	exports['default'] = aspect;
+	module.exports = exports['default'];
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	'use strict';
 	
-	function around(methodName, callback, context) {
-	    weave.call(this, 'before', methodName, callback, context);
-	    weave.call(this, 'after', methodName, callback, context);
-	    return this;
-	}
+	module.exports = {
+	    //BEFORE_DIGEST: 'beforeDigest',
+	    //AFTER_DIGEST: 'afterDigest',
 	
-	exports.before = before;
-	exports.after = after;
-	exports.around = around;
+	    BEGIN_UPDATE: 'beginUpdate',
+	    END_UPDATE: 'endUpdate',
+	
+	    START_EDIT: 'startEdit',
+	    END_EDIT: 'endEdit',
+	
+	    CHANGE: 'change'
+	};
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(30);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function RootChange(model, root) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.root = root;
+	        that.previous = root;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var model = that.model;
+	        var previous = that.previous;
+	
+	        that.root = previous;
+	        that.previous = model.rootChanged(previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Change() {},
+	    digest: function digest() {
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(30);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	
+	    constructor: function ChildChange(model, parent, child, index) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.child = child;
+	        that.parent = parent;
+	        that.index = index;
+	        that.previous = parent;
+	        that.previousIndex = index;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var model = that.model;
+	        var child = that.child;
+	        var newParent = that.previous;
+	        var newIndex = that.previousIndex;
+	        var oldParent = child.parent;
+	        var oldIndex = oldParent ? oldParent.getChildIndex(child) : 0;
+	
+	        // 移除连线时，需要移除连线和节点的关联关系
+	        if (!newParent) {
+	            that.connect(child, false);
+	        }
+	
+	        oldParent = model.childChanged(child, newParent, newIndex);
+	
+	        // 更新连线的父节点时，需要同时更新连线的关联节点
+	        // TODO: 检查一下这段代码是否真的有必要？
+	        if (newParent) {
+	            that.connect(child, true);
+	        }
+	
+	        that.parent = newParent;
+	        that.index = newIndex;
+	        that.previous = oldParent;
+	        that.previousIndex = oldIndex;
+	
+	        return that;
+	    },
+	
+	    connect: function connect(cell, isConnected) {
+	
+	        var that = this;
+	        var model = that.model;
+	
+	        if (cell.isLink) {
+	            var sourceNode = cell.getNode(true);
+	            var targetNode = cell.getNode(false);
+	
+	            if (sourceNode) {
+	                model.linkChanged(cell, isConnected ? sourceNode : null, true);
+	            }
+	
+	            if (targetNode) {
+	                model.linkChanged(cell, isConnected ? targetNode : null, false);
+	            }
+	
+	            cell.setNode(sourceNode, true);
+	            cell.setNode(targetNode, false);
+	        }
+	
+	        cell.eachChild(function (child) {
+	            that.connect(child, isConnected);
+	        });
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _eventsEventNames = __webpack_require__(28);
+	
+	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function ChangeCollection(model) {
+	
+	        var that = this;
+	        that.model = model;
+	    },
+	
+	    hasChange: function hasChange() {
+	        var changes = this.changes;
+	        return changes && changes.length;
+	    },
+	
+	    add: function add(change) {
+	
+	        var that = this;
+	        var changes = that.changes;
+	
+	        if (change) {
+	            if (!changes) {
+	                changes = that.changes = [];
+	            }
+	
+	            changes.push(change);
+	        }
+	
+	        return change;
+	    },
+	
+	    clear: function clear() {
+	        this.changes = null;
+	        return this;
+	    },
+	
+	    notify: function notify() {
+	
+	        var that = this;
+	
+	        that.model.emit(_eventsEventNames2['default'].CHANGE, { changes: that.changes });
+	
+	        return that;
+	    }
+	
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _commonDetector = __webpack_require__(34);
+	
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _libPoint = __webpack_require__(23);
+	
+	var _libPoint2 = _interopRequireDefault(_libPoint);
+	
+	var _libRectangle = __webpack_require__(35);
+	
+	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var _libDictionary = __webpack_require__(36);
+	
+	var _libDictionary2 = _interopRequireDefault(_libDictionary);
+	
+	var _enumsStyleNames = __webpack_require__(17);
+	
+	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
+	
+	var _enumsAlignments = __webpack_require__(19);
+	
+	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
+	
+	var _cellState = __webpack_require__(38);
+	
+	var _cellState2 = _interopRequireDefault(_cellState);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    constructor: function View(graph) {
+	
+	        var that = this;
+	        that.graph = graph;
+	        that.states = new _libDictionary2['default']();
+	        that.translate = new _libPoint2['default']();
+	        that.graphBounds = new _libRectangle2['default']();
+	    },
+	
+	    getBounds: function getBounds() {},
+	
+	    setCurrentRoot: function setCurrentRoot() {},
+	
+	    scaleAndTranslate: function scaleAndTranslate() {},
+	
+	    setScale: function setScale() {},
+	
+	    setTranslate: function setTranslate() {},
+	
+	    refresh: function refresh() {},
+	
+	    revalidate: function revalidate() {
+	        return this.invalidate().validate();
+	    },
+	
+	    clear: function clear(cell, force, recurse) {
+	
+	        var that = this;
+	        var model = that.graph.model;
+	
+	        cell = cell || model.getRoot();
+	        force = force ? force : false;
+	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
+	
+	        that.removeState(cell);
+	
+	        if (recurse && (force || cell !== that.currentRoot)) {
+	            cell.eachChild(function (child) {
+	                that.clear(child);
+	            });
+	        } else {
+	            that.invalidate(cell);
+	        }
+	
+	        return that;
+	    },
+	
+	    invalidate: function invalidate(cell, recurse, includeLink) {
+	
+	        var that = this;
+	        var model = that.graph.model;
+	
+	        cell = cell || model.getRoot();
+	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
+	        includeLink = !(0, _commonUtils.isNullOrUndefined)(includeLink) ? includeLink : true;
+	
+	        var state = that.getState(cell);
+	
+	        if (state) {
+	            state.invalid = true;
+	        }
+	
+	        if (!cell.invalidating) {
+	
+	            cell.invalidating = true;
+	
+	            if (recurse) {
+	                cell.eachChild(function (child) {
+	                    that.invalidate(child, recurse, includeLink);
+	                });
+	            }
+	
+	            if (includeLink) {
+	                cell.eachLink(function (link) {
+	                    that.invalidate(link, recurse, includeLink);
+	                });
+	            }
+	
+	            delete cell.invalidating;
+	        }
+	
+	        return that;
+	    },
+	
+	    validate: function validate(cell) {
+	        var that = this;
+	
+	        cell = cell || that.currentRoot || that.graph.model.getRoot();
+	
+	        that.resetValidationState();
+	
+	        that.validateCell(cell);
+	        var state = that.validateCellState(cell);
+	        var graphBounds = that.getBoundingBox(state);
+	
+	        that.setGraphBounds(graphBounds || that.getEmptyBounds());
+	        that.validateBackground();
+	        that.resetValidationState();
+	    },
+	
+	    getEmptyBounds: function getEmptyBounds() {},
+	
+	    getBoundingBox: function getBoundingBox() {},
+	
+	    // 创建或移除 cell 对应的 state
+	    validateCell: function validateCell(cell, visible) {
+	        var that = this;
+	
+	        if (!cell) {
+	            return cell;
+	        }
+	
+	        visible = !(0, _commonUtils.isNullOrUndefined)(visible) ? visible : true;
+	        visible = visible && cell.visible;
+	
+	        var state = that.getState(cell, visible);
+	
+	        if (state && !visible) {
+	            that.removeState(cell);
+	        } else {
+	            cell.eachChild(function (child) {
+	                var childVisible = visible && (!cell.collapsed || cell === that.currentRoot);
+	                that.validateCell(child, childVisible);
+	            });
+	        }
+	
+	        return cell;
+	    },
+	
+	    validateCellState: function validateCellState(cell, recurse) {
+	
+	        var that = this;
+	        var state = null;
+	
+	        if (!cell) {
+	            return state;
+	        }
+	
+	        state = that.getState(cell);
+	
+	        if (!state) {
+	            return state;
+	        }
+	
+	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
+	
+	        if (state.invalid) {
+	            state.invalid = false;
+	
+	            if (cell !== that.currentRoot) {
+	                that.validateCellState(cell.parent, false);
+	            }
+	
+	            if (cell.isLink) {
+	                var sourceNode = that.getVisibleTerminal(cell, true);
+	                var targetNode = that.getVisibleTerminal(cell, false);
+	                var sourceState = that.validateCellState(sourceNode, false);
+	                var targetState = that.validateCellState(targetNode, false);
+	                state.setVisibleTerminalState(sourceState, true);
+	                state.setVisibleTerminalState(targetState, false);
+	            }
+	
+	            // 更新 state 的大小、位置信息
+	            that.updateCellState(state);
+	
+	            if (cell !== that.currentRoot) {
+	                that.graph.cellRenderer.redraw(state, false, that.isRendering());
+	            }
+	        }
+	
+	        if (recurse) {
+	            // 更新 state.cellBounds 和 state.paintBounds
+	            state.updateCachedBounds();
+	
+	            // 更新 DOM 的层级顺序
+	            if (state.shape) {
+	                that.stateValidated(state);
+	            }
+	
+	            cell.eachChild(function (child) {
+	                that.validateCellState(child, true);
+	            });
+	        }
+	
+	        return state;
+	    },
+	
+	    updateCellState: function updateCellState(state) {
+	
+	        var that = this;
+	        var cell = state.cell;
+	        var currentRoot = that.currentRoot;
+	        var stateOrigin = state.origin;
+	        var stateAbsoluteOffset = state.absoluteOffset;
+	
+	        // 重置
+	        stateAbsoluteOffset.x = 0;
+	        stateAbsoluteOffset.y = 0;
+	        stateOrigin.x = 0;
+	        stateOrigin.y = 0;
+	        state.length = 0;
+	
+	        if (cell !== currentRoot) {
+	
+	            var graph = that.graph;
+	            var scale = that.scale;
+	            var translate = that.translate;
+	            var parent = cell.parent;
+	            var parentState = parent ? that.getState(parent) : null;
+	
+	            // 父节点的 origin
+	            if (parentState && parent !== currentRoot) {
+	                stateOrigin.x += parentState.origin.x;
+	                stateOrigin.y += parentState.origin.y;
+	            }
+	
+	            // 获取 cell 的 offset
+	            var cellOffset = graph.getChildOffsetForCell(cell);
+	            if (cellOffset) {
+	                stateOrigin.x += cellOffset.x;
+	                stateOrigin.y += cellOffset.y;
+	            }
+	
+	            var geo = cell.geometry;
+	            if (geo) {
+	                if (!cell.isLink) {
+	
+	                    var geoOffset = geo.offset || new _libPoint2['default']();
+	
+	                    // 相对定位
+	                    if (geo.relative && parentState) {
+	                        if (parent.isLink) {
+	                            var origin = that.getPoint(parentState, geo);
+	
+	                            if (origin) {
+	                                stateOrigin.x += origin.x / scale - parentState.origin.x - translate.x;
+	                                stateOrigin.y += origin.y / scale - parentState.origin.y - translate.y;
+	                            }
+	                        } else {
+	                            // 相对定位时 geo.x 和 geo.y 是相对于父元素 w 和 h 的百分比
+	                            stateOrigin.x += geo.x * parentState.width / scale + geoOffset.x;
+	                            stateOrigin.y += geo.y * parentState.height / scale + geoOffset.y;
+	                        }
+	                    } else {
+	                        stateAbsoluteOffset.x = scale * geoOffset.x;
+	                        stateAbsoluteOffset.y = scale * geoOffset.y;
+	                        stateOrigin.x += geo.x;
+	                        stateOrigin.y += geo.y;
+	                    }
+	                }
+	
+	                // 设置 scale 和 translate 之后的 x, y, w, h
+	                state.x = scale * (translate.x + stateOrigin.x);
+	                state.y = scale * (translate.y + stateOrigin.y);
+	                state.width = scale * geo.width;
+	                state.height = scale * geo.height;
+	
+	                cell.isNode && that.updateNodeState(state);
+	                cell.isLink && that.updateLinkState(state);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    updateNodeState: function updateNodeState(state) {
+	
+	        var that = this;
+	        var cell = state.cell;
+	        var geo = cell.geometry;
+	        var parent = cell.parent;
+	        var parentState = parent ? that.getState(parent) : null;
+	
+	        if (geo.relative && parentState && !parent.isLink) {
+	            var deg = parentState.style[_enumsStyleNames2['default'].ROTATION] || 0;
+	
+	            // 绕父元素的中心旋转
+	            if (deg) {
+	                var origin = state.getCenter();
+	                var center = parentState.getCenter();
+	                var rotated = (0, _commonUtils.rotatePoint)(origin, deg, center);
+	                state.x = rotated.x - state.width / 2;
+	                state.y = rotated.y - state.height / 2;
+	            }
+	        }
+	
+	        return that.updateNodeLabelOffset(state);
+	    },
+	
+	    updateLinkState: function updateLinkState(state) {
+	
+	        var that = this;
+	        var cell = state.cell;
+	        var geo = cell.geometry;
+	
+	        var sourceNode = cell.getTerminal(true);
+	        var targetNode = cell.getTerminal(false);
+	        var visibleSourceState = state.getVisibleTerminalState(true);
+	        var visibleTargetState = state.getVisibleTerminalState(false);
+	        var sourcePoint = geo.getTerminalPoint(true);
+	        var targetPoint = geo.getTerminalPoint(false);
+	
+	        if (sourceNode && !visibleSourceState || !visibleSourceState && !sourcePoint || targetNode && !visibleTargetState || !visibleTargetState && !targetPoint) {
+	            that.clear(cell, true);
+	        } else {
+	            that.updateFixedTerminalPoints(state, visibleSourceState, visibleTargetState);
+	            that.updatePoints(state, geo.points, visibleSourceState, visibleTargetState);
+	            that.updateFloatingTerminalPoints(state, visibleSourceState, visibleTargetState);
+	
+	            var absolutePoints = state.absolutePoints;
+	            // 检查是否能够绘制连线
+	            var canDrawLink = absolutePoints && absolutePoints.length >= 2 && absolutePoints[0] && absolutePoints[absolutePoints.length - 1];
+	
+	            if (cell !== that.currentRoot && canDrawLink) {
+	                that.clear(state.cell, true);
+	            } else {
+	                that.updateEdgeBounds(state);
+	                that.updateEdgeLabelOffset(state);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    updateNodeLabelOffset: function updateNodeLabelOffset(state) {
+	
+	        var that = this;
+	        var scale = that.scale;
+	        var style = state.style;
+	        var stateWidth = state.width;
+	        var stateHeight = state.height;
+	        var labelOffset = state.absoluteOffset;
+	        var labelWidth = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].LABEL_WIDTH, 0);
+	        var hAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].LABEL_POSITION, _enumsAlignments2['default'].CENTER);
+	        var vAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].VERTICAL_LABEL_POSITION, _enumsAlignments2['default'].MIDDLE);
+	
+	        // label 在水平方向上的位置
+	        if (hAlign === _enumsAlignments2['default'].LEFT) {
+	            // 左外侧
+	            if (labelWidth) {
+	                labelWidth *= scale;
+	            } else {
+	                labelWidth = stateWidth;
+	            }
+	            labelOffset.x -= labelWidth;
+	        } else if (hAlign === _enumsAlignments2['default'].RIGHT) {
+	            // 右外侧
+	            labelOffset.x += stateWidth;
+	        } else {
+	            // 水平居中时，还要根据 cell 的对齐方式来确定 label 的位置
+	            if (labelWidth) {
+	                var cellAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].ALIGN, _enumsAlignments2['default'].CENTER);
+	                var dx = 0;
+	
+	                if (cellAlign === _enumsAlignments2['default'].CENTER) {
+	                    dx = 0.5;
+	                } else if (cellAlign === _enumsAlignments2['default'].RIGHT) {
+	                    dx = 1;
+	                }
+	
+	                if (dx !== 0) {
+	                    labelOffset.x -= (labelWidth * scale - stateWidth) * dx;
+	                }
+	            }
+	        }
+	
+	        // label 在垂直方向上的位置
+	        if (vAlign === _enumsAlignments2['default'].TOP) {
+	            labelOffset.y -= stateHeight;
+	        } else if (vAlign === _enumsAlignments2['default'].BOTTOM) {
+	            labelOffset.y += stateHeight;
+	        }
+	
+	        return that;
+	    },
+	
+	    resetValidationState: function resetValidationState() {
+	        var that = this;
+	        that.lastNode = null;
+	        that.lastHtmlNode = null;
+	        that.lastForegroundNode = null;
+	        that.lastForegroundHtmlNode = null;
+	        return that;
+	    },
+	
+	    stateValidated: function stateValidated(state) {
+	
+	        var that = this;
+	        var cell = state.cell;
+	        var graph = that.graph;
+	
+	        var fg = cell.isLink && graph.keepEdgesInForeground || cell.isNode && graph.keepEdgesInBackground;
+	
+	        var htmlNode = fg ? that.lastForegroundHtmlNode || that.lastHtmlNode : that.lastHtmlNode;
+	        var node = fg ? that.lastForegroundNode || that.lastNode : that.lastNode;
+	        var result = graph.cellRenderer.insertStateAfter(state, node, htmlNode);
+	
+	        if (fg) {
+	            that.lastForegroundHtmlNode = result[1];
+	            that.lastForegroundNode = result[0];
+	        } else {
+	            that.lastHtmlNode = result[1];
+	            that.lastNode = result[0];
+	        }
+	
+	        return that;
+	    },
+	
+	    updateFixedTerminalPoints: function updateFixedTerminalPoints() {},
+	
+	    updateFixedTerminalPoint: function updateFixedTerminalPoint() {},
+	
+	    updatePoints: function updatePoints(edge, points, source, target) {},
+	
+	    transformControlPoint: function transformControlPoint(state, pt) {},
+	
+	    getEdgeStyle: function getEdgeStyle(edge, points, source, target) {},
+	
+	    updateFloatingTerminalPoints: function updateFloatingTerminalPoints(state, source, target) {},
+	
+	    updateFloatingTerminalPoint: function updateFloatingTerminalPoint(edge, start, end, source) {},
+	
+	    getTerminalPort: function getTerminalPort(state, terminal, source) {},
+	
+	    getPerimeterPoint: function getPerimeterPoint(terminal, next, orthogonal, border) {},
+	
+	    getRoutingCenterX: function getRoutingCenterX(state) {},
+	
+	    getRoutingCenterY: function getRoutingCenterY(state) {},
+	
+	    getPerimeterBounds: function getPerimeterBounds(terminal, border) {},
+	
+	    getPerimeterFunction: function getPerimeterFunction(state) {},
+	
+	    getNextPoint: function getNextPoint(edge, opposite, source) {},
+	
+	    getVisibleTerminal: function getVisibleTerminal(link, isSource) {
+	
+	        var that = this;
+	        var best = null;
+	
+	        if (link) {
+	            var result = link.getTerminal(isSource);
+	            best = result;
+	
+	            while (result && result !== this.currentRoot) {
+	                // 如果自己不可见或父节点处于折叠状态
+	                if (!best.visible || result.collapsed) {
+	                    best = result;
+	                }
+	
+	                result = result.parent;
+	            }
+	
+	            if (that.model.isLayer(best)) {
+	                best = null;
+	            }
+	        }
+	
+	        return best;
+	    },
+	
+	    updateEdgeBounds: function updateEdgeBounds(state) {},
+	
+	    // 获取连线上的相对于 geometry 定位的点
+	    // TODO: 搞明白
+	    getPoint: function getPoint(state, geometry) {
+	        var x = state.getCenterX();
+	        var y = state.getCenterY();
+	
+	        if (state.segments && (!geometry || geometry.relative)) {
+	
+	            var gx = geometry ? geometry.x / 2 : 0;
+	            var pointCount = state.absolutePoints.length;
+	            var dist = (gx + 0.5) * state.length;
+	            var segment = state.segments[0];
+	            var length = 0;
+	            var index = 1;
+	
+	            while (dist > length + segment && index < pointCount - 1) {
+	                length += segment;
+	                segment = state.segments[index++];
+	            }
+	
+	            var factor = segment == 0 ? 0 : (dist - length) / segment;
+	            var p0 = state.absolutePoints[index - 1];
+	            var pe = state.absolutePoints[index];
+	
+	            if (p0 != null && pe != null) {
+	                var gy = 0;
+	                var offsetX = 0;
+	                var offsetY = 0;
+	
+	                if (geometry != null) {
+	                    gy = geometry.y;
+	                    var offset = geometry.offset;
+	
+	                    if (offset != null) {
+	                        offsetX = offset.x;
+	                        offsetY = offset.y;
+	                    }
+	                }
+	
+	                var dx = pe.x - p0.x;
+	                var dy = pe.y - p0.y;
+	                var nx = segment == 0 ? 0 : dy / segment;
+	                var ny = segment == 0 ? 0 : dx / segment;
+	
+	                x = p0.x + dx * factor + (nx * gy + offsetX) * this.scale;
+	                y = p0.y + dy * factor - (ny * gy - offsetY) * this.scale;
+	            }
+	        } else if (geometry) {
+	
+	            var offset = geometry.offset;
+	
+	            if (offset != null) {
+	                x += offset.x;
+	                y += offset.y;
+	            }
+	        }
+	
+	        return new _libPoint2['default'](x, y);
+	    },
+	
+	    getRelativePoint: function getRelativePoint(edgeState, x, y) {},
+	
+	    updateEdgeLabelOffset: function updateEdgeLabelOffset(state) {},
+	
+	    // State
+	    // -----
+	    getState: function getState(cell, create) {
+	
+	        if (!cell) {
+	            return;
+	        }
+	
+	        var that = this;
+	        var states = that.states;
+	        var state = states.get(cell);
+	
+	        // TODO: that.updateStyle
+	        if (create && (!state || that.updateStyle) && cell.visible) {
+	
+	            if (!state) {
+	                state = that.createState(cell);
+	                states.put(cell, state);
+	            } else {
+	                state.style = that.graph.getCellStyle(cell);
+	            }
+	        }
+	
+	        return state;
+	    },
+	
+	    createState: function createState(cell) {
+	
+	        var that = this;
+	        var graph = that.graph;
+	
+	        // TODO: that.currentRoot
+	
+	        var state = new _cellState2['default'](this, cell, this.graph.getCellStyle(cell));
+	
+	        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
+	            this.graph.cellRenderer.createShape(state);
+	        }
+	
+	        return state;
+	    },
+	
+	    removeState: function removeState(cell) {
+	
+	        var that = this;
+	        var state = null;
+	
+	        if (cell) {
+	            state = that.states.remove(cell);
+	
+	            if (state) {
+	                that.graph.cellRenderer.destroy(state);
+	                state.destroy();
+	            }
+	        }
+	
+	        return state;
+	    },
+	
+	    isContainerEvent: function isContainerEvent(evt) {},
+	
+	    isScrollEvent: function isScrollEvent(evt) {},
+	
+	    init: function init() {
+	
+	        var that = this;
+	        var root = (0, _commonUtils.createSvgElement)('svg');
+	        var canvas = (0, _commonUtils.createSvgElement)('g');
+	        var backgroundPane = (0, _commonUtils.createSvgElement)('g');
+	        var drawPane = (0, _commonUtils.createSvgElement)('g');
+	        var overlayPane = (0, _commonUtils.createSvgElement)('g');
+	        var decoratorPane = (0, _commonUtils.createSvgElement)('g');
+	
+	        canvas.appendChild(backgroundPane);
+	        canvas.appendChild(drawPane);
+	        canvas.appendChild(overlayPane);
+	        canvas.appendChild(decoratorPane);
+	        root.appendChild(canvas);
+	
+	        root.style.width = '100%';
+	        root.style.height = '100%';
+	        root.style.display = 'block';
+	
+	        that.canvas = canvas;
+	        that.backgroundPane = backgroundPane;
+	        that.drawPane = drawPane;
+	        that.overlayPane = overlayPane;
+	        that.decoratorPane = decoratorPane;
+	
+	        var container = that.graph.container;
+	        if (container) {
+	            container.appendChild(root);
+	
+	            // update container style
+	            var style = (0, _commonUtils.getCurrentStyle)(container);
+	            if (style.position === 'static') {
+	                container.style.position = 'relative';
+	            }
+	
+	            // Disables built-in pan and zoom in IE10 and later
+	            if (_commonDetector2['default'].IS_POINTER) {
+	                container.style.msTouchAction = 'none';
+	            }
+	        }
+	
+	        that.installListeners();
+	    },
+	
+	    installListeners: function installListeners() {},
+	
+	    destroy: function destroy() {}
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var ua = navigator.userAgent;
+	var av = navigator.appVersion;
+	
+	module.exports = {
+	    // IE
+	    IS_IE: ua.indexOf('MSIE') >= 0,
+	
+	    IS_IE11: !!ua.match(/Trident\/7\./),
+	
+	    // Netscape
+	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
+	
+	    // Firefox
+	    IS_FF: ua.indexOf('Firefox/') >= 0,
+	
+	    // Chrome
+	    IS_GC: ua.indexOf('Chrome/') >= 0,
+	
+	    // Safari
+	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
+	
+	    // Opera
+	    IS_OP: ua.indexOf('Opera/') >= 0,
+	
+	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
+	
+	    IS_WIN: av.indexOf('Win') > 0,
+	
+	    IS_MAC: av.indexOf('Mac') > 0,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement,
+	
+	    IS_POINTER: window.navigator.msPointerEnabled || false
+	};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Base = __webpack_require__(13);
+	
+	var _Base2 = _interopRequireDefault(_Base);
+	
+	var _Point = __webpack_require__(23);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var Rectangle = _Base2['default'].extend({
+	
+	    constructor: function Rectangle(x, y, width, height) {
+	
+	        var that = this;
+	
+	        that.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
+	        that.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
+	        that.width = width ? width : 0; // w 和 h 不能为负数，所以不需要 isNullOrUndefined 判断
+	        that.height = height ? height : 0;
+	    },
+	
+	    setRect: function setRect(x, y, width, height) {
+	
+	        var that = this;
+	
+	        that.x = x;
+	        that.y = y;
+	        that.width = width;
+	        that.height = height;
+	
+	        return that;
+	    },
+	
+	    getCenterX: function getCenterX() {
+	        return this.x + this.width / 2;
+	    },
+	
+	    getCenterY: function getCenterY() {
+	        return this.y + this.height / 2;
+	    },
+	
+	    getCenter: function getCenter() {
+	        return new _Point2['default'](this.getCenterX(), this.getCenterY());
+	    },
+	
+	    add: function add(rect) {
+	
+	        if (!rect) {
+	            return;
+	        }
+	
+	        var that = this;
+	
+	        var minX = Math.min(that.x, rect.x);
+	        var minY = Math.min(that.y, rect.y);
+	        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
+	        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
+	
+	        that.x = minX;
+	        that.y = minY;
+	        that.width = maxX - minX;
+	        that.height = maxY - minY;
+	
+	        return that;
+	    },
+	
+	    grow: function grow(amount) {
+	
+	        var rect = this;
+	
+	        rect.x -= amount;
+	        rect.y -= amount;
+	        rect.width += 2 * amount;
+	        rect.height += 2 * amount;
+	
+	        return rect;
+	    },
+	
+	    rotate90: function rotate90() {
+	
+	        var that = this;
+	        var w = that.width;
+	        var h = that.height;
+	        var t = (w - h) / 2;
+	
+	        that.x += t;
+	        that.y -= t;
+	        that.width = h;
+	        that.height = w;
+	
+	        return that;
+	    },
+	
+	    equals: function equals(rect) {
+	
+	        var that = this;
+	
+	        return rect instanceof Rectangle && rect.x === that.x && rect.y === that.y && rect.width === that.width && rect.height === that.height;
+	    },
+	
+	    clone: function clone() {
+	        var rect = this;
+	        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+	    }
+	});
+	
+	exports['default'] = Rectangle;
+	module.exports = exports['default'];
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Base = __webpack_require__(13);
+	
+	var _Base2 = _interopRequireDefault(_Base);
+	
+	var _commonObjectIdentity = __webpack_require__(37);
+	
+	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
+	
+	exports['default'] = _Base2['default'].extend({
+	
+	    constructor: function Dictionary() {
+	        this.clear();
+	    },
+	
+	    clear: function clear() {
+	        var that = this;
+	
+	        that.map = {};
+	
+	        return that;
+	    },
+	
+	    get: function get(key) {
+	        var id = _commonObjectIdentity2['default'].get(key);
+	        return this.map[id];
+	    },
+	
+	    put: function put(key, value) {
+	
+	        var map = this.map;
+	        var id = _commonObjectIdentity2['default'].get(key);
+	        var previous = map[id];
+	
+	        map[id] = value;
+	
+	        return previous;
+	    },
+	
+	    remove: function remove(key) {
+	
+	        var map = this.map;
+	        var id = _commonObjectIdentity2['default'].get(key);
+	        var previous = map[id];
+	
+	        delete map[id];
+	
+	        return previous;
+	    },
+	
+	    getKeys: function getKeys() {
+	        return (0, _commonUtils.keys)(this.map);
+	    },
+	
+	    getValues: function getValues() {
+	
+	        var result = [];
+	
+	        (0, _commonUtils.forIn)(this.map, function (value) {
+	            result.push(value);
+	        });
+	
+	        return result;
+	    },
+	
+	    each: function each(visitor, context) {
+	
+	        var that = this;
+	
+	        (0, _commonUtils.forIn)(that.map, visitor, context);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	// 用构造函数名作为计数器依据
+	var counterMap = {};
+	
+	var objectIdentity = {
+	
+	    fieldName: 'objectId',
+	
+	    get: function get(obj) {
+	
+	        var fieldName = objectIdentity.fieldName;
+	        var isObj = (0, _utils.isObject)(obj);
+	
+	        if (isObj && (0, _utils.isUndefined)(obj[fieldName])) {
+	
+	            var ctorName = (0, _utils.getFunctionName)(obj.constructor);
+	
+	            if ((0, _utils.isUndefined)(counterMap[ctorName])) {
+	                counterMap[ctorName] = 0;
+	            } else {
+	                counterMap[ctorName] += 1;
+	            }
+	
+	            obj[fieldName] = ctorName + '#' + counterMap[ctorName];
+	        }
+	
+	        return isObj ? obj[fieldName] : '' + obj;
+	    },
+	
+	    clear: function clear(obj) {
+	        if ((0, _utils.isObject)(obj)) {
+	            delete obj[objectIdentity.fieldName];
+	        }
+	    }
+	};
+	
+	exports['default'] = objectIdentity;
+	module.exports = exports['default'];
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libPoint = __webpack_require__(23);
+	
+	var _libPoint2 = _interopRequireDefault(_libPoint);
+	
+	var _libRectangle = __webpack_require__(35);
+	
+	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var State = _libRectangle2['default'].extend({
+	
+	    invalid: true, // 默认为无效，需要重绘
+	
+	    constructor: function State(view, cell, style) {
+	
+	        var that = this;
+	
+	        that.view = view;
+	        that.cell = cell;
+	        that.style = style;
+	
+	        // cell 在画布上的原始（scale 和 translate）坐标，在 view.validateCellState() 过程中更新
+	        that.origin = new _libPoint2['default']();
+	        // 对于连线来说，这是 label 的绝对位置，对于节点来说，这是 label 相对于节点左上角的位置
+	        that.absoluteOffset = new _libPoint2['default']();
+	
+	        // props
+	        // -----
+	        // that.shape = null;
+	        // that.text = null;
+	        // that.cellBounds = null;        // 缩放和平移之前的边界
+	        // that.paintBounds = null;       // 缩放和平移之前的绘图边界，cellBounds 或旋转 90° 之后的 cellBounds
+	        // that.absolutePoints = null;    // 连线关键点的坐标数组
+	        // that.visibleSourceState =null;
+	        // that.visibleTargetState =null;
+	        // that.terminalDistance = 0;     // 连线起点和终点之间的距离
+	        // that.segments = null;          // 连线每个片段的长度
+	        // that.length = 0;               // 连线的长度
+	    },
+	
+	    getPerimeterBounds: function getPerimeterBounds(border, bounds) {
+	
+	        var that = this;
+	
+	        border = border || 0;
+	        bounds = bounds ? bounds : new _libRectangle2['default'](that.x, that.y, that.width, that.height);
+	
+	        if (border) {
+	            bounds.grow(border);
+	        }
+	
+	        return bounds;
+	    },
+	
+	    // 设置连线起点或终点的坐标
+	    setAbsolutePoint: function setAbsolutePoint(point, isSource) {
+	        var that = this;
+	        var absolutePoints = that.absolutePoints;
+	
+	        if (!absolutePoints) {
+	            absolutePoints = that.absolutePoints = [];
+	        }
+	
+	        var length = absolutePoints.length;
+	
+	        if (isSource) {
+	            length ? absolutePoints[0] = point : absolutePoints.push(point);
+	        } else {
+	            if (length === 0) {
+	                absolutePoints.push(null);
+	                absolutePoints.push(point);
+	            } else if (length === 1) {
+	                absolutePoints.push(point);
+	            } else {
+	                absolutePoints[length - 1] = point;
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    // 设置鼠标样式
+	    setCursor: function setCursor(cursor) {
+	
+	        var that = this;
+	
+	        that.shape && that.shape.setCursor(cursor);
+	        that.text && that.text.setCursor(cursor);
+	
+	        return that;
+	    },
+	
+	    // 获取连线连接的可见起点/终点节点
+	    getVisibleTerminal: function getVisibleTerminal(isSource) {
+	        var state = this.getVisibleTerminalState(isSource);
+	        return state ? state.cell : null;
+	    },
+	
+	    getVisibleTerminalState: function getVisibleTerminalState(isSource) {
+	        return isSource ? this.visibleSourceState : this.visibleTargetState;
+	    },
+	
+	    setVisibleTerminalState: function setVisibleTerminalState(state, isSource) {
+	
+	        var that = this;
+	
+	        if (isSource) {
+	            that.visibleSourceState = state;
+	        } else {
+	            that.visibleTargetState = state;
+	        }
+	
+	        return that;
+	    },
+	
+	    updateCachedBounds: function updateCachedBounds() {
+	
+	        var that = this;
+	        var view = that.view;
+	        var shape = that.shape;
+	        var scale = view.scale;
+	        var translate = view.translate;
+	
+	        // 计算缩放和平移之前的边界
+	        var x = that.x / scale - translate.x;
+	        var y = that.y / scale - translate.y;
+	        var w = that.width / scale;
+	        var h = that.height / scale;
+	
+	        that.cellBounds = new _libRectangle2['default'](x, y, w, h);
+	        that.paintBounds = new _libRectangle2['default'](x, y, w, h);
+	
+	        // 如果需要旋转，则旋转绘图边界
+	        if (shape && shape.isPaintBoundsInverted()) {
+	            that.paintBounds.rotate90();
+	        }
+	    },
+	
+	    destroy: function destroy() {},
+	
+	    clone: function clone() {
+	
+	        var that = this;
+	        var cloned = new State(that.view, that.cell, that.style);
+	
+	        if (that.absolutePoints) {
+	            cloned.absolutePoints = [];
+	
+	            for (var i = 0, l = this.absolutePoints.length; i < l; i++) {
+	                cloned.absolutePoints[i] = this.absolutePoints[i].clone();
+	            }
+	        }
+	
+	        if (that.origin) {
+	            cloned.origin = that.origin.clone();
+	        }
+	
+	        if (that.absoluteOffset) {
+	            cloned.absoluteOffset = that.absoluteOffset.clone();
+	        }
+	
+	        if (that.boundingBox) {
+	            cloned.boundingBox = that.boundingBox.clone();
+	        }
+	
+	        cloned.terminalDistance = that.terminalDistance;
+	        cloned.segments = that.segments;
+	        cloned.length = that.length;
+	        cloned.x = that.x;
+	        cloned.y = that.y;
+	        cloned.width = that.width;
+	        cloned.height = that.height;
+	
+	        return cloned;
+	    }
+	});
+	
+	exports['default'] = State;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

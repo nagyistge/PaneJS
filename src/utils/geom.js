@@ -1,5 +1,4 @@
 import { toFloat }           from './number';
-import { isNullOrUndefined } from './lang';
 
 
 function toRadians(deg) {
@@ -47,18 +46,18 @@ function scalePoint(point, sx, sy) {
     return point;
 }
 
-function isPointEqual(point1, point2) {
-    return (!point1 && !point2) || (point1 && point1.equals(point2));
+function isEqualEntity(o1, o2) {
+    return (!o1 && !o2) || (o1 && o1.equals(o2));
 }
 
-function isPointsEqual(points1, points2) {
-    if ((!points1 && points2) ||
-        (!points2 && points1) ||
-        (!points1 && !points2 && points1.length != points2.length)) {
+function isEqualEntities(arr1, arr2) {
+    if ((!arr1 && arr2) ||
+        (!arr2 && arr1) ||
+        (!arr1 && !arr2 && arr1.length != arr2.length)) {
         return false;
-    } else if (points1 && points2) {
-        for (var i = 0, l = points1.length; i < l; i++) {
-            if (!isPointEqual(points1[i], points2[i])) {
+    } else if (arr1 && arr2) {
+        for (var i = 0, l = arr1.length; i < l; i++) {
+            if (!isEqualEntity(arr1[i], arr2[i])) {
                 return false;
             }
         }
@@ -67,9 +66,6 @@ function isPointsEqual(points1, points2) {
     return true;
 }
 
-function isRectangleEqual(rect1, rect2) {
-    return (!rect1 && !rect2) || (rect1 && rect1.equals(rect2));
-}
 
 export {
     toRadians,
@@ -78,7 +74,6 @@ export {
     rotatePoint,
     rotatePointEx,
     translatePoint,
-    isPointEqual,
-    isPointsEqual,
-    isRectangleEqual
+    isEqualEntity,
+    isEqualEntities
 };

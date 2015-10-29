@@ -63,6 +63,12 @@ module.exports = Class.create({
         this.styles[name] = style;
     },
 
+    //getCellStyle: function () {},
+
+    parse: function (style) {
+
+    },
+
     getCellStyle: function (name, defaultStyle) {
         var style = defaultStyle;
 

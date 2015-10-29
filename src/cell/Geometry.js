@@ -5,12 +5,11 @@ import {
     scalePoint,
     rotatePointEx,
     translatePoint,
-    isPointEqual,
-    isPointsEqual,
-    isRectangleEqual
+    isEqualEntity,
+    isEqualEntities
 } from  '../common/utils'
 
-import Rectangle from './Rectangle';
+import Rectangle from '../lib/Rectangle';
 
 var Geometry = Rectangle.extend({
 
@@ -22,7 +21,10 @@ var Geometry = Rectangle.extend({
 
         Geometry.superclass.constructor.call(that, x, y, width, height);
 
+        // relative 为 true 时，即相对定位，x 和 y 是相对父节点 w 和 h 上的百分比；
+        // 绝对定位时，x 和 y 是相对于父节点左上角的坐标
         that.relative = !!relative;
+
 
         // props
         // -----
@@ -32,7 +34,8 @@ var Geometry = Rectangle.extend({
         //                              // 略该点，连线的起点坐标将自动计算得到。
         // that.targetPoint = null;     // 连线的终点坐标。
         // that.points = null;          // 连线中的控制点坐标，这些点不包含连线的起点和终点的坐标。
-        // that.offset = null;          //
+        // that.offset = null;          // 对于连线，是相对于 x 和 y 的偏移量
+        //                              // 对于节点，
 
     },
 
@@ -160,11 +163,11 @@ var Geometry = Rectangle.extend({
 
         return Geometry.superclass.equals.call(that, geo) &&
             that.relative === geo.relative &&
-            isPointEqual(that.sourcePoint, geom.sourcePoint) &&
-            isPointEqual(that.targetPoint, geom.targetPoint) &&
-            isPointEqual(that.offset, geom.offset) &&
-            isPointsEqual(that.points, geom.points) &&
-            isRectangleEqual(that.alternateBounds, geom.alternateBounds);
+            isEqualEntity(that.sourcePoint, geom.sourcePoint) &&
+            isEqualEntity(that.targetPoint, geom.targetPoint) &&
+            isEqualEntity(that.offset, geom.offset) &&
+            isEqualEntities(that.points, geom.points) &&
+            isEqualEntity(that.alternateBounds, geom.alternateBounds);
     }
 });
 

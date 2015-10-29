@@ -1,21 +1,20 @@
 import {
     each,
+    isNullOrUndefined,
     isUndefined,
     isNumeric
-} from './common/utils';
+} from '../common/utils';
 
-import Class from './common/class';
-// cells
-import Node from './cells/Node';
-import Link from './cells/Link';
+import Class from '../common/class';
+import Cell  from '../cell/Cell';
 // events
-import aspect      from './events/aspect';
-import eventNames  from './events/eventNames';
-import EventSource from './events/EventSource';
+import aspect      from '../events/aspect';
+import eventNames  from '../events/eventNames';
+import EventSource from '../events/EventSource';
 // changes
-import RootChange       from './changes/RootChange';
-import ChildChange      from './changes/ChildChange';
-import ChangeCollection from './changes/ChangeCollection';
+import RootChange       from '../changes/RootChange';
+import ChildChange      from '../changes/ChildChange';
+import ChangeCollection from '../changes/ChangeCollection';
 
 
 export default Class.create({
@@ -106,9 +105,9 @@ export default Class.create({
     },
 
     createRoot: function () {
-        var root = new Node();
+        var root = new Cell();
 
-        root.insertChild(new Node());
+        root.insertChild(new Cell());
 
         return root;
     },
@@ -173,7 +172,7 @@ export default Class.create({
 
         if (parent && child && parent !== child) {
 
-            if (isUndefined(index)) {
+            if (isNullOrUndefined(index)) {
                 index = parent.getChildCount();
             }
 
@@ -216,12 +215,12 @@ export default Class.create({
 
             // 去重
             if (id) {
-                var collision = that.getCell(id);
+                var collision = that.getCellById(id);
 
                 if (collision !== cell) {
                     while (collision) {
                         id = that.createId(cell);
-                        collision = that.getCell(id);
+                        collision = that.getCellById(id);
                     }
 
                     if (!that.cells) {

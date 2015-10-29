@@ -62,22 +62,19 @@ function wrap(methodName) {
     that[methodName].__isAspected = true;
 }
 
-function before(methodName, callback, context) {
-    return weave.call(this, 'before', methodName, callback, context);
-}
-
-function after(methodName, callback, context) {
-    return weave.call(this, 'after', methodName, callback, context);
-}
-
-function around(methodName, callback, context) {
-    weave.call(this, 'before', methodName, callback, context);
-    weave.call(this, 'after', methodName, callback, context);
-    return this;
-}
-
-export {
-    before,
-    after,
-    around
+var aspect = {
+    before: function (methodName, callback, context) {
+        return weave.call(this, 'before', methodName, callback, context);
+    },
+    after: function (methodName, callback, context) {
+        return weave.call(this, 'after', methodName, callback, context);
+    },
+    around: function (methodName, callback, context) {
+        weave.call(this, 'before', methodName, callback, context);
+        weave.call(this, 'after', methodName, callback, context);
+        return this;
+    }
 };
+
+
+export default aspect;
