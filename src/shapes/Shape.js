@@ -90,6 +90,7 @@ var Shape = Base.extend({
             that.isShadow = getValue(that.style, constants.STYLE_SHADOW, that.isShadow) === 1;
             that.isDashed = getValue(that.style, constants.STYLE_DASHED, that.isDashed) === 1;
             that.isRounded = getValue(that.style, constants.STYLE_ROUNDED, that.isRounded) === 1;
+console.log(that.style, that.isRounded, getValue(that.style, constants.STYLE_ROUNDED, that.isRounded));
             that.glass = getValue(that.style, constants.STYLE_GLASS, that.glass) === 1;
 
             if (that.fill === constants.NONE) {

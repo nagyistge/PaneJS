@@ -1,5 +1,7 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
-/* global window */
+/* global window, document */
+
+var detector = require('./detector');
 
 var utils = {};
 
@@ -8,6 +10,10 @@ var objProto = Object.prototype;
 var slice = arrProto.slice;
 var toString = objProto.toString;
 var hasOwn = objProto.hasOwnProperty;
+
+//var Point = require('../Point');
+//var Rectangle = require('../Rectangle');
+//var constants = require('../constants');
 
 
 // Lang
@@ -130,16 +136,16 @@ function hasKey(obj, key) {
 
 function clone(obj, transients, shallow) {
 
-    shallow = (shallow != null) ? shallow : false;
+    shallow = (shallow !== null) ? shallow : false;
     var cloned = null;
 
     if (obj && isFunction(obj.constructor)) {
         cloned = new obj.constructor();
 
         for (var i in obj) {
-            //if (i != mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
-            if (i !== 'objectId' && (!transients || indexOf(transients, i) < 0)) {
-                if (!shallow && typeof(obj[i]) == 'object') {
+            //if (i !== mxObjectIdentity.FIELD_NAME && (!transients || indexOf(transients, i) < 0)) {
+            if (i !== 'objectId' && (!transients || utils.indexOf(transients, i) < 0)) {
+                if (!shallow && typeof(obj[i]) === 'object') {
                     cloned[i] = clone(obj[i]);
                 } else {
                     cloned[i] = obj[i];
@@ -202,31 +208,13 @@ utils.extend = function (dist) {
 };
 
 utils.equalEntries = function (a, b) {
-    if ((a == null && b != null) || (a != null && b == null) ||
-        (a != null && b != null && a.length != b.length)) {
+    if ((a === null && b !== null) || (a !== null && b === null) ||
+        (a !== null && b !== null && a.length !== b.length)) {
         return false;
     }
     else if (a && b) {
         for (var key in a) {
-            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] != b[key]) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
-utils.equalPoints = function (points1, points2) {
-    if ((!points1 && points2) || (points1 && !points2) ||
-        (points1 && points2 && points1.length !== points2.length)) {
-        return false;
-    } else if (points1 && points2) {
-        for (var i = 0; i < points1.length; i++) {
-            var p1 = points1[i];
-            var p2 = points2[i];
-
-            if ((!p1 && p2) || (p1 && !p2) || (p1 && p2 && !p1.equal(p2))) {
+            if ((!isNaN(a[key]) || !isNaN(b[key])) && a[key] !== b[key]) {
                 return false;
             }
         }
@@ -337,6 +325,19 @@ utils.getFunctionName = function (fn) {
     return str;
 };
 
+/**
+ * Function: bind
+ *
+ * Returns a wrapper function that locks the execution scope of the given
+ * function to the specified scope. Inside funct, the "this" keyword
+ * becomes a reference to that scope.
+ */
+utils.bind = function(scope, funct) {
+    return function () {
+        return funct.apply(scope, arguments);
+    };
+};
+
 // BOW
 // ---
 utils.isNode = function (node, nodeName, attributeName, attributeValue) {
@@ -358,7 +359,7 @@ utils.getOffset = function (container, scrollOffset) {
     var offsetLeft = 0;
     var offsetTop = 0;
 
-    if (scrollOffset != null && scrollOffset) {
+    if (scrollOffset !== null && scrollOffset) {
         var offset = utils.getDocumentScrollOrigin(container.ownerDocument);
         offsetLeft += offset.left;
         offsetTop += offset.top;
@@ -380,13 +381,13 @@ utils.getOffset = function (container, scrollOffset) {
 utils.getDocumentScrollOrigin = function (doc) {
     var wnd = doc.defaultView || doc.parentWindow;
 
-    var x = (wnd && window.pageXOffset !== undefined)
-        ? window.pageXOffset
-        : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+    var x = (wnd && window.pageXOffset !== undefined) ?
+        window.pageXOffset :
+        (document.documentElement || document.body.parentNode || document.body).scrollLeft;
 
-    var y = (wnd && window.pageYOffset !== undefined)
-        ? window.pageYOffset
-        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+    var y = (wnd && window.pageYOffset !== undefined) ?
+        window.pageYOffset :
+        (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
     return {
         left: x,
@@ -409,19 +410,6 @@ utils.getScrollOrigin = function (node) {
     }
 
     return result;
-};
-
-utils.convertPoint = function (container, x, y) {
-    var origin = utils.getScrollOrigin(container);
-    var offset = utils.getOffset(container);
-
-    offset.left -= origin.left;
-    offset.top -= origin.top;
-
-    return {
-        left: x - offset.left,
-        top: y - offset.top
-    };
 };
 
 utils.createSvgGroup = function () {};
@@ -461,7 +449,7 @@ utils.setCellStyles = function (model, cells, key, value) {
         model.beginUpdate();
         try {
             for (var i = 0; i < cells.length; i++) {
-                if (cells[i] != null) {
+                if (cells[i] !== null) {
                     var style = utils.setStyle(model.getStyle(cells[i]), key, value);
                     model.setStyle(cells[i], style);
                 }
@@ -486,7 +474,7 @@ utils.setStyle = function (style, key, value) {
 
         if (index < 0) {
             if (isValue) {
-                var sep = (style.charAt(style.length - 1) == ';') ? '' : ';';
+                var sep = (style.charAt(style.length - 1) === ';') ? '' : ';';
                 style = style + sep + key + '=' + value;
             }
         }
@@ -505,6 +493,32 @@ utils.setStyle = function (style, key, value) {
 
     return style;
 };
+
+utils.setPrefixedStyle = function () {
+    var prefix = null;
+
+    if (detector.IS_OP && detector.IS_OT) {
+        prefix = 'O';
+    }
+    else if (detector.IS_SF || detector.IS_GC) {
+        prefix = 'Webkit';
+    }
+    else if (detector.IS_MT) {
+        prefix = 'Moz';
+    }
+    else if (detector.IS_IE && document.documentMode >= 9 && document.documentMode < 10) {
+        prefix = 'ms';
+    }
+
+    return function (style, name, value) {
+        style[name] = value;
+
+        if (prefix !== null && name.length > 0) {
+            name = prefix + name.substring(0, 1).toUpperCase() + name.substring(1);
+            style[name] = value;
+        }
+    };
+}();
 
 module.exports = utils;
 

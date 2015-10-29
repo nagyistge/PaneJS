@@ -70,7 +70,7 @@ module.exports = Class.create({
             var pairs = name.split(';');
 
             if (style && name.charAt(0) != ';') {
-                style = mxUtils.clone(style);
+                style = utils.clone(style);
             }
             else {
                 style = {};

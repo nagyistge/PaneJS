@@ -1,27 +1,26 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
+var Cell = require('./Cell');
+var CellRenderer = require('./CellRenderer');
+var ChildChange = require('./changes/ChildChange');
 var Class = require('./common/class');
-var utils = require('./common/utils');
+var ConnectionConstraint = require('./ConnectionConstraint');
+var ConnectionHandler = require('./handler/ConnectionHandler');
 var Event = require('./events/Event');
 var EventObject = require('./events/EventObject');
-var eventNames = require('./events/eventNames');
-var constants = require('./constants');
-var View = require('./View');
-var Model = require('./Model');
-var Cell = require('./Cell');
 var Geometry = require('./Geometry');
-var Rectangle = require('./Rectangle');
-var Point = require('./Point');
-var CellRenderer = require('./CellRenderer');
-var Stylesheet = require('./Stylesheet');
-var edgeStyle = require('./edgeStyle');
-
-var ConnectionConstraint = require('./ConnectionConstraint');
-
-var RootChange = require('./changes/RootChange');
-var ChildChange = require('./changes/ChildChange');
-var TerminalChange = require('./changes/TerminalChange');
 var GeometryChange = require('./changes/GeometryChange');
+var Model = require('./Model');
+var Point = require('./Point');
+var Rectangle = require('./Rectangle');
+var RootChange = require('./changes/RootChange');
+var Stylesheet = require('./Stylesheet');
+var TerminalChange = require('./changes/TerminalChange');
+var View = require('./View');
+var constants = require('./constants');
+var edgeStyle = require('./edgeStyle');
+var eventNames = require('./events/eventNames');
+var utils = require('./common/utils');
 
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getValue = utils.getValue;
@@ -163,6 +162,8 @@ module.exports = Class.create({
             that.graphModelChanged(evt.getData('edit').changes);
         });
 
+        that.createHandlers(); // create handlers
+
         if (container) {
             that.init(container);
         }
@@ -186,7 +187,7 @@ module.exports = Class.create({
         that.sizeDidChange();
 
         // Hides tooltips and resets tooltip timer if mouse leaves container
-        //mxEvent.addListener(container, 'mouseleave', mxUtils.bind(this, function () {
+        //mxEvent.addListener(container, 'mouseleave', utils.bind(this, function () {
         //    if (this.tooltipHandler != null) {
         //        this.tooltipHandler.hide();
         //    }
@@ -194,9 +195,16 @@ module.exports = Class.create({
     },
 
 
-    createHandlers: function () {},
-    //
-    //
+    createHandlers: function () {
+        var that = this;
+        that.connectionHandler = that.createConnectionHandler();
+        that.connectionHandler.setEnabled(false);
+    },
+
+    createConnectionHandler: function () {
+        return new ConnectionHandler(this);
+    },
+
     createSelectionModel: function () {},
     createStylesheet: function () {
         return new Stylesheet();
@@ -425,7 +433,7 @@ module.exports = Class.create({
 
         // Draws page breaks independent of translate. To ignore
         // the translate set bounds.x/y = 0. Note that modulo
-        // in JavaScript has a bug, so use mxUtils instead.
+        // in JavaScript has a bug, so use utils instead.
         bounds.x = utils.mod(bounds.x, bounds.width);
         bounds.y = utils.mod(bounds.y, bounds.height);
 
@@ -526,7 +534,38 @@ module.exports = Class.create({
 
         return style;
     },
-    postProcessCellStyle: function (style) {},
+    postProcessCellStyle: function (style) {
+        if (style != null) {
+            var key = style[constants.STYLE_IMAGE];
+            var image = this.getImageFromBundles(key);
+
+            if (image != null) {
+                style[constants.STYLE_IMAGE] = image;
+            }
+            else {
+                image = key;
+            }
+
+            // Converts short data uris to normal data uris
+            if (image != null && image.substring(0, 11) == 'data:image/') {
+                if (image.substring(0, 20) == 'data:image/svg+xml,<') {
+                    // Required for FF and IE11
+                    image = image.substring(0, 19) + encodeURIComponent(image.substring(19));
+                }
+                else if (image.substring(0, 22) != 'data:image/svg+xml,%3C') {
+                    var comma = image.indexOf(',');
+
+                    if (comma > 0) {
+                        image = image.substring(0, comma) + ';base64,'
+                            + image.substring(comma + 1);
+                    }
+                }
+
+                style[constants.STYLE_IMAGE] = image;
+            }
+        }
+        return style;
+    },
     setCellStyle: function (style, cells) {
         cells = cells || this.getSelectionCells();
 
@@ -828,27 +867,27 @@ module.exports = Class.create({
 
             try {
                 if (constraint == null || constraint.point == null) {
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
-                        mxConstants.STYLE_ENTRY_X, null, [edge]);
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
-                        mxConstants.STYLE_ENTRY_Y, null, [edge]);
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
-                        mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_X :
+                        constants.STYLE_ENTRY_X, null, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_Y :
+                        constants.STYLE_ENTRY_Y, null, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_PERIMETER :
+                        constants.STYLE_ENTRY_PERIMETER, null, [edge]);
                 }
                 else if (constraint.point != null) {
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_X :
-                        mxConstants.STYLE_ENTRY_X, constraint.point.x, [edge]);
-                    this.setCellStyles((source) ? mxConstants.STYLE_EXIT_Y :
-                        mxConstants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_X :
+                        constants.STYLE_ENTRY_X, constraint.point.x, [edge]);
+                    this.setCellStyles((source) ? constants.STYLE_EXIT_Y :
+                        constants.STYLE_ENTRY_Y, constraint.point.y, [edge]);
 
                     // Only writes 0 since 1 is default
                     if (!constraint.perimeter) {
-                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
-                            mxConstants.STYLE_ENTRY_PERIMETER, '0', [edge]);
+                        this.setCellStyles((source) ? constants.STYLE_EXIT_PERIMETER :
+                            constants.STYLE_ENTRY_PERIMETER, '0', [edge]);
                     }
                     else {
-                        this.setCellStyles((source) ? mxConstants.STYLE_EXIT_PERIMETER :
-                            mxConstants.STYLE_ENTRY_PERIMETER, null, [edge]);
+                        this.setCellStyles((source) ? constants.STYLE_EXIT_PERIMETER :
+                            constants.STYLE_ENTRY_PERIMETER, null, [edge]);
                     }
                 }
             }
@@ -897,8 +936,8 @@ module.exports = Class.create({
 
                     // Legacy support for stencilFlipH/V
                     if (vertex.shape != null && vertex.shape.stencil != null) {
-                        flipH = mxUtils.getValue(vertex.style, 'stencilFlipH', 0) == 1 || flipH;
-                        flipV = mxUtils.getValue(vertex.style, 'stencilFlipV', 0) == 1 || flipV;
+                        flipH = utils.getValue(vertex.style, 'stencilFlipH', 0) == 1 || flipH;
+                        flipV = utils.getValue(vertex.style, 'stencilFlipV', 0) == 1 || flipV;
                     }
 
                     if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH) {
@@ -941,7 +980,7 @@ module.exports = Class.create({
                         sin = -1;
                     }
 
-                    point = mxUtils.getRotatedPoint(point, cos, sin, cx);
+                    point = Point.getRotatedPoint(point, cos, sin, cx);
                 }
 
                 if (point != null && constraint.perimeter) {
@@ -954,11 +993,11 @@ module.exports = Class.create({
 
             // Generic rotation after projection on perimeter
             if (r2 != 0 && point != null) {
-                var rad = mxUtils.toRadians(r2);
+                var rad = utils.toRadians(r2);
                 var cos = Math.cos(rad);
                 var sin = Math.sin(rad);
 
-                point = mxUtils.getRotatedPoint(point, cos, sin, cx);
+                point = Point.getRotatedPoint(point, cos, sin, cx);
             }
         }
 
@@ -1021,7 +1060,9 @@ module.exports = Class.create({
     isPort: function (cell) {
         return false;
     },
-    getTerminalForPort: function () {},
+    getTerminalForPort: function (cell, source) {
+        return this.model.getParent(cell);
+    },
     getChildOffsetForCell: function (cell) {
         return null;
     },
@@ -1222,7 +1263,9 @@ module.exports = Class.create({
     isPortsEnabled: function () {
         return this.portsEnabled;
     },
-    setPortsEnabled: function () {},
+    setPortsEnabled: function (value) {
+        this.portsEnabled = value;
+    },
     getGridSize: function () {},
     setGridSize: function () {},
     getTolerance: function () {},
@@ -1267,8 +1310,12 @@ module.exports = Class.create({
     isValidSource: function () {},
     isValidTarget: function () {},
     isValidConnection: function () {},
-    setConnectable: function () {},
-    isConnectable: function () {},
+    setConnectable: function (connectable) {
+        this.connectionHandler.setEnabled(connectable);
+    },
+    isConnectable: function () {
+        return this.connectionHandler.isEnabled();
+    },
     setTooltips: function () {},
     setPanning: function () {},
     isEditing: function () {},
@@ -1411,10 +1458,10 @@ module.exports = Class.create({
     removeMouseListener: function () {},
     updateMouseEvent: function (me) {
         if (me.graphX == null || me.graphY == null) {
-            var pt = mxUtils.convertPoint(this.container, me.getX(), me.getY());
+            //var pt = Point.convertPoint(this.container, me.getX(), me.getY());
 
-            me.graphX = pt.x - this.panDx;
-            me.graphY = pt.y - this.panDy;
+            //me.graphX = pt.x - this.panDx;
+            //me.graphY = pt.y - this.panDy;
         }
 
         return me;
@@ -1433,178 +1480,6 @@ module.exports = Class.create({
     },
 
     fireMouseEvent: function (evtName, me, sender) {
-        //if (this.isEventSourceIgnored(evtName, me)) {
-        //    if (this.tooltipHandler != null) {
-        //        this.tooltipHandler.hide();
-        //    }
-        //
-        //    return;
-        //}
-
-        if (sender == null) {
-            sender = this;
-        }
-
-        // Updates the graph coordinates in the event
-        me = this.updateMouseEvent(me);
-
-        // Stops editing for all events other than from cellEditor
-        //if (evtName == mxEvent.MOUSE_DOWN && this.isEditing() && !this.cellEditor.isEventSource(me.getEvent())) {
-        //    this.stopEditing(!this.isInvokesStopCellEditing());
-        //}
-
-        // Detects and processes double taps for touch-based devices which do not have native double click events
-        // or where detection of double click is not always possible (quirks, IE10+). Note that this can only handle
-        // double clicks on cells because the sequence of events in IE prevents detection on the background, it fires
-        // two mouse ups, one of which without a cell but no mousedown for the second click which means we cannot
-        // detect which mouseup(s) are part of the first click, ie we do not know when the first click ends.
-        if ((!this.nativeDblClickEnabled && !mxEvent.isPopupTrigger(me.getEvent())) || (this.doubleTapEnabled &&
-            mxClient.IS_TOUCH && mxEvent.isTouchEvent(me.getEvent()))) {
-            var currentTime = new Date().getTime();
-
-            // NOTE: Second mouseDown for double click missing in quirks mode
-            if ((!mxClient.IS_QUIRKS && evtName == mxEvent.MOUSE_DOWN) || (mxClient.IS_QUIRKS && evtName == mxEvent.MOUSE_UP && !this.fireDoubleClick)) {
-                if (this.lastTouchEvent != null && this.lastTouchEvent != me.getEvent() &&
-                    currentTime - this.lastTouchTime < this.doubleTapTimeout &&
-                    Math.abs(this.lastTouchX - me.getX()) < this.doubleTapTolerance &&
-                    Math.abs(this.lastTouchY - me.getY()) < this.doubleTapTolerance &&
-                    this.doubleClickCounter < 2) {
-                    this.doubleClickCounter++;
-                    var doubleClickFired = false;
-
-                    if (evtName == mxEvent.MOUSE_UP) {
-                        if (me.getCell() == this.lastTouchCell && this.lastTouchCell != null) {
-                            this.lastTouchTime = 0;
-                            var cell = this.lastTouchCell;
-                            this.lastTouchCell = null;
-
-                            // Fires native dblclick event via event source
-                            // NOTE: This fires two double click events on edges in quirks mode. While
-                            // trying to fix this, we realized that nativeDoubleClick can be disabled for
-                            // quirks and IE10+ (or we didn't find the case mentioned above where it
-                            // would not work), ie. all double clicks seem to be working without this.
-                            if (mxClient.IS_QUIRKS) {
-                                me.getSource().fireEvent('ondblclick');
-                            }
-
-                            this.dblClick(me.getEvent(), cell);
-                            doubleClickFired = true;
-                        }
-                    }
-                    else {
-                        this.fireDoubleClick = true;
-                        this.lastTouchTime = 0;
-                    }
-
-                    // Do not ignore mouse up in quirks in this case
-                    if (!mxClient.IS_QUIRKS || doubleClickFired) {
-                        mxEvent.consume(me.getEvent());
-                        return;
-                    }
-                }
-                else if (this.lastTouchEvent == null || this.lastTouchEvent != me.getEvent()) {
-                    this.lastTouchCell = me.getCell();
-                    this.lastTouchX = me.getX();
-                    this.lastTouchY = me.getY();
-                    this.lastTouchTime = currentTime;
-                    this.lastTouchEvent = me.getEvent();
-                    this.doubleClickCounter = 0;
-                }
-            }
-            else if ((this.isMouseDown || evtName == mxEvent.MOUSE_UP) && this.fireDoubleClick) {
-                this.fireDoubleClick = false;
-                var cell = this.lastTouchCell;
-                this.lastTouchCell = null;
-                this.isMouseDown = false;
-
-                // Workaround for Chrome/Safari not firing native double click events for double touch on background
-                var valid = (cell != null) || (mxEvent.isTouchEvent(me.getEvent()) && (mxClient.IS_GC || mxClient.IS_SF));
-
-                if (valid && Math.abs(this.lastTouchX - me.getX()) < this.doubleTapTolerance &&
-                    Math.abs(this.lastTouchY - me.getY()) < this.doubleTapTolerance) {
-                    this.dblClick(me.getEvent(), cell);
-                }
-                else {
-                    mxEvent.consume(me.getEvent());
-                }
-
-                return;
-            }
-        }
-
-        if (!this.isEventIgnored(evtName, me, sender)) {
-            this.fireEvent(new mxEventObject(mxEvent.FIRE_MOUSE_EVENT, 'eventName', evtName, 'event', me));
-
-            if ((mxClient.IS_OP || mxClient.IS_SF || mxClient.IS_GC ||
-                (mxClient.IS_IE && mxClient.IS_SVG) || me.getEvent().target != this.container)) {
-                if (evtName == mxEvent.MOUSE_MOVE && this.isMouseDown && this.autoScroll && !mxEvent.isMultiTouchEvent(me.getEvent)) {
-                    this.scrollPointToVisible(me.getGraphX(), me.getGraphY(), this.autoExtend);
-                }
-
-                if (this.mouseListeners != null) {
-                    var args = [sender, me];
-
-                    // Does not change returnValue in Opera
-                    if (!me.getEvent().preventDefault) {
-                        me.getEvent().returnValue = true;
-                    }
-
-                    for (var i = 0; i < this.mouseListeners.length; i++) {
-                        var l = this.mouseListeners[i];
-
-                        if (evtName == mxEvent.MOUSE_DOWN) {
-                            l.mouseDown.apply(l, args);
-                        }
-                        else if (evtName == mxEvent.MOUSE_MOVE) {
-                            l.mouseMove.apply(l, args);
-                        }
-                        else if (evtName == mxEvent.MOUSE_UP) {
-                            l.mouseUp.apply(l, args);
-                        }
-                    }
-                }
-
-                // Invokes the click handler
-                if (evtName == mxEvent.MOUSE_UP) {
-                    this.click(me);
-                }
-            }
-
-            // Detects tapAndHold events using a timer
-            if (mxEvent.isTouchEvent(me.getEvent()) && evtName == mxEvent.MOUSE_DOWN &&
-                this.tapAndHoldEnabled && !this.tapAndHoldInProgress) {
-                this.tapAndHoldInProgress = true;
-                this.initialTouchX = me.getGraphX();
-                this.initialTouchY = me.getGraphY();
-
-                var handler = function () {
-                    if (this.tapAndHoldValid) {
-                        this.tapAndHold(me);
-                    }
-
-                    this.tapAndHoldInProgress = false;
-                    this.tapAndHoldValid = false;
-                };
-
-                if (this.tapAndHoldThread) {
-                    window.clearTimeout(this.tapAndHoldThread);
-                }
-
-                this.tapAndHoldThread = window.setTimeout(mxUtils.bind(this, handler), this.tapAndHoldDelay);
-                this.tapAndHoldValid = true;
-            }
-            else if (evtName == mxEvent.MOUSE_UP) {
-                this.tapAndHoldInProgress = false;
-                this.tapAndHoldValid = false;
-            }
-            else if (this.tapAndHoldValid) {
-                this.tapAndHoldValid =
-                    Math.abs(this.initialTouchX - me.getGraphX()) < this.tolerance &&
-                    Math.abs(this.initialTouchY - me.getGraphY()) < this.tolerance;
-            }
-
-            this.consumeMouseEvent(evtName, me, sender);
-        }
     },
 
     consumeMouseEvent: function () {},

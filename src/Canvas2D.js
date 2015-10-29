@@ -169,7 +169,7 @@ var proto = {
     rotatePoint: function (x, y, theta, cx, cy) {
         var rad = toRadians(theta);
 
-        //return mxUtils.getRotatedPoint(new Point(x, y), Math.cos(rad),
+        //return Point.getRotatedPoint(new Point(x, y), Math.cos(rad),
         //    Math.sin(rad), new Point(cx, cy));
     },
 

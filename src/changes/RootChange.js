@@ -1,4 +1,5 @@
-'use strict';
+
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Change = require('./Change');
 
@@ -8,7 +9,7 @@ module.exports = Change.extend({
 
         var change = this;
 
-        RootChange.superclass.constructor.call(change, model);
+        Change.call(change, model);
 
         change.root = root;
         change.previous = root;

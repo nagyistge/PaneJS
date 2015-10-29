@@ -1,14 +1,17 @@
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
+var Cell = require('./Cell');
+var ChildChange = require('./changes/ChildChange');
 var Class = require('./common/class');
-var utils = require('./common/utils');
 var Event = require('./events/Event');
 var EventObject = require('./events/EventObject');
 var RootChange = require('./changes/RootChange');
-var ChildChange = require('./changes/ChildChange');
+var StyleChange = require('./changes/StyleChange');
 var TerminalChange = require('./changes/TerminalChange');
-var Cell = require('./Cell');
 var UndoableEdit = require('./UndoableEdit');
+var utils = require('./common/utils');
+var Point = require('./Point');
+var cellPath = require('./cellPath');
 
 var each = utils.each;
 var isNumeric = utils.isNumeric;
@@ -33,7 +36,11 @@ module.exports = Class.create({
 
         this.currentEdit = model.createUndoableEdit();
 
-        root ? model.setRoot(root) : model.clear();
+        if (root) {
+            model.setRoot(root);
+        } else {
+            model.clear();
+        }
     },
 
     // 清理并创建一个默认的 root
@@ -87,7 +94,7 @@ module.exports = Class.create({
     filterCells: function (cells, filter) {
         var result = [];
 
-        if (cells != null) {
+        if (cells !== null) {
             for (var i = 0; i < cells.length; i++) {
                 if (filter(cells[i])) {
                     result.push(cells[i]);
@@ -261,12 +268,12 @@ module.exports = Class.create({
         var edgeCount = this.getEdgeCount(cell);
         var edges = [];
 
-        for (var i = 0; i < edgeCount; i++) {
-            edges.push(this.getEdgeAt(cell, i));
+        for (var j = 0; j < edgeCount; j++) {
+            edges.push(this.getEdgeAt(cell, j));
         }
 
-        for (var i = 0; i < edges.length; i++) {
-            var edge = edges[i];
+        for (var k = 0; k < edges.length; k++) {
+            var edge = edges[k];
 
             // Updates edge parent if edge and child have
             // a common root node (does not need to be the
@@ -295,18 +302,18 @@ module.exports = Class.create({
         }
 
         if (this.isAncestor(root, sourceNode) && this.isAncestor(root, targetNode)) {
-            if (sourceNode == targetNode) {
+            if (sourceNode === targetNode) {
                 cell = this.getParent(sourceNode);
             }
             else {
-                cell = this.getNearestCommonAncestor(sourceNode, targetNode);
+                //cell = this.getNearestCommonAncestor(sourceNode, targetNode);
             }
 
-            if (cell != null && (this.getParent(cell) != this.root ||
-                this.isAncestor(cell, edge)) && this.getParent(edge) != cell) {
+            if (cell !== null && (this.getParent(cell) !== this.root ||
+                this.isAncestor(cell, edge)) && this.getParent(edge) !== cell) {
                 var geo = this.getGeometry(edge);
 
-                if (geo != null) {
+                if (geo !== null) {
                     var origin1 = this.getOrigin(this.getParent(edge));
                     var origin2 = this.getOrigin(cell);
 
@@ -349,13 +356,13 @@ module.exports = Class.create({
     getNearestCommonAncestor: function (cell1, cell2) {
         if (cell1 && cell2) {
             // Creates the cell path for the second cell
-            var path = mxCellPath.create(cell2);
+            var path = cellPath.create(cell2);
 
             if (path && path.length > 0) {
                 // Bubbles through the ancestors of the first
                 // cell to find the nearest common ancestor.
                 var cell = cell1;
-                var current = mxCellPath.create(cell);
+                var current = cellPath.create(cell);
 
                 // Inverts arguments
                 if (path.length < current.length) {
@@ -365,15 +372,15 @@ module.exports = Class.create({
                     path = tmp;
                 }
 
-                while (cell != null) {
+                while (cell !== null) {
                     var parent = this.getParent(cell);
 
                     // Checks if the cell path is equal to the beginning of the given cell path
-                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+                    if (path.indexOf(current + cellPath.PATH_SEPARATOR) === 0 && parent !== null) {
                         return cell;
                     }
 
-                    current = mxCellPath.getParentPath(current);
+                    current = cellPath.getParentPath(current);
                     cell = parent;
                 }
             }
@@ -428,7 +435,7 @@ module.exports = Class.create({
         // model and avoids calling cellAdded if it was.
         if (!this.contains(previous) && parent) {
             this.cellAdded(cell);
-        } else if (parent == null) {
+        } else if (parent === null) {
             this.cellRemoved(cell);
         }
 
@@ -476,7 +483,7 @@ module.exports = Class.create({
         return edge ? edge.getTerminal(isSource) : null;
     },
     setTerminal: function (edge, terminal, isSource) {
-        var terminalChanged = terminal != this.getTerminal(edge, isSource);
+        var terminalChanged = terminal !== this.getTerminal(edge, isSource);
         this.execute(new TerminalChange(this, edge, terminal, isSource));
 
         if (this.maintainEdgeParent && terminalChanged) {
@@ -526,7 +533,7 @@ module.exports = Class.create({
         for (var i = 0; i < edgeCount; i++) {
             var edge = this.getEdgeAt(cell, i);
 
-            if (edge != ignoredEdge && this.getTerminal(edge, outgoing) == cell) {
+            if (edge !== ignoredEdge && this.getTerminal(edge, outgoing) === cell) {
                 count++;
             }
         }
@@ -576,7 +583,7 @@ module.exports = Class.create({
     },
 
     setGeometry: function (cell, geometry) {
-        if (geometry != this.getGeometry(cell)) {
+        if (geometry !== this.getGeometry(cell)) {
             this.execute(new GeometryChange(this, cell, geometry));
         }
 
@@ -590,14 +597,18 @@ module.exports = Class.create({
     },
 
     setStyle: function (cell, style) {
-        if (style != this.getStyle(cell)) {
+        if (style !== this.getStyle(cell)) {
             this.execute(new StyleChange(this, cell, style));
         }
 
         return style;
     },
 
-    styleForCellChanged: function (cell, style) {},
+    styleForCellChanged: function (cell, style) {
+        var previous = this.getStyle(cell);
+        cell.setStyle(style);
+        return previous;
+    },
 
     isCollapsed: function (cell) {},
 
@@ -635,7 +646,7 @@ module.exports = Class.create({
         //this.fireEvent(new mxEventObject(mxEvent.BEGIN_UPDATE));
         this.emit(new EventObject('beginUpdate'));
 
-        if (this.updateLevel == 1) {
+        if (this.updateLevel === 1) {
             //this.fireEvent(new mxEventObject(mxEvent.START_EDIT));
             this.emit(new EventObject('startEdit'));
         }
@@ -644,13 +655,13 @@ module.exports = Class.create({
     endUpdate: function () {
         this.updateLevel--;
 
-        if (this.updateLevel == 0) {
+        if (this.updateLevel === 0) {
             //this.fireEvent(new mxEventObject(mxEvent.END_EDIT));
             this.emit(new EventObject('endEdit'));
         }
 
         if (!this.endingUpdate) {
-            this.endingUpdate = this.updateLevel == 0;
+            this.endingUpdate = this.updateLevel === 0;
             //this.fireEvent(new mxEventObject(mxEvent.END_UPDATE, 'edit', this.currentEdit));
             this.emit(new EventObject('endUpdate', {edit: this.currentEdit}));
 

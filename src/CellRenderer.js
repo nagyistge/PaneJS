@@ -1,4 +1,4 @@
-'use strict';
+/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('./common/class');
 var utils = require('./common/utils');
@@ -206,7 +206,7 @@ var CellRenderer = Class.create({
 
                     // Dispatches the drop event to the graph which
                     // consumes and executes the source function
-                    var pt = mxUtils.convertPoint(graph.container, x, y);
+                    var pt = Point.convertPoint(graph.container, x, y);
                     result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
                 }
 
@@ -430,7 +430,7 @@ var CellRenderer = Class.create({
 
                 // Dispatches the drop event to the graph which
                 // consumes and executes the source function
-                var pt = utils.convertPoint(graph.container, x, y);
+                var pt = Point.convertPoint(graph.container, x, y);
                 result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
             }
 
@@ -613,7 +613,7 @@ var CellRenderer = Class.create({
 
             if (bounds.x != cx || bounds.y != cy) {
                 var rad = theta * (Math.PI / 180);
-                var pt = mxUtils.getRotatedPoint(new Point(bounds.x, bounds.y),
+                var pt = Point.getRotatedPoint(new Point(bounds.x, bounds.y),
                     Math.cos(rad), Math.sin(rad), new Point(cx, cy));
 
                 bounds.x = pt.x;
@@ -639,7 +639,7 @@ var CellRenderer = Class.create({
                         var cx = bounds.getCenterX();
                         var cy = bounds.getCenterY();
 
-                        var point = mxUtils.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
+                        var point = Point.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
                             new mxPoint(state.getCenterX(), state.getCenterY()));
 
                         cx = point.x;
@@ -709,7 +709,7 @@ var CellRenderer = Class.create({
                         var cos = Math.cos(rad);
                         var sin = Math.sin(rad);
 
-                        var point = mxUtils.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
+                        var point = Point.getRotatedPoint(new mxPoint(cx, cy), cos, sin,
                             new mxPoint(state.getCenterX(), state.getCenterY()));
                         cx = point.x;
                         cy = point.y;
@@ -816,7 +816,7 @@ var CellRenderer = Class.create({
             // defined as the bounds are updated for the given points inside the shape
             if (force || !state.shape.bounds || state.shape.scale != state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
-                (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
+                (state.absolutePoints != null && !Point.equalPoints(state.shape.points, state.absolutePoints))) {
                 if (state.absolutePoints) {
                     state.shape.points = state.absolutePoints.slice();
                     state.shape.bounds = null;
