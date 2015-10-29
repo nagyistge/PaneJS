@@ -4,7 +4,7 @@
 var Class = require('../common/class');
 var detector = require('../common/detector');
 var utils = require('../common/utils');
-var domEvent = require('../common/domEvent');
+var domEvent = require('./domEvent');
 
 module.exports = Class.create({
     constructor: function MouseEvent(evt, state) {
@@ -37,6 +37,14 @@ module.exports = Class.create({
             return utils.isAncestorNode(shape.node, this.getSource());
         }
         return false;
+    },
+
+    getX: function () {
+        return domEvent.getClientX(this.getEvent());
+    },
+
+    getY: function () {
+        return domEvent.getClientY(this.getEvent());
     },
 
     getGraphX: function () {

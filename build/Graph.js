@@ -7,7 +7,9 @@ var Class = require('./common/class');
 var detector = require('./common/detector');
 var ConnectionConstraint = require('./ConnectionConstraint');
 var ConnectionHandler = require('./handler/ConnectionHandler');
+var EventSource = require('./events/EventSource');
 var Event = require('./events/Event');
+var domEvent = require('./events/domEvent');
 var EventObject = require('./events/EventObject');
 var Geometry = require('./Geometry');
 var GeometryChange = require('./changes/GeometryChange');
@@ -26,7 +28,7 @@ var utils = require('./common/utils');
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getValue = utils.getValue;
 
-module.exports = Class.create({
+module.exports = EventSource.extend({
     Implements: Event,
 
     EMPTY_ARRAY: [],

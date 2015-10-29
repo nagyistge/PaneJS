@@ -5,76 +5,32 @@ var Class = require('../common/class');
 var EventObject = require('./EventObject');
 
 var EventSource = Class.create({
+
+    eventListeners: null,
+    eventsEnabled: true,
+    eventSource: null,
+
     constructor: function EventSource(eventSource) {
         this.setEventSource(eventSource);
     },
-    /**
-     * Variable: eventListeners
-     *
-     * Holds the event names and associated listeners in an array. The array
-     * contains the event name followed by the respective listener for each
-     * registered listener.
-     */
-    eventListeners: null,
 
-    /**
-     * Variable: eventsEnabled
-     *
-     * Specifies if events can be fired. Default is true.
-     */
-    eventsEnabled: true,
-
-    /**
-     * Variable: eventSource
-     *
-     * Optional source for events. Default is null.
-     */
-    eventSource: null,
-
-    /**
-     * Function: isEventsEnabled
-     *
-     * Returns <eventsEnabled>.
-     */
     isEventsEnabled: function () {
         return this.eventsEnabled;
     },
 
-    /**
-     * Function: setEventsEnabled
-     *
-     * Sets <eventsEnabled>.
-     */
+
     setEventsEnabled: function (value) {
         this.eventsEnabled = value;
     },
 
-    /**
-     * Function: getEventSource
-     *
-     * Returns <eventSource>.
-     */
     getEventSource: function () {
         return this.eventSource;
     },
 
-    /**
-     * Function: setEventSource
-     *
-     * Sets <eventSource>.
-     */
     setEventSource: function (value) {
         this.eventSource = value;
     },
 
-    /**
-     * Function: addListener
-     *
-     * Binds the specified function to the given event name. If no event name
-     * is given, then the listener is registered for all events.
-     *
-     * The parameters of the listener are the sender and an <mxEventObject>.
-     */
     addListener: function (name, funct) {
         if (this.eventListeners === null) {
             this.eventListeners = [];
@@ -84,11 +40,6 @@ var EventSource = Class.create({
         this.eventListeners.push(funct);
     },
 
-    /**
-     * Function: removeListener
-     *
-     * Removes all occurrences of the given listener from <eventListeners>.
-     */
     removeListener: function (funct) {
         if (this.eventListeners !== null) {
             var i = 0;
@@ -103,25 +54,6 @@ var EventSource = Class.create({
         }
     },
 
-    /**
-     * Function: fireEvent
-     *
-     * Dispatches the given event to the listeners which are registered for
-     * the event. The sender argument is optional. The current execution scope
-     * ("this") is used for the listener invocation (see <mxUtils.bind>).
-     *
-     * Example:
-     *
-     * (code)
-     * fireEvent(new mxEventObject("eventName", key1, val1, .., keyN, valN))
-     * (end)
-     *
-     * Parameters:
-     *
-     * evt - <mxEventObject> that represents the event.
-     * sender - Optional sender to be passed to the listener. Default value is
-     * the return value of <getEventSource>.
-     */
     fireEvent: function (evt, sender) {
         if (this.eventListeners !== null && this.isEventsEnabled()) {
             if (evt === null) {
@@ -146,7 +78,7 @@ var EventSource = Class.create({
                 }
             }
         }
-    },
+    }
 });
 
 module.exports = EventSource;
