@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello, Graph</title>
+    <script src="../node_modules/requirejs/require.js"></script>
+</head>
+<body>
+<div id="graphContainer"
+     style="position:relative;overflow:hidden;width:800px;height:600px;background:url('images/grid.gif');cursor:default;">
+</div>
+<script>
+    window.onload = function () {
+        require([
+            '../build/Graph',
+            '../build/handler/Rubberhand'
+        ], function (Graph, Rubberhand) {
+
+            var container = document.getElementById('graphContainer');
+
+            var graph = new Graph(container);
+
+            new Rubberhand(graph);
+
+            var parent = graph.getDefaultParent();
+
+            graph.getModel().beginUpdate();
+            try {
+                var v1 = graph.insertVertex(parent, null, 'Hello', 20, 20, 80, 30);
+                var v2 = graph.insertVertex(parent, null, 'PaneJS', 200, 150, 80, 30);
+                var e1 = graph.insertEdge(parent, null, '', v1, v2);
+            }
+            finally {
+                graph.getModel().endUpdate();
+            }
+        });
+    };
+</script>
+</body>
+</html>

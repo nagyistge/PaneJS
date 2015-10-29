@@ -1,4 +1,4 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define(function(require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Cell = require('./Cell');
 var CellRenderer = require('./CellRenderer');
@@ -1654,3 +1654,4 @@ module.exports = Class.create({
     destroy: function () {}
 });
 
+});

@@ -1,10 +1,8 @@
-
+define(function(require, exports, module) {
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('../common/class');
 var detector = require('../common/detector');
-var utils = require('../common/utils');
-var domEvent = require('../common/domEvent');
 
 module.exports = Class.create({
     constructor: function MouseEvent(evt, state) {
@@ -21,22 +19,6 @@ module.exports = Class.create({
 
     getEvent:function(){
         return this.evt;
-    },
-
-    /**
-     * Function: getSource
-     *
-     * Returns the target DOM element using <mxEvent.getSource> for <evt>.
-     */
-    getSource: function () {
-        return domEvent.getSource(this.evt);
-    },
-
-    isSource: function (shape) {
-        if (shape != null) {
-            return utils.isAncestorNode(shape.node, this.getSource());
-        }
-        return false;
     },
 
     getGraphX: function () {
@@ -83,3 +65,4 @@ module.exports = Class.create({
     },
 });
 
+});

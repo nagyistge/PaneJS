@@ -1,4 +1,4 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define(function(require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global window, document */
 
 var detector = require('./detector');
@@ -355,21 +355,6 @@ utils.isNode = function (node, nodeName, attributeName, attributeValue) {
     return ret;
 };
 
-utils.isAncestorNode = function (ancestor, child) {
-    var parent = child;
-
-    while (parent != null) {
-        if (parent == ancestor) {
-            return true;
-        }
-
-        parent = parent.parentNode;
-    }
-
-    return false;
-};
-
-
 utils.getOffset = function (container, scrollOffset) {
     var offsetLeft = 0;
     var offsetTop = 0;
@@ -537,3 +522,4 @@ utils.setPrefixedStyle = function () {
 
 module.exports = utils;
 
+});
