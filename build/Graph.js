@@ -1496,8 +1496,8 @@ var Graph = EventSource.extend({
         if (me.graphX == null || me.graphY == null) {
             var pt = Point.convertPoint(this.container, me.getX(), me.getY());
 
-            me.graphX = pt.x - this.panDx;
-            me.graphY = pt.y - this.panDy;
+            me.graphX = pt.left - this.panDx;
+            me.graphY = pt.top - this.panDy;
         }
 
         return me;
