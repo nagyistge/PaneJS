@@ -63,7 +63,10 @@ function extend(dist) {
     var sources = slice.call(arguments, 1);
 
     for (var i = 0, length = sources.length; i < length; i++) {
-        forIn(sources[i], function (value, key) {
+
+        var source = sources[i];
+
+        source && forIn(source, function (value, key) {
             dist[key] = value;
         });
     }

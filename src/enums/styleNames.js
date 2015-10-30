@@ -1,6 +1,6 @@
 module.exports = {
-    SHAPE: 'shape',
-    PERIMETER: 'perimeter',
+    shape: 'shape',
+    perimeter: 'perimeter',
 
     SOURCE_PORT: 'sourcePort',
     TARGET_PORT: 'targetPort',
@@ -19,11 +19,13 @@ module.exports = {
     ENTRY_PERIMETER: 'entryPerimeter',
     WHITE_SPACE: 'whiteSpace',
     ROTATION: 'rotation',
-    FILL_COLOR: 'fillColor',
+    fillColor: 'fillColor',
     SWIMLANE_FILL_COLOR: 'swimlaneFillColor',
     MARGIN: 'margin',
-    GRADIENT_COLOR: 'gradientColor',
-    GRADIENT_DIRECTION: 'gradientDirection',
+
+    gradientColor: 'gradientColor',
+    gradientDirection: 'gradientDirection',
+
     STROKE_COLOR: 'strokeColor',
     SEPARATOR_COLOR: 'separatorColor',
     STROKE_WIDTH: 'strokeWidth',

@@ -5,7 +5,7 @@ import arrowTypes from '../enums/arrowTypes';
 
 var style = {};
 
-style[styleNames.SHAPE] = shapeNames.CONNECTOR;
+style[styleNames.shape] = shapeNames.CONNECTOR;
 style[styleNames.END_ARROW] = arrowTypes.CLASSIC;
 style[styleNames.VERTICAL_ALIGN] = alignments.MIDDLE;
 style[styleNames.ALIGN] = alignments.CENTER;

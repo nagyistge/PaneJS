@@ -4,18 +4,11 @@ import {
     createSvgElement
 } from '../common/utils';
 
-import Base      from '../lib/Base'
-import Rectangle from '../lib/Rectangle';
+import Base       from '../lib/Base';
+import Rectangle  from '../lib/Rectangle';
+import styleNames from '../enums/styleNames';
 
 var Shape = Base.extend({
-
-    node: null,         // 图形的根节点，通常是 g 元素
-    state: null,        // cellState
-    style: null,        // cellStyle
-    bounds: null,       // Rectangle 表示该图形的区域范围
-    boundingBox: null,  // 图形的边框
-    stencil: null,
-    points: null,
 
     pointerEvents: true,
     svgPointerEvents: 'all',
@@ -25,19 +18,27 @@ var Shape = Base.extend({
 
     scale: 1,
     rotation: 0,
-    strokeWidth: 1,
     opacity: 100,       // 透明度
-    antiAlias: true,    // 抗锯齿，平滑处理
-    outline: false,
-    visible: true,      // 默认可见
+    strokeWidth: 1,     // 边框宽度
     flipH: false,       // 水平翻转
     flipV: false,       // 垂直翻转
+    visible: true,      // 默认可见
+    outline: false,
+    antiAlias: true,    // 抗锯齿，平滑处理
 
-    constructor: function Shape(stencil) {
 
-        var that = this;
+    constructor: function Shape() {
 
-        that.stencil = stencil; // 模板
+        //var that = this;
+
+        // props
+        // -----
+        // that.node = null;        // 图形的根节点，通常是 g 元素
+        // that.state = null;
+        // that.style = null;
+        // that.points = null;      // 绘制连线需要的点
+        // that.bounds = null;      // 表示该图形的区域范围
+        // that.boundingBox = null; // 图形的边框
     },
 
     // 根据 state.style 初始化该图形的样式属性
@@ -46,31 +47,30 @@ var Shape = Base.extend({
         var that = this;
 
         that.state = state;
-        that.style = state.style;
+        var style = that.style = state.style;
 
-        if (that.style) {
-            that.fill = getValue(that.style, constants.STYLE_FILLCOLOR, that.fill);
-            that.gradient = getValue(that.style, constants.STYLE_GRADIENTCOLOR, that.gradient);
-            that.gradientDirection = getValue(that.style, constants.STYLE_GRADIENT_DIRECTION, that.gradientDirection);
-            that.opacity = getValue(that.style, constants.STYLE_OPACITY, that.opacity);
-            that.stroke = getValue(that.style, constants.STYLE_STROKECOLOR, that.stroke);
-            that.strokeWidth = getNumber(that.style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
-            // Arrow stroke width is used to compute the arrow heads size in mxConnector
-            that.arrowStrokewidth = getNumber(that.style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
-            that.spacing = getValue(that.style, constants.STYLE_SPACING, that.spacing);
-            that.startSize = getNumber(that.style, constants.STYLE_STARTSIZE, that.startSize);
-            that.endSize = getNumber(that.style, constants.STYLE_ENDSIZE, that.endSize);
-            that.startArrow = getValue(that.style, constants.STYLE_STARTARROW, that.startArrow);
-            that.endArrow = getValue(that.style, constants.STYLE_ENDARROW, that.endArrow);
-            that.rotation = getValue(that.style, constants.STYLE_ROTATION, that.rotation);
-            that.direction = getValue(that.style, constants.STYLE_DIRECTION, that.direction);
-            that.flipH = getValue(that.style, constants.STYLE_FLIPH, 0) === 1;
-            that.flipV = getValue(that.style, constants.STYLE_FLIPV, 0) === 1;
+        if (style) {
+            that.fillColor = getValue(style, styleNames.fillColor, that.fillColor);
+            that.gradientColor = getValue(style, styleNames.gradientColor, that.gradientColor);
+            that.gradientDirection = getValue(style, styleNames.gradientDirection, that.gradientDirection);
+            that.opacity = getValue(style, constants.STYLE_OPACITY, that.opacity);
+            that.stroke = getValue(style, constants.STYLE_STROKECOLOR, that.stroke);
+            that.strokeWidth = getNumber(style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
+            that.arrowStrokeWidth = getNumber(style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
+            that.spacing = getValue(style, constants.STYLE_SPACING, that.spacing);
+            that.startSize = getNumber(style, constants.STYLE_STARTSIZE, that.startSize);
+            that.endSize = getNumber(style, constants.STYLE_ENDSIZE, that.endSize);
+            that.startArrow = getValue(style, constants.STYLE_STARTARROW, that.startArrow);
+            that.endArrow = getValue(style, constants.STYLE_ENDARROW, that.endArrow);
+            that.rotation = getValue(style, constants.STYLE_ROTATION, that.rotation);
+            that.direction = getValue(style, constants.STYLE_DIRECTION, that.direction);
+            that.flipH = getValue(style, constants.STYLE_FLIPH, 0) === 1;
+            that.flipV = getValue(style, constants.STYLE_FLIPV, 0) === 1;
 
             // Legacy support for stencilFlipH/V
             if (that.stencil) {
-                that.flipH = getValue(that.style, 'stencilFlipH', 0) === 1 || that.flipH;
-                that.flipV = getValue(that.style, 'stencilFlipV', 0) === 1 || that.flipV;
+                that.flipH = getValue(style, 'stencilFlipH', 0) === 1 || that.flipH;
+                that.flipV = getValue(style, 'stencilFlipV', 0) === 1 || that.flipV;
             }
 
             if (that.direction === constants.DIRECTION_NORTH || that.direction === constants.DIRECTION_SOUTH) {
@@ -79,10 +79,10 @@ var Shape = Base.extend({
                 that.flipV = tmp;
             }
 
-            that.isShadow = getValue(that.style, constants.STYLE_SHADOW, that.isShadow) === 1;
-            that.isDashed = getValue(that.style, constants.STYLE_DASHED, that.isDashed) === 1;
-            that.isRounded = getValue(that.style, constants.STYLE_ROUNDED, that.isRounded) === 1;
-            that.glass = getValue(that.style, constants.STYLE_GLASS, that.glass) === 1;
+            that.isShadow = getValue(style, constants.STYLE_SHADOW, that.isShadow) === 1;
+            that.isDashed = getValue(style, constants.STYLE_DASHED, that.isDashed) === 1;
+            that.isRounded = getValue(style, constants.STYLE_ROUNDED, that.isRounded) === 1;
+            that.glass = getValue(style, constants.STYLE_GLASS, that.glass) === 1;
 
             if (that.fill === constants.NONE) {
                 that.fill = null;

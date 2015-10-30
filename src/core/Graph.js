@@ -4,9 +4,11 @@ import {
     isUndefined,
     isNullOrUndefined
 } from '../common/utils';
+
 import Class       from '../common/class';
 import EventSource from '../events/EventSource';
 import Stylesheet  from '../styles/Stylesheet';
+import styleNames  from '../enums/styleNames';
 import Cell        from '../cell/Cell';
 import Geometry    from '../cell/Geometry';
 import View        from './View';
@@ -484,13 +486,14 @@ export default Class.create({
     getCellStyle: function (cell) {
 
         var that = this;
-        var stylesheet = that.stylesheet;
         var style = cell.style;
-        var defaultStyle = cell.isLink ?
-            stylesheet.getDefaultLinkStyle() :
-            stylesheet.getDefaultNodeStyle();
+        var stylesheet = that.stylesheet;
+        var defaultStyle = cell.isLink
+            ? stylesheet.getDefaultLinkStyle() : cell.isNode
+            ? stylesheet.getDefaultNodeStyle()
+            : null;
 
-        style = extend({}, style || {}, defaultStyle);
+        style = extend({}, style, defaultStyle);
 
         that.postProcessCellStyle(style);
 
@@ -1106,7 +1109,8 @@ export default Class.create({
         return (state && state.style) ? state.style[constants.STYLE_INDICATOR_GRADIENTCOLOR] : null;
     },
     getIndicatorShape: function (state) {
-        return (state && state.style) ? state.style[constants.STYLE_INDICATOR_SHAPE] : null;
+        var style = state && state.style;
+        return style ? style[styleNames.INDICATOR_SHAPE] : null;
 
     },
     getIndicatorImage: function (state) {

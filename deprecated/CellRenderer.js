@@ -91,7 +91,7 @@ var CellRenderer = Class.create({
         return Ctor;
     },
 
-    // 应用样式
+    // 通过 state 初始化 shape 的样式，并从 graph 暴露的接口中获取某些样式
     configureShape: function (state) {
         state.shape.apply(state);
         state.shape.image = state.view.graph.getImage(state);
@@ -148,6 +148,7 @@ var CellRenderer = Class.create({
         }
     },
 
+    // 获取 label 显示的文本
     getLabelValue: function (state) {
         return state.view.graph.getLabel(state.cell);
     },

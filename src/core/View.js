@@ -16,14 +16,24 @@ import Dictionary  from '../lib/Dictionary';
 import styleNames  from '../enums/styleNames';
 import alignments  from '../enums/alignments';
 import State       from '../cell/State';
+import Renderer    from '../cell/Renderer';
 
 export default Base.extend({
+
+    currentRoot: null,
+    graphBounds: null,
+    rendering: true,    // 是否需要创建、更新或销毁图形
+    updateStyle: false, // 重绘过程中是否需要更新样式，默认只会在创建 state 和 state.style 改变时才更新样式
+    captureDocumentGesture: true,
+    scale: 1,
+    translate: null,
 
     constructor: function View(graph) {
 
         var that = this;
         that.graph = graph;
         that.states = new Dictionary();
+        that.renderer = new Renderer();
         that.translate = new Point();
         that.graphBounds = new Rectangle();
     },
@@ -114,17 +124,134 @@ export default Base.extend({
         that.resetValidationState();
 
         that.validateCell(cell);
-        var state = that.validateCellState(cell);
-        var graphBounds = that.getBoundingBox(state);
+        that.validateCellState(cell);
 
-        that.setGraphBounds(graphBounds || that.getEmptyBounds());
+        that.graphBounds = that.getBoundingBox(cell) || that.getEmptyBounds();
+
         that.validateBackground();
         that.resetValidationState();
     },
 
-    getEmptyBounds: function () {},
+    // BackgroundPage
+    // ---------------
+    createBackgroundPageShape: function (bounds) {
+        return new RectangleShape(bounds, 'white', 'black');
+    },
 
-    getBoundingBox: function () {},
+    validateBackground: function () {
+        this.validateBackgroundImage();
+        this.validateBackgroundPage();
+    },
+
+    validateBackgroundImage: function () {
+        var bg = this.graph.getBackgroundImage();
+
+        if (bg) {
+            if (this.backgroundImage == null || this.backgroundImage.image != bg.src) {
+                if (this.backgroundImage) {
+                    this.backgroundImage.destroy();
+                }
+
+                var bounds = new Rectangle(0, 0, 1, 1);
+
+                this.backgroundImage = new ImageShape(bounds, bg.src);
+                this.backgroundImage.dialect = this.graph.dialect;
+                this.backgroundImage.init(this.backgroundPane);
+                this.backgroundImage.redraw();
+
+                // Workaround for ignored event on background in IE8 standards mode
+                if (document.documentMode == 8 && !mxClient.IS_EM) {
+                    mxEvent.addGestureListeners(this.backgroundImage.node,
+                        mxUtils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
+                        }),
+                        mxUtils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
+                        }),
+                        mxUtils.bind(this, function (evt) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
+                        })
+                    );
+                }
+            }
+
+            this.redrawBackgroundImage(this.backgroundImage, bg);
+        }
+        else if (this.backgroundImage != null) {
+            this.backgroundImage.destroy();
+            this.backgroundImage = null;
+        }
+    },
+
+    validateBackgroundPage: function () {},
+
+    getBackgroundPageBounds: function () {
+        var view = this;
+        var scale = view.scale;
+        var translate = view.translate;
+        var fmt = view.graph.pageFormat;
+        var ps = scale * view.graph.pageScale;
+
+        return new Rectangle(scale * translate.x, scale * translate.y, fmt.width * ps, fmt.height * ps);
+    },
+
+    redrawBackgroundImage: function (backgroundImage, bg) {
+        backgroundImage.scale = this.scale;
+        backgroundImage.bounds.x = this.scale * this.translate.x;
+        backgroundImage.bounds.y = this.scale * this.translate.y;
+        backgroundImage.bounds.width = this.scale * bg.width;
+        backgroundImage.bounds.height = this.scale * bg.height;
+
+        backgroundImage.redraw();
+    },
+
+    getEmptyBounds: function () {
+        var that = this;
+        var translate = that.translate;
+        var scale = that.scale;
+        return new Rectangle(translate.x * scale, translate.y * scale);
+    },
+
+    getBoundingBox: function (cell, recurse) {
+
+        var that = this;
+        var state = that.getState(cell);
+        var boundingBox = null;
+
+        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+
+        if (state) {
+
+            var shapeBoundingBox = state.shape && state.shape.boundingBox;
+            if (shapeBoundingBox) {
+                boundingBox = shapeBoundingBox.clone();
+            }
+
+            var textBoundingBox = state.text && state.text.boundingBox;
+            if (textBoundingBox) {
+                if (boundingBox) {
+                    boundingBox.add(textBoundingBox);
+                } else {
+                    boundingBox = textBoundingBox.clone();
+                }
+            }
+
+            if (recurse) {
+                cell.eachChild(function (child) {
+                    var childBoundingBox = that.getBoundingBox(child, recurse);
+                    if (childBoundingBox) {
+                        if (boundingBox) {
+                            boundingBox.add(childBoundingBox);
+                        } else {
+                            boundingBox = childBoundingBox;
+                        }
+                    }
+                });
+            }
+        }
+
+        return boundingBox;
+    },
 
     // 创建或移除 cell 对应的 state
     validateCell: function (cell, visible) {
@@ -148,7 +275,7 @@ export default Base.extend({
             });
         }
 
-        return cell;
+        return that;
     },
 
     validateCellState: function (cell, recurse) {
@@ -188,7 +315,7 @@ export default Base.extend({
             that.updateCellState(state);
 
             if (cell !== that.currentRoot) {
-                that.graph.cellRenderer.redraw(state, false, that.isRendering());
+                that.renderer.redraw(state, false, that.rendering);
             }
         }
 
@@ -405,7 +532,7 @@ export default Base.extend({
     },
 
     resetValidationState: function () {
-        var that =this;
+        var that = this;
         that.lastNode = null;
         that.lastHtmlNode = null;
         that.lastForegroundNode = null;
@@ -593,7 +720,7 @@ export default Base.extend({
         var state = new State(this, cell, this.graph.getCellStyle(cell));
 
         if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
-            this.graph.cellRenderer.createShape(state);
+            this.renderer.createShape(state);
         }
 
         return state;
@@ -615,7 +742,6 @@ export default Base.extend({
 
         return state;
     },
-
 
     isContainerEvent: function (evt) {},
 

@@ -1,8 +1,8 @@
 module.exports = {
-    LEFT: 'left',
-    CENTER: 'center',
-    RIGHT: 'right',
-    TOP: 'top',
-    MIDDLE: 'middle',
-    BOTTOM: 'bottom'
+    left: 'left',
+    center: 'center',
+    right: 'right',
+    top: 'top',
+    middle: 'middle',
+    bottom: 'bottom'
 };
