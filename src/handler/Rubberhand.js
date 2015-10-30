@@ -87,9 +87,9 @@ var Rubberband = Class.create({
             me.getState() == null && !domEvent.isMultiTouchEvent(me.getEvent())) {
             var offset = utils.getOffset(this.graph.container);
             var origin = utils.getScrollOrigin(this.graph.container);
-            origin.x -= offset.x;
-            origin.y -= offset.y;
-            this.start(me.getX() + origin.x, me.getY() + origin.y);
+            origin.left -= offset.left;
+            origin.left -= offset.left;
+            this.start(me.getX() + origin.left, me.getY() + origin.left);
 
             me.consume(false);
         }
@@ -129,10 +129,10 @@ var Rubberband = Class.create({
         if (!me.isConsumed() && this.first != null) {
             var origin = utils.getScrollOrigin(this.graph.container);
             var offset = utils.getOffset(this.graph.container);
-            origin.x -= offset.x;
-            origin.y -= offset.y;
-            var x = me.getX() + origin.x;
-            var y = me.getY() + origin.y;
+            origin.left -= offset.left;
+            origin.top -= offset.top;
+            var x = me.getX() + origin.left;
+            var y = me.getY() + origin.top;
             var dx = this.first.x - x;
             var dy = this.first.y - y;
             var tol = this.graph.tolerance;
@@ -156,7 +156,7 @@ var Rubberband = Class.create({
     createShape : function () {
         if (this.sharedDiv == null) {
             this.sharedDiv = document.createElement('div');
-            this.sharedDiv.className = 'mxRubberband';
+            this.sharedDiv.className = 'rubberband';
             utils.setOpacity(this.sharedDiv, this.defaultOpacity);
         }
 
@@ -212,8 +212,8 @@ var Rubberband = Class.create({
             this.width = Math.max(this.first.x, x) - this.x;
             this.height = Math.max(this.first.y, y) - this.y;
 
-            var dx = (detector.IS_VML) ? this.graph.panDx : 0;
-            var dy = (detector.IS_VML) ? this.graph.panDy : 0;
+            var dx = 0;
+            var dy = 0;
 
             this.div.style.left = (this.x + dx) + 'px';
             this.div.style.top = (this.y + dy) + 'px';

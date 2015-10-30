@@ -28,7 +28,7 @@ var utils = require('./common/utils');
 var isNullOrUndefined = utils.isNullOrUndefined;
 var getValue = utils.getValue;
 
-module.exports = EventSource.extend({
+var Graph = EventSource.extend({
     Implements: Event,
 
     EMPTY_ARRAY: [],
@@ -1229,8 +1229,15 @@ module.exports = EventSource.extend({
     // ---------------
     isResizeContainer: function () {},
     setResizeContainer: function () {},
-    isEnabled: function () {},
-    setEnabled: function () {},
+
+    isEnabled: function () {
+        return this.enabled;
+    },
+
+    setEnabled: function (value) {
+        this.enabled = value;
+    },
+
     isEscapeEnabled: function () {},
     setEscapeEnabled: function () {},
     isInvokesStopCellEditing: function () {},
@@ -1321,7 +1328,17 @@ module.exports = EventSource.extend({
     },
     setTooltips: function () {},
     setPanning: function () {},
-    isEditing: function () {},
+
+    isEditing: function (cell) {
+        if (this.cellEditor != null) {
+            var editingCell = this.cellEditor.getEditingCell();
+
+            return (cell == null) ? editingCell != null : cell == editingCell;
+        }
+
+        return false;
+    },
+
     isAutoSizeCell: function () {},
     isAutoSizeCells: function () {},
     setAutoSizeCells: function () {},
@@ -1457,8 +1474,24 @@ module.exports = EventSource.extend({
 
     // Graph events
     // ------------
-    addMouseListener: function () {},
-    removeMouseListener: function () {},
+    addMouseListener: function (listener) {
+        if (this.mouseListeners == null) {
+            this.mouseListeners = [];
+        }
+        this.mouseListeners.push(listener);
+    },
+
+    removeMouseListener: function (listener) {
+        if (this.mouseListeners != null) {
+            for (var i = 0; i < this.mouseListeners.length; i++) {
+                if (this.mouseListeners[i] == listener) {
+                    this.mouseListeners.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    },
+
     updateMouseEvent: function (me) {
         if (me.graphX == null || me.graphY == null) {
             var pt = Point.convertPoint(this.container, me.getX(), me.getY());
@@ -1469,9 +1502,101 @@ module.exports = EventSource.extend({
 
         return me;
     },
-    getStateForTouchEvent: function () {},
-    isEventIgnored: function () {},
-    isSyntheticEventIgnored: function () {},
+
+    getStateForTouchEvent: function (evt) {
+        var x = domEvent.getClientX(evt);
+        var y = domEvent.getClientY(evt);
+
+        // Dispatches the drop event to the graph which
+        // consumes and executes the source function
+        var pt = Point.convertPoint(this.container, x, y);
+
+        return this.view.getState(this.getCellAt(pt.x, pt.y));
+    },
+
+    isEventIgnored: function (evtName, me, sender) {
+        var mouseEvent = domEvent.isMouseEvent(me.getEvent());
+        var result = this.isEditing();
+
+        if (me.getEvent() == this.lastEvent) {
+            result = true;
+        }
+        else {
+            this.lastEvent = me.getEvent();
+        }
+
+        if (this.eventSource != null && evtName != domEvent.MOUSE_MOVE) {
+            domEvent.offGesture(this.eventSource, null, this.mouseMoveRedirect, this.mouseUpRedirect);
+            this.mouseMoveRedirect = null;
+            this.mouseUpRedirect = null;
+            this.eventSource = null;
+        }
+        else if (this.eventSource != null && me.getSource() != this.eventSource) {
+            result = true;
+        }
+        else if (detector.IS_TOUCH && evtName == domEvent.MOUSE_DOWN && !mouseEvent) {
+            this.eventSource = me.getSource();
+
+            this.mouseMoveRedirect = utils.bind(this, function (evt) {
+                this.fireMouseEvent(mxEvent.MOUSE_MOVE, new MouseEvent(evt, this.getStateForTouchEvent(evt)));
+            });
+            this.mouseUpRedirect = mxUtils.bind(this, function (evt) {
+                this.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt, this.getStateForTouchEvent(evt)));
+            });
+
+            mxEvent.onGesture(this.eventSource, null, this.mouseMoveRedirect, this.mouseUpRedirect);
+        }
+
+        // Factored out the workarounds for FF to make it easier to override/remove
+        // Note this method has side-effects!
+        if (this.isSyntheticEventIgnored(evtName, me, sender)) {
+            result = true;
+        }
+
+        // Never fires mouseUp/-Down for double clicks
+        if (!domEvent.isPopupTrigger(this.lastEvent) && evtName != domEvent.MOUSE_MOVE && this.lastEvent.detail == 2) {
+            return true;
+        }
+
+        // Filters out of sequence events or mixed event types during a gesture
+        if (evtName == domEvent.MOUSE_UP && this.isMouseDown) {
+            this.isMouseDown = false;
+        }
+        else if (evtName == domEvent.MOUSE_DOWN && !this.isMouseDown) {
+            this.isMouseDown = true;
+            this.isMouseTrigger = mouseEvent;
+        }
+        // Drops mouse events that are fired during touch gestures as a workaround for Webkit
+        // and mouse events that are not in sync with the current internal button state
+        else if (!result && (((!detector.IS_FF || evtName != domEvent.MOUSE_MOVE) &&
+            this.isMouseDown && this.isMouseTrigger != mouseEvent) ||
+            (evtName == domEvent.MOUSE_DOWN && this.isMouseDown) ||
+            (evtName == domEvent.MOUSE_UP && !this.isMouseDown))) {
+            result = true;
+        }
+
+        if (!result && evtName == domEvent.MOUSE_DOWN) {
+            this.lastMouseX = me.getX();
+            this.lastMouseY = me.getY();
+        }
+
+        return result;
+    },
+
+    isSyntheticEventIgnored: function (evtName, me, sender) {
+        var result = false;
+        var mouseEvent = domEvent.isMouseEvent(me.getEvent());
+
+        if (this.ignoreMouseEvents && mouseEvent && evtName != domEvent.MOUSE_MOVE) {
+            this.ignoreMouseEvents = evtName != domEvent.MOUSE_UP;
+            result = true;
+        }
+        else if (detector.IS_FF && !mouseEvent && evtName == domEvent.MOUSE_UP) {
+            this.ignoreMouseEvents = true;
+        }
+
+        return result;
+    },
     isEventSourceIgnored: function (evtName, me) {
         var source = me.getSource();
         var name = (source.nodeName != null) ? source.nodeName.toLowerCase() : '';
@@ -1638,7 +1763,7 @@ module.exports = EventSource.extend({
         }
     },
 
-    consumeMouseEvent: function () {
+    consumeMouseEvent: function (evtName, me, sender) {
         if (evtName == domEvent.MOUSE_DOWN && domEvent.isTouchEvent(me.getEvent())) {
             me.consume(false);
         }
@@ -1656,3 +1781,4 @@ module.exports = EventSource.extend({
     destroy: function () {}
 });
 
+module.exports = Graph;

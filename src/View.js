@@ -1368,6 +1368,7 @@ module.exports = Class.create({
                 domEvent.on(container, 'gestureend', handler);
             }
 
+            // container events
             domEvent.onGesture(container,
                 utils.bind(this, function (evt) {
                     // Condition to avoid scrollbar events starting a rubberband selection
@@ -1389,6 +1390,41 @@ module.exports = Class.create({
                     graph.dblClick(evt);
                 }
             });
+
+            var getState = function (evt) {
+                var state = null;
+
+                if (detector.IS_TOUCH) {
+                    var x = domEvent.getClientX(evt);
+                    var y = domEvent.getClientY(evt);
+
+                    var pt = Point.convertPoint(container, x, y);
+                    state = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+                }
+
+                return state;
+            };
+
+            // document events
+            this.moveHandler = utils.bind(this, function (evt) {
+                if (graph.tooltipHandler != null && graph.tooltipHandler.isHideOnHover()) {
+                    graph.tooltipHandler.hide();
+                }
+
+                if (this.captureDocumentGesture && graph.isMouseDown && graph.container != null && !this.isContainerEvent(evt) && graph.container.style.display != 'none' &&
+                    graph.container.style.visibility != 'hidden' && !domEvent.isConsumed(evt)) {
+                    graph.fireMouseEvent(domEvent.MOUSE_MOVE, new MouseEvent(evt, getState(evt)));
+                }
+            });
+
+            this.endHandler = utils.bind(this, function (evt) {
+                if (this.captureDocumentGesture && graph.isMouseDown && graph.container != null && !this.isContainerEvent(evt) && graph.container.style.display != 'none' &&
+                    graph.container.style.visibility != 'hidden') {
+                    graph.fireMouseEvent(domEvent.MOUSE_UP, new MouseEvent(evt));
+                }
+            });
+
+            domEvent.onGesture(document, null, this.moveHandler, this.endHandler);
 
 
         }

@@ -338,7 +338,7 @@ utils.bind = function(scope, funct) {
     };
 };
 
-// BOW
+// BOM
 // ---
 utils.isNode = function (node, nodeName, attributeName, attributeValue) {
 
@@ -534,6 +534,26 @@ utils.setPrefixedStyle = function () {
         }
     };
 }();
+
+utils.clearSelection = function () {
+    if (document.selection) {
+        return function () {
+            document.selection.empty();
+        };
+    }
+    else if (window.getSelection) {
+        return function () {
+            window.getSelection().removeAllRanges();
+        };
+    }
+    else {
+        return function () { };
+    }
+}();
+
+utils.setOpacity = function (node, value) {
+    node.style.opacity = (value / 100);
+};
 
 module.exports = utils;
 
