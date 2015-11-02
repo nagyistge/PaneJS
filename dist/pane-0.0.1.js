@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var pane = {
 	    utils: __webpack_require__(1),
 	    Graph: __webpack_require__(10),
-	    Model: __webpack_require__(33),
+	    Model: __webpack_require__(35),
 	    View: __webpack_require__(27)
 	};
 	
@@ -581,6 +581,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var NS_SVG = 'http://www.w3.org/2000/svg';
 	
+	function getBaseUrl() {
+	    var href = window.location.href;
+	    var hash = href.lastIndexOf('#');
+	
+	    if (hash > 0) {
+	        href = href.substring(0, hash);
+	    }
+	
+	    return href;
+	}
+	
 	function isNode(node, nodeName, attributeName, attributeValue) {
 	    var ret = node && !isNaN(node.nodeType);
 	
@@ -616,6 +627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ele;
 	}
 	
+	exports.getBaseUrl = getBaseUrl;
 	exports.isNode = isNode;
 	exports.getCurrentStyle = getCurrentStyle;
 	exports.createSvgElement = createSvgElement;
@@ -746,15 +758,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _View2 = _interopRequireDefault(_View);
 	
-	var _Model = __webpack_require__(33);
+	var _Model = __webpack_require__(35);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _changesRootChange = __webpack_require__(36);
+	var _changesRootChange = __webpack_require__(38);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(38);
+	var _changesChildChange = __webpack_require__(40);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
@@ -2698,7 +2710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	style[_enumsStyleNames2['default'].END_ARROW] = _enumsArrowTypes2['default'].CLASSIC;
 	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
 	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
-	style[_enumsStyleNames2['default'].STROKE_COLOR] = '#289de9';
+	style[_enumsStyleNames2['default'].strokeColor] = '#289de9';
 	style[_enumsStyleNames2['default'].FONT_COLOR] = '#446299';
 	
 	exports['default'] = style;
@@ -2719,7 +2731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    PORT_CONSTRAINT: 'portConstraint',
 	    PORT_CONSTRAINT_ROTATION: 'portConstraintRotation',
 	
-	    OPACITY: 'opacity',
+	    opacity: 'opacity',
 	    TEXT_OPACITY: 'textOpacity',
 	    OVERFLOW: 'overflow',
 	    ORTHOGONAL: 'orthogonal',
@@ -2730,36 +2742,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ENTRY_Y: 'entryY',
 	    ENTRY_PERIMETER: 'entryPerimeter',
 	    WHITE_SPACE: 'whiteSpace',
-	    ROTATION: 'rotation',
-	    fillColor: 'fillColor',
+	    rotation: 'rotation',
+	
 	    SWIMLANE_FILL_COLOR: 'swimlaneFillColor',
 	    MARGIN: 'margin',
 	
+	    fillColor: 'fillColor',
 	    gradientColor: 'gradientColor',
 	    gradientDirection: 'gradientDirection',
 	
-	    STROKE_COLOR: 'strokeColor',
+	    strokeColor: 'strokeColor',
+	    strokeWidth: 'strokeWidth',
+	
 	    SEPARATOR_COLOR: 'separatorColor',
-	    STROKE_WIDTH: 'strokeWidth',
+	
 	    ALIGN: 'align',
 	    VERTICAL_ALIGN: 'verticalAlign',
-	    LABEL_WIDTH: 'labelWidth',
-	    LABEL_POSITION: 'labelPosition',
-	    VERTICAL_LABEL_POSITION: 'verticalLabelPosition',
+	
 	    IMAGE_ASPECT: 'imageAspect',
 	    IMAGE_ALIGN: 'imageAlign',
 	    IMAGE_VERTICAL_ALIGN: 'imageVerticalAlign',
-	    GLASS: 'glass',
+	
+	    glass: 'glass',
+	
 	    IMAGE: 'image',
 	    IMAGE_WIDTH: 'imageWidth',
 	    IMAGE_HEIGHT: 'imageHeight',
 	    IMAGE_BACKGROUND: 'imageBackground',
 	    IMAGE_BORDER: 'imageBorder',
-	    FLIPH: 'flipH',
-	    FLIPV: 'flipV',
+	
+	    flipH: 'flipH',
+	    flipV: 'flipV',
+	
 	    NO_LABEL: 'noLabel',
 	    NO_EDGE_STYLE: 'noEdgeStyle',
 	
+	    LABEL_WIDTH: 'labelWidth',
+	    LABEL_POSITION: 'labelPosition',
+	    VERTICAL_LABEL_POSITION: 'verticalLabelPosition',
 	    LABEL_BACKGROUND_COLOR: 'labelBackgroundColor',
 	    LABEL_BORDER_COLOR: 'labelBorderColor',
 	    LABEL_PADDING: 'labelPadding',
@@ -2774,31 +2794,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	    INDICATOR_HEIGHT: 'indicatorHeight',
 	    INDICATOR_DIRECTION: 'indicatorDirection',
 	
-	    SHADOW: 'shadow',
+	    shadow: 'shadow',
 	    SEGMENT: 'segment',
-	    END_ARROW: 'endArrow',
-	    START_ARROW: 'startArrow',
-	    END_SIZE: 'endSize',
-	    START_SIZE: 'startSize',
+	    startArrow: 'startArrow',
+	    endArrow: 'endArrow',
+	    endSize: 'endSize',
+	    startSize: 'startSize',
 	    SWIMLANE_LINE: 'swimlaneLine',
 	    END_FILL: 'endFill',
 	    START_FILL: 'startFill',
-	    DASHED: 'dashed',
+	    dashed: 'dashed',
 	    DASH_PATTERN: 'dashPattern',
-	    ROUNDED: 'rounded',
+	    rounded: 'rounded',
 	    CURVED: 'curved',
 	    ARCSIZE: 'arcSize',
 	    SMOOTH: 'smooth',
 	    SOURCE_PERIMETER_SPACING: 'sourcePerimeterSpacing',
 	    TARGET_PERIMETER_SPACING: 'targetPerimeterSpacing',
 	    PERIMETER_SPACING: 'perimeterSpacing',
-	    SPACING: 'spacing',
+	    spacing: 'spacing',
 	    SPACING_TOP: 'spacingTop',
 	    SPACING_LEFT: 'spacingLeft',
 	    SPACING_BOTTOM: 'spacingBottom',
 	    SPACING_RIGHT: 'spacingRight',
 	    HORIZONTAL: 'horizontal',
-	    DIRECTION: 'direction',
+	    direction: 'direction',
 	    ELBOW: 'elbow',
 	    FONT_COLOR: 'fontColor',
 	    FONT_FAMILY: 'fontFamily',
@@ -2907,7 +2927,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
 	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
 	style[_enumsStyleNames2['default'].fillColor] = '#e3f4ff';
-	style[_enumsStyleNames2['default'].STROKE_COLOR] = '#289de9';
+	style[_enumsStyleNames2['default'].strokeColor] = '#289de9';
 	style[_enumsStyleNames2['default'].FONT_COLOR] = '#774400';
 	
 	exports['default'] = style;
@@ -4517,7 +4537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var parentState = parent ? that.getState(parent) : null;
 	
 	        if (geo.relative && parentState && !parent.isLink) {
-	            var deg = parentState.style[_enumsStyleNames2['default'].ROTATION] || 0;
+	            var deg = parentState.style[_enumsStyleNames2['default'].rotation] || 0;
 	
 	            // 绕父元素的中心旋转
 	            if (deg) {
@@ -5280,7 +5300,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _shapesRect = __webpack_require__(40);
+	var _libRectangle = __webpack_require__(26);
+	
+	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var _shapesRect = __webpack_require__(33);
 	
 	var _shapesRect2 = _interopRequireDefault(_shapesRect);
 	
@@ -5328,7 +5352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    createIndicatorShape: function createIndicatorShape(state) {
+	    createIndicator: function createIndicator(state) {
 	
 	        var that = this;
 	        var shapeName = state.view.graph.getIndicatorShape(state);
@@ -5337,6 +5361,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return that;
 	    },
+	
+	    createCellOverlays: function createCellOverlays() {},
+	
+	    createControl: function createControl() {},
 	
 	    initShape: function initShape(state) {
 	
@@ -5356,17 +5384,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var style = state.style;
 	
 	        shape.apply(state);
-	        shape.image = graph.getImage(state);
-	        shape.indicatorColor = graph.getIndicatorColor(state);
-	        shape.indicatorStrokeColor = style[mxConstants.STYLE_INDICATOR_STROKECOLOR];
-	        shape.indicatorGradientColor = graph.getIndicatorGradientColor(state);
-	        shape.indicatorDirection = style[mxConstants.STYLE_INDICATOR_DIRECTION];
-	        shape.indicatorImage = graph.getIndicatorImage(state);
+	        //shape.image = graph.getImage(state);
+	        //shape.indicatorColor = graph.getIndicatorColor(state);
+	        //shape.indicatorStrokeColor = style[mxConstants.STYLE_INDICATOR_STROKECOLOR];
+	        //shape.indicatorGradientColor = graph.getIndicatorGradientColor(state);
+	        //shape.indicatorDirection = style[mxConstants.STYLE_INDICATOR_DIRECTION];
+	        //shape.indicatorImage = graph.getIndicatorImage(state);
 	
 	        that.postConfigureShape(state);
 	
 	        return that;
 	    },
+	
+	    postConfigureShape: function postConfigureShape() {},
+	    resolveColor: function resolveColor() {},
 	
 	    redraw: function redraw(state, force, rendering) {
 	
@@ -5391,14 +5422,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (shape) {
 	            if (!shape.node) {
-	                that.createIndicatorShape(state);
+	                that.createIndicator(state);
 	                that.initShape(state);
 	                that.createCellOverlays(state);
 	                that.installListeners(state);
 	            }
 	
 	            // Handles changes of the collapse icon
-	            this.createControl(state);
+	            that.createControl(state);
 	
 	            // 检查样式是否有更新
 	            //if (!mxUtils.equalEntries(state.shape.style, state.style)) {
@@ -5408,21 +5439,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // Redraws the cell if required, ignores changes to bounds if points are
 	            // defined as the bounds are updated for the given points inside the shape
-	            if (force || !state.shape.bounds || state.shape.scale != state.view.scale || state.absolutePoints == null && !state.shape.bounds.equals(state) || state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints)) {
+	            if (force || !shape.bounds || shape.scale !== state.view.scale || state.absolutePoints == null && !state.shape.bounds.equals(state) || state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints)) {
 	                if (state.absolutePoints) {
 	                    state.shape.points = state.absolutePoints.slice();
 	                    state.shape.bounds = null;
 	                } else {
 	                    state.shape.points = null;
-	                    state.shape.bounds = new Rectangle(state.x, state.y, state.width, state.height);
+	                    state.shape.bounds = new _libRectangle2['default'](state.x, state.y, state.width, state.height);
 	                }
 	
-	                state.shape.scale = state.view.scale;
+	                shape.scale = state.view.scale;
 	
-	                if ((0, _commonUtils.isNullOrUndefined)(rendering) || rendering) {
-	                    state.shape.redraw();
+	                if (rendering) {
+	                    shape.redraw();
 	                } else {
-	                    state.shape.updateBoundingBox();
+	                    shape.updateBoundingBox();
 	                }
 	
 	                shapeChanged = true;
@@ -5430,7 +5461,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        return shapeChanged;
-	    }
+	    },
+	
+	    installListeners: function installListeners() {}
 	});
 	
 	// 注册图形
@@ -5455,6 +5488,718 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
+	var _Shape = __webpack_require__(34);
+	
+	var _Shape2 = _interopRequireDefault(_Shape);
+	
+	exports['default'] = _Shape2['default'].extend({
+	    constructor: function Rect(bounds, fill, stroke, strokeWidth) {
+	
+	        var that = this;
+	
+	        Rect.superclass.constructor.call(that);
+	
+	        that.bounds = bounds;
+	        that.fill = fill;
+	        that.stroke = stroke;
+	        that.strokewidth = !(0, _commonUtils.isNullOrUndefined)(strokeWidth) ? strokeWidth : 1;
+	    },
+	
+	    isHtmlAllowed: function isHtmlAllowed() {
+	        var shape = this;
+	        return !shape.isRounded && !shape.glass && shape.rotation === 0;
+	    },
+	
+	    paintBackground: function paintBackground(canvas, x, y, w, h) {
+	
+	        var shape = this;
+	
+	        if (shape.isRounded) {
+	            var f = (0, _commonUtils.getValue)(shape.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
+	            var r = Math.min(w * f, h * f);
+	            canvas.rect(x, y, w, h, r, r);
+	        } else {
+	            canvas.rect(x, y, w, h);
+	        }
+	
+	        canvas.fillAndStroke();
+	
+	        return shape;
+	    },
+	
+	    paintForeground: function paintForeground(c, x, y, w, h) {
+	
+	        var shape = this;
+	
+	        if (shape.glass && !shape.outline) {
+	            shape.paintGlassEffect(c, x, y, w, h, shape.getArcSize(w + shape.strokewidth, h + shape.strokewidth));
+	        }
+	
+	        return shape;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _libRectangle = __webpack_require__(26);
+	
+	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var _enumsStyleNames = __webpack_require__(17);
+	
+	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
+	
+	var _enumsDirections = __webpack_require__(42);
+	
+	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
+	
+	var Shape = _libBase2['default'].extend({
+	
+	    pointerEvents: true,
+	    svgPointerEvents: 'all',
+	    svgStrokeTolerance: 8,
+	    shapePointerEvents: false,
+	    stencilPointerEvents: false,
+	
+	    scale: 1,
+	    rotation: 0,
+	    opacity: 100, // 透明度
+	    strokeWidth: 1, // 边框宽度
+	    flipH: false, // 水平翻转
+	    flipV: false, // 垂直翻转
+	    visible: true, // 默认可见
+	    outline: false,
+	    antiAlias: true, // 抗锯齿，平滑处理
+	
+	    constructor: function Shape() {
+	
+	        //var that = this;
+	
+	        // props
+	        // -----
+	        // that.node = null;        // 图形的根节点，通常是 g 元素
+	        // that.state = null;
+	        // that.style = null;
+	        // that.points = null;      // 绘制连线需要的点
+	        // that.bounds = null;      // 表示该图形的区域范围
+	        // that.boundingBox = null; // 图形的边框
+	    },
+	
+	    apply: function apply(state) {
+	
+	        var that = this;
+	
+	        that.state = state;
+	        var style = that.style = state.style;
+	
+	        if (style) {
+	            // 背景
+	            that.fillColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].fillColor, that.fillColor);
+	            that.gradientColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].gradientColor, that.gradientColor);
+	            that.gradientDirection = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].gradientDirection, that.gradientDirection);
+	            that.opacity = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].opacity, that.opacity);
+	            // 边框
+	            that.strokeColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].strokeColor, that.strokeColor);
+	            that.strokeWidth = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].strokeWidth, that.strokeWidth);
+	            that.arrowStrokeWidth = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].strokeWidth, that.strokeWidth);
+	            that.spacing = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].spacing, that.spacing);
+	            that.startSize = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].startSize, that.startSize);
+	            that.endSize = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].endSize, that.endSize);
+	            that.startArrow = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].startArrow, that.startArrow);
+	            that.endArrow = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].endArrow, that.endArrow);
+	            that.rotation = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].rotation, that.rotation);
+	            that.direction = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].direction, that.direction);
+	            that.flipH = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].flipH, 0) === 1;
+	            that.flipV = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].flipV, 0) === 1;
+	
+	            if (that.direction === _enumsDirections2['default'].north || that.direction === _enumsDirections2['default'].south) {
+	                var tmp = that.flipH;
+	                that.flipH = that.flipV;
+	                that.flipV = tmp;
+	            }
+	
+	            that.isShadow = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].shadow, that.isShadow) === 1;
+	            that.isDashed = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].dashed, that.isDashed) === 1;
+	            that.isRounded = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].rounded, that.isRounded) === 1;
+	            that.glass = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].glass, that.glass) === 1;
+	
+	            //if (that.fillColor === constants.NONE) {
+	            //    that.fillColor = null;
+	            //}
+	            //
+	            //if (that.gradientColor === constants.NONE) {
+	            //    that.gradientColor = null;
+	            //}
+	            //
+	            //if (that.strokeColor === constants.NONE) {
+	            //    that.strokeColor = null;
+	            //}
+	        }
+	
+	        return that;
+	    },
+	
+	    init: function init(container) {
+	
+	        var that = this;
+	        var node = that.node || that.create(container);
+	
+	        if (node && container) {
+	            that.node = node;
+	            container.appendChild(node);
+	        }
+	
+	        return that;
+	    },
+	
+	    create: function create(container) {
+	        if (container && container.ownerSVGElement) {
+	            return (0, _commonUtils.createSvgElement)('g');
+	        }
+	    },
+	
+	    clear: function clear() {
+	
+	        var that = this;
+	        var node = that.node;
+	
+	        if (node && node.ownerDocument) {
+	            while (node.lastChild) {
+	                node.removeChild(node.lastChild);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    getScreenOffset: function getScreenOffset() {
+	
+	        var that = this;
+	        var strokeWidth = that.strokeWidth;
+	        //var strokeWidth = that.stencil && that.stencil.strokeWidth !== 'inherit'
+	        //    ? that.stencil.strokeWidth
+	        //    : that.strokeWidth;
+	
+	        strokeWidth = Math.max(1, Math.round(strokeWidth * that.scale));
+	
+	        return (0, _commonUtils.mod)(strokeWidth, 2) === 1 ? 0.5 : 0;
+	    },
+	
+	    redraw: function redraw() {
+	
+	        var that = this;
+	        var node = that.node;
+	
+	        // 对于连线，需要根据 points 来计算出连线的 bounds
+	        that.updateBoundsFromPoints();
+	
+	        if (that.visible && that.checkBounds()) {
+	            node.style.visibility = 'visible';
+	            that.clear(); // 删除根节点下的所有子元素
+	            that.redrawShape();
+	            that.updateBoundingBox();
+	        } else {
+	            node.style.visibility = 'hidden';
+	            that.boundingBox = null;
+	        }
+	
+	        return that;
+	    },
+	
+	    redrawShape: function redrawShape() {
+	
+	        var that = this;
+	        var canvas = that.createCanvas();
+	
+	        if (canvas) {
+	            canvas.pointerEvents = that.pointerEvents;
+	
+	            that.draw(canvas);
+	            that.destroyCanvas(canvas);
+	        }
+	
+	        return that;
+	    },
+	
+	    draw: function draw(canvas) {
+	
+	        var that = this;
+	        var bounds = that.bounds;
+	
+	        // Scale is passed-through to canvas
+	        var scale = that.scale;
+	        var x = bounds.x / scale;
+	        var y = bounds.y / scale;
+	        var w = bounds.width / scale;
+	        var h = bounds.height / scale;
+	
+	        if (that.isPaintBoundsInverted()) {
+	
+	            var t = (w - h) / 2;
+	            x += t;
+	            y -= t;
+	
+	            var tmp = w;
+	            w = h;
+	            h = tmp;
+	        }
+	
+	        that.updateTransform(canvas, x, y, w, h);
+	        that.configureCanvas(canvas, x, y, w, h);
+	
+	        // Adds background rectangle to capture events
+	        var bg = null;
+	
+	        if (!that.stencil && !that.points && that.shapePointerEvents || that.stencil && that.stencilPointerEvents) {
+	
+	            var bb = that.createBoundingBox();
+	
+	            bg = that.createTransparentSvgRectangle(bb.x, bb.y, bb.width, bb.height);
+	            that.node.appendChild(bg);
+	        }
+	
+	        if (that.stencil) {
+	            that.stencil.drawShape(canvas, that, x, y, w, h);
+	        } else {
+	            // Stencils have separate strokeWidth
+	            canvas.setStrokeWidth(that.strokeWidth);
+	
+	            if (that.points) {
+	                var pts = [];
+	                for (var i = 0; i < that.points.length; i++) {
+	                    if (that.points[i]) {
+	                        pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
+	                    }
+	                }
+	
+	                that.paintEdgeShape(canvas, pts);
+	            } else {
+	                that.paintVertexShape(canvas, x, y, w, h);
+	            }
+	        }
+	
+	        if (bg && canvas.state && canvas.state.transform) {
+	            bg.setAttribute('transform', canvas.state.transform);
+	        }
+	    },
+	
+	    drawNode: function drawNode(c, x, y, w, h) {
+	        this.drawNodeBackground(c, x, y, w, h);
+	        c.setShadow(false);
+	        this.drawNodeForeground(c, x, y, w, h);
+	    },
+	
+	    // 绘制 node 背景
+	    drawNodeBackground: function drawNodeBackground(c, x, y, w, h) {},
+	
+	    // 绘制 node 前景
+	    drawNodeForeground: function drawNodeForeground(c, x, y, w, h) {},
+	
+	    drawLink: function drawLink(c, pts) {},
+	
+	    paintGlassEffect: function paintGlassEffect(c, x, y, w, h, arc) {
+	        var sw = Math.ceil(this.strokeWidth / 2);
+	        var size = 0.4;
+	
+	        c.setGradient('#ffffff', '#ffffff', x, y, w, h * 0.6, 'south', 0.9, 0.1);
+	        c.begin();
+	        arc += 2 * sw;
+	
+	        if (this.isRounded) {
+	            c.moveTo(x - sw + arc, y - sw);
+	            c.quadTo(x - sw, y - sw, x - sw, y - sw + arc);
+	            c.lineTo(x - sw, y + h * size);
+	            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
+	            c.lineTo(x + w + sw, y - sw + arc);
+	            c.quadTo(x + w + sw, y - sw, x + w + sw - arc, y - sw);
+	        } else {
+	            c.moveTo(x - sw, y - sw);
+	            c.lineTo(x - sw, y + h * size);
+	            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
+	            c.lineTo(x + w + sw, y - sw);
+	        }
+	
+	        c.close();
+	        c.fill();
+	    },
+	
+	    addPoints: function addPoints(c, pts, rounded, arcSize, close) {
+	        var pe = pts[pts.length - 1];
+	
+	        // Adds virtual waypoint in the center between start and end point
+	        if (close && rounded) {
+	            pts = pts.slice();
+	            var p0 = pts[0];
+	            var wp = new Point(pe.x + (p0.x - pe.x) / 2, pe.y + (p0.y - pe.y) / 2);
+	            pts.splice(0, 0, wp);
+	        }
+	
+	        var pt = pts[0];
+	        var i = 1;
+	
+	        // Draws the line segments
+	        c.moveTo(pt.x, pt.y);
+	
+	        while (i < (close ? pts.length : pts.length - 1)) {
+	            var tmp = pts[mxUtils.mod(i, pts.length)];
+	            var dx = pt.x - tmp.x;
+	            var dy = pt.y - tmp.y;
+	
+	            if (rounded && (dx != 0 || dy != 0)) {
+	                // Draws a line from the last point to the current
+	                // point with a spacing of size off the current point
+	                // into direction of the last point
+	                var dist = Math.sqrt(dx * dx + dy * dy);
+	                var nx1 = dx * Math.min(arcSize, dist / 2) / dist;
+	                var ny1 = dy * Math.min(arcSize, dist / 2) / dist;
+	
+	                var x1 = tmp.x + nx1;
+	                var y1 = tmp.y + ny1;
+	                c.lineTo(x1, y1);
+	
+	                // Draws a curve from the last point to the current
+	                // point with a spacing of size off the current point
+	                // into direction of the next point
+	                var next = pts[mxUtils.mod(i + 1, pts.length)];
+	
+	                // Uses next non-overlapping point
+	                while (i < pts.length - 2 && Math.round(next.x - tmp.x) == 0 && Math.round(next.y - tmp.y) == 0) {
+	                    next = pts[mxUtils.mod(i + 2, pts.length)];
+	                    i++;
+	                }
+	
+	                dx = next.x - tmp.x;
+	                dy = next.y - tmp.y;
+	
+	                dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+	                var nx2 = dx * Math.min(arcSize, dist / 2) / dist;
+	                var ny2 = dy * Math.min(arcSize, dist / 2) / dist;
+	
+	                var x2 = tmp.x + nx2;
+	                var y2 = tmp.y + ny2;
+	
+	                c.quadTo(tmp.x, tmp.y, x2, y2);
+	                tmp = new Point(x2, y2);
+	            } else {
+	                c.lineTo(tmp.x, tmp.y);
+	            }
+	
+	            pt = tmp;
+	            i++;
+	        }
+	
+	        if (close) {
+	            c.close();
+	        } else {
+	            c.lineTo(pe.x, pe.y);
+	        }
+	    },
+	
+	    updateBoundsFromPoints: function updateBoundsFromPoints() {
+	
+	        var that = this;
+	        var bounds;
+	
+	        (0, _commonUtils.each)(that.points || [], function (point, index) {
+	
+	            var rect = new _libRectangle2['default'](point.x, point.y, 1, 1);
+	
+	            if (index === 0) {
+	                that.bounds = bounds = rect;
+	            } else {
+	                bounds.add(rect);
+	            }
+	        });
+	
+	        return that;
+	    },
+	
+	    checkBounds: function checkBounds() {
+	
+	        var bounds = this.bounds;
+	
+	        return bounds && !isNaN(bounds.x) && !isNaN(bounds.y) && !isNaN(bounds.width) && !isNaN(bounds.height) && bounds.width > 0 && bounds.height > 0;
+	    },
+	
+	    getLabelBounds: function getLabelBounds(rect) {
+	        return rect;
+	    },
+	
+	    getGradientBounds: function getGradientBounds(c, x, y, w, h) {
+	        return new _libRectangle2['default'](x, y, w, h);
+	    },
+	
+	    // 圆弧尺寸
+	    getArcSize: function getArcSize(w, h) {
+	        var f = (0, _commonUtils.getValue)(this.style, constants.STYLE_ARCSIZE, constants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
+	        return Math.min(w * f, h * f);
+	    },
+	
+	    createBoundingBox: function createBoundingBox() {
+	
+	        var bb = this.bounds.clone();
+	
+	        if (this.stencil && (this.direction === constants.DIRECTION_NORTH || this.direction === constants.DIRECTION_SOUTH) || this.isPaintBoundsInverted()) {
+	            bb.rotate90();
+	        }
+	
+	        return bb;
+	    },
+	
+	    updateBoundingBox: function updateBoundingBox() {
+	        if (this.bounds) {
+	            var boundingBox = this.createBoundingBox();
+	
+	            if (boundingBox != null) {
+	                this.augmentBoundingBox(boundingBox);
+	                var rot = this.getShapeRotation();
+	
+	                if (rot != 0) {
+	                    boundingBox = mxUtils.getBoundingBox(boundingBox, rot);
+	                }
+	            }
+	
+	            this.boundingBox = boundingBox;
+	        }
+	    },
+	
+	    augmentBoundingBox: function augmentBoundingBox(bbox) {
+	        if (this.isShadow) {
+	            bbox.width += Math.ceil(constants.SHADOW_OFFSET_X * this.scale);
+	            bbox.height += Math.ceil(constants.SHADOW_OFFSET_Y * this.scale);
+	        }
+	
+	        // Adds strokeWidth
+	        bbox.grow(this.strokeWidth * this.scale / 2);
+	    },
+	
+	    updateTransform: function updateTransform(canvas, x, y, w, h) {
+	
+	        var shape = this;
+	
+	        canvas.scale(shape.scale);
+	        canvas.rotate(shape.getShapeRotation(), shape.flipH, shape.flipV, x + w / 2, y + h / 2);
+	
+	        return shape;
+	    },
+	
+	    createCanvas: function createCanvas() {
+	
+	        var that = this;
+	        var node = that.node;
+	        var canvas = new Canvas2D(node, false);
+	
+	        canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
+	        canvas.pointerEventsValue = that.svgPointerEvents;
+	        canvas.blockImagePointerEvents = false; //mxClient.IS_FF;
+	        canvas.antiAlias = that.antiAlias; // 抗锯齿
+	
+	        var off = that.getScreenOffset();
+	
+	        if (off === 0) {
+	            node.removeAttribute('transform');
+	        } else {
+	            node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
+	        }
+	
+	        if (that.outline) {
+	            canvas.setStrokeWidth(this.strokeWidth);
+	            canvas.setStrokeColor(this.stroke);
+	
+	            if (this.isDashed !== null) {
+	                canvas.setDashed(this.isDashed);
+	            }
+	
+	            canvas.setStrokeWidth = function () {};
+	            canvas.setStrokeColor = function () {};
+	            canvas.setFillColor = function () {};
+	            canvas.setGradient = function () {};
+	            canvas.setDashed = function () {};
+	        }
+	
+	        return canvas;
+	    },
+	
+	    configureCanvas: function configureCanvas(canvas, x, y, w, h) {
+	        var dash;
+	
+	        if (this.style) {
+	            dash = this.style['dashPattern'];
+	        }
+	
+	        canvas.setAlpha(this.opacity / 100);
+	
+	        // Sets alpha, colors and gradients
+	        if (this.isShadow != null) {
+	            canvas.setShadow(this.isShadow);
+	        }
+	
+	        // Dash pattern
+	        if (this.isDashed != null) {
+	            canvas.setDashed(this.isDashed);
+	        }
+	
+	        if (dash != null) {
+	            canvas.setDashPattern(dash);
+	        }
+	
+	        if (this.fill != null && this.fill != constants.NONE && this.gradient && this.gradient != constants.NONE) {
+	            var b = this.getGradientBounds(canvas, x, y, w, h);
+	            canvas.setGradient(this.fill, this.gradient, b.x, b.y, b.width, b.height, this.gradientDirection);
+	        } else {
+	            canvas.setFillColor(this.fill);
+	        }
+	
+	        canvas.setStrokeColor(this.stroke);
+	    },
+	
+	    destroyCanvas: function destroyCanvas(canvas) {
+	
+	        (0, _commonUtils.each)(canvas.gradients, function (gradient) {
+	            gradient.mxRefCount = (gradient.mxRefCount || 0) + 1;
+	        });
+	        this.releaseSvgGradients(this.oldGradients);
+	        this.oldGradients = canvas.gradients;
+	    },
+	
+	    setCursor: function setCursor(cursor) {
+	
+	        var shape = this;
+	        var node = shape.node;
+	
+	        cursor = cursor || '';
+	
+	        shape.cursor = cursor;
+	
+	        if (node) {
+	            node.style.cursor = cursor;
+	        }
+	
+	        return shape;
+	    },
+	
+	    getCursor: function getCursor() {
+	        return this.cursor;
+	    },
+	
+	    getRotation: function getRotation() {
+	        var rotation = this.rotation;
+	        return isNullOrUndefined(rotation) ? 0 : rotation;
+	    },
+	
+	    getTextRotation: function getTextRotation() {
+	        var rot = this.getRotation();
+	
+	        if ((0, _commonUtils.getValue)(this.style, constants.STYLE_HORIZONTAL, 1) !== 1) {
+	            //rot += mxText.prototype.verticalTextRotation;
+	            rot += -90;
+	        }
+	
+	        return rot;
+	    },
+	
+	    getShapeRotation: function getShapeRotation() {
+	        var rot = this.getRotation();
+	
+	        if (this.direction) {
+	            if (this.direction === constants.DIRECTION_NORTH) {
+	                rot += 270;
+	            } else if (this.direction === constants.DIRECTION_WEST) {
+	                rot += 180;
+	            } else if (this.direction === constants.DIRECTION_SOUTH) {
+	                rot += 90;
+	            }
+	        }
+	
+	        return rot;
+	    },
+	
+	    createTransparentSvgRectangle: function createTransparentSvgRectangle(x, y, w, h) {
+	        var rect = document.createElementNS(constants.NS_SVG, 'rect');
+	        rect.setAttribute('x', x);
+	        rect.setAttribute('y', y);
+	        rect.setAttribute('width', w);
+	        rect.setAttribute('height', h);
+	        rect.setAttribute('fill', 'none');
+	        rect.setAttribute('stroke', 'none');
+	        rect.setAttribute('pointer-events', 'all');
+	
+	        return rect;
+	    },
+	
+	    setTransparentBackgroundImage: function setTransparentBackgroundImage(node) {
+	        node.style.backgroundImage = 'url(\'' + mxClient.imageBasePath + '/transparent.gif\')';
+	    },
+	
+	    releaseSvgGradients: function releaseSvgGradients(grads) {
+	        if (grads != null) {
+	            for (var key in grads) {
+	                var gradient = grads[key];
+	                gradient.mxRefCount = (gradient.mxRefCount || 0) - 1;
+	
+	                if (gradient.mxRefCount == 0 && gradient.parentNode != null) {
+	                    gradient.parentNode.removeChild(gradient);
+	                }
+	            }
+	        }
+	    },
+	
+	    isPaintBoundsInverted: function isPaintBoundsInverted() {
+	        return !this.stencil && (this.direction === constants.DIRECTION_NORTH || this.direction === constants.DIRECTION_SOUTH);
+	    },
+	
+	    destroy: function destroy() {
+	        if (this.node) {
+	            mxEvent.release(this.node);
+	
+	            if (this.node.parentNode) {
+	                this.node.parentNode.removeChild(this.node);
+	            }
+	
+	            this.node = null;
+	        }
+	
+	        // Decrements refCount and removes unused
+	        this.releaseSvgGradients(this.oldGradients);
+	        this.oldGradients = null;
+	    }
+	
+	});
+	
+	exports['default'] = Shape;
+	module.exports = exports['default'];
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
 	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
@@ -5465,11 +6210,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// events
 	
-	var _eventsAspect = __webpack_require__(34);
+	var _eventsAspect = __webpack_require__(36);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
 	
-	var _eventsEventNames = __webpack_require__(35);
+	var _eventsEventNames = __webpack_require__(37);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
@@ -5479,15 +6224,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// changes
 	
-	var _changesRootChange = __webpack_require__(36);
+	var _changesRootChange = __webpack_require__(38);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(38);
+	var _changesChildChange = __webpack_require__(40);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesChangeCollection = __webpack_require__(39);
+	var _changesChangeCollection = __webpack_require__(41);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
@@ -5841,7 +6586,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5925,7 +6670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5944,7 +6689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5955,7 +6700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(37);
+	var _Change = __webpack_require__(39);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -5984,7 +6729,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6008,7 +6753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6019,7 +6764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(37);
+	var _Change = __webpack_require__(39);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -6099,7 +6844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6114,7 +6859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _eventsEventNames = __webpack_require__(35);
+	var _eventsEventNames = __webpack_require__(37);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
@@ -6164,722 +6909,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
+/* 42 */
+/***/ function(module, exports) {
 
 	'use strict';
 	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Shape = __webpack_require__(41);
-	
-	var _Shape2 = _interopRequireDefault(_Shape);
-	
-	exports['default'] = _Shape2['default'].extend({
-	    constructor: function Rect(bounds, fill, stroke, strokeWidth) {
-	
-	        var that = this;
-	
-	        Rect.superclass.constructor.call(that);
-	
-	        that.bounds = bounds;
-	        that.fill = fill;
-	        that.stroke = stroke;
-	        that.strokewidth = !(0, _commonUtils.isNullOrUndefined)(strokeWidth) ? strokeWidth : 1;
-	    },
-	
-	    isHtmlAllowed: function isHtmlAllowed() {
-	        var shape = this;
-	        return !shape.isRounded && !shape.glass && shape.rotation === 0;
-	    },
-	
-	    paintBackground: function paintBackground(canvas, x, y, w, h) {
-	
-	        var shape = this;
-	
-	        if (shape.isRounded) {
-	            var f = (0, _commonUtils.getValue)(shape.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-	            var r = Math.min(w * f, h * f);
-	            canvas.rect(x, y, w, h, r, r);
-	        } else {
-	            canvas.rect(x, y, w, h);
-	        }
-	
-	        canvas.fillAndStroke();
-	
-	        return shape;
-	    },
-	
-	    paintForeground: function paintForeground(c, x, y, w, h) {
-	
-	        var shape = this;
-	
-	        if (shape.glass && !shape.outline) {
-	            shape.paintGlassEffect(c, x, y, w, h, shape.getArcSize(w + shape.strokewidth, h + shape.strokewidth));
-	        }
-	
-	        return shape;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	var _libRectangle = __webpack_require__(26);
-	
-	var _libRectangle2 = _interopRequireDefault(_libRectangle);
-	
-	var _enumsStyleNames = __webpack_require__(17);
-	
-	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
-	
-	var Shape = _libBase2['default'].extend({
-	
-	    pointerEvents: true,
-	    svgPointerEvents: 'all',
-	    svgStrokeTolerance: 8,
-	    shapePointerEvents: false,
-	    stencilPointerEvents: false,
-	
-	    scale: 1,
-	    rotation: 0,
-	    opacity: 100, // 透明度
-	    strokeWidth: 1, // 边框宽度
-	    flipH: false, // 水平翻转
-	    flipV: false, // 垂直翻转
-	    visible: true, // 默认可见
-	    outline: false,
-	    antiAlias: true, // 抗锯齿，平滑处理
-	
-	    constructor: function Shape() {
-	
-	        //var that = this;
-	
-	        // props
-	        // -----
-	        // that.node = null;        // 图形的根节点，通常是 g 元素
-	        // that.state = null;
-	        // that.style = null;
-	        // that.points = null;      // 绘制连线需要的点
-	        // that.bounds = null;      // 表示该图形的区域范围
-	        // that.boundingBox = null; // 图形的边框
-	    },
-	
-	    // 根据 state.style 初始化该图形的样式属性
-	    apply: function apply(state) {
-	
-	        var that = this;
-	
-	        that.state = state;
-	        var style = that.style = state.style;
-	
-	        if (style) {
-	            that.fillColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].fillColor, that.fillColor);
-	            that.gradientColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].gradientColor, that.gradientColor);
-	            that.gradientDirection = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].gradientDirection, that.gradientDirection);
-	            that.opacity = (0, _commonUtils.getValue)(style, constants.STYLE_OPACITY, that.opacity);
-	            that.stroke = (0, _commonUtils.getValue)(style, constants.STYLE_STROKECOLOR, that.stroke);
-	            that.strokeWidth = getNumber(style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
-	            that.arrowStrokeWidth = getNumber(style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
-	            that.spacing = (0, _commonUtils.getValue)(style, constants.STYLE_SPACING, that.spacing);
-	            that.startSize = getNumber(style, constants.STYLE_STARTSIZE, that.startSize);
-	            that.endSize = getNumber(style, constants.STYLE_ENDSIZE, that.endSize);
-	            that.startArrow = (0, _commonUtils.getValue)(style, constants.STYLE_STARTARROW, that.startArrow);
-	            that.endArrow = (0, _commonUtils.getValue)(style, constants.STYLE_ENDARROW, that.endArrow);
-	            that.rotation = (0, _commonUtils.getValue)(style, constants.STYLE_ROTATION, that.rotation);
-	            that.direction = (0, _commonUtils.getValue)(style, constants.STYLE_DIRECTION, that.direction);
-	            that.flipH = (0, _commonUtils.getValue)(style, constants.STYLE_FLIPH, 0) === 1;
-	            that.flipV = (0, _commonUtils.getValue)(style, constants.STYLE_FLIPV, 0) === 1;
-	
-	            // Legacy support for stencilFlipH/V
-	            if (that.stencil) {
-	                that.flipH = (0, _commonUtils.getValue)(style, 'stencilFlipH', 0) === 1 || that.flipH;
-	                that.flipV = (0, _commonUtils.getValue)(style, 'stencilFlipV', 0) === 1 || that.flipV;
-	            }
-	
-	            if (that.direction === constants.DIRECTION_NORTH || that.direction === constants.DIRECTION_SOUTH) {
-	                var tmp = that.flipH;
-	                that.flipH = that.flipV;
-	                that.flipV = tmp;
-	            }
-	
-	            that.isShadow = (0, _commonUtils.getValue)(style, constants.STYLE_SHADOW, that.isShadow) === 1;
-	            that.isDashed = (0, _commonUtils.getValue)(style, constants.STYLE_DASHED, that.isDashed) === 1;
-	            that.isRounded = (0, _commonUtils.getValue)(style, constants.STYLE_ROUNDED, that.isRounded) === 1;
-	            that.glass = (0, _commonUtils.getValue)(style, constants.STYLE_GLASS, that.glass) === 1;
-	
-	            if (that.fill === constants.NONE) {
-	                that.fill = null;
-	            }
-	
-	            if (that.gradient === constants.NONE) {
-	                that.gradient = null;
-	            }
-	
-	            if (that.stroke === constants.NONE) {
-	                that.stroke = null;
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    // 创建该图形的根节点
-	    init: function init(container) {
-	
-	        var that = this;
-	        var node = that.node || that.create(container);
-	
-	        if (node && container) {
-	            that.node = node;
-	            container.appendChild(node);
-	        }
-	
-	        return that;
-	    },
-	
-	    create: function create(container) {
-	        if (container && container.ownerSVGElement) {
-	            return (0, _commonUtils.createSvgElement)('g');
-	        }
-	    },
-	
-	    // 删除根节点下所有的子元素
-	    clear: function clear() {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if (node && node.ownerDocument) {
-	            while (node.lastChild) {
-	                node.removeChild(node.lastChild);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    getScreenOffset: function getScreenOffset() {
-	
-	        var that = this;
-	        var strokeWidth = that.strokeWidth;
-	        //var strokeWidth = that.stencil && that.stencil.strokeWidth !== 'inherit'
-	        //    ? that.stencil.strokeWidth
-	        //    : that.strokeWidth;
-	
-	        strokeWidth = Math.max(1, Math.round(strokeWidth * that.scale));
-	
-	        return (0, _commonUtils.mod)(strokeWidth, 2) === 1 ? 0.5 : 0;
-	    },
-	
-	    reconfigure: function reconfigure() {
-	        return this.redraw();
-	    },
-	
-	    redraw: function redraw() {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        that.updateBoundsFromPoints();
-	
-	        if (that.visible && that.checkBounds()) {
-	            node.style.visibility = 'visible';
-	            that.clear(); // 删除根节点下的所有子元素
-	            that.redrawShape();
-	            that.updateBoundingBox();
-	        } else {
-	            node.style.visibility = 'hidden';
-	            that.boundingBox = null;
-	        }
-	
-	        return that;
-	    },
-	
-	    redrawShape: function redrawShape() {
-	
-	        var that = this;
-	        var canvas = that.createCanvas();
-	
-	        if (canvas) {
-	            canvas.pointerEvents = that.pointerEvents;
-	
-	            that.paint(canvas);
-	            that.destroyCanvas(canvas);
-	        }
-	
-	        return that;
-	    },
-	
-	    paint: function paint(canvas) {
-	
-	        var that = this;
-	        var bounds = that.bounds;
-	
-	        // Scale is passed-through to canvas
-	        var scale = that.scale;
-	        var x = bounds.x / scale;
-	        var y = bounds.y / scale;
-	        var w = bounds.width / scale;
-	        var h = bounds.height / scale;
-	
-	        if (that.isPaintBoundsInverted()) {
-	
-	            var t = (w - h) / 2;
-	            x += t;
-	            y -= t;
-	
-	            var tmp = w;
-	            w = h;
-	            h = tmp;
-	        }
-	
-	        that.updateTransform(canvas, x, y, w, h);
-	        that.configureCanvas(canvas, x, y, w, h);
-	
-	        // Adds background rectangle to capture events
-	        var bg = null;
-	
-	        if (!that.stencil && !that.points && that.shapePointerEvents || that.stencil && that.stencilPointerEvents) {
-	
-	            var bb = that.createBoundingBox();
-	
-	            bg = that.createTransparentSvgRectangle(bb.x, bb.y, bb.width, bb.height);
-	            that.node.appendChild(bg);
-	        }
-	
-	        if (that.stencil) {
-	            that.stencil.drawShape(canvas, that, x, y, w, h);
-	        } else {
-	            // Stencils have separate strokeWidth
-	            canvas.setStrokeWidth(that.strokeWidth);
-	
-	            if (that.points) {
-	                var pts = [];
-	                for (var i = 0; i < that.points.length; i++) {
-	                    if (that.points[i]) {
-	                        pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
-	                    }
-	                }
-	
-	                that.paintEdgeShape(canvas, pts);
-	            } else {
-	                that.paintVertexShape(canvas, x, y, w, h);
-	            }
-	        }
-	
-	        if (bg && canvas.state && canvas.state.transform) {
-	            bg.setAttribute('transform', canvas.state.transform);
-	        }
-	    },
-	
-	    paintVertexShape: function paintVertexShape(c, x, y, w, h) {
-	        this.paintBackground(c, x, y, w, h);
-	        c.setShadow(false);
-	        this.paintForeground(c, x, y, w, h);
-	    },
-	
-	    // 绘制 node 背景
-	    paintBackground: function paintBackground(c, x, y, w, h) {},
-	
-	    // 绘制 node 前景
-	    paintForeground: function paintForeground(c, x, y, w, h) {},
-	
-	    paintEdgeShape: function paintEdgeShape(c, pts) {},
-	
-	    paintGlassEffect: function paintGlassEffect(c, x, y, w, h, arc) {
-	        var sw = Math.ceil(this.strokeWidth / 2);
-	        var size = 0.4;
-	
-	        c.setGradient('#ffffff', '#ffffff', x, y, w, h * 0.6, 'south', 0.9, 0.1);
-	        c.begin();
-	        arc += 2 * sw;
-	
-	        if (this.isRounded) {
-	            c.moveTo(x - sw + arc, y - sw);
-	            c.quadTo(x - sw, y - sw, x - sw, y - sw + arc);
-	            c.lineTo(x - sw, y + h * size);
-	            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
-	            c.lineTo(x + w + sw, y - sw + arc);
-	            c.quadTo(x + w + sw, y - sw, x + w + sw - arc, y - sw);
-	        } else {
-	            c.moveTo(x - sw, y - sw);
-	            c.lineTo(x - sw, y + h * size);
-	            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
-	            c.lineTo(x + w + sw, y - sw);
-	        }
-	
-	        c.close();
-	        c.fill();
-	    },
-	
-	    addPoints: function addPoints(c, pts, rounded, arcSize, close) {
-	        var pe = pts[pts.length - 1];
-	
-	        // Adds virtual waypoint in the center between start and end point
-	        if (close && rounded) {
-	            pts = pts.slice();
-	            var p0 = pts[0];
-	            var wp = new Point(pe.x + (p0.x - pe.x) / 2, pe.y + (p0.y - pe.y) / 2);
-	            pts.splice(0, 0, wp);
-	        }
-	
-	        var pt = pts[0];
-	        var i = 1;
-	
-	        // Draws the line segments
-	        c.moveTo(pt.x, pt.y);
-	
-	        while (i < (close ? pts.length : pts.length - 1)) {
-	            var tmp = pts[mxUtils.mod(i, pts.length)];
-	            var dx = pt.x - tmp.x;
-	            var dy = pt.y - tmp.y;
-	
-	            if (rounded && (dx != 0 || dy != 0)) {
-	                // Draws a line from the last point to the current
-	                // point with a spacing of size off the current point
-	                // into direction of the last point
-	                var dist = Math.sqrt(dx * dx + dy * dy);
-	                var nx1 = dx * Math.min(arcSize, dist / 2) / dist;
-	                var ny1 = dy * Math.min(arcSize, dist / 2) / dist;
-	
-	                var x1 = tmp.x + nx1;
-	                var y1 = tmp.y + ny1;
-	                c.lineTo(x1, y1);
-	
-	                // Draws a curve from the last point to the current
-	                // point with a spacing of size off the current point
-	                // into direction of the next point
-	                var next = pts[mxUtils.mod(i + 1, pts.length)];
-	
-	                // Uses next non-overlapping point
-	                while (i < pts.length - 2 && Math.round(next.x - tmp.x) == 0 && Math.round(next.y - tmp.y) == 0) {
-	                    next = pts[mxUtils.mod(i + 2, pts.length)];
-	                    i++;
-	                }
-	
-	                dx = next.x - tmp.x;
-	                dy = next.y - tmp.y;
-	
-	                dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
-	                var nx2 = dx * Math.min(arcSize, dist / 2) / dist;
-	                var ny2 = dy * Math.min(arcSize, dist / 2) / dist;
-	
-	                var x2 = tmp.x + nx2;
-	                var y2 = tmp.y + ny2;
-	
-	                c.quadTo(tmp.x, tmp.y, x2, y2);
-	                tmp = new Point(x2, y2);
-	            } else {
-	                c.lineTo(tmp.x, tmp.y);
-	            }
-	
-	            pt = tmp;
-	            i++;
-	        }
-	
-	        if (close) {
-	            c.close();
-	        } else {
-	            c.lineTo(pe.x, pe.y);
-	        }
-	    },
-	
-	    updateBoundsFromPoints: function updateBoundsFromPoints() {
-	
-	        var that = this;
-	        var bounds;
-	
-	        each(that.points || [], function (point, index) {
-	
-	            var rect = new _libRectangle2['default'](point.x, point.y, 1, 1);
-	
-	            if (index === 0) {
-	                that.bounds = bounds = rect;
-	            } else {
-	                bounds.add(rect);
-	            }
-	        });
-	
-	        return that;
-	    },
-	
-	    checkBounds: function checkBounds() {
-	
-	        var bounds = this.bounds;
-	
-	        return bounds && !isNaN(bounds.x) && !isNaN(bounds.y) && !isNaN(bounds.width) && !isNaN(bounds.height) && bounds.width > 0 && bounds.height > 0;
-	    },
-	
-	    getLabelBounds: function getLabelBounds(rect) {
-	        return rect;
-	    },
-	
-	    getGradientBounds: function getGradientBounds(c, x, y, w, h) {
-	        return new _libRectangle2['default'](x, y, w, h);
-	    },
-	
-	    // 圆弧尺寸
-	    getArcSize: function getArcSize(w, h) {
-	        var f = (0, _commonUtils.getValue)(this.style, constants.STYLE_ARCSIZE, constants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-	        return Math.min(w * f, h * f);
-	    },
-	
-	    createBoundingBox: function createBoundingBox() {
-	
-	        var bb = this.bounds.clone();
-	
-	        if (this.stencil && (this.direction === constants.DIRECTION_NORTH || this.direction === constants.DIRECTION_SOUTH) || this.isPaintBoundsInverted()) {
-	            bb.rotate90();
-	        }
-	
-	        return bb;
-	    },
-	
-	    updateBoundingBox: function updateBoundingBox() {
-	        if (this.bounds != null) {
-	            var bbox = this.createBoundingBox();
-	
-	            if (bbox != null) {
-	                this.augmentBoundingBox(bbox);
-	                var rot = this.getShapeRotation();
-	
-	                if (rot != 0) {
-	                    bbox = mxUtils.getBoundingBox(bbox, rot);
-	                }
-	            }
-	
-	            this.boundingBox = bbox;
-	        }
-	    },
-	
-	    augmentBoundingBox: function augmentBoundingBox(bbox) {
-	        if (this.isShadow) {
-	            bbox.width += Math.ceil(constants.SHADOW_OFFSET_X * this.scale);
-	            bbox.height += Math.ceil(constants.SHADOW_OFFSET_Y * this.scale);
-	        }
-	
-	        // Adds strokeWidth
-	        bbox.grow(this.strokeWidth * this.scale / 2);
-	    },
-	
-	    updateTransform: function updateTransform(canvas, x, y, w, h) {
-	
-	        var shape = this;
-	
-	        canvas.scale(shape.scale);
-	        canvas.rotate(shape.getShapeRotation(), shape.flipH, shape.flipV, x + w / 2, y + h / 2);
-	
-	        return shape;
-	    },
-	
-	    createCanvas: function createCanvas() {
-	
-	        var that = this;
-	        var node = that.node;
-	        var canvas = new Canvas2D(node, false);
-	
-	        canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
-	        canvas.pointerEventsValue = that.svgPointerEvents;
-	        canvas.blockImagePointerEvents = false; //mxClient.IS_FF;
-	        canvas.antiAlias = that.antiAlias; // 抗锯齿
-	
-	        var off = that.getScreenOffset();
-	
-	        if (off === 0) {
-	            node.removeAttribute('transform');
-	        } else {
-	            node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
-	        }
-	
-	        if (that.outline) {
-	            canvas.setStrokeWidth(this.strokeWidth);
-	            canvas.setStrokeColor(this.stroke);
-	
-	            if (this.isDashed !== null) {
-	                canvas.setDashed(this.isDashed);
-	            }
-	
-	            canvas.setStrokeWidth = function () {};
-	            canvas.setStrokeColor = function () {};
-	            canvas.setFillColor = function () {};
-	            canvas.setGradient = function () {};
-	            canvas.setDashed = function () {};
-	        }
-	
-	        return canvas;
-	    },
-	
-	    configureCanvas: function configureCanvas(canvas, x, y, w, h) {
-	        var dash;
-	
-	        if (this.style) {
-	            dash = this.style['dashPattern'];
-	        }
-	
-	        canvas.setAlpha(this.opacity / 100);
-	
-	        // Sets alpha, colors and gradients
-	        if (this.isShadow != null) {
-	            canvas.setShadow(this.isShadow);
-	        }
-	
-	        // Dash pattern
-	        if (this.isDashed != null) {
-	            canvas.setDashed(this.isDashed);
-	        }
-	
-	        if (dash != null) {
-	            canvas.setDashPattern(dash);
-	        }
-	
-	        if (this.fill != null && this.fill != constants.NONE && this.gradient && this.gradient != constants.NONE) {
-	            var b = this.getGradientBounds(canvas, x, y, w, h);
-	            canvas.setGradient(this.fill, this.gradient, b.x, b.y, b.width, b.height, this.gradientDirection);
-	        } else {
-	            canvas.setFillColor(this.fill);
-	        }
-	
-	        canvas.setStrokeColor(this.stroke);
-	    },
-	
-	    destroyCanvas: function destroyCanvas(canvas) {
-	
-	        each(canvas.gradients, function (gradient) {
-	            gradient.mxRefCount = (gradient.mxRefCount || 0) + 1;
-	        });
-	        this.releaseSvgGradients(this.oldGradients);
-	        this.oldGradients = canvas.gradients;
-	    },
-	
-	    setCursor: function setCursor(cursor) {
-	
-	        var shape = this;
-	        var node = shape.node;
-	
-	        cursor = cursor || '';
-	
-	        shape.cursor = cursor;
-	
-	        if (node) {
-	            node.style.cursor = cursor;
-	        }
-	
-	        return shape;
-	    },
-	
-	    getCursor: function getCursor() {
-	        return this.cursor;
-	    },
-	
-	    getRotation: function getRotation() {
-	        var rotation = this.rotation;
-	        return isNullOrUndefined(rotation) ? 0 : rotation;
-	    },
-	
-	    getTextRotation: function getTextRotation() {
-	        var rot = this.getRotation();
-	
-	        if ((0, _commonUtils.getValue)(this.style, constants.STYLE_HORIZONTAL, 1) !== 1) {
-	            //rot += mxText.prototype.verticalTextRotation;
-	            rot += -90;
-	        }
-	
-	        return rot;
-	    },
-	
-	    getShapeRotation: function getShapeRotation() {
-	        var rot = this.getRotation();
-	
-	        if (this.direction) {
-	            if (this.direction === constants.DIRECTION_NORTH) {
-	                rot += 270;
-	            } else if (this.direction === constants.DIRECTION_WEST) {
-	                rot += 180;
-	            } else if (this.direction === constants.DIRECTION_SOUTH) {
-	                rot += 90;
-	            }
-	        }
-	
-	        return rot;
-	    },
-	
-	    createTransparentSvgRectangle: function createTransparentSvgRectangle(x, y, w, h) {
-	        var rect = document.createElementNS(constants.NS_SVG, 'rect');
-	        rect.setAttribute('x', x);
-	        rect.setAttribute('y', y);
-	        rect.setAttribute('width', w);
-	        rect.setAttribute('height', h);
-	        rect.setAttribute('fill', 'none');
-	        rect.setAttribute('stroke', 'none');
-	        rect.setAttribute('pointer-events', 'all');
-	
-	        return rect;
-	    },
-	
-	    setTransparentBackgroundImage: function setTransparentBackgroundImage(node) {
-	        node.style.backgroundImage = 'url(\'' + mxClient.imageBasePath + '/transparent.gif\')';
-	    },
-	
-	    releaseSvgGradients: function releaseSvgGradients(grads) {
-	        if (grads != null) {
-	            for (var key in grads) {
-	                var gradient = grads[key];
-	                gradient.mxRefCount = (gradient.mxRefCount || 0) - 1;
-	
-	                if (gradient.mxRefCount == 0 && gradient.parentNode != null) {
-	                    gradient.parentNode.removeChild(gradient);
-	                }
-	            }
-	        }
-	    },
-	
-	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return !this.stencil && (this.direction === constants.DIRECTION_NORTH || this.direction === constants.DIRECTION_SOUTH);
-	    },
-	
-	    destroy: function destroy() {
-	        if (this.node) {
-	            mxEvent.release(this.node);
-	
-	            if (this.node.parentNode) {
-	                this.node.parentNode.removeChild(this.node);
-	            }
-	
-	            this.node = null;
-	        }
-	
-	        // Decrements refCount and removes unused
-	        this.releaseSvgGradients(this.oldGradients);
-	        this.oldGradients = null;
-	    }
-	
-	});
-	
-	exports['default'] = Shape;
-	module.exports = exports['default'];
+	module.exports = {
+	    north: 'north',
+	    south: 'south',
+	    east: 'east',
+	    west: 'west'
+	};
 
 /***/ }
 /******/ ])

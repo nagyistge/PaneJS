@@ -423,7 +423,7 @@ export default Base.extend({
         var parentState = parent ? that.getState(parent) : null;
 
         if (geo.relative && parentState && !parent.isLink) {
-            var deg = parentState.style[styleNames.ROTATION] || 0;
+            var deg = parentState.style[styleNames.rotation] || 0;
 
             // 绕父元素的中心旋转
             if (deg) {

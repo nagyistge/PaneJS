@@ -36,11 +36,6 @@ var proto = {
     pointerEventsValue: 'all',
     fontMetricsPadding: 10,
     pointerEvents: false,
-    //moveOp: 'M',
-    //lineOp: 'L',
-    //quadOp: 'Q',   // 二次贝塞尔曲线
-    //curveOp: 'C',  // 三次贝塞尔曲线
-    //closeOp: 'Z',
 
     constructor: function Canvas2D(root, styleEnabled) {
 
@@ -110,29 +105,39 @@ var proto = {
             dy: 0,
             scale: 1,
             alpha: 1,
+
+            // 填充
             fillColor: null,
             fillAlpha: 1,
             gradientColor: null,
             gradientAlpha: 1,
             gradientDirection: null,
-            strokeColor: null,
+
+            // 边框
             strokeWidth: 1,
+            strokeColor: null,
             dashed: false,
             dashPattern: '3 3',
             lineCap: 'flat',
             lineJoin: 'miter',
             miterLimit: 10,
+
+            // 字体
             fontColor: '#000000',
             fontBackgroundColor: null,
             fontBorderColor: null,
             fontSize: constants.DEFAULT_FONT_SIZE,
             fontFamily: constants.DEFAULT_FONT_FAMILY,
             fontStyle: 0,
+
+            // 阴影
             shadow: false,
             shadowColor: constants.SHADOW_COLOR,
             shadowAlpha: constants.SHADOW_OPACITY,
             shadowDx: constants.SHADOW_OFFSET_X,
             shadowDy: constants.SHADOW_OFFSET_Y,
+
+            // 旋转
             rotation: 0,
             rotationCx: 0,
             rotationCy: 0
@@ -1277,6 +1282,8 @@ var proto = {
         }
     },
 
+    // stroke
+    // ------
     getCurrentStrokeWidth: function () {
         return Math.max(1, this.format(this.state.strokeWidth * this.state.scale));
     },
@@ -1349,6 +1356,9 @@ var proto = {
 
         return pat.join(' ');
     },
+
+
+    //
 
     createTolerance: function (node) {
         var tol = node.cloneNode(true);
@@ -1487,7 +1497,7 @@ each([
     'fontColor',
     'fontBackgroundColor',
     'fontBorderColor',
-    'setShadowColor'
+    'shadowColor'
 ], function (attr) {
     proto['set' + ucFirst(attr)] = function (value) {
 

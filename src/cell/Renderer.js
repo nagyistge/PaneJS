@@ -3,7 +3,8 @@ import {
 } from '../common/utils';
 
 import Base       from '../lib/Base';
-import styleNames from '../enums/styleNames'
+import styleNames from '../enums/styleNames';
+import Rectangle  from '../lib/Rectangle';
 
 import Rect from '../shapes/Rect';
 
@@ -51,7 +52,7 @@ var Renderer = Base.extend({
         return that;
     },
 
-    createIndicatorShape: function (state) {
+    createIndicator: function (state) {
 
         var that = this;
         var shapeName = state.view.graph.getIndicatorShape(state);
@@ -60,6 +61,10 @@ var Renderer = Base.extend({
 
         return that;
     },
+
+    createCellOverlays: function () {},
+
+    createControl: function () {},
 
     initShape: function (state) {
 
@@ -79,17 +84,20 @@ var Renderer = Base.extend({
         var style = state.style;
 
         shape.apply(state);
-        shape.image = graph.getImage(state);
-        shape.indicatorColor = graph.getIndicatorColor(state);
-        shape.indicatorStrokeColor = style[mxConstants.STYLE_INDICATOR_STROKECOLOR];
-        shape.indicatorGradientColor = graph.getIndicatorGradientColor(state);
-        shape.indicatorDirection = style[mxConstants.STYLE_INDICATOR_DIRECTION];
-        shape.indicatorImage = graph.getIndicatorImage(state);
+        //shape.image = graph.getImage(state);
+        //shape.indicatorColor = graph.getIndicatorColor(state);
+        //shape.indicatorStrokeColor = style[mxConstants.STYLE_INDICATOR_STROKECOLOR];
+        //shape.indicatorGradientColor = graph.getIndicatorGradientColor(state);
+        //shape.indicatorDirection = style[mxConstants.STYLE_INDICATOR_DIRECTION];
+        //shape.indicatorImage = graph.getIndicatorImage(state);
 
         that.postConfigureShape(state);
 
         return that;
     },
+
+    postConfigureShape: function () {},
+    resolveColor: function () {},
 
     redraw: function (state, force, rendering) {
 
@@ -114,14 +122,14 @@ var Renderer = Base.extend({
 
         if (shape) {
             if (!shape.node) {
-                that.createIndicatorShape(state);
+                that.createIndicator(state);
                 that.initShape(state);
                 that.createCellOverlays(state);
                 that.installListeners(state);
             }
 
             // Handles changes of the collapse icon
-            this.createControl(state);
+            that.createControl(state);
 
             // 检查样式是否有更新
             //if (!mxUtils.equalEntries(state.shape.style, state.style)) {
@@ -131,7 +139,7 @@ var Renderer = Base.extend({
 
             // Redraws the cell if required, ignores changes to bounds if points are
             // defined as the bounds are updated for the given points inside the shape
-            if (force || !state.shape.bounds || state.shape.scale != state.view.scale ||
+            if (force || !shape.bounds || shape.scale !== state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
                 (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
                 if (state.absolutePoints) {
@@ -142,12 +150,12 @@ var Renderer = Base.extend({
                     state.shape.bounds = new Rectangle(state.x, state.y, state.width, state.height);
                 }
 
-                state.shape.scale = state.view.scale;
+                shape.scale = state.view.scale;
 
-                if (isNullOrUndefined(rendering) || rendering) {
-                    state.shape.redraw();
+                if (rendering) {
+                    shape.redraw();
                 } else {
-                    state.shape.updateBoundingBox();
+                    shape.updateBoundingBox();
                 }
 
                 shapeChanged = true;
@@ -155,7 +163,9 @@ var Renderer = Base.extend({
         }
 
         return shapeChanged;
-    }
+    },
+
+    installListeners: function () {}
 });
 
 // 注册图形

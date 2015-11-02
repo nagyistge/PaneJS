@@ -1,12 +1,15 @@
 import {
     mod,
+    each,
     getValue,
+    getNumber,
     createSvgElement
 } from '../common/utils';
 
 import Base       from '../lib/Base';
 import Rectangle  from '../lib/Rectangle';
 import styleNames from '../enums/styleNames';
+import directions from '../enums/directions';
 
 var Shape = Base.extend({
 
@@ -41,7 +44,6 @@ var Shape = Base.extend({
         // that.boundingBox = null; // 图形的边框
     },
 
-    // 根据 state.style 初始化该图形的样式属性
     apply: function (state) {
 
         var that = this;
@@ -50,57 +52,54 @@ var Shape = Base.extend({
         var style = that.style = state.style;
 
         if (style) {
+            // 背景
             that.fillColor = getValue(style, styleNames.fillColor, that.fillColor);
             that.gradientColor = getValue(style, styleNames.gradientColor, that.gradientColor);
             that.gradientDirection = getValue(style, styleNames.gradientDirection, that.gradientDirection);
-            that.opacity = getValue(style, constants.STYLE_OPACITY, that.opacity);
-            that.stroke = getValue(style, constants.STYLE_STROKECOLOR, that.stroke);
-            that.strokeWidth = getNumber(style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
-            that.arrowStrokeWidth = getNumber(style, constants.STYLE_STROKEWIDTH, that.strokeWidth);
-            that.spacing = getValue(style, constants.STYLE_SPACING, that.spacing);
-            that.startSize = getNumber(style, constants.STYLE_STARTSIZE, that.startSize);
-            that.endSize = getNumber(style, constants.STYLE_ENDSIZE, that.endSize);
-            that.startArrow = getValue(style, constants.STYLE_STARTARROW, that.startArrow);
-            that.endArrow = getValue(style, constants.STYLE_ENDARROW, that.endArrow);
-            that.rotation = getValue(style, constants.STYLE_ROTATION, that.rotation);
-            that.direction = getValue(style, constants.STYLE_DIRECTION, that.direction);
-            that.flipH = getValue(style, constants.STYLE_FLIPH, 0) === 1;
-            that.flipV = getValue(style, constants.STYLE_FLIPV, 0) === 1;
+            that.opacity = getValue(style, styleNames.opacity, that.opacity);
+            // 边框
+            that.strokeColor = getValue(style, styleNames.strokeColor, that.strokeColor);
+            that.strokeWidth = getNumber(style, styleNames.strokeWidth, that.strokeWidth);
+            that.arrowStrokeWidth = getNumber(style, styleNames.strokeWidth, that.strokeWidth);
+            that.spacing = getValue(style, styleNames.spacing, that.spacing);
+            that.startSize = getNumber(style, styleNames.startSize, that.startSize);
+            that.endSize = getNumber(style, styleNames.endSize, that.endSize);
+            that.startArrow = getValue(style, styleNames.startArrow, that.startArrow);
+            that.endArrow = getValue(style, styleNames.endArrow, that.endArrow);
+            that.rotation = getValue(style, styleNames.rotation, that.rotation);
+            that.direction = getValue(style, styleNames.direction, that.direction);
+            that.flipH = getValue(style, styleNames.flipH, 0) === 1;
+            that.flipV = getValue(style, styleNames.flipV, 0) === 1;
 
-            // Legacy support for stencilFlipH/V
-            if (that.stencil) {
-                that.flipH = getValue(style, 'stencilFlipH', 0) === 1 || that.flipH;
-                that.flipV = getValue(style, 'stencilFlipV', 0) === 1 || that.flipV;
-            }
 
-            if (that.direction === constants.DIRECTION_NORTH || that.direction === constants.DIRECTION_SOUTH) {
+            if (that.direction === directions.north || that.direction === directions.south) {
                 var tmp = that.flipH;
                 that.flipH = that.flipV;
                 that.flipV = tmp;
             }
 
-            that.isShadow = getValue(style, constants.STYLE_SHADOW, that.isShadow) === 1;
-            that.isDashed = getValue(style, constants.STYLE_DASHED, that.isDashed) === 1;
-            that.isRounded = getValue(style, constants.STYLE_ROUNDED, that.isRounded) === 1;
-            that.glass = getValue(style, constants.STYLE_GLASS, that.glass) === 1;
+            that.isShadow = getValue(style, styleNames.shadow, that.isShadow) === 1;
+            that.isDashed = getValue(style, styleNames.dashed, that.isDashed) === 1;
+            that.isRounded = getValue(style, styleNames.rounded, that.isRounded) === 1;
+            that.glass = getValue(style, styleNames.glass, that.glass) === 1;
 
-            if (that.fill === constants.NONE) {
-                that.fill = null;
-            }
 
-            if (that.gradient === constants.NONE) {
-                that.gradient = null;
-            }
-
-            if (that.stroke === constants.NONE) {
-                that.stroke = null;
-            }
+            //if (that.fillColor === constants.NONE) {
+            //    that.fillColor = null;
+            //}
+            //
+            //if (that.gradientColor === constants.NONE) {
+            //    that.gradientColor = null;
+            //}
+            //
+            //if (that.strokeColor === constants.NONE) {
+            //    that.strokeColor = null;
+            //}
         }
 
         return that;
     },
 
-    // 创建该图形的根节点
     init: function (container) {
 
         var that = this;
@@ -120,7 +119,6 @@ var Shape = Base.extend({
         }
     },
 
-    // 删除根节点下所有的子元素
     clear: function () {
 
         var that = this;
@@ -148,15 +146,12 @@ var Shape = Base.extend({
         return mod(strokeWidth, 2) === 1 ? 0.5 : 0;
     },
 
-    reconfigure: function () {
-        return this.redraw();
-    },
-
     redraw: function () {
 
         var that = this;
         var node = that.node;
 
+        // 对于连线，需要根据 points 来计算出连线的 bounds
         that.updateBoundsFromPoints();
 
         if (that.visible && that.checkBounds()) {
@@ -180,14 +175,14 @@ var Shape = Base.extend({
         if (canvas) {
             canvas.pointerEvents = that.pointerEvents;
 
-            that.paint(canvas);
+            that.draw(canvas);
             that.destroyCanvas(canvas);
         }
 
         return that;
     },
 
-    paint: function (canvas) {
+    draw: function (canvas) {
 
         var that = this;
         var bounds = that.bounds;
@@ -251,19 +246,19 @@ var Shape = Base.extend({
         }
     },
 
-    paintVertexShape: function (c, x, y, w, h) {
-        this.paintBackground(c, x, y, w, h);
+    drawNode: function (c, x, y, w, h) {
+        this.drawNodeBackground(c, x, y, w, h);
         c.setShadow(false);
-        this.paintForeground(c, x, y, w, h);
+        this.drawNodeForeground(c, x, y, w, h);
     },
 
     // 绘制 node 背景
-    paintBackground: function (c, x, y, w, h) { },
+    drawNodeBackground: function (c, x, y, w, h) { },
 
     // 绘制 node 前景
-    paintForeground: function (c, x, y, w, h) { },
+    drawNodeForeground: function (c, x, y, w, h) { },
 
-    paintEdgeShape: function (c, pts) {},
+    drawLink: function (c, pts) {},
 
     paintGlassEffect: function (c, x, y, w, h, arc) {
         var sw = Math.ceil(this.strokeWidth / 2);
@@ -426,19 +421,19 @@ var Shape = Base.extend({
     },
 
     updateBoundingBox: function () {
-        if (this.bounds != null) {
-            var bbox = this.createBoundingBox();
+        if (this.bounds) {
+            var boundingBox = this.createBoundingBox();
 
-            if (bbox != null) {
-                this.augmentBoundingBox(bbox);
+            if (boundingBox != null) {
+                this.augmentBoundingBox(boundingBox);
                 var rot = this.getShapeRotation();
 
                 if (rot != 0) {
-                    bbox = mxUtils.getBoundingBox(bbox, rot);
+                    boundingBox = mxUtils.getBoundingBox(boundingBox, rot);
                 }
             }
 
-            this.boundingBox = bbox;
+            this.boundingBox = boundingBox;
         }
     },
 

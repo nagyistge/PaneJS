@@ -2,6 +2,17 @@ import { isNullOrUndefined } from './lang';
 
 var NS_SVG = 'http://www.w3.org/2000/svg';
 
+function getBaseUrl() {
+    var href = window.location.href;
+    var hash = href.lastIndexOf('#');
+
+    if (hash > 0) {
+        href = href.substring(0, hash);
+    }
+
+    return href;
+}
+
 function isNode(node, nodeName, attributeName, attributeValue) {
     var ret = node && !isNaN(node.nodeType);
 
@@ -38,6 +49,7 @@ function createSvgElement(tagName, ownerDocument, namespace) {
 }
 
 export {
+    getBaseUrl,
     isNode,
     getCurrentStyle,
     createSvgElement

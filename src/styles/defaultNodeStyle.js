@@ -11,7 +11,7 @@ style[styleNames.perimeter] = rectanglePerimeter;
 style[styleNames.VERTICAL_ALIGN] = alignments.MIDDLE;
 style[styleNames.ALIGN] = alignments.CENTER;
 style[styleNames.fillColor] = '#e3f4ff';
-style[styleNames.STROKE_COLOR] = '#289de9';
+style[styleNames.strokeColor] = '#289de9';
 style[styleNames.FONT_COLOR] = '#774400';
 
 export default style;
