@@ -63,10 +63,10 @@ export default Base.extend({
     close: function () {
 
         var that = this;
-        var paths = that.paths;
 
         that.addOp('Z');
-        that.canvas.node.setAttribute('d', paths.join(' '));
+        that.closed = true;
+        //that.canvas.node.setAttribute('d', paths.join(' '));
 
         return that.canvas; // 链式调用
     }

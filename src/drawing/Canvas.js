@@ -1,5 +1,6 @@
 import {
-    clone
+    clone,
+    toFixed
 } from '../common/utils'
 import Base  from '../lib/Base';
 import Path  from './Path';
@@ -116,14 +117,69 @@ export default Base.extend({
         return that;
     },
 
+    rotate: function (theta, flipH, flipV, cx, cy) {
+
+        var canvas = this;
+        var format = canvas.format;
+
+        if (theta !== 0 || flipH || flipV) {
+
+            var state = canvas.state;
+
+            cx += state.dx;
+            cy += state.dy;
+
+            cx *= state.scale;
+            cy *= state.scale;
+
+            state.transform = state.transform || '';
+
+            // This implementation uses custom scale/translate and built-in rotation
+            // Rotation state is part of the AffineTransform in state.transform
+            if (flipH && flipV) {
+                theta += 180;
+            } else if (flipH !== flipV) {
+                var tx = (flipH) ? cx : 0;
+                var sx = (flipH) ? -1 : 1;
+
+                var ty = (flipV) ? cy : 0;
+                var sy = (flipV) ? -1 : 1;
+
+                state.transform += 'translate(' + format(tx) + ',' + format(ty) + ')' +
+                    'scale(' + format(sx) + ',' + format(sy) + ')' +
+                    'translate(' + format(-tx) + ',' + format(-ty) + ')';
+            }
+
+            if (flipH ? !flipV : flipV) {
+                theta *= -1;
+            }
+
+            if (theta !== 0) {
+                state.transform += 'rotate(' + format(theta) + ',' + format(cx) + ',' + format(cy) + ')';
+            }
+
+            state.rotation = state.rotation + theta;
+            state.rotationCx = cx;
+            state.rotationCy = cy;
+        }
+    },
+
+    format: function (value) {
+        return this.antiAlias ? toFixed(value, 2) : Math.round(parseFloat(value));
+    },
+
     // Draw
     // ----
 
     drawPath: function () {
 
         var that = this;
+        var path = new Path(that);
+
         that.node = canvas.createElement('path');
-        return new Path(that);
+        that.path = path;
+
+        return path;
     },
 
     drawRect: function (x, y, w, h, dx, dy) {
@@ -195,6 +251,11 @@ export default Base.extend({
 
         if (node) {
 
+            var path = that.path;
+            if (path) {
+
+            }
+
             // fill
             if (state.fillColor && state.gradientColor) {
                 new LinearGradientBrush(that).fill(filled);
@@ -212,14 +273,62 @@ export default Base.extend({
             }
 
             // shadow
+            if (state.shadow) {
+                root.appendChild(that.createShadow(node));
+            }
 
             // strokeTolerance
+            filled = filled && state.fillColor ? true : false;
+            if (that.strokeTolerance > 0 && !filled) {
+                root.appendChild(that.createTolerance(node));
+            }
 
             // pointer events
+            if (that.pointerEvents && (!path || path.closed)) {
+                node.setAttribute('pointer-events', that.pointerEventsValue);
+            } else if (!that.pointerEvents && !that.originalRoot) {
+                node.setAttribute('pointer-events', 'none');
+            }
 
             root.appendChild(node);
         }
 
         return that;
+    },
+
+    createShadow: function (node) {
+
+        var that = this;
+        var state = that.state;
+        var shadow = node.cloneNode(true);
+
+        if (shadow.getAttribute('fill') !== 'none') {
+            shadow.setAttribute('fill', state.shadowColor);
+        }
+
+        if (shadow.getAttribute('stroke') !== 'none') {
+            shadow.setAttribute('stroke', state.shadowColor);
+        }
+
+        shadow.setAttribute('transform', 'translate(' + that.format(state.shadowDx * state.scale) +
+            ',' + this.format(state.shadowDy * state.scale) + ')' + (state.transform || ''));
+        shadow.setAttribute('opacity', state.shadowAlpha);
+
+        return shadow;
+    },
+
+    createTolerance: function (node) {
+
+        var ele = node.cloneNode(true);
+        var sw = parseFloat(ele.getAttribute('stroke-width') || 1) + this.strokeTolerance;
+        ele.setAttribute('pointer-events', 'stroke');
+        ele.setAttribute('visibility', 'hidden');
+        ele.setAttribute('stroke-width', sw);
+        ele.setAttribute('fill', 'none');
+        ele.setAttribute('stroke', 'white');
+        ele.removeAttribute('stroke-dasharray');
+
+
+        return ele;
     }
 });
