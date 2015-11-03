@@ -49,23 +49,37 @@ module.exports = {
         shadowColor: 'gray',
         shadowOpacity: 1,
         shadowDx: 2,
-        shadowDy: 3
+        shadowDy: 3,
+
+        // label
+        labelShape: 'label',
+        labelWidth: 0,
+        labelSpacing: 2, // [2, 2, 2, 2]
+        labelPosition: '',
+        labelVerticalPosition: '',
+        labelBorderColor: '',
+        labelBackgroundColor: '',
+        labelPadding: '',
+        whiteSpace: 'wrap',
+        overflow: 'hidden',
+
+        glass: false,
+        flipH: false,       // 水平翻转
+        flipV: false,       // 垂直翻转
+        visible: true,      // 默认可见
+        outline: false,
+        antiAlias: true
     },
 
     // 节点
     node: {
         shape: 'rectangle',
-        round: 0.1, // 圆角大小的百分比（0-1）
+        round: 0, // 圆角大小的百分比（0-1）
     },
 
     // 连线
     link: {
         shape: 'connector',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
-    },
-
-    label: {
-        shape: 'text',
-        spacing: 2, // [2, 2, 2, 2]
     }
 };

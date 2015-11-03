@@ -7,6 +7,7 @@ import styleNames from '../enums/styleNames';
 import Rectangle  from '../lib/Rectangle';
 
 import Rect from '../shapes/Rect';
+import Label from '../shapes/Label';
 
 var Renderer = Base.extend({
 
@@ -22,13 +23,28 @@ var Renderer = Base.extend({
 
     defaultNodeShape: Rect,
     defaultLinkShape: null,
-    defaultTextShape: null,
+    defaultLabelShape: Label,
     antiAlias: true,         // 是否绘制平滑的图形（抗锯齿）
 
     constructor: function Renderer() {},
 
     getShape: function (shapeName) {
         return shapeName ? Renderer.getShape(shapeName) : null;
+    },
+
+    getLabelBounds: function (state) {
+        var graph = state.view.graph;
+        var scale = state.view.scale;
+        var isLink = state.cell.isLink;
+        var bounds = new Rectangle(state.absoluteOffset.x, state.absoluteOffset.y);
+
+        if (isLink) {
+
+        } else {
+
+        }
+
+        return bounds;
     },
 
     // 在 view.createState() 方法中调用
@@ -38,7 +54,7 @@ var Renderer = Base.extend({
 
         if (state.style) {
 
-            var shapeName = state.style[styleNames.shape];
+            var shapeName = state.style.shape;
             var Constructor = that.getShape(shapeName);
 
             if (!Constructor) {
@@ -52,16 +68,27 @@ var Renderer = Base.extend({
         return that;
     },
 
-    createLabel: function (state, value) {
+    createLabel: function (state, text) {
+
+        var that = this;
+
+        if (state.style) {
+            var shapeName = state.style.labelShape;
+            var Constructor = that.getShape(shapeName) || that.defaultLabelShape;
+
+            state.label = new Constructor(state);
+        }
+
+
         var graph = state.view.graph;
         var style = state.style;
         var isEdge = graph.getModel().isEdge(state.cell);
 
         if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
             // Avoids using DOM node for empty labels
-            var isForceHtml = (graph.isHtmlLabel(state.cell) || (value != null && mxUtils.isNode(value)));
+            var isForceHtml = (graph.isHtmlLabel(state.cell) || (text != null && mxUtils.isNode(text)));
 
-            state.text = new this.defaultTextShape(value, new mxRectangle(),
+            state.text = new this.defaultTextShape(text, new mxRectangle(),
                 (state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER),
                 graph.getVerticalAlign(state),
                 state.style[mxConstants.STYLE_FONTCOLOR],
@@ -175,7 +202,7 @@ var Renderer = Base.extend({
     },
 
     initLabel: function (state) {
-
+        state.label.init(state.view.drawPane);
     },
 
     configureShape: function (state) {
@@ -281,12 +308,19 @@ var Renderer = Base.extend({
         var that = this;
         var text = state.view.graph.getLabelText(state.cell);
 
-        if (!state.text && text) {
+        if (!state.label && text) {
             that.createLabel(state, text);
+        } else if (state.label && !text) {
+            state.label.destroy();
+            state.label = null;
         }
 
-        if (state.text) {
+        if (state.label) {
 
+            var label = state.label;
+            if (forced || label.text !== text) {
+
+            }
         }
     },
 
@@ -297,5 +331,6 @@ var Renderer = Base.extend({
 var registerShape = Renderer.registerShape;
 
 registerShape('rectangle', Rect);
+registerShape('label', Label);
 
 export default Renderer;

@@ -488,24 +488,24 @@ export default Base.extend({
         var stateWidth = state.width;
         var stateHeight = state.height;
         var labelOffset = state.absoluteOffset;
-        var labelWidth = getValue(style, styleNames.LABEL_WIDTH, 0);
-        var hAlign = getValue(style, styleNames.LABEL_POSITION, alignments.CENTER);
-        var vAlign = getValue(style, styleNames.VERTICAL_LABEL_POSITION, alignments.MIDDLE);
+        var labelWidth = style.labelWidth || 0;
+        var hPosition = style.labelPosition || 'center';
+        var vPosition = style.labelVerticalPosition || 'middle';
 
         // label 在水平方向上的位置
-        if (hAlign === 'left') {          // 左外侧
+        if (hPosition === 'left') {          // 左外侧
             if (labelWidth) {
                 labelWidth *= scale;
             } else {
                 labelWidth = stateWidth;
             }
             labelOffset.x -= labelWidth;
-        } else if (hAlign === 'right') {  // 右外侧
+        } else if (hPosition === 'right') {  // 右外侧
             labelOffset.x += stateWidth;
         } else {
             // 水平居中时，还要根据 cell 的对齐方式来确定 label 的位置
             if (labelWidth) {
-                var cellAlign = getValue(style, styleNames.ALIGN, alignments.CENTER);
+                var cellAlign = style.align || 'center';
                 var dx = 0;
 
                 if (cellAlign === 'center') {
@@ -521,10 +521,10 @@ export default Base.extend({
         }
 
         // label 在垂直方向上的位置
-        if (vAlign === 'top') {
+        if (vPosition === 'top') {
             labelOffset.y -= stateHeight;
         }
-        else if (vAlign === 'bottom') {
+        else if (vPosition === 'bottom') {
             labelOffset.y += stateHeight;
         }
 

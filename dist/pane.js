@@ -4598,12 +4598,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var stateWidth = state.width;
 	        var stateHeight = state.height;
 	        var labelOffset = state.absoluteOffset;
-	        var labelWidth = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].LABEL_WIDTH, 0);
-	        var hAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].LABEL_POSITION, _enumsAlignments2['default'].CENTER);
-	        var vAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].VERTICAL_LABEL_POSITION, _enumsAlignments2['default'].MIDDLE);
+	        var labelWidth = style.labelWidth || 0;
+	        var hPosition = style.labelPosition || 'center';
+	        var vPosition = style.labelVerticalPosition || 'middle';
 	
 	        // label 在水平方向上的位置
-	        if (hAlign === 'left') {
+	        if (hPosition === 'left') {
 	            // 左外侧
 	            if (labelWidth) {
 	                labelWidth *= scale;
@@ -4611,13 +4611,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                labelWidth = stateWidth;
 	            }
 	            labelOffset.x -= labelWidth;
-	        } else if (hAlign === 'right') {
+	        } else if (hPosition === 'right') {
 	            // 右外侧
 	            labelOffset.x += stateWidth;
 	        } else {
 	            // 水平居中时，还要根据 cell 的对齐方式来确定 label 的位置
 	            if (labelWidth) {
-	                var cellAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].ALIGN, _enumsAlignments2['default'].CENTER);
+	                var cellAlign = style.align || 'center';
 	                var dx = 0;
 	
 	                if (cellAlign === 'center') {
@@ -4633,9 +4633,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // label 在垂直方向上的位置
-	        if (vAlign === 'top') {
+	        if (vPosition === 'top') {
 	            labelOffset.y -= stateHeight;
-	        } else if (vAlign === 'bottom') {
+	        } else if (vPosition === 'bottom') {
 	            labelOffset.y += stateHeight;
 	        }
 	
@@ -5311,6 +5311,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _shapesRect2 = _interopRequireDefault(_shapesRect);
 	
+	var _shapesLabel = __webpack_require__(50);
+	
+	var _shapesLabel2 = _interopRequireDefault(_shapesLabel);
+	
 	var Renderer = _libBase2['default'].extend({
 	
 	    Statics: {
@@ -5325,13 +5329,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    defaultNodeShape: _shapesRect2['default'],
 	    defaultLinkShape: null,
-	    defaultTextShape: null,
+	    defaultLabelShape: _shapesLabel2['default'],
 	    antiAlias: true, // 是否绘制平滑的图形（抗锯齿）
 	
 	    constructor: function Renderer() {},
 	
 	    getShape: function getShape(shapeName) {
 	        return shapeName ? Renderer.getShape(shapeName) : null;
+	    },
+	
+	    getLabelBounds: function getLabelBounds(state) {
+	        var graph = state.view.graph;
+	        var scale = state.view.scale;
+	        var isLink = state.cell.isLink;
+	        var bounds = new _libRectangle2['default'](state.absoluteOffset.x, state.absoluteOffset.y);
+	
+	        if (isLink) {} else {}
+	
+	        return bounds;
 	    },
 	
 	    // 在 view.createState() 方法中调用
@@ -5341,7 +5356,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (state.style) {
 	
-	            var shapeName = state.style[_enumsStyleNames2['default'].shape];
+	            var shapeName = state.style.shape;
 	            var Constructor = that.getShape(shapeName);
 	
 	            if (!Constructor) {
@@ -5355,16 +5370,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    createLabel: function createLabel(state, value) {
+	    createLabel: function createLabel(state, text) {
+	
+	        var that = this;
+	
+	        if (state.style) {
+	            var shapeName = state.style.labelShape;
+	            var Constructor = that.getShape(shapeName) || that.defaultLabelShape;
+	
+	            state.label = new Constructor(state);
+	        }
+	
 	        var graph = state.view.graph;
 	        var style = state.style;
 	        var isEdge = graph.getModel().isEdge(state.cell);
 	
 	        if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
 	            // Avoids using DOM node for empty labels
-	            var isForceHtml = graph.isHtmlLabel(state.cell) || value != null && mxUtils.isNode(value);
+	            var isForceHtml = graph.isHtmlLabel(state.cell) || text != null && mxUtils.isNode(text);
 	
-	            state.text = new this.defaultTextShape(value, new mxRectangle(), state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER, graph.getVerticalAlign(state), state.style[mxConstants.STYLE_FONTCOLOR], state.style[mxConstants.STYLE_FONTFAMILY], state.style[mxConstants.STYLE_FONTSIZE], state.style[mxConstants.STYLE_FONTSTYLE], state.style[mxConstants.STYLE_SPACING], state.style[mxConstants.STYLE_SPACING_TOP], state.style[mxConstants.STYLE_SPACING_RIGHT], state.style[mxConstants.STYLE_SPACING_BOTTOM], state.style[mxConstants.STYLE_SPACING_LEFT], state.style[mxConstants.STYLE_HORIZONTAL], state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR], state.style[mxConstants.STYLE_LABEL_BORDERCOLOR], graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell), graph.isLabelClipped(state.cell), state.style[mxConstants.STYLE_OVERFLOW], state.style[mxConstants.STYLE_LABEL_PADDING]);
+	            state.text = new this.defaultTextShape(text, new mxRectangle(), state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER, graph.getVerticalAlign(state), state.style[mxConstants.STYLE_FONTCOLOR], state.style[mxConstants.STYLE_FONTFAMILY], state.style[mxConstants.STYLE_FONTSIZE], state.style[mxConstants.STYLE_FONTSTYLE], state.style[mxConstants.STYLE_SPACING], state.style[mxConstants.STYLE_SPACING_TOP], state.style[mxConstants.STYLE_SPACING_RIGHT], state.style[mxConstants.STYLE_SPACING_BOTTOM], state.style[mxConstants.STYLE_SPACING_LEFT], state.style[mxConstants.STYLE_HORIZONTAL], state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR], state.style[mxConstants.STYLE_LABEL_BORDERCOLOR], graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell), graph.isLabelClipped(state.cell), state.style[mxConstants.STYLE_OVERFLOW], state.style[mxConstants.STYLE_LABEL_PADDING]);
 	
 	            state.text.opacity = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_OPACITY, 100);
 	            state.text.dialect = isForceHtml ? mxConstants.DIALECT_STRICTHTML : state.view.graph.dialect;
@@ -5451,7 +5476,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    initLabel: function initLabel(state) {},
+	    initLabel: function initLabel(state) {
+	        state.label.init(state.view.drawPane);
+	    },
 	
 	    configureShape: function configureShape(state) {
 	
@@ -5553,11 +5580,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var text = state.view.graph.getLabelText(state.cell);
 	
-	        if (!state.text && text) {
+	        if (!state.label && text) {
 	            that.createLabel(state, text);
+	        } else if (state.label && !text) {
+	            state.label.destroy();
+	            state.label = null;
 	        }
 	
-	        if (state.text) {}
+	        if (state.label) {
+	
+	            var label = state.label;
+	            if (forced || label.text !== text) {}
+	        }
 	    },
 	
 	    installListeners: function installListeners() {}
@@ -5567,6 +5601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var registerShape = Renderer.registerShape;
 	
 	registerShape('rectangle', _shapesRect2['default']);
+	registerShape('label', _shapesLabel2['default']);
 	
 	exports['default'] = Renderer;
 	module.exports = exports['default'];
@@ -5696,7 +5731,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    constructor: function Shape(state) {
 	
 	        this.state = state;
-	        //var that = this;
 	
 	        // props
 	        // -----
@@ -7883,26 +7917,110 @@ return /******/ (function(modules) { // webpackBootstrap
 	        shadowColor: 'gray',
 	        shadowOpacity: 1,
 	        shadowDx: 2,
-	        shadowDy: 3
+	        shadowDy: 3,
+	
+	        // label
+	        labelShape: 'label',
+	        labelWidth: 0,
+	        labelSpacing: 2, // [2, 2, 2, 2]
+	        labelPosition: '',
+	        labelVerticalPosition: '',
+	        labelBorderColor: '',
+	        labelBackgroundColor: '',
+	        labelPadding: '',
+	        whiteSpace: 'wrap',
+	        overflow: 'hidden',
+	
+	        glass: false,
+	        flipH: false, // 水平翻转
+	        flipV: false, // 垂直翻转
+	        visible: true, // 默认可见
+	        outline: false,
+	        antiAlias: true
 	    },
 	
 	    // 节点
 	    node: {
 	        shape: 'rectangle',
-	        round: 0.1 },
+	        round: 0 },
 	
 	    // 圆角大小的百分比（0-1）
 	    // 连线
 	    link: {
 	        shape: 'connector',
-	        endArrow: 'classic' },
-	
-	    // classic, block, open, oval, diamond, diamondThin
-	    label: {
-	        shape: 'text',
-	        spacing: 2 }
+	        endArrow: 'classic' }
 	};
-	// [2, 2, 2, 2]
+	// classic, block, open, oval, diamond, diamondThin
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Shape = __webpack_require__(34);
+	
+	var _Shape2 = _interopRequireDefault(_Shape);
+	
+	exports['default'] = _Shape2['default'].extend({
+	    constructor: function Text(state) {
+	
+	        var that = this;
+	
+	        Text.superclass.constructor.call(that, state);
+	
+	        //that.bounds = bounds;
+	        //that.fill = fill;
+	        //that.stroke = stroke;
+	        //that.strokeWidth = !isNullOrUndefined(strokeWidth) ? strokeWidth : 1;
+	    },
+	
+	    isHtmlAllowed: function isHtmlAllowed() {
+	        var shape = this;
+	        return !shape.isRounded && !shape.glass && shape.rotation === 0;
+	    },
+	
+	    getScreenOffset: function getScreenOffset() {
+	        return 0;
+	    },
+	
+	    drawNodeBackground: function drawNodeBackground(canvas, x, y, w, h) {
+	
+	        var that = this;
+	        var style = that.style;
+	
+	        if (style.round) {
+	            var r = Math.min(w, h) * style.round;
+	            canvas.drawRect(x, y, w, h, r, r);
+	        } else {
+	            canvas.drawRect(x, y, w, h);
+	        }
+	
+	        canvas.addNode(true, true);
+	
+	        return that;
+	    },
+	
+	    drawNodeForeground: function drawNodeForeground(c, x, y, w, h) {
+	
+	        var that = this;
+	
+	        if (that.glass && !that.outline) {
+	            that.paintGlassEffect(c, x, y, w, h, that.getArcSize(w + that.strokewidth, h + that.strokewidth));
+	        }
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

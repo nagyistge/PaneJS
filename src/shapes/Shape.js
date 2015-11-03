@@ -36,7 +36,6 @@ var Shape = Base.extend({
     constructor: function Shape(state) {
 
         this.state = state;
-        //var that = this;
 
         // props
         // -----
