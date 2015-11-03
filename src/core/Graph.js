@@ -1066,6 +1066,9 @@ export default Class.create({
 
         return result;
     },
+    getLabelText: function (cell) {
+        return cell.value;
+    },
     isHtmlLabel: function () {
         return this.isHtmlLabels();
     },

@@ -55,11 +55,17 @@ module.exports = {
     // 节点
     node: {
         shape: 'rectangle',
+        round: 0.1, // 圆角大小的百分比（0-1）
     },
 
     // 连线
     link: {
         shape: 'connector',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
+    },
+
+    label: {
+        shape: 'text',
+        spacing: 2, // [2, 2, 2, 2]
     }
 };

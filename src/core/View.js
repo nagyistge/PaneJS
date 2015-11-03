@@ -715,15 +715,12 @@ export default Base.extend({
         var that = this;
         var graph = that.graph;
 
-
-
-
         // TODO: that.currentRoot
 
-        var state = new State(this, cell, this.graph.getCellStyle(cell));
+        var state = new State(that, cell, graph.getCellStyle(cell));
 
         if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
-            this.renderer.createShape(state);
+            that.renderer.createShape(state);
         }
 
         return state;

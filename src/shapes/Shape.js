@@ -33,8 +33,9 @@ var Shape = Base.extend({
     antiAlias: true,    // 抗锯齿，平滑处理
 
 
-    constructor: function Shape() {
+    constructor: function Shape(state) {
 
+        this.state = state;
         //var that = this;
 
         // props
@@ -141,10 +142,7 @@ var Shape = Base.extend({
     getScreenOffset: function () {
 
         var that = this;
-        var strokeWidth = that.strokeWidth;
-        //var strokeWidth = that.stencil && that.stencil.strokeWidth !== 'inherit'
-        //    ? that.stencil.strokeWidth
-        //    : that.strokeWidth;
+        var strokeWidth = that.style.strokeWidth;
 
         strokeWidth = Math.max(1, Math.round(strokeWidth * that.scale));
 
@@ -233,6 +231,7 @@ var Shape = Base.extend({
             canvas.setStrokeWidth(that.strokeWidth);
 
             if (that.points) {
+
                 var pts = [];
                 for (var i = 0; i < that.points.length; i++) {
                     if (that.points[i]) {
@@ -241,8 +240,11 @@ var Shape = Base.extend({
                 }
 
                 that.drawLink(canvas, pts);
+
             } else {
+
                 that.drawNode(canvas, x, y, w, h);
+
             }
         }
 
@@ -481,25 +483,29 @@ var Shape = Base.extend({
             node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
         }
 
-        if (that.outline) {
-            canvas.setStrokeWidth(this.strokeWidth);
-            canvas.setStrokeColor(this.stroke);
-
-            if (this.isDashed !== null) {
-                canvas.setDashed(this.isDashed);
-            }
-
-            canvas.setStrokeWidth = function () {};
-            canvas.setStrokeColor = function () {};
-            canvas.setFillColor = function () {};
-            canvas.setGradient = function () {};
-            canvas.setDashed = function () {};
-        }
+        //if (that.outline) {
+        //    canvas.setStrokeWidth(this.strokeWidth);
+        //    canvas.setStrokeColor(this.stroke);
+        //
+        //    if (this.isDashed !== null) {
+        //        canvas.setDashed(this.isDashed);
+        //    }
+        //
+        //    canvas.setStrokeWidth = function () {};
+        //    canvas.setStrokeColor = function () {};
+        //    canvas.setFillColor = function () {};
+        //    canvas.setGradient = function () {};
+        //    canvas.setDashed = function () {};
+        //}
 
         return canvas;
     },
 
     configureCanvas: function (canvas, x, y, w, h) {
+
+        canvas.state = this.style;
+        return;
+
         var dash;
 
         if (this.style) {

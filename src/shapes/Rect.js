@@ -6,13 +6,13 @@ import {
 import Shape from './Shape';
 
 export default Shape.extend({
-    constructor: function Rect(bounds) {
+    constructor: function Rect(state) {
 
         var that = this;
 
-        Rect.superclass.constructor.call(that);
+        Rect.superclass.constructor.call(that, state);
 
-        that.bounds = bounds;
+        //that.bounds = bounds;
         //that.fill = fill;
         //that.stroke = stroke;
         //that.strokeWidth = !isNullOrUndefined(strokeWidth) ? strokeWidth : 1;
@@ -26,10 +26,10 @@ export default Shape.extend({
     drawNodeBackground: function (canvas, x, y, w, h) {
 
         var that = this;
+        var style = that.style;
 
-        if (that.isRounded) {
-            var f = getValue(that.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-            var r = Math.min(w * f, h * f);
+        if (style.round) {
+            var r = Math.min(w, h) * style.round;
             canvas.drawRect(x, y, w, h, r, r);
         } else {
             canvas.drawRect(x, y, w, h);
