@@ -23,7 +23,7 @@ var Renderer = Base.extend({
     defaultNodeShape: Rect,
     defaultLinkShape: null,
     defaultTextShape: null,
-    antiAlias: true,
+    antiAlias: true,         // 是否绘制平滑的图形（抗锯齿）
 
     constructor: function Renderer() {},
 
@@ -97,6 +97,7 @@ var Renderer = Base.extend({
     },
 
     postConfigureShape: function () {},
+
     resolveColor: function () {},
 
     redraw: function (state, force, rendering) {
@@ -142,11 +143,15 @@ var Renderer = Base.extend({
             if (force || !shape.bounds || shape.scale !== state.view.scale ||
                 (state.absolutePoints == null && !state.shape.bounds.equals(state)) ||
                 (state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints))) {
+
                 if (state.absolutePoints) {
+                    // 绘制连线
                     state.shape.points = state.absolutePoints.slice();
                     state.shape.bounds = null;
                 } else {
+                    // 绘制节点
                     state.shape.points = null;
+                    // 初始化节点的 bounds
                     state.shape.bounds = new Rectangle(state.x, state.y, state.width, state.height);
                 }
 

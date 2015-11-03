@@ -423,7 +423,7 @@ export default Base.extend({
         var parentState = parent ? that.getState(parent) : null;
 
         if (geo.relative && parentState && !parent.isLink) {
-            var deg = parentState.style[styleNames.rotation] || 0;
+            var deg = parentState.style.rotation || 0;
 
             // 绕父元素的中心旋转
             if (deg) {
@@ -493,14 +493,14 @@ export default Base.extend({
         var vAlign = getValue(style, styleNames.VERTICAL_LABEL_POSITION, alignments.MIDDLE);
 
         // label 在水平方向上的位置
-        if (hAlign === alignments.LEFT) {          // 左外侧
+        if (hAlign === 'left') {          // 左外侧
             if (labelWidth) {
                 labelWidth *= scale;
             } else {
                 labelWidth = stateWidth;
             }
             labelOffset.x -= labelWidth;
-        } else if (hAlign === alignments.RIGHT) {  // 右外侧
+        } else if (hAlign === 'right') {  // 右外侧
             labelOffset.x += stateWidth;
         } else {
             // 水平居中时，还要根据 cell 的对齐方式来确定 label 的位置
@@ -508,9 +508,9 @@ export default Base.extend({
                 var cellAlign = getValue(style, styleNames.ALIGN, alignments.CENTER);
                 var dx = 0;
 
-                if (cellAlign === alignments.CENTER) {
+                if (cellAlign === 'center') {
                     dx = 0.5;
-                } else if (cellAlign === alignments.RIGHT) {
+                } else if (cellAlign === 'right') {
                     dx = 1;
                 }
 
@@ -521,10 +521,10 @@ export default Base.extend({
         }
 
         // label 在垂直方向上的位置
-        if (vAlign === alignments.TOP) {
+        if (vAlign === 'top') {
             labelOffset.y -= stateHeight;
         }
-        else if (vAlign === alignments.BOTTOM) {
+        else if (vAlign === 'bottom') {
             labelOffset.y += stateHeight;
         }
 
@@ -714,6 +714,9 @@ export default Base.extend({
 
         var that = this;
         var graph = that.graph;
+
+
+
 
         // TODO: that.currentRoot
 

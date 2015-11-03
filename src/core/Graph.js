@@ -484,22 +484,18 @@ export default Class.create({
     // Cell styles
     // -----------
     getCellStyle: function (cell) {
-
+        return this.processCellStyle(cell, cell.style);
+    },
+    processCellStyle: function (cell, style) {
         var that = this;
-        var style = cell.style;
-        var stylesheet = that.stylesheet;
         var defaultStyle = cell.isLink
-            ? stylesheet.getDefaultLinkStyle() : cell.isNode
-            ? stylesheet.getDefaultNodeStyle()
+            ? that.stylesheet.getDefaultLinkStyle() : cell.isNode
+            ? that.stylesheet.getDefaultNodeStyle()
             : null;
 
-        style = extend({}, style, defaultStyle);
+        return extend({}, defaultStyle, style);
 
-        that.postProcessCellStyle(style);
-
-        return style;
     },
-    postProcessCellStyle: function (style) {},
     setCellStyle: function (style, cells) {
         cells = cells || this.getSelectionCells();
 

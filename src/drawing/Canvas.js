@@ -1,6 +1,9 @@
 import {
+    each,
     clone,
-    toFixed
+    ucFirst,
+    toFixed,
+    createSvgElement
 } from '../common/utils'
 import Base  from '../lib/Base';
 import Path  from './Path';
@@ -8,9 +11,57 @@ import Pen   from './Pen';
 import SolidBrush          from './SolidBrush';
 import LinearGradientBrush from './LinearGradientBrush';
 
+// 属性访问器
+var accessor = {};
+each([
+    'alpha',
+
+    'fillColor',
+    'fillAlpha',
+    'gradientColor',
+    'gradientAlpha',
+    'gradientDirection',
+
+    'strokeWidth',
+    'strokeColor',
+    'dashed',
+    'dashPattern',
+    'dashOffset',
+    'lineCap',
+    'lineJoin',
+    'miterLimit',
+
+    'fontColor',
+    'fontBackgroundColor',
+    'fontBorderColor',
+    'fontSize',
+    'fontStyle',
+    'fontFamily',
+
+    'shadow',
+    'shadowColor',
+    'shadowAlpha',
+    'shadowDx',
+    'shadowDy'
+], function (attr) {
+    accessor['set' + ucFirst(attr)] = function (value) {
+
+        var that = this;
+        var state = that.state;
+
+        if (state) {
+            state[attr] = value;
+        }
+
+        return that;
+    };
+});
+
 export default Base.extend({
 
     antiAlias: true,
+
+    Implements: accessor,
 
     constructor: function Canvas(root) {
 
@@ -80,8 +131,8 @@ export default Base.extend({
             fontBackgroundColor: null,
             fontBorderColor: null,
             fontSize: 12,
-            fontFamily: 'Arial,Helvetica',
             fontStyle: 0,
+            fontFamily: 'Arial,Helvetica',
 
             // 阴影
             shadow: false,
@@ -168,15 +219,20 @@ export default Base.extend({
         return this.antiAlias ? toFixed(value, 2) : Math.round(parseFloat(value));
     },
 
+
     // Draw
     // ----
+
+    createElement: function (tagName, namespace) {
+        return createSvgElement(tagName, this.root.ownerDocument, namespace);
+    },
 
     drawPath: function () {
 
         var that = this;
         var path = new Path(that);
 
-        that.node = canvas.createElement('path');
+        that.node = that.createElement('path');
         that.path = path;
 
         return path;
@@ -186,7 +242,7 @@ export default Base.extend({
 
         var that = this;
         var state = that.state;
-        var format = that.format;
+        var format = that.format.bind(that);
         var scale = state.scale;
         var node = that.createElement('rect');
 
@@ -229,18 +285,6 @@ export default Base.extend({
     drawImage: function () {},
 
     drawString: function () {},
-
-    stroke: function () {
-        return this.addNode(false, true);
-    },
-
-    fill: function () {
-        return this.addNode(true, false);
-    },
-
-    fillAndStroke: function () {
-        return this.addNode(true, true);
-    },
 
     addNode: function (filled, stroked) {
 

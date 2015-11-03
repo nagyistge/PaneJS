@@ -3,11 +3,14 @@ import {
     each,
     getValue,
     getNumber,
-    createSvgElement
+    createSvgElement,
+    isNullOrUndefined
 } from '../common/utils';
 
 import Base       from '../lib/Base';
+import Canvas     from '../drawing/Canvas';
 import Rectangle  from '../lib/Rectangle';
+import detector   from '../common/detector';
 import styleNames from '../enums/styleNames';
 import directions from '../enums/directions';
 
@@ -113,12 +116,14 @@ var Shape = Base.extend({
         return that;
     },
 
+    // 创建图形的根节点
     create: function (container) {
         if (container && container.ownerSVGElement) {
             return createSvgElement('g');
         }
     },
 
+    // 清除根节点的所有子节点
     clear: function () {
 
         var that = this;
@@ -151,12 +156,12 @@ var Shape = Base.extend({
         var that = this;
         var node = that.node;
 
-        // 对于连线，需要根据 points 来计算出连线的 bounds
+        // 对于连线，需要根据 points 来计算连线的 bounds
         that.updateBoundsFromPoints();
 
         if (that.visible && that.checkBounds()) {
             node.style.visibility = 'visible';
-            that.clear(); // 删除根节点下的所有子元素
+            that.clear();
             that.redrawShape();
             that.updateBoundingBox();
         } else {
@@ -235,9 +240,9 @@ var Shape = Base.extend({
                     }
                 }
 
-                that.paintEdgeShape(canvas, pts);
+                that.drawLink(canvas, pts);
             } else {
-                that.paintVertexShape(canvas, x, y, w, h);
+                that.drawNode(canvas, x, y, w, h);
             }
         }
 
@@ -246,48 +251,48 @@ var Shape = Base.extend({
         }
     },
 
-    drawNode: function (c, x, y, w, h) {
-        this.drawNodeBackground(c, x, y, w, h);
-        c.setShadow(false);
-        this.drawNodeForeground(c, x, y, w, h);
+    drawNode: function (canvas, x, y, w, h) {
+        this.drawNodeBackground(canvas, x, y, w, h);
+        canvas.setShadow(false);
+        this.drawNodeForeground(canvas, x, y, w, h);
     },
 
     // 绘制 node 背景
-    drawNodeBackground: function (c, x, y, w, h) { },
+    drawNodeBackground: function (canvas, x, y, w, h) { },
 
     // 绘制 node 前景
-    drawNodeForeground: function (c, x, y, w, h) { },
+    drawNodeForeground: function (canvas, x, y, w, h) { },
 
-    drawLink: function (c, pts) {},
+    drawLink: function (canvas, pts) {},
 
-    paintGlassEffect: function (c, x, y, w, h, arc) {
+    paintGlassEffect: function (canvas, x, y, w, h, arc) {
         var sw = Math.ceil(this.strokeWidth / 2);
         var size = 0.4;
 
-        c.setGradient('#ffffff', '#ffffff', x, y, w, h * 0.6, 'south', 0.9, 0.1);
-        c.begin();
+        canvas.setGradient('#ffffff', '#ffffff', x, y, w, h * 0.6, 'south', 0.9, 0.1);
+        canvas.begin();
         arc += 2 * sw;
 
         if (this.isRounded) {
-            c.moveTo(x - sw + arc, y - sw);
-            c.quadTo(x - sw, y - sw, x - sw, y - sw + arc);
-            c.lineTo(x - sw, y + h * size);
-            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
-            c.lineTo(x + w + sw, y - sw + arc);
-            c.quadTo(x + w + sw, y - sw, x + w + sw - arc, y - sw);
+            canvas.moveTo(x - sw + arc, y - sw);
+            canvas.quadTo(x - sw, y - sw, x - sw, y - sw + arc);
+            canvas.lineTo(x - sw, y + h * size);
+            canvas.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
+            canvas.lineTo(x + w + sw, y - sw + arc);
+            canvas.quadTo(x + w + sw, y - sw, x + w + sw - arc, y - sw);
         }
         else {
-            c.moveTo(x - sw, y - sw);
-            c.lineTo(x - sw, y + h * size);
-            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
-            c.lineTo(x + w + sw, y - sw);
+            canvas.moveTo(x - sw, y - sw);
+            canvas.lineTo(x - sw, y + h * size);
+            canvas.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
+            canvas.lineTo(x + w + sw, y - sw);
         }
 
-        c.close();
-        c.fill();
+        canvas.close();
+        canvas.fill();
     },
 
-    addPoints: function (c, pts, rounded, arcSize, close) {
+    addPoints: function (canvas, pts, rounded, arcSize, close) {
         var pe = pts[pts.length - 1];
 
         // Adds virtual waypoint in the center between start and end point
@@ -302,7 +307,7 @@ var Shape = Base.extend({
         var i = 1;
 
         // Draws the line segments
-        c.moveTo(pt.x, pt.y);
+        canvas.moveTo(pt.x, pt.y);
 
         while (i < ((close) ? pts.length : pts.length - 1)) {
             var tmp = pts[mxUtils.mod(i, pts.length)];
@@ -319,7 +324,7 @@ var Shape = Base.extend({
 
                 var x1 = tmp.x + nx1;
                 var y1 = tmp.y + ny1;
-                c.lineTo(x1, y1);
+                canvas.lineTo(x1, y1);
 
                 // Draws a curve from the last point to the current
                 // point with a spacing of size off the current point
@@ -342,11 +347,11 @@ var Shape = Base.extend({
                 var x2 = tmp.x + nx2;
                 var y2 = tmp.y + ny2;
 
-                c.quadTo(tmp.x, tmp.y, x2, y2);
+                canvas.quadTo(tmp.x, tmp.y, x2, y2);
                 tmp = new Point(x2, y2);
             }
             else {
-                c.lineTo(tmp.x, tmp.y);
+                canvas.lineTo(tmp.x, tmp.y);
             }
 
             pt = tmp;
@@ -354,10 +359,10 @@ var Shape = Base.extend({
         }
 
         if (close) {
-            c.close();
+            canvas.close();
         }
         else {
-            c.lineTo(pe.x, pe.y);
+            canvas.lineTo(pe.x, pe.y);
         }
     },
 
@@ -397,7 +402,7 @@ var Shape = Base.extend({
         return rect;
     },
 
-    getGradientBounds: function (c, x, y, w, h) {
+    getGradientBounds: function (canvas, x, y, w, h) {
         return new Rectangle(x, y, w, h);
     },
 
@@ -461,12 +466,12 @@ var Shape = Base.extend({
 
         var that = this;
         var node = that.node;
-        var canvas = new Canvas2D(node, false);
+        var canvas = new Canvas(node);
 
         canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
         canvas.pointerEventsValue = that.svgPointerEvents;
-        canvas.blockImagePointerEvents = false;//mxClient.IS_FF;
-        canvas.antiAlias = that.antiAlias; // 抗锯齿
+        canvas.blockImagePointerEvents = detector.IS_FF;
+        canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
 
         var off = that.getScreenOffset();
 
@@ -539,27 +544,22 @@ var Shape = Base.extend({
 
     setCursor: function (cursor) {
 
-        var shape = this;
-        var node = shape.node;
+        var that = this;
+        var node = that.node;
 
         cursor = cursor || '';
 
-        shape.cursor = cursor;
+        that.cursor = cursor;
 
         if (node) {
             node.style.cursor = cursor;
         }
 
-        return shape;
-    },
-
-    getCursor: function () {
-        return this.cursor;
+        return that;
     },
 
     getRotation: function () {
-        var rotation = this.rotation;
-        return isNullOrUndefined(rotation) ? 0 : rotation;
+        return isNullOrUndefined(this.rotation) ? 0 : this.rotation;
     },
 
     getTextRotation: function () {
@@ -622,8 +622,7 @@ var Shape = Base.extend({
     },
 
     isPaintBoundsInverted: function () {
-        return !this.stencil && (this.direction === constants.DIRECTION_NORTH ||
-            this.direction === constants.DIRECTION_SOUTH);
+        return this.direction === directions.north || this.direction === directions.south;
     },
 
     destroy: function () {

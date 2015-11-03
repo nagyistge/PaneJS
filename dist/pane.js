@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var pane = {
 	    utils: __webpack_require__(1),
 	    Graph: __webpack_require__(10),
-	    Model: __webpack_require__(35),
+	    Model: __webpack_require__(36),
 	    View: __webpack_require__(27)
 	};
 	
@@ -758,15 +758,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _View2 = _interopRequireDefault(_View);
 	
-	var _Model = __webpack_require__(35);
+	var _Model = __webpack_require__(36);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _changesRootChange = __webpack_require__(38);
+	var _changesRootChange = __webpack_require__(39);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(40);
+	var _changesChildChange = __webpack_require__(41);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
@@ -1223,19 +1223,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Cell styles
 	    // -----------
 	    getCellStyle: function getCellStyle(cell) {
-	
-	        var that = this;
-	        var style = cell.style;
-	        var stylesheet = that.stylesheet;
-	        var defaultStyle = cell.isLink ? stylesheet.getDefaultLinkStyle() : cell.isNode ? stylesheet.getDefaultNodeStyle() : null;
-	
-	        style = (0, _commonUtils.extend)({}, style, defaultStyle);
-	
-	        that.postProcessCellStyle(style);
-	
-	        return style;
+	        return this.processCellStyle(cell, cell.style);
 	    },
-	    postProcessCellStyle: function postProcessCellStyle(style) {},
+	    processCellStyle: function processCellStyle(cell, style) {
+	        var that = this;
+	        var defaultStyle = cell.isLink ? that.stylesheet.getDefaultLinkStyle() : cell.isNode ? that.stylesheet.getDefaultNodeStyle() : null;
+	
+	        return (0, _commonUtils.extend)({}, defaultStyle, style);
+	    },
 	    setCellStyle: function setCellStyle(style, cells) {
 	        cells = cells || this.getSelectionCells();
 	
@@ -2640,12 +2635,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _defaultNodeStyle2 = _interopRequireDefault(_defaultNodeStyle);
 	
+	var _defaultStyle = __webpack_require__(49);
+	
+	var _defaultStyle2 = _interopRequireDefault(_defaultStyle);
+	
 	exports['default'] = _libBase2['default'].extend({
+	
 	    constructor: function Stylesheet() {
 	        var that = this;
 	
 	        that.styles = {};
-	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, _defaultNodeStyle2['default']));
+	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, _defaultStyle2['default'].common, _defaultStyle2['default'].node));
 	        that.setDefaultLinkStyle((0, _commonUtils.extend)({}, _defaultLinkStyle2['default']));
 	    },
 	
@@ -4537,7 +4537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var parentState = parent ? that.getState(parent) : null;
 	
 	        if (geo.relative && parentState && !parent.isLink) {
-	            var deg = parentState.style[_enumsStyleNames2['default'].rotation] || 0;
+	            var deg = parentState.style.rotation || 0;
 	
 	            // 绕父元素的中心旋转
 	            if (deg) {
@@ -4600,7 +4600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var vAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].VERTICAL_LABEL_POSITION, _enumsAlignments2['default'].MIDDLE);
 	
 	        // label 在水平方向上的位置
-	        if (hAlign === _enumsAlignments2['default'].LEFT) {
+	        if (hAlign === 'left') {
 	            // 左外侧
 	            if (labelWidth) {
 	                labelWidth *= scale;
@@ -4608,7 +4608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                labelWidth = stateWidth;
 	            }
 	            labelOffset.x -= labelWidth;
-	        } else if (hAlign === _enumsAlignments2['default'].RIGHT) {
+	        } else if (hAlign === 'right') {
 	            // 右外侧
 	            labelOffset.x += stateWidth;
 	        } else {
@@ -4617,9 +4617,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var cellAlign = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].ALIGN, _enumsAlignments2['default'].CENTER);
 	                var dx = 0;
 	
-	                if (cellAlign === _enumsAlignments2['default'].CENTER) {
+	                if (cellAlign === 'center') {
 	                    dx = 0.5;
-	                } else if (cellAlign === _enumsAlignments2['default'].RIGHT) {
+	                } else if (cellAlign === 'right') {
 	                    dx = 1;
 	                }
 	
@@ -4630,9 +4630,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // label 在垂直方向上的位置
-	        if (vAlign === _enumsAlignments2['default'].TOP) {
+	        if (vAlign === 'top') {
 	            labelOffset.y -= stateHeight;
-	        } else if (vAlign === _enumsAlignments2['default'].BOTTOM) {
+	        } else if (vAlign === 'bottom') {
 	            labelOffset.y += stateHeight;
 	        }
 	
@@ -5323,7 +5323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    defaultNodeShape: _shapesRect2['default'],
 	    defaultLinkShape: null,
 	    defaultTextShape: null,
-	    antiAlias: true,
+	    antiAlias: true, // 是否绘制平滑的图形（抗锯齿）
 	
 	    constructor: function Renderer() {},
 	
@@ -5397,6 +5397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    postConfigureShape: function postConfigureShape() {},
+	
 	    resolveColor: function resolveColor() {},
 	
 	    redraw: function redraw(state, force, rendering) {
@@ -5440,11 +5441,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // Redraws the cell if required, ignores changes to bounds if points are
 	            // defined as the bounds are updated for the given points inside the shape
 	            if (force || !shape.bounds || shape.scale !== state.view.scale || state.absolutePoints == null && !state.shape.bounds.equals(state) || state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints)) {
+	
 	                if (state.absolutePoints) {
+	                    // 绘制连线
 	                    state.shape.points = state.absolutePoints.slice();
 	                    state.shape.bounds = null;
 	                } else {
+	                    // 绘制节点
 	                    state.shape.points = null;
+	                    // 初始化节点的 bounds
 	                    state.shape.bounds = new _libRectangle2['default'](state.x, state.y, state.width, state.height);
 	                }
 	
@@ -5493,16 +5498,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
 	exports['default'] = _Shape2['default'].extend({
-	    constructor: function Rect(bounds, fill, stroke, strokeWidth) {
+	    constructor: function Rect(bounds) {
 	
 	        var that = this;
 	
 	        Rect.superclass.constructor.call(that);
 	
 	        that.bounds = bounds;
-	        that.fill = fill;
-	        that.stroke = stroke;
-	        that.strokewidth = !(0, _commonUtils.isNullOrUndefined)(strokeWidth) ? strokeWidth : 1;
+	        //that.fill = fill;
+	        //that.stroke = stroke;
+	        //that.strokeWidth = !isNullOrUndefined(strokeWidth) ? strokeWidth : 1;
 	    },
 	
 	    isHtmlAllowed: function isHtmlAllowed() {
@@ -5510,32 +5515,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return !shape.isRounded && !shape.glass && shape.rotation === 0;
 	    },
 	
-	    paintBackground: function paintBackground(canvas, x, y, w, h) {
+	    drawNodeBackground: function drawNodeBackground(canvas, x, y, w, h) {
 	
-	        var shape = this;
+	        var that = this;
 	
-	        if (shape.isRounded) {
-	            var f = (0, _commonUtils.getValue)(shape.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
+	        if (that.isRounded) {
+	            var f = (0, _commonUtils.getValue)(that.style, constants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
 	            var r = Math.min(w * f, h * f);
-	            canvas.rect(x, y, w, h, r, r);
+	            canvas.drawRect(x, y, w, h, r, r);
 	        } else {
-	            canvas.rect(x, y, w, h);
+	            canvas.drawRect(x, y, w, h);
 	        }
 	
-	        canvas.fillAndStroke();
+	        canvas.addNode(true, true);
 	
-	        return shape;
+	        return that;
 	    },
 	
-	    paintForeground: function paintForeground(c, x, y, w, h) {
+	    drawNodeForeground: function drawNodeForeground(c, x, y, w, h) {
 	
-	        var shape = this;
+	        var that = this;
 	
-	        if (shape.glass && !shape.outline) {
-	            shape.paintGlassEffect(c, x, y, w, h, shape.getArcSize(w + shape.strokewidth, h + shape.strokewidth));
+	        if (that.glass && !that.outline) {
+	            that.paintGlassEffect(c, x, y, w, h, that.getArcSize(w + that.strokewidth, h + that.strokewidth));
 	        }
 	
-	        return shape;
+	        return that;
 	    }
 	});
 	module.exports = exports['default'];
@@ -5558,15 +5563,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
+	var _drawingCanvas = __webpack_require__(43);
+	
+	var _drawingCanvas2 = _interopRequireDefault(_drawingCanvas);
+	
 	var _libRectangle = __webpack_require__(26);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var _commonDetector = __webpack_require__(28);
+	
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
 	var _enumsStyleNames = __webpack_require__(17);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsDirections = __webpack_require__(42);
+	var _enumsDirections = __webpack_require__(35);
 	
 	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
 	
@@ -5669,12 +5682,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
+	    // 创建图形的根节点
 	    create: function create(container) {
 	        if (container && container.ownerSVGElement) {
 	            return (0, _commonUtils.createSvgElement)('g');
 	        }
 	    },
 	
+	    // 清除根节点的所有子节点
 	    clear: function clear() {
 	
 	        var that = this;
@@ -5707,12 +5722,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var node = that.node;
 	
-	        // 对于连线，需要根据 points 来计算出连线的 bounds
+	        // 对于连线，需要根据 points 来计算连线的 bounds
 	        that.updateBoundsFromPoints();
 	
 	        if (that.visible && that.checkBounds()) {
 	            node.style.visibility = 'visible';
-	            that.clear(); // 删除根节点下的所有子元素
+	            that.clear();
 	            that.redrawShape();
 	            that.updateBoundingBox();
 	        } else {
@@ -5789,9 +5804,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                }
 	
-	                that.paintEdgeShape(canvas, pts);
+	                that.drawLink(canvas, pts);
 	            } else {
-	                that.paintVertexShape(canvas, x, y, w, h);
+	                that.drawNode(canvas, x, y, w, h);
 	            }
 	        }
 	
@@ -5800,47 +5815,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    drawNode: function drawNode(c, x, y, w, h) {
-	        this.drawNodeBackground(c, x, y, w, h);
-	        c.setShadow(false);
-	        this.drawNodeForeground(c, x, y, w, h);
+	    drawNode: function drawNode(canvas, x, y, w, h) {
+	        this.drawNodeBackground(canvas, x, y, w, h);
+	        canvas.setShadow(false);
+	        this.drawNodeForeground(canvas, x, y, w, h);
 	    },
 	
 	    // 绘制 node 背景
-	    drawNodeBackground: function drawNodeBackground(c, x, y, w, h) {},
+	    drawNodeBackground: function drawNodeBackground(canvas, x, y, w, h) {},
 	
 	    // 绘制 node 前景
-	    drawNodeForeground: function drawNodeForeground(c, x, y, w, h) {},
+	    drawNodeForeground: function drawNodeForeground(canvas, x, y, w, h) {},
 	
-	    drawLink: function drawLink(c, pts) {},
+	    drawLink: function drawLink(canvas, pts) {},
 	
-	    paintGlassEffect: function paintGlassEffect(c, x, y, w, h, arc) {
+	    paintGlassEffect: function paintGlassEffect(canvas, x, y, w, h, arc) {
 	        var sw = Math.ceil(this.strokeWidth / 2);
 	        var size = 0.4;
 	
-	        c.setGradient('#ffffff', '#ffffff', x, y, w, h * 0.6, 'south', 0.9, 0.1);
-	        c.begin();
+	        canvas.setGradient('#ffffff', '#ffffff', x, y, w, h * 0.6, 'south', 0.9, 0.1);
+	        canvas.begin();
 	        arc += 2 * sw;
 	
 	        if (this.isRounded) {
-	            c.moveTo(x - sw + arc, y - sw);
-	            c.quadTo(x - sw, y - sw, x - sw, y - sw + arc);
-	            c.lineTo(x - sw, y + h * size);
-	            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
-	            c.lineTo(x + w + sw, y - sw + arc);
-	            c.quadTo(x + w + sw, y - sw, x + w + sw - arc, y - sw);
+	            canvas.moveTo(x - sw + arc, y - sw);
+	            canvas.quadTo(x - sw, y - sw, x - sw, y - sw + arc);
+	            canvas.lineTo(x - sw, y + h * size);
+	            canvas.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
+	            canvas.lineTo(x + w + sw, y - sw + arc);
+	            canvas.quadTo(x + w + sw, y - sw, x + w + sw - arc, y - sw);
 	        } else {
-	            c.moveTo(x - sw, y - sw);
-	            c.lineTo(x - sw, y + h * size);
-	            c.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
-	            c.lineTo(x + w + sw, y - sw);
+	            canvas.moveTo(x - sw, y - sw);
+	            canvas.lineTo(x - sw, y + h * size);
+	            canvas.quadTo(x + w * 0.5, y + h * 0.7, x + w + sw, y + h * size);
+	            canvas.lineTo(x + w + sw, y - sw);
 	        }
 	
-	        c.close();
-	        c.fill();
+	        canvas.close();
+	        canvas.fill();
 	    },
 	
-	    addPoints: function addPoints(c, pts, rounded, arcSize, close) {
+	    addPoints: function addPoints(canvas, pts, rounded, arcSize, close) {
 	        var pe = pts[pts.length - 1];
 	
 	        // Adds virtual waypoint in the center between start and end point
@@ -5855,7 +5870,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var i = 1;
 	
 	        // Draws the line segments
-	        c.moveTo(pt.x, pt.y);
+	        canvas.moveTo(pt.x, pt.y);
 	
 	        while (i < (close ? pts.length : pts.length - 1)) {
 	            var tmp = pts[mxUtils.mod(i, pts.length)];
@@ -5872,7 +5887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var x1 = tmp.x + nx1;
 	                var y1 = tmp.y + ny1;
-	                c.lineTo(x1, y1);
+	                canvas.lineTo(x1, y1);
 	
 	                // Draws a curve from the last point to the current
 	                // point with a spacing of size off the current point
@@ -5895,10 +5910,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var x2 = tmp.x + nx2;
 	                var y2 = tmp.y + ny2;
 	
-	                c.quadTo(tmp.x, tmp.y, x2, y2);
+	                canvas.quadTo(tmp.x, tmp.y, x2, y2);
 	                tmp = new Point(x2, y2);
 	            } else {
-	                c.lineTo(tmp.x, tmp.y);
+	                canvas.lineTo(tmp.x, tmp.y);
 	            }
 	
 	            pt = tmp;
@@ -5906,9 +5921,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        if (close) {
-	            c.close();
+	            canvas.close();
 	        } else {
-	            c.lineTo(pe.x, pe.y);
+	            canvas.lineTo(pe.x, pe.y);
 	        }
 	    },
 	
@@ -5942,7 +5957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return rect;
 	    },
 	
-	    getGradientBounds: function getGradientBounds(c, x, y, w, h) {
+	    getGradientBounds: function getGradientBounds(canvas, x, y, w, h) {
 	        return new _libRectangle2['default'](x, y, w, h);
 	    },
 	
@@ -6004,12 +6019,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var node = that.node;
-	        var canvas = new Canvas2D(node, false);
+	        var canvas = new _drawingCanvas2['default'](node);
 	
 	        canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
 	        canvas.pointerEventsValue = that.svgPointerEvents;
-	        canvas.blockImagePointerEvents = false; //mxClient.IS_FF;
-	        canvas.antiAlias = that.antiAlias; // 抗锯齿
+	        canvas.blockImagePointerEvents = _commonDetector2['default'].IS_FF;
+	        canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
 	
 	        var off = that.getScreenOffset();
 	
@@ -6081,27 +6096,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    setCursor: function setCursor(cursor) {
 	
-	        var shape = this;
-	        var node = shape.node;
+	        var that = this;
+	        var node = that.node;
 	
 	        cursor = cursor || '';
 	
-	        shape.cursor = cursor;
+	        that.cursor = cursor;
 	
 	        if (node) {
 	            node.style.cursor = cursor;
 	        }
 	
-	        return shape;
-	    },
-	
-	    getCursor: function getCursor() {
-	        return this.cursor;
+	        return that;
 	    },
 	
 	    getRotation: function getRotation() {
-	        var rotation = this.rotation;
-	        return isNullOrUndefined(rotation) ? 0 : rotation;
+	        return (0, _commonUtils.isNullOrUndefined)(this.rotation) ? 0 : this.rotation;
 	    },
 	
 	    getTextRotation: function getTextRotation() {
@@ -6162,7 +6172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return !this.stencil && (this.direction === constants.DIRECTION_NORTH || this.direction === constants.DIRECTION_SOUTH);
+	        return this.direction === _enumsDirections2['default'].north || this.direction === _enumsDirections2['default'].south;
 	    },
 	
 	    destroy: function destroy() {
@@ -6188,6 +6198,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 35 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    north: 'north',
+	    south: 'south',
+	    east: 'east',
+	    west: 'west'
+	};
+
+/***/ },
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6210,11 +6233,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// events
 	
-	var _eventsAspect = __webpack_require__(36);
+	var _eventsAspect = __webpack_require__(37);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
 	
-	var _eventsEventNames = __webpack_require__(37);
+	var _eventsEventNames = __webpack_require__(38);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
@@ -6224,15 +6247,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// changes
 	
-	var _changesRootChange = __webpack_require__(38);
+	var _changesRootChange = __webpack_require__(39);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(40);
+	var _changesChildChange = __webpack_require__(41);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesChangeCollection = __webpack_require__(41);
+	var _changesChangeCollection = __webpack_require__(42);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
@@ -6586,7 +6609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6670,7 +6693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6689,7 +6712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6700,7 +6723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(39);
+	var _Change = __webpack_require__(40);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -6729,7 +6752,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6753,7 +6776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6764,7 +6787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(39);
+	var _Change = __webpack_require__(40);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -6844,7 +6867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6859,7 +6882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _eventsEventNames = __webpack_require__(37);
+	var _eventsEventNames = __webpack_require__(38);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
@@ -6909,17 +6932,875 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _Path = __webpack_require__(44);
+	
+	var _Path2 = _interopRequireDefault(_Path);
+	
+	var _Pen = __webpack_require__(45);
+	
+	var _Pen2 = _interopRequireDefault(_Pen);
+	
+	var _SolidBrush = __webpack_require__(46);
+	
+	var _SolidBrush2 = _interopRequireDefault(_SolidBrush);
+	
+	var _LinearGradientBrush = __webpack_require__(48);
+	
+	var _LinearGradientBrush2 = _interopRequireDefault(_LinearGradientBrush);
+	
+	// 属性访问器
+	var accessor = {};
+	(0, _commonUtils.each)(['alpha', 'fillColor', 'fillAlpha', 'gradientColor', 'gradientAlpha', 'gradientDirection', 'strokeWidth', 'strokeColor', 'dashed', 'dashPattern', 'dashOffset', 'lineCap', 'lineJoin', 'miterLimit', 'fontColor', 'fontBackgroundColor', 'fontBorderColor', 'fontSize', 'fontStyle', 'fontFamily', 'shadow', 'shadowColor', 'shadowAlpha', 'shadowDx', 'shadowDy'], function (attr) {
+	    accessor['set' + (0, _commonUtils.ucFirst)(attr)] = function (value) {
+	
+	        var that = this;
+	        var state = that.state;
+	
+	        if (state) {
+	            state[attr] = value;
+	        }
+	
+	        return that;
+	    };
+	});
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    antiAlias: true,
+	
+	    Implements: accessor,
+	
+	    constructor: function Canvas(root) {
+	
+	        var that = this;
+	
+	        that.root = root;
+	        that.reset();
+	    },
+	
+	    reset: function reset() {
+	
+	        var that = this;
+	
+	        that.state = that.createState();
+	        that.states = [];
+	        that.gradients = [];
+	
+	        return that;
+	    },
+	
+	    save: function save() {
+	
+	        var that = this;
+	        var state = that.state;
+	
+	        that.states.push(state);
+	        that.state = (0, _commonUtils.clone)(state);
+	
+	        return that;
+	    },
+	
+	    restore: function restore() {
+	
+	        var that = this;
+	
+	        that.state = that.states.pop();
+	
+	        return that;
+	    },
+	
+	    createState: function createState() {
+	        return {
+	            dx: 0,
+	            dy: 0,
+	            scale: 1,
+	            alpha: 1,
+	
+	            // 填充
+	            fillColor: null,
+	            fillAlpha: 1,
+	            gradientColor: null,
+	            gradientAlpha: 1,
+	            gradientDirection: null,
+	
+	            // 边框
+	            strokeWidth: 1,
+	            strokeColor: null,
+	            dashed: false,
+	            dashPattern: '3 3',
+	            dashOffset: '',
+	            lineCap: 'butt', // butt, round, square
+	            lineJoin: 'miter', // miter, round, bevel
+	            miterLimit: 10,
+	
+	            // 字体
+	            fontColor: '#000000',
+	            fontBackgroundColor: null,
+	            fontBorderColor: null,
+	            fontSize: 12,
+	            fontStyle: 0,
+	            fontFamily: 'Arial,Helvetica',
+	
+	            // 阴影
+	            shadow: false,
+	            shadowColor: 'gray',
+	            shadowAlpha: 1,
+	            shadowDx: 2,
+	            shadowDy: 3,
+	
+	            // 旋转
+	            rotation: 0,
+	            rotationCx: 0,
+	            rotationCy: 0
+	        };
+	    },
+	
+	    scale: function scale(value) {
+	        var that = this;
+	        var state = that.state;
+	
+	        state.scale *= value;
+	        state.strokeWidth *= value;
+	
+	        return that;
+	    },
+	
+	    translate: function translate(dx, dy) {
+	        var that = this;
+	        var state = that.state;
+	
+	        state.dx += dx;
+	        state.dy += dy;
+	
+	        return that;
+	    },
+	
+	    rotate: function rotate(theta, flipH, flipV, cx, cy) {
+	
+	        var canvas = this;
+	        var format = canvas.format;
+	
+	        if (theta !== 0 || flipH || flipV) {
+	
+	            var state = canvas.state;
+	
+	            cx += state.dx;
+	            cy += state.dy;
+	
+	            cx *= state.scale;
+	            cy *= state.scale;
+	
+	            state.transform = state.transform || '';
+	
+	            // This implementation uses custom scale/translate and built-in rotation
+	            // Rotation state is part of the AffineTransform in state.transform
+	            if (flipH && flipV) {
+	                theta += 180;
+	            } else if (flipH !== flipV) {
+	                var tx = flipH ? cx : 0;
+	                var sx = flipH ? -1 : 1;
+	
+	                var ty = flipV ? cy : 0;
+	                var sy = flipV ? -1 : 1;
+	
+	                state.transform += 'translate(' + format(tx) + ',' + format(ty) + ')' + 'scale(' + format(sx) + ',' + format(sy) + ')' + 'translate(' + format(-tx) + ',' + format(-ty) + ')';
+	            }
+	
+	            if (flipH ? !flipV : flipV) {
+	                theta *= -1;
+	            }
+	
+	            if (theta !== 0) {
+	                state.transform += 'rotate(' + format(theta) + ',' + format(cx) + ',' + format(cy) + ')';
+	            }
+	
+	            state.rotation = state.rotation + theta;
+	            state.rotationCx = cx;
+	            state.rotationCy = cy;
+	        }
+	    },
+	
+	    format: function format(value) {
+	        return this.antiAlias ? (0, _commonUtils.toFixed)(value, 2) : Math.round(parseFloat(value));
+	    },
+	
+	    // Draw
+	    // ----
+	
+	    createElement: function createElement(tagName, namespace) {
+	        return (0, _commonUtils.createSvgElement)(tagName, this.root.ownerDocument, namespace);
+	    },
+	
+	    drawPath: function drawPath() {
+	
+	        var that = this;
+	        var path = new _Path2['default'](that);
+	
+	        that.node = that.createElement('path');
+	        that.path = path;
+	
+	        return path;
+	    },
+	
+	    drawRect: function drawRect(x, y, w, h, dx, dy) {
+	
+	        var that = this;
+	        var state = that.state;
+	        var format = that.format.bind(that);
+	        var scale = state.scale;
+	        var node = that.createElement('rect');
+	
+	        node.setAttribute('x', format((x + state.dx) * scale));
+	        node.setAttribute('y', format((y + state.dy) * scale));
+	        node.setAttribute('width', format(w * scale));
+	        node.setAttribute('height', format(h * scale));
+	
+	        if (dx > 0) {
+	            node.setAttribute('rx', format(dx * scale));
+	        }
+	
+	        if (dy > 0) {
+	            node.setAttribute('ry', format(dy * scale));
+	        }
+	
+	        that.node = node;
+	
+	        return that;
+	    },
+	
+	    drawEllipse: function drawEllipse(x, y, w, h) {
+	
+	        var canvas = this;
+	        var state = canvas.state;
+	        var scale = state.scale;
+	
+	        var node = canvas.createElement('ellipse');
+	
+	        node.setAttribute('cx', Math.round((x + w / 2 + state.dx) * scale));
+	        node.setAttribute('cy', Math.round((y + h / 2 + state.dy) * scale));
+	        node.setAttribute('rx', w / 2 * scale);
+	        node.setAttribute('ry', h / 2 * scale);
+	
+	        canvas.node = node;
+	
+	        return canvas;
+	    },
+	
+	    drawImage: function drawImage() {},
+	
+	    drawString: function drawString() {},
+	
+	    addNode: function addNode(filled, stroked) {
+	
+	        var that = this;
+	        var root = that.root;
+	        var node = that.node;
+	        var state = that.state;
+	
+	        if (node) {
+	
+	            var path = that.path;
+	            if (path) {}
+	
+	            // fill
+	            if (state.fillColor && state.gradientColor) {
+	                new _LinearGradientBrush2['default'](that).fill(filled);
+	            } else {
+	                new _SolidBrush2['default'](that).fill(filled);
+	            }
+	
+	            // stroke
+	            new _Pen2['default'](that).stroke(stroked);
+	
+	            // transform
+	            var transform = state.transform;
+	            if (transform && transform.length > 0) {
+	                node.setAttribute('transform', transform);
+	            }
+	
+	            // shadow
+	            if (state.shadow) {
+	                root.appendChild(that.createShadow(node));
+	            }
+	
+	            // strokeTolerance
+	            filled = filled && state.fillColor ? true : false;
+	            if (that.strokeTolerance > 0 && !filled) {
+	                root.appendChild(that.createTolerance(node));
+	            }
+	
+	            // pointer events
+	            if (that.pointerEvents && (!path || path.closed)) {
+	                node.setAttribute('pointer-events', that.pointerEventsValue);
+	            } else if (!that.pointerEvents && !that.originalRoot) {
+	                node.setAttribute('pointer-events', 'none');
+	            }
+	
+	            root.appendChild(node);
+	        }
+	
+	        return that;
+	    },
+	
+	    createShadow: function createShadow(node) {
+	
+	        var that = this;
+	        var state = that.state;
+	        var shadow = node.cloneNode(true);
+	
+	        if (shadow.getAttribute('fill') !== 'none') {
+	            shadow.setAttribute('fill', state.shadowColor);
+	        }
+	
+	        if (shadow.getAttribute('stroke') !== 'none') {
+	            shadow.setAttribute('stroke', state.shadowColor);
+	        }
+	
+	        shadow.setAttribute('transform', 'translate(' + that.format(state.shadowDx * state.scale) + ',' + this.format(state.shadowDy * state.scale) + ')' + (state.transform || ''));
+	        shadow.setAttribute('opacity', state.shadowAlpha);
+	
+	        return shadow;
+	    },
+	
+	    createTolerance: function createTolerance(node) {
+	
+	        var ele = node.cloneNode(true);
+	        var sw = parseFloat(ele.getAttribute('stroke-width') || 1) + this.strokeTolerance;
+	        ele.setAttribute('pointer-events', 'stroke');
+	        ele.setAttribute('visibility', 'hidden');
+	        ele.setAttribute('stroke-width', sw);
+	        ele.setAttribute('fill', 'none');
+	        ele.setAttribute('stroke', 'white');
+	        ele.removeAttribute('stroke-dasharray');
+	
+	        return ele;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Path(canvas) {
+	
+	        var that = this;
+	        that.canvas = canvas;
+	        that.lastX = 0;
+	        that.lastY = 0;
+	        that.paths = [];
+	    },
+	
+	    addOp: function addOp() {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var paths = that.paths;
+	        var format = canvas.format;
+	        var state = canvas.state;
+	        var scale = state.scale;
+	        var length = arguments.length;
+	
+	        if (paths) {
+	            paths.push(arguments[0]);
+	
+	            if (length > 2) {
+	                for (var i = 2; i < length; i += 2) {
+	                    that.lastX = arguments[i - 1];
+	                    that.lastY = arguments[i];
+	
+	                    paths.push(format((that.lastX + state.dx) * scale));
+	                    paths.push(format((that.lastY + state.dy) * scale));
+	                }
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    moveTo: function moveTo(x, y) {
+	        return this.addOp('M', x, y);
+	    },
+	
+	    lineTo: function lineTo(x, y) {
+	        return this.addOp('L', x, y);
+	    },
+	
+	    // 二次贝塞尔曲线
+	    quadTo: function quadTo(x1, y1, x2, y2) {
+	        return this.addOp('Q', x1, y1, x2, y2);
+	    },
+	
+	    // 三次贝塞尔曲线
+	    curveTo: function curveTo(x1, y1, x2, y2, x3, y3) {
+	        return this.addOp('C', x1, y1, x2, y2, x3, y3);
+	    },
+	
+	    // 圆弧
+	    arcTo: function arcTo() /*rx, ry, angle, largeArcFlag, sweepFlag, x, y*/{},
+	
+	    close: function close() {
+	
+	        var that = this;
+	
+	        that.addOp('Z');
+	        that.closed = true;
+	        //that.canvas.node.setAttribute('d', paths.join(' '));
+	
+	        return that.canvas; // 链式调用
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    // 创建一个描边画笔的实例
+	    constructor: function Pen(canvas) {
+	        this.canvas = canvas;
+	    },
+	
+	    stroke: function stroke(stroked) {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var state = canvas.state;
+	        var node = canvas.node;
+	
+	        if (stroked && state.strokeColor) {
+	
+	            node.setAttribute('stroke', state.strokeColor.toLowerCase());
+	
+	            if (state.alpha < 1) {
+	                node.setAttribute('stroke-opacity', state.alpha);
+	            }
+	
+	            var strokeWidth = state.strokeWidth * state.scale;
+	            var fixedStrokeWidth = Math.max(1, strokeWidth);
+	
+	            if (fixedStrokeWidth !== 1) {
+	                node.setAttribute('stroke-width', fixedStrokeWidth);
+	            }
+	
+	            // 更新路径样式
+	            if (node.nodeName.toLowerCase() === 'path') {
+	
+	                // lineJoin
+	                var lineJoin = state.lineJoin;
+	                // 'miter' is default in SVG
+	                if (lineJoin && lineJoin !== 'miter') {
+	                    node.setAttribute('stroke-linejoin', lineJoin);
+	                }
+	
+	                // lineCap
+	                var lineCap = state.lineCap;
+	                // 'butt' is default in SVG
+	                if (lineCap && lineCap !== 'butt') {
+	                    node.setAttribute('stroke-linecap', lineCap);
+	                }
+	
+	                // miterLimit
+	                var miterLimit = state.miterLimit;
+	                // 10 is default in our document
+	                if (miterLimit && miterLimit !== 10) {
+	                    this.node.setAttribute('stroke-miterlimit', miterLimit);
+	                }
+	            }
+	
+	            if (state.dashed) {
+	
+	                // dashPattern
+	                var dashPattern = state.dashPattern;
+	                var dash = ('' + dashPattern).split(' ');
+	                var pattern = (0, _commonUtils.map)(dash, function (pat) {
+	                    return pat * strokeWidth;
+	                });
+	
+	                node.setAttribute('stroke-dasharray', pattern.join(' '));
+	
+	                // dashOffset
+	                var dashOffset = state.dashOffset;
+	                if (dashOffset) {
+	                    node.setAttribute('stroke-dashoffset', dashOffset);
+	                }
+	            }
+	        } else {
+	            node.setAttribute('stroke', 'none');
+	        }
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Brush = __webpack_require__(47);
+	
+	var _Brush2 = _interopRequireDefault(_Brush);
+	
+	exports['default'] = _Brush2['default'].extend({
+	
+	    constructor: function SolidBrush(canvas) {
+	        SolidBrush.superclass.constructor.call(this, canvas);
+	    },
+	
+	    doFill: function doFill() {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var state = canvas.state;
+	        var node = canvas.node;
+	
+	        var fillColor = state.fillColor;
+	
+	        if (fillColor) {
+	            node.setAttribute('fill', fillColor.toLowerCase());
+	        }
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(13);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    constructor: function Brush(canvas) {
+	        this.canvas = canvas;
+	    },
+	
+	    fill: function fill(filled) {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var state = canvas.state;
+	        var node = canvas.node;
+	
+	        if (filled) {
+	
+	            if (state.alpha < 1) {
+	                node.setAttribute('fill-opacity', state.alpha);
+	            }
+	
+	            that.doFill();
+	        } else {
+	            node.setAttribute('fill', 'none');
+	        }
+	
+	        return that;
+	    },
+	
+	    doFill: function doFill() {
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Brush = __webpack_require__(47);
+	
+	var _Brush2 = _interopRequireDefault(_Brush);
+	
+	var _enumsDirections = __webpack_require__(35);
+	
+	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
+	
+	var LinearGradientBrush = _Brush2['default'].extend({
+	
+	    gradients: {},
+	
+	    constructor: function LinearGradientBrush(canvas) {
+	        LinearGradientBrush.superclass.constructor.call(this, canvas);
+	    },
+	
+	    createGradientId: function createGradientId(start, end, alpha1, alpha2, direction) {
+	
+	        if (start.charAt(0) === '#') {
+	            start = start.substring(1);
+	        }
+	
+	        if (end.charAt(0) === '#') {
+	            end = end.substring(1);
+	        }
+	
+	        // Workaround for gradient IDs not working in Safari 5 / Chrome 6
+	        // if they contain uppercase characters
+	        start = start.toLowerCase() + '-' + alpha1;
+	        end = end.toLowerCase() + '-' + alpha2;
+	
+	        var dir = '';
+	
+	        if (!direction || direction === _enumsDirections2['default'].south) {
+	            dir = 's'; // 从上到下
+	        } else if (direction === _enumsDirections2['default'].east) {
+	                dir = 'e'; // 从左到右
+	            } else {
+	                    var tmp = start;
+	                    start = end;
+	                    end = tmp;
+	
+	                    if (direction === _enumsDirections2['default'].north) {
+	                        dir = 's'; // 从下到上
+	                    } else if (direction === _enumsDirections2['default'].west) {
+	                            dir = 'e'; // 从右到左
+	                        }
+	                }
+	
+	        return 'gradient-' + start + '-' + end + '-' + dir;
+	    },
+	
+	    createGradient: function createGradient(start, end, alpha1, alpha2, direction) {
+	
+	        var root = this.canvas.root;
+	        var gradient = (0, _commonUtils.createSvgElement)('linearGradient', root);
+	
+	        gradient.setAttribute('x1', '0%');
+	        gradient.setAttribute('y1', '0%');
+	        gradient.setAttribute('x2', '0%');
+	        gradient.setAttribute('y2', '0%');
+	
+	        if (!direction || direction === _enumsDirections2['default'].south) {
+	            gradient.setAttribute('y2', '100%');
+	        } else if (direction === _enumsDirections2['default'].east) {
+	            gradient.setAttribute('x2', '100%');
+	        } else if (direction === _enumsDirections2['default'].north) {
+	            gradient.setAttribute('y1', '100%');
+	        } else if (direction === _enumsDirections2['default'].west) {
+	            gradient.setAttribute('x1', '100%');
+	        }
+	
+	        var op = alpha1 < 1 ? ';stop-opacity:' + alpha1 : '';
+	
+	        var stop = (0, _commonUtils.createSvgElement)('stop', root);
+	        stop.setAttribute('offset', '0%');
+	        stop.setAttribute('style', 'stop-color:' + start + op);
+	        gradient.appendChild(stop);
+	
+	        op = alpha2 < 1 ? ';stop-opacity:' + alpha2 : '';
+	
+	        stop = (0, _commonUtils.createSvgElement)('stop', root);
+	        stop.setAttribute('offset', '100%');
+	        stop.setAttribute('style', 'stop-color:' + end + op);
+	        gradient.appendChild(stop);
+	
+	        return gradient;
+	    },
+	
+	    getGradient: function getGradient(start, end, alpha1, alpha2, direction) {
+	
+	        var that = this;
+	        var id = that.createGradientId(start, end, alpha1, alpha2, direction);
+	        var gradients = LinearGradientBrush.gradients;
+	        var gradient = gradients[id];
+	
+	        if (!gradient) {
+	
+	            var root = that.canvas.root;
+	            var svg = root.ownerSVGElement;
+	            var doc = svg.ownerDocument;
+	
+	            var counter = 0;
+	            var tmpId = id + '-' + counter;
+	
+	            gradient = doc.getElementById(tmpId);
+	            while (gradient && gradient.ownerSVGElement !== svg) {
+	                tmpId = id + '-' + counter++;
+	                gradient = doc.getElementById(tmpId);
+	            }
+	
+	            if (!gradient) {
+	                gradient = that.createGradient(start, end, alpha1, alpha2, direction);
+	                gradient.setAttribute('id', tmpId);
+	
+	                svg.appendChild(gradient);
+	            }
+	
+	            gradients[id] = gradient;
+	        }
+	
+	        return gradient.getAttribute('id');
+	    },
+	
+	    doFill: function doFill() {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var state = canvas.state;
+	        var node = canvas.node;
+	        var fillColor = state.fillColor;
+	        var gradientColor = state.gradientColor;
+	
+	        if (fillColor && gradientColor) {
+	            var id = that.getGradient(fillColor, gradientColor, state.fillAlpha, state.gradientAlpha, state.gradientDirection);
+	            var base = (0, _commonUtils.getBaseUrl)().replace(/([\(\)])/g, '\\$1');
+	
+	            node.setAttribute('fill', 'url(' + base + '#' + id + ')');
+	        }
+	
+	        return that;
+	    }
+	});
+	
+	exports['default'] = LinearGradientBrush;
+	module.exports = exports['default'];
+
+/***/ },
+/* 49 */
 /***/ function(module, exports) {
 
 	'use strict';
 	
 	module.exports = {
-	    north: 'north',
-	    south: 'south',
-	    east: 'east',
-	    west: 'west'
+	
+	    common: {
+	        // 平移
+	        dx: 0,
+	        dy: 0,
+	
+	        // 缩放
+	        scale: 1,
+	
+	        // 旋转
+	        rotation: 0,
+	        rotationCx: 0,
+	        rotationCy: 0,
+	
+	        opacity: 1,
+	
+	        // 填充
+	        fillColor: '#e3f4ff',
+	        fillOpacity: 1,
+	        gradientColor: '',
+	        gradientOpacity: 1,
+	        gradientDirection: '',
+	
+	        // 边框
+	        strokeWidth: 1,
+	        strokeColor: '#289de9',
+	        dashed: false,
+	        dashPattern: '3 3',
+	        dashOffset: 0,
+	        lineCap: 'butt', // butt, round, square
+	        lineJoin: 'miter', // miter, round, bevel
+	        miterLimit: 10,
+	
+	        // 字体
+	        fontColor: '#774400',
+	        fontBackgroundColor: '',
+	        fontBorderColor: '',
+	        fontSize: 12,
+	        fontStyle: 0,
+	        fontFamily: 'Arial,Helvetica',
+	
+	        // 对齐
+	        verticalAlign: 'middle', // top, middle, bottom
+	        align: 'center', // left, center, right
+	
+	        // 阴影
+	        shadow: false,
+	        shadowColor: 'gray',
+	        shadowOpacity: 1,
+	        shadowDx: 2,
+	        shadowDy: 3
+	    },
+	
+	    // 节点
+	    node: {
+	        shape: 'rectangle'
+	    },
+	
+	    // 连线
+	    link: {
+	        shape: 'connector',
+	        endArrow: 'classic' }
 	};
+	// classic, block, open, oval, diamond, diamondThin
 
 /***/ }
 /******/ ])
