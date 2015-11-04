@@ -22,17 +22,6 @@ var Shape = Base.extend({
     shapePointerEvents: false,
     stencilPointerEvents: false,
 
-    //scale: 1,
-    //rotation: 0,
-    //opacity: 100,       // 透明度
-    //strokeWidth: 1,     // 边框宽度
-    //flipH: false,       // 水平翻转
-    //flipV: false,       // 垂直翻转
-    //visible: true,      // 默认可见
-    //outline: false,
-    //antiAlias: true,    // 抗锯齿，平滑处理
-
-
     constructor: function Shape(state, style, bounds) {
 
         var that = this;
@@ -82,15 +71,15 @@ var Shape = Base.extend({
         return that;
     },
 
-    getScreenOffset: function () {
-
-        var style = this.style;
-        var strokeWidth = style.strokeWidth * style.scale;
-
-        strokeWidth = Math.max(1, Math.round(strokeWidth));
-
-        return mod(strokeWidth, 2) === 1 ? 0.5 : 0;
-    },
+    //getScreenOffset: function () {
+    //
+    //    var style = this.style;
+    //    var strokeWidth = style.strokeWidth * style.scale;
+    //
+    //    strokeWidth = Math.max(1, Math.round(strokeWidth));
+    //
+    //    return mod(strokeWidth, 2) === 1 ? 0.5 : 0;
+    //},
 
     redraw: function () {
 
@@ -98,8 +87,7 @@ var Shape = Base.extend({
         var node = that.node;
         var style = that.style;
 
-        // 对于连线，需要根据 points 来计算连线的 bounds
-        that.updateBoundsFromPoints();
+        that.updateLinkBounds();
 
         if (style.visible && that.checkBounds()) {
             node.style.visibility = 'visible';
@@ -129,6 +117,7 @@ var Shape = Base.extend({
         return that;
     },
 
+
     draw: function (canvas) {
 
         var that = this;
@@ -150,8 +139,8 @@ var Shape = Base.extend({
             h = t;
         }
 
-        that.updateTransform(canvas, x, y, w, h);
-        that.configureCanvas(canvas, x, y, w, h);
+        //that.updateTransform(canvas, x, y, w, h);
+        //that.configureCanvas(canvas, x, y, w, h);
 
         // Adds background rectangle to capture events
         var bg = null;
@@ -187,7 +176,7 @@ var Shape = Base.extend({
 
     drawNode: function (canvas, x, y, w, h) {
         this.drawNodeBackground(canvas, x, y, w, h);
-        canvas.state.shadow = false;
+        canvas.style.shadow = false;
         this.drawNodeForeground(canvas, x, y, w, h);
     },
 
@@ -300,25 +289,6 @@ var Shape = Base.extend({
         }
     },
 
-    updateBoundsFromPoints: function () {
-
-        var that = this;
-        var bounds;
-
-        each(that.points || [], function (point, index) {
-
-            var rect = new Rectangle(point.x, point.y, 1, 1);
-
-            if (index === 0) {
-                that.bounds = bounds = rect;
-            } else {
-                bounds.add(rect);
-            }
-        });
-
-        return that;
-    },
-
     checkBounds: function () {
 
         var bounds = this.bounds;
@@ -330,6 +300,26 @@ var Shape = Base.extend({
             && !isNaN(bounds.height)
             && bounds.width > 0
             && bounds.height > 0;
+    },
+
+    updateLinkBounds: function () {
+
+        var that = this;
+        var points = that.points;
+        var bounds;
+
+        points && each(points, function (point, index) {
+
+            var rect = new Rectangle(point.x, point.y, 1, 1);
+
+            if (bounds) {
+                bounds.add(rect);
+            } else {
+                that.bounds = bounds = rect;
+            }
+        });
+
+        return that;
     },
 
     // 可以更改内部 label 的 bounds
@@ -400,21 +390,20 @@ var Shape = Base.extend({
     createCanvas: function () {
 
         var that = this;
-        var node = that.node;
-        var canvas = new Canvas(node);
+        var canvas = new Canvas(that.node, that.style);
 
         canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
         canvas.pointerEventsValue = that.svgPointerEvents;
         canvas.blockImagePointerEvents = detector.IS_FF;
         //canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
 
-        var off = that.getScreenOffset();
-
-        if (off === 0) {
-            node.removeAttribute('transform');
-        } else {
-            node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
-        }
+        //var off = that.getScreenOffset();
+        //
+        //if (off === 0) {
+        //    node.removeAttribute('transform');
+        //} else {
+        //    node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
+        //}
 
         //if (that.outline) {
         //    canvas.setStrokeWidth(this.strokeWidth);
@@ -436,8 +425,9 @@ var Shape = Base.extend({
 
     configureCanvas: function (canvas, x, y, w, h) {
 
-        canvas.state = this.style;
         return;
+
+        canvas.state = this.style;
 
         var dash;
 
@@ -474,11 +464,11 @@ var Shape = Base.extend({
 
     destroyCanvas: function (canvas) {
 
-        each(canvas.gradients, function (gradient) {
-            gradient.mxRefCount = (gradient.mxRefCount || 0) + 1;
-        });
-        this.releaseSvgGradients(this.oldGradients);
-        this.oldGradients = canvas.gradients;
+        //each(canvas.gradients, function (gradient) {
+        //    gradient.mxRefCount = (gradient.mxRefCount || 0) + 1;
+        //});
+        //this.releaseSvgGradients(this.oldGradients);
+        //this.oldGradients = canvas.gradients;
     },
 
     setCursor: function (cursor) {
@@ -561,7 +551,7 @@ var Shape = Base.extend({
     },
 
     isPaintBoundsInverted: function () {
-        return this.direction === directions.north || this.direction === directions.south;
+        return this.direction === 'north' || this.direction === 'south';
     },
 
     destroy: function () {

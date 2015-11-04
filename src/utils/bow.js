@@ -48,9 +48,21 @@ function createSvgElement(tagName, ownerDocument, namespace) {
     return ele;
 }
 
+function write(parent, text) {
+    var doc = parent.ownerDocument;
+    var node = doc.createTextNode(text);
+
+    if (parent) {
+        parent.appendChild(node);
+    }
+
+    return node;
+}
+
 export {
     getBaseUrl,
     isNode,
     getCurrentStyle,
-    createSvgElement
+    createSvgElement,
+    write
 };

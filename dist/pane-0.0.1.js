@@ -276,7 +276,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _array = __webpack_require__(6);
 	
 	var hasOwn = Object.prototype.hasOwnProperty;
-	var slice = Array.prototype.slice;
 	
 	var hasKey = exports.hasKey = function hasKey(obj, key) {
 	    return obj !== null && hasOwn.call(obj, key);
@@ -287,7 +286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var keys = [];
 	
-	    if (isObject(obj)) {
+	    if ((0, _lang.isObject)(obj)) {
 	        for (var key in obj) {
 	            if (hasKey(obj, key)) {
 	                keys.push(key);
@@ -334,12 +333,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dist = {};
 	    }
 	
-	    var sources = slice.call(arguments, 1);
-	
-	    for (var i = 0, length = sources.length; i < length; i++) {
-	
-	        var source = sources[i];
-	
+	    for (var i = 1, length = arguments.length; i < length; i++) {
+	        var source = arguments[i];
 	        source && forIn(source, function (value, key) {
 	            dist[key] = value;
 	        });
@@ -392,7 +387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var slice = arrProto.slice;
 	
 	function toArray(obj) {
-	    return (0, _lang.isArrayLike)(obj) ? slice.call(obj) : [];
+	    return (0, _lang.isArray)(obj) ? obj : (0, _lang.isArrayLike)(obj) ? slice.call(obj) : [];
 	}
 	
 	var indexOf = arrProto.indexOf ? function (arr, item) {
@@ -424,8 +419,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        iterator.call(context, arr[i], i, arr);
 	    }
 	};
-	
-	var forEach = each;
 	
 	var map = arrProto.map ? function (arr, iterator, context) {
 	    return arr.map(iterator, context);
@@ -491,7 +484,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toArray = toArray;
 	exports.indexOf = indexOf;
 	exports.lastIndexOf = lastIndexOf;
-	exports.forEach = forEach;
 	exports.each = each;
 	exports.map = map;
 	exports.filter = filter;
@@ -627,10 +619,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ele;
 	}
 	
+	function write(parent, text) {
+	    var doc = parent.ownerDocument;
+	    var node = doc.createTextNode(text);
+	
+	    if (parent) {
+	        parent.appendChild(node);
+	    }
+	
+	    return node;
+	}
+	
 	exports.getBaseUrl = getBaseUrl;
 	exports.isNode = isNode;
 	exports.getCurrentStyle = getCurrentStyle;
 	exports.createSvgElement = createSvgElement;
+	exports.write = write;
 
 /***/ },
 /* 9 */
@@ -2649,7 +2653,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	
 	        that.styles = {};
-	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, _defaultStyle2['default'].common, _defaultStyle2['default'].node));
+	        var common = _defaultStyle2['default'].common;
+	        var nodeStyle = _defaultStyle2['default'].node;
+	
+	        nodeStyle.label = (0, _commonUtils.extend)({}, common.label, nodeStyle.label);
+	
+	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, common, nodeStyle));
 	        that.setDefaultLinkStyle((0, _commonUtils.extend)({}, _defaultLinkStyle2['default']));
 	    },
 	
@@ -4638,6 +4647,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            labelOffset.y += stateHeight;
 	        }
 	
+	        console.log(labelOffset);
+	
 	        return that;
 	    },
 	
@@ -5243,6 +5254,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
+	    equalToBounds: function equalToBounds(bounds) {
+	
+	        var that = this;
+	        return that.x === bounds.x && that.y === bounds.y && that.width === bounds.width && that.height === bounds.height;
+	    },
+	
 	    destroy: function destroy() {},
 	
 	    clone: function clone() {
@@ -5348,7 +5365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var style = state.style;
 	        var isLink = state.cell.isLink;
 	        var bounds = new _libRectangle2['default'](state.absoluteOffset.x, state.absoluteOffset.y);
-	        var inverted = state.label.isPaintBoundsInverted();
+	        var inverted = false; // state.label.isPaintBoundsInverted();
 	
 	        if (isLink) {} else {
 	            if (inverted) {
@@ -5396,131 +5413,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    rotateLabelBounds: function rotateLabelBounds(state, bounds) {},
 	
-	    // 在 view.createState() 方法中调用
+	    // try to create state's shape after the state be created
 	    createShape: function createShape(state) {
 	
 	        var that = this;
 	
 	        if (state.style) {
 	
-	            var shapeName = state.style.shape;
-	            var Constructor = that.getShape(shapeName);
+	            var Constructor = that.getShape(state.style.shape);
 	
 	            if (!Constructor) {
-	                Constructor = state.cell.isLink ? that.defaultLinkShape : that.defaultNodeShape;
+	                Constructor = state.cell.isLink ? that.defaultLinkShape : state.cell.isNode ? that.defaultNodeShape : null;
 	            }
 	
-	            state.shape = new Constructor(state, null, state.style);
+	            if (Constructor) {
+	                state.shape = new Constructor(state, state.style);
+	            }
 	        }
 	
 	        return that;
 	    },
 	
-	    createLabel: function createLabel(state, text) {
+	    createLabel: function createLabel(state, bounds) {
 	
 	        var that = this;
+	        var style = (0, _commonUtils.extend)({}, state.style, state.style.label);
 	
-	        if (state.style) {
-	            var shapeName = state.style.labelShape;
-	            var Constructor = that.getShape(shapeName) || that.defaultLabelShape;
+	        delete style.label;
 	
-	            state.label = new Constructor(state);
+	        if (style) {
+	            var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
 	
-	            that.initLabel(state);
+	            state.label = new Constructor(state, style, bounds);
+	
+	            that.appendLabel(state);
 	        }
-	
-	        //var graph = state.view.graph;
-	        //var style = state.style;
-	        //var isEdge = graph.getModel().isEdge(state.cell);
-	        //
-	        //if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
-	        //    // Avoids using DOM node for empty labels
-	        //    var isForceHtml = (graph.isHtmlLabel(state.cell) || (text != null && mxUtils.isNode(text)));
-	        //
-	        //    state.text = new this.defaultTextShape(text, new mxRectangle(),
-	        //        (state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER),
-	        //        graph.getVerticalAlign(state),
-	        //        state.style[mxConstants.STYLE_FONTCOLOR],
-	        //        state.style[mxConstants.STYLE_FONTFAMILY],
-	        //        state.style[mxConstants.STYLE_FONTSIZE],
-	        //        state.style[mxConstants.STYLE_FONTSTYLE],
-	        //        state.style[mxConstants.STYLE_SPACING],
-	        //        state.style[mxConstants.STYLE_SPACING_TOP],
-	        //        state.style[mxConstants.STYLE_SPACING_RIGHT],
-	        //        state.style[mxConstants.STYLE_SPACING_BOTTOM],
-	        //        state.style[mxConstants.STYLE_SPACING_LEFT],
-	        //        state.style[mxConstants.STYLE_HORIZONTAL],
-	        //        state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR],
-	        //        state.style[mxConstants.STYLE_LABEL_BORDERCOLOR],
-	        //        graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell),
-	        //        graph.isLabelClipped(state.cell),
-	        //        state.style[mxConstants.STYLE_OVERFLOW],
-	        //        state.style[mxConstants.STYLE_LABEL_PADDING]);
-	        //
-	        //    state.text.opacity = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_OPACITY, 100);
-	        //    state.text.dialect = (isForceHtml) ? mxConstants.DIALECT_STRICTHTML : state.view.graph.dialect;
-	        //    state.text.style = state.style;
-	        //    state.text.state = state;
-	        //
-	        //    this.initLabel(state);
-	        //
-	        //    // Workaround for touch devices routing all events for a mouse gesture
-	        //    // (down, move, up) via the initial DOM node. IE additionally redirects
-	        //    // the event via the initial DOM node but the event source is the node
-	        //    // under the mouse, so we need to check if this is the case and force
-	        //    // getCellAt for the subsequent mouseMoves and the final mouseUp.
-	        //    var forceGetCell = false;
-	        //
-	        //    var getState = function (evt) {
-	        //        var result = state;
-	        //
-	        //        if (mxClient.IS_TOUCH || forceGetCell) {
-	        //            var x = mxEvent.getClientX(evt);
-	        //            var y = mxEvent.getClientY(evt);
-	        //
-	        //            // Dispatches the drop event to the graph which
-	        //            // consumes and executes the source function
-	        //            var pt = mxUtils.convertPoint(graph.container, x, y);
-	        //            result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
-	        //        }
-	        //
-	        //        return result;
-	        //    };
-	        //
-	        //    // TODO: Add handling for special touch device gestures
-	        //    mxEvent.addGestureListeners(state.text.node,
-	        //        mxUtils.bind(this, function (evt) {
-	        //            if (this.isLabelEvent(state, evt)) {
-	        //                graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt, state));
-	        //                forceGetCell = graph.dialect != mxConstants.DIALECT_SVG &&
-	        //                    mxEvent.getSource(evt).nodeName == 'IMG';
-	        //            }
-	        //        }),
-	        //        mxUtils.bind(this, function (evt) {
-	        //            if (this.isLabelEvent(state, evt)) {
-	        //                graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt, getState(evt)));
-	        //            }
-	        //        }),
-	        //        mxUtils.bind(this, function (evt) {
-	        //            if (this.isLabelEvent(state, evt)) {
-	        //                graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt, getState(evt)));
-	        //                forceGetCell = false;
-	        //            }
-	        //        })
-	        //    );
-	        //
-	        //    // Uses double click timeout in mxGraph for quirks mode
-	        //    if (graph.nativeDblClickEnabled) {
-	        //        mxEvent.addListener(state.text.node, 'dblclick',
-	        //            mxUtils.bind(this, function (evt) {
-	        //                if (this.isLabelEvent(state, evt)) {
-	        //                    graph.dblClick(evt, state.cell);
-	        //                    mxEvent.consume(evt);
-	        //                }
-	        //            })
-	        //        );
-	        //    }
-	        //}
 	    },
 	
 	    createIndicator: function createIndicator(state) {
@@ -5533,65 +5460,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    createCellOverlays: function createCellOverlays() {},
+	    createOverlays: function createOverlays() {},
 	
 	    createControl: function createControl() {},
 	
-	    initShape: function initShape(state) {
-	
-	        var that = this;
-	        var shape = state.shape;
-	
-	        //that.configureShape(state);
-	        shape.init(state.view.drawPane);
-	        shape.style = state.style;
-	
-	        return that;
+	    appendShape: function appendShape(state) {
+	        state.shape.init(state.view.drawPane);
+	        return this;
 	    },
 	
-	    initLabel: function initLabel(state) {
+	    appendLabel: function appendLabel(state) {
 	        state.label.init(state.view.drawPane);
+	        return this;
 	    },
-	
-	    configureShape: function configureShape(state) {
-	
-	        var that = this;
-	        var graph = state.view.graph;
-	        var shape = state.shape;
-	        var style = state.style;
-	
-	        shape.style = style;
-	
-	        shape.apply(state);
-	        //shape.image = graph.getImage(state);
-	        //shape.indicatorColor = graph.getIndicatorColor(state);
-	        //shape.indicatorStrokeColor = style[mxConstants.STYLE_INDICATOR_STROKECOLOR];
-	        //shape.indicatorGradientColor = graph.getIndicatorGradientColor(state);
-	        //shape.indicatorDirection = style[mxConstants.STYLE_INDICATOR_DIRECTION];
-	        //shape.indicatorImage = graph.getIndicatorImage(state);
-	
-	        that.postConfigureShape(state);
-	
-	        return that;
-	    },
-	
-	    postConfigureShape: function postConfigureShape() {},
-	
-	    resolveColor: function resolveColor() {},
 	
 	    redraw: function redraw(state, force, rendering) {
 	
 	        var that = this;
-	
-	        rendering = !(0, _commonUtils.isNullOrUndefined)(rendering) ? rendering : true;
-	
 	        // 处理 force, 检查样式是否更新，因为下面就更新样式了
-	
 	        var shapeChanged = that.redrawShape(state, force, rendering);
 	
 	        if (state.shape && rendering) {
 	            that.redrawLabel(state, shapeChanged);
-	            that.redrawCellOverlays(state, shapeChanged);
+	            that.redrawOverlays(state, shapeChanged);
 	            that.redrawControl(state, shapeChanged);
 	        }
 	    },
@@ -5605,8 +5496,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (shape) {
 	            if (!shape.node) {
 	                that.createIndicator(state);
-	                that.initShape(state);
-	                that.createCellOverlays(state);
+	                that.appendShape(state);
+	                that.createOverlays(state);
 	                that.installListeners(state);
 	            }
 	
@@ -5621,17 +5512,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // Redraws the cell if required, ignores changes to bounds if points are
 	            // defined as the bounds are updated for the given points inside the shape
-	            if (force || !shape.bounds || shape.scale !== state.view.scale || state.absolutePoints == null && !state.shape.bounds.equals(state) || state.absolutePoints != null && !utils.equalPoints(state.shape.points, state.absolutePoints)) {
+	            if (force || !shape.bounds || shape.scale !== state.view.scale || !state.absolutePoints && !state.equalToBounds(shape.bounds) || state.absolutePoints && !utils.equalPoints(state.shape.points, state.absolutePoints)) {
 	
 	                if (state.absolutePoints) {
 	                    // 绘制连线
-	                    state.shape.points = state.absolutePoints.slice();
-	                    state.shape.bounds = null;
+	                    shape.points = state.absolutePoints.slice();
+	                    shape.bounds = null;
 	                } else {
 	                    // 绘制节点
-	                    state.shape.points = null;
+	                    shape.points = null;
 	                    // 初始化节点的 bounds
-	                    state.shape.bounds = new _libRectangle2['default'](state.x, state.y, state.width, state.height);
+	                    shape.bounds = new _libRectangle2['default'](state.x, state.y, state.width, state.height);
 	                }
 	
 	                //shape.scale = state.view.scale;
@@ -5653,9 +5544,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var text = state.view.graph.getLabelText(state.cell);
+	        var bounds = that.getLabelBounds(state);
 	
 	        if (!state.label && text) {
-	            that.createLabel(state, text);
+	            that.createLabel(state, bounds);
 	        } else if (state.label && !text) {
 	            state.label.destroy();
 	            state.label = null;
@@ -5664,13 +5556,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (state.label) {
 	
 	            var label = state.label;
-	            var bounds = that.getLabelBounds(state);
 	
 	            if (forced || label.text !== text) {
+	                label.text = text;
 	                label.redraw();
 	            }
 	        }
 	    },
+	
+	    redrawOverlays: function redrawOverlays() {},
+	
+	    redrawControl: function redrawControl() {},
 	
 	    installListeners: function installListeners() {}
 	});
@@ -5784,16 +5680,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    shapePointerEvents: false,
 	    stencilPointerEvents: false,
 	
-	    //scale: 1,
-	    //rotation: 0,
-	    //opacity: 100,       // 透明度
-	    //strokeWidth: 1,     // 边框宽度
-	    //flipH: false,       // 水平翻转
-	    //flipV: false,       // 垂直翻转
-	    //visible: true,      // 默认可见
-	    //outline: false,
-	    //antiAlias: true,    // 抗锯齿，平滑处理
-	
 	    constructor: function Shape(state, style, bounds) {
 	
 	        var that = this;
@@ -5843,15 +5729,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    getScreenOffset: function getScreenOffset() {
-	
-	        var style = this.style;
-	        var strokeWidth = style.strokeWidth * style.scale;
-	
-	        strokeWidth = Math.max(1, Math.round(strokeWidth));
-	
-	        return (0, _commonUtils.mod)(strokeWidth, 2) === 1 ? 0.5 : 0;
-	    },
+	    //getScreenOffset: function () {
+	    //
+	    //    var style = this.style;
+	    //    var strokeWidth = style.strokeWidth * style.scale;
+	    //
+	    //    strokeWidth = Math.max(1, Math.round(strokeWidth));
+	    //
+	    //    return mod(strokeWidth, 2) === 1 ? 0.5 : 0;
+	    //},
 	
 	    redraw: function redraw() {
 	
@@ -5859,8 +5745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = that.node;
 	        var style = that.style;
 	
-	        // 对于连线，需要根据 points 来计算连线的 bounds
-	        that.updateBoundsFromPoints();
+	        that.updateLinkBounds();
 	
 	        if (style.visible && that.checkBounds()) {
 	            node.style.visibility = 'visible';
@@ -5911,8 +5796,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            h = t;
 	        }
 	
-	        that.updateTransform(canvas, x, y, w, h);
-	        that.configureCanvas(canvas, x, y, w, h);
+	        //that.updateTransform(canvas, x, y, w, h);
+	        //that.configureCanvas(canvas, x, y, w, h);
 	
 	        // Adds background rectangle to capture events
 	        var bg = null;
@@ -5948,7 +5833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    drawNode: function drawNode(canvas, x, y, w, h) {
 	        this.drawNodeBackground(canvas, x, y, w, h);
-	        canvas.state.shadow = false;
+	        canvas.style.shadow = false;
 	        this.drawNodeForeground(canvas, x, y, w, h);
 	    },
 	
@@ -6058,30 +5943,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    updateBoundsFromPoints: function updateBoundsFromPoints() {
-	
-	        var that = this;
-	        var bounds;
-	
-	        (0, _commonUtils.each)(that.points || [], function (point, index) {
-	
-	            var rect = new _libRectangle2['default'](point.x, point.y, 1, 1);
-	
-	            if (index === 0) {
-	                that.bounds = bounds = rect;
-	            } else {
-	                bounds.add(rect);
-	            }
-	        });
-	
-	        return that;
-	    },
-	
 	    checkBounds: function checkBounds() {
 	
 	        var bounds = this.bounds;
 	
 	        return bounds && !isNaN(bounds.x) && !isNaN(bounds.y) && !isNaN(bounds.width) && !isNaN(bounds.height) && bounds.width > 0 && bounds.height > 0;
+	    },
+	
+	    updateLinkBounds: function updateLinkBounds() {
+	
+	        var that = this;
+	        var points = that.points;
+	        var bounds;
+	
+	        points && (0, _commonUtils.each)(points, function (point, index) {
+	
+	            var rect = new _libRectangle2['default'](point.x, point.y, 1, 1);
+	
+	            if (bounds) {
+	                bounds.add(rect);
+	            } else {
+	                that.bounds = bounds = rect;
+	            }
+	        });
+	
+	        return that;
 	    },
 	
 	    // 可以更改内部 label 的 bounds
@@ -6150,21 +6036,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    createCanvas: function createCanvas() {
 	
 	        var that = this;
-	        var node = that.node;
-	        var canvas = new _drawingCanvas2['default'](node);
+	        var canvas = new _drawingCanvas2['default'](that.node, that.style);
 	
 	        canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
 	        canvas.pointerEventsValue = that.svgPointerEvents;
 	        canvas.blockImagePointerEvents = _commonDetector2['default'].IS_FF;
 	        //canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
 	
-	        var off = that.getScreenOffset();
-	
-	        if (off === 0) {
-	            node.removeAttribute('transform');
-	        } else {
-	            node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
-	        }
+	        //var off = that.getScreenOffset();
+	        //
+	        //if (off === 0) {
+	        //    node.removeAttribute('transform');
+	        //} else {
+	        //    node.setAttribute('transform', 'translate(' + off + ',' + off + ')');
+	        //}
 	
 	        //if (that.outline) {
 	        //    canvas.setStrokeWidth(this.strokeWidth);
@@ -6186,8 +6071,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    configureCanvas: function configureCanvas(canvas, x, y, w, h) {
 	
-	        canvas.state = this.style;
 	        return;
+	
+	        canvas.state = this.style;
 	
 	        var dash;
 	
@@ -6223,11 +6109,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    destroyCanvas: function destroyCanvas(canvas) {
 	
-	        (0, _commonUtils.each)(canvas.gradients, function (gradient) {
-	            gradient.mxRefCount = (gradient.mxRefCount || 0) + 1;
-	        });
-	        this.releaseSvgGradients(this.oldGradients);
-	        this.oldGradients = canvas.gradients;
+	        //each(canvas.gradients, function (gradient) {
+	        //    gradient.mxRefCount = (gradient.mxRefCount || 0) + 1;
+	        //});
+	        //this.releaseSvgGradients(this.oldGradients);
+	        //this.oldGradients = canvas.gradients;
 	    },
 	
 	    setCursor: function setCursor(cursor) {
@@ -6308,7 +6194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return this.direction === _enumsDirections2['default'].north || this.direction === _enumsDirections2['default'].south;
+	        return this.direction === 'north' || this.direction === 'south';
 	    },
 	
 	    destroy: function destroy() {
@@ -7101,134 +6987,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LinearGradientBrush2 = _interopRequireDefault(_LinearGradientBrush);
 	
-	// 属性访问器
-	var accessor = {};
-	(0, _commonUtils.each)(['alpha', 'fillColor', 'fillAlpha', 'gradientColor', 'gradientAlpha', 'gradientDirection', 'strokeWidth', 'strokeColor', 'dashed', 'dashPattern', 'dashOffset', 'lineCap', 'lineJoin', 'miterLimit', 'fontColor', 'fontBackgroundColor', 'fontBorderColor', 'fontSize', 'fontStyle', 'fontFamily', 'shadow', 'shadowColor', 'shadowAlpha', 'shadowDx', 'shadowDy'], function (attr) {
-	    accessor['set' + (0, _commonUtils.ucFirst)(attr)] = function (value) {
-	
-	        var that = this;
-	        var state = that.state;
-	
-	        if (state) {
-	            state[attr] = value;
-	        }
-	
-	        return that;
-	    };
-	});
-	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    //antiAlias: true,
-	
-	    //Implements: accessor,
-	
-	    constructor: function Canvas(root) {
+	    constructor: function Canvas(root, style) {
 	
 	        var that = this;
 	
 	        that.root = root;
-	        that.reset();
-	    },
-	
-	    reset: function reset() {
-	
-	        var that = this;
-	
-	        that.state = {};
-	        that.states = [];
-	        that.gradients = [];
-	
-	        return that;
-	    },
-	
-	    save: function save() {
-	
-	        var that = this;
-	        var state = that.state;
-	
-	        that.states.push(state);
-	        that.state = (0, _commonUtils.clone)(state);
-	
-	        return that;
-	    },
-	
-	    restore: function restore() {
-	
-	        var that = this;
-	
-	        that.state = that.states.pop();
-	
-	        return that;
-	    },
-	
-	    scale: function scale(value) {
-	        var that = this;
-	        var state = that.state;
-	
-	        state.scale *= value;
-	        state.strokeWidth *= value;
-	
-	        return that;
-	    },
-	
-	    translate: function translate(dx, dy) {
-	        var that = this;
-	        var state = that.state;
-	
-	        state.dx += dx;
-	        state.dy += dy;
-	
-	        return that;
-	    },
-	
-	    rotate: function rotate(theta, flipH, flipV, cx, cy) {
-	
-	        var canvas = this;
-	        var format = canvas.format;
-	
-	        if (theta !== 0 || flipH || flipV) {
-	
-	            var state = canvas.state;
-	
-	            cx += state.dx;
-	            cy += state.dy;
-	
-	            cx *= state.scale;
-	            cy *= state.scale;
-	
-	            state.transform = state.transform || '';
-	
-	            // This implementation uses custom scale/translate and built-in rotation
-	            // Rotation state is part of the AffineTransform in state.transform
-	            if (flipH && flipV) {
-	                theta += 180;
-	            } else if (flipH !== flipV) {
-	                var tx = flipH ? cx : 0;
-	                var sx = flipH ? -1 : 1;
-	
-	                var ty = flipV ? cy : 0;
-	                var sy = flipV ? -1 : 1;
-	
-	                state.transform += 'translate(' + format(tx) + ',' + format(ty) + ')' + 'scale(' + format(sx) + ',' + format(sy) + ')' + 'translate(' + format(-tx) + ',' + format(-ty) + ')';
-	            }
-	
-	            if (flipH ? !flipV : flipV) {
-	                theta *= -1;
-	            }
-	
-	            if (theta !== 0) {
-	                state.transform += 'rotate(' + format(theta) + ',' + format(cx) + ',' + format(cy) + ')';
-	            }
-	
-	            state.rotation = state.rotation + theta;
-	            state.rotationCx = cx;
-	            state.rotationCy = cy;
-	        }
-	    },
-	
-	    format: function format(value) {
-	        return this.state.antiAlias ? (0, _commonUtils.toFixed)(value, 2) : Math.round(parseFloat(value));
+	        that.style = style;
+	        that.format = style.antiAlias ? function (value) {
+	            return (0, _commonUtils.toFixed)(value, 2);
+	        } : function (value) {
+	            return Math.round(value);
+	        };
 	    },
 	
 	    // Draw
@@ -7249,25 +7020,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return path;
 	    },
 	
-	    drawRect: function drawRect(x, y, w, h, dx, dy) {
+	    drawRect: function drawRect(x, y, w, h, rx, ry) {
 	
 	        var that = this;
-	        var state = that.state;
+	        var style = that.style;
+	        var scale = style.scale;
 	        var format = that.format.bind(that);
-	        var scale = state.scale;
 	        var node = that.createElement('rect');
 	
-	        node.setAttribute('x', format((x + state.dx) * scale));
-	        node.setAttribute('y', format((y + state.dy) * scale));
+	        node.setAttribute('x', format((x + style.dx) * scale));
+	        node.setAttribute('y', format((y + style.dy) * scale));
 	        node.setAttribute('width', format(w * scale));
 	        node.setAttribute('height', format(h * scale));
 	
-	        if (dx > 0) {
-	            node.setAttribute('rx', format(dx * scale));
+	        if (rx > 0) {
+	            node.setAttribute('rx', format(rx * scale));
 	        }
 	
-	        if (dy > 0) {
-	            node.setAttribute('ry', format(dy * scale));
+	        if (ry > 0) {
+	            node.setAttribute('ry', format(ry * scale));
 	        }
 	
 	        that.node = node;
@@ -7278,13 +7049,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    drawEllipse: function drawEllipse(x, y, w, h) {
 	
 	        var canvas = this;
-	        var state = canvas.state;
-	        var scale = state.scale;
+	        var style = canvas.style;
+	        var scale = style.scale;
 	
 	        var node = canvas.createElement('ellipse');
 	
-	        node.setAttribute('cx', Math.round((x + w / 2 + state.dx) * scale));
-	        node.setAttribute('cy', Math.round((y + h / 2 + state.dy) * scale));
+	        node.setAttribute('cx', Math.round((x + w / 2 + style.dx) * scale));
+	        node.setAttribute('cy', Math.round((y + h / 2 + style.dy) * scale));
 	        node.setAttribute('rx', w / 2 * scale);
 	        node.setAttribute('ry', h / 2 * scale);
 	
@@ -7295,14 +7066,70 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    drawImage: function drawImage() {},
 	
-	    drawString: function drawString() {},
+	    drawString: function drawString(x, y, w, h, text) {
+	
+	        var that = this;
+	        var node = that.createElement('g');
+	        var style = that.style;
+	        var scale = style.scale;
+	        var align = style.align;
+	        var vAlign = style.verticalAlign;
+	        var fontSize = Math.round(style.fontSize);
+	
+	        if (fontSize) {
+	            node.setAttribute('font-size', Math.round(fontSize * scale) + 'px');
+	        }
+	
+	        if (style.fontColor) {
+	            node.setAttribute('fill', style.fontColor);
+	        }
+	
+	        if (style.fontFamily) {
+	            node.setAttribute('font-family', style.fontFamily);
+	        }
+	
+	        if (style.fontWeight) {
+	            node.setAttribute('font-weight', style.fontWeight);
+	        }
+	
+	        if (style.italic) {
+	            node.setAttribute('font-style', 'italic');
+	        }
+	
+	        if (style.textDecoration) {
+	            node.setAttribute('text-decoration', style.textDecoration);
+	        }
+	
+	        var anchor = align === 'right' ? 'end' : align === 'center' ? 'middle' : 'start';
+	
+	        if (anchor !== 'start') {
+	            node.setAttribute('text-anchor', anchor);
+	        }
+	
+	        if (style.opacity < 1) {
+	            node.setAttribute('opacity', style.opacity);
+	        }
+	
+	        //var lines = text.split('\n');
+	        //var lineHeight = Math.round(style.lineHeight * fontSize);
+	        //var totalHeight = lines.length * lineHeight;
+	
+	        var textNode = that.createElement('text');
+	        textNode.setAttribute('x', 10);
+	        textNode.setAttribute('y', 10);
+	
+	        (0, _commonUtils.write)(textNode, text);
+	        node.appendChild(textNode);
+	
+	        that.root.appendChild(node);
+	    },
 	
 	    addNode: function addNode(filled, stroked) {
 	
 	        var that = this;
 	        var root = that.root;
 	        var node = that.node;
-	        var state = that.state;
+	        var style = that.style;
 	
 	        if (node) {
 	
@@ -7310,7 +7137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (path) {}
 	
 	            // fill
-	            if (state.fillColor && state.gradientColor) {
+	            if (style.fillColor && style.gradientColor) {
 	                new _LinearGradientBrush2['default'](that).fill(filled);
 	            } else {
 	                new _SolidBrush2['default'](that).fill(filled);
@@ -7320,18 +7147,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            new _Pen2['default'](that).stroke(stroked);
 	
 	            // transform
-	            var transform = state.transform;
+	            var transform = style.transform;
 	            if (transform && transform.length > 0) {
 	                node.setAttribute('transform', transform);
 	            }
 	
 	            // shadow
-	            if (state.shadow) {
+	            if (style.shadow) {
 	                root.appendChild(that.createShadow(node));
 	            }
 	
 	            // strokeTolerance
-	            filled = filled && state.fillColor ? true : false;
+	            filled = filled && style.fillColor ? true : false;
 	            if (that.strokeTolerance > 0 && !filled) {
 	                root.appendChild(that.createTolerance(node));
 	            }
@@ -7352,19 +7179,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    createShadow: function createShadow(node) {
 	
 	        var that = this;
-	        var state = that.state;
+	        var style = that.style;
 	        var shadow = node.cloneNode(true);
 	
 	        if (shadow.getAttribute('fill') !== 'none') {
-	            shadow.setAttribute('fill', state.shadowColor);
+	            shadow.setAttribute('fill', style.shadowColor);
 	        }
 	
 	        if (shadow.getAttribute('stroke') !== 'none') {
-	            shadow.setAttribute('stroke', state.shadowColor);
+	            shadow.setAttribute('stroke', style.shadowColor);
 	        }
 	
-	        shadow.setAttribute('transform', 'translate(' + that.format(state.shadowDx * state.scale) + ',' + this.format(state.shadowDy * state.scale) + ')' + (state.transform || ''));
-	        shadow.setAttribute('opacity', state.shadowAlpha);
+	        shadow.setAttribute('transform', 'translate(' + that.format(style.shadowDx * style.scale) + ',' + this.format(style.shadowDy * style.scale) + ')' + (style.transform || ''));
+	        shadow.setAttribute('opacity', style.shadowAlpha);
 	
 	        return shadow;
 	    },
@@ -7501,18 +7328,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var canvas = that.canvas;
-	        var state = canvas.state;
+	        var style = canvas.style;
 	        var node = canvas.node;
 	
-	        if (stroked && state.strokeColor) {
+	        if (stroked && style.strokeColor) {
 	
-	            node.setAttribute('stroke', state.strokeColor.toLowerCase());
+	            node.setAttribute('stroke', style.strokeColor.toLowerCase());
 	
-	            if (state.alpha < 1) {
-	                node.setAttribute('stroke-opacity', state.alpha);
+	            if (style.alpha < 1) {
+	                node.setAttribute('stroke-opacity', style.alpha);
 	            }
 	
-	            var strokeWidth = state.strokeWidth * state.scale;
+	            var strokeWidth = style.strokeWidth * style.scale;
 	            var fixedStrokeWidth = Math.max(1, strokeWidth);
 	
 	            if (fixedStrokeWidth !== 1) {
@@ -7523,31 +7350,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (node.nodeName.toLowerCase() === 'path') {
 	
 	                // lineJoin
-	                var lineJoin = state.lineJoin;
+	                var lineJoin = style.lineJoin;
 	                // 'miter' is default in SVG
 	                if (lineJoin && lineJoin !== 'miter') {
 	                    node.setAttribute('stroke-linejoin', lineJoin);
 	                }
 	
 	                // lineCap
-	                var lineCap = state.lineCap;
+	                var lineCap = style.lineCap;
 	                // 'butt' is default in SVG
 	                if (lineCap && lineCap !== 'butt') {
 	                    node.setAttribute('stroke-linecap', lineCap);
 	                }
 	
 	                // miterLimit
-	                var miterLimit = state.miterLimit;
+	                var miterLimit = style.miterLimit;
 	                // 10 is default in our document
 	                if (miterLimit && miterLimit !== 10) {
 	                    this.node.setAttribute('stroke-miterlimit', miterLimit);
 	                }
 	            }
 	
-	            if (state.dashed) {
+	            if (style.dashed) {
 	
 	                // dashPattern
-	                var dashPattern = state.dashPattern;
+	                var dashPattern = style.dashPattern;
 	                var dash = ('' + dashPattern).split(' ');
 	                var pattern = (0, _commonUtils.map)(dash, function (pat) {
 	                    return pat * strokeWidth;
@@ -7556,7 +7383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                node.setAttribute('stroke-dasharray', pattern.join(' '));
 	
 	                // dashOffset
-	                var dashOffset = state.dashOffset;
+	                var dashOffset = style.dashOffset;
 	                if (dashOffset) {
 	                    node.setAttribute('stroke-dashoffset', dashOffset);
 	                }
@@ -7596,10 +7423,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var canvas = that.canvas;
-	        var state = canvas.state;
+	        var style = canvas.style;
 	        var node = canvas.node;
 	
-	        var fillColor = state.fillColor;
+	        var fillColor = style.fillColor;
 	
 	        if (fillColor) {
 	            node.setAttribute('fill', fillColor.toLowerCase());
@@ -7636,13 +7463,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var canvas = that.canvas;
-	        var state = canvas.state;
+	        var style = canvas.style;
 	        var node = canvas.node;
 	
 	        if (filled) {
 	
-	            if (state.alpha < 1) {
-	                node.setAttribute('fill-opacity', state.alpha);
+	            if (style.alpha < 1) {
+	                node.setAttribute('fill-opacity', style.alpha);
 	            }
 	
 	            that.doFill();
@@ -7801,13 +7628,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var canvas = that.canvas;
-	        var state = canvas.state;
+	        var style = canvas.style;
 	        var node = canvas.node;
-	        var fillColor = state.fillColor;
-	        var gradientColor = state.gradientColor;
+	        var fillColor = style.fillColor;
+	        var gradientColor = style.gradientColor;
 	
 	        if (fillColor && gradientColor) {
-	            var id = that.getGradient(fillColor, gradientColor, state.fillAlpha, state.gradientAlpha, state.gradientDirection);
+	            var id = that.getGradient(fillColor, gradientColor, style.fillAlpha, style.gradientAlpha, style.gradientDirection);
 	            var base = (0, _commonUtils.getBaseUrl)().replace(/([\(\)])/g, '\\$1');
 	
 	            node.setAttribute('fill', 'url(' + base + '#' + id + ')');
@@ -7851,7 +7678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // border
 	        strokeWidth: 1,
-	        strokeColor: '#289de9',
+	        strokeColor: '#2db7f5',
 	        dashed: false,
 	        dashPattern: '3 3',
 	        dashOffset: 0,
@@ -7859,29 +7686,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        lineJoin: 'miter', // miter, round, bevel
 	        miterLimit: 10,
 	
-	        // alignment
-	        verticalAlign: 'middle', // top, middle, bottom
-	        align: 'center', // left, center, right
-	
 	        // shadow
 	        shadow: false,
 	        shadowColor: 'gray',
 	        shadowOpacity: 1,
 	        shadowDx: 2,
 	        shadowDy: 3,
-	
-	        // label
-	        labelShape: 'label',
-	        labelWidth: 0,
-	        labelSpacing: 2, // [2, 2, 2, 2]
-	        labelPosition: '',
-	        labelVerticalPosition: '',
-	        labelBorderColor: '',
-	        labelBorderWidth: '',
-	        labelBackgroundColor: '',
-	        labelPadding: '',
-	        whiteSpace: 'wrap',
-	        overflow: 'hidden',
 	
 	        glass: false,
 	        flipH: false, // 水平翻转
@@ -7891,48 +7701,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	        antiAlias: true,
 	
 	        label: {
+	            shape: 'label',
+	            width: 0, // 0 表示直接
+	            spacing: 2,
+	            align: 'center', // left, center, right
+	            verticalAlign: 'middle', // top, middle, bottom
+	            position: 'center', // top, right, bottom, left, center
+	
+	            whiteSpace: 'wrap', // 自动换行
+	            overflow: 'hidden',
+	
+	            strokeWidth: 0,
+	            dashed: false,
+	            shadow: false,
+	            fillColor: '',
+	
 	            // font
 	            fontColor: '#774400',
-	            fontOpacity: 1,
 	            fontSize: 12,
-	            fontStyle: 0,
 	            fontFamily: 'Arial,Helvetica',
-	            fontVariant: '',
+	            fontOpacity: 1,
 	            fontWeight: '',
+	            italic: false,
+	            textDecoration: '', // line-through, underline,
+	            fontVariant: '',
 	            fontStretch: '',
 	            letterSpacing: '',
 	            wordSpacing: '',
 	            kerning: '',
-	            textDecoration: ''
+	            lineHeight: 1
 	        }
 	    },
 	
 	    node: {
 	        shape: 'rectangle',
-	        round: 0, // 圆角大小的百分比（0-1）
+	        round: 0, // percentage
 	        label: {}
 	    },
 	
 	    link: {
-	        shape: 'connector',
+	        shape: 'link',
 	        endArrow: 'classic', // classic, block, open, oval, diamond, diamondThin
 	        label: {}
-	    },
-	
-	    label: {
-	        shape: 'label',
-	        width: 0,
-	        spacing: 2,
-	        position: '',
-	        verticalPosition: '',
-	
-	        strokeWidth: 0,
-	        strokeColor: '#289de9',
-	        dashed: false,
-	        dashPattern: '3 3',
-	        dashOffset: 0,
-	        shadow: false,
-	        fillColor: ''
 	    }
 	};
 
@@ -7955,25 +7765,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
 	exports['default'] = _Shape2['default'].extend({
-	    constructor: function Text(state) {
 	
-	        var that = this;
-	
-	        Text.superclass.constructor.call(that, state);
-	
-	        //that.bounds = bounds;
-	        //that.fill = fill;
-	        //that.stroke = stroke;
-	        //that.strokeWidth = !isNullOrUndefined(strokeWidth) ? strokeWidth : 1;
-	    },
-	
-	    isHtmlAllowed: function isHtmlAllowed() {
-	        var shape = this;
-	        return !shape.isRounded && !shape.glass && shape.rotation === 0;
-	    },
-	
-	    getScreenOffset: function getScreenOffset() {
-	        return 0;
+	    constructor: function Text(state, style, bounds) {
+	        Text.superclass.constructor.call(this, state, style, bounds);
 	    },
 	
 	    draw: function draw(canvas) {
@@ -7984,23 +7778,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var w = that.bounds.width / scale;
 	        var h = that.bounds.height / scale;
 	
-	        this.updateTransform(canvas, x, y, w, h);
-	        this.configureCanvas(canvas, x, y, w, h);
+	        //this.updateTransform(canvas, x, y, w, h);
+	
+	        canvas.drawString(x, y, w, h, that.text);
 	
 	        // Checks if text contains HTML markup
-	        var realHtml = mxUtils.isNode(this.value) || this.dialect == mxConstants.DIALECT_STRICTHTML;
-	
-	        // Always renders labels as HTML in VML
-	        var fmt = realHtml || canvas instanceof mxVmlCanvas2D ? 'html' : '';
-	        var val = this.value;
-	
-	        if (!realHtml && fmt == 'html') {
-	            val = mxUtils.htmlEntities(val, false);
-	        }
-	
-	        val = !mxUtils.isNode(this.value) && this.replaceLinefeeds && fmt == 'html' ? val.replace(/\n/g, '<br/>') : val;
-	
-	        canvas.text(x, y, w, h, val, this.align, this.valign, this.wrap, fmt, this.overflow, this.clipped, this.getTextRotation());
+	        //var realHtml = mxUtils.isNode(this.value) || this.dialect == mxConstants.DIALECT_STRICTHTML;
+	        //
+	        //// Always renders labels as HTML in VML
+	        //var fmt = (realHtml || canvas instanceof mxVmlCanvas2D) ? 'html' : '';
+	        //var val = this.value;
+	        //
+	        //if (!realHtml && fmt == 'html') {
+	        //    val = mxUtils.htmlEntities(val, false);
+	        //}
+	        //
+	        //val = (!mxUtils.isNode(this.value) && this.replaceLinefeeds && fmt == 'html') ?
+	        //    val.replace(/\n/g, '<br/>') : val;
+	        //
+	        //canvas.text(x, y, w, h, val, this.align, this.valign, this.wrap, fmt, this.overflow,
+	        //    this.clipped, this.getTextRotation());
 	    }
 	
 	});

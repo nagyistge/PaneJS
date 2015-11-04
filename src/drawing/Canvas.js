@@ -3,6 +3,7 @@ import {
     clone,
     ucFirst,
     toFixed,
+    write,
     createSvgElement
 } from '../common/utils'
 import Base  from '../lib/Base';
@@ -11,170 +12,22 @@ import Pen   from './Pen';
 import SolidBrush          from './SolidBrush';
 import LinearGradientBrush from './LinearGradientBrush';
 
-// 属性访问器
-var accessor = {};
-each([
-    'alpha',
-
-    'fillColor',
-    'fillAlpha',
-    'gradientColor',
-    'gradientAlpha',
-    'gradientDirection',
-
-    'strokeWidth',
-    'strokeColor',
-    'dashed',
-    'dashPattern',
-    'dashOffset',
-    'lineCap',
-    'lineJoin',
-    'miterLimit',
-
-    'fontColor',
-    'fontBackgroundColor',
-    'fontBorderColor',
-    'fontSize',
-    'fontStyle',
-    'fontFamily',
-
-    'shadow',
-    'shadowColor',
-    'shadowAlpha',
-    'shadowDx',
-    'shadowDy'
-], function (attr) {
-    accessor['set' + ucFirst(attr)] = function (value) {
-
-        var that = this;
-        var state = that.state;
-
-        if (state) {
-            state[attr] = value;
-        }
-
-        return that;
-    };
-});
-
 export default Base.extend({
 
-    //antiAlias: true,
-
-    //Implements: accessor,
-
-    constructor: function Canvas(root) {
+    constructor: function Canvas(root, style) {
 
         var that = this;
 
         that.root = root;
-        that.reset();
+        that.style = style;
+        that.format = style.antiAlias ?
+            function (value) {
+                return toFixed(value, 2);
+            } :
+            function (value) {
+                return Math.round(value);
+            };
     },
-
-    reset: function () {
-
-        var that = this;
-
-        that.state = {};
-        that.states = [];
-        that.gradients = [];
-
-        return that;
-    },
-
-    save: function () {
-
-        var that = this;
-        var state = that.state;
-
-        that.states.push(state);
-        that.state = clone(state);
-
-        return that;
-    },
-
-    restore: function () {
-
-        var that = this;
-
-        that.state = that.states.pop();
-
-        return that;
-    },
-
-    scale: function (value) {
-        var that = this;
-        var state = that.state;
-
-        state.scale *= value;
-        state.strokeWidth *= value;
-
-        return that;
-    },
-
-    translate: function (dx, dy) {
-        var that = this;
-        var state = that.state;
-
-        state.dx += dx;
-        state.dy += dy;
-
-        return that;
-    },
-
-    rotate: function (theta, flipH, flipV, cx, cy) {
-
-        var canvas = this;
-        var format = canvas.format;
-
-        if (theta !== 0 || flipH || flipV) {
-
-            var state = canvas.state;
-
-            cx += state.dx;
-            cy += state.dy;
-
-            cx *= state.scale;
-            cy *= state.scale;
-
-            state.transform = state.transform || '';
-
-            // This implementation uses custom scale/translate and built-in rotation
-            // Rotation state is part of the AffineTransform in state.transform
-            if (flipH && flipV) {
-                theta += 180;
-            } else if (flipH !== flipV) {
-                var tx = (flipH) ? cx : 0;
-                var sx = (flipH) ? -1 : 1;
-
-                var ty = (flipV) ? cy : 0;
-                var sy = (flipV) ? -1 : 1;
-
-                state.transform += 'translate(' + format(tx) + ',' + format(ty) + ')' +
-                    'scale(' + format(sx) + ',' + format(sy) + ')' +
-                    'translate(' + format(-tx) + ',' + format(-ty) + ')';
-            }
-
-            if (flipH ? !flipV : flipV) {
-                theta *= -1;
-            }
-
-            if (theta !== 0) {
-                state.transform += 'rotate(' + format(theta) + ',' + format(cx) + ',' + format(cy) + ')';
-            }
-
-            state.rotation = state.rotation + theta;
-            state.rotationCx = cx;
-            state.rotationCy = cy;
-        }
-    },
-
-    format: function (value) {
-        return this.state.antiAlias
-            ? toFixed(value, 2)
-            : Math.round(parseFloat(value));
-    },
-
 
     // Draw
     // ----
@@ -194,25 +47,25 @@ export default Base.extend({
         return path;
     },
 
-    drawRect: function (x, y, w, h, dx, dy) {
+    drawRect: function (x, y, w, h, rx, ry) {
 
         var that = this;
-        var state = that.state;
+        var style = that.style;
+        var scale = style.scale;
         var format = that.format.bind(that);
-        var scale = state.scale;
         var node = that.createElement('rect');
 
-        node.setAttribute('x', format((x + state.dx) * scale));
-        node.setAttribute('y', format((y + state.dy) * scale));
+        node.setAttribute('x', format((x + style.dx) * scale));
+        node.setAttribute('y', format((y + style.dy) * scale));
         node.setAttribute('width', format(w * scale));
         node.setAttribute('height', format(h * scale));
 
-        if (dx > 0) {
-            node.setAttribute('rx', format(dx * scale));
+        if (rx > 0) {
+            node.setAttribute('rx', format(rx * scale));
         }
 
-        if (dy > 0) {
-            node.setAttribute('ry', format(dy * scale));
+        if (ry > 0) {
+            node.setAttribute('ry', format(ry * scale));
         }
 
         that.node = node;
@@ -223,13 +76,13 @@ export default Base.extend({
     drawEllipse: function (x, y, w, h) {
 
         var canvas = this;
-        var state = canvas.state;
-        var scale = state.scale;
+        var style = canvas.style;
+        var scale = style.scale;
 
         var node = canvas.createElement('ellipse');
 
-        node.setAttribute('cx', Math.round((x + w / 2 + state.dx) * scale));
-        node.setAttribute('cy', Math.round((y + h / 2 + state.dy) * scale));
+        node.setAttribute('cx', Math.round((x + w / 2 + style.dx) * scale));
+        node.setAttribute('cy', Math.round((y + h / 2 + style.dy) * scale));
         node.setAttribute('rx', w / 2 * scale);
         node.setAttribute('ry', h / 2 * scale);
 
@@ -240,14 +93,73 @@ export default Base.extend({
 
     drawImage: function () {},
 
-    drawString: function () {},
+    drawString: function (x, y, w, h, text) {
+
+        var that = this;
+        var node = that.createElement('g');
+        var style = that.style;
+        var scale = style.scale;
+        var align = style.align;
+        var vAlign = style.verticalAlign;
+        var fontSize = Math.round(style.fontSize);
+
+        if (fontSize) {
+            node.setAttribute('font-size', Math.round(fontSize * scale) + 'px');
+        }
+
+        if (style.fontColor) {
+            node.setAttribute('fill', style.fontColor);
+        }
+
+        if (style.fontFamily) {
+            node.setAttribute('font-family', style.fontFamily);
+        }
+
+        if (style.fontWeight) {
+            node.setAttribute('font-weight', style.fontWeight);
+        }
+
+        if (style.italic) {
+            node.setAttribute('font-style', 'italic');
+        }
+
+        if (style.textDecoration) {
+            node.setAttribute('text-decoration', style.textDecoration);
+        }
+
+        var anchor = align === 'right'
+            ? 'end' : align === 'center'
+            ? 'middle'
+            : 'start';
+
+        if (anchor !== 'start') {
+            node.setAttribute('text-anchor', anchor);
+        }
+
+        if (style.opacity < 1) {
+            node.setAttribute('opacity', style.opacity);
+        }
+
+        //var lines = text.split('\n');
+        //var lineHeight = Math.round(style.lineHeight * fontSize);
+        //var totalHeight = lines.length * lineHeight;
+
+        var textNode = that.createElement('text');
+        textNode.setAttribute('x', 10);
+        textNode.setAttribute('y', 10);
+
+        write(textNode, text);
+        node.appendChild(textNode);
+
+        that.root.appendChild(node);
+    },
 
     addNode: function (filled, stroked) {
 
         var that = this;
         var root = that.root;
         var node = that.node;
-        var state = that.state;
+        var style = that.style;
 
         if (node) {
 
@@ -257,7 +169,7 @@ export default Base.extend({
             }
 
             // fill
-            if (state.fillColor && state.gradientColor) {
+            if (style.fillColor && style.gradientColor) {
                 new LinearGradientBrush(that).fill(filled);
             } else {
                 new SolidBrush(that).fill(filled);
@@ -267,18 +179,18 @@ export default Base.extend({
             new Pen(that).stroke(stroked);
 
             // transform
-            var transform = state.transform;
+            var transform = style.transform;
             if (transform && transform.length > 0) {
                 node.setAttribute('transform', transform);
             }
 
             // shadow
-            if (state.shadow) {
+            if (style.shadow) {
                 root.appendChild(that.createShadow(node));
             }
 
             // strokeTolerance
-            filled = filled && state.fillColor ? true : false;
+            filled = filled && style.fillColor ? true : false;
             if (that.strokeTolerance > 0 && !filled) {
                 root.appendChild(that.createTolerance(node));
             }
@@ -299,20 +211,20 @@ export default Base.extend({
     createShadow: function (node) {
 
         var that = this;
-        var state = that.state;
+        var style = that.style;
         var shadow = node.cloneNode(true);
 
         if (shadow.getAttribute('fill') !== 'none') {
-            shadow.setAttribute('fill', state.shadowColor);
+            shadow.setAttribute('fill', style.shadowColor);
         }
 
         if (shadow.getAttribute('stroke') !== 'none') {
-            shadow.setAttribute('stroke', state.shadowColor);
+            shadow.setAttribute('stroke', style.shadowColor);
         }
 
-        shadow.setAttribute('transform', 'translate(' + that.format(state.shadowDx * state.scale) +
-            ',' + this.format(state.shadowDy * state.scale) + ')' + (state.transform || ''));
-        shadow.setAttribute('opacity', state.shadowAlpha);
+        shadow.setAttribute('transform', 'translate(' + that.format(style.shadowDx * style.scale) +
+            ',' + this.format(style.shadowDy * style.scale) + ')' + (style.transform || ''));
+        shadow.setAttribute('opacity', style.shadowAlpha);
 
         return shadow;
     },

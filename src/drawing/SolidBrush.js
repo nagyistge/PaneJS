@@ -10,10 +10,10 @@ export default Brush.extend({
 
         var that = this;
         var canvas = that.canvas;
-        var state = canvas.state;
+        var style = canvas.style;
         var node = canvas.node;
 
-        var fillColor = state.fillColor;
+        var fillColor = style.fillColor;
 
         if (fillColor) {
             node.setAttribute('fill', fillColor.toLowerCase());

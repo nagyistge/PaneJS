@@ -135,6 +135,15 @@ var State = Rectangle.extend({
         }
     },
 
+    equalToBounds: function (bounds) {
+
+        var that = this;
+        return that.x === bounds.x &&
+            that.y === bounds.y &&
+            that.width === bounds.width &&
+            that.height === bounds.height
+    },
+
     destroy: function () {},
 
     clone: function () {

@@ -1,8 +1,7 @@
-import { isFunction, isUndefined } from './lang'
-import { indexOf } from './array'
+import { isFunction, isUndefined, isArray, isObject } from './lang'
+import { indexOf, each } from './array'
 
 var hasOwn = Object.prototype.hasOwnProperty;
-var slice = Array.prototype.slice;
 
 var hasKey = exports.hasKey = function hasKey(obj, key) {
     return obj !== null && hasOwn.call(obj, key);
@@ -60,12 +59,8 @@ function extend(dist) {
         dist = {};
     }
 
-    var sources = slice.call(arguments, 1);
-
-    for (var i = 0, length = sources.length; i < length; i++) {
-
-        var source = sources[i];
-
+    for (var i = 1, length = arguments.length; i < length; i++) {
+        var source = arguments[i];
         source && forIn(source, function (value, key) {
             dist[key] = value;
         });

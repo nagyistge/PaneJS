@@ -523,10 +523,11 @@ export default Base.extend({
         // label 在垂直方向上的位置
         if (vPosition === 'top') {
             labelOffset.y -= stateHeight;
-        }
-        else if (vPosition === 'bottom') {
+        } else if (vPosition === 'bottom') {
             labelOffset.y += stateHeight;
         }
+
+        console.log(labelOffset);
 
         return that;
     },

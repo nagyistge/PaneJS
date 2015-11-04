@@ -10,13 +10,13 @@ export default Base.extend({
 
         var that = this;
         var canvas = that.canvas;
-        var state = canvas.state;
+        var style = canvas.style;
         var node = canvas.node;
 
         if (filled) {
 
-            if (state.alpha < 1) {
-                node.setAttribute('fill-opacity', state.alpha);
+            if (style.alpha < 1) {
+                node.setAttribute('fill-opacity', style.alpha);
             }
 
             that.doFill();

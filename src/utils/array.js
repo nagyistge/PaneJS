@@ -1,10 +1,13 @@
-import { isArrayLike } from './lang';
+import { isArray, isArrayLike } from './lang';
 
 var arrProto = Array.prototype;
 var slice = arrProto.slice;
 
 function toArray(obj) {
-    return isArrayLike(obj) ? slice.call(obj) : [];
+    return isArray(obj)
+        ? obj : isArrayLike(obj)
+        ? slice.call(obj)
+        : [];
 }
 
 var indexOf = arrProto.indexOf ?
@@ -42,8 +45,6 @@ var each = arrProto.forEach ?
             iterator.call(context, arr[i], i, arr);
         }
     };
-
-var forEach = each;
 
 var map = arrProto.map ?
     function (arr, iterator, context) {
@@ -119,7 +120,6 @@ export {
     toArray,
     indexOf,
     lastIndexOf,
-    forEach,
     each,
     map,
     filter,

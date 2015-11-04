@@ -130,13 +130,13 @@ var LinearGradientBrush = Brush.extend({
 
         var that = this;
         var canvas = that.canvas;
-        var state = canvas.state;
+        var style = canvas.style;
         var node = canvas.node;
-        var fillColor = state.fillColor;
-        var gradientColor = state.gradientColor;
+        var fillColor = style.fillColor;
+        var gradientColor = style.gradientColor;
 
         if (fillColor && gradientColor) {
-            var id = that.getGradient(fillColor, gradientColor, state.fillAlpha, state.gradientAlpha, state.gradientDirection);
+            var id = that.getGradient(fillColor, gradientColor, style.fillAlpha, style.gradientAlpha, style.gradientDirection);
             var base = getBaseUrl().replace(/([\(\)])/g, '\\$1');
 
             node.setAttribute('fill', 'url(' + base + '#' + id + ')');
