@@ -25,8 +25,6 @@ export default Base.extend({
     rendering: true,    // 是否需要创建、更新或销毁图形
     updateStyle: false, // 重绘过程中是否需要更新样式，默认只会在创建 state 和 state.style 改变时才更新样式
     captureDocumentGesture: true,
-    scale: 1,
-    translate: null,
 
     constructor: function View(graph) {
 
@@ -34,8 +32,10 @@ export default Base.extend({
         that.graph = graph;
         that.states = new Dictionary();
         that.renderer = new Renderer();
-        that.translate = new Point();
         that.graphBounds = new Rectangle();
+        that.scale = 1;
+        that.translate = new Point();
+
     },
 
     getBounds: function () {},
@@ -44,7 +44,9 @@ export default Base.extend({
 
     scaleAndTranslate: function () {},
 
-    setScale: function () {},
+    setScale: function () {
+
+    },
 
     setTranslate: function () {},
 
@@ -52,8 +54,8 @@ export default Base.extend({
 
     revalidate: function () {
         return this
-            .invalidate()
-            .validate();
+            .invalidate(null, true, true)
+            .validate(null);
     },
 
     clear: function (cell, force, recurse) {
@@ -63,16 +65,16 @@ export default Base.extend({
 
         cell = cell || model.getRoot();
         force = force ? force : false;
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
 
         that.removeState(cell);
 
         if (recurse && (force || cell !== that.currentRoot)) {
             cell.eachChild(function (child) {
-                that.clear(child);
+                that.clear(child, false, true);
             });
         } else {
-            that.invalidate(cell);
+            that.invalidate(cell, true, true);
         }
 
         return that;
@@ -84,9 +86,8 @@ export default Base.extend({
         var model = that.graph.model;
 
         cell = cell || model.getRoot();
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-        includeLink = !isNullOrUndefined(includeLink) ? includeLink : true;
-
+        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
+        //includeLink = !isNullOrUndefined(includeLink) ? includeLink : true;
 
         var state = that.getState(cell);
 
@@ -95,7 +96,6 @@ export default Base.extend({
         }
 
         if (!cell.invalidating) {
-
             cell.invalidating = true;
 
             if (recurse) {
@@ -110,7 +110,7 @@ export default Base.extend({
                 });
             }
 
-            delete cell.invalidating;
+            cell.invalidating = false;
         }
 
         return that;
@@ -123,8 +123,8 @@ export default Base.extend({
 
         that.resetValidationState();
 
-        that.validateCell(cell);
-        that.validateCellState(cell);
+        that.validateCell(cell, true);
+        that.validateCellState(cell, true);
 
         that.graphBounds = that.getBoundingBox(cell) || that.getEmptyBounds();
 
@@ -261,7 +261,7 @@ export default Base.extend({
             return cell;
         }
 
-        visible = !isNullOrUndefined(visible) ? visible : true;
+        //visible = !isNullOrUndefined(visible) ? visible : true;
         visible = visible && cell.visible;
 
         var state = that.getState(cell, visible);
@@ -293,7 +293,7 @@ export default Base.extend({
             return state;
         }
 
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
+        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
 
         if (state.invalid) {
             state.invalid = false;
@@ -455,7 +455,7 @@ export default Base.extend({
             (!visibleSourceState && !sourcePoint) ||
             (targetNode && !visibleTargetState) ||
             (!visibleTargetState && !targetPoint)) {
-            that.clear(cell, true);
+            that.clear(cell, true, true);
         }
         else {
             that.updateFixedTerminalPoints(state, visibleSourceState, visibleTargetState);
@@ -470,7 +470,7 @@ export default Base.extend({
                 && absolutePoints[absolutePoints.length - 1];
 
             if (cell !== that.currentRoot && canDrawLink) {
-                that.clear(state.cell, true);
+                that.clear(state.cell, true, true);
             } else {
                 that.updateEdgeBounds(state);
                 that.updateEdgeLabelOffset(state);
@@ -714,11 +714,16 @@ export default Base.extend({
 
         var that = this;
         var graph = that.graph;
+        var style = graph.getCellStyle(cell);
+
+        // 使用 view 中的平移和缩放
+        style.scale = that.scale;
+        style.dx = that.translate.x;
+        style.dy = that.translate.y;
+
+        var state = new State(that, cell, style);
 
         // TODO: that.currentRoot
-
-        var state = new State(that, cell, graph.getCellStyle(cell));
-
         if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
             that.renderer.createShape(state);
         }

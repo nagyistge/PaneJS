@@ -59,9 +59,9 @@ each([
 
 export default Base.extend({
 
-    antiAlias: true,
+    //antiAlias: true,
 
-    Implements: accessor,
+    //Implements: accessor,
 
     constructor: function Canvas(root) {
 
@@ -75,7 +75,7 @@ export default Base.extend({
 
         var that = this;
 
-        that.state = that.createState();
+        that.state = {};
         that.states = [];
         that.gradients = [];
 
@@ -100,52 +100,6 @@ export default Base.extend({
         that.state = that.states.pop();
 
         return that;
-    },
-
-    createState: function () {
-        return {
-            dx: 0,
-            dy: 0,
-            scale: 1,
-            alpha: 1,
-
-            // 填充
-            fillColor: null,
-            fillAlpha: 1,
-            gradientColor: null,
-            gradientAlpha: 1,
-            gradientDirection: null,
-
-            // 边框
-            strokeWidth: 1,
-            strokeColor: null,
-            dashed: false,
-            dashPattern: '3 3',
-            dashOffset: '',
-            lineCap: 'butt',    // butt, round, square
-            lineJoin: 'miter',  // miter, round, bevel
-            miterLimit: 10,
-
-            // 字体
-            fontColor: '#000000',
-            fontBackgroundColor: null,
-            fontBorderColor: null,
-            fontSize: 12,
-            fontStyle: 0,
-            fontFamily: 'Arial,Helvetica',
-
-            // 阴影
-            shadow: false,
-            shadowColor: 'gray',
-            shadowAlpha: 1,
-            shadowDx: 2,
-            shadowDy: 3,
-
-            // 旋转
-            rotation: 0,
-            rotationCx: 0,
-            rotationCy: 0
-        };
     },
 
     scale: function (value) {
@@ -216,7 +170,9 @@ export default Base.extend({
     },
 
     format: function (value) {
-        return this.antiAlias ? toFixed(value, 2) : Math.round(parseFloat(value));
+        return this.state.antiAlias
+            ? toFixed(value, 2)
+            : Math.round(parseFloat(value));
     },
 
 

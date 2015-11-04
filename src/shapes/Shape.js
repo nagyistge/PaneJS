@@ -22,85 +22,30 @@ var Shape = Base.extend({
     shapePointerEvents: false,
     stencilPointerEvents: false,
 
-    scale: 1,
-    rotation: 0,
-    opacity: 100,       // 透明度
-    strokeWidth: 1,     // 边框宽度
-    flipH: false,       // 水平翻转
-    flipV: false,       // 垂直翻转
-    visible: true,      // 默认可见
-    outline: false,
-    antiAlias: true,    // 抗锯齿，平滑处理
+    //scale: 1,
+    //rotation: 0,
+    //opacity: 100,       // 透明度
+    //strokeWidth: 1,     // 边框宽度
+    //flipH: false,       // 水平翻转
+    //flipV: false,       // 垂直翻转
+    //visible: true,      // 默认可见
+    //outline: false,
+    //antiAlias: true,    // 抗锯齿，平滑处理
 
 
-    constructor: function Shape(state) {
+    constructor: function Shape(state, style, bounds) {
 
-        this.state = state;
+        var that = this;
+        that.state = state;
+        that.style = style;
+        that.bounds = bounds;
 
         // props
         // -----
         // that.node = null;        // 图形的根节点，通常是 g 元素
-        // that.state = null;
-        // that.style = null;
         // that.points = null;      // 绘制连线需要的点
         // that.bounds = null;      // 表示该图形的区域范围
         // that.boundingBox = null; // 图形的边框
-    },
-
-    apply: function (state) {
-
-        var that = this;
-
-        that.state = state;
-        var style = that.style = state.style;
-
-        if (style) {
-            // 背景
-            that.fillColor = getValue(style, styleNames.fillColor, that.fillColor);
-            that.gradientColor = getValue(style, styleNames.gradientColor, that.gradientColor);
-            that.gradientDirection = getValue(style, styleNames.gradientDirection, that.gradientDirection);
-            that.opacity = getValue(style, styleNames.opacity, that.opacity);
-            // 边框
-            that.strokeColor = getValue(style, styleNames.strokeColor, that.strokeColor);
-            that.strokeWidth = getNumber(style, styleNames.strokeWidth, that.strokeWidth);
-            that.arrowStrokeWidth = getNumber(style, styleNames.strokeWidth, that.strokeWidth);
-            that.spacing = getValue(style, styleNames.spacing, that.spacing);
-            that.startSize = getNumber(style, styleNames.startSize, that.startSize);
-            that.endSize = getNumber(style, styleNames.endSize, that.endSize);
-            that.startArrow = getValue(style, styleNames.startArrow, that.startArrow);
-            that.endArrow = getValue(style, styleNames.endArrow, that.endArrow);
-            that.rotation = getValue(style, styleNames.rotation, that.rotation);
-            that.direction = getValue(style, styleNames.direction, that.direction);
-            that.flipH = getValue(style, styleNames.flipH, 0) === 1;
-            that.flipV = getValue(style, styleNames.flipV, 0) === 1;
-
-
-            if (that.direction === directions.north || that.direction === directions.south) {
-                var tmp = that.flipH;
-                that.flipH = that.flipV;
-                that.flipV = tmp;
-            }
-
-            that.isShadow = getValue(style, styleNames.shadow, that.isShadow) === 1;
-            that.isDashed = getValue(style, styleNames.dashed, that.isDashed) === 1;
-            that.isRounded = getValue(style, styleNames.rounded, that.isRounded) === 1;
-            that.glass = getValue(style, styleNames.glass, that.glass) === 1;
-
-
-            //if (that.fillColor === constants.NONE) {
-            //    that.fillColor = null;
-            //}
-            //
-            //if (that.gradientColor === constants.NONE) {
-            //    that.gradientColor = null;
-            //}
-            //
-            //if (that.strokeColor === constants.NONE) {
-            //    that.strokeColor = null;
-            //}
-        }
-
-        return that;
     },
 
     init: function (container) {
@@ -116,14 +61,13 @@ var Shape = Base.extend({
         return that;
     },
 
-    // 创建图形的根节点
+    // create the root node
     create: function (container) {
         if (container && container.ownerSVGElement) {
             return createSvgElement('g');
         }
     },
 
-    // 清除根节点的所有子节点
     clear: function () {
 
         var that = this;
@@ -140,10 +84,10 @@ var Shape = Base.extend({
 
     getScreenOffset: function () {
 
-        var that = this;
-        var strokeWidth = that.style.strokeWidth;
+        var style = this.style;
+        var strokeWidth = style.strokeWidth * style.scale;
 
-        strokeWidth = Math.max(1, Math.round(strokeWidth * that.scale));
+        strokeWidth = Math.max(1, Math.round(strokeWidth));
 
         return mod(strokeWidth, 2) === 1 ? 0.5 : 0;
     },
@@ -152,11 +96,12 @@ var Shape = Base.extend({
 
         var that = this;
         var node = that.node;
+        var style = that.style;
 
         // 对于连线，需要根据 points 来计算连线的 bounds
         that.updateBoundsFromPoints();
 
-        if (that.visible && that.checkBounds()) {
+        if (style.visible && that.checkBounds()) {
             node.style.visibility = 'visible';
             that.clear();
             that.redrawShape();
@@ -188,9 +133,7 @@ var Shape = Base.extend({
 
         var that = this;
         var bounds = that.bounds;
-
-        // Scale is passed-through to canvas
-        var scale = that.scale;
+        var scale = that.style.scale;
         var x = bounds.x / scale;
         var y = bounds.y / scale;
         var w = bounds.width / scale;
@@ -202,9 +145,9 @@ var Shape = Base.extend({
             x += t;
             y -= t;
 
-            var tmp = w;
+            t = w;
             w = h;
-            h = tmp;
+            h = t;
         }
 
         that.updateTransform(canvas, x, y, w, h);
@@ -213,8 +156,7 @@ var Shape = Base.extend({
         // Adds background rectangle to capture events
         var bg = null;
 
-        if ((!that.stencil && !that.points && that.shapePointerEvents) ||
-            (that.stencil && that.stencilPointerEvents)) {
+        if (!that.points && that.shapePointerEvents) {
 
             var bb = that.createBoundingBox();
 
@@ -222,29 +164,20 @@ var Shape = Base.extend({
             that.node.appendChild(bg);
         }
 
+        if (that.points) {
 
-        if (that.stencil) {
-            that.stencil.drawShape(canvas, that, x, y, w, h);
-        } else {
-            // Stencils have separate strokeWidth
-            canvas.setStrokeWidth(that.strokeWidth);
-
-            if (that.points) {
-
-                var pts = [];
-                for (var i = 0; i < that.points.length; i++) {
-                    if (that.points[i]) {
-                        pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
-                    }
+            var pts = [];
+            for (var i = 0; i < that.points.length; i++) {
+                if (that.points[i]) {
+                    pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
                 }
-
-                that.drawLink(canvas, pts);
-
-            } else {
-
-                that.drawNode(canvas, x, y, w, h);
-
             }
+
+            // 绘制连线
+            that.drawLink(canvas, pts);
+        } else {
+            // 绘制节点
+            that.drawNode(canvas, x, y, w, h);
         }
 
         if (bg && canvas.state && canvas.state.transform) {
@@ -254,7 +187,7 @@ var Shape = Base.extend({
 
     drawNode: function (canvas, x, y, w, h) {
         this.drawNodeBackground(canvas, x, y, w, h);
-        canvas.setShadow(false);
+        canvas.state.shadow = false;
         this.drawNodeForeground(canvas, x, y, w, h);
     },
 
@@ -399,6 +332,7 @@ var Shape = Base.extend({
             && bounds.height > 0;
     },
 
+    // 可以更改内部 label 的 bounds
     getLabelBounds: function (rect) {
         return rect;
     },
@@ -472,7 +406,7 @@ var Shape = Base.extend({
         canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
         canvas.pointerEventsValue = that.svgPointerEvents;
         canvas.blockImagePointerEvents = detector.IS_FF;
-        canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
+        //canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
 
         var off = that.getScreenOffset();
 
@@ -582,13 +516,13 @@ var Shape = Base.extend({
         var rot = this.getRotation();
 
         if (this.direction) {
-            if (this.direction === constants.DIRECTION_NORTH) {
+            if (this.direction === 'north') {
                 rot += 270;
             }
-            else if (this.direction === constants.DIRECTION_WEST) {
+            else if (this.direction === 'west') {
                 rot += 180;
             }
-            else if (this.direction === constants.DIRECTION_SOUTH) {
+            else if (this.direction === 'south') {
                 rot += 90;
             }
         }

@@ -27,31 +27,33 @@ export default Shape.extend({
         return 0;
     },
 
-    drawNodeBackground: function (canvas, x, y, w, h) {
-
+    draw: function (canvas) {
         var that = this;
-        var style = that.style;
+        var scale = that.scale;
+        var x = that.bounds.x / scale;
+        var y = that.bounds.y / scale;
+        var w = that.bounds.width / scale;
+        var h = that.bounds.height / scale;
 
-        if (style.round) {
-            var r = Math.min(w, h) * style.round;
-            canvas.drawRect(x, y, w, h, r, r);
-        } else {
-            canvas.drawRect(x, y, w, h);
+        this.updateTransform(canvas, x, y, w, h);
+        this.configureCanvas(canvas, x, y, w, h);
+
+        // Checks if text contains HTML markup
+        var realHtml = mxUtils.isNode(this.value) || this.dialect == mxConstants.DIALECT_STRICTHTML;
+
+        // Always renders labels as HTML in VML
+        var fmt = (realHtml || canvas instanceof mxVmlCanvas2D) ? 'html' : '';
+        var val = this.value;
+
+        if (!realHtml && fmt == 'html') {
+            val = mxUtils.htmlEntities(val, false);
         }
 
-        canvas.addNode(true, true);
+        val = (!mxUtils.isNode(this.value) && this.replaceLinefeeds && fmt == 'html') ?
+            val.replace(/\n/g, '<br/>') : val;
 
-        return that;
+        canvas.text(x, y, w, h, val, this.align, this.valign, this.wrap, fmt, this.overflow,
+            this.clipped, this.getTextRotation());
     },
 
-    drawNodeForeground: function (c, x, y, w, h) {
-
-        var that = this;
-
-        if (that.glass && !that.outline) {
-            that.paintGlassEffect(c, x, y, w, h, that.getArcSize(w + that.strokewidth, h + that.strokewidth));
-        }
-
-        return that;
-    }
 });

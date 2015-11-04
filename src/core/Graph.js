@@ -195,6 +195,7 @@ export default Class.create({
         that.view.validate();
         that.sizeDidChange();
     },
+
     processChange: function (change) {
 
         var that = this;

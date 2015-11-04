@@ -24,7 +24,6 @@ var Renderer = Base.extend({
     defaultNodeShape: Rect,
     defaultLinkShape: null,
     defaultLabelShape: Label,
-    antiAlias: true,         // 是否绘制平滑的图形（抗锯齿）
 
     constructor: function Renderer() {},
 
@@ -33,19 +32,63 @@ var Renderer = Base.extend({
     },
 
     getLabelBounds: function (state) {
+        var that = this;
         var graph = state.view.graph;
         var scale = state.view.scale;
+        var style = state.style;
         var isLink = state.cell.isLink;
         var bounds = new Rectangle(state.absoluteOffset.x, state.absoluteOffset.y);
+        var inverted = state.label.isPaintBoundsInverted();
 
         if (isLink) {
 
         } else {
+            if (inverted) {
+                var temp = bounds.x;
+                bounds.x = bounds.y;
+                bounds.y = temp;
+            }
 
+            bounds.x += state.x;
+            bounds.y += state.y;
+            bounds.width = Math.max(1, state.width);
+            bounds.height = Math.max(1, state.height);
+
+            // border
+            if (style.strokeColor) {
+
+            }
+        }
+
+        if (inverted) {
+            // Rotates around center of state
+            var t = (state.width - state.height) / 2;
+            bounds.x += t;
+            bounds.y -= t;
+            var tmp = bounds.width;
+            bounds.width = bounds.height;
+            bounds.height = tmp;
+        }
+
+        // shape can modify its label bounds
+        if (state.shape) {
+            bounds = state.shape.getLabelBounds(bounds);
+        }
+
+        // label width style overrides actual label width
+        var labelWidth = style.labelWidth;
+        if (labelWidth) {
+            bounds.width = labelWidth * scale;
+        }
+
+        if (!isLink) {
+            that.rotateLabelBounds(state, bounds);
         }
 
         return bounds;
     },
+
+    rotateLabelBounds: function (state, bounds) {},
 
     // 在 view.createState() 方法中调用
     createShape: function (state) {
@@ -61,8 +104,7 @@ var Renderer = Base.extend({
                 Constructor = state.cell.isLink ? that.defaultLinkShape : that.defaultNodeShape;
             }
 
-            state.shape = new Constructor(state);
-            state.shape.antiAlias = that.antiAlias;
+            state.shape = new Constructor(state, null, state.style);
         }
 
         return that;
@@ -77,101 +119,103 @@ var Renderer = Base.extend({
             var Constructor = that.getShape(shapeName) || that.defaultLabelShape;
 
             state.label = new Constructor(state);
+
+            that.initLabel(state);
         }
 
 
-        var graph = state.view.graph;
-        var style = state.style;
-        var isEdge = graph.getModel().isEdge(state.cell);
-
-        if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
-            // Avoids using DOM node for empty labels
-            var isForceHtml = (graph.isHtmlLabel(state.cell) || (text != null && mxUtils.isNode(text)));
-
-            state.text = new this.defaultTextShape(text, new mxRectangle(),
-                (state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER),
-                graph.getVerticalAlign(state),
-                state.style[mxConstants.STYLE_FONTCOLOR],
-                state.style[mxConstants.STYLE_FONTFAMILY],
-                state.style[mxConstants.STYLE_FONTSIZE],
-                state.style[mxConstants.STYLE_FONTSTYLE],
-                state.style[mxConstants.STYLE_SPACING],
-                state.style[mxConstants.STYLE_SPACING_TOP],
-                state.style[mxConstants.STYLE_SPACING_RIGHT],
-                state.style[mxConstants.STYLE_SPACING_BOTTOM],
-                state.style[mxConstants.STYLE_SPACING_LEFT],
-                state.style[mxConstants.STYLE_HORIZONTAL],
-                state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR],
-                state.style[mxConstants.STYLE_LABEL_BORDERCOLOR],
-                graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell),
-                graph.isLabelClipped(state.cell),
-                state.style[mxConstants.STYLE_OVERFLOW],
-                state.style[mxConstants.STYLE_LABEL_PADDING]);
-
-            state.text.opacity = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_OPACITY, 100);
-            state.text.dialect = (isForceHtml) ? mxConstants.DIALECT_STRICTHTML : state.view.graph.dialect;
-            state.text.style = state.style;
-            state.text.state = state;
-
-            this.initLabel(state);
-
-            // Workaround for touch devices routing all events for a mouse gesture
-            // (down, move, up) via the initial DOM node. IE additionally redirects
-            // the event via the initial DOM node but the event source is the node
-            // under the mouse, so we need to check if this is the case and force
-            // getCellAt for the subsequent mouseMoves and the final mouseUp.
-            var forceGetCell = false;
-
-            var getState = function (evt) {
-                var result = state;
-
-                if (mxClient.IS_TOUCH || forceGetCell) {
-                    var x = mxEvent.getClientX(evt);
-                    var y = mxEvent.getClientY(evt);
-
-                    // Dispatches the drop event to the graph which
-                    // consumes and executes the source function
-                    var pt = mxUtils.convertPoint(graph.container, x, y);
-                    result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
-                }
-
-                return result;
-            };
-
-            // TODO: Add handling for special touch device gestures
-            mxEvent.addGestureListeners(state.text.node,
-                mxUtils.bind(this, function (evt) {
-                    if (this.isLabelEvent(state, evt)) {
-                        graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt, state));
-                        forceGetCell = graph.dialect != mxConstants.DIALECT_SVG &&
-                            mxEvent.getSource(evt).nodeName == 'IMG';
-                    }
-                }),
-                mxUtils.bind(this, function (evt) {
-                    if (this.isLabelEvent(state, evt)) {
-                        graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt, getState(evt)));
-                    }
-                }),
-                mxUtils.bind(this, function (evt) {
-                    if (this.isLabelEvent(state, evt)) {
-                        graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt, getState(evt)));
-                        forceGetCell = false;
-                    }
-                })
-            );
-
-            // Uses double click timeout in mxGraph for quirks mode
-            if (graph.nativeDblClickEnabled) {
-                mxEvent.addListener(state.text.node, 'dblclick',
-                    mxUtils.bind(this, function (evt) {
-                        if (this.isLabelEvent(state, evt)) {
-                            graph.dblClick(evt, state.cell);
-                            mxEvent.consume(evt);
-                        }
-                    })
-                );
-            }
-        }
+        //var graph = state.view.graph;
+        //var style = state.style;
+        //var isEdge = graph.getModel().isEdge(state.cell);
+        //
+        //if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
+        //    // Avoids using DOM node for empty labels
+        //    var isForceHtml = (graph.isHtmlLabel(state.cell) || (text != null && mxUtils.isNode(text)));
+        //
+        //    state.text = new this.defaultTextShape(text, new mxRectangle(),
+        //        (state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER),
+        //        graph.getVerticalAlign(state),
+        //        state.style[mxConstants.STYLE_FONTCOLOR],
+        //        state.style[mxConstants.STYLE_FONTFAMILY],
+        //        state.style[mxConstants.STYLE_FONTSIZE],
+        //        state.style[mxConstants.STYLE_FONTSTYLE],
+        //        state.style[mxConstants.STYLE_SPACING],
+        //        state.style[mxConstants.STYLE_SPACING_TOP],
+        //        state.style[mxConstants.STYLE_SPACING_RIGHT],
+        //        state.style[mxConstants.STYLE_SPACING_BOTTOM],
+        //        state.style[mxConstants.STYLE_SPACING_LEFT],
+        //        state.style[mxConstants.STYLE_HORIZONTAL],
+        //        state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR],
+        //        state.style[mxConstants.STYLE_LABEL_BORDERCOLOR],
+        //        graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell),
+        //        graph.isLabelClipped(state.cell),
+        //        state.style[mxConstants.STYLE_OVERFLOW],
+        //        state.style[mxConstants.STYLE_LABEL_PADDING]);
+        //
+        //    state.text.opacity = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_OPACITY, 100);
+        //    state.text.dialect = (isForceHtml) ? mxConstants.DIALECT_STRICTHTML : state.view.graph.dialect;
+        //    state.text.style = state.style;
+        //    state.text.state = state;
+        //
+        //    this.initLabel(state);
+        //
+        //    // Workaround for touch devices routing all events for a mouse gesture
+        //    // (down, move, up) via the initial DOM node. IE additionally redirects
+        //    // the event via the initial DOM node but the event source is the node
+        //    // under the mouse, so we need to check if this is the case and force
+        //    // getCellAt for the subsequent mouseMoves and the final mouseUp.
+        //    var forceGetCell = false;
+        //
+        //    var getState = function (evt) {
+        //        var result = state;
+        //
+        //        if (mxClient.IS_TOUCH || forceGetCell) {
+        //            var x = mxEvent.getClientX(evt);
+        //            var y = mxEvent.getClientY(evt);
+        //
+        //            // Dispatches the drop event to the graph which
+        //            // consumes and executes the source function
+        //            var pt = mxUtils.convertPoint(graph.container, x, y);
+        //            result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+        //        }
+        //
+        //        return result;
+        //    };
+        //
+        //    // TODO: Add handling for special touch device gestures
+        //    mxEvent.addGestureListeners(state.text.node,
+        //        mxUtils.bind(this, function (evt) {
+        //            if (this.isLabelEvent(state, evt)) {
+        //                graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt, state));
+        //                forceGetCell = graph.dialect != mxConstants.DIALECT_SVG &&
+        //                    mxEvent.getSource(evt).nodeName == 'IMG';
+        //            }
+        //        }),
+        //        mxUtils.bind(this, function (evt) {
+        //            if (this.isLabelEvent(state, evt)) {
+        //                graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt, getState(evt)));
+        //            }
+        //        }),
+        //        mxUtils.bind(this, function (evt) {
+        //            if (this.isLabelEvent(state, evt)) {
+        //                graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt, getState(evt)));
+        //                forceGetCell = false;
+        //            }
+        //        })
+        //    );
+        //
+        //    // Uses double click timeout in mxGraph for quirks mode
+        //    if (graph.nativeDblClickEnabled) {
+        //        mxEvent.addListener(state.text.node, 'dblclick',
+        //            mxUtils.bind(this, function (evt) {
+        //                if (this.isLabelEvent(state, evt)) {
+        //                    graph.dblClick(evt, state.cell);
+        //                    mxEvent.consume(evt);
+        //                }
+        //            })
+        //        );
+        //    }
+        //}
     },
 
     createIndicator: function (state) {
@@ -289,7 +333,7 @@ var Renderer = Base.extend({
                     state.shape.bounds = new Rectangle(state.x, state.y, state.width, state.height);
                 }
 
-                shape.scale = state.view.scale;
+                //shape.scale = state.view.scale;
 
                 if (rendering) {
                     shape.redraw();
@@ -305,6 +349,7 @@ var Renderer = Base.extend({
     },
 
     redrawLabel: function (state, forced) {
+
         var that = this;
         var text = state.view.graph.getLabelText(state.cell);
 
@@ -318,8 +363,10 @@ var Renderer = Base.extend({
         if (state.label) {
 
             var label = state.label;
-            if (forced || label.text !== text) {
+            var bounds = that.getLabelBounds(state);
 
+            if (forced || label.text !== text) {
+                label.redraw();
             }
         }
     },

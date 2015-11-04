@@ -945,6 +945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.view.validate();
 	        that.sizeDidChange();
 	    },
+	
 	    processChange: function processChange(change) {
 	
 	        var that = this;
@@ -4150,8 +4151,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rendering: true, // 是否需要创建、更新或销毁图形
 	    updateStyle: false, // 重绘过程中是否需要更新样式，默认只会在创建 state 和 state.style 改变时才更新样式
 	    captureDocumentGesture: true,
-	    scale: 1,
-	    translate: null,
 	
 	    constructor: function View(graph) {
 	
@@ -4159,8 +4158,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.graph = graph;
 	        that.states = new _libDictionary2['default']();
 	        that.renderer = new _cellRenderer2['default']();
-	        that.translate = new _libPoint2['default']();
 	        that.graphBounds = new _libRectangle2['default']();
+	        that.scale = 1;
+	        that.translate = new _libPoint2['default']();
 	    },
 	
 	    getBounds: function getBounds() {},
@@ -4176,7 +4176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    refresh: function refresh() {},
 	
 	    revalidate: function revalidate() {
-	        return this.invalidate().validate();
+	        return this.invalidate(null, true, true).validate(null);
 	    },
 	
 	    clear: function clear(cell, force, recurse) {
@@ -4186,16 +4186,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        cell = cell || model.getRoot();
 	        force = force ? force : false;
-	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
+	        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
 	
 	        that.removeState(cell);
 	
 	        if (recurse && (force || cell !== that.currentRoot)) {
 	            cell.eachChild(function (child) {
-	                that.clear(child);
+	                that.clear(child, false, true);
 	            });
 	        } else {
-	            that.invalidate(cell);
+	            that.invalidate(cell, true, true);
 	        }
 	
 	        return that;
@@ -4207,8 +4207,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var model = that.graph.model;
 	
 	        cell = cell || model.getRoot();
-	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
-	        includeLink = !(0, _commonUtils.isNullOrUndefined)(includeLink) ? includeLink : true;
+	        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
+	        //includeLink = !isNullOrUndefined(includeLink) ? includeLink : true;
 	
 	        var state = that.getState(cell);
 	
@@ -4217,7 +4217,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        if (!cell.invalidating) {
-	
 	            cell.invalidating = true;
 	
 	            if (recurse) {
@@ -4232,7 +4231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	            }
 	
-	            delete cell.invalidating;
+	            cell.invalidating = false;
 	        }
 	
 	        return that;
@@ -4245,8 +4244,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.resetValidationState();
 	
-	        that.validateCell(cell);
-	        that.validateCellState(cell);
+	        that.validateCell(cell, true);
+	        that.validateCellState(cell, true);
 	
 	        that.graphBounds = that.getBoundingBox(cell) || that.getEmptyBounds();
 	
@@ -4378,7 +4377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return cell;
 	        }
 	
-	        visible = !(0, _commonUtils.isNullOrUndefined)(visible) ? visible : true;
+	        //visible = !isNullOrUndefined(visible) ? visible : true;
 	        visible = visible && cell.visible;
 	
 	        var state = that.getState(cell, visible);
@@ -4410,7 +4409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return state;
 	        }
 	
-	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
+	        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
 	
 	        if (state.invalid) {
 	            state.invalid = false;
@@ -4569,7 +4568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var targetPoint = geo.getTerminalPoint(false);
 	
 	        if (sourceNode && !visibleSourceState || !visibleSourceState && !sourcePoint || targetNode && !visibleTargetState || !visibleTargetState && !targetPoint) {
-	            that.clear(cell, true);
+	            that.clear(cell, true, true);
 	        } else {
 	            that.updateFixedTerminalPoints(state, visibleSourceState, visibleTargetState);
 	            that.updatePoints(state, geo.points, visibleSourceState, visibleTargetState);
@@ -4580,7 +4579,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var canDrawLink = absolutePoints && absolutePoints.length >= 2 && absolutePoints[0] && absolutePoints[absolutePoints.length - 1];
 	
 	            if (cell !== that.currentRoot && canDrawLink) {
-	                that.clear(state.cell, true);
+	                that.clear(state.cell, true, true);
 	            } else {
 	                that.updateEdgeBounds(state);
 	                that.updateEdgeLabelOffset(state);
@@ -4824,11 +4823,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var graph = that.graph;
+	        var style = graph.getCellStyle(cell);
+	
+	        // 使用 view 中的平移和缩放
+	        style.scale = that.scale;
+	        style.dx = that.translate.x;
+	        style.dy = that.translate.y;
+	
+	        var state = new _cellState2['default'](that, cell, style);
 	
 	        // TODO: that.currentRoot
-	
-	        var state = new _cellState2['default'](that, cell, graph.getCellStyle(cell));
-	
 	        if (graph.container && cell !== that.currentRoot && (cell.isNode || cell.isLink)) {
 	            that.renderer.createShape(state);
 	        }
@@ -5330,7 +5334,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    defaultNodeShape: _shapesRect2['default'],
 	    defaultLinkShape: null,
 	    defaultLabelShape: _shapesLabel2['default'],
-	    antiAlias: true, // 是否绘制平滑的图形（抗锯齿）
 	
 	    constructor: function Renderer() {},
 	
@@ -5339,15 +5342,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getLabelBounds: function getLabelBounds(state) {
+	        var that = this;
 	        var graph = state.view.graph;
 	        var scale = state.view.scale;
+	        var style = state.style;
 	        var isLink = state.cell.isLink;
 	        var bounds = new _libRectangle2['default'](state.absoluteOffset.x, state.absoluteOffset.y);
+	        var inverted = state.label.isPaintBoundsInverted();
 	
-	        if (isLink) {} else {}
+	        if (isLink) {} else {
+	            if (inverted) {
+	                var temp = bounds.x;
+	                bounds.x = bounds.y;
+	                bounds.y = temp;
+	            }
+	
+	            bounds.x += state.x;
+	            bounds.y += state.y;
+	            bounds.width = Math.max(1, state.width);
+	            bounds.height = Math.max(1, state.height);
+	
+	            // border
+	            if (style.strokeColor) {}
+	        }
+	
+	        if (inverted) {
+	            // Rotates around center of state
+	            var t = (state.width - state.height) / 2;
+	            bounds.x += t;
+	            bounds.y -= t;
+	            var tmp = bounds.width;
+	            bounds.width = bounds.height;
+	            bounds.height = tmp;
+	        }
+	
+	        // shape can modify its label bounds
+	        if (state.shape) {
+	            bounds = state.shape.getLabelBounds(bounds);
+	        }
+	
+	        // label width style overrides actual label width
+	        var labelWidth = style.labelWidth;
+	        if (labelWidth) {
+	            bounds.width = labelWidth * scale;
+	        }
+	
+	        if (!isLink) {
+	            that.rotateLabelBounds(state, bounds);
+	        }
 	
 	        return bounds;
 	    },
+	
+	    rotateLabelBounds: function rotateLabelBounds(state, bounds) {},
 	
 	    // 在 view.createState() 方法中调用
 	    createShape: function createShape(state) {
@@ -5363,8 +5410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                Constructor = state.cell.isLink ? that.defaultLinkShape : that.defaultNodeShape;
 	            }
 	
-	            state.shape = new Constructor(state);
-	            state.shape.antiAlias = that.antiAlias;
+	            state.shape = new Constructor(state, null, state.style);
 	        }
 	
 	        return that;
@@ -5379,75 +5425,102 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var Constructor = that.getShape(shapeName) || that.defaultLabelShape;
 	
 	            state.label = new Constructor(state);
+	
+	            that.initLabel(state);
 	        }
 	
-	        var graph = state.view.graph;
-	        var style = state.style;
-	        var isEdge = graph.getModel().isEdge(state.cell);
-	
-	        if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
-	            // Avoids using DOM node for empty labels
-	            var isForceHtml = graph.isHtmlLabel(state.cell) || text != null && mxUtils.isNode(text);
-	
-	            state.text = new this.defaultTextShape(text, new mxRectangle(), state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER, graph.getVerticalAlign(state), state.style[mxConstants.STYLE_FONTCOLOR], state.style[mxConstants.STYLE_FONTFAMILY], state.style[mxConstants.STYLE_FONTSIZE], state.style[mxConstants.STYLE_FONTSTYLE], state.style[mxConstants.STYLE_SPACING], state.style[mxConstants.STYLE_SPACING_TOP], state.style[mxConstants.STYLE_SPACING_RIGHT], state.style[mxConstants.STYLE_SPACING_BOTTOM], state.style[mxConstants.STYLE_SPACING_LEFT], state.style[mxConstants.STYLE_HORIZONTAL], state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR], state.style[mxConstants.STYLE_LABEL_BORDERCOLOR], graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell), graph.isLabelClipped(state.cell), state.style[mxConstants.STYLE_OVERFLOW], state.style[mxConstants.STYLE_LABEL_PADDING]);
-	
-	            state.text.opacity = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_OPACITY, 100);
-	            state.text.dialect = isForceHtml ? mxConstants.DIALECT_STRICTHTML : state.view.graph.dialect;
-	            state.text.style = state.style;
-	            state.text.state = state;
-	
-	            this.initLabel(state);
-	
-	            // Workaround for touch devices routing all events for a mouse gesture
-	            // (down, move, up) via the initial DOM node. IE additionally redirects
-	            // the event via the initial DOM node but the event source is the node
-	            // under the mouse, so we need to check if this is the case and force
-	            // getCellAt for the subsequent mouseMoves and the final mouseUp.
-	            var forceGetCell = false;
-	
-	            var getState = function getState(evt) {
-	                var result = state;
-	
-	                if (mxClient.IS_TOUCH || forceGetCell) {
-	                    var x = mxEvent.getClientX(evt);
-	                    var y = mxEvent.getClientY(evt);
-	
-	                    // Dispatches the drop event to the graph which
-	                    // consumes and executes the source function
-	                    var pt = mxUtils.convertPoint(graph.container, x, y);
-	                    result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
-	                }
-	
-	                return result;
-	            };
-	
-	            // TODO: Add handling for special touch device gestures
-	            mxEvent.addGestureListeners(state.text.node, mxUtils.bind(this, function (evt) {
-	                if (this.isLabelEvent(state, evt)) {
-	                    graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt, state));
-	                    forceGetCell = graph.dialect != mxConstants.DIALECT_SVG && mxEvent.getSource(evt).nodeName == 'IMG';
-	                }
-	            }), mxUtils.bind(this, function (evt) {
-	                if (this.isLabelEvent(state, evt)) {
-	                    graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt, getState(evt)));
-	                }
-	            }), mxUtils.bind(this, function (evt) {
-	                if (this.isLabelEvent(state, evt)) {
-	                    graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt, getState(evt)));
-	                    forceGetCell = false;
-	                }
-	            }));
-	
-	            // Uses double click timeout in mxGraph for quirks mode
-	            if (graph.nativeDblClickEnabled) {
-	                mxEvent.addListener(state.text.node, 'dblclick', mxUtils.bind(this, function (evt) {
-	                    if (this.isLabelEvent(state, evt)) {
-	                        graph.dblClick(evt, state.cell);
-	                        mxEvent.consume(evt);
-	                    }
-	                }));
-	            }
-	        }
+	        //var graph = state.view.graph;
+	        //var style = state.style;
+	        //var isEdge = graph.getModel().isEdge(state.cell);
+	        //
+	        //if (state.style[mxConstants.STYLE_FONTSIZE] > 0 || state.style[mxConstants.STYLE_FONTSIZE] == null) {
+	        //    // Avoids using DOM node for empty labels
+	        //    var isForceHtml = (graph.isHtmlLabel(state.cell) || (text != null && mxUtils.isNode(text)));
+	        //
+	        //    state.text = new this.defaultTextShape(text, new mxRectangle(),
+	        //        (state.style[mxConstants.STYLE_ALIGN] || mxConstants.ALIGN_CENTER),
+	        //        graph.getVerticalAlign(state),
+	        //        state.style[mxConstants.STYLE_FONTCOLOR],
+	        //        state.style[mxConstants.STYLE_FONTFAMILY],
+	        //        state.style[mxConstants.STYLE_FONTSIZE],
+	        //        state.style[mxConstants.STYLE_FONTSTYLE],
+	        //        state.style[mxConstants.STYLE_SPACING],
+	        //        state.style[mxConstants.STYLE_SPACING_TOP],
+	        //        state.style[mxConstants.STYLE_SPACING_RIGHT],
+	        //        state.style[mxConstants.STYLE_SPACING_BOTTOM],
+	        //        state.style[mxConstants.STYLE_SPACING_LEFT],
+	        //        state.style[mxConstants.STYLE_HORIZONTAL],
+	        //        state.style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR],
+	        //        state.style[mxConstants.STYLE_LABEL_BORDERCOLOR],
+	        //        graph.isWrapping(state.cell) && graph.isHtmlLabel(state.cell),
+	        //        graph.isLabelClipped(state.cell),
+	        //        state.style[mxConstants.STYLE_OVERFLOW],
+	        //        state.style[mxConstants.STYLE_LABEL_PADDING]);
+	        //
+	        //    state.text.opacity = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_OPACITY, 100);
+	        //    state.text.dialect = (isForceHtml) ? mxConstants.DIALECT_STRICTHTML : state.view.graph.dialect;
+	        //    state.text.style = state.style;
+	        //    state.text.state = state;
+	        //
+	        //    this.initLabel(state);
+	        //
+	        //    // Workaround for touch devices routing all events for a mouse gesture
+	        //    // (down, move, up) via the initial DOM node. IE additionally redirects
+	        //    // the event via the initial DOM node but the event source is the node
+	        //    // under the mouse, so we need to check if this is the case and force
+	        //    // getCellAt for the subsequent mouseMoves and the final mouseUp.
+	        //    var forceGetCell = false;
+	        //
+	        //    var getState = function (evt) {
+	        //        var result = state;
+	        //
+	        //        if (mxClient.IS_TOUCH || forceGetCell) {
+	        //            var x = mxEvent.getClientX(evt);
+	        //            var y = mxEvent.getClientY(evt);
+	        //
+	        //            // Dispatches the drop event to the graph which
+	        //            // consumes and executes the source function
+	        //            var pt = mxUtils.convertPoint(graph.container, x, y);
+	        //            result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+	        //        }
+	        //
+	        //        return result;
+	        //    };
+	        //
+	        //    // TODO: Add handling for special touch device gestures
+	        //    mxEvent.addGestureListeners(state.text.node,
+	        //        mxUtils.bind(this, function (evt) {
+	        //            if (this.isLabelEvent(state, evt)) {
+	        //                graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt, state));
+	        //                forceGetCell = graph.dialect != mxConstants.DIALECT_SVG &&
+	        //                    mxEvent.getSource(evt).nodeName == 'IMG';
+	        //            }
+	        //        }),
+	        //        mxUtils.bind(this, function (evt) {
+	        //            if (this.isLabelEvent(state, evt)) {
+	        //                graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt, getState(evt)));
+	        //            }
+	        //        }),
+	        //        mxUtils.bind(this, function (evt) {
+	        //            if (this.isLabelEvent(state, evt)) {
+	        //                graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt, getState(evt)));
+	        //                forceGetCell = false;
+	        //            }
+	        //        })
+	        //    );
+	        //
+	        //    // Uses double click timeout in mxGraph for quirks mode
+	        //    if (graph.nativeDblClickEnabled) {
+	        //        mxEvent.addListener(state.text.node, 'dblclick',
+	        //            mxUtils.bind(this, function (evt) {
+	        //                if (this.isLabelEvent(state, evt)) {
+	        //                    graph.dblClick(evt, state.cell);
+	        //                    mxEvent.consume(evt);
+	        //                }
+	        //            })
+	        //        );
+	        //    }
+	        //}
 	    },
 	
 	    createIndicator: function createIndicator(state) {
@@ -5561,7 +5634,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    state.shape.bounds = new _libRectangle2['default'](state.x, state.y, state.width, state.height);
 	                }
 	
-	                shape.scale = state.view.scale;
+	                //shape.scale = state.view.scale;
 	
 	                if (rendering) {
 	                    shape.redraw();
@@ -5577,6 +5650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    redrawLabel: function redrawLabel(state, forced) {
+	
 	        var that = this;
 	        var text = state.view.graph.getLabelText(state.cell);
 	
@@ -5590,7 +5664,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (state.label) {
 	
 	            var label = state.label;
-	            if (forced || label.text !== text) {}
+	            var bounds = that.getLabelBounds(state);
+	
+	            if (forced || label.text !== text) {
+	                label.redraw();
+	            }
 	        }
 	    },
 	
@@ -5625,21 +5703,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
 	exports['default'] = _Shape2['default'].extend({
-	    constructor: function Rect(state) {
 	
-	        var that = this;
-	
-	        Rect.superclass.constructor.call(that, state);
-	
-	        //that.bounds = bounds;
-	        //that.fill = fill;
-	        //that.stroke = stroke;
-	        //that.strokeWidth = !isNullOrUndefined(strokeWidth) ? strokeWidth : 1;
-	    },
-	
-	    isHtmlAllowed: function isHtmlAllowed() {
-	        var shape = this;
-	        return !shape.isRounded && !shape.glass && shape.rotation === 0;
+	    constructor: function Rect(state, style, bounds) {
+	        Rect.superclass.constructor.call(this, state, style, bounds);
 	    },
 	
 	    drawNodeBackground: function drawNodeBackground(canvas, x, y, w, h) {
@@ -5718,82 +5784,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    shapePointerEvents: false,
 	    stencilPointerEvents: false,
 	
-	    scale: 1,
-	    rotation: 0,
-	    opacity: 100, // 透明度
-	    strokeWidth: 1, // 边框宽度
-	    flipH: false, // 水平翻转
-	    flipV: false, // 垂直翻转
-	    visible: true, // 默认可见
-	    outline: false,
-	    antiAlias: true, // 抗锯齿，平滑处理
+	    //scale: 1,
+	    //rotation: 0,
+	    //opacity: 100,       // 透明度
+	    //strokeWidth: 1,     // 边框宽度
+	    //flipH: false,       // 水平翻转
+	    //flipV: false,       // 垂直翻转
+	    //visible: true,      // 默认可见
+	    //outline: false,
+	    //antiAlias: true,    // 抗锯齿，平滑处理
 	
-	    constructor: function Shape(state) {
+	    constructor: function Shape(state, style, bounds) {
 	
-	        this.state = state;
+	        var that = this;
+	        that.state = state;
+	        that.style = style;
+	        that.bounds = bounds;
 	
 	        // props
 	        // -----
 	        // that.node = null;        // 图形的根节点，通常是 g 元素
-	        // that.state = null;
-	        // that.style = null;
 	        // that.points = null;      // 绘制连线需要的点
 	        // that.bounds = null;      // 表示该图形的区域范围
 	        // that.boundingBox = null; // 图形的边框
-	    },
-	
-	    apply: function apply(state) {
-	
-	        var that = this;
-	
-	        that.state = state;
-	        var style = that.style = state.style;
-	
-	        if (style) {
-	            // 背景
-	            that.fillColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].fillColor, that.fillColor);
-	            that.gradientColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].gradientColor, that.gradientColor);
-	            that.gradientDirection = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].gradientDirection, that.gradientDirection);
-	            that.opacity = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].opacity, that.opacity);
-	            // 边框
-	            that.strokeColor = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].strokeColor, that.strokeColor);
-	            that.strokeWidth = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].strokeWidth, that.strokeWidth);
-	            that.arrowStrokeWidth = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].strokeWidth, that.strokeWidth);
-	            that.spacing = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].spacing, that.spacing);
-	            that.startSize = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].startSize, that.startSize);
-	            that.endSize = (0, _commonUtils.getNumber)(style, _enumsStyleNames2['default'].endSize, that.endSize);
-	            that.startArrow = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].startArrow, that.startArrow);
-	            that.endArrow = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].endArrow, that.endArrow);
-	            that.rotation = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].rotation, that.rotation);
-	            that.direction = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].direction, that.direction);
-	            that.flipH = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].flipH, 0) === 1;
-	            that.flipV = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].flipV, 0) === 1;
-	
-	            if (that.direction === _enumsDirections2['default'].north || that.direction === _enumsDirections2['default'].south) {
-	                var tmp = that.flipH;
-	                that.flipH = that.flipV;
-	                that.flipV = tmp;
-	            }
-	
-	            that.isShadow = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].shadow, that.isShadow) === 1;
-	            that.isDashed = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].dashed, that.isDashed) === 1;
-	            that.isRounded = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].rounded, that.isRounded) === 1;
-	            that.glass = (0, _commonUtils.getValue)(style, _enumsStyleNames2['default'].glass, that.glass) === 1;
-	
-	            //if (that.fillColor === constants.NONE) {
-	            //    that.fillColor = null;
-	            //}
-	            //
-	            //if (that.gradientColor === constants.NONE) {
-	            //    that.gradientColor = null;
-	            //}
-	            //
-	            //if (that.strokeColor === constants.NONE) {
-	            //    that.strokeColor = null;
-	            //}
-	        }
-	
-	        return that;
 	    },
 	
 	    init: function init(container) {
@@ -5809,14 +5822,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    // 创建图形的根节点
+	    // create the root node
 	    create: function create(container) {
 	        if (container && container.ownerSVGElement) {
 	            return (0, _commonUtils.createSvgElement)('g');
 	        }
 	    },
 	
-	    // 清除根节点的所有子节点
 	    clear: function clear() {
 	
 	        var that = this;
@@ -5833,10 +5845,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    getScreenOffset: function getScreenOffset() {
 	
-	        var that = this;
-	        var strokeWidth = that.style.strokeWidth;
+	        var style = this.style;
+	        var strokeWidth = style.strokeWidth * style.scale;
 	
-	        strokeWidth = Math.max(1, Math.round(strokeWidth * that.scale));
+	        strokeWidth = Math.max(1, Math.round(strokeWidth));
 	
 	        return (0, _commonUtils.mod)(strokeWidth, 2) === 1 ? 0.5 : 0;
 	    },
@@ -5845,11 +5857,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var node = that.node;
+	        var style = that.style;
 	
 	        // 对于连线，需要根据 points 来计算连线的 bounds
 	        that.updateBoundsFromPoints();
 	
-	        if (that.visible && that.checkBounds()) {
+	        if (style.visible && that.checkBounds()) {
 	            node.style.visibility = 'visible';
 	            that.clear();
 	            that.redrawShape();
@@ -5881,9 +5894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var bounds = that.bounds;
-	
-	        // Scale is passed-through to canvas
-	        var scale = that.scale;
+	        var scale = that.style.scale;
 	        var x = bounds.x / scale;
 	        var y = bounds.y / scale;
 	        var w = bounds.width / scale;
@@ -5895,9 +5906,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            x += t;
 	            y -= t;
 	
-	            var tmp = w;
+	            t = w;
 	            w = h;
-	            h = tmp;
+	            h = t;
 	        }
 	
 	        that.updateTransform(canvas, x, y, w, h);
@@ -5906,7 +5917,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Adds background rectangle to capture events
 	        var bg = null;
 	
-	        if (!that.stencil && !that.points && that.shapePointerEvents || that.stencil && that.stencilPointerEvents) {
+	        if (!that.points && that.shapePointerEvents) {
 	
 	            var bb = that.createBoundingBox();
 	
@@ -5914,26 +5925,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            that.node.appendChild(bg);
 	        }
 	
-	        if (that.stencil) {
-	            that.stencil.drawShape(canvas, that, x, y, w, h);
-	        } else {
-	            // Stencils have separate strokeWidth
-	            canvas.setStrokeWidth(that.strokeWidth);
+	        if (that.points) {
 	
-	            if (that.points) {
-	
-	                var pts = [];
-	                for (var i = 0; i < that.points.length; i++) {
-	                    if (that.points[i]) {
-	                        pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
-	                    }
+	            var pts = [];
+	            for (var i = 0; i < that.points.length; i++) {
+	                if (that.points[i]) {
+	                    pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
 	                }
-	
-	                that.drawLink(canvas, pts);
-	            } else {
-	
-	                that.drawNode(canvas, x, y, w, h);
 	            }
+	
+	            // 绘制连线
+	            that.drawLink(canvas, pts);
+	        } else {
+	            // 绘制节点
+	            that.drawNode(canvas, x, y, w, h);
 	        }
 	
 	        if (bg && canvas.state && canvas.state.transform) {
@@ -5943,7 +5948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    drawNode: function drawNode(canvas, x, y, w, h) {
 	        this.drawNodeBackground(canvas, x, y, w, h);
-	        canvas.setShadow(false);
+	        canvas.state.shadow = false;
 	        this.drawNodeForeground(canvas, x, y, w, h);
 	    },
 	
@@ -6079,6 +6084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return bounds && !isNaN(bounds.x) && !isNaN(bounds.y) && !isNaN(bounds.width) && !isNaN(bounds.height) && bounds.width > 0 && bounds.height > 0;
 	    },
 	
+	    // 可以更改内部 label 的 bounds
 	    getLabelBounds: function getLabelBounds(rect) {
 	        return rect;
 	    },
@@ -6150,7 +6156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        canvas.strokeTolerance = that.pointerEvents ? that.svgStrokeTolerance : 0;
 	        canvas.pointerEventsValue = that.svgPointerEvents;
 	        canvas.blockImagePointerEvents = _commonDetector2['default'].IS_FF;
-	        canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
+	        //canvas.antiAlias = that.antiAlias; // renderer.antiAlias -> shape.antiAlias -> canvas.antiAlias
 	
 	        var off = that.getScreenOffset();
 	
@@ -6259,11 +6265,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var rot = this.getRotation();
 	
 	        if (this.direction) {
-	            if (this.direction === constants.DIRECTION_NORTH) {
+	            if (this.direction === 'north') {
 	                rot += 270;
-	            } else if (this.direction === constants.DIRECTION_WEST) {
+	            } else if (this.direction === 'west') {
 	                rot += 180;
-	            } else if (this.direction === constants.DIRECTION_SOUTH) {
+	            } else if (this.direction === 'south') {
 	                rot += 90;
 	            }
 	        }
@@ -7113,9 +7119,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    antiAlias: true,
+	    //antiAlias: true,
 	
-	    Implements: accessor,
+	    //Implements: accessor,
 	
 	    constructor: function Canvas(root) {
 	
@@ -7129,7 +7135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        that.state = that.createState();
+	        that.state = {};
 	        that.states = [];
 	        that.gradients = [];
 	
@@ -7154,52 +7160,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.state = that.states.pop();
 	
 	        return that;
-	    },
-	
-	    createState: function createState() {
-	        return {
-	            dx: 0,
-	            dy: 0,
-	            scale: 1,
-	            alpha: 1,
-	
-	            // 填充
-	            fillColor: null,
-	            fillAlpha: 1,
-	            gradientColor: null,
-	            gradientAlpha: 1,
-	            gradientDirection: null,
-	
-	            // 边框
-	            strokeWidth: 1,
-	            strokeColor: null,
-	            dashed: false,
-	            dashPattern: '3 3',
-	            dashOffset: '',
-	            lineCap: 'butt', // butt, round, square
-	            lineJoin: 'miter', // miter, round, bevel
-	            miterLimit: 10,
-	
-	            // 字体
-	            fontColor: '#000000',
-	            fontBackgroundColor: null,
-	            fontBorderColor: null,
-	            fontSize: 12,
-	            fontStyle: 0,
-	            fontFamily: 'Arial,Helvetica',
-	
-	            // 阴影
-	            shadow: false,
-	            shadowColor: 'gray',
-	            shadowAlpha: 1,
-	            shadowDx: 2,
-	            shadowDy: 3,
-	
-	            // 旋转
-	            rotation: 0,
-	            rotationCx: 0,
-	            rotationCy: 0
-	        };
 	    },
 	
 	    scale: function scale(value) {
@@ -7268,7 +7228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    format: function format(value) {
-	        return this.antiAlias ? (0, _commonUtils.toFixed)(value, 2) : Math.round(parseFloat(value));
+	        return this.state.antiAlias ? (0, _commonUtils.toFixed)(value, 2) : Math.round(parseFloat(value));
 	    },
 	
 	    // Draw
@@ -7869,28 +7829,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	
 	    common: {
-	        // 平移
+	        // translate
 	        dx: 0,
 	        dy: 0,
 	
-	        // 缩放
 	        scale: 1,
 	
-	        // 旋转
+	        // rotate
 	        rotation: 0,
 	        rotationCx: 0,
 	        rotationCy: 0,
 	
 	        opacity: 1,
 	
-	        // 填充
+	        // fill
 	        fillColor: '#e3f4ff',
 	        fillOpacity: 1,
 	        gradientColor: '',
 	        gradientOpacity: 1,
 	        gradientDirection: '',
 	
-	        // 边框
+	        // border
 	        strokeWidth: 1,
 	        strokeColor: '#289de9',
 	        dashed: false,
@@ -7900,19 +7859,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        lineJoin: 'miter', // miter, round, bevel
 	        miterLimit: 10,
 	
-	        // 字体
-	        fontColor: '#774400',
-	        fontBackgroundColor: '',
-	        fontBorderColor: '',
-	        fontSize: 12,
-	        fontStyle: 0,
-	        fontFamily: 'Arial,Helvetica',
-	
-	        // 对齐
+	        // alignment
 	        verticalAlign: 'middle', // top, middle, bottom
 	        align: 'center', // left, center, right
 	
-	        // 阴影
+	        // shadow
 	        shadow: false,
 	        shadowColor: 'gray',
 	        shadowOpacity: 1,
@@ -7926,6 +7877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        labelPosition: '',
 	        labelVerticalPosition: '',
 	        labelBorderColor: '',
+	        labelBorderWidth: '',
 	        labelBackgroundColor: '',
 	        labelPadding: '',
 	        whiteSpace: 'wrap',
@@ -7936,21 +7888,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	        flipV: false, // 垂直翻转
 	        visible: true, // 默认可见
 	        outline: false,
-	        antiAlias: true
+	        antiAlias: true,
+	
+	        label: {
+	            // font
+	            fontColor: '#774400',
+	            fontOpacity: 1,
+	            fontSize: 12,
+	            fontStyle: 0,
+	            fontFamily: 'Arial,Helvetica',
+	            fontVariant: '',
+	            fontWeight: '',
+	            fontStretch: '',
+	            letterSpacing: '',
+	            wordSpacing: '',
+	            kerning: '',
+	            textDecoration: ''
+	        }
 	    },
 	
-	    // 节点
 	    node: {
 	        shape: 'rectangle',
-	        round: 0 },
+	        round: 0, // 圆角大小的百分比（0-1）
+	        label: {}
+	    },
 	
-	    // 圆角大小的百分比（0-1）
-	    // 连线
 	    link: {
 	        shape: 'connector',
-	        endArrow: 'classic' }
+	        endArrow: 'classic', // classic, block, open, oval, diamond, diamondThin
+	        label: {}
+	    },
+	
+	    label: {
+	        shape: 'label',
+	        width: 0,
+	        spacing: 2,
+	        position: '',
+	        verticalPosition: '',
+	
+	        strokeWidth: 0,
+	        strokeColor: '#289de9',
+	        dashed: false,
+	        dashPattern: '3 3',
+	        dashOffset: 0,
+	        shadow: false,
+	        fillColor: ''
+	    }
 	};
-	// classic, block, open, oval, diamond, diamondThin
 
 /***/ },
 /* 50 */
@@ -7992,33 +7976,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return 0;
 	    },
 	
-	    drawNodeBackground: function drawNodeBackground(canvas, x, y, w, h) {
-	
+	    draw: function draw(canvas) {
 	        var that = this;
-	        var style = that.style;
+	        var scale = that.scale;
+	        var x = that.bounds.x / scale;
+	        var y = that.bounds.y / scale;
+	        var w = that.bounds.width / scale;
+	        var h = that.bounds.height / scale;
 	
-	        if (style.round) {
-	            var r = Math.min(w, h) * style.round;
-	            canvas.drawRect(x, y, w, h, r, r);
-	        } else {
-	            canvas.drawRect(x, y, w, h);
+	        this.updateTransform(canvas, x, y, w, h);
+	        this.configureCanvas(canvas, x, y, w, h);
+	
+	        // Checks if text contains HTML markup
+	        var realHtml = mxUtils.isNode(this.value) || this.dialect == mxConstants.DIALECT_STRICTHTML;
+	
+	        // Always renders labels as HTML in VML
+	        var fmt = realHtml || canvas instanceof mxVmlCanvas2D ? 'html' : '';
+	        var val = this.value;
+	
+	        if (!realHtml && fmt == 'html') {
+	            val = mxUtils.htmlEntities(val, false);
 	        }
 	
-	        canvas.addNode(true, true);
+	        val = !mxUtils.isNode(this.value) && this.replaceLinefeeds && fmt == 'html' ? val.replace(/\n/g, '<br/>') : val;
 	
-	        return that;
-	    },
-	
-	    drawNodeForeground: function drawNodeForeground(c, x, y, w, h) {
-	
-	        var that = this;
-	
-	        if (that.glass && !that.outline) {
-	            that.paintGlassEffect(c, x, y, w, h, that.getArcSize(w + that.strokewidth, h + that.strokewidth));
-	        }
-	
-	        return that;
+	        canvas.text(x, y, w, h, val, this.align, this.valign, this.wrap, fmt, this.overflow, this.clipped, this.getTextRotation());
 	    }
+	
 	});
 	module.exports = exports['default'];
 

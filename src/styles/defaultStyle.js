@@ -1,28 +1,27 @@
 module.exports = {
 
     common: {
-        // 平移
+        // translate
         dx: 0,
         dy: 0,
 
-        // 缩放
         scale: 1,
 
-        // 旋转
+        // rotate
         rotation: 0,
         rotationCx: 0,
         rotationCy: 0,
 
         opacity: 1,
 
-        // 填充
+        // fill
         fillColor: '#e3f4ff',
         fillOpacity: 1,
         gradientColor: '',
         gradientOpacity: 1,
         gradientDirection: '',
 
-        // 边框
+        // border
         strokeWidth: 1,
         strokeColor: '#289de9',
         dashed: false,
@@ -32,19 +31,11 @@ module.exports = {
         lineJoin: 'miter', // miter, round, bevel
         miterLimit: 10,
 
-        // 字体
-        fontColor: '#774400',
-        fontBackgroundColor: '',
-        fontBorderColor: '',
-        fontSize: 12,
-        fontStyle: 0,
-        fontFamily: 'Arial,Helvetica',
-
-        // 对齐
+        // alignment
         verticalAlign: 'middle',  // top, middle, bottom
         align: 'center',          // left, center, right
 
-        // 阴影
+        // shadow
         shadow: false,
         shadowColor: 'gray',
         shadowOpacity: 1,
@@ -58,6 +49,7 @@ module.exports = {
         labelPosition: '',
         labelVerticalPosition: '',
         labelBorderColor: '',
+        labelBorderWidth: '',
         labelBackgroundColor: '',
         labelPadding: '',
         whiteSpace: 'wrap',
@@ -68,18 +60,50 @@ module.exports = {
         flipV: false,       // 垂直翻转
         visible: true,      // 默认可见
         outline: false,
-        antiAlias: true
+        antiAlias: true,
+
+        label: {
+            // font
+            fontColor: '#774400',
+            fontOpacity: 1,
+            fontSize: 12,
+            fontStyle: 0,
+            fontFamily: 'Arial,Helvetica',
+            fontVariant: '',
+            fontWeight: '',
+            fontStretch: '',
+            letterSpacing: '',
+            wordSpacing: '',
+            kerning: '',
+            textDecoration: ''
+        },
     },
 
-    // 节点
     node: {
         shape: 'rectangle',
         round: 0, // 圆角大小的百分比（0-1）
+        label: {}
     },
 
-    // 连线
     link: {
         shape: 'connector',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
+        label: {}
+    },
+
+    label: {
+        shape: 'label',
+        width: 0,
+        spacing: 2,
+        position: '',
+        verticalPosition: '',
+
+        strokeWidth: 0,
+        strokeColor: '#289de9',
+        dashed: false,
+        dashPattern: '3 3',
+        dashOffset: 0,
+        shadow: false,
+        fillColor: '',
     }
 };

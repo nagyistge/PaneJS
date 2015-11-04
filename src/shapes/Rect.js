@@ -6,21 +6,9 @@ import {
 import Shape from './Shape';
 
 export default Shape.extend({
-    constructor: function Rect(state) {
 
-        var that = this;
-
-        Rect.superclass.constructor.call(that, state);
-
-        //that.bounds = bounds;
-        //that.fill = fill;
-        //that.stroke = stroke;
-        //that.strokeWidth = !isNullOrUndefined(strokeWidth) ? strokeWidth : 1;
-    },
-
-    isHtmlAllowed: function () {
-        var shape = this;
-        return !shape.isRounded && !shape.glass && shape.rotation === 0;
+    constructor: function Rect(state, style, bounds) {
+        Rect.superclass.constructor.call(this, state, style, bounds);
     },
 
     drawNodeBackground: function (canvas, x, y, w, h) {
