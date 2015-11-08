@@ -66,6 +66,32 @@ function isEqualEntities(arr1, arr2) {
     return true;
 }
 
+function getAlignmentAsPoint(align, valign) {
+    var dx = 0;
+    var dy = 0;
+
+    // Horizontal alignment
+    if (align === 'center') {
+        dx = -0.5;
+    }
+    else if (align === 'right') {
+        dx = -1;
+    }
+
+    // Vertical alignment
+    if (valign === 'middle') {
+        dy = -0.5;
+    }
+    else if (valign === 'bottom') {
+        dy = -1;
+    }
+
+    return {
+        x: dx,
+        y: dy
+    };
+}
+
 
 export {
     toRadians,
@@ -75,5 +101,6 @@ export {
     rotatePointEx,
     translatePoint,
     isEqualEntity,
-    isEqualEntities
+    isEqualEntities,
+    getAlignmentAsPoint
 };

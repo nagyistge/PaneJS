@@ -1,5 +1,7 @@
 import {
     extend,
+    getCurrentStyle,
+    rotatePoint,
     isNullOrUndefined
 } from '../common/utils';
 
@@ -39,10 +41,19 @@ var Renderer = Base.extend({
         var style = state.style;
         var isLink = state.cell.isLink;
         var bounds = new Rectangle(state.absoluteOffset.x, state.absoluteOffset.y);
-        var inverted = false;// state.label.isPaintBoundsInverted();
+        var inverted = state.label.isPaintBoundsInverted();
 
         if (isLink) {
+            var spacing = state.text.getSpacing();
+            bounds.x += spacing.x * scale;
+            bounds.y += spacing.y * scale;
 
+            var geo = graph.getCellGeometry(state.cell);
+
+            if (geo) {
+                bounds.width = Math.max(0, geo.width * scale);
+                bounds.height = Math.max(0, geo.height * scale);
+            }
         } else {
             if (inverted) {
                 var temp = bounds.x;
@@ -55,9 +66,17 @@ var Renderer = Base.extend({
             bounds.width = Math.max(1, state.width);
             bounds.height = Math.max(1, state.height);
 
-            // border
-            if (style.strokeColor) {
+            // 减去外边框
+            var strokeWidth = getCurrentStyle(state.shape.node).strokeWidth;
+            strokeWidth = strokeWidth ? parseFloat(strokeWidth) : 0;
+            if (strokeWidth) {
+                var s1 = Math.max(strokeWidth, 1) * scale;
+                var s2 = 2 * s1;
 
+                bounds.x += s1;
+                bounds.y += s1;
+                bounds.width -= s2;
+                bounds.height -= s2;
             }
         }
 
@@ -91,6 +110,55 @@ var Renderer = Base.extend({
 
     rotateLabelBounds: function (state, bounds) {
 
+        var label = state.label;
+        var style = label.style;
+
+        bounds.x -= label.margin.x * bounds.width;
+        bounds.y -= label.margin.y * bounds.height;
+
+        //var overflow = style.overflow;
+        //
+        //if (overflow !== 'fill' && overflow !== 'width') {
+        //    var scale = state.view.scale;
+        //    var spacing = state.text.getSpacing();
+        //    bounds.x += spacing.x * scale;
+        //    bounds.y += spacing.y * scale;
+        //
+        //    var pos = state.style.position;
+        //
+        //}
+        //
+        //
+        //if (!this.legacySpacing || (state.style[mxConstants.STYLE_OVERFLOW] != 'fill' && state.style[mxConstants.STYLE_OVERFLOW] != 'width')) {
+        //
+        //    var scale = state.view.scale;
+        //    var spacing = state.text.getSpacing();
+        //    bounds.x += spacing.x * scale;
+        //    bounds.y += spacing.y * scale;
+        //
+        //    var pos = state.style.position;
+        //
+        //
+        //    var hpos = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER);
+        //    var vpos = mxUtils.getValue(state.style, mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_MIDDLE);
+        //    var lw = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_WIDTH, null);
+        //
+        //
+        //    bounds.width = Math.max(0, bounds.width - ((hpos == mxConstants.ALIGN_CENTER && lw == null) ? (state.text.spacingLeft * scale + state.text.spacingRight * scale) : 0));
+        //    bounds.height = Math.max(0, bounds.height - ((vpos == mxConstants.ALIGN_MIDDLE) ? (state.text.spacingTop * scale + state.text.spacingBottom * scale) : 0));
+        //}
+
+        var theta = state.label.getRotation();
+
+        // Only needed if rotated around another center
+        if (theta && state && state.cell.isNode) {
+            var center = state.getCenter();
+            if (bounds.x != center.x || bounds.y != center.y) {
+                var p = rotatePoint(new Point(bounds.x, bounds.y), theta, center);
+                bounds.x = p.x;
+                bounds.y = p.y;
+            }
+        }
     },
 
     // try to create state's shape after the state be created
@@ -120,17 +188,11 @@ var Renderer = Base.extend({
     createLabel: function (state, bounds) {
 
         var that = this;
-        var style = extend({}, state.style, state.style.label);
-
-        delete style.label;
-
+        var style = state.style.label;
 
         if (style) {
             var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
-
             state.label = new Constructor(state, style, bounds);
-
-            that.appendLabel(state);
         }
     },
 
@@ -150,11 +212,6 @@ var Renderer = Base.extend({
 
     appendShape: function (state) {
         state.shape.init(state.view.drawPane);
-        return this;
-    },
-
-    appendLabel: function (state) {
-        state.label.init(state.view.drawPane);
         return this;
     },
 
@@ -229,12 +286,15 @@ var Renderer = Base.extend({
     redrawLabel: function (state, forced) {
 
         var that = this;
-        var text = state.view.graph.getLabelText(state.cell);
-        var bounds = that.getLabelBounds(state);
+        var content = state.view.graph.getCellLabel(state.cell);
 
-        if (!state.label && text) {
+
+        if (!state.label && content) {
             that.createLabel(state, bounds);
-        } else if (state.label && !text) {
+            var bounds = that.getLabelBounds(state);
+            state.label.bounds = bounds;
+            console.log(state.label.node.style);
+        } else if (state.label && !content) {
             state.label.destroy();
             state.label = null;
         }
@@ -243,8 +303,8 @@ var Renderer = Base.extend({
 
             var label = state.label;
 
-            if (forced || label.text !== text) {
-                label.text = text;
+            if (forced || label.content !== content) {
+                label.content = content;
                 label.redraw();
             }
         }

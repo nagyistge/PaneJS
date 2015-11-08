@@ -484,23 +484,22 @@ export default Base.extend({
 
         var that = this;
         var scale = that.scale;
-        var style = state.style;
+        var style = state.style.label;
         var stateWidth = state.width;
         var stateHeight = state.height;
         var labelOffset = state.absoluteOffset;
         var labelWidth = style.labelWidth || 0;
-        var hPosition = style.labelPosition || 'center';
-        var vPosition = style.labelVerticalPosition || 'middle';
+        var position = style.position || 'center';
 
         // label 在水平方向上的位置
-        if (hPosition === 'left') {          // 左外侧
+        if (position === 'left') {          // 左外侧
             if (labelWidth) {
                 labelWidth *= scale;
             } else {
                 labelWidth = stateWidth;
             }
             labelOffset.x -= labelWidth;
-        } else if (hPosition === 'right') {  // 右外侧
+        } else if (position === 'right') {  // 右外侧
             labelOffset.x += stateWidth;
         } else {
             // 水平居中时，还要根据 cell 的对齐方式来确定 label 的位置
@@ -521,13 +520,11 @@ export default Base.extend({
         }
 
         // label 在垂直方向上的位置
-        if (vPosition === 'top') {
+        if (position === 'top') {
             labelOffset.y -= stateHeight;
-        } else if (vPosition === 'bottom') {
+        } else if (position === 'bottom') {
             labelOffset.y += stateHeight;
         }
-
-        console.log(labelOffset);
 
         return that;
     },
@@ -756,12 +753,15 @@ export default Base.extend({
     init: function () {
 
         var that = this;
+        var doc = window.document;
         var root = createSvgElement('svg');
         var canvas = createSvgElement('g');
         var backgroundPane = createSvgElement('g');
         var drawPane = createSvgElement('g');
         var overlayPane = createSvgElement('g');
         var decoratorPane = createSvgElement('g');
+        var foreignPane = doc.createElement('div');
+
 
         canvas.appendChild(backgroundPane);
         canvas.appendChild(drawPane);
@@ -769,19 +769,16 @@ export default Base.extend({
         canvas.appendChild(decoratorPane);
         root.appendChild(canvas);
 
-        root.style.width = '100%';
-        root.style.height = '100%';
-        root.style.display = 'block';
-
         that.canvas = canvas;
         that.backgroundPane = backgroundPane;
         that.drawPane = drawPane;
         that.overlayPane = overlayPane;
         that.decoratorPane = decoratorPane;
+        that.foreignPane = foreignPane;
 
         var container = that.graph.container;
+
         if (container) {
-            container.appendChild(root);
 
             // update container style
             var style = getCurrentStyle(container);
@@ -793,6 +790,11 @@ export default Base.extend({
             if (detector.IS_POINTER) {
                 container.style.msTouchAction = 'none';
             }
+
+            root.style.cssText = 'width: 100%; height: 100%; display: block;';
+
+            container.appendChild(root);
+            container.appendChild(foreignPane);
         }
 
         that.installListeners();

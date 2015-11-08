@@ -569,6 +569,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonDetector = __webpack_require__(28);
+	
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
+	
 	var _lang = __webpack_require__(2);
 	
 	var NS_SVG = 'http://www.w3.org/2000/svg';
@@ -602,6 +608,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return node.currentStyle || window.getComputedStyle(node, null);
 	}
 	
+	var setPrefixedStyle = (function () {
+	    var prefix = null;
+	
+	    if (_commonDetector2['default'].IS_OP && _commonDetector2['default'].IS_OT) {
+	        prefix = 'O';
+	    } else if (_commonDetector2['default'].IS_SF || _commonDetector2['default'].IS_GC) {
+	        prefix = 'Webkit';
+	    } else if (_commonDetector2['default'].IS_MT) {
+	        prefix = 'Moz';
+	    } else if (_commonDetector2['default'].IS_IE && document.documentMode >= 9 && document.documentMode < 10) {
+	        prefix = 'ms';
+	    }
+	
+	    return function (style, name, value) {
+	        style[name] = value;
+	
+	        if (prefix && name.length > 0) {
+	            name = prefix + name.substring(0, 1).toUpperCase() + name.substring(1);
+	            style[name] = value;
+	        }
+	    };
+	})();
+	
 	function createSvgElement(tagName, ownerDocument, namespace) {
 	
 	    var doc = ownerDocument || document;
@@ -634,6 +663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isNode = isNode;
 	exports.getCurrentStyle = getCurrentStyle;
 	exports.createSvgElement = createSvgElement;
+	exports.setPrefixedStyle = setPrefixedStyle;
 	exports.write = write;
 
 /***/ },
@@ -711,6 +741,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return true;
 	}
 	
+	function getAlignmentAsPoint(align, valign) {
+	    var dx = 0;
+	    var dy = 0;
+	
+	    // Horizontal alignment
+	    if (align === 'center') {
+	        dx = -0.5;
+	    } else if (align === 'right') {
+	        dx = -1;
+	    }
+	
+	    // Vertical alignment
+	    if (valign === 'middle') {
+	        dy = -0.5;
+	    } else if (valign === 'bottom') {
+	        dy = -1;
+	    }
+	
+	    return {
+	        x: dx,
+	        y: dy
+	    };
+	}
+	
 	exports.toRadians = toRadians;
 	exports.roundPoint = roundPoint;
 	exports.scalePoint = scalePoint;
@@ -719,6 +773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.translatePoint = translatePoint;
 	exports.isEqualEntity = isEqualEntity;
 	exports.isEqualEntities = isEqualEntities;
+	exports.getAlignmentAsPoint = getAlignmentAsPoint;
 
 /***/ },
 /* 10 */
@@ -1762,7 +1817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return result;
 	    },
-	    getLabelText: function getLabelText(cell) {
+	    getCellLabel: function getCellLabel(cell) {
 	        return cell.value;
 	    },
 	    isHtmlLabel: function isHtmlLabel() {
@@ -4602,16 +4657,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var scale = that.scale;
-	        var style = state.style;
+	        var style = state.style.label;
 	        var stateWidth = state.width;
 	        var stateHeight = state.height;
 	        var labelOffset = state.absoluteOffset;
 	        var labelWidth = style.labelWidth || 0;
-	        var hPosition = style.labelPosition || 'center';
-	        var vPosition = style.labelVerticalPosition || 'middle';
+	        var position = style.position || 'center';
 	
 	        // label 在水平方向上的位置
-	        if (hPosition === 'left') {
+	        if (position === 'left') {
 	            // 左外侧
 	            if (labelWidth) {
 	                labelWidth *= scale;
@@ -4619,7 +4673,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                labelWidth = stateWidth;
 	            }
 	            labelOffset.x -= labelWidth;
-	        } else if (hPosition === 'right') {
+	        } else if (position === 'right') {
 	            // 右外侧
 	            labelOffset.x += stateWidth;
 	        } else {
@@ -4641,13 +4695,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // label 在垂直方向上的位置
-	        if (vPosition === 'top') {
+	        if (position === 'top') {
 	            labelOffset.y -= stateHeight;
-	        } else if (vPosition === 'bottom') {
+	        } else if (position === 'bottom') {
 	            labelOffset.y += stateHeight;
 	        }
-	
-	        console.log(labelOffset);
 	
 	        return that;
 	    },
@@ -4875,12 +4927,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    init: function init() {
 	
 	        var that = this;
+	        var doc = window.document;
 	        var root = (0, _commonUtils.createSvgElement)('svg');
 	        var canvas = (0, _commonUtils.createSvgElement)('g');
 	        var backgroundPane = (0, _commonUtils.createSvgElement)('g');
 	        var drawPane = (0, _commonUtils.createSvgElement)('g');
 	        var overlayPane = (0, _commonUtils.createSvgElement)('g');
 	        var decoratorPane = (0, _commonUtils.createSvgElement)('g');
+	        var foreignPane = doc.createElement('div');
 	
 	        canvas.appendChild(backgroundPane);
 	        canvas.appendChild(drawPane);
@@ -4888,19 +4942,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        canvas.appendChild(decoratorPane);
 	        root.appendChild(canvas);
 	
-	        root.style.width = '100%';
-	        root.style.height = '100%';
-	        root.style.display = 'block';
-	
 	        that.canvas = canvas;
 	        that.backgroundPane = backgroundPane;
 	        that.drawPane = drawPane;
 	        that.overlayPane = overlayPane;
 	        that.decoratorPane = decoratorPane;
+	        that.foreignPane = foreignPane;
 	
 	        var container = that.graph.container;
+	
 	        if (container) {
-	            container.appendChild(root);
 	
 	            // update container style
 	            var style = (0, _commonUtils.getCurrentStyle)(container);
@@ -4912,6 +4963,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (_commonDetector2['default'].IS_POINTER) {
 	                container.style.msTouchAction = 'none';
 	            }
+	
+	            root.style.cssText = 'width: 100%; height: 100%; display: block;';
+	
+	            container.appendChild(root);
+	            container.appendChild(foreignPane);
 	        }
 	
 	        that.installListeners();
@@ -4952,6 +5008,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Opera
 	    IS_OP: ua.indexOf('Opera/') >= 0,
+	
+	    // True if -o-transform is available as a CSS style. This is the case
+	    // for Opera browsers that use Presto/2.5 and later.
+	    IS_OT: ua.indexOf('Presto/2.4.') < 0 && ua.indexOf('Presto/2.3.') < 0 && ua.indexOf('Presto/2.2.') < 0 && ua.indexOf('Presto/2.1.') < 0 && ua.indexOf('Presto/2.0.') < 0 && ua.indexOf('Presto/1.') < 0,
+	
+	    // True if -moz-transform is available as a CSS style. This is the case
+	    // for all Firefox-based browsers newer than or equal 3, such as Camino,
+	    // Iceweasel, Seamonkey and Iceape.
+	    IS_MT: ua.indexOf('Firefox/') >= 0 && ua.indexOf('Firefox/1.') < 0 && ua.indexOf('Firefox/2.') < 0 || ua.indexOf('Iceweasel/') >= 0 && ua.indexOf('Iceweasel/1.') < 0 && ua.indexOf('Iceweasel/2.') < 0 || ua.indexOf('SeaMonkey/') >= 0 && ua.indexOf('SeaMonkey/1.') < 0 || ua.indexOf('Iceape/') >= 0 && ua.indexOf('Iceape/1.') < 0,
 	
 	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
 	
@@ -5365,9 +5430,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var style = state.style;
 	        var isLink = state.cell.isLink;
 	        var bounds = new _libRectangle2['default'](state.absoluteOffset.x, state.absoluteOffset.y);
-	        var inverted = false; // state.label.isPaintBoundsInverted();
+	        var inverted = state.label.isPaintBoundsInverted();
 	
-	        if (isLink) {} else {
+	        if (isLink) {
+	            var spacing = state.text.getSpacing();
+	            bounds.x += spacing.x * scale;
+	            bounds.y += spacing.y * scale;
+	
+	            var geo = graph.getCellGeometry(state.cell);
+	
+	            if (geo) {
+	                bounds.width = Math.max(0, geo.width * scale);
+	                bounds.height = Math.max(0, geo.height * scale);
+	            }
+	        } else {
 	            if (inverted) {
 	                var temp = bounds.x;
 	                bounds.x = bounds.y;
@@ -5379,8 +5455,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            bounds.width = Math.max(1, state.width);
 	            bounds.height = Math.max(1, state.height);
 	
-	            // border
-	            if (style.strokeColor) {}
+	            // 减去外边框
+	            var strokeWidth = (0, _commonUtils.getCurrentStyle)(state.shape.node).strokeWidth;
+	            strokeWidth = strokeWidth ? parseFloat(strokeWidth) : 0;
+	            if (strokeWidth) {
+	                var s1 = Math.max(strokeWidth, 1) * scale;
+	                var s2 = 2 * s1;
+	
+	                bounds.x += s1;
+	                bounds.y += s1;
+	                bounds.width -= s2;
+	                bounds.height -= s2;
+	            }
 	        }
 	
 	        if (inverted) {
@@ -5411,7 +5497,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return bounds;
 	    },
 	
-	    rotateLabelBounds: function rotateLabelBounds(state, bounds) {},
+	    rotateLabelBounds: function rotateLabelBounds(state, bounds) {
+	
+	        var label = state.label;
+	        var style = label.style;
+	
+	        bounds.x -= label.margin.x * bounds.width;
+	        bounds.y -= label.margin.y * bounds.height;
+	
+	        //var overflow = style.overflow;
+	        //
+	        //if (overflow !== 'fill' && overflow !== 'width') {
+	        //    var scale = state.view.scale;
+	        //    var spacing = state.text.getSpacing();
+	        //    bounds.x += spacing.x * scale;
+	        //    bounds.y += spacing.y * scale;
+	        //
+	        //    var pos = state.style.position;
+	        //
+	        //}
+	        //
+	        //
+	        //if (!this.legacySpacing || (state.style[mxConstants.STYLE_OVERFLOW] != 'fill' && state.style[mxConstants.STYLE_OVERFLOW] != 'width')) {
+	        //
+	        //    var scale = state.view.scale;
+	        //    var spacing = state.text.getSpacing();
+	        //    bounds.x += spacing.x * scale;
+	        //    bounds.y += spacing.y * scale;
+	        //
+	        //    var pos = state.style.position;
+	        //
+	        //
+	        //    var hpos = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER);
+	        //    var vpos = mxUtils.getValue(state.style, mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_MIDDLE);
+	        //    var lw = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_WIDTH, null);
+	        //
+	        //
+	        //    bounds.width = Math.max(0, bounds.width - ((hpos == mxConstants.ALIGN_CENTER && lw == null) ? (state.text.spacingLeft * scale + state.text.spacingRight * scale) : 0));
+	        //    bounds.height = Math.max(0, bounds.height - ((vpos == mxConstants.ALIGN_MIDDLE) ? (state.text.spacingTop * scale + state.text.spacingBottom * scale) : 0));
+	        //}
+	
+	        var theta = state.label.getRotation();
+	
+	        // Only needed if rotated around another center
+	        if (theta && state && state.cell.isNode) {
+	            var center = state.getCenter();
+	            if (bounds.x != center.x || bounds.y != center.y) {
+	                var p = (0, _commonUtils.rotatePoint)(new Point(bounds.x, bounds.y), theta, center);
+	                bounds.x = p.x;
+	                bounds.y = p.y;
+	            }
+	        }
+	    },
 	
 	    // try to create state's shape after the state be created
 	    createShape: function createShape(state) {
@@ -5437,16 +5574,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    createLabel: function createLabel(state, bounds) {
 	
 	        var that = this;
-	        var style = (0, _commonUtils.extend)({}, state.style, state.style.label);
-	
-	        delete style.label;
+	        var style = state.style.label;
 	
 	        if (style) {
 	            var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
-	
 	            state.label = new Constructor(state, style, bounds);
-	
-	            that.appendLabel(state);
 	        }
 	    },
 	
@@ -5466,11 +5598,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    appendShape: function appendShape(state) {
 	        state.shape.init(state.view.drawPane);
-	        return this;
-	    },
-	
-	    appendLabel: function appendLabel(state) {
-	        state.label.init(state.view.drawPane);
 	        return this;
 	    },
 	
@@ -5543,12 +5670,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    redrawLabel: function redrawLabel(state, forced) {
 	
 	        var that = this;
-	        var text = state.view.graph.getLabelText(state.cell);
-	        var bounds = that.getLabelBounds(state);
+	        var content = state.view.graph.getCellLabel(state.cell);
 	
-	        if (!state.label && text) {
+	        if (!state.label && content) {
 	            that.createLabel(state, bounds);
-	        } else if (state.label && !text) {
+	            var bounds = that.getLabelBounds(state);
+	            state.label.bounds = bounds;
+	            console.log(state.label.node.style);
+	        } else if (state.label && !content) {
 	            state.label.destroy();
 	            state.label = null;
 	        }
@@ -5557,8 +5686,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var label = state.label;
 	
-	            if (forced || label.text !== text) {
-	                label.text = text;
+	            if (forced || label.content !== content) {
+	                label.content = content;
 	                label.redraw();
 	            }
 	        }
@@ -6002,7 +6131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (boundingBox != null) {
 	                this.augmentBoundingBox(boundingBox);
-	                var rot = this.getShapeRotation();
+	                var rot = this.getRotation();
 	
 	                if (rot != 0) {
 	                    boundingBox = mxUtils.getBoundingBox(boundingBox, rot);
@@ -6133,22 +6262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getRotation: function getRotation() {
-	        return (0, _commonUtils.isNullOrUndefined)(this.rotation) ? 0 : this.rotation;
-	    },
-	
-	    getTextRotation: function getTextRotation() {
-	        var rot = this.getRotation();
-	
-	        if ((0, _commonUtils.getValue)(this.style, constants.STYLE_HORIZONTAL, 1) !== 1) {
-	            //rot += mxText.prototype.verticalTextRotation;
-	            rot += -90;
-	        }
-	
-	        return rot;
-	    },
-	
-	    getShapeRotation: function getShapeRotation() {
-	        var rot = this.getRotation();
+	        var rot = this.style.rotation || 0;
 	
 	        if (this.direction) {
 	            if (this.direction === 'north') {
@@ -7702,49 +7816,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        label: {
 	            shape: 'label',
-	            width: 0, // 0 表示直接
-	            spacing: 2,
+	            position: 'center', // top, right, bottom, left, center
 	            align: 'center', // left, center, right
 	            verticalAlign: 'middle', // top, middle, bottom
-	            position: 'center', // top, right, bottom, left, center
-	
-	            whiteSpace: 'wrap', // 自动换行
-	            overflow: 'hidden',
-	
-	            strokeWidth: 0,
-	            dashed: false,
-	            shadow: false,
-	            fillColor: '',
-	
-	            // font
-	            fontColor: '#774400',
-	            fontSize: 12,
-	            fontFamily: 'Arial,Helvetica',
-	            fontOpacity: 1,
-	            fontWeight: '',
-	            italic: false,
-	            textDecoration: '', // line-through, underline,
-	            fontVariant: '',
-	            fontStretch: '',
-	            letterSpacing: '',
-	            wordSpacing: '',
-	            kerning: '',
-	            lineHeight: 1
+	            overflow: '', // hidden, fill, width
+	            vertical: true,
+	            verticalRotation: -90
 	        }
 	    },
 	
 	    node: {
 	        shape: 'rectangle',
-	        round: 0, // percentage
-	        label: {}
+	        round: 0 // percentage
 	    },
 	
 	    link: {
 	        shape: 'link',
-	        endArrow: 'classic', // classic, block, open, oval, diamond, diamondThin
-	        label: {}
-	    }
+	        endArrow: 'classic' }
+	
 	};
+	// classic, block, open, oval, diamond, diamondThin
 
 /***/ },
 /* 50 */
@@ -7766,38 +7857,205 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _Shape2['default'].extend({
 	
-	    constructor: function Text(state, style, bounds) {
-	        Text.superclass.constructor.call(this, state, style, bounds);
+	    constructor: function Label(state, style, bounds) {
+	
+	        var that = this;
+	
+	        Label.superclass.constructor.call(that, state, style, bounds);
+	
+	        that.align = style.align || 'center';
+	        that.verticalAlign = style.verticalAlign || 'middle';
+	        that.overflow = style.overflow;
+	        that.vertical = style.vertical || false;
+	
+	        that.parent = state.shape;
+	        that.margin = (0, _commonUtils.getAlignmentAsPoint)(that.align, that.verticalAlign);
+	        that.init(state.view.foreignPane);
 	    },
 	
-	    draw: function draw(canvas) {
+	    create: function create(container) {
+	
 	        var that = this;
-	        var scale = that.scale;
-	        var x = that.bounds.x / scale;
-	        var y = that.bounds.y / scale;
-	        var w = that.bounds.width / scale;
-	        var h = that.bounds.height / scale;
+	        var doc = container && container.ownerDocument;
+	        if (doc) {
 	
-	        //this.updateTransform(canvas, x, y, w, h);
+	            var node = doc.createElement('div');
+	            var bg = doc.createElement('div');
+	            var content = doc.createElement('div');
 	
-	        canvas.drawString(x, y, w, h, that.text);
+	            node.className = 'pane-label';
+	            bg.className = 'pane-label-bg';
+	            content.className = 'pane-label-content';
 	
-	        // Checks if text contains HTML markup
-	        //var realHtml = mxUtils.isNode(this.value) || this.dialect == mxConstants.DIALECT_STRICTHTML;
+	            node.appendChild(bg);
+	            node.appendChild(content);
+	
+	            that.backgroundNode = bg;
+	            that.contentNode = content;
+	
+	            bg.style.cssText = 'position:absolute; top:0; left:0; right:0; bottom:0;';
+	            content.style.cssText = 'position:relative; border:1px solid red;';
+	
+	            return node;
+	        }
+	    },
+	
+	    clear: function clear() {
+	
+	        var that = this;
+	        var node = that.contentNode;
+	
+	        if (node && node.ownerDocument) {
+	            while (node.lastChild) {
+	                node.removeChild(node.lastChild);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    redraw: function redraw() {
+	
+	        var that = this;
+	        var node = that.node;
+	        var visible = that.parent.style.visible;
+	
+	        if (visible && that.checkBounds()) {
+	            node.style.visibility = 'visible';
+	            that.clear();
+	            that.redrawShape();
+	            that.updateBoundingBox();
+	        } else {
+	            node.style.visibility = 'hidden';
+	            that.boundingBox = null;
+	        }
+	
+	        return that;
+	    },
+	
+	    redrawShape: function redrawShape() {
+	        return this.draw();
+	    },
+	
+	    draw: function draw() {
+	        var that = this;
+	        var node = that.node;
+	        var style = node.style;
+	
+	        // resets CSS styles
+	        style.position = 'absolute';
+	        style.whiteSpace = 'normal';
+	        style.overflow = '';
+	        style.width = '';
+	        style.height = '';
+	
+	        return that.updateValue().updateSize().updateTransform();
+	    },
+	
+	    updateValue: function updateValue() {
+	
+	        var that = this;
+	        var content = that.content;
+	        var contentNode = that.contentNode;
+	
+	        if ((0, _commonUtils.isNode)(content)) {
+	            contentNode.innerHTML = '';
+	            contentNode.appendChild(content);
+	        } else {
+	            contentNode.innerHTML = content;
+	        }
+	
+	        return that;
+	    },
+	
+	    updateSize: function updateSize() {
+	
+	        var that = this;
+	        //var contentNode = that.contentNode;
+	        //var backgroundNode = that.backgroundNode;
 	        //
-	        //// Always renders labels as HTML in VML
-	        //var fmt = (realHtml || canvas instanceof mxVmlCanvas2D) ? 'html' : '';
-	        //var val = this.value;
+	        //var contentStyle = getCurrentStyle(that.contentNode);
 	        //
-	        //if (!realHtml && fmt == 'html') {
-	        //    val = mxUtils.htmlEntities(val, false);
-	        //}
-	        //
-	        //val = (!mxUtils.isNode(this.value) && this.replaceLinefeeds && fmt == 'html') ?
-	        //    val.replace(/\n/g, '<br/>') : val;
-	        //
-	        //canvas.text(x, y, w, h, val, this.align, this.valign, this.wrap, fmt, this.overflow,
-	        //    this.clipped, this.getTextRotation());
+	        //backgroundNode.style.width = contentStyle.width;
+	        //backgroundNode.style.height = contentStyle.height;
+	
+	        var scale = that.getScale();
+	        var w = Math.round(that.bounds.width / scale) + 'px';
+	        var h = Math.round(that.bounds.height / scale) + 'px';
+	
+	        var style = that.node.style;
+	        var overflow = that.overflow;
+	
+	        if (overflow === 'hidden') {
+	            style.maxHeight = h;
+	            style.maxWidth = w;
+	        } else if (overflow === 'fill') {
+	            style.width = w;
+	            style.height = h;
+	        } else if (overflow === 'width') {
+	            style.width = w;
+	            style.maxHeight = h;
+	        } else {}
+	
+	        return that;
+	    },
+	
+	    updateTransform: function updateTransform() {
+	
+	        var that = this;
+	        var theta = that.getRotation();
+	        var style = that.node.style;
+	        var scale = that.parent.style.scale;
+	        var dx = that.margin.x;
+	        var dy = that.margin.y;
+	        var bounds = that.bounds;
+	
+	        if (theta != 0) {
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', -dx * 100 + '%' + ' ' + -dy * 100 + '%');
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transform', 'translate(' + dx * 100 + '%' + ',' + dy * 100 + '%)' + 'scale(' + scale + ') rotate(' + theta + 'deg)');
+	        } else {
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', '0% 0%');
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transform', 'scale(' + scale + ')' + 'translate(' + dx * 100 + '%' + ',' + dy * 100 + '%)');
+	        }
+	
+	        style.left = Math.round(bounds.x) + 'px';
+	        style.top = Math.round(bounds.y) + 'px';
+	
+	        return that;
+	    },
+	
+	    isPaintBoundsInverted: function isPaintBoundsInverted() {
+	        return this.vertical;
+	    },
+	
+	    getSpacing: function getSpacing() {
+	
+	        var that = this;
+	
+	        var dx = 0;
+	        var dy = 0;
+	        var style = that.style;
+	        var align = that.align;
+	        var vAlign = that.verticalAlign;
+	
+	        if (align === 'center') {} else if (align === 'right') {} else {}
+	
+	        if (vAlign === 'middle') {} else if (vAlign === 'top') {} else {}
+	    },
+	
+	    getScale: function getScale() {
+	        return this.parent.style.scale;
+	    },
+	
+	    getRotation: function getRotation() {
+	
+	        var rot = this.parent.style.rotation || 0;
+	
+	        if (this.vertical) {
+	            rot += this.style.verticalRotation;
+	        }
+	
+	        return rot;
 	    }
 	
 	});

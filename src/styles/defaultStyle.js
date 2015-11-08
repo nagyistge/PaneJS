@@ -47,47 +47,25 @@ module.exports = {
 
         label: {
             shape: 'label',
-            width: 0, // 0 表示直接
-            spacing: 2,
-            align: 'center',         // left, center, right
-            verticalAlign: 'middle', // top, middle, bottom
-            position: 'center',      // top, right, bottom, left, center
-
-            whiteSpace: 'wrap', // 自动换行
-            overflow: 'hidden',
-
-            strokeWidth: 0,
-            dashed: false,
-            shadow: false,
-            fillColor: '',
-
-            // font
-            fontColor: '#774400',
-            fontSize: 12,
-            fontFamily: 'Arial,Helvetica',
-            fontOpacity: 1,
-            fontWeight:'',
-            italic: false,
-            textDecoration: '',  // line-through, underline,
-            fontVariant: '',
-            fontStretch: '',
-            letterSpacing: '',
-            wordSpacing: '',
-            kerning: '',
-            lineHeight: 1
+            position: 'center',       // top, right, bottom, left, center
+            align: 'center',          // left, center, right
+            verticalAlign: 'middle',  // top, middle, bottom
+            overflow: '',       // hidden, fill, width
+            vertical: true,
+            verticalRotation: -90
         },
     },
 
 
     node: {
         shape: 'rectangle',
-        round: 0, // percentage
-        label: {}
+        round: 0 // percentage
     },
 
     link: {
         shape: 'link',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
-        label: {}
     }
+
+
 };

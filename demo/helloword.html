@@ -8,14 +8,10 @@
 </head>
 <body>
 <div id="graphContainer"
-     style="position:relative;overflow:hidden;width:321px;height:241px;background:url('images/grid.gif');cursor:default;">
+     style="position:relative;overflow:hidden;width:800px;height:600px;background:url('images/grid.gif');cursor:default;">
 </div>
 <script>
     window.onload = function () {
-
-        //        console.log(pane);
-        //        console.log(pane.Graph);
-        //        console.log(new pane.Model());
 
         var container = document.getElementById('graphContainer');
         var graph = new pane.Graph(container);
@@ -27,7 +23,7 @@
         graph.getModel().beginUpdate();
 
         try {
-            graph.insertNode(parent, null, 'Hello, PaneJS', 20, 20, 100, 60);
+            graph.insertNode(parent, null, 'is Paint Bounds Inverted', 100, 100, 200, 80);
         }
         finally {
             graph.getModel().endUpdate();

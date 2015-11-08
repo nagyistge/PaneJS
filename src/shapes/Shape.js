@@ -356,7 +356,7 @@ var Shape = Base.extend({
 
             if (boundingBox != null) {
                 this.augmentBoundingBox(boundingBox);
-                var rot = this.getShapeRotation();
+                var rot = this.getRotation();
 
                 if (rot != 0) {
                     boundingBox = mxUtils.getBoundingBox(boundingBox, rot);
@@ -488,22 +488,7 @@ var Shape = Base.extend({
     },
 
     getRotation: function () {
-        return isNullOrUndefined(this.rotation) ? 0 : this.rotation;
-    },
-
-    getTextRotation: function () {
-        var rot = this.getRotation();
-
-        if (getValue(this.style, constants.STYLE_HORIZONTAL, 1) !== 1) {
-            //rot += mxText.prototype.verticalTextRotation;
-            rot += -90;
-        }
-
-        return rot;
-    },
-
-    getShapeRotation: function () {
-        var rot = this.getRotation();
+        var rot = this.style.rotation || 0;
 
         if (this.direction) {
             if (this.direction === 'north') {
