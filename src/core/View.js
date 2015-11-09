@@ -324,9 +324,9 @@ export default Base.extend({
             state.updateCachedBounds();
 
             // 更新 DOM 的层级顺序
-            if (state.shape) {
-                that.stateValidated(state);
-            }
+            //if (state.shape) {
+            //    that.stateValidated(state);
+            //}
 
             cell.eachChild(function (child) {
                 that.validateCellState(child, true);

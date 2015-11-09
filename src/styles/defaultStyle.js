@@ -50,8 +50,9 @@ module.exports = {
             position: 'center',       // top, right, bottom, left, center
             align: 'center',          // left, center, right
             verticalAlign: 'middle',  // top, middle, bottom
-            overflow: '',       // hidden, fill, width
-            vertical: true,
+            overflow: '',             // hidden, fill, width
+            spacing: 5,
+            vertical: false,
             verticalRotation: -90
         },
     },

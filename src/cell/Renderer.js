@@ -9,7 +9,7 @@ import Base       from '../lib/Base';
 import styleNames from '../enums/styleNames';
 import Rectangle  from '../lib/Rectangle';
 
-import Rect from '../shapes/Rect';
+import Rect  from '../shapes/Rect';
 import Label from '../shapes/Label';
 
 var Renderer = Base.extend({
@@ -35,6 +35,7 @@ var Renderer = Base.extend({
     },
 
     getLabelBounds: function (state) {
+
         var that = this;
         var graph = state.view.graph;
         var scale = state.view.scale;
@@ -44,7 +45,7 @@ var Renderer = Base.extend({
         var inverted = state.label.isPaintBoundsInverted();
 
         if (isLink) {
-            var spacing = state.text.getSpacing();
+            var spacing = state.label.getSpacing();
             bounds.x += spacing.x * scale;
             bounds.y += spacing.y * scale;
 
@@ -70,24 +71,20 @@ var Renderer = Base.extend({
             var strokeWidth = getCurrentStyle(state.shape.node).strokeWidth;
             strokeWidth = strokeWidth ? parseFloat(strokeWidth) : 0;
             if (strokeWidth) {
-                var s1 = Math.max(strokeWidth, 1) * scale;
-                var s2 = 2 * s1;
-
-                bounds.x += s1;
-                bounds.y += s1;
-                bounds.width -= s2;
-                bounds.height -= s2;
+                bounds.grow(Math.max(strokeWidth, 1) * scale);
             }
         }
 
         if (inverted) {
             // Rotates around center of state
             var t = (state.width - state.height) / 2;
+            var w = bounds.width;
+            var h = bounds.height;
+
             bounds.x += t;
             bounds.y -= t;
-            var tmp = bounds.width;
-            bounds.width = bounds.height;
-            bounds.height = tmp;
+            bounds.width = h;
+            bounds.height = w;
         }
 
         // shape can modify its label bounds
@@ -111,49 +108,32 @@ var Renderer = Base.extend({
     rotateLabelBounds: function (state, bounds) {
 
         var label = state.label;
-        var style = label.style;
+        var overflow = label.overflow;
 
         bounds.x -= label.margin.x * bounds.width;
         bounds.y -= label.margin.y * bounds.height;
 
-        //var overflow = style.overflow;
-        //
-        //if (overflow !== 'fill' && overflow !== 'width') {
-        //    var scale = state.view.scale;
-        //    var spacing = state.text.getSpacing();
-        //    bounds.x += spacing.x * scale;
-        //    bounds.y += spacing.y * scale;
-        //
-        //    var pos = state.style.position;
-        //
-        //}
-        //
-        //
-        //if (!this.legacySpacing || (state.style[mxConstants.STYLE_OVERFLOW] != 'fill' && state.style[mxConstants.STYLE_OVERFLOW] != 'width')) {
-        //
-        //    var scale = state.view.scale;
-        //    var spacing = state.text.getSpacing();
-        //    bounds.x += spacing.x * scale;
-        //    bounds.y += spacing.y * scale;
-        //
-        //    var pos = state.style.position;
-        //
-        //
-        //    var hpos = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER);
-        //    var vpos = mxUtils.getValue(state.style, mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_MIDDLE);
-        //    var lw = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_WIDTH, null);
-        //
-        //
-        //    bounds.width = Math.max(0, bounds.width - ((hpos == mxConstants.ALIGN_CENTER && lw == null) ? (state.text.spacingLeft * scale + state.text.spacingRight * scale) : 0));
-        //    bounds.height = Math.max(0, bounds.height - ((vpos == mxConstants.ALIGN_MIDDLE) ? (state.text.spacingTop * scale + state.text.spacingBottom * scale) : 0));
-        //}
+        if (overflow !== 'fill' && overflow !== 'width') {
+            var scale = state.view.scale;
+            var spacing = label.getSpacing();
+
+            bounds.x += spacing.x * scale;
+            bounds.y += spacing.y * scale;
+
+            if (label.position === 'center') {
+                spacing = label.spacing;
+
+                bounds.width = Math.max(0, bounds.width - (spacing[1] + spacing[3]) * scale);
+                bounds.height = Math.max(0, bounds.height - (spacing[0] + spacing[2]) * scale);
+            }
+        }
 
         var theta = state.label.getRotation();
 
         // Only needed if rotated around another center
         if (theta && state && state.cell.isNode) {
             var center = state.getCenter();
-            if (bounds.x != center.x || bounds.y != center.y) {
+            if (bounds.x !== center.x || bounds.y !== center.y) {
                 var p = rotatePoint(new Point(bounds.x, bounds.y), theta, center);
                 bounds.x = p.x;
                 bounds.y = p.y;

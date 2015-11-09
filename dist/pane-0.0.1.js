@@ -58,9 +58,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var pane = {
 	    utils: __webpack_require__(1),
-	    Graph: __webpack_require__(10),
-	    Model: __webpack_require__(36),
-	    View: __webpack_require__(27)
+	    Graph: __webpack_require__(11),
+	    Model: __webpack_require__(44),
+	    View: __webpack_require__(29)
 	};
 	
 	module.exports = pane;
@@ -107,7 +107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	_defaults(exports, _interopExportWildcard(_utilsBow, _defaults));
 	
-	var _utilsGeom = __webpack_require__(9);
+	var _utilsGeom = __webpack_require__(10);
 	
 	_defaults(exports, _interopExportWildcard(_utilsGeom, _defaults));
 
@@ -571,7 +571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _commonDetector = __webpack_require__(28);
+	var _commonDetector = __webpack_require__(9);
 	
 	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
@@ -668,6 +668,56 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var ua = navigator.userAgent;
+	var av = navigator.appVersion;
+	
+	module.exports = {
+	    // IE
+	    IS_IE: ua.indexOf('MSIE') >= 0,
+	
+	    IS_IE11: !!ua.match(/Trident\/7\./),
+	
+	    // Netscape
+	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
+	
+	    // Firefox
+	    IS_FF: ua.indexOf('Firefox/') >= 0,
+	
+	    // Chrome
+	    IS_GC: ua.indexOf('Chrome/') >= 0,
+	
+	    // Safari
+	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
+	
+	    // Opera
+	    IS_OP: ua.indexOf('Opera/') >= 0,
+	
+	    // True if -o-transform is available as a CSS style. This is the case
+	    // for Opera browsers that use Presto/2.5 and later.
+	    IS_OT: ua.indexOf('Presto/2.4.') < 0 && ua.indexOf('Presto/2.3.') < 0 && ua.indexOf('Presto/2.2.') < 0 && ua.indexOf('Presto/2.1.') < 0 && ua.indexOf('Presto/2.0.') < 0 && ua.indexOf('Presto/1.') < 0,
+	
+	    // True if -moz-transform is available as a CSS style. This is the case
+	    // for all Firefox-based browsers newer than or equal 3, such as Camino,
+	    // Iceweasel, Seamonkey and Iceape.
+	    IS_MT: ua.indexOf('Firefox/') >= 0 && ua.indexOf('Firefox/1.') < 0 && ua.indexOf('Firefox/2.') < 0 || ua.indexOf('Iceweasel/') >= 0 && ua.indexOf('Iceweasel/1.') < 0 && ua.indexOf('Iceweasel/2.') < 0 || ua.indexOf('SeaMonkey/') >= 0 && ua.indexOf('SeaMonkey/1.') < 0 || ua.indexOf('Iceape/') >= 0 && ua.indexOf('Iceape/1.') < 0,
+	
+	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
+	
+	    IS_WIN: av.indexOf('Win') > 0,
+	
+	    IS_MAC: av.indexOf('Mac') > 0,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement,
+	
+	    IS_POINTER: window.navigator.msPointerEnabled || false
+	};
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -776,7 +826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getAlignmentAsPoint = getAlignmentAsPoint;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -789,43 +839,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonClass = __webpack_require__(11);
+	var _commonClass = __webpack_require__(12);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _eventsEventSource = __webpack_require__(12);
+	var _eventsEventSource = __webpack_require__(13);
 	
 	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
 	
-	var _stylesStylesheet = __webpack_require__(15);
+	var _stylesStylesheet = __webpack_require__(16);
 	
 	var _stylesStylesheet2 = _interopRequireDefault(_stylesStylesheet);
 	
-	var _enumsStyleNames = __webpack_require__(17);
+	var _enumsStyleNames = __webpack_require__(18);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _cellCell = __webpack_require__(24);
+	var _cellCell = __webpack_require__(26);
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
-	var _cellGeometry = __webpack_require__(25);
+	var _cellGeometry = __webpack_require__(27);
 	
 	var _cellGeometry2 = _interopRequireDefault(_cellGeometry);
 	
-	var _View = __webpack_require__(27);
+	var _View = __webpack_require__(29);
 	
 	var _View2 = _interopRequireDefault(_View);
 	
-	var _Model = __webpack_require__(36);
+	var _Model = __webpack_require__(44);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _changesRootChange = __webpack_require__(39);
+	var _changesRootChange = __webpack_require__(47);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(41);
+	var _changesChildChange = __webpack_require__(49);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
@@ -2281,7 +2331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2436,7 +2486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2449,11 +2499,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _EventObject = __webpack_require__(14);
+	var _EventObject = __webpack_require__(15);
 	
 	var _EventObject2 = _interopRequireDefault(_EventObject);
 	
@@ -2576,7 +2626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2589,7 +2639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonClass = __webpack_require__(11);
+	var _commonClass = __webpack_require__(12);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
@@ -2620,7 +2670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2633,7 +2683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -2673,7 +2723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2686,19 +2736,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _defaultLinkStyle = __webpack_require__(16);
+	var _defaultLinkStyle = __webpack_require__(17);
 	
 	var _defaultLinkStyle2 = _interopRequireDefault(_defaultLinkStyle);
 	
-	var _defaultNodeStyle = __webpack_require__(21);
+	var _defaultNodeStyle = __webpack_require__(22);
 	
 	var _defaultNodeStyle2 = _interopRequireDefault(_defaultNodeStyle);
 	
-	var _defaultStyle = __webpack_require__(49);
+	var _defaultStyle = __webpack_require__(25);
 	
 	var _defaultStyle2 = _interopRequireDefault(_defaultStyle);
 	
@@ -2745,7 +2795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2756,19 +2806,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _enumsStyleNames = __webpack_require__(17);
+	var _enumsStyleNames = __webpack_require__(18);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsShapeNames = __webpack_require__(18);
+	var _enumsShapeNames = __webpack_require__(19);
 	
 	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
 	
-	var _enumsAlignments = __webpack_require__(19);
+	var _enumsAlignments = __webpack_require__(20);
 	
 	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
 	
-	var _enumsArrowTypes = __webpack_require__(20);
+	var _enumsArrowTypes = __webpack_require__(21);
 	
 	var _enumsArrowTypes2 = _interopRequireDefault(_enumsArrowTypes);
 	
@@ -2785,7 +2835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2909,7 +2959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2933,7 +2983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2948,7 +2998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2963,7 +3013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2974,19 +3024,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _enumsStyleNames = __webpack_require__(17);
+	var _enumsStyleNames = __webpack_require__(18);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsShapeNames = __webpack_require__(18);
+	var _enumsShapeNames = __webpack_require__(19);
 	
 	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
 	
-	var _enumsAlignments = __webpack_require__(19);
+	var _enumsAlignments = __webpack_require__(20);
 	
 	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
 	
-	var _commonPerimeter = __webpack_require__(22);
+	var _commonPerimeter = __webpack_require__(23);
 	
 	var style = {};
 	
@@ -3002,7 +3052,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3013,7 +3063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libPoint = __webpack_require__(23);
+	var _libPoint = __webpack_require__(24);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
@@ -3565,7 +3615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.hexagonPerimeter = hexagonPerimeter;
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3578,7 +3628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Base = __webpack_require__(13);
+	var _Base = __webpack_require__(14);
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
@@ -3602,7 +3652,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 25 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	
+	    common: {
+	        // translate
+	        dx: 0,
+	        dy: 0,
+	
+	        scale: 1,
+	
+	        // rotate
+	        rotation: 0,
+	        rotationCx: 0,
+	        rotationCy: 0,
+	
+	        opacity: 1,
+	
+	        // fill
+	        fillColor: '#e3f4ff',
+	        fillOpacity: 1,
+	        gradientColor: '',
+	        gradientOpacity: 1,
+	        gradientDirection: '',
+	
+	        // border
+	        strokeWidth: 1,
+	        strokeColor: '#2db7f5',
+	        dashed: false,
+	        dashPattern: '3 3',
+	        dashOffset: 0,
+	        lineCap: 'butt', // butt, round, square
+	        lineJoin: 'miter', // miter, round, bevel
+	        miterLimit: 10,
+	
+	        // shadow
+	        shadow: false,
+	        shadowColor: 'gray',
+	        shadowOpacity: 1,
+	        shadowDx: 2,
+	        shadowDy: 3,
+	
+	        glass: false,
+	        flipH: false, // 水平翻转
+	        flipV: false, // 垂直翻转
+	        visible: true, // 默认可见
+	        outline: false,
+	        antiAlias: true,
+	
+	        label: {
+	            shape: 'label',
+	            position: 'center', // top, right, bottom, left, center
+	            align: 'center', // left, center, right
+	            verticalAlign: 'middle', // top, middle, bottom
+	            overflow: '', // hidden, fill, width
+	            spacing: 5,
+	            vertical: false,
+	            verticalRotation: -90
+	        }
+	    },
+	
+	    node: {
+	        shape: 'rectangle',
+	        round: 0 // percentage
+	    },
+	
+	    link: {
+	        shape: 'link',
+	        endArrow: 'classic' }
+	
+	};
+	// classic, block, open, oval, diamond, diamondThin
+
+/***/ },
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3615,7 +3742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -3864,7 +3991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3877,7 +4004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libRectangle = __webpack_require__(26);
+	var _libRectangle = __webpack_require__(28);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
@@ -4037,7 +4164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4050,11 +4177,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Base = __webpack_require__(13);
+	var _Base = __webpack_require__(14);
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
-	var _Point = __webpack_require__(23);
+	var _Point = __webpack_require__(24);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
@@ -4159,7 +4286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4172,39 +4299,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonDetector = __webpack_require__(28);
+	var _commonDetector = __webpack_require__(9);
 	
 	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _libPoint = __webpack_require__(23);
+	var _libPoint = __webpack_require__(24);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
-	var _libRectangle = __webpack_require__(26);
+	var _libRectangle = __webpack_require__(28);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
-	var _libDictionary = __webpack_require__(29);
+	var _libDictionary = __webpack_require__(30);
 	
 	var _libDictionary2 = _interopRequireDefault(_libDictionary);
 	
-	var _enumsStyleNames = __webpack_require__(17);
+	var _enumsStyleNames = __webpack_require__(18);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsAlignments = __webpack_require__(19);
+	var _enumsAlignments = __webpack_require__(20);
 	
 	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
 	
-	var _cellState = __webpack_require__(31);
+	var _cellState = __webpack_require__(32);
 	
 	var _cellState2 = _interopRequireDefault(_cellState);
 	
-	var _cellRenderer = __webpack_require__(32);
+	var _cellRenderer = __webpack_require__(33);
 	
 	var _cellRenderer2 = _interopRequireDefault(_cellRenderer);
 	
@@ -4504,9 +4631,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            state.updateCachedBounds();
 	
 	            // 更新 DOM 的层级顺序
-	            if (state.shape) {
-	                that.stateValidated(state);
-	            }
+	            //if (state.shape) {
+	            //    that.stateValidated(state);
+	            //}
 	
 	            cell.eachChild(function (child) {
 	                that.validateCellState(child, true);
@@ -4980,57 +5107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 28 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var ua = navigator.userAgent;
-	var av = navigator.appVersion;
-	
-	module.exports = {
-	    // IE
-	    IS_IE: ua.indexOf('MSIE') >= 0,
-	
-	    IS_IE11: !!ua.match(/Trident\/7\./),
-	
-	    // Netscape
-	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
-	
-	    // Firefox
-	    IS_FF: ua.indexOf('Firefox/') >= 0,
-	
-	    // Chrome
-	    IS_GC: ua.indexOf('Chrome/') >= 0,
-	
-	    // Safari
-	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
-	
-	    // Opera
-	    IS_OP: ua.indexOf('Opera/') >= 0,
-	
-	    // True if -o-transform is available as a CSS style. This is the case
-	    // for Opera browsers that use Presto/2.5 and later.
-	    IS_OT: ua.indexOf('Presto/2.4.') < 0 && ua.indexOf('Presto/2.3.') < 0 && ua.indexOf('Presto/2.2.') < 0 && ua.indexOf('Presto/2.1.') < 0 && ua.indexOf('Presto/2.0.') < 0 && ua.indexOf('Presto/1.') < 0,
-	
-	    // True if -moz-transform is available as a CSS style. This is the case
-	    // for all Firefox-based browsers newer than or equal 3, such as Camino,
-	    // Iceweasel, Seamonkey and Iceape.
-	    IS_MT: ua.indexOf('Firefox/') >= 0 && ua.indexOf('Firefox/1.') < 0 && ua.indexOf('Firefox/2.') < 0 || ua.indexOf('Iceweasel/') >= 0 && ua.indexOf('Iceweasel/1.') < 0 && ua.indexOf('Iceweasel/2.') < 0 || ua.indexOf('SeaMonkey/') >= 0 && ua.indexOf('SeaMonkey/1.') < 0 || ua.indexOf('Iceape/') >= 0 && ua.indexOf('Iceape/1.') < 0,
-	
-	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
-	
-	    IS_WIN: av.indexOf('Win') > 0,
-	
-	    IS_MAC: av.indexOf('Mac') > 0,
-	
-	    IS_TOUCH: 'ontouchstart' in document.documentElement,
-	
-	    IS_POINTER: window.navigator.msPointerEnabled || false
-	};
-
-/***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5043,11 +5120,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Base = __webpack_require__(13);
+	var _Base = __webpack_require__(14);
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
-	var _commonObjectIdentity = __webpack_require__(30);
+	var _commonObjectIdentity = __webpack_require__(31);
 	
 	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
 	
@@ -5119,7 +5196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5169,7 +5246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5182,11 +5259,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libPoint = __webpack_require__(23);
+	var _libPoint = __webpack_require__(24);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
-	var _libRectangle = __webpack_require__(26);
+	var _libRectangle = __webpack_require__(28);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
@@ -5368,7 +5445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5381,23 +5458,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _enumsStyleNames = __webpack_require__(17);
+	var _enumsStyleNames = __webpack_require__(18);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _libRectangle = __webpack_require__(26);
+	var _libRectangle = __webpack_require__(28);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
-	var _shapesRect = __webpack_require__(33);
+	var _shapesRect = __webpack_require__(34);
 	
 	var _shapesRect2 = _interopRequireDefault(_shapesRect);
 	
-	var _shapesLabel = __webpack_require__(50);
+	var _shapesLabel = __webpack_require__(43);
 	
 	var _shapesLabel2 = _interopRequireDefault(_shapesLabel);
 	
@@ -5424,6 +5501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getLabelBounds: function getLabelBounds(state) {
+	
 	        var that = this;
 	        var graph = state.view.graph;
 	        var scale = state.view.scale;
@@ -5433,7 +5511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var inverted = state.label.isPaintBoundsInverted();
 	
 	        if (isLink) {
-	            var spacing = state.text.getSpacing();
+	            var spacing = state.label.getSpacing();
 	            bounds.x += spacing.x * scale;
 	            bounds.y += spacing.y * scale;
 	
@@ -5459,24 +5537,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var strokeWidth = (0, _commonUtils.getCurrentStyle)(state.shape.node).strokeWidth;
 	            strokeWidth = strokeWidth ? parseFloat(strokeWidth) : 0;
 	            if (strokeWidth) {
-	                var s1 = Math.max(strokeWidth, 1) * scale;
-	                var s2 = 2 * s1;
-	
-	                bounds.x += s1;
-	                bounds.y += s1;
-	                bounds.width -= s2;
-	                bounds.height -= s2;
+	                bounds.grow(Math.max(strokeWidth, 1) * scale);
 	            }
 	        }
 	
 	        if (inverted) {
 	            // Rotates around center of state
 	            var t = (state.width - state.height) / 2;
+	            var w = bounds.width;
+	            var h = bounds.height;
+	
 	            bounds.x += t;
 	            bounds.y -= t;
-	            var tmp = bounds.width;
-	            bounds.width = bounds.height;
-	            bounds.height = tmp;
+	            bounds.width = h;
+	            bounds.height = w;
 	        }
 	
 	        // shape can modify its label bounds
@@ -5500,49 +5574,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rotateLabelBounds: function rotateLabelBounds(state, bounds) {
 	
 	        var label = state.label;
-	        var style = label.style;
+	        var overflow = label.overflow;
 	
 	        bounds.x -= label.margin.x * bounds.width;
 	        bounds.y -= label.margin.y * bounds.height;
 	
-	        //var overflow = style.overflow;
-	        //
-	        //if (overflow !== 'fill' && overflow !== 'width') {
-	        //    var scale = state.view.scale;
-	        //    var spacing = state.text.getSpacing();
-	        //    bounds.x += spacing.x * scale;
-	        //    bounds.y += spacing.y * scale;
-	        //
-	        //    var pos = state.style.position;
-	        //
-	        //}
-	        //
-	        //
-	        //if (!this.legacySpacing || (state.style[mxConstants.STYLE_OVERFLOW] != 'fill' && state.style[mxConstants.STYLE_OVERFLOW] != 'width')) {
-	        //
-	        //    var scale = state.view.scale;
-	        //    var spacing = state.text.getSpacing();
-	        //    bounds.x += spacing.x * scale;
-	        //    bounds.y += spacing.y * scale;
-	        //
-	        //    var pos = state.style.position;
-	        //
-	        //
-	        //    var hpos = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER);
-	        //    var vpos = mxUtils.getValue(state.style, mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_MIDDLE);
-	        //    var lw = mxUtils.getValue(state.style, mxConstants.STYLE_LABEL_WIDTH, null);
-	        //
-	        //
-	        //    bounds.width = Math.max(0, bounds.width - ((hpos == mxConstants.ALIGN_CENTER && lw == null) ? (state.text.spacingLeft * scale + state.text.spacingRight * scale) : 0));
-	        //    bounds.height = Math.max(0, bounds.height - ((vpos == mxConstants.ALIGN_MIDDLE) ? (state.text.spacingTop * scale + state.text.spacingBottom * scale) : 0));
-	        //}
+	        if (overflow !== 'fill' && overflow !== 'width') {
+	            var scale = state.view.scale;
+	            var spacing = label.getSpacing();
+	
+	            bounds.x += spacing.x * scale;
+	            bounds.y += spacing.y * scale;
+	
+	            if (label.position === 'center') {
+	                spacing = label.spacing;
+	
+	                bounds.width = Math.max(0, bounds.width - (spacing[1] + spacing[3]) * scale);
+	                bounds.height = Math.max(0, bounds.height - (spacing[0] + spacing[2]) * scale);
+	            }
+	        }
 	
 	        var theta = state.label.getRotation();
 	
 	        // Only needed if rotated around another center
 	        if (theta && state && state.cell.isNode) {
 	            var center = state.getCenter();
-	            if (bounds.x != center.x || bounds.y != center.y) {
+	            if (bounds.x !== center.x || bounds.y !== center.y) {
 	                var p = (0, _commonUtils.rotatePoint)(new Point(bounds.x, bounds.y), theta, center);
 	                bounds.x = p.x;
 	                bounds.y = p.y;
@@ -5710,7 +5767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5723,7 +5780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Shape = __webpack_require__(34);
+	var _Shape = __webpack_require__(35);
 	
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
@@ -5764,7 +5821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5777,27 +5834,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _drawingCanvas = __webpack_require__(43);
+	var _drawingCanvas = __webpack_require__(36);
 	
 	var _drawingCanvas2 = _interopRequireDefault(_drawingCanvas);
 	
-	var _libRectangle = __webpack_require__(26);
+	var _libRectangle = __webpack_require__(28);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
-	var _commonDetector = __webpack_require__(28);
+	var _commonDetector = __webpack_require__(9);
 	
 	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
-	var _enumsStyleNames = __webpack_require__(17);
+	var _enumsStyleNames = __webpack_require__(18);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsDirections = __webpack_require__(35);
+	var _enumsDirections = __webpack_require__(42);
 	
 	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
 	
@@ -6333,19 +6390,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    north: 'north',
-	    south: 'south',
-	    east: 'east',
-	    west: 'west'
-	};
-
-/***/ },
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -6359,39 +6403,993 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonClass = __webpack_require__(11);
+	var _libBase = __webpack_require__(14);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _Path = __webpack_require__(37);
+	
+	var _Path2 = _interopRequireDefault(_Path);
+	
+	var _Pen = __webpack_require__(38);
+	
+	var _Pen2 = _interopRequireDefault(_Pen);
+	
+	var _SolidBrush = __webpack_require__(39);
+	
+	var _SolidBrush2 = _interopRequireDefault(_SolidBrush);
+	
+	var _LinearGradientBrush = __webpack_require__(41);
+	
+	var _LinearGradientBrush2 = _interopRequireDefault(_LinearGradientBrush);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    constructor: function Canvas(root, style) {
+	
+	        var that = this;
+	
+	        that.root = root;
+	        that.style = style;
+	        that.format = style.antiAlias ? function (value) {
+	            return (0, _commonUtils.toFixed)(value, 2);
+	        } : function (value) {
+	            return Math.round(value);
+	        };
+	    },
+	
+	    // Draw
+	    // ----
+	
+	    createElement: function createElement(tagName, namespace) {
+	        return (0, _commonUtils.createSvgElement)(tagName, this.root.ownerDocument, namespace);
+	    },
+	
+	    drawPath: function drawPath() {
+	
+	        var that = this;
+	        var path = new _Path2['default'](that);
+	
+	        that.node = that.createElement('path');
+	        that.path = path;
+	
+	        return path;
+	    },
+	
+	    drawRect: function drawRect(x, y, w, h, rx, ry) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var scale = style.scale;
+	        var format = that.format.bind(that);
+	        var node = that.createElement('rect');
+	
+	        node.setAttribute('x', format((x + style.dx) * scale));
+	        node.setAttribute('y', format((y + style.dy) * scale));
+	        node.setAttribute('width', format(w * scale));
+	        node.setAttribute('height', format(h * scale));
+	
+	        if (rx > 0) {
+	            node.setAttribute('rx', format(rx * scale));
+	        }
+	
+	        if (ry > 0) {
+	            node.setAttribute('ry', format(ry * scale));
+	        }
+	
+	        that.node = node;
+	
+	        return that;
+	    },
+	
+	    drawEllipse: function drawEllipse(x, y, w, h) {
+	
+	        var canvas = this;
+	        var style = canvas.style;
+	        var scale = style.scale;
+	
+	        var node = canvas.createElement('ellipse');
+	
+	        node.setAttribute('cx', Math.round((x + w / 2 + style.dx) * scale));
+	        node.setAttribute('cy', Math.round((y + h / 2 + style.dy) * scale));
+	        node.setAttribute('rx', w / 2 * scale);
+	        node.setAttribute('ry', h / 2 * scale);
+	
+	        canvas.node = node;
+	
+	        return canvas;
+	    },
+	
+	    drawImage: function drawImage() {},
+	
+	    drawString: function drawString(x, y, w, h, text) {
+	
+	        var that = this;
+	        var node = that.createElement('g');
+	        var style = that.style;
+	        var scale = style.scale;
+	        var align = style.align;
+	        var vAlign = style.verticalAlign;
+	        var fontSize = Math.round(style.fontSize);
+	
+	        if (fontSize) {
+	            node.setAttribute('font-size', Math.round(fontSize * scale) + 'px');
+	        }
+	
+	        if (style.fontColor) {
+	            node.setAttribute('fill', style.fontColor);
+	        }
+	
+	        if (style.fontFamily) {
+	            node.setAttribute('font-family', style.fontFamily);
+	        }
+	
+	        if (style.fontWeight) {
+	            node.setAttribute('font-weight', style.fontWeight);
+	        }
+	
+	        if (style.italic) {
+	            node.setAttribute('font-style', 'italic');
+	        }
+	
+	        if (style.textDecoration) {
+	            node.setAttribute('text-decoration', style.textDecoration);
+	        }
+	
+	        var anchor = align === 'right' ? 'end' : align === 'center' ? 'middle' : 'start';
+	
+	        if (anchor !== 'start') {
+	            node.setAttribute('text-anchor', anchor);
+	        }
+	
+	        if (style.opacity < 1) {
+	            node.setAttribute('opacity', style.opacity);
+	        }
+	
+	        //var lines = text.split('\n');
+	        //var lineHeight = Math.round(style.lineHeight * fontSize);
+	        //var totalHeight = lines.length * lineHeight;
+	
+	        var textNode = that.createElement('text');
+	        textNode.setAttribute('x', 10);
+	        textNode.setAttribute('y', 10);
+	
+	        (0, _commonUtils.write)(textNode, text);
+	        node.appendChild(textNode);
+	
+	        that.root.appendChild(node);
+	    },
+	
+	    addNode: function addNode(filled, stroked) {
+	
+	        var that = this;
+	        var root = that.root;
+	        var node = that.node;
+	        var style = that.style;
+	
+	        if (node) {
+	
+	            var path = that.path;
+	            if (path) {}
+	
+	            // fill
+	            if (style.fillColor && style.gradientColor) {
+	                new _LinearGradientBrush2['default'](that).fill(filled);
+	            } else {
+	                new _SolidBrush2['default'](that).fill(filled);
+	            }
+	
+	            // stroke
+	            new _Pen2['default'](that).stroke(stroked);
+	
+	            // transform
+	            var transform = style.transform;
+	            if (transform && transform.length > 0) {
+	                node.setAttribute('transform', transform);
+	            }
+	
+	            // shadow
+	            if (style.shadow) {
+	                root.appendChild(that.createShadow(node));
+	            }
+	
+	            // strokeTolerance
+	            filled = filled && style.fillColor ? true : false;
+	            if (that.strokeTolerance > 0 && !filled) {
+	                root.appendChild(that.createTolerance(node));
+	            }
+	
+	            // pointer events
+	            if (that.pointerEvents && (!path || path.closed)) {
+	                node.setAttribute('pointer-events', that.pointerEventsValue);
+	            } else if (!that.pointerEvents && !that.originalRoot) {
+	                node.setAttribute('pointer-events', 'none');
+	            }
+	
+	            root.appendChild(node);
+	        }
+	
+	        return that;
+	    },
+	
+	    createShadow: function createShadow(node) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var shadow = node.cloneNode(true);
+	
+	        if (shadow.getAttribute('fill') !== 'none') {
+	            shadow.setAttribute('fill', style.shadowColor);
+	        }
+	
+	        if (shadow.getAttribute('stroke') !== 'none') {
+	            shadow.setAttribute('stroke', style.shadowColor);
+	        }
+	
+	        shadow.setAttribute('transform', 'translate(' + that.format(style.shadowDx * style.scale) + ',' + this.format(style.shadowDy * style.scale) + ')' + (style.transform || ''));
+	        shadow.setAttribute('opacity', style.shadowAlpha);
+	
+	        return shadow;
+	    },
+	
+	    createTolerance: function createTolerance(node) {
+	
+	        var ele = node.cloneNode(true);
+	        var sw = parseFloat(ele.getAttribute('stroke-width') || 1) + this.strokeTolerance;
+	        ele.setAttribute('pointer-events', 'stroke');
+	        ele.setAttribute('visibility', 'hidden');
+	        ele.setAttribute('stroke-width', sw);
+	        ele.setAttribute('fill', 'none');
+	        ele.setAttribute('stroke', 'white');
+	        ele.removeAttribute('stroke-dasharray');
+	
+	        return ele;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(14);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Path(canvas) {
+	
+	        var that = this;
+	        that.canvas = canvas;
+	        that.lastX = 0;
+	        that.lastY = 0;
+	        that.paths = [];
+	    },
+	
+	    addOp: function addOp() {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var paths = that.paths;
+	        var format = canvas.format;
+	        var state = canvas.state;
+	        var scale = state.scale;
+	        var length = arguments.length;
+	
+	        if (paths) {
+	            paths.push(arguments[0]);
+	
+	            if (length > 2) {
+	                for (var i = 2; i < length; i += 2) {
+	                    that.lastX = arguments[i - 1];
+	                    that.lastY = arguments[i];
+	
+	                    paths.push(format((that.lastX + state.dx) * scale));
+	                    paths.push(format((that.lastY + state.dy) * scale));
+	                }
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    moveTo: function moveTo(x, y) {
+	        return this.addOp('M', x, y);
+	    },
+	
+	    lineTo: function lineTo(x, y) {
+	        return this.addOp('L', x, y);
+	    },
+	
+	    // 二次贝塞尔曲线
+	    quadTo: function quadTo(x1, y1, x2, y2) {
+	        return this.addOp('Q', x1, y1, x2, y2);
+	    },
+	
+	    // 三次贝塞尔曲线
+	    curveTo: function curveTo(x1, y1, x2, y2, x3, y3) {
+	        return this.addOp('C', x1, y1, x2, y2, x3, y3);
+	    },
+	
+	    // 圆弧
+	    arcTo: function arcTo() /*rx, ry, angle, largeArcFlag, sweepFlag, x, y*/{},
+	
+	    close: function close() {
+	
+	        var that = this;
+	
+	        that.addOp('Z');
+	        that.closed = true;
+	        //that.canvas.node.setAttribute('d', paths.join(' '));
+	
+	        return that.canvas; // 链式调用
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _libBase = __webpack_require__(14);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    // 创建一个描边画笔的实例
+	    constructor: function Pen(canvas) {
+	        this.canvas = canvas;
+	    },
+	
+	    stroke: function stroke(stroked) {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var style = canvas.style;
+	        var node = canvas.node;
+	
+	        if (stroked && style.strokeColor) {
+	
+	            node.setAttribute('stroke', style.strokeColor.toLowerCase());
+	
+	            if (style.alpha < 1) {
+	                node.setAttribute('stroke-opacity', style.alpha);
+	            }
+	
+	            var strokeWidth = style.strokeWidth * style.scale;
+	            var fixedStrokeWidth = Math.max(1, strokeWidth);
+	
+	            if (fixedStrokeWidth !== 1) {
+	                node.setAttribute('stroke-width', fixedStrokeWidth);
+	            }
+	
+	            // 更新路径样式
+	            if (node.nodeName.toLowerCase() === 'path') {
+	
+	                // lineJoin
+	                var lineJoin = style.lineJoin;
+	                // 'miter' is default in SVG
+	                if (lineJoin && lineJoin !== 'miter') {
+	                    node.setAttribute('stroke-linejoin', lineJoin);
+	                }
+	
+	                // lineCap
+	                var lineCap = style.lineCap;
+	                // 'butt' is default in SVG
+	                if (lineCap && lineCap !== 'butt') {
+	                    node.setAttribute('stroke-linecap', lineCap);
+	                }
+	
+	                // miterLimit
+	                var miterLimit = style.miterLimit;
+	                // 10 is default in our document
+	                if (miterLimit && miterLimit !== 10) {
+	                    this.node.setAttribute('stroke-miterlimit', miterLimit);
+	                }
+	            }
+	
+	            if (style.dashed) {
+	
+	                // dashPattern
+	                var dashPattern = style.dashPattern;
+	                var dash = ('' + dashPattern).split(' ');
+	                var pattern = (0, _commonUtils.map)(dash, function (pat) {
+	                    return pat * strokeWidth;
+	                });
+	
+	                node.setAttribute('stroke-dasharray', pattern.join(' '));
+	
+	                // dashOffset
+	                var dashOffset = style.dashOffset;
+	                if (dashOffset) {
+	                    node.setAttribute('stroke-dashoffset', dashOffset);
+	                }
+	            }
+	        } else {
+	            node.setAttribute('stroke', 'none');
+	        }
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Brush = __webpack_require__(40);
+	
+	var _Brush2 = _interopRequireDefault(_Brush);
+	
+	exports['default'] = _Brush2['default'].extend({
+	
+	    constructor: function SolidBrush(canvas) {
+	        SolidBrush.superclass.constructor.call(this, canvas);
+	    },
+	
+	    doFill: function doFill() {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var style = canvas.style;
+	        var node = canvas.node;
+	
+	        var fillColor = style.fillColor;
+	
+	        if (fillColor) {
+	            node.setAttribute('fill', fillColor.toLowerCase());
+	        }
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libBase = __webpack_require__(14);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	exports['default'] = _libBase2['default'].extend({
+	
+	    constructor: function Brush(canvas) {
+	        this.canvas = canvas;
+	    },
+	
+	    fill: function fill(filled) {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var style = canvas.style;
+	        var node = canvas.node;
+	
+	        if (filled) {
+	
+	            if (style.alpha < 1) {
+	                node.setAttribute('fill-opacity', style.alpha);
+	            }
+	
+	            that.doFill();
+	        } else {
+	            node.setAttribute('fill', 'none');
+	        }
+	
+	        return that;
+	    },
+	
+	    doFill: function doFill() {
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Brush = __webpack_require__(40);
+	
+	var _Brush2 = _interopRequireDefault(_Brush);
+	
+	var _enumsDirections = __webpack_require__(42);
+	
+	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
+	
+	var LinearGradientBrush = _Brush2['default'].extend({
+	
+	    gradients: {},
+	
+	    constructor: function LinearGradientBrush(canvas) {
+	        LinearGradientBrush.superclass.constructor.call(this, canvas);
+	    },
+	
+	    createGradientId: function createGradientId(start, end, alpha1, alpha2, direction) {
+	
+	        if (start.charAt(0) === '#') {
+	            start = start.substring(1);
+	        }
+	
+	        if (end.charAt(0) === '#') {
+	            end = end.substring(1);
+	        }
+	
+	        // Workaround for gradient IDs not working in Safari 5 / Chrome 6
+	        // if they contain uppercase characters
+	        start = start.toLowerCase() + '-' + alpha1;
+	        end = end.toLowerCase() + '-' + alpha2;
+	
+	        var dir = '';
+	
+	        if (!direction || direction === _enumsDirections2['default'].south) {
+	            dir = 's'; // 从上到下
+	        } else if (direction === _enumsDirections2['default'].east) {
+	                dir = 'e'; // 从左到右
+	            } else {
+	                    var tmp = start;
+	                    start = end;
+	                    end = tmp;
+	
+	                    if (direction === _enumsDirections2['default'].north) {
+	                        dir = 's'; // 从下到上
+	                    } else if (direction === _enumsDirections2['default'].west) {
+	                            dir = 'e'; // 从右到左
+	                        }
+	                }
+	
+	        return 'gradient-' + start + '-' + end + '-' + dir;
+	    },
+	
+	    createGradient: function createGradient(start, end, alpha1, alpha2, direction) {
+	
+	        var root = this.canvas.root;
+	        var gradient = (0, _commonUtils.createSvgElement)('linearGradient', root);
+	
+	        gradient.setAttribute('x1', '0%');
+	        gradient.setAttribute('y1', '0%');
+	        gradient.setAttribute('x2', '0%');
+	        gradient.setAttribute('y2', '0%');
+	
+	        if (!direction || direction === _enumsDirections2['default'].south) {
+	            gradient.setAttribute('y2', '100%');
+	        } else if (direction === _enumsDirections2['default'].east) {
+	            gradient.setAttribute('x2', '100%');
+	        } else if (direction === _enumsDirections2['default'].north) {
+	            gradient.setAttribute('y1', '100%');
+	        } else if (direction === _enumsDirections2['default'].west) {
+	            gradient.setAttribute('x1', '100%');
+	        }
+	
+	        var op = alpha1 < 1 ? ';stop-opacity:' + alpha1 : '';
+	
+	        var stop = (0, _commonUtils.createSvgElement)('stop', root);
+	        stop.setAttribute('offset', '0%');
+	        stop.setAttribute('style', 'stop-color:' + start + op);
+	        gradient.appendChild(stop);
+	
+	        op = alpha2 < 1 ? ';stop-opacity:' + alpha2 : '';
+	
+	        stop = (0, _commonUtils.createSvgElement)('stop', root);
+	        stop.setAttribute('offset', '100%');
+	        stop.setAttribute('style', 'stop-color:' + end + op);
+	        gradient.appendChild(stop);
+	
+	        return gradient;
+	    },
+	
+	    getGradient: function getGradient(start, end, alpha1, alpha2, direction) {
+	
+	        var that = this;
+	        var id = that.createGradientId(start, end, alpha1, alpha2, direction);
+	        var gradients = LinearGradientBrush.gradients;
+	        var gradient = gradients[id];
+	
+	        if (!gradient) {
+	
+	            var root = that.canvas.root;
+	            var svg = root.ownerSVGElement;
+	            var doc = svg.ownerDocument;
+	
+	            var counter = 0;
+	            var tmpId = id + '-' + counter;
+	
+	            gradient = doc.getElementById(tmpId);
+	            while (gradient && gradient.ownerSVGElement !== svg) {
+	                tmpId = id + '-' + counter++;
+	                gradient = doc.getElementById(tmpId);
+	            }
+	
+	            if (!gradient) {
+	                gradient = that.createGradient(start, end, alpha1, alpha2, direction);
+	                gradient.setAttribute('id', tmpId);
+	
+	                svg.appendChild(gradient);
+	            }
+	
+	            gradients[id] = gradient;
+	        }
+	
+	        return gradient.getAttribute('id');
+	    },
+	
+	    doFill: function doFill() {
+	
+	        var that = this;
+	        var canvas = that.canvas;
+	        var style = canvas.style;
+	        var node = canvas.node;
+	        var fillColor = style.fillColor;
+	        var gradientColor = style.gradientColor;
+	
+	        if (fillColor && gradientColor) {
+	            var id = that.getGradient(fillColor, gradientColor, style.fillAlpha, style.gradientAlpha, style.gradientDirection);
+	            var base = (0, _commonUtils.getBaseUrl)().replace(/([\(\)])/g, '\\$1');
+	
+	            node.setAttribute('fill', 'url(' + base + '#' + id + ')');
+	        }
+	
+	        return that;
+	    }
+	});
+	
+	exports['default'] = LinearGradientBrush;
+	module.exports = exports['default'];
+
+/***/ },
+/* 42 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    north: 'north',
+	    south: 'south',
+	    east: 'east',
+	    west: 'west'
+	};
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Shape = __webpack_require__(35);
+	
+	var _Shape2 = _interopRequireDefault(_Shape);
+	
+	exports['default'] = _Shape2['default'].extend({
+	
+	    constructor: function Label(state, style, bounds) {
+	
+	        var that = this;
+	
+	        Label.superclass.constructor.call(that, state, style, bounds);
+	
+	        that.position = style.position || 'center';
+	        that.align = style.align || 'center';
+	        that.verticalAlign = style.verticalAlign || 'middle';
+	        that.vertical = style.vertical || false;
+	        that.overflow = style.overflow;
+	
+	        var spacing = style.spacing;
+	
+	        if ((0, _commonUtils.isArray)(spacing)) {
+	
+	            spacing = spacing.slice();
+	
+	            spacing[0] = !isNaN(spacing[0]) ? Math.round(spacing[0]) : 0;
+	            spacing[1] = !isNaN(spacing[1]) ? Math.round(spacing[1]) : 0;
+	            spacing[2] = !isNaN(spacing[2]) ? Math.round(spacing[2]) : 0;
+	            spacing[3] = !isNaN(spacing[3]) ? Math.round(spacing[3]) : 0;
+	
+	            that.spacing = spacing;
+	        } else {
+	            spacing = !isNaN(spacing) ? Math.round(spacing) : 0;
+	            that.spacing = [spacing, spacing, spacing, spacing];
+	        }
+	
+	        that.parent = state.shape;
+	        that.margin = (0, _commonUtils.getAlignmentAsPoint)(that.align, that.verticalAlign);
+	        that.init(state.view.foreignPane);
+	    },
+	
+	    create: function create(container) {
+	
+	        var that = this;
+	        var doc = container && container.ownerDocument;
+	        if (doc) {
+	
+	            var node = doc.createElement('div');
+	            var bg = doc.createElement('div');
+	            var content = doc.createElement('div');
+	
+	            node.className = 'pane-label';
+	            bg.className = 'pane-label-bg';
+	            content.className = 'pane-label-content';
+	
+	            node.appendChild(bg);
+	            node.appendChild(content);
+	
+	            that.backgroundNode = bg;
+	            that.contentNode = content;
+	
+	            bg.style.cssText = 'position:absolute; top:0; left:0; right:0; bottom:0;';
+	            content.style.cssText = 'position:relative;';
+	
+	            return node;
+	        }
+	    },
+	
+	    clear: function clear() {
+	
+	        var that = this;
+	        var node = that.contentNode;
+	
+	        if (node && node.ownerDocument) {
+	            while (node.lastChild) {
+	                node.removeChild(node.lastChild);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    redraw: function redraw() {
+	
+	        var that = this;
+	        var node = that.node;
+	        var visible = that.parent.style.visible;
+	
+	        if (visible && that.checkBounds()) {
+	            node.style.visibility = 'visible';
+	            that.clear();
+	            that.redrawShape();
+	            that.updateBoundingBox();
+	        } else {
+	            node.style.visibility = 'hidden';
+	            that.boundingBox = null;
+	        }
+	
+	        return that;
+	    },
+	
+	    redrawShape: function redrawShape() {
+	        return this.draw();
+	    },
+	
+	    draw: function draw() {
+	        var that = this;
+	        var node = that.node;
+	
+	        // resets CSS styles
+	        node.style.cssText = 'position:absolute; whiteSpace:normal;';
+	
+	        return that.updateValue().updateSize().updateTransform();
+	    },
+	
+	    updateValue: function updateValue() {
+	
+	        var that = this;
+	        var content = that.content;
+	        var contentNode = that.contentNode;
+	
+	        if ((0, _commonUtils.isNode)(content)) {
+	            contentNode.innerHTML = '';
+	            contentNode.appendChild(content);
+	        } else {
+	            contentNode.innerHTML = content;
+	        }
+	
+	        return that;
+	    },
+	
+	    updateSize: function updateSize() {
+	
+	        var that = this;
+	        var scale = that.getScale();
+	        var w = Math.round(that.bounds.width / scale) + 'px';
+	        var h = Math.round(that.bounds.height / scale) + 'px';
+	
+	        var style = that.node.style;
+	        var overflow = that.overflow;
+	
+	        if (overflow === 'hidden') {
+	            style.maxHeight = h;
+	            style.maxWidth = w;
+	        } else if (overflow === 'fill') {
+	            style.width = w;
+	            style.height = h;
+	        } else if (overflow === 'width') {
+	            style.width = w;
+	            style.maxHeight = h;
+	        } else {}
+	
+	        return that;
+	    },
+	
+	    updateTransform: function updateTransform() {
+	
+	        var that = this;
+	        var theta = that.getRotation();
+	        var scale = that.parent.style.scale;
+	        var style = that.node.style;
+	        var bounds = that.bounds;
+	        var dx = that.margin.x * 100;
+	        var dy = that.margin.y * 100;
+	
+	        if (theta) {
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', -dx + '%' + ' ' + -dy + '%');
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transform', 'translate(' + dx + '%' + ',' + dy + '%)' + 'scale(' + scale + ') rotate(' + theta + 'deg)');
+	        } else {
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', '0% 0%');
+	            (0, _commonUtils.setPrefixedStyle)(style, 'transform', 'scale(' + scale + ')' + 'translate(' + dx + '%' + ',' + dy + '%)');
+	        }
+	
+	        style.left = Math.round(bounds.x) + 'px';
+	        style.top = Math.round(bounds.y) + 'px';
+	
+	        return that;
+	    },
+	
+	    isPaintBoundsInverted: function isPaintBoundsInverted() {
+	        return this.vertical;
+	    },
+	
+	    getSpacing: function getSpacing() {
+	
+	        var that = this;
+	
+	        var dx = 0;
+	        var dy = 0;
+	        var align = that.align;
+	        var vAlign = that.verticalAlign;
+	        var spacing = that.spacing;
+	
+	        if (align === 'center') {
+	            dx = (spacing[1] - spacing[3]) / 2;
+	        } else if (align === 'right') {
+	            dx = -spacing[1];
+	        } else {
+	            dx = spacing[3];
+	        }
+	
+	        if (vAlign === 'middle') {
+	            dy = (spacing[0] - spacing[2]) / 2;
+	        } else if (vAlign === 'top') {
+	            dy = -spacing[0];
+	        } else {
+	            dy = spacing[2];
+	        }
+	
+	        return {
+	            x: dx,
+	            y: dy
+	        };
+	    },
+	
+	    getScale: function getScale() {
+	        return this.parent.style.scale;
+	    },
+	
+	    getRotation: function getRotation() {
+	
+	        var that = this;
+	        var rot = that.parent.style.rotation || 0;
+	
+	        if (that.vertical) {
+	            rot += that.style.verticalRotation;
+	        }
+	
+	        return rot;
+	    }
+	
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _commonClass = __webpack_require__(12);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _cellCell = __webpack_require__(24);
+	var _cellCell = __webpack_require__(26);
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
 	// events
 	
-	var _eventsAspect = __webpack_require__(37);
+	var _eventsAspect = __webpack_require__(45);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
 	
-	var _eventsEventNames = __webpack_require__(38);
+	var _eventsEventNames = __webpack_require__(46);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
-	var _eventsEventSource = __webpack_require__(12);
+	var _eventsEventSource = __webpack_require__(13);
 	
 	var _eventsEventSource2 = _interopRequireDefault(_eventsEventSource);
 	
 	// changes
 	
-	var _changesRootChange = __webpack_require__(39);
+	var _changesRootChange = __webpack_require__(47);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(41);
+	var _changesChildChange = __webpack_require__(49);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesChangeCollection = __webpack_require__(42);
+	var _changesChangeCollection = __webpack_require__(50);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
@@ -6745,7 +7743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6829,7 +7827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 46 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6848,7 +7846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 39 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6859,7 +7857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(40);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -6888,7 +7886,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6899,7 +7897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -6912,7 +7910,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6923,7 +7921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(40);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -7003,7 +8001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7014,11 +8012,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(13);
+	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _eventsEventNames = __webpack_require__(38);
+	var _eventsEventNames = __webpack_require__(46);
 	
 	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
@@ -7062,1000 +8060,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.model.emit(_eventsEventNames2['default'].CHANGE, { changes: that.changes });
 	
 	        return that;
-	    }
-	
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 43 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	var _Path = __webpack_require__(44);
-	
-	var _Path2 = _interopRequireDefault(_Path);
-	
-	var _Pen = __webpack_require__(45);
-	
-	var _Pen2 = _interopRequireDefault(_Pen);
-	
-	var _SolidBrush = __webpack_require__(46);
-	
-	var _SolidBrush2 = _interopRequireDefault(_SolidBrush);
-	
-	var _LinearGradientBrush = __webpack_require__(48);
-	
-	var _LinearGradientBrush2 = _interopRequireDefault(_LinearGradientBrush);
-	
-	exports['default'] = _libBase2['default'].extend({
-	
-	    constructor: function Canvas(root, style) {
-	
-	        var that = this;
-	
-	        that.root = root;
-	        that.style = style;
-	        that.format = style.antiAlias ? function (value) {
-	            return (0, _commonUtils.toFixed)(value, 2);
-	        } : function (value) {
-	            return Math.round(value);
-	        };
-	    },
-	
-	    // Draw
-	    // ----
-	
-	    createElement: function createElement(tagName, namespace) {
-	        return (0, _commonUtils.createSvgElement)(tagName, this.root.ownerDocument, namespace);
-	    },
-	
-	    drawPath: function drawPath() {
-	
-	        var that = this;
-	        var path = new _Path2['default'](that);
-	
-	        that.node = that.createElement('path');
-	        that.path = path;
-	
-	        return path;
-	    },
-	
-	    drawRect: function drawRect(x, y, w, h, rx, ry) {
-	
-	        var that = this;
-	        var style = that.style;
-	        var scale = style.scale;
-	        var format = that.format.bind(that);
-	        var node = that.createElement('rect');
-	
-	        node.setAttribute('x', format((x + style.dx) * scale));
-	        node.setAttribute('y', format((y + style.dy) * scale));
-	        node.setAttribute('width', format(w * scale));
-	        node.setAttribute('height', format(h * scale));
-	
-	        if (rx > 0) {
-	            node.setAttribute('rx', format(rx * scale));
-	        }
-	
-	        if (ry > 0) {
-	            node.setAttribute('ry', format(ry * scale));
-	        }
-	
-	        that.node = node;
-	
-	        return that;
-	    },
-	
-	    drawEllipse: function drawEllipse(x, y, w, h) {
-	
-	        var canvas = this;
-	        var style = canvas.style;
-	        var scale = style.scale;
-	
-	        var node = canvas.createElement('ellipse');
-	
-	        node.setAttribute('cx', Math.round((x + w / 2 + style.dx) * scale));
-	        node.setAttribute('cy', Math.round((y + h / 2 + style.dy) * scale));
-	        node.setAttribute('rx', w / 2 * scale);
-	        node.setAttribute('ry', h / 2 * scale);
-	
-	        canvas.node = node;
-	
-	        return canvas;
-	    },
-	
-	    drawImage: function drawImage() {},
-	
-	    drawString: function drawString(x, y, w, h, text) {
-	
-	        var that = this;
-	        var node = that.createElement('g');
-	        var style = that.style;
-	        var scale = style.scale;
-	        var align = style.align;
-	        var vAlign = style.verticalAlign;
-	        var fontSize = Math.round(style.fontSize);
-	
-	        if (fontSize) {
-	            node.setAttribute('font-size', Math.round(fontSize * scale) + 'px');
-	        }
-	
-	        if (style.fontColor) {
-	            node.setAttribute('fill', style.fontColor);
-	        }
-	
-	        if (style.fontFamily) {
-	            node.setAttribute('font-family', style.fontFamily);
-	        }
-	
-	        if (style.fontWeight) {
-	            node.setAttribute('font-weight', style.fontWeight);
-	        }
-	
-	        if (style.italic) {
-	            node.setAttribute('font-style', 'italic');
-	        }
-	
-	        if (style.textDecoration) {
-	            node.setAttribute('text-decoration', style.textDecoration);
-	        }
-	
-	        var anchor = align === 'right' ? 'end' : align === 'center' ? 'middle' : 'start';
-	
-	        if (anchor !== 'start') {
-	            node.setAttribute('text-anchor', anchor);
-	        }
-	
-	        if (style.opacity < 1) {
-	            node.setAttribute('opacity', style.opacity);
-	        }
-	
-	        //var lines = text.split('\n');
-	        //var lineHeight = Math.round(style.lineHeight * fontSize);
-	        //var totalHeight = lines.length * lineHeight;
-	
-	        var textNode = that.createElement('text');
-	        textNode.setAttribute('x', 10);
-	        textNode.setAttribute('y', 10);
-	
-	        (0, _commonUtils.write)(textNode, text);
-	        node.appendChild(textNode);
-	
-	        that.root.appendChild(node);
-	    },
-	
-	    addNode: function addNode(filled, stroked) {
-	
-	        var that = this;
-	        var root = that.root;
-	        var node = that.node;
-	        var style = that.style;
-	
-	        if (node) {
-	
-	            var path = that.path;
-	            if (path) {}
-	
-	            // fill
-	            if (style.fillColor && style.gradientColor) {
-	                new _LinearGradientBrush2['default'](that).fill(filled);
-	            } else {
-	                new _SolidBrush2['default'](that).fill(filled);
-	            }
-	
-	            // stroke
-	            new _Pen2['default'](that).stroke(stroked);
-	
-	            // transform
-	            var transform = style.transform;
-	            if (transform && transform.length > 0) {
-	                node.setAttribute('transform', transform);
-	            }
-	
-	            // shadow
-	            if (style.shadow) {
-	                root.appendChild(that.createShadow(node));
-	            }
-	
-	            // strokeTolerance
-	            filled = filled && style.fillColor ? true : false;
-	            if (that.strokeTolerance > 0 && !filled) {
-	                root.appendChild(that.createTolerance(node));
-	            }
-	
-	            // pointer events
-	            if (that.pointerEvents && (!path || path.closed)) {
-	                node.setAttribute('pointer-events', that.pointerEventsValue);
-	            } else if (!that.pointerEvents && !that.originalRoot) {
-	                node.setAttribute('pointer-events', 'none');
-	            }
-	
-	            root.appendChild(node);
-	        }
-	
-	        return that;
-	    },
-	
-	    createShadow: function createShadow(node) {
-	
-	        var that = this;
-	        var style = that.style;
-	        var shadow = node.cloneNode(true);
-	
-	        if (shadow.getAttribute('fill') !== 'none') {
-	            shadow.setAttribute('fill', style.shadowColor);
-	        }
-	
-	        if (shadow.getAttribute('stroke') !== 'none') {
-	            shadow.setAttribute('stroke', style.shadowColor);
-	        }
-	
-	        shadow.setAttribute('transform', 'translate(' + that.format(style.shadowDx * style.scale) + ',' + this.format(style.shadowDy * style.scale) + ')' + (style.transform || ''));
-	        shadow.setAttribute('opacity', style.shadowAlpha);
-	
-	        return shadow;
-	    },
-	
-	    createTolerance: function createTolerance(node) {
-	
-	        var ele = node.cloneNode(true);
-	        var sw = parseFloat(ele.getAttribute('stroke-width') || 1) + this.strokeTolerance;
-	        ele.setAttribute('pointer-events', 'stroke');
-	        ele.setAttribute('visibility', 'hidden');
-	        ele.setAttribute('stroke-width', sw);
-	        ele.setAttribute('fill', 'none');
-	        ele.setAttribute('stroke', 'white');
-	        ele.removeAttribute('stroke-dasharray');
-	
-	        return ele;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 44 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	exports['default'] = _libBase2['default'].extend({
-	    constructor: function Path(canvas) {
-	
-	        var that = this;
-	        that.canvas = canvas;
-	        that.lastX = 0;
-	        that.lastY = 0;
-	        that.paths = [];
-	    },
-	
-	    addOp: function addOp() {
-	
-	        var that = this;
-	        var canvas = that.canvas;
-	        var paths = that.paths;
-	        var format = canvas.format;
-	        var state = canvas.state;
-	        var scale = state.scale;
-	        var length = arguments.length;
-	
-	        if (paths) {
-	            paths.push(arguments[0]);
-	
-	            if (length > 2) {
-	                for (var i = 2; i < length; i += 2) {
-	                    that.lastX = arguments[i - 1];
-	                    that.lastY = arguments[i];
-	
-	                    paths.push(format((that.lastX + state.dx) * scale));
-	                    paths.push(format((that.lastY + state.dy) * scale));
-	                }
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    moveTo: function moveTo(x, y) {
-	        return this.addOp('M', x, y);
-	    },
-	
-	    lineTo: function lineTo(x, y) {
-	        return this.addOp('L', x, y);
-	    },
-	
-	    // 二次贝塞尔曲线
-	    quadTo: function quadTo(x1, y1, x2, y2) {
-	        return this.addOp('Q', x1, y1, x2, y2);
-	    },
-	
-	    // 三次贝塞尔曲线
-	    curveTo: function curveTo(x1, y1, x2, y2, x3, y3) {
-	        return this.addOp('C', x1, y1, x2, y2, x3, y3);
-	    },
-	
-	    // 圆弧
-	    arcTo: function arcTo() /*rx, ry, angle, largeArcFlag, sweepFlag, x, y*/{},
-	
-	    close: function close() {
-	
-	        var that = this;
-	
-	        that.addOp('Z');
-	        that.closed = true;
-	        //that.canvas.node.setAttribute('d', paths.join(' '));
-	
-	        return that.canvas; // 链式调用
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	exports['default'] = _libBase2['default'].extend({
-	
-	    // 创建一个描边画笔的实例
-	    constructor: function Pen(canvas) {
-	        this.canvas = canvas;
-	    },
-	
-	    stroke: function stroke(stroked) {
-	
-	        var that = this;
-	        var canvas = that.canvas;
-	        var style = canvas.style;
-	        var node = canvas.node;
-	
-	        if (stroked && style.strokeColor) {
-	
-	            node.setAttribute('stroke', style.strokeColor.toLowerCase());
-	
-	            if (style.alpha < 1) {
-	                node.setAttribute('stroke-opacity', style.alpha);
-	            }
-	
-	            var strokeWidth = style.strokeWidth * style.scale;
-	            var fixedStrokeWidth = Math.max(1, strokeWidth);
-	
-	            if (fixedStrokeWidth !== 1) {
-	                node.setAttribute('stroke-width', fixedStrokeWidth);
-	            }
-	
-	            // 更新路径样式
-	            if (node.nodeName.toLowerCase() === 'path') {
-	
-	                // lineJoin
-	                var lineJoin = style.lineJoin;
-	                // 'miter' is default in SVG
-	                if (lineJoin && lineJoin !== 'miter') {
-	                    node.setAttribute('stroke-linejoin', lineJoin);
-	                }
-	
-	                // lineCap
-	                var lineCap = style.lineCap;
-	                // 'butt' is default in SVG
-	                if (lineCap && lineCap !== 'butt') {
-	                    node.setAttribute('stroke-linecap', lineCap);
-	                }
-	
-	                // miterLimit
-	                var miterLimit = style.miterLimit;
-	                // 10 is default in our document
-	                if (miterLimit && miterLimit !== 10) {
-	                    this.node.setAttribute('stroke-miterlimit', miterLimit);
-	                }
-	            }
-	
-	            if (style.dashed) {
-	
-	                // dashPattern
-	                var dashPattern = style.dashPattern;
-	                var dash = ('' + dashPattern).split(' ');
-	                var pattern = (0, _commonUtils.map)(dash, function (pat) {
-	                    return pat * strokeWidth;
-	                });
-	
-	                node.setAttribute('stroke-dasharray', pattern.join(' '));
-	
-	                // dashOffset
-	                var dashOffset = style.dashOffset;
-	                if (dashOffset) {
-	                    node.setAttribute('stroke-dashoffset', dashOffset);
-	                }
-	            }
-	        } else {
-	            node.setAttribute('stroke', 'none');
-	        }
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 46 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Brush = __webpack_require__(47);
-	
-	var _Brush2 = _interopRequireDefault(_Brush);
-	
-	exports['default'] = _Brush2['default'].extend({
-	
-	    constructor: function SolidBrush(canvas) {
-	        SolidBrush.superclass.constructor.call(this, canvas);
-	    },
-	
-	    doFill: function doFill() {
-	
-	        var that = this;
-	        var canvas = that.canvas;
-	        var style = canvas.style;
-	        var node = canvas.node;
-	
-	        var fillColor = style.fillColor;
-	
-	        if (fillColor) {
-	            node.setAttribute('fill', fillColor.toLowerCase());
-	        }
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 47 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _libBase = __webpack_require__(13);
-	
-	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	exports['default'] = _libBase2['default'].extend({
-	
-	    constructor: function Brush(canvas) {
-	        this.canvas = canvas;
-	    },
-	
-	    fill: function fill(filled) {
-	
-	        var that = this;
-	        var canvas = that.canvas;
-	        var style = canvas.style;
-	        var node = canvas.node;
-	
-	        if (filled) {
-	
-	            if (style.alpha < 1) {
-	                node.setAttribute('fill-opacity', style.alpha);
-	            }
-	
-	            that.doFill();
-	        } else {
-	            node.setAttribute('fill', 'none');
-	        }
-	
-	        return that;
-	    },
-	
-	    doFill: function doFill() {
-	        return this;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 48 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Brush = __webpack_require__(47);
-	
-	var _Brush2 = _interopRequireDefault(_Brush);
-	
-	var _enumsDirections = __webpack_require__(35);
-	
-	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
-	
-	var LinearGradientBrush = _Brush2['default'].extend({
-	
-	    gradients: {},
-	
-	    constructor: function LinearGradientBrush(canvas) {
-	        LinearGradientBrush.superclass.constructor.call(this, canvas);
-	    },
-	
-	    createGradientId: function createGradientId(start, end, alpha1, alpha2, direction) {
-	
-	        if (start.charAt(0) === '#') {
-	            start = start.substring(1);
-	        }
-	
-	        if (end.charAt(0) === '#') {
-	            end = end.substring(1);
-	        }
-	
-	        // Workaround for gradient IDs not working in Safari 5 / Chrome 6
-	        // if they contain uppercase characters
-	        start = start.toLowerCase() + '-' + alpha1;
-	        end = end.toLowerCase() + '-' + alpha2;
-	
-	        var dir = '';
-	
-	        if (!direction || direction === _enumsDirections2['default'].south) {
-	            dir = 's'; // 从上到下
-	        } else if (direction === _enumsDirections2['default'].east) {
-	                dir = 'e'; // 从左到右
-	            } else {
-	                    var tmp = start;
-	                    start = end;
-	                    end = tmp;
-	
-	                    if (direction === _enumsDirections2['default'].north) {
-	                        dir = 's'; // 从下到上
-	                    } else if (direction === _enumsDirections2['default'].west) {
-	                            dir = 'e'; // 从右到左
-	                        }
-	                }
-	
-	        return 'gradient-' + start + '-' + end + '-' + dir;
-	    },
-	
-	    createGradient: function createGradient(start, end, alpha1, alpha2, direction) {
-	
-	        var root = this.canvas.root;
-	        var gradient = (0, _commonUtils.createSvgElement)('linearGradient', root);
-	
-	        gradient.setAttribute('x1', '0%');
-	        gradient.setAttribute('y1', '0%');
-	        gradient.setAttribute('x2', '0%');
-	        gradient.setAttribute('y2', '0%');
-	
-	        if (!direction || direction === _enumsDirections2['default'].south) {
-	            gradient.setAttribute('y2', '100%');
-	        } else if (direction === _enumsDirections2['default'].east) {
-	            gradient.setAttribute('x2', '100%');
-	        } else if (direction === _enumsDirections2['default'].north) {
-	            gradient.setAttribute('y1', '100%');
-	        } else if (direction === _enumsDirections2['default'].west) {
-	            gradient.setAttribute('x1', '100%');
-	        }
-	
-	        var op = alpha1 < 1 ? ';stop-opacity:' + alpha1 : '';
-	
-	        var stop = (0, _commonUtils.createSvgElement)('stop', root);
-	        stop.setAttribute('offset', '0%');
-	        stop.setAttribute('style', 'stop-color:' + start + op);
-	        gradient.appendChild(stop);
-	
-	        op = alpha2 < 1 ? ';stop-opacity:' + alpha2 : '';
-	
-	        stop = (0, _commonUtils.createSvgElement)('stop', root);
-	        stop.setAttribute('offset', '100%');
-	        stop.setAttribute('style', 'stop-color:' + end + op);
-	        gradient.appendChild(stop);
-	
-	        return gradient;
-	    },
-	
-	    getGradient: function getGradient(start, end, alpha1, alpha2, direction) {
-	
-	        var that = this;
-	        var id = that.createGradientId(start, end, alpha1, alpha2, direction);
-	        var gradients = LinearGradientBrush.gradients;
-	        var gradient = gradients[id];
-	
-	        if (!gradient) {
-	
-	            var root = that.canvas.root;
-	            var svg = root.ownerSVGElement;
-	            var doc = svg.ownerDocument;
-	
-	            var counter = 0;
-	            var tmpId = id + '-' + counter;
-	
-	            gradient = doc.getElementById(tmpId);
-	            while (gradient && gradient.ownerSVGElement !== svg) {
-	                tmpId = id + '-' + counter++;
-	                gradient = doc.getElementById(tmpId);
-	            }
-	
-	            if (!gradient) {
-	                gradient = that.createGradient(start, end, alpha1, alpha2, direction);
-	                gradient.setAttribute('id', tmpId);
-	
-	                svg.appendChild(gradient);
-	            }
-	
-	            gradients[id] = gradient;
-	        }
-	
-	        return gradient.getAttribute('id');
-	    },
-	
-	    doFill: function doFill() {
-	
-	        var that = this;
-	        var canvas = that.canvas;
-	        var style = canvas.style;
-	        var node = canvas.node;
-	        var fillColor = style.fillColor;
-	        var gradientColor = style.gradientColor;
-	
-	        if (fillColor && gradientColor) {
-	            var id = that.getGradient(fillColor, gradientColor, style.fillAlpha, style.gradientAlpha, style.gradientDirection);
-	            var base = (0, _commonUtils.getBaseUrl)().replace(/([\(\)])/g, '\\$1');
-	
-	            node.setAttribute('fill', 'url(' + base + '#' + id + ')');
-	        }
-	
-	        return that;
-	    }
-	});
-	
-	exports['default'] = LinearGradientBrush;
-	module.exports = exports['default'];
-
-/***/ },
-/* 49 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	
-	    common: {
-	        // translate
-	        dx: 0,
-	        dy: 0,
-	
-	        scale: 1,
-	
-	        // rotate
-	        rotation: 0,
-	        rotationCx: 0,
-	        rotationCy: 0,
-	
-	        opacity: 1,
-	
-	        // fill
-	        fillColor: '#e3f4ff',
-	        fillOpacity: 1,
-	        gradientColor: '',
-	        gradientOpacity: 1,
-	        gradientDirection: '',
-	
-	        // border
-	        strokeWidth: 1,
-	        strokeColor: '#2db7f5',
-	        dashed: false,
-	        dashPattern: '3 3',
-	        dashOffset: 0,
-	        lineCap: 'butt', // butt, round, square
-	        lineJoin: 'miter', // miter, round, bevel
-	        miterLimit: 10,
-	
-	        // shadow
-	        shadow: false,
-	        shadowColor: 'gray',
-	        shadowOpacity: 1,
-	        shadowDx: 2,
-	        shadowDy: 3,
-	
-	        glass: false,
-	        flipH: false, // 水平翻转
-	        flipV: false, // 垂直翻转
-	        visible: true, // 默认可见
-	        outline: false,
-	        antiAlias: true,
-	
-	        label: {
-	            shape: 'label',
-	            position: 'center', // top, right, bottom, left, center
-	            align: 'center', // left, center, right
-	            verticalAlign: 'middle', // top, middle, bottom
-	            overflow: '', // hidden, fill, width
-	            vertical: true,
-	            verticalRotation: -90
-	        }
-	    },
-	
-	    node: {
-	        shape: 'rectangle',
-	        round: 0 // percentage
-	    },
-	
-	    link: {
-	        shape: 'link',
-	        endArrow: 'classic' }
-	
-	};
-	// classic, block, open, oval, diamond, diamondThin
-
-/***/ },
-/* 50 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Shape = __webpack_require__(34);
-	
-	var _Shape2 = _interopRequireDefault(_Shape);
-	
-	exports['default'] = _Shape2['default'].extend({
-	
-	    constructor: function Label(state, style, bounds) {
-	
-	        var that = this;
-	
-	        Label.superclass.constructor.call(that, state, style, bounds);
-	
-	        that.align = style.align || 'center';
-	        that.verticalAlign = style.verticalAlign || 'middle';
-	        that.overflow = style.overflow;
-	        that.vertical = style.vertical || false;
-	
-	        that.parent = state.shape;
-	        that.margin = (0, _commonUtils.getAlignmentAsPoint)(that.align, that.verticalAlign);
-	        that.init(state.view.foreignPane);
-	    },
-	
-	    create: function create(container) {
-	
-	        var that = this;
-	        var doc = container && container.ownerDocument;
-	        if (doc) {
-	
-	            var node = doc.createElement('div');
-	            var bg = doc.createElement('div');
-	            var content = doc.createElement('div');
-	
-	            node.className = 'pane-label';
-	            bg.className = 'pane-label-bg';
-	            content.className = 'pane-label-content';
-	
-	            node.appendChild(bg);
-	            node.appendChild(content);
-	
-	            that.backgroundNode = bg;
-	            that.contentNode = content;
-	
-	            bg.style.cssText = 'position:absolute; top:0; left:0; right:0; bottom:0;';
-	            content.style.cssText = 'position:relative; border:1px solid red;';
-	
-	            return node;
-	        }
-	    },
-	
-	    clear: function clear() {
-	
-	        var that = this;
-	        var node = that.contentNode;
-	
-	        if (node && node.ownerDocument) {
-	            while (node.lastChild) {
-	                node.removeChild(node.lastChild);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    redraw: function redraw() {
-	
-	        var that = this;
-	        var node = that.node;
-	        var visible = that.parent.style.visible;
-	
-	        if (visible && that.checkBounds()) {
-	            node.style.visibility = 'visible';
-	            that.clear();
-	            that.redrawShape();
-	            that.updateBoundingBox();
-	        } else {
-	            node.style.visibility = 'hidden';
-	            that.boundingBox = null;
-	        }
-	
-	        return that;
-	    },
-	
-	    redrawShape: function redrawShape() {
-	        return this.draw();
-	    },
-	
-	    draw: function draw() {
-	        var that = this;
-	        var node = that.node;
-	        var style = node.style;
-	
-	        // resets CSS styles
-	        style.position = 'absolute';
-	        style.whiteSpace = 'normal';
-	        style.overflow = '';
-	        style.width = '';
-	        style.height = '';
-	
-	        return that.updateValue().updateSize().updateTransform();
-	    },
-	
-	    updateValue: function updateValue() {
-	
-	        var that = this;
-	        var content = that.content;
-	        var contentNode = that.contentNode;
-	
-	        if ((0, _commonUtils.isNode)(content)) {
-	            contentNode.innerHTML = '';
-	            contentNode.appendChild(content);
-	        } else {
-	            contentNode.innerHTML = content;
-	        }
-	
-	        return that;
-	    },
-	
-	    updateSize: function updateSize() {
-	
-	        var that = this;
-	        //var contentNode = that.contentNode;
-	        //var backgroundNode = that.backgroundNode;
-	        //
-	        //var contentStyle = getCurrentStyle(that.contentNode);
-	        //
-	        //backgroundNode.style.width = contentStyle.width;
-	        //backgroundNode.style.height = contentStyle.height;
-	
-	        var scale = that.getScale();
-	        var w = Math.round(that.bounds.width / scale) + 'px';
-	        var h = Math.round(that.bounds.height / scale) + 'px';
-	
-	        var style = that.node.style;
-	        var overflow = that.overflow;
-	
-	        if (overflow === 'hidden') {
-	            style.maxHeight = h;
-	            style.maxWidth = w;
-	        } else if (overflow === 'fill') {
-	            style.width = w;
-	            style.height = h;
-	        } else if (overflow === 'width') {
-	            style.width = w;
-	            style.maxHeight = h;
-	        } else {}
-	
-	        return that;
-	    },
-	
-	    updateTransform: function updateTransform() {
-	
-	        var that = this;
-	        var theta = that.getRotation();
-	        var style = that.node.style;
-	        var scale = that.parent.style.scale;
-	        var dx = that.margin.x;
-	        var dy = that.margin.y;
-	        var bounds = that.bounds;
-	
-	        if (theta != 0) {
-	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', -dx * 100 + '%' + ' ' + -dy * 100 + '%');
-	            (0, _commonUtils.setPrefixedStyle)(style, 'transform', 'translate(' + dx * 100 + '%' + ',' + dy * 100 + '%)' + 'scale(' + scale + ') rotate(' + theta + 'deg)');
-	        } else {
-	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', '0% 0%');
-	            (0, _commonUtils.setPrefixedStyle)(style, 'transform', 'scale(' + scale + ')' + 'translate(' + dx * 100 + '%' + ',' + dy * 100 + '%)');
-	        }
-	
-	        style.left = Math.round(bounds.x) + 'px';
-	        style.top = Math.round(bounds.y) + 'px';
-	
-	        return that;
-	    },
-	
-	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return this.vertical;
-	    },
-	
-	    getSpacing: function getSpacing() {
-	
-	        var that = this;
-	
-	        var dx = 0;
-	        var dy = 0;
-	        var style = that.style;
-	        var align = that.align;
-	        var vAlign = that.verticalAlign;
-	
-	        if (align === 'center') {} else if (align === 'right') {} else {}
-	
-	        if (vAlign === 'middle') {} else if (vAlign === 'top') {} else {}
-	    },
-	
-	    getScale: function getScale() {
-	        return this.parent.style.scale;
-	    },
-	
-	    getRotation: function getRotation() {
-	
-	        var rot = this.parent.style.rotation || 0;
-	
-	        if (this.vertical) {
-	            rot += this.style.verticalRotation;
-	        }
-	
-	        return rot;
 	    }
 	
 	});
