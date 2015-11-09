@@ -1,4 +1,4 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: false */
+define(function(require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: false */
 /* global document */
 
 'use strict';
@@ -1477,3 +1477,4 @@ module.exports = Class.create({
     destroy: function () {}
 });
 
+});

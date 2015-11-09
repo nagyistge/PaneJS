@@ -1,4 +1,4 @@
-
+define(function(require, exports, module) {
 /* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('../common/class');
@@ -91,3 +91,4 @@ module.exports = Class.create({
     },
 });
 
+});

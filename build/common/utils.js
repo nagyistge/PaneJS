@@ -1,4 +1,4 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define(function(require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 /* global window, document */
 
 var detector = require('./detector');
@@ -557,3 +557,4 @@ utils.setOpacity = function (node, value) {
 
 module.exports = utils;
 
+});

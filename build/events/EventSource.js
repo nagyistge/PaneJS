@@ -1,4 +1,4 @@
-/* jshint node: true, loopfunc: true, undef: true, unused: true */
+define(function(require, exports, module) {/* jshint node: true, loopfunc: true, undef: true, unused: true */
 
 var Class = require('../common/class');
 //var utils = require('../common/utils');
@@ -83,3 +83,4 @@ var EventSource = Class.create({
 
 module.exports = EventSource;
 
+});
