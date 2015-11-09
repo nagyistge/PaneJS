@@ -4,11 +4,13 @@ import {
     getValue,
     getNumber,
     createSvgElement,
+    rotatePoint,
     isNullOrUndefined
 } from '../common/utils';
 
 import Base       from '../lib/Base';
 import Canvas     from '../drawing/Canvas';
+import Point      from '../lib/Point';
 import Rectangle  from '../lib/Rectangle';
 import detector   from '../common/detector';
 import styleNames from '../enums/styleNames';
@@ -186,7 +188,7 @@ var Shape = Base.extend({
     // 绘制 node 前景
     drawNodeForeground: function (canvas, x, y, w, h) { },
 
-    drawLink: function (canvas, pts) {},
+    drawLink: function (canvas, points) {},
 
     paintGlassEffect: function (canvas, x, y, w, h, arc) {
         var sw = Math.ceil(this.strokeWidth / 2);
@@ -216,26 +218,27 @@ var Shape = Base.extend({
     },
 
     addPoints: function (canvas, pts, rounded, arcSize, close) {
-        var pe = pts[pts.length - 1];
+
+        var lastPoint = pts[pts.length - 1];
 
         // Adds virtual waypoint in the center between start and end point
         if (close && rounded) {
             pts = pts.slice();
             var p0 = pts[0];
-            var wp = new Point(pe.x + (p0.x - pe.x) / 2, pe.y + (p0.y - pe.y) / 2);
+            var wp = new Point(lastPoint.x + (p0.x - lastPoint.x) / 2, lastPoint.y + (p0.y - lastPoint.y) / 2);
             pts.splice(0, 0, wp);
         }
 
-        var pt = pts[0];
+        var firstPoint = pts[0];
         var i = 1;
 
         // Draws the line segments
-        canvas.moveTo(pt.x, pt.y);
+        canvas.moveTo(firstPoint.x, firstPoint.y);
 
         while (i < ((close) ? pts.length : pts.length - 1)) {
-            var tmp = pts[mxUtils.mod(i, pts.length)];
-            var dx = pt.x - tmp.x;
-            var dy = pt.y - tmp.y;
+            var tmp = pts[mod(i, pts.length)];
+            var dx = firstPoint.x - tmp.x;
+            var dy = firstPoint.y - tmp.y;
 
             if (rounded && (dx != 0 || dy != 0)) {
                 // Draws a line from the last point to the current
@@ -277,15 +280,14 @@ var Shape = Base.extend({
                 canvas.lineTo(tmp.x, tmp.y);
             }
 
-            pt = tmp;
+            firstPoint = tmp;
             i++;
         }
 
         if (close) {
             canvas.close();
-        }
-        else {
-            canvas.lineTo(pe.x, pe.y);
+        } else {
+            canvas.lineTo(lastPoint.x, lastPoint.y);
         }
     },
 
@@ -340,41 +342,74 @@ var Shape = Base.extend({
 
     createBoundingBox: function () {
 
-        var bb = this.bounds.clone();
+        var that = this;
+        var bbox = that.bounds.clone();
 
-        if ((this.stencil && (this.direction === constants.DIRECTION_NORTH ||
-            this.direction === constants.DIRECTION_SOUTH)) || this.isPaintBoundsInverted()) {
-            bb.rotate90();
+        if (that.isPaintBoundsInverted()) {
+            bbox.rotate90();
         }
 
-        return bb;
+        return bbox;
     },
 
     updateBoundingBox: function () {
-        if (this.bounds) {
-            var boundingBox = this.createBoundingBox();
 
-            if (boundingBox != null) {
-                this.augmentBoundingBox(boundingBox);
-                var rot = this.getRotation();
+        var that = this;
 
-                if (rot != 0) {
-                    boundingBox = mxUtils.getBoundingBox(boundingBox, rot);
-                }
+        if (that.bounds) {
+            var boundingBox = that.createBoundingBox();
+
+            if (boundingBox) {
+                that.augmentBoundingBox(boundingBox)
+                    .rotateBoundingBox(boundingBox, that.getRotation());
             }
 
-            this.boundingBox = boundingBox;
+            that.boundingBox = boundingBox;
         }
     },
 
     augmentBoundingBox: function (bbox) {
-        if (this.isShadow) {
-            bbox.width += Math.ceil(constants.SHADOW_OFFSET_X * this.scale);
-            bbox.height += Math.ceil(constants.SHADOW_OFFSET_Y * this.scale);
+
+        var that = this;
+        var style = that.style;
+        var scale = style.scale;
+
+        if (style.shadow) {
+            bbox.width += Math.ceil(style.shadowDx * scale);
+            bbox.height += Math.ceil(style.shadowDY * scale);
         }
 
         // Adds strokeWidth
-        bbox.grow(this.strokeWidth * this.scale / 2);
+        bbox.grow(style.strokeWidth * scale / 2);
+
+        return that;
+    },
+
+    rotateBoundingBox: function (bbox, degree, center) {
+
+        if (bbox && degree) {
+
+            center = center || bbox.getCenter();
+
+            var p1 = new Point(bbox.x, bbox.y);
+            var p2 = new Point(bbox.x + bbox.width, bbox.y);
+            var p3 = new Point(p2.x, bbox.y + bbox.height);
+            var p4 = new Point(bbox.x, p3.y);
+
+            p1 = rotatePoint(p1, degree, center);
+            p2 = rotatePoint(p2, degree, center);
+            p3 = rotatePoint(p3, degree, center);
+            p4 = rotatePoint(p4, degree, center);
+
+            var result = new Rectangle(p1.x, p1.y, 0, 0);
+            result.add(new Rectangle(p2.x, p2.y, 0, 0));
+            result.add(new Rectangle(p3.x, p3.y, 0, 0));
+            result.add(new Rectangle(p4.x, p4.y, 0, 0));
+
+            bbox.setRect(result.x, result.y, result.width, result.height);
+        }
+
+        return this;
     },
 
     updateTransform: function (canvas, x, y, w, h) {
@@ -488,16 +523,19 @@ var Shape = Base.extend({
     },
 
     getRotation: function () {
-        var rot = this.style.rotation || 0;
 
-        if (this.direction) {
-            if (this.direction === 'north') {
+        var style = this.style;
+        var rot = style.rotation || 0;
+        var direction = style.direction;
+
+        if (direction) {
+            if (direction === 'north') {
                 rot += 270;
             }
-            else if (this.direction === 'west') {
+            else if (direction === 'west') {
                 rot += 180;
             }
-            else if (this.direction === 'south') {
+            else if (direction === 'south') {
                 rot += 90;
             }
         }
@@ -536,7 +574,8 @@ var Shape = Base.extend({
     },
 
     isPaintBoundsInverted: function () {
-        return this.direction === 'north' || this.direction === 'south';
+        var direction = this.style.direction;
+        return direction === 'north' || direction === 'south';
     },
 
     destroy: function () {

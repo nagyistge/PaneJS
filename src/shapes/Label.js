@@ -3,7 +3,7 @@ import {
     isArray,
     getCurrentStyle,
     setPrefixedStyle,
-    getAlignmentAsPoint
+    getAlignments
 } from '../common/utils';
 
 import Shape from './Shape';
@@ -16,6 +16,10 @@ export default Shape.extend({
 
         Label.superclass.constructor.call(that, state, style, bounds);
 
+        // set visible from shape
+        style.visible = state.shape.style.visible;
+
+        that.parent = state.shape;
         that.position = style.position || 'center';
         that.align = style.align || 'center';
         that.verticalAlign = style.verticalAlign || 'middle';
@@ -39,9 +43,8 @@ export default Shape.extend({
             that.spacing = [spacing, spacing, spacing, spacing];
         }
 
-        that.parent = state.shape;
-        that.margin = getAlignmentAsPoint(that.align, that.verticalAlign);
-        that.init(state.view.foreignPane);
+        that.updateAlignments()
+            .init(state.view.foreignPane);
     },
 
     create: function (container) {
@@ -85,25 +88,6 @@ export default Shape.extend({
         return that;
     },
 
-    redraw: function () {
-
-        var that = this;
-        var node = that.node;
-        var visible = that.parent.style.visible;
-
-        if (visible && that.checkBounds()) {
-            node.style.visibility = 'visible';
-            that.clear();
-            that.redrawShape();
-            that.updateBoundingBox();
-        } else {
-            node.style.visibility = 'hidden';
-            that.boundingBox = null;
-        }
-
-        return that;
-    },
-
     redrawShape: function () {
         return this.draw();
     },
@@ -119,6 +103,36 @@ export default Shape.extend({
             .updateSize()
             .updateTransform();
 
+    },
+
+    updateBoundingBox: function () {
+
+        var that = this;
+        var style = that.style;
+        var alignments = that.alignments;
+        var boundingBox = that.bounds.clone();
+
+        if (style.overflow !== 'fill') {
+
+            var scale = that.getScale();
+            var contentNode = that.contentNode;
+
+            var w = contentNode.offsetWidth * scale || 1;
+            var h = contentNode.offsetHeight * scale || 1;
+
+            boundingBox.x += alignments.x * w;
+            boundingBox.y += alignments.y * h;
+            boundingBox.width = w;
+            boundingBox.height = h;
+        } else {
+            boundingBox.x += that.alignments.x * boundingBox.width;
+            boundingBox.y += that.alignments.y * boundingBox.height;
+        }
+
+        that.rotateBoundingBox(boundingBox, that.getRotation());
+        that.boundingBox = boundingBox;
+
+        return that;
     },
 
     updateValue: function () {
@@ -171,8 +185,8 @@ export default Shape.extend({
         var scale = that.parent.style.scale;
         var style = that.node.style;
         var bounds = that.bounds;
-        var dx = that.margin.x * 100;
-        var dy = that.margin.y * 100;
+        var dx = that.alignments.x * 100;
+        var dy = that.alignments.y * 100;
 
         if (theta) {
             setPrefixedStyle(style, 'transformOrigin', (-dx) + '%' + ' ' + (-dy) + '%');
@@ -187,6 +201,12 @@ export default Shape.extend({
         style.left = Math.round(bounds.x) + 'px';
         style.top = Math.round(bounds.y) + 'px';
 
+        return that;
+    },
+
+    updateAlignments: function () {
+        var that = this;
+        that.alignments = getAlignments(that.align, that.verticalAlign);
         return that;
     },
 

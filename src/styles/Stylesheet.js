@@ -12,11 +12,13 @@ export default Base.extend({
         that.styles = {};
         var common = defaultStyle.common;
         var nodeStyle = defaultStyle.node;
+        var linkStyle = defaultStyle.link;
 
         nodeStyle.label = extend({}, common.label, nodeStyle.label);
+        linkStyle.label = extend({}, common.label, linkStyle.label);
 
         that.setDefaultNodeStyle(extend({}, common, nodeStyle));
-        that.setDefaultLinkStyle(extend({}, defaultLinkStyle));
+        that.setDefaultLinkStyle(extend({}, common, linkStyle));
     },
 
     getDefaultNodeStyle: function () {

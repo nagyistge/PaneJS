@@ -66,7 +66,7 @@ function isEqualEntities(arr1, arr2) {
     return true;
 }
 
-function getAlignmentAsPoint(align, valign) {
+function getAlignments(align, valign) {
     var dx = 0;
     var dy = 0;
 
@@ -102,5 +102,5 @@ export {
     translatePoint,
     isEqualEntity,
     isEqualEntities,
-    getAlignmentAsPoint
+    getAlignments
 };

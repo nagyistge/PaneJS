@@ -64,7 +64,7 @@ module.exports = {
     },
 
     link: {
-        shape: 'link',
+        shape: 'connector',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
     }
 

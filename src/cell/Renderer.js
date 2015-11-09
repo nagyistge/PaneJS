@@ -11,6 +11,7 @@ import Rectangle  from '../lib/Rectangle';
 
 import Rect  from '../shapes/Rect';
 import Label from '../shapes/Label';
+import Connector from '../shapes/Connector';
 
 var Renderer = Base.extend({
 
@@ -25,7 +26,7 @@ var Renderer = Base.extend({
     },
 
     defaultNodeShape: Rect,
-    defaultLinkShape: null,
+    defaultLinkShape: Connector,
     defaultLabelShape: Label,
 
     constructor: function Renderer() {},
@@ -110,8 +111,8 @@ var Renderer = Base.extend({
         var label = state.label;
         var overflow = label.overflow;
 
-        bounds.x -= label.margin.x * bounds.width;
-        bounds.y -= label.margin.y * bounds.height;
+        bounds.x -= label.alignments.x * bounds.width;
+        bounds.y -= label.alignments.y * bounds.height;
 
         if (overflow !== 'fill' && overflow !== 'width') {
             var scale = state.view.scale;
@@ -273,7 +274,6 @@ var Renderer = Base.extend({
             that.createLabel(state, bounds);
             var bounds = that.getLabelBounds(state);
             state.label.bounds = bounds;
-            console.log(state.label.node.style);
         } else if (state.label && !content) {
             state.label.destroy();
             state.label = null;
@@ -301,6 +301,7 @@ var Renderer = Base.extend({
 var registerShape = Renderer.registerShape;
 
 registerShape('rectangle', Rect);
+registerShape('connector', Connector);
 registerShape('label', Label);
 
 export default Renderer;

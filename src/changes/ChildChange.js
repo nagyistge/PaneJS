@@ -51,8 +51,8 @@ export default Change.extend({
         var model = that.model;
 
         if (cell.isLink) {
-            var sourceNode = cell.getNode(true);
-            var targetNode = cell.getNode(false);
+            var sourceNode = cell.getTerminal(true);
+            var targetNode = cell.getTerminal(false);
 
             if (sourceNode) {
                 model.linkChanged(cell, isConnected ? sourceNode : null, true);
@@ -62,8 +62,8 @@ export default Change.extend({
                 model.linkChanged(cell, isConnected ? targetNode : null, false);
             }
 
-            cell.setNode(sourceNode, true);
-            cell.setNode(targetNode, false);
+            cell.setTerminal(sourceNode, true);
+            cell.setTerminal(targetNode, false);
         }
 
         cell.eachChild(function (child) {

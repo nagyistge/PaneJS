@@ -791,7 +791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return true;
 	}
 	
-	function getAlignmentAsPoint(align, valign) {
+	function getAlignments(align, valign) {
 	    var dx = 0;
 	    var dy = 0;
 	
@@ -823,7 +823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.translatePoint = translatePoint;
 	exports.isEqualEntity = isEqualEntity;
 	exports.isEqualEntities = isEqualEntities;
-	exports.getAlignmentAsPoint = getAlignmentAsPoint;
+	exports.getAlignments = getAlignments;
 
 /***/ },
 /* 11 */
@@ -1156,9 +1156,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getBorderSizes: function getBorderSizes() {},
 	    getPreferredPageSize: function getPreferredPageSize(bounds, width, height) {},
 	    sizeDidChange: function sizeDidChange() {
-	        var bounds = this.getGraphBounds();
 	
-	        if (this.container) {
+	        var that = this;
+	
+	        return;
+	
+	        var bounds = that.view.graphBounds;
+	
+	        if (that.container) {
 	            var border = this.getBorder();
 	
 	            var width = Math.max(0, bounds.x + bounds.width + 1 + border);
@@ -1183,7 +1188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            if (this.minimumGraphSize != null) {
+	            if (this.minimumGraphSize) {
 	                width = Math.max(width, this.minimumGraphSize.width * this.view.scale);
 	                height = Math.max(height, this.minimumGraphSize.height * this.view.scale);
 	            }
@@ -1212,7 +1217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return;
 	
-	            this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
+	            //this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
 	        }
 	
 	        //this.fireEvent(new mxEventObject(mxEvent.SIZE, 'bounds', bounds));
@@ -1411,8 +1416,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    insertLink: function insertLink(parent, id, value, source, target, style) {
-	        var edge = this.createEdge(parent, id, value, source, target, style);
-	        return this.addEdge(edge, parent, source, target);
+	        var link = this.createLink(parent, id, value, source, target, style);
+	        return this.addLink(link, parent, source, target);
 	    },
 	
 	    createLink: function createLink(parent, id, value, source, target, style) {
@@ -2760,11 +2765,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.styles = {};
 	        var common = _defaultStyle2['default'].common;
 	        var nodeStyle = _defaultStyle2['default'].node;
+	        var linkStyle = _defaultStyle2['default'].link;
 	
 	        nodeStyle.label = (0, _commonUtils.extend)({}, common.label, nodeStyle.label);
+	        linkStyle.label = (0, _commonUtils.extend)({}, common.label, linkStyle.label);
 	
 	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, common, nodeStyle));
-	        that.setDefaultLinkStyle((0, _commonUtils.extend)({}, _defaultLinkStyle2['default']));
+	        that.setDefaultLinkStyle((0, _commonUtils.extend)({}, common, linkStyle));
 	    },
 	
 	    getDefaultNodeStyle: function getDefaultNodeStyle() {
@@ -3722,7 +3729,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    link: {
-	        shape: 'link',
+	        shape: 'connector',
 	        endArrow: 'classic' }
 	
 	};
@@ -4438,7 +4445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.validateCell(cell, true);
 	        that.validateCellState(cell, true);
 	
-	        that.graphBounds = that.getBoundingBox(cell) || that.getEmptyBounds();
+	        that.graphBounds = that.getBoundingBox(cell, true) || that.getEmptyBounds();
 	
 	        that.validateBackground();
 	        that.resetValidationState();
@@ -4512,10 +4519,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        backgroundImage.redraw();
 	    },
 	
+	    // Bounding
+	    // --------
 	    getEmptyBounds: function getEmptyBounds() {
+	
 	        var that = this;
-	        var translate = that.translate;
 	        var scale = that.scale;
+	        var translate = that.translate;
 	        return new _libRectangle2['default'](translate.x * scale, translate.y * scale);
 	    },
 	
@@ -4525,8 +4535,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var state = that.getState(cell);
 	        var boundingBox = null;
 	
-	        recurse = !(0, _commonUtils.isNullOrUndefined)(recurse) ? recurse : true;
-	
 	        if (state) {
 	
 	            var shapeBoundingBox = state.shape && state.shape.boundingBox;
@@ -4534,7 +4542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                boundingBox = shapeBoundingBox.clone();
 	            }
 	
-	            var textBoundingBox = state.text && state.text.boundingBox;
+	            var textBoundingBox = state.label && state.label.boundingBox;
 	            if (textBoundingBox) {
 	                if (boundingBox) {
 	                    boundingBox.add(textBoundingBox);
@@ -4909,7 +4917,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result = result.parent;
 	            }
 	
-	            if (that.model.isLayer(best)) {
+	            if (that.graph.model.isLayer(best)) {
 	                best = null;
 	            }
 	        }
@@ -5478,6 +5486,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _shapesLabel2 = _interopRequireDefault(_shapesLabel);
 	
+	var _shapesConnector = __webpack_require__(51);
+	
+	var _shapesConnector2 = _interopRequireDefault(_shapesConnector);
+	
 	var Renderer = _libBase2['default'].extend({
 	
 	    Statics: {
@@ -5491,7 +5503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    defaultNodeShape: _shapesRect2['default'],
-	    defaultLinkShape: null,
+	    defaultLinkShape: _shapesConnector2['default'],
 	    defaultLabelShape: _shapesLabel2['default'],
 	
 	    constructor: function Renderer() {},
@@ -5576,8 +5588,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var label = state.label;
 	        var overflow = label.overflow;
 	
-	        bounds.x -= label.margin.x * bounds.width;
-	        bounds.y -= label.margin.y * bounds.height;
+	        bounds.x -= label.alignments.x * bounds.width;
+	        bounds.y -= label.alignments.y * bounds.height;
 	
 	        if (overflow !== 'fill' && overflow !== 'width') {
 	            var scale = state.view.scale;
@@ -5733,7 +5745,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            that.createLabel(state, bounds);
 	            var bounds = that.getLabelBounds(state);
 	            state.label.bounds = bounds;
-	            console.log(state.label.node.style);
 	        } else if (state.label && !content) {
 	            state.label.destroy();
 	            state.label = null;
@@ -5761,6 +5772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var registerShape = Renderer.registerShape;
 	
 	registerShape('rectangle', _shapesRect2['default']);
+	registerShape('connector', _shapesConnector2['default']);
 	registerShape('label', _shapesLabel2['default']);
 	
 	exports['default'] = Renderer;
@@ -5841,6 +5853,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _drawingCanvas = __webpack_require__(36);
 	
 	var _drawingCanvas2 = _interopRequireDefault(_drawingCanvas);
+	
+	var _libPoint = __webpack_require__(24);
+	
+	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
 	var _libRectangle = __webpack_require__(28);
 	
@@ -6001,7 +6017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var pts = [];
 	            for (var i = 0; i < that.points.length; i++) {
 	                if (that.points[i]) {
-	                    pts.push(new Point(that.points[i].x / scale, that.points[i].y / scale));
+	                    pts.push(new _libPoint2['default'](that.points[i].x / scale, that.points[i].y / scale));
 	                }
 	            }
 	
@@ -6029,7 +6045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // 绘制 node 前景
 	    drawNodeForeground: function drawNodeForeground(canvas, x, y, w, h) {},
 	
-	    drawLink: function drawLink(canvas, pts) {},
+	    drawLink: function drawLink(canvas, points) {},
 	
 	    paintGlassEffect: function paintGlassEffect(canvas, x, y, w, h, arc) {
 	        var sw = Math.ceil(this.strokeWidth / 2);
@@ -6058,26 +6074,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    addPoints: function addPoints(canvas, pts, rounded, arcSize, close) {
-	        var pe = pts[pts.length - 1];
+	
+	        var lastPoint = pts[pts.length - 1];
 	
 	        // Adds virtual waypoint in the center between start and end point
 	        if (close && rounded) {
 	            pts = pts.slice();
 	            var p0 = pts[0];
-	            var wp = new Point(pe.x + (p0.x - pe.x) / 2, pe.y + (p0.y - pe.y) / 2);
+	            var wp = new _libPoint2['default'](lastPoint.x + (p0.x - lastPoint.x) / 2, lastPoint.y + (p0.y - lastPoint.y) / 2);
 	            pts.splice(0, 0, wp);
 	        }
 	
-	        var pt = pts[0];
+	        var firstPoint = pts[0];
 	        var i = 1;
 	
 	        // Draws the line segments
-	        canvas.moveTo(pt.x, pt.y);
+	        canvas.moveTo(firstPoint.x, firstPoint.y);
 	
 	        while (i < (close ? pts.length : pts.length - 1)) {
-	            var tmp = pts[mxUtils.mod(i, pts.length)];
-	            var dx = pt.x - tmp.x;
-	            var dy = pt.y - tmp.y;
+	            var tmp = pts[(0, _commonUtils.mod)(i, pts.length)];
+	            var dx = firstPoint.x - tmp.x;
+	            var dy = firstPoint.y - tmp.y;
 	
 	            if (rounded && (dx != 0 || dy != 0)) {
 	                // Draws a line from the last point to the current
@@ -6113,19 +6130,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var y2 = tmp.y + ny2;
 	
 	                canvas.quadTo(tmp.x, tmp.y, x2, y2);
-	                tmp = new Point(x2, y2);
+	                tmp = new _libPoint2['default'](x2, y2);
 	            } else {
 	                canvas.lineTo(tmp.x, tmp.y);
 	            }
 	
-	            pt = tmp;
+	            firstPoint = tmp;
 	            i++;
 	        }
 	
 	        if (close) {
 	            canvas.close();
 	        } else {
-	            canvas.lineTo(pe.x, pe.y);
+	            canvas.lineTo(lastPoint.x, lastPoint.y);
 	        }
 	    },
 	
@@ -6173,40 +6190,73 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    createBoundingBox: function createBoundingBox() {
 	
-	        var bb = this.bounds.clone();
+	        var that = this;
+	        var bbox = that.bounds.clone();
 	
-	        if (this.stencil && (this.direction === constants.DIRECTION_NORTH || this.direction === constants.DIRECTION_SOUTH) || this.isPaintBoundsInverted()) {
-	            bb.rotate90();
+	        if (that.isPaintBoundsInverted()) {
+	            bbox.rotate90();
 	        }
 	
-	        return bb;
+	        return bbox;
 	    },
 	
 	    updateBoundingBox: function updateBoundingBox() {
-	        if (this.bounds) {
-	            var boundingBox = this.createBoundingBox();
 	
-	            if (boundingBox != null) {
-	                this.augmentBoundingBox(boundingBox);
-	                var rot = this.getRotation();
+	        var that = this;
 	
-	                if (rot != 0) {
-	                    boundingBox = mxUtils.getBoundingBox(boundingBox, rot);
-	                }
+	        if (that.bounds) {
+	            var boundingBox = that.createBoundingBox();
+	
+	            if (boundingBox) {
+	                that.augmentBoundingBox(boundingBox).rotateBoundingBox(boundingBox, that.getRotation());
 	            }
 	
-	            this.boundingBox = boundingBox;
+	            that.boundingBox = boundingBox;
 	        }
 	    },
 	
 	    augmentBoundingBox: function augmentBoundingBox(bbox) {
-	        if (this.isShadow) {
-	            bbox.width += Math.ceil(constants.SHADOW_OFFSET_X * this.scale);
-	            bbox.height += Math.ceil(constants.SHADOW_OFFSET_Y * this.scale);
+	
+	        var that = this;
+	        var style = that.style;
+	        var scale = style.scale;
+	
+	        if (style.shadow) {
+	            bbox.width += Math.ceil(style.shadowDx * scale);
+	            bbox.height += Math.ceil(style.shadowDY * scale);
 	        }
 	
 	        // Adds strokeWidth
-	        bbox.grow(this.strokeWidth * this.scale / 2);
+	        bbox.grow(style.strokeWidth * scale / 2);
+	
+	        return that;
+	    },
+	
+	    rotateBoundingBox: function rotateBoundingBox(bbox, degree, center) {
+	
+	        if (bbox && degree) {
+	
+	            center = center || bbox.getCenter();
+	
+	            var p1 = new _libPoint2['default'](bbox.x, bbox.y);
+	            var p2 = new _libPoint2['default'](bbox.x + bbox.width, bbox.y);
+	            var p3 = new _libPoint2['default'](p2.x, bbox.y + bbox.height);
+	            var p4 = new _libPoint2['default'](bbox.x, p3.y);
+	
+	            p1 = (0, _commonUtils.rotatePoint)(p1, degree, center);
+	            p2 = (0, _commonUtils.rotatePoint)(p2, degree, center);
+	            p3 = (0, _commonUtils.rotatePoint)(p3, degree, center);
+	            p4 = (0, _commonUtils.rotatePoint)(p4, degree, center);
+	
+	            var result = new _libRectangle2['default'](p1.x, p1.y, 0, 0);
+	            result.add(new _libRectangle2['default'](p2.x, p2.y, 0, 0));
+	            result.add(new _libRectangle2['default'](p3.x, p3.y, 0, 0));
+	            result.add(new _libRectangle2['default'](p4.x, p4.y, 0, 0));
+	
+	            bbox.setRect(result.x, result.y, result.width, result.height);
+	        }
+	
+	        return this;
 	    },
 	
 	    updateTransform: function updateTransform(canvas, x, y, w, h) {
@@ -6319,14 +6369,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getRotation: function getRotation() {
-	        var rot = this.style.rotation || 0;
 	
-	        if (this.direction) {
-	            if (this.direction === 'north') {
+	        var style = this.style;
+	        var rot = style.rotation || 0;
+	        var direction = style.direction;
+	
+	        if (direction) {
+	            if (direction === 'north') {
 	                rot += 270;
-	            } else if (this.direction === 'west') {
+	            } else if (direction === 'west') {
 	                rot += 180;
-	            } else if (this.direction === 'south') {
+	            } else if (direction === 'south') {
 	                rot += 90;
 	            }
 	        }
@@ -6365,7 +6418,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return this.direction === 'north' || this.direction === 'south';
+	        var direction = this.style.direction;
+	        return direction === 'north' || direction === 'south';
 	    },
 	
 	    destroy: function destroy() {
@@ -7122,6 +7176,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        Label.superclass.constructor.call(that, state, style, bounds);
 	
+	        // set visible from shape
+	        style.visible = state.shape.style.visible;
+	
+	        that.parent = state.shape;
 	        that.position = style.position || 'center';
 	        that.align = style.align || 'center';
 	        that.verticalAlign = style.verticalAlign || 'middle';
@@ -7145,9 +7203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            that.spacing = [spacing, spacing, spacing, spacing];
 	        }
 	
-	        that.parent = state.shape;
-	        that.margin = (0, _commonUtils.getAlignmentAsPoint)(that.align, that.verticalAlign);
-	        that.init(state.view.foreignPane);
+	        that.updateAlignments().init(state.view.foreignPane);
 	    },
 	
 	    create: function create(container) {
@@ -7191,25 +7247,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    redraw: function redraw() {
-	
-	        var that = this;
-	        var node = that.node;
-	        var visible = that.parent.style.visible;
-	
-	        if (visible && that.checkBounds()) {
-	            node.style.visibility = 'visible';
-	            that.clear();
-	            that.redrawShape();
-	            that.updateBoundingBox();
-	        } else {
-	            node.style.visibility = 'hidden';
-	            that.boundingBox = null;
-	        }
-	
-	        return that;
-	    },
-	
 	    redrawShape: function redrawShape() {
 	        return this.draw();
 	    },
@@ -7222,6 +7259,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        node.style.cssText = 'position:absolute; whiteSpace:normal;';
 	
 	        return that.updateValue().updateSize().updateTransform();
+	    },
+	
+	    updateBoundingBox: function updateBoundingBox() {
+	
+	        var that = this;
+	        var style = that.style;
+	        var alignments = that.alignments;
+	        var boundingBox = that.bounds.clone();
+	
+	        if (style.overflow !== 'fill') {
+	
+	            var scale = that.getScale();
+	            var contentNode = that.contentNode;
+	
+	            var w = contentNode.offsetWidth * scale || 1;
+	            var h = contentNode.offsetHeight * scale || 1;
+	
+	            boundingBox.x += alignments.x * w;
+	            boundingBox.y += alignments.y * h;
+	            boundingBox.width = w;
+	            boundingBox.height = h;
+	        } else {
+	            boundingBox.x += that.alignments.x * boundingBox.width;
+	            boundingBox.y += that.alignments.y * boundingBox.height;
+	        }
+	
+	        that.rotateBoundingBox(boundingBox, that.getRotation());
+	        that.boundingBox = boundingBox;
+	
+	        return that;
 	    },
 	
 	    updateValue: function updateValue() {
@@ -7271,8 +7338,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var scale = that.parent.style.scale;
 	        var style = that.node.style;
 	        var bounds = that.bounds;
-	        var dx = that.margin.x * 100;
-	        var dy = that.margin.y * 100;
+	        var dx = that.alignments.x * 100;
+	        var dy = that.alignments.y * 100;
 	
 	        if (theta) {
 	            (0, _commonUtils.setPrefixedStyle)(style, 'transformOrigin', -dx + '%' + ' ' + -dy + '%');
@@ -7285,6 +7352,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        style.left = Math.round(bounds.x) + 'px';
 	        style.top = Math.round(bounds.y) + 'px';
 	
+	        return that;
+	    },
+	
+	    updateAlignments: function updateAlignments() {
+	        var that = this;
+	        that.alignments = (0, _commonUtils.getAlignments)(that.align, that.verticalAlign);
 	        return that;
 	    },
 	
@@ -7976,8 +8049,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var model = that.model;
 	
 	        if (cell.isLink) {
-	            var sourceNode = cell.getNode(true);
-	            var targetNode = cell.getNode(false);
+	            var sourceNode = cell.getTerminal(true);
+	            var targetNode = cell.getTerminal(false);
 	
 	            if (sourceNode) {
 	                model.linkChanged(cell, isConnected ? sourceNode : null, true);
@@ -7987,8 +8060,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                model.linkChanged(cell, isConnected ? targetNode : null, false);
 	            }
 	
-	            cell.setNode(sourceNode, true);
-	            cell.setNode(targetNode, false);
+	            cell.setTerminal(sourceNode, true);
+	            cell.setTerminal(targetNode, false);
 	        }
 	
 	        cell.eachChild(function (child) {
@@ -8062,6 +8135,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    }
 	
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _PolyLine = __webpack_require__(52);
+	
+	var _PolyLine2 = _interopRequireDefault(_PolyLine);
+	
+	exports['default'] = Polyline.extend({
+	
+	    constructor: function Connector(state, style, points) {
+	
+	        var that = this;
+	
+	        that.state = state;
+	        that.style = style;
+	        that.points = points;
+	    },
+	
+	    getRotation: function getRotation() {
+	        return 0;
+	    },
+	
+	    isPaintBoundsInverted: function isPaintBoundsInverted() {
+	        return false;
+	    },
+	
+	    drawLink: function drawLink(canvas, points) {
+	
+	        var that = this;
+	        var style = that.style;
+	
+	        if (style && style.curved) {} else {}
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Shape = __webpack_require__(35);
+	
+	var _Shape2 = _interopRequireDefault(_Shape);
+	
+	exports['default'] = _Shape2['default'].extend({
+	
+	    constructor: function Polyline(state, style, points) {
+	
+	        var that = this;
+	
+	        that.state = state;
+	        that.style = style;
+	        that.points = points;
+	    },
+	
+	    getRotation: function getRotation() {
+	        return 0;
+	    },
+	
+	    isPaintBoundsInverted: function isPaintBoundsInverted() {
+	        return false;
+	    },
+	
+	    drawLink: function drawLink(canvas, points) {
+	
+	        var that = this;
+	        var style = that.style;
+	
+	        if (style && style.curved) {} else {}
+	
+	        return that;
+	    }
 	});
 	module.exports = exports['default'];
 

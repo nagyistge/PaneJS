@@ -51,7 +51,7 @@ module.exports = Shape.extend({
         this.overflow = (overflow != null) ? overflow : 'visible';
         this.labelPadding = (labelPadding != null) ? labelPadding : 0;
         this.rotation = 0;
-        this.updateMargin();
+        this.updateAlignments();
     },
 
     isParseVml: function () {return false},
@@ -81,7 +81,7 @@ module.exports = Shape.extend({
             this.horizontal = mxUtils.getValue(this.style, constants.STYLE_HORIZONTAL, this.horizontal);
             this.background = mxUtils.getValue(this.style, constants.STYLE_LABEL_BACKGROUNDCOLOR, this.background);
             this.border = mxUtils.getValue(this.style, constants.STYLE_LABEL_BORDERCOLOR, this.border);
-            this.updateMargin();
+            this.updateAlignments();
         }
     },
 
@@ -587,7 +587,7 @@ module.exports = Shape.extend({
 
 
     // 根据对齐方式，返回一个代表对齐方式的 point
-    updateMargin: function () {
+    updateAlignments: function () {
         this.margin = this.getAlignmentAsPoint(this.align, this.valign);
     },
 

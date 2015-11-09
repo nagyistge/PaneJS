@@ -303,9 +303,14 @@ export default Class.create({
     getBorderSizes: function () {},
     getPreferredPageSize: function (bounds, width, height) {},
     sizeDidChange: function () {
-        var bounds = this.getGraphBounds();
 
-        if (this.container) {
+        var that = this;
+
+        return;
+
+        var bounds = that.view.graphBounds;
+
+        if (that.container) {
             var border = this.getBorder();
 
             var width = Math.max(0, bounds.x + bounds.width + 1 + border);
@@ -330,7 +335,7 @@ export default Class.create({
                 }
             }
 
-            if (this.minimumGraphSize != null) {
+            if (this.minimumGraphSize) {
                 width = Math.max(width, this.minimumGraphSize.width * this.view.scale);
                 height = Math.max(height, this.minimumGraphSize.height * this.view.scale);
             }
@@ -359,7 +364,7 @@ export default Class.create({
 
             return;
 
-            this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
+            //this.updatePageBreaks(this.pageBreaksVisible, width - 1, height - 1);
         }
 
         //this.fireEvent(new mxEventObject(mxEvent.SIZE, 'bounds', bounds));
@@ -572,8 +577,8 @@ export default Class.create({
     },
 
     insertLink: function (parent, id, value, source, target, style) {
-        var edge = this.createEdge(parent, id, value, source, target, style);
-        return this.addEdge(edge, parent, source, target);
+        var link = this.createLink(parent, id, value, source, target, style);
+        return this.addLink(link, parent, source, target);
     },
 
     createLink: function (parent, id, value, source, target, style) {
@@ -1067,7 +1072,7 @@ export default Class.create({
 
         return result;
     },
-    getCellLabel:function(cell){
+    getCellLabel: function (cell) {
         return cell.value;
     },
     isHtmlLabel: function () {

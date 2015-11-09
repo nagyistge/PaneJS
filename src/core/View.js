@@ -126,7 +126,7 @@ export default Base.extend({
         that.validateCell(cell, true);
         that.validateCellState(cell, true);
 
-        that.graphBounds = that.getBoundingBox(cell) || that.getEmptyBounds();
+        that.graphBounds = that.getBoundingBox(cell, true) || that.getEmptyBounds();
 
         that.validateBackground();
         that.resetValidationState();
@@ -205,10 +205,13 @@ export default Base.extend({
         backgroundImage.redraw();
     },
 
+    // Bounding
+    // --------
     getEmptyBounds: function () {
+
         var that = this;
-        var translate = that.translate;
         var scale = that.scale;
+        var translate = that.translate;
         return new Rectangle(translate.x * scale, translate.y * scale);
     },
 
@@ -218,8 +221,6 @@ export default Base.extend({
         var state = that.getState(cell);
         var boundingBox = null;
 
-        recurse = !isNullOrUndefined(recurse) ? recurse : true;
-
         if (state) {
 
             var shapeBoundingBox = state.shape && state.shape.boundingBox;
@@ -227,7 +228,7 @@ export default Base.extend({
                 boundingBox = shapeBoundingBox.clone();
             }
 
-            var textBoundingBox = state.text && state.text.boundingBox;
+            var textBoundingBox = state.label && state.label.boundingBox;
             if (textBoundingBox) {
                 if (boundingBox) {
                     boundingBox.add(textBoundingBox);
@@ -607,7 +608,7 @@ export default Base.extend({
                 result = result.parent;
             }
 
-            if (that.model.isLayer(best)) {
+            if (that.graph.model.isLayer(best)) {
                 best = null;
             }
         }
