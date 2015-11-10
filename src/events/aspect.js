@@ -1,9 +1,9 @@
 import {
-    isFunction,
-    toArray,
     each,
     some,
-    invoke
+    invoke,
+    toArray,
+    isFunction
 } from '../common/utils';
 
 var eventSplitter = /\s+/;
@@ -21,7 +21,7 @@ function weave(when, methodName, callback, context) {
             throw new Error('Event handler must be function, event name: ' + name);
         }
 
-        if (!method.__isAspected) {
+        if (!method.__aspected) {
             wrap.call(that, name);
         }
 
@@ -59,16 +59,19 @@ function wrap(methodName) {
         return ret;
     };
 
-    that[methodName].__isAspected = true;
+    that[methodName].__aspected = true;
 }
 
 var aspect = {
+
     before: function (methodName, callback, context) {
         return weave.call(this, 'before', methodName, callback, context);
     },
+
     after: function (methodName, callback, context) {
         return weave.call(this, 'after', methodName, callback, context);
     },
+
     around: function (methodName, callback, context) {
         weave.call(this, 'before', methodName, callback, context);
         weave.call(this, 'after', methodName, callback, context);

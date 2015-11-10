@@ -8182,7 +8182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw new Error('Event handler must be function, event name: ' + name);
 	        }
 	
-	        if (!method.__isAspected) {
+	        if (!method.__aspected) {
 	            wrap.call(that, name);
 	        }
 	
@@ -8220,16 +8220,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return ret;
 	    };
 	
-	    that[methodName].__isAspected = true;
+	    that[methodName].__aspected = true;
 	}
 	
 	var aspect = {
+	
 	    before: function before(methodName, callback, context) {
 	        return weave.call(this, 'before', methodName, callback, context);
 	    },
+	
 	    after: function after(methodName, callback, context) {
 	        return weave.call(this, 'after', methodName, callback, context);
 	    },
+	
 	    around: function around(methodName, callback, context) {
 	        weave.call(this, 'before', methodName, callback, context);
 	        weave.call(this, 'after', methodName, callback, context);
