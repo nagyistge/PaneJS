@@ -4,7 +4,6 @@ import {
     isNullOrUndefined,
     getCurrentStyle,
     createSvgElement,
-    getValue,
     rotatePoint
 } from '../common/utils';
 
@@ -13,8 +12,6 @@ import Base        from '../lib/Base';
 import Point       from '../lib/Point';
 import Rectangle   from '../lib/Rectangle';
 import Dictionary  from '../lib/Dictionary';
-import styleNames  from '../enums/styleNames';
-import alignments  from '../enums/alignments';
 import State       from '../cell/State';
 import Renderer    from '../cell/Renderer';
 

@@ -4219,14 +4219,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libDictionary2 = _interopRequireDefault(_libDictionary);
 	
-	var _enumsStyleNames = __webpack_require__(20);
-	
-	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
-	
-	var _enumsAlignments = __webpack_require__(27);
-	
-	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
-	
 	var _cellState = __webpack_require__(28);
 	
 	var _cellState2 = _interopRequireDefault(_cellState);
@@ -5424,21 +5416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    left: 'left',
-	    center: 'center',
-	    right: 'right',
-	    top: 'top',
-	    middle: 'middle',
-	    bottom: 'bottom'
-	};
-
-/***/ },
+/* 27 */,
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -7875,7 +7853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
-	var _cellRoute = __webpack_require__(56);
+	var _cellRoute = __webpack_require__(44);
 	
 	var _cellRoute2 = _interopRequireDefault(_cellRoute);
 	
@@ -7883,9 +7861,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
 	
+	var _libPoint = __webpack_require__(19);
+	
+	var _libPoint2 = _interopRequireDefault(_libPoint);
+	
 	// events
 	
-	var _eventsAspect = __webpack_require__(44);
+	var _eventsAspect = __webpack_require__(45);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
 	
@@ -8183,7 +8165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // update links on children first
 	        cell.eachChild(function (child) {
-	            that.updateEdgeParents(child, root);
+	            that.updateLinkParents(child, root);
 	        });
 	
 	        // update the parents of all connected links
@@ -8298,7 +8280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	        } else {
-	            result = new Point();
+	            result = new _libPoint2['default']();
 	        }
 	
 	        return result;
@@ -8725,7 +8707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (recurse) {
 	            cell.eachChild(function (child) {
 	                var cloneChild = that.doCellClone(child, mapping, recurse);
-	                cloned.insert(cloneChild);
+	                cloned.insertChild(cloneChild);
 	            });
 	        }
 	
@@ -8762,6 +8744,107 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 44 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	var cellRoute = {
+	
+	    separator: '.',
+	
+	    create: function create(cell) {
+	
+	        var result = '';
+	
+	        if (cell) {
+	            var parent = cell.parent;
+	
+	            while (parent) {
+	                var index = parent.getChildIndex(cell);
+	                result = index + cellRoute.separator + result;
+	
+	                cell = parent;
+	                parent = cell.parent;
+	            }
+	        }
+	
+	        var l = result.length;
+	        if (l > 1) {
+	            result = result.substring(0, l - 1);
+	        }
+	
+	        return result;
+	    },
+	
+	    getParentRoute: function getParentRoute(path) {
+	
+	        if (path) {
+	            var index = path.lastIndexOf(cellRoute.separator);
+	
+	            if (index >= 0) {
+	                return path.substring(0, index);
+	            } else if (path.length > 0) {
+	                return '';
+	            }
+	        }
+	
+	        return null;
+	    },
+	
+	    resolve: function resolve(root, path) {
+	        var parent = root;
+	
+	        if (path) {
+	            var tokens = path.split(cellRoute.separator);
+	            for (var i = 0; i < tokens.length; i++) {
+	                parent = parent.getChildAt(parseInt(tokens[i]));
+	            }
+	        }
+	
+	        return parent;
+	    },
+	
+	    compare: function compare(p1, p2) {
+	        var min = Math.min(p1.length, p2.length);
+	        var comp = 0;
+	
+	        for (var i = 0; i < min; i++) {
+	            if (p1[i] != p2[i]) {
+	                if (p1[i].length == 0 || p2[i].length == 0) {
+	                    comp = p1[i] == p2[i] ? 0 : p1[i] > p2[i] ? 1 : -1;
+	                } else {
+	                    var t1 = parseInt(p1[i]);
+	                    var t2 = parseInt(p2[i]);
+	
+	                    comp = t1 == t2 ? 0 : t1 > t2 ? 1 : -1;
+	                }
+	
+	                break;
+	            }
+	        }
+	
+	        // Compares path length if both paths are equal to this point
+	        if (comp == 0) {
+	            var t1 = p1.length;
+	            var t2 = p2.length;
+	
+	            if (t1 != t2) {
+	                comp = t1 > t2 ? 1 : -1;
+	            }
+	        }
+	
+	        return comp;
+	    }
+	};
+	
+	exports['default'] = cellRoute;
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8848,7 +8931,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */,
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -9296,107 +9378,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    }
 	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 56 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	var cellRoute = {
-	
-	    separator: '.',
-	
-	    create: function create(cell) {
-	
-	        var result = '';
-	
-	        if (cell) {
-	            var parent = cell.parent;
-	
-	            while (parent) {
-	                var index = parent.getChildIndex(cell);
-	                result = index + cellRoute.separator + result;
-	
-	                cell = parent;
-	                parent = cell.parent;
-	            }
-	        }
-	
-	        var l = result.length;
-	        if (l > 1) {
-	            result = result.substring(0, l - 1);
-	        }
-	
-	        return result;
-	    },
-	
-	    getParentRoute: function getParentRoute(path) {
-	
-	        if (path) {
-	            var index = path.lastIndexOf(cellRoute.separator);
-	
-	            if (index >= 0) {
-	                return path.substring(0, index);
-	            } else if (path.length > 0) {
-	                return '';
-	            }
-	        }
-	
-	        return null;
-	    },
-	
-	    resolve: function resolve(root, path) {
-	        var parent = root;
-	
-	        if (path) {
-	            var tokens = path.split(cellRoute.separator);
-	            for (var i = 0; i < tokens.length; i++) {
-	                parent = parent.getChildAt(parseInt(tokens[i]));
-	            }
-	        }
-	
-	        return parent;
-	    },
-	
-	    compare: function compare(p1, p2) {
-	        var min = Math.min(p1.length, p2.length);
-	        var comp = 0;
-	
-	        for (var i = 0; i < min; i++) {
-	            if (p1[i] != p2[i]) {
-	                if (p1[i].length == 0 || p2[i].length == 0) {
-	                    comp = p1[i] == p2[i] ? 0 : p1[i] > p2[i] ? 1 : -1;
-	                } else {
-	                    var t1 = parseInt(p1[i]);
-	                    var t2 = parseInt(p2[i]);
-	
-	                    comp = t1 == t2 ? 0 : t1 > t2 ? 1 : -1;
-	                }
-	
-	                break;
-	            }
-	        }
-	
-	        // Compares path length if both paths are equal to this point
-	        if (comp == 0) {
-	            var t1 = p1.length;
-	            var t2 = p2.length;
-	
-	            if (t1 != t2) {
-	                comp = t1 > t2 ? 1 : -1;
-	            }
-	        }
-	
-	        return comp;
-	    }
-	};
-	
-	exports['default'] = cellRoute;
 	module.exports = exports['default'];
 
 /***/ }

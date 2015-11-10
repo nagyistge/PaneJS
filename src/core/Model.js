@@ -10,6 +10,7 @@ import Class            from '../common/class';
 import Cell             from '../cell/Cell';
 import cellRoute        from '../cell/route';
 import objectIdentity   from '../common/objectIdentity';
+import Point            from '../lib/Point'
 // events
 import aspect           from '../events/aspect';
 import EventSource      from '../events/EventSource';
@@ -53,11 +54,11 @@ export default Class.create({
         }
     },
 
-    clear: function () {
+    clear() {
         return this.setRoot(this.createRoot());
     },
 
-    isAncestor: function (parent, child) {
+    isAncestor(parent, child) {
 
         if (!parent || !child) {
             return false;
@@ -70,15 +71,15 @@ export default Class.create({
         return child === parent;
     },
 
-    contains: function (cell) {
+    contains(cell) {
         return this.isAncestor(this.root, cell);
     },
 
-    getCellById: function (id) {
+    getCellById(id) {
         return this.cells ? this.cells[id] : null;
     },
 
-    createId: function () {
+    createId() {
         var that = this;
         var id = that.nextId;
 
@@ -87,7 +88,7 @@ export default Class.create({
         return that.prefix + id + that.postfix;
     },
 
-    getAncestors: function (child) {
+    getAncestors(child) {
 
         var that = this;
         var result = [];
@@ -101,7 +102,7 @@ export default Class.create({
         return result;
     },
 
-    getDescendants: function (parent) {
+    getDescendants(parent) {
 
         var that = this;
         var result = [];
@@ -115,7 +116,7 @@ export default Class.create({
         return result;
     },
 
-    getParents: function (cells) {
+    getParents(cells) {
 
         var parents = [];
 
@@ -143,11 +144,11 @@ export default Class.create({
     // Root
     // ----
 
-    isRoot: function (cell) {
+    isRoot(cell) {
         return cell && this.root === cell;
     },
 
-    createRoot: function () {
+    createRoot() {
         var root = new Cell();
 
         root.insertChild(new Cell());
@@ -155,7 +156,7 @@ export default Class.create({
         return root;
     },
 
-    getRoot: function (cell) {
+    getRoot(cell) {
 
         var root = cell || this.root;
 
@@ -169,11 +170,11 @@ export default Class.create({
         return root;
     },
 
-    setRoot: function (root) {
+    setRoot(root) {
         return this.digest(new RootChange(this, root));
     },
 
-    rootChanged: function (newRoot) {
+    rootChanged(newRoot) {
 
         var that = this;
         var oldRoot = that.root;
@@ -190,11 +191,11 @@ export default Class.create({
     // Layers
     // ------
 
-    isLayer: function (cell) {
+    isLayer(cell) {
         return cell && this.isRoot(cell.parent);
     },
 
-    getLayers: function () {
+    getLayers() {
         return this.getRoot().children || [];
     },
 
@@ -202,11 +203,11 @@ export default Class.create({
     // child
     // -----
 
-    getParent: function (cell) {
+    getParent(cell) {
         return cell ? cell.parent : null;
     },
 
-    add: function (parent, child, index) {
+    add(parent, child, index) {
 
         var that = this;
 
@@ -229,7 +230,7 @@ export default Class.create({
         return that;
     },
 
-    cellAdded: function (cell) {
+    cellAdded(cell) {
 
         var that = this;
 
@@ -271,7 +272,7 @@ export default Class.create({
         }
     },
 
-    updateLinkParents: function (cell, root) {
+    updateLinkParents(cell, root) {
 
         var that = this;
 
@@ -279,7 +280,7 @@ export default Class.create({
 
         // update links on children first
         cell.eachChild(function (child) {
-            that.updateEdgeParents(child, root);
+            that.updateLinkParents(child, root);
         });
 
         // update the parents of all connected links
@@ -293,7 +294,7 @@ export default Class.create({
         });
     },
 
-    updateLinkParent: function (link, root) {
+    updateLinkParent(link, root) {
 
         var that = this;
         var cell = null;
@@ -341,7 +342,7 @@ export default Class.create({
         }
     },
 
-    getNearestCommonAncestor: function (cell1, cell2) {
+    getNearestCommonAncestor(cell1, cell2) {
 
         if (cell1 && cell2) {
 
@@ -379,7 +380,7 @@ export default Class.create({
 
     // get the absolute, accumulated origin for the children
     // inside the given parent as an `Point`.
-    getOrigin: function (cell) {
+    getOrigin(cell) {
 
         var that = this;
         var result = null;
@@ -402,7 +403,7 @@ export default Class.create({
         return result;
     },
 
-    remove: function (cell) {
+    remove(cell) {
 
         var that = this;
 
@@ -417,7 +418,7 @@ export default Class.create({
         return cell;
     },
 
-    cellRemoved: function (cell) {
+    cellRemoved(cell) {
 
         var that = this;
 
@@ -435,7 +436,7 @@ export default Class.create({
         }
     },
 
-    childChanged: function (cell, newParent, newIndex) {
+    childChanged(cell, newParent, newIndex) {
 
         var that = this;
         var oldParent = cell.parent;
@@ -459,7 +460,7 @@ export default Class.create({
         return oldParent;
     },
 
-    linkChanged: function (link, newNode, isSource) {
+    linkChanged(link, newNode, isSource) {
         var oldNode = link.getNode(isSource);
 
         if (newNode) {
@@ -471,15 +472,15 @@ export default Class.create({
         return oldNode;
     },
 
-    getChildNodes: function (parent) {
+    getChildNodes(parent) {
         return this.getChildCells(parent, true, false);
     },
 
-    getChildLinks: function (parent) {
+    getChildLinks(parent) {
         return this.getChildCells(parent, false, true);
     },
 
-    getChildCells: function (parent, isNode, isLink) {
+    getChildCells(parent, isNode, isLink) {
         return parent ? parent.filterChild(function (child) {
             return (isNode && child.isNode) || (isLink && child.isLink);
         }) : [];
@@ -488,11 +489,11 @@ export default Class.create({
     // link
     // ----
 
-    getTerminal: function (link, isSource) {
+    getTerminal(link, isSource) {
         return link ? link.getTerminal(isSource) : null;
     },
 
-    setTerminal: function (link, node, isSource) {
+    setTerminal(link, node, isSource) {
 
         var that = this;
         var terminalChanged = node !== link.getTerminal(isSource);
@@ -505,7 +506,7 @@ export default Class.create({
         return that;
     },
 
-    terminalChanged: function (link, node, isSource) {
+    terminalChanged(link, node, isSource) {
 
         var previous = link.getTerminal(isSource);
 
@@ -518,7 +519,7 @@ export default Class.create({
         return previous;
     },
 
-    getDirectedLinkCount: function (cell, outgoing, ignoredEdge) {
+    getDirectedLinkCount(cell, outgoing, ignoredEdge) {
         var count = 0;
 
         cell.eachLink(function (link) {
@@ -530,19 +531,19 @@ export default Class.create({
         return count;
     },
 
-    getConnections: function (cell) {
+    getConnections(cell) {
         return this.getLinks(cell, true, true, false);
     },
 
-    getIncomingLinks: function (cell) {
+    getIncomingLinks(cell) {
         return this.getLinks(cell, true, false, false);
     },
 
-    getOutgoingLinks: function (cell) {
+    getOutgoingLinks(cell) {
         return this.getLinks(cell, false, true, false);
     },
 
-    getLinks: function (cell, incoming, outgoing, includeLoops) {
+    getLinks(cell, incoming, outgoing, includeLoops) {
         return cell.filterLink(function (link) {
             var source = link.source;
             var target = link.target;
@@ -563,7 +564,7 @@ export default Class.create({
     // Return all links between the given source and target pair.
     // If directed is true, then only links from the source to the target
     // are returned, otherwise, all edges between the two cells are returned.
-    getLinksBetween: function (source, target, directed) {
+    getLinksBetween(source, target, directed) {
         var tmp1 = source.getLinkCount();
         var tmp2 = target.getLinkCount();
 
@@ -581,7 +582,7 @@ export default Class.create({
         });
     },
 
-    getOpposites: function (links, terminal, isSource, isTarget) {
+    getOpposites(links, terminal, isSource, isTarget) {
         var result = [];
 
         links && each(links, function (link) {
@@ -598,7 +599,7 @@ export default Class.create({
         return result;
     },
 
-    getTopmostCells: function (cells) {
+    getTopmostCells(cells) {
         var result = [];
 
         cells && each(cells, function (cell) {
@@ -626,15 +627,15 @@ export default Class.create({
 
     // value
     // -----
-    getValue: function (cell) {
+    getValue(cell) {
         return cell ? cell.value : null;
     },
 
-    setValue: function (cell, value) {
+    setValue(cell, value) {
         return this.digest(new ValueChange(this, cell, value));
     },
 
-    valueChanged: function (cell, value) {
+    valueChanged(cell, value) {
         var previous = cell.value;
         cell.value = value;
         return previous;
@@ -644,11 +645,11 @@ export default Class.create({
     // geometry
     // --------
 
-    getGeometry: function (cell) {
+    getGeometry(cell) {
         return cell ? cell.geometry : null;
     },
 
-    setGeometry: function (cell, geometry) {
+    setGeometry(cell, geometry) {
 
         var that = this;
 
@@ -659,7 +660,7 @@ export default Class.create({
         return that;
     },
 
-    geometryChanged: function (cell, geometry) {
+    geometryChanged(cell, geometry) {
         var previous = cell.geometry;
         cell.geometry = geometry;
         return previous;
@@ -669,11 +670,11 @@ export default Class.create({
     // style
     // -----
 
-    getStyle: function (cell) {
+    getStyle(cell) {
         return cell ? cell.style : null;
     },
 
-    setStyle: function (cell, style) {
+    setStyle(cell, style) {
 
         var that = this;
 
@@ -684,7 +685,7 @@ export default Class.create({
         return that;
     },
 
-    styleChanged: function (cell, style) {
+    styleChanged(cell, style) {
         var previous = cell.geometry;
         cell.style = style;
         return previous;
@@ -694,11 +695,11 @@ export default Class.create({
     // collapse
     // --------
 
-    isCollapsed: function (cell) {
+    isCollapsed(cell) {
         return cell ? cell.collapsed : false;
     },
 
-    setCollapsed: function (cell, collapsed) {
+    setCollapsed(cell, collapsed) {
 
         var that = this;
 
@@ -709,7 +710,7 @@ export default Class.create({
         return that;
     },
 
-    collapseChanged: function (cell, collapsed) {
+    collapseChanged(cell, collapsed) {
         var previous = cell.collapsed;
         cell.collapsed = collapsed;
         return previous;
@@ -719,11 +720,11 @@ export default Class.create({
     // visible
     // -------
 
-    isVisible: function (cell) {
+    isVisible(cell) {
         return cell ? cell.visible : false
     },
 
-    setVisible: function (cell, visible) {
+    setVisible(cell, visible) {
 
         var that = this;
 
@@ -734,7 +735,7 @@ export default Class.create({
         return that;
     },
 
-    visibleChanged: function (cell, visible) {
+    visibleChanged(cell, visible) {
         var previous = cell.visible;
         cell.visible = visible;
         return previous;
@@ -744,7 +745,7 @@ export default Class.create({
     // update
     // ------
 
-    digest: function (change) {
+    digest(change) {
 
         var that = this;
 
@@ -757,7 +758,7 @@ export default Class.create({
         return that;
     },
 
-    beginUpdate: function () {
+    beginUpdate() {
 
         var that = this;
         that.updateLevel += 1;
@@ -768,7 +769,7 @@ export default Class.create({
         }
     },
 
-    endUpdate: function () {
+    endUpdate() {
 
         var that = this;
 
@@ -797,11 +798,11 @@ export default Class.create({
     // clone
     // -----
 
-    cloneCell: function (cell) {
+    cloneCell(cell) {
         return cell ? this.cloneCells([cell], true) : null;
     },
 
-    cloneCells: function (cells, recurse) {
+    cloneCells(cells, recurse) {
 
         var that = this;
         var result = [];
@@ -819,7 +820,7 @@ export default Class.create({
         return result;
     },
 
-    doCellClone: function (cell, mapping, recurse) {
+    doCellClone(cell, mapping, recurse) {
 
         var that = this;
         var cloned = cell.clone();
@@ -830,14 +831,14 @@ export default Class.create({
         if (recurse) {
             cell.eachChild(function (child) {
                 var cloneChild = that.doCellClone(child, mapping, recurse);
-                cloned.insert(cloneChild);
+                cloned.insertChild(cloneChild);
             });
         }
 
         return cloned;
     },
 
-    restoreClone: function (cloned, cell, mapping) {
+    restoreClone(cloned, cell, mapping) {
 
         var that = this;
         var temp;

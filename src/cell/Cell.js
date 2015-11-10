@@ -40,12 +40,12 @@ export default Base.extend({
     // ----
 
     // 获取连线连接的节点
-    getTerminal: function (isSource) {
+    getTerminal(isSource) {
         return isSource ? this.source : this.target;
     },
 
     // 设置连线连接的节点
-    setTerminal: function (node, isSource) {
+    setTerminal(node, isSource) {
         if (isSource) {
             this.source = node;
         } else {
@@ -56,7 +56,7 @@ export default Base.extend({
     },
 
     // 将连线从节点移除
-    removeFromTerminal: function (isSource) {
+    removeFromTerminal(isSource) {
 
         var that = this;
 
@@ -73,21 +73,21 @@ export default Base.extend({
     // children
     // --------
 
-    getChildCount: function () {
+    getChildCount() {
         var children = this.children;
         return children ? children.length : 0;
     },
 
-    getChildIndex: function (child) {
+    getChildIndex(child) {
         return indexOf(this.children || [], child);
     },
 
-    getChildAt: function (index) {
+    getChildAt(index) {
         var children = this.children;
         return children ? children[index] : null;
     },
 
-    eachChild: function (iterator, context) {
+    eachChild(iterator, context) {
 
         var that = this;
         var children = that.children;
@@ -97,12 +97,12 @@ export default Base.extend({
         return that;
     },
 
-    filterChild: function (iterator, context) {
+    filterChild(iterator, context) {
         var children = this.children;
         return children ? filter(children, iterator, context) : [];
     },
 
-    insertChild: function (child, index) {
+    insertChild(child, index) {
         var that = this;
 
         if (child) {
@@ -134,11 +134,11 @@ export default Base.extend({
         return that;
     },
 
-    removeChild: function (child) {
+    removeChild(child) {
         return this.removeChildAt(this.getChildIndex(child));
     },
 
-    removeChildAt: function (index) {
+    removeChildAt(index) {
         var that = this;
         var child = null;
         var children = that.children;
@@ -159,21 +159,21 @@ export default Base.extend({
     // node
     // -----
 
-    getLinkCount: function () {
+    getLinkCount() {
         var links = this.links;
         return links ? links.length : 0;
     },
 
-    getLinkIndex: function (link) {
+    getLinkIndex(link) {
         return indexOf(this.links || [], link);
     },
 
-    getLinkAt: function (index) {
+    getLinkAt(index) {
         var links = this.links;
         return links ? links[index] : null;
     },
 
-    eachLink: function (iterator, context) {
+    eachLink(iterator, context) {
 
         var that = this;
         var links = that.links;
@@ -183,12 +183,12 @@ export default Base.extend({
         return that;
     },
 
-    filterLink: function (iterator, context) {
+    filterLink(iterator, context) {
         var links = this.links;
         return links ? filter(links, iterator, context) : [];
     },
 
-    insertLink: function (link, outgoing) {
+    insertLink(link, outgoing) {
 
         var that = this;
 
@@ -211,7 +211,7 @@ export default Base.extend({
         return link;
     },
 
-    removeLink: function (link, outgoing) {
+    removeLink(link, outgoing) {
 
         var that = this;
         var links = that.links;
@@ -237,7 +237,7 @@ export default Base.extend({
     // common
     // ------
 
-    removeFromParent: function () {
+    removeFromParent() {
         var that = this;
         var parent = that.parent;
 
@@ -248,7 +248,7 @@ export default Base.extend({
         return that;
     },
 
-    cloneValue: function () {
+    cloneValue() {
         var value = this.value;
 
         if (value) {
@@ -264,7 +264,7 @@ export default Base.extend({
         return value;
     },
 
-    clone: function () {
+    clone() {
         var that = this;
         var cloned = clone(that, that.transients);
         cloned.value = that.cloneValue();
