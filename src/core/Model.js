@@ -310,6 +310,11 @@ export default Class.create({
     },
 
 
+    collapsedStateForCellChanged: function (cell, collapsed) {
+
+    },
+
+
     getTerminal: function (link, isSource) {
         return link ? link.getTerminal(isSource) : null;
     },

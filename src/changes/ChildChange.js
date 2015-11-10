@@ -31,8 +31,7 @@ export default Change.extend({
 
         oldParent = model.childChanged(child, newParent, newIndex);
 
-        // 更新连线的父节点时，需要同时更新连线的关联节点
-        // TODO: 检查一下这段代码是否真的有必要？
+        // 更新连线的父节点时，同时更新连线的关联节点
         if (newParent) {
             that.connect(child, true);
         }
@@ -45,29 +44,30 @@ export default Change.extend({
         return that;
     },
 
-    connect: function (cell, isConnected) {
+    connect: function (cell, connected) {
 
         var that = this;
         var model = that.model;
 
         if (cell.isLink) {
-            var sourceNode = cell.getTerminal(true);
-            var targetNode = cell.getTerminal(false);
 
-            if (sourceNode) {
-                model.linkChanged(cell, isConnected ? sourceNode : null, true);
+            var source = cell.getTerminal(true);
+            var target = cell.getTerminal(false);
+
+            if (source) {
+                model.linkChanged(cell, connected ? source : null, true);
             }
 
-            if (targetNode) {
-                model.linkChanged(cell, isConnected ? targetNode : null, false);
+            if (target) {
+                model.linkChanged(cell, connected ? target : null, false);
             }
 
-            cell.setTerminal(sourceNode, true);
-            cell.setTerminal(targetNode, false);
+            cell.setTerminal(source, true);
+            cell.setTerminal(target, false);
         }
 
         cell.eachChild(function (child) {
-            that.connect(child, isConnected);
+            that.connect(child, connected);
         });
 
         return that;

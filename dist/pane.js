@@ -2665,7 +2665,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var Base = _commonClass2['default'].create({
+	exports['default'] = _commonClass2['default'].create({
+	
 	    constructor: function Base() {},
 	
 	    toString: function toString() {
@@ -2687,8 +2688,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.destroyed = true;
 	    }
 	});
-	
-	exports['default'] = Base;
 	module.exports = exports['default'];
 
 /***/ },
@@ -4223,7 +4222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
 	        that.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
-	        that.width = width ? width : 0; // w 和 h 不能为负数，所以不需要 isNullOrUndefined 判断
+	        that.width = width ? width : 0;
 	        that.height = height ? height : 0;
 	    },
 	
@@ -8066,6 +8065,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return oldNode;
 	    },
 	
+	    collapsedStateForCellChanged: function collapsedStateForCellChanged(cell, collapsed) {},
+	
 	    getTerminal: function getTerminal(link, isSource) {
 	        return link ? link.getTerminal(isSource) : null;
 	    },
@@ -8369,8 +8370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        oldParent = model.childChanged(child, newParent, newIndex);
 	
-	        // 更新连线的父节点时，需要同时更新连线的关联节点
-	        // TODO: 检查一下这段代码是否真的有必要？
+	        // 更新连线的父节点时，同时更新连线的关联节点
 	        if (newParent) {
 	            that.connect(child, true);
 	        }
@@ -8383,29 +8383,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    connect: function connect(cell, isConnected) {
+	    connect: function connect(cell, connected) {
 	
 	        var that = this;
 	        var model = that.model;
 	
 	        if (cell.isLink) {
-	            var sourceNode = cell.getTerminal(true);
-	            var targetNode = cell.getTerminal(false);
 	
-	            if (sourceNode) {
-	                model.linkChanged(cell, isConnected ? sourceNode : null, true);
+	            var source = cell.getTerminal(true);
+	            var target = cell.getTerminal(false);
+	
+	            if (source) {
+	                model.linkChanged(cell, connected ? source : null, true);
 	            }
 	
-	            if (targetNode) {
-	                model.linkChanged(cell, isConnected ? targetNode : null, false);
+	            if (target) {
+	                model.linkChanged(cell, connected ? target : null, false);
 	            }
 	
-	            cell.setTerminal(sourceNode, true);
-	            cell.setTerminal(targetNode, false);
+	            cell.setTerminal(source, true);
+	            cell.setTerminal(target, false);
 	        }
 	
 	        cell.eachChild(function (child) {
-	            that.connect(child, isConnected);
+	            that.connect(child, connected);
 	        });
 	
 	        return that;

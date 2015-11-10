@@ -13,7 +13,7 @@ var Rectangle = Base.extend({
 
         that.x = !isNullOrUndefined(x) ? x : 0;
         that.y = !isNullOrUndefined(y) ? y : 0;
-        that.width = width ? width : 0;    // w 和 h 不能为负数，所以不需要 isNullOrUndefined 判断
+        that.width = width ? width : 0;
         that.height = height ? height : 0;
     },
 

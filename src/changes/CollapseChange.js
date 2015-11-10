@@ -1,7 +1,7 @@
 import Change from './Change';
 
 export default Change.extend({
-    constructor: function GeometryChange(model, cell, collapsed) {
+    constructor: function CollapseChange(model, cell, collapsed) {
 
         var that = this;
 

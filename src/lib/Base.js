@@ -5,7 +5,8 @@ import {
 
 import Class from '../common/class';
 
-var Base = Class.create({
+export default Class.create({
+
     constructor: function Base() {},
 
     toString: function () {
@@ -27,5 +28,3 @@ var Base = Class.create({
         that.destroyed = true;
     }
 });
-
-export default Base;
