@@ -1,14 +1,14 @@
 import Change from './Change';
 
 export default Change.extend({
-    constructor: function TerminalChange(model, cell, terminal, isSource) {
+    constructor: function TerminalChange(model, link, node, isSource) {
 
         var that = this;
 
         that.model = model;
-        that.cell = cell;
-        that.terminal = terminal;
-        that.previous = terminal;
+        that.cell = link;
+        that.terminal = node;
+        that.previous = node;
         that.isSource = isSource;
     },
 

@@ -2,7 +2,8 @@ import { extend }       from '../common/utils'
 import Base             from '../lib/Base';
 import defaultLinkStyle from './defaultLinkStyle';
 import defaultNodeStyle from './defaultNodeStyle';
-import defaultStyle from './defaultStyle';
+import defaultStyle     from './defaultStyle';
+import perimeter        from '../shapes/perimeter';
 
 export default Base.extend({
 
@@ -16,6 +17,8 @@ export default Base.extend({
 
         nodeStyle.label = extend({}, common.label, nodeStyle.label);
         linkStyle.label = extend({}, common.label, linkStyle.label);
+
+        nodeStyle.perimeter = perimeter.RectanglePerimeter;
 
         that.setDefaultNodeStyle(extend({}, common, nodeStyle));
         that.setDefaultLinkStyle(extend({}, common, linkStyle));

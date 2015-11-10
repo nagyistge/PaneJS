@@ -149,7 +149,7 @@ export default Base.extend({
     },
 
 
-    // links
+    // node
     // -----
 
     getLinkCount: function () {

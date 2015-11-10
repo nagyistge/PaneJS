@@ -13,8 +13,10 @@ import Cell        from '../cell/Cell';
 import Geometry    from '../cell/Geometry';
 import View        from './View';
 import Model       from './Model';
-import RootChange  from '../changes/RootChange';
-import ChildChange from '../changes/ChildChange';
+
+import RootChange     from '../changes/RootChange';
+import ChildChange    from '../changes/ChildChange';
+import TerminalChange from '../changes/TerminalChange';
 
 
 export default Class.create({
@@ -257,6 +259,7 @@ export default Class.create({
     },
 
     getRemovedCellsForChanges: function () {},
+
     removeStateForCell: function (cell) {
         var childCount = this.model.getChildCount(cell);
 
@@ -661,14 +664,14 @@ export default Class.create({
                 }
 
                 // Sets the source terminal
-                //if (source) {
-                //    this.cellConnected(cells[i], source, true);
-                //}
+                if (source) {
+                    that.cellConnected(cells[i], source, true);
+                }
 
                 // Sets the target terminal
-                //if (target) {
-                //    this.cellConnected(cells[i], target, false);
-                //}
+                if (target) {
+                    that.cellConnected(cells[i], target, false);
+                }
 
             });
 
@@ -723,17 +726,19 @@ export default Class.create({
     getMaximumGraphBounds: function () {},
     constrainChild: function () {},
     resetEdges: function () {},
-    resetEdge: function (edge) {
-        var geo = this.model.getGeometry(edge);
+    resetEdge: function (link) {
+
+        var geo = link.geometry;
 
         // Resets the control points
-        if (geo != null && geo.points != null && geo.points.length > 0) {
+        if (geo && geo.points && geo.points.length > 0) {
             geo = geo.clone();
             geo.points = [];
-            this.model.setGeometry(edge, geo);
+
+            link.geometry = geo;
         }
 
-        return edge;
+        return link;
     },
 
 
@@ -744,10 +749,10 @@ export default Class.create({
 
     getConnectionConstraint: function (linkState, terminalState, isSource) {
         var point = null;
-        var x = linkState.style[(isSource) ? constants.STYLE_EXIT_X : constants.STYLE_ENTRY_X];
+        var x = linkState.style[isSource ? constants.STYLE_EXIT_X : constants.STYLE_ENTRY_X];
 
         if (x != null) {
-            var y = linkState.style[(isSource) ? constants.STYLE_EXIT_Y : constants.STYLE_ENTRY_Y];
+            var y = linkState.style[isSource ? constants.STYLE_EXIT_Y : constants.STYLE_ENTRY_Y];
 
             if (y != null) {
                 point = new Point(parseFloat(x), parseFloat(y));
@@ -756,7 +761,7 @@ export default Class.create({
 
         var perimeter = false;
 
-        if (point != null) {
+        if (point) {
             perimeter = getValue(linkState.style, (isSource)
                 ? constants.STYLE_EXIT_PERIMETER
                 : constants.STYLE_ENTRY_PERIMETER, true);
@@ -764,6 +769,7 @@ export default Class.create({
 
         return new ConnectionConstraint(point, perimeter);
     },
+
     setConnectionConstraint: function (edge, terminal, source, constraint) {
         if (constraint) {
             this.model.beginUpdate();
@@ -799,6 +805,7 @@ export default Class.create({
             }
         }
     },
+
     getConnectionPoint: function (vertex, constraint) {
         var point = null;
 
@@ -911,35 +918,40 @@ export default Class.create({
 
         return point;
     },
+
     connectCell: function () {},
-    cellConnected: function (edge, terminal, source, constraint) {
-        if (edge) {
+
+    cellConnected: function (link, node, isSource, constraint) {
+
+        if (link) {
             this.model.beginUpdate();
             try {
-                var previous = this.model.getTerminal(edge, source);
+                //var previous = this.model.getTerminal(link, isSource);
 
                 // Updates the constraint
-                this.setConnectionConstraint(edge, terminal, source, constraint);
+                // this.setConnectionConstraint(link, node, isSource, constraint);
 
                 // Checks if the new terminal is a port, uses the ID of the port in the
                 // style and the parent of the port as the actual terminal of the edge.
-                if (this.isPortsEnabled()) {
-                    var id = null;
+                //if (this.isPortsEnabled()) {
+                //    var id = null;
+                //
+                //    if (this.isPort(node)) {
+                //        id = node.getId();
+                //        node = this.getTerminalForPort(node, isSource);
+                //    }
+                //
+                //    // Sets or resets all previous information for connecting to a child port
+                //    var key = isSource ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+                //    this.setCellStyles(key, id, [link]);
+                //}
 
-                    if (this.isPort(terminal)) {
-                        id = terminal.getId();
-                        terminal = this.getTerminalForPort(terminal, source);
-                    }
+                this.model.setTerminal(link, node, isSource);
 
-                    // Sets or resets all previous information for connecting to a child port
-                    var key = source ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
-                    this.setCellStyles(key, id, [edge]);
-                }
-
-                this.model.setTerminal(edge, terminal, source);
+                //link.setTerminal(node, isSource);
 
                 if (this.resetEdgesOnConnect) {
-                    this.resetEdge(edge);
+                    this.resetEdge(link);
                 }
 
                 //this.fireEvent(new mxEventObject(mxEvent.CELL_CONNECTED,
@@ -1006,9 +1018,12 @@ export default Class.create({
     isCellConnectable: function () {},
 
     isOrthogonal: function (edge) {
-        var orthogonal = edge.style[constants.STYLE_ORTHOGONAL];
 
-        if (orthogonal != null) {
+        return false;
+
+        var orthogonal = edge.style.orthogonal;
+
+        if (orthogonal) {
             return orthogonal;
         }
 

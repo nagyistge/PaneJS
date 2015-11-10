@@ -14,6 +14,7 @@ import EventSource from '../events/EventSource';
 // changes
 import RootChange       from '../changes/RootChange';
 import ChildChange      from '../changes/ChildChange';
+import TerminalChange   from '../changes/TerminalChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
 
@@ -307,6 +308,36 @@ export default Class.create({
 
         return oldNode;
     },
+
+
+    getTerminal: function (link, isSource) {
+        return link ? link.getTerminal(isSource) : null;
+    },
+
+    setTerminal: function (link, node, isSource) {
+        var terminalChanged = node !== this.getTerminal(link, isSource);
+        this.digest(new TerminalChange(this, link, node, isSource));
+
+        if (this.maintainEdgeParent && terminalChanged) {
+            this.updateEdgeParent(link, this.getRoot());
+        }
+
+        return node;
+    },
+
+    // 连线的起点节点或终点节点改变后
+    terminalForCellChanged: function (link, node, isSource) {
+        var previous = this.getTerminal(link, isSource);
+
+        if (node) {
+            node.insertLink(link, isSource);
+        } else if (previous) {
+            previous.removeLink(link, isSource);
+        }
+
+        return previous;
+    },
+
 
     createId: function () {
         var that = this;

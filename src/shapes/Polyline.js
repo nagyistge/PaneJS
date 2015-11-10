@@ -7,7 +7,7 @@ import Shape from './Shape';
 
 export default Shape.extend({
 
-    constructor: function Polyline(state, style, points) {
+    constructor: function PolyLine(state, style, points) {
 
         var that = this;
 

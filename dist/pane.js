@@ -879,6 +879,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
+	var _changesTerminalChange = __webpack_require__(54);
+	
+	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
+	
 	exports['default'] = _commonClass2['default'].create({
 	
 	    Extends: _eventsEventSource2['default'],
@@ -1063,8 +1067,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            that.processRootChange(change);
 	        } else if (change instanceof _changesChildChange2['default']) {
 	            that.processChildChange(change);
-	        } else if (change instanceof TerminalChange || change instanceof GeometryChange) {
-	            if (change instanceof TerminalChange || (change.previous == null && change.geometry != null || change.previous != null && !change.previous.equals(change.geometry))) {
+	        } else if (change instanceof _changesTerminalChange2['default'] || change instanceof GeometryChange) {
+	            if (change instanceof _changesTerminalChange2['default'] || (change.previous == null && change.geometry != null || change.previous != null && !change.previous.equals(change.geometry))) {
 	                this.view.invalidate(change.cell);
 	            }
 	        }
@@ -1113,6 +1117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getRemovedCellsForChanges: function getRemovedCellsForChanges() {},
+	
 	    removeStateForCell: function removeStateForCell(cell) {
 	        var childCount = this.model.getChildCount(cell);
 	
@@ -1495,14 +1500,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                //this.constrainChild(cells[i]);
 	
 	                // Sets the source terminal
-	                //if (source) {
-	                //    this.cellConnected(cells[i], source, true);
-	                //}
+	                if (source) {
+	                    that.cellConnected(cells[i], source, true);
+	                }
 	
 	                // Sets the target terminal
-	                //if (target) {
-	                //    this.cellConnected(cells[i], target, false);
-	                //}
+	                if (target) {
+	                    that.cellConnected(cells[i], target, false);
+	                }
 	            });
 	
 	            model.endUpdate();
@@ -1552,17 +1557,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getMaximumGraphBounds: function getMaximumGraphBounds() {},
 	    constrainChild: function constrainChild() {},
 	    resetEdges: function resetEdges() {},
-	    resetEdge: function resetEdge(edge) {
-	        var geo = this.model.getGeometry(edge);
+	    resetEdge: function resetEdge(link) {
+	
+	        var geo = link.geometry;
 	
 	        // Resets the control points
-	        if (geo != null && geo.points != null && geo.points.length > 0) {
+	        if (geo && geo.points && geo.points.length > 0) {
 	            geo = geo.clone();
 	            geo.points = [];
-	            this.model.setGeometry(edge, geo);
+	
+	            link.geometry = geo;
 	        }
 	
-	        return edge;
+	        return link;
 	    },
 	
 	    // Cell connecting and connection constraints
@@ -1584,12 +1591,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var perimeter = false;
 	
-	        if (point != null) {
+	        if (point) {
 	            perimeter = getValue(linkState.style, isSource ? constants.STYLE_EXIT_PERIMETER : constants.STYLE_ENTRY_PERIMETER, true);
 	        }
 	
 	        return new ConnectionConstraint(point, perimeter);
 	    },
+	
 	    setConnectionConstraint: function setConnectionConstraint(edge, terminal, source, constraint) {
 	        if (constraint) {
 	            this.model.beginUpdate();
@@ -1615,6 +1623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    },
+	
 	    getConnectionPoint: function getConnectionPoint(vertex, constraint) {
 	        var point = null;
 	
@@ -1721,35 +1730,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return point;
 	    },
+	
 	    connectCell: function connectCell() {},
-	    cellConnected: function cellConnected(edge, terminal, source, constraint) {
-	        if (edge) {
+	
+	    cellConnected: function cellConnected(link, node, isSource, constraint) {
+	
+	        if (link) {
 	            this.model.beginUpdate();
 	            try {
-	                var previous = this.model.getTerminal(edge, source);
+	                //var previous = this.model.getTerminal(link, isSource);
 	
 	                // Updates the constraint
-	                this.setConnectionConstraint(edge, terminal, source, constraint);
+	                // this.setConnectionConstraint(link, node, isSource, constraint);
 	
 	                // Checks if the new terminal is a port, uses the ID of the port in the
 	                // style and the parent of the port as the actual terminal of the edge.
-	                if (this.isPortsEnabled()) {
-	                    var id = null;
+	                //if (this.isPortsEnabled()) {
+	                //    var id = null;
+	                //
+	                //    if (this.isPort(node)) {
+	                //        id = node.getId();
+	                //        node = this.getTerminalForPort(node, isSource);
+	                //    }
+	                //
+	                //    // Sets or resets all previous information for connecting to a child port
+	                //    var key = isSource ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
+	                //    this.setCellStyles(key, id, [link]);
+	                //}
 	
-	                    if (this.isPort(terminal)) {
-	                        id = terminal.getId();
-	                        terminal = this.getTerminalForPort(terminal, source);
-	                    }
+	                this.model.setTerminal(link, node, isSource);
 	
-	                    // Sets or resets all previous information for connecting to a child port
-	                    var key = source ? constants.STYLE_SOURCE_PORT : constants.STYLE_TARGET_PORT;
-	                    this.setCellStyles(key, id, [edge]);
-	                }
-	
-	                this.model.setTerminal(edge, terminal, source);
+	                //link.setTerminal(node, isSource);
 	
 	                if (this.resetEdgesOnConnect) {
-	                    this.resetEdge(edge);
+	                    this.resetEdge(link);
 	                }
 	
 	                //this.fireEvent(new mxEventObject(mxEvent.CELL_CONNECTED,
@@ -1813,9 +1827,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    isCellConnectable: function isCellConnectable() {},
 	
 	    isOrthogonal: function isOrthogonal(edge) {
-	        var orthogonal = edge.style[constants.STYLE_ORTHOGONAL];
 	
-	        if (orthogonal != null) {
+	        return false;
+	
+	        var orthogonal = edge.style.orthogonal;
+	
+	        if (orthogonal) {
 	            return orthogonal;
 	        }
 	
@@ -2757,6 +2774,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _defaultStyle2 = _interopRequireDefault(_defaultStyle);
 	
+	var _shapesPerimeter = __webpack_require__(55);
+	
+	var _shapesPerimeter2 = _interopRequireDefault(_shapesPerimeter);
+	
 	exports['default'] = _libBase2['default'].extend({
 	
 	    constructor: function Stylesheet() {
@@ -2769,6 +2790,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        nodeStyle.label = (0, _commonUtils.extend)({}, common.label, nodeStyle.label);
 	        linkStyle.label = (0, _commonUtils.extend)({}, common.label, linkStyle.label);
+	
+	        nodeStyle.perimeter = _shapesPerimeter2['default'].RectanglePerimeter;
 	
 	        that.setDefaultNodeStyle((0, _commonUtils.extend)({}, common, nodeStyle));
 	        that.setDefaultLinkStyle((0, _commonUtils.extend)({}, common, linkStyle));
@@ -3887,7 +3910,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return child;
 	    },
 	
-	    // links
+	    // node
 	    // -----
 	
 	    getLinkCount: function getLinkCount() {
@@ -4769,6 +4792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (sourceNode && !visibleSourceState || !visibleSourceState && !sourcePoint || targetNode && !visibleTargetState || !visibleTargetState && !targetPoint) {
 	            that.clear(cell, true, true);
 	        } else {
+	            // 获取绘制连点需要的起点/终点和关键点
 	            that.updateFixedTerminalPoints(state, visibleSourceState, visibleTargetState);
 	            that.updatePoints(state, geo.points, visibleSourceState, visibleTargetState);
 	            that.updateFloatingTerminalPoints(state, visibleSourceState, visibleTargetState);
@@ -4777,10 +4801,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // 检查是否能够绘制连线
 	            var canDrawLink = absolutePoints && absolutePoints.length >= 2 && absolutePoints[0] && absolutePoints[absolutePoints.length - 1];
 	
-	            if (cell !== that.currentRoot && canDrawLink) {
+	            if (cell !== that.currentRoot && !canDrawLink) {
 	                that.clear(state.cell, true, true);
 	            } else {
+	                // 根据关键点更新 bounds
 	                that.updateEdgeBounds(state);
+	                // 更新标签位置
 	                that.updateEdgeLabelOffset(state);
 	            }
 	        }
@@ -4871,33 +4897,209 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    updateFixedTerminalPoints: function updateFixedTerminalPoints() {},
+	    updateFixedTerminalPoints: function updateFixedTerminalPoints(linkState, sourceState, targetState) {
 	
-	    updateFixedTerminalPoint: function updateFixedTerminalPoint() {},
+	        //var sourceConstraint = this.graph.getConnectionConstraint(linkState, sourceState, true);
+	        //var targetConstraint = this.graph.getConnectionConstraint(linkState, targetState, false);
 	
-	    updatePoints: function updatePoints(edge, points, source, target) {},
+	        var sourceConstraint = null;
+	        var targetConstraint = null;
+	
+	        this.updateFixedTerminalPoint(linkState, sourceState, true, sourceConstraint);
+	        this.updateFixedTerminalPoint(linkState, targetState, false, targetConstraint);
+	    },
+	
+	    updateFixedTerminalPoint: function updateFixedTerminalPoint(linkState, terminalState, isSource, constraint) {
+	        var pt = null;
+	
+	        if (constraint) {
+	            pt = this.graph.getConnectionPoint(terminalState, constraint);
+	        }
+	
+	        if (pt && terminalState) {
+	            var s = this.scale;
+	            var tr = this.translate;
+	            var orig = linkState.origin;
+	            var geo = this.graph.getCellGeometry(linkState.cell);
+	            pt = geo.getTerminalPoint(isSource);
+	
+	            if (pt) {
+	                pt = new mxPoint(s * (tr.x + pt.x + orig.x), s * (tr.y + pt.y + orig.y));
+	            }
+	        }
+	
+	        linkState.setAbsolutePoint(pt, isSource);
+	    },
+	
+	    updatePoints: function updatePoints(linkState, points, sourceState, targetState) {
+	        if (linkState) {
+	            var pts = [];
+	            pts.push(linkState.absolutePoints[0]);
+	            var edgeStyle = this.getEdgeStyle(linkState, points, sourceState, targetState);
+	
+	            if (edgeStyle != null) {
+	                var src = this.getTerminalPort(linkState, sourceState, true);
+	                var trg = this.getTerminalPort(linkState, targetState, false);
+	
+	                edgeStyle(linkState, src, trg, points, pts);
+	            } else if (points != null) {
+	                for (var i = 0; i < points.length; i++) {
+	                    if (points[i] != null) {
+	                        var pt = mxUtils.clone(points[i]);
+	                        pts.push(this.transformControlPoint(linkState, pt));
+	                    }
+	                }
+	            }
+	
+	            var tmp = linkState.absolutePoints;
+	            pts.push(tmp[tmp.length - 1]);
+	
+	            linkState.absolutePoints = pts;
+	        }
+	    },
 	
 	    transformControlPoint: function transformControlPoint(state, pt) {},
 	
 	    getEdgeStyle: function getEdgeStyle(edge, points, source, target) {},
 	
-	    updateFloatingTerminalPoints: function updateFloatingTerminalPoints(state, source, target) {},
+	    updateFloatingTerminalPoints: function updateFloatingTerminalPoints(linkState, sourceState, targetState) {
+	        var pts = linkState.absolutePoints;
+	        var p0 = pts[0];
+	        var pe = pts[pts.length - 1];
 	
-	    updateFloatingTerminalPoint: function updateFloatingTerminalPoint(edge, start, end, source) {},
+	        // 连线终点
+	        if (!pe && targetState) {
+	            this.updateFloatingTerminalPoint(linkState, targetState, sourceState, false);
+	        }
 	
-	    getTerminalPort: function getTerminalPort(state, terminal, source) {},
+	        // 连线起点
+	        if (!p0 && sourceState) {
+	            this.updateFloatingTerminalPoint(linkState, sourceState, targetState, true);
+	        }
+	    },
 	
-	    getPerimeterPoint: function getPerimeterPoint(terminal, next, orthogonal, border) {},
+	    updateFloatingTerminalPoint: function updateFloatingTerminalPoint(linkState, startState, endState, isSource) {
+	        startState = this.getTerminalPort(linkState, startState, isSource);
+	
+	        var nextPoint = this.getNextPoint(linkState, endState, isSource);
+	        var orth = this.graph.isOrthogonal(linkState);
+	        var alpha = startState.style.rotation || 0; // mxUtils.toRadians(Number(startState.style[mxConstants.STYLE_ROTATION] || '0'));
+	        var center = startState.getCenter(); // new Point(startState.getCenterX(), startState.getCenterY());
+	
+	        if (alpha) {
+	            var cos = Math.cos(-alpha);
+	            var sin = Math.sin(-alpha);
+	            nextPoint = mxUtils.getRotatedPoint(nextPoint, cos, sin, center);
+	        }
+	
+	        var border = parseFloat(linkState.style.perimeterSpacing || 0);
+	        border += parseFloat(linkState.style[isSource ? 'sourcePerimeterSpacing' : 'targetPerimeterSpacing'] || 0);
+	
+	        var pt = this.getPerimeterPoint(startState, nextPoint, alpha === 0 && orth, border);
+	
+	        if (alpha) {
+	            var cos = Math.cos(alpha);
+	            var sin = Math.sin(alpha);
+	            pt = mxUtils.getRotatedPoint(pt, cos, sin, center);
+	        }
+	
+	        linkState.setAbsolutePoint(pt, isSource);
+	    },
+	
+	    getTerminalPort: function getTerminalPort(linkState, terminal, isSource) {
+	
+	        var key = isSource ? 'sourcePort' : 'targetPort';
+	        var id = linkState.style[key];
+	
+	        if (id) {
+	            var tmp = this.getState(this.graph.getModel().getCell(id));
+	
+	            // Only uses ports where a cell state exists
+	            if (tmp) {
+	                terminal = tmp;
+	            }
+	        }
+	
+	        return terminal;
+	    },
+	
+	    getPerimeterPoint: function getPerimeterPoint(terminal, next, orthogonal, border) {
+	        var point = null;
+	
+	        if (terminal) {
+	            var perimeter = this.getPerimeterFunction(terminal);
+	
+	            if (perimeter && next) {
+	                var bounds = this.getPerimeterBounds(terminal, border);
+	
+	                if (bounds.width > 0 || bounds.height > 0) {
+	                    point = perimeter(bounds, terminal, next, orthogonal);
+	
+	                    if (point != null) {
+	                        point.x = Math.round(point.x);
+	                        point.y = Math.round(point.y);
+	                    }
+	                }
+	            }
+	
+	            if (point === null) {
+	                point = this.getPoint(terminal);
+	            }
+	        }
+	
+	        return point;
+	    },
 	
 	    getRoutingCenterX: function getRoutingCenterX(state) {},
 	
 	    getRoutingCenterY: function getRoutingCenterY(state) {},
 	
-	    getPerimeterBounds: function getPerimeterBounds(terminal, border) {},
+	    getPerimeterBounds: function getPerimeterBounds(terminal, border) {
+	        border = border != null ? border : 0;
 	
-	    getPerimeterFunction: function getPerimeterFunction(state) {},
+	        if (terminal) {
+	            border += parseFloat(terminal.style.perimeterSpacing || 0);
+	        }
 	
-	    getNextPoint: function getNextPoint(edge, opposite, source) {},
+	        return terminal.getPerimeterBounds(border * this.scale);
+	    },
+	
+	    getPerimeterFunction: function getPerimeterFunction(state) {
+	        var perimeter = state.style.perimeter;
+	
+	        // Converts string values to objects
+	        if (typeof perimeter === "string") {
+	            var tmp = mxStyleRegistry.getValue(perimeter);
+	
+	            if (tmp == null && this.isAllowEval()) {
+	                tmp = mxUtils.eval(perimeter);
+	            }
+	
+	            perimeter = tmp;
+	        }
+	
+	        if (typeof perimeter === "function") {
+	            return perimeter;
+	        }
+	
+	        return null;
+	    },
+	
+	    getNextPoint: function getNextPoint(linkState, opposite, isSource) {
+	        var pts = linkState.absolutePoints;
+	        var point = null;
+	
+	        if (pts && pts.length >= 2) {
+	            var count = pts.length;
+	            point = pts[isSource ? Math.min(1, count - 1) : Math.max(0, count - 2)];
+	        }
+	
+	        if (!point && opposite) {
+	            point = opposite.getCenter(); // new Point(opposite.getCenterX(), opposite.getCenterY());
+	        }
+	
+	        return point;
+	    },
 	
 	    getVisibleTerminal: function getVisibleTerminal(link, isSource) {
 	
@@ -4925,7 +5127,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return best;
 	    },
 	
-	    updateEdgeBounds: function updateEdgeBounds(state) {},
+	    updateEdgeBounds: function updateEdgeBounds(state) {
+	
+	        var points = state.absolutePoints;
+	        var p0 = points[0];
+	        var pe = points[points.length - 1];
+	
+	        var dx;
+	        var dy;
+	
+	        if (p0.x !== pe.x || p0.y !== pe.y) {
+	            dx = pe.x - p0.x;
+	            dy = pe.y - p0.y;
+	            state.terminalDistance = Math.sqrt(dx * dx + dy * dy);
+	        } else {
+	            state.terminalDistance = 0;
+	        }
+	
+	        var length = 0;
+	        var segments = [];
+	        var pt = p0;
+	
+	        if (pt) {
+	            var minX = pt.x;
+	            var minY = pt.y;
+	            var maxX = minX;
+	            var maxY = minY;
+	
+	            for (var i = 1; i < points.length; i++) {
+	                var tmp = points[i];
+	
+	                if (tmp) {
+	                    dx = pt.x - tmp.x;
+	                    dy = pt.y - tmp.y;
+	
+	                    var segment = Math.sqrt(dx * dx + dy * dy);
+	                    segments.push(segment);
+	                    length += segment;
+	
+	                    pt = tmp;
+	
+	                    minX = Math.min(pt.x, minX);
+	                    minY = Math.min(pt.y, minY);
+	                    maxX = Math.max(pt.x, maxX);
+	                    maxY = Math.max(pt.y, maxY);
+	                }
+	            }
+	
+	            state.length = length;
+	            state.segments = segments;
+	
+	            var markerSize = 1; // TODO: include marker size
+	
+	            state.x = minX;
+	            state.y = minY;
+	            state.width = Math.max(markerSize, maxX - minX);
+	            state.height = Math.max(markerSize, maxY - minY);
+	        }
+	    },
 	
 	    // 获取连线上的相对于 geometry 定位的点
 	    // TODO: 搞明白
@@ -4989,7 +5248,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    getRelativePoint: function getRelativePoint(edgeState, x, y) {},
 	
-	    updateEdgeLabelOffset: function updateEdgeLabelOffset(state) {},
+	    updateEdgeLabelOffset: function updateEdgeLabelOffset(state) {
+	        var points = state.absolutePoints;
+	
+	        state.absoluteOffset = state.getCenter();
+	        //state.absoluteOffset.x = state.getCenterX();
+	        //state.absoluteOffset.y = state.getCenterY();
+	
+	        if (points && points.length > 0 && state.segments) {
+	            var geometry = state.cell.geometry; // this.graph.getCellGeometry(state.cell);
+	
+	            if (geometry.relative) {
+	                var offset = this.getPoint(state, geometry);
+	
+	                if (offset) {
+	                    state.absoluteOffset = offset;
+	                }
+	            } else {
+	                var p0 = points[0];
+	                var pe = points[points.length - 1];
+	
+	                if (p0 != null && pe != null) {
+	                    var dx = pe.x - p0.x;
+	                    var dy = pe.y - p0.y;
+	                    var x0 = 0;
+	                    var y0 = 0;
+	
+	                    var off = geometry.offset;
+	
+	                    if (off != null) {
+	                        x0 = off.x;
+	                        y0 = off.y;
+	                    }
+	
+	                    var x = p0.x + dx / 2 + x0 * this.scale;
+	                    var y = p0.y + dy / 2 + y0 * this.scale;
+	
+	                    state.absoluteOffset.x = x;
+	                    state.absoluteOffset.y = y;
+	                }
+	            }
+	        }
+	    },
 	
 	    // State
 	    // -----
@@ -7462,6 +7762,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
+	var _changesTerminalChange = __webpack_require__(54);
+	
+	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
+	
 	var _changesChangeCollection = __webpack_require__(50);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
@@ -7752,6 +8056,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        return oldNode;
+	    },
+	
+	    getTerminal: function getTerminal(link, isSource) {
+	        return link ? link.getTerminal(isSource) : null;
+	    },
+	
+	    setTerminal: function setTerminal(link, node, isSource) {
+	        var terminalChanged = node !== this.getTerminal(link, isSource);
+	        this.digest(new _changesTerminalChange2['default'](this, link, node, isSource));
+	
+	        if (this.maintainEdgeParent && terminalChanged) {
+	            this.updateEdgeParent(link, this.getRoot());
+	        }
+	
+	        return node;
+	    },
+	
+	    // 连线的起点节点或终点节点改变后
+	    terminalForCellChanged: function terminalForCellChanged(link, node, isSource) {
+	        var previous = this.getTerminal(link, isSource);
+	
+	        if (node) {
+	            node.insertLink(link, isSource);
+	        } else if (previous) {
+	            previous.removeLink(link, isSource);
+	        }
+	
+	        return previous;
 	    },
 	
 	    createId: function createId() {
@@ -8156,9 +8488,100 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PolyLine2 = _interopRequireDefault(_PolyLine);
 	
-	exports['default'] = Polyline.extend({
+	var _marker = __webpack_require__(53);
+	
+	var _marker2 = _interopRequireDefault(_marker);
+	
+	var Connector = _PolyLine2['default'].extend({
 	
 	    constructor: function Connector(state, style, points) {
+	        Connector.superclass.constructor.call(this, state, style, points);
+	    },
+	
+	    drawLink: function drawLink(canvas, points) {
+	
+	        var that = this;
+	
+	        var sourceMarker = that.createMarker(canvas, points, true);
+	        var targetMarker = that.createMarker(canvas, points, false);
+	
+	        Connector.superclass.drawLink.call(that, canvas, points);
+	
+	        sourceMarker && sourceMarker();
+	        targetMarker && targetMarker();
+	
+	        return that;
+	    },
+	
+	    createMarker: function createMarker(canvas, points, isSource) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var result = null;
+	        var n = points.length;
+	        var type = isSource ? style.startArrow : style.endArrow;
+	        var p0 = isSource ? points[1] : points[n - 2];
+	        var pe = isSource ? points[0] : points[n - 1];
+	
+	        if (type && p0 && pe) {
+	            var count = 1;
+	
+	            // Uses next non-overlapping point
+	            while (count < n - 1 && Math.round(p0.x - pe.x) === 0 && Math.round(p0.y - pe.y) === 0) {
+	                p0 = isSource ? points[1 + count] : points[n - 2 - count];
+	                count++;
+	            }
+	
+	            // Computes the norm and the inverse norm
+	            var dx = pe.x - p0.x;
+	            var dy = pe.y - p0.y;
+	
+	            var dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+	
+	            var unitX = dx / dist;
+	            var unitY = dy / dist;
+	
+	            var size = 6; //mxUtils.getNumber(this.style, (isSource) ? mxConstants.STYLE_STARTSIZE : mxConstants.STYLE_ENDSIZE, mxConstants.DEFAULT_MARKERSIZE);
+	
+	            // Allow for stroke width in the end point used and the
+	            // orthogonal vectors describing the direction of the marker
+	            var filled = true; //this.style[(isSource) ? mxConstants.STYLE_STARTFILL : mxConstants.STYLE_ENDFILL] != 0;
+	
+	            result = _marker2['default'].createMarker(canvas, this, type, pe, unitX, unitY, size, isSource, 1, filled);
+	        }
+	
+	        return result;
+	    }
+	
+	});
+	
+	//augmentBoundingBox: function (bbox) {
+	//
+	//}
+	exports['default'] = Connector;
+	module.exports = exports['default'];
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Shape = __webpack_require__(35);
+	
+	var _Shape2 = _interopRequireDefault(_Shape);
+	
+	exports['default'] = _Shape2['default'].extend({
+	
+	    constructor: function PolyLine(state, style, points) {
 	
 	        var that = this;
 	
@@ -8188,7 +8611,76 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 53 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	var marker = {
+	
+	    markers: {},
+	
+	    addMarker: function addMarker(type, func) {
+	        marker.markers[type] = func;
+	    },
+	
+	    createMarker: function createMarker(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+	
+	        var func = marker.markers[type];
+	
+	        return func ? func(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) : null;
+	    }
+	};
+	
+	function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+	    // The angle of the forward facing arrow sides against the x axis is
+	    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+	    // only half the strokewidth is processed ).
+	    var endOffsetX = unitX * sw * 1.118;
+	    var endOffsetY = unitY * sw * 1.118;
+	
+	    unitX = unitX * (size + sw);
+	    unitY = unitY * (size + sw);
+	
+	    var pt = pe.clone();
+	    pt.x -= endOffsetX;
+	    pt.y -= endOffsetY;
+	
+	    var f = type !== 'classic' ? 1 : 3 / 4;
+	    pe.x += -unitX * f - endOffsetX;
+	    pe.y += -unitY * f - endOffsetY;
+	
+	    return function () {
+	        canvas.begin();
+	        canvas.moveTo(pt.x, pt.y);
+	        canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+	
+	        if (type === 'classic') {
+	            canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+	        }
+	
+	        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+	        canvas.close();
+	
+	        if (filled) {
+	            canvas.fillAndStroke();
+	        } else {
+	            canvas.stroke();
+	        }
+	    };
+	}
+	
+	marker.addMarker('classic', arrow);
+	marker.addMarker('block', arrow);
+	
+	exports['default'] = marker;
+	module.exports = exports['default'];
+
+/***/ },
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8199,42 +8691,584 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _commonUtils = __webpack_require__(1);
+	var _Change = __webpack_require__(48);
 	
-	var _Shape = __webpack_require__(35);
+	var _Change2 = _interopRequireDefault(_Change);
 	
-	var _Shape2 = _interopRequireDefault(_Shape);
-	
-	exports['default'] = _Shape2['default'].extend({
-	
-	    constructor: function Polyline(state, style, points) {
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function TerminalChange(model, link, node, isSource) {
 	
 	        var that = this;
 	
-	        that.state = state;
-	        that.style = style;
-	        that.points = points;
+	        that.model = model;
+	        that.cell = link;
+	        that.terminal = node;
+	        that.previous = node;
+	        that.isSource = isSource;
 	    },
 	
-	    getRotation: function getRotation() {
-	        return 0;
-	    },
-	
-	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return false;
-	    },
-	
-	    drawLink: function drawLink(canvas, points) {
+	    digest: function digest() {
 	
 	        var that = this;
-	        var style = that.style;
 	
-	        if (style && style.curved) {} else {}
+	        that.terminal = that.previous;
+	        that.previous = that.model.terminalForCellChanged(that.cell, that.previous, that.isSource);
 	
 	        return that;
 	    }
 	});
 	module.exports = exports['default'];
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _libPoint = __webpack_require__(24);
+	
+	var _libPoint2 = _interopRequireDefault(_libPoint);
+	
+	module.exports = {
+	    RectanglePerimeter: function RectanglePerimeter(bounds, vertex, next, orthogonal) {
+	        var cx = bounds.getCenterX();
+	        var cy = bounds.getCenterY();
+	        var dx = next.x - cx;
+	        var dy = next.y - cy;
+	        var alpha = Math.atan2(dy, dx);
+	        var p = new _libPoint2['default'](0, 0);
+	        var pi = Math.PI;
+	        var pi2 = Math.PI / 2;
+	        var beta = pi2 - alpha;
+	        var t = Math.atan2(bounds.height, bounds.width);
+	
+	        if (alpha < -pi + t || alpha > pi - t) {
+	            // Left edge
+	            p.x = bounds.x;
+	            p.y = cy - bounds.width * Math.tan(alpha) / 2;
+	        } else if (alpha < -t) {
+	            // Top Edge
+	            p.y = bounds.y;
+	            p.x = cx - bounds.height * Math.tan(beta) / 2;
+	        } else if (alpha < t) {
+	            // Right Edge
+	            p.x = bounds.x + bounds.width;
+	            p.y = cy + bounds.width * Math.tan(alpha) / 2;
+	        } else {
+	            // Bottom Edge
+	            p.y = bounds.y + bounds.height;
+	            p.x = cx + bounds.height * Math.tan(beta) / 2;
+	        }
+	
+	        if (orthogonal) {
+	            if (next.x >= bounds.x && next.x <= bounds.x + bounds.width) {
+	                p.x = next.x;
+	            } else if (next.y >= bounds.y && next.y <= bounds.y + bounds.height) {
+	                p.y = next.y;
+	            }
+	            if (next.x < bounds.x) {
+	                p.x = bounds.x;
+	            } else if (next.x > bounds.x + bounds.width) {
+	                p.x = bounds.x + bounds.width;
+	            }
+	            if (next.y < bounds.y) {
+	                p.y = bounds.y;
+	            } else if (next.y > bounds.y + bounds.height) {
+	                p.y = bounds.y + bounds.height;
+	            }
+	        }
+	
+	        return p;
+	    },
+	    EllipsePerimeter: function EllipsePerimeter(bounds, vertex, next, orthogonal) {
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var a = bounds.width / 2;
+	        var b = bounds.height / 2;
+	        var cx = x + a;
+	        var cy = y + b;
+	        var px = next.x;
+	        var py = next.y;
+	
+	        // Calculates straight line equation through
+	        // point and ellipse center y = d * x + h
+	        var dx = parseInt(px - cx);
+	        var dy = parseInt(py - cy);
+	
+	        if (dx == 0 && dy != 0) {
+	            return new mxPoint(cx, cy + b * dy / Math.abs(dy));
+	        } else if (dx == 0 && dy == 0) {
+	            return new mxPoint(px, py);
+	        }
+	
+	        if (orthogonal) {
+	            if (py >= y && py <= y + bounds.height) {
+	                var ty = py - cy;
+	                var tx = Math.sqrt(a * a * (1 - ty * ty / (b * b))) || 0;
+	
+	                if (px <= x) {
+	                    tx = -tx;
+	                }
+	
+	                return new mxPoint(cx + tx, py);
+	            }
+	
+	            if (px >= x && px <= x + bounds.width) {
+	                var tx = px - cx;
+	                var ty = Math.sqrt(b * b * (1 - tx * tx / (a * a))) || 0;
+	
+	                if (py <= y) {
+	                    ty = -ty;
+	                }
+	
+	                return new mxPoint(px, cy + ty);
+	            }
+	        }
+	
+	        // Calculates intersection
+	        var d = dy / dx;
+	        var h = cy - d * cx;
+	        var e = a * a * d * d + b * b;
+	        var f = -2 * cx * e;
+	        var g = a * a * d * d * cx * cx + b * b * cx * cx - a * a * b * b;
+	        var det = Math.sqrt(f * f - 4 * e * g);
+	
+	        // Two solutions (perimeter points)
+	        var xout1 = (-f + det) / (2 * e);
+	        var xout2 = (-f - det) / (2 * e);
+	        var yout1 = d * xout1 + h;
+	        var yout2 = d * xout2 + h;
+	        var dist1 = Math.sqrt(Math.pow(xout1 - px, 2) + Math.pow(yout1 - py, 2));
+	        var dist2 = Math.sqrt(Math.pow(xout2 - px, 2) + Math.pow(yout2 - py, 2));
+	
+	        // Correct solution
+	        var xout = 0;
+	        var yout = 0;
+	
+	        if (dist1 < dist2) {
+	            xout = xout1;
+	            yout = yout1;
+	        } else {
+	            xout = xout2;
+	            yout = yout2;
+	        }
+	
+	        return new mxPoint(xout, yout);
+	    },
+	    RhombusPerimeter: function RhombusPerimeter(bounds, vertex, next, orthogonal) {
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var w = bounds.width;
+	        var h = bounds.height;
+	
+	        var cx = x + w / 2;
+	        var cy = y + h / 2;
+	
+	        var px = next.x;
+	        var py = next.y;
+	
+	        // Special case for intersecting the diamond's corners
+	        if (cx == px) {
+	            if (cy > py) {
+	                return new mxPoint(cx, y); // top
+	            } else {
+	                    return new mxPoint(cx, y + h); // bottom
+	                }
+	        } else if (cy == py) {
+	                if (cx > px) {
+	                    return new mxPoint(x, cy); // left
+	                } else {
+	                        return new mxPoint(x + w, cy); // right
+	                    }
+	            }
+	
+	        var tx = cx;
+	        var ty = cy;
+	
+	        if (orthogonal) {
+	            if (px >= x && px <= x + w) {
+	                tx = px;
+	            } else if (py >= y && py <= y + h) {
+	                ty = py;
+	            }
+	        }
+	
+	        // In which quadrant will the intersection be?
+	        // set the slope and offset of the border line accordingly
+	        if (px < cx) {
+	            if (py < cy) {
+	                return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
+	            } else {
+	                return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
+	            }
+	        } else if (py < cy) {
+	            return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
+	        } else {
+	            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
+	        }
+	    },
+	    TrianglePerimeter: function TrianglePerimeter(bounds, vertex, next, orthogonal) {
+	        var direction = vertex != null ? vertex.style[mxConstants.STYLE_DIRECTION] : null;
+	        var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
+	
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var w = bounds.width;
+	        var h = bounds.height;
+	
+	        var cx = x + w / 2;
+	        var cy = y + h / 2;
+	
+	        var start = new mxPoint(x, y);
+	        var corner = new mxPoint(x + w, cy);
+	        var end = new mxPoint(x, y + h);
+	
+	        if (direction == mxConstants.DIRECTION_NORTH) {
+	            start = end;
+	            corner = new mxPoint(cx, y);
+	            end = new mxPoint(x + w, y + h);
+	        } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	            corner = new mxPoint(cx, y + h);
+	            end = new mxPoint(x + w, y);
+	        } else if (direction == mxConstants.DIRECTION_WEST) {
+	            start = new mxPoint(x + w, y);
+	            corner = new mxPoint(x, cy);
+	            end = new mxPoint(x + w, y + h);
+	        }
+	
+	        var dx = next.x - cx;
+	        var dy = next.y - cy;
+	
+	        var alpha = vertical ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
+	        var t = vertical ? Math.atan2(w, h) : Math.atan2(h, w);
+	
+	        var base = false;
+	
+	        if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_WEST) {
+	            base = alpha > -t && alpha < t;
+	        } else {
+	            base = alpha < -Math.PI + t || alpha > Math.PI - t;
+	        }
+	
+	        var result = null;
+	
+	        if (base) {
+	            if (orthogonal && (vertical && next.x >= start.x && next.x <= end.x || !vertical && next.y >= start.y && next.y <= end.y)) {
+	                if (vertical) {
+	                    result = new mxPoint(next.x, start.y);
+	                } else {
+	                    result = new mxPoint(start.x, next.y);
+	                }
+	            } else {
+	                if (direction == mxConstants.DIRECTION_NORTH) {
+	                    result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2, y + h);
+	                } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	                    result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2, y);
+	                } else if (direction == mxConstants.DIRECTION_WEST) {
+	                    result = new mxPoint(x + w, y + h / 2 + w * Math.tan(alpha) / 2);
+	                } else {
+	                    result = new mxPoint(x, y + h / 2 - w * Math.tan(alpha) / 2);
+	                }
+	            }
+	        } else {
+	            if (orthogonal) {
+	                var pt = new mxPoint(cx, cy);
+	
+	                if (next.y >= y && next.y <= y + h) {
+	                    pt.x = vertical ? cx : direction == mxConstants.DIRECTION_WEST ? x + w : x;
+	                    pt.y = next.y;
+	                } else if (next.x >= x && next.x <= x + w) {
+	                    pt.x = next.x;
+	                    pt.y = !vertical ? cy : direction == mxConstants.DIRECTION_NORTH ? y + h : y;
+	                }
+	
+	                // Compute angle
+	                dx = next.x - pt.x;
+	                dy = next.y - pt.y;
+	
+	                cx = pt.x;
+	                cy = pt.y;
+	            }
+	
+	            if (vertical && next.x <= x + w / 2 || !vertical && next.y <= y + h / 2) {
+	                result = mxUtils.intersection(next.x, next.y, cx, cy, start.x, start.y, corner.x, corner.y);
+	            } else {
+	                result = mxUtils.intersection(next.x, next.y, cx, cy, corner.x, corner.y, end.x, end.y);
+	            }
+	        }
+	
+	        if (result == null) {
+	            result = new mxPoint(cx, cy);
+	        }
+	
+	        return result;
+	    },
+	    HexagonPerimeter: function HexagonPerimeter(bounds, vertex, next, orthogonal) {
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var w = bounds.width;
+	        var h = bounds.height;
+	
+	        var cx = bounds.getCenterX();
+	        var cy = bounds.getCenterY();
+	        var px = next.x;
+	        var py = next.y;
+	        var dx = px - cx;
+	        var dy = py - cy;
+	        var alpha = -Math.atan2(dy, dx);
+	        var pi = Math.PI;
+	        var pi2 = Math.PI / 2;
+	
+	        var result = new mxPoint(cx, cy);
+	
+	        var direction = vertex != null ? mxUtils.getValue(vertex.style, mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
+	        var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
+	        var a = new mxPoint();
+	        var b = new mxPoint();
+	
+	        //Only consider corrects quadrants for the orthogonal case.
+	        if (px < x && py < y || px < x && py > y + h || px > x + w && py < y || px > x + w && py > y + h) {
+	            orthogonal = false;
+	        }
+	
+	        if (orthogonal) {
+	            if (vertical) {
+	                //Special cases where intersects with hexagon corners
+	                if (px == cx) {
+	                    if (py <= y) {
+	                        return new mxPoint(cx, y);
+	                    } else if (py >= y + h) {
+	                        return new mxPoint(cx, y + h);
+	                    }
+	                } else if (px < x) {
+	                    if (py == y + h / 4) {
+	                        return new mxPoint(x, y + h / 4);
+	                    } else if (py == y + 3 * h / 4) {
+	                        return new mxPoint(x, y + 3 * h / 4);
+	                    }
+	                } else if (px > x + w) {
+	                    if (py == y + h / 4) {
+	                        return new mxPoint(x + w, y + h / 4);
+	                    } else if (py == y + 3 * h / 4) {
+	                        return new mxPoint(x + w, y + 3 * h / 4);
+	                    }
+	                } else if (px == x) {
+	                    if (py < cy) {
+	                        return new mxPoint(x, y + h / 4);
+	                    } else if (py > cy) {
+	                        return new mxPoint(x, y + 3 * h / 4);
+	                    }
+	                } else if (px == x + w) {
+	                    if (py < cy) {
+	                        return new mxPoint(x + w, y + h / 4);
+	                    } else if (py > cy) {
+	                        return new mxPoint(x + w, y + 3 * h / 4);
+	                    }
+	                }
+	                if (py == y) {
+	                    return new mxPoint(cx, y);
+	                } else if (py == y + h) {
+	                    return new mxPoint(cx, y + h);
+	                }
+	
+	                if (px < cx) {
+	                    if (py > y + h / 4 && py < y + 3 * h / 4) {
+	                        a = new mxPoint(x, y);
+	                        b = new mxPoint(x, y + h);
+	                    } else if (py < y + h / 4) {
+	                        a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                        b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+	                    } else if (py > y + 3 * h / 4) {
+	                        a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                        b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+	                    }
+	                } else if (px > cx) {
+	                    if (py > y + h / 4 && py < y + 3 * h / 4) {
+	                        a = new mxPoint(x + w, y);
+	                        b = new mxPoint(x + w, y + h);
+	                    } else if (py < y + h / 4) {
+	                        a = new mxPoint(x, y - Math.floor(0.25 * h));
+	                        b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                    } else if (py > y + 3 * h / 4) {
+	                        a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                        b = new mxPoint(x, y + Math.floor(1.25 * h));
+	                    }
+	                }
+	            } else {
+	                //Special cases where intersects with hexagon corners
+	                if (py == cy) {
+	                    if (px <= x) {
+	                        return new mxPoint(x, y + h / 2);
+	                    } else if (px >= x + w) {
+	                        return new mxPoint(x + w, y + h / 2);
+	                    }
+	                } else if (py < y) {
+	                    if (px == x + w / 4) {
+	                        return new mxPoint(x + w / 4, y);
+	                    } else if (px == x + 3 * w / 4) {
+	                        return new mxPoint(x + 3 * w / 4, y);
+	                    }
+	                } else if (py > y + h) {
+	                    if (px == x + w / 4) {
+	                        return new mxPoint(x + w / 4, y + h);
+	                    } else if (px == x + 3 * w / 4) {
+	                        return new mxPoint(x + 3 * w / 4, y + h);
+	                    }
+	                } else if (py == y) {
+	                    if (px < cx) {
+	                        return new mxPoint(x + w / 4, y);
+	                    } else if (px > cx) {
+	                        return new mxPoint(x + 3 * w / 4, y);
+	                    }
+	                } else if (py == y + h) {
+	                    if (px < cx) {
+	                        return new mxPoint(x + w / 4, y + h);
+	                    } else if (py > cy) {
+	                        return new mxPoint(x + 3 * w / 4, y + h);
+	                    }
+	                }
+	                if (px == x) {
+	                    return new mxPoint(x, cy);
+	                } else if (px == x + w) {
+	                    return new mxPoint(x + w, cy);
+	                }
+	
+	                if (py < cy) {
+	                    if (px > x + w / 4 && px < x + 3 * w / 4) {
+	                        a = new mxPoint(x, y);
+	                        b = new mxPoint(x + w, y);
+	                    } else if (px < x + w / 4) {
+	                        a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+	                        b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                    } else if (px > x + 3 * w / 4) {
+	                        a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                        b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+	                    }
+	                } else if (py > cy) {
+	                    if (px > x + w / 4 && px < x + 3 * w / 4) {
+	                        a = new mxPoint(x, y + h);
+	                        b = new mxPoint(x + w, y + h);
+	                    } else if (px < x + w / 4) {
+	                        a = new mxPoint(x - Math.floor(0.25 * w), y);
+	                        b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                    } else if (px > x + 3 * w / 4) {
+	                        a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                        b = new mxPoint(x + Math.floor(1.25 * w), y);
+	                    }
+	                }
+	            }
+	
+	            var tx = cx;
+	            var ty = cy;
+	
+	            if (px >= x && px <= x + w) {
+	                tx = px;
+	
+	                if (py < cy) {
+	                    ty = y + h;
+	                } else {
+	                    ty = y;
+	                }
+	            } else if (py >= y && py <= y + h) {
+	                ty = py;
+	
+	                if (px < cx) {
+	                    tx = x + w;
+	                } else {
+	                    tx = x;
+	                }
+	            }
+	
+	            result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
+	        } else {
+	            if (vertical) {
+	                var beta = Math.atan2(h / 4, w / 2);
+	
+	                //Special cases where intersects with hexagon corners
+	                if (alpha == beta) {
+	                    return new mxPoint(x + w, y + Math.floor(0.25 * h));
+	                } else if (alpha == pi2) {
+	                    return new mxPoint(x + Math.floor(0.5 * w), y);
+	                } else if (alpha == pi - beta) {
+	                    return new mxPoint(x, y + Math.floor(0.25 * h));
+	                } else if (alpha == -beta) {
+	                    return new mxPoint(x + w, y + Math.floor(0.75 * h));
+	                } else if (alpha == -pi2) {
+	                    return new mxPoint(x + Math.floor(0.5 * w), y + h);
+	                } else if (alpha == -pi + beta) {
+	                    return new mxPoint(x, y + Math.floor(0.75 * h));
+	                }
+	
+	                if (alpha < beta && alpha > -beta) {
+	                    a = new mxPoint(x + w, y);
+	                    b = new mxPoint(x + w, y + h);
+	                } else if (alpha > beta && alpha < pi2) {
+	                    a = new mxPoint(x, y - Math.floor(0.25 * h));
+	                    b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                } else if (alpha > pi2 && alpha < pi - beta) {
+	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+	                } else if (alpha > pi - beta && alpha <= pi || alpha < -pi + beta && alpha >= -pi) {
+	                    a = new mxPoint(x, y);
+	                    b = new mxPoint(x, y + h);
+	                } else if (alpha < -beta && alpha > -pi2) {
+	                    a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x, y + Math.floor(1.25 * h));
+	                } else if (alpha < -pi2 && alpha > -pi + beta) {
+	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+	                }
+	            } else {
+	                var beta = Math.atan2(h / 2, w / 4);
+	
+	                //Special cases where intersects with hexagon corners
+	                if (alpha == beta) {
+	                    return new mxPoint(x + Math.floor(0.75 * w), y);
+	                } else if (alpha == pi - beta) {
+	                    return new mxPoint(x + Math.floor(0.25 * w), y);
+	                } else if (alpha == pi || alpha == -pi) {
+	                    return new mxPoint(x, y + Math.floor(0.5 * h));
+	                } else if (alpha == 0) {
+	                    return new mxPoint(x + w, y + Math.floor(0.5 * h));
+	                } else if (alpha == -beta) {
+	                    return new mxPoint(x + Math.floor(0.75 * w), y + h);
+	                } else if (alpha == -pi + beta) {
+	                    return new mxPoint(x + Math.floor(0.25 * w), y + h);
+	                }
+	
+	                if (alpha > 0 && alpha < beta) {
+	                    a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+	                } else if (alpha > beta && alpha < pi - beta) {
+	                    a = new mxPoint(x, y);
+	                    b = new mxPoint(x + w, y);
+	                } else if (alpha > pi - beta && alpha < pi) {
+	                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+	                    b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                } else if (alpha < 0 && alpha > -beta) {
+	                    a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                    b = new mxPoint(x + Math.floor(1.25 * w), y);
+	                } else if (alpha < -beta && alpha > -pi + beta) {
+	                    a = new mxPoint(x, y + h);
+	                    b = new mxPoint(x + w, y + h);
+	                } else if (alpha < -pi + beta && alpha > -pi) {
+	                    a = new mxPoint(x - Math.floor(0.25 * w), y);
+	                    b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                }
+	            }
+	
+	            result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
+	        }
+	
+	        if (result == null) {
+	            return new mxPoint(cx, cy);
+	        }
+	
+	        return result;
+	    }
+	};
 
 /***/ }
 /******/ ])
