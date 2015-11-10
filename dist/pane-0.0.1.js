@@ -3462,17 +3462,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _commonUtils = __webpack_require__(1);
-	
 	var _Base = __webpack_require__(14);
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
 	var Point = _Base2['default'].extend({
 	
-	    constructor: function Point(x, y) {
-	        this.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
-	        this.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
+	    constructor: function Point() {
+	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	
+	        this.x = x;
+	        this.y = y;
 	    },
 	
 	    equals: function equals(point) {
@@ -3631,8 +3632,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    // 原型上的属性
-	    visible: true, // 默认可见
+	    // props on prototype
+	    visible: true,
 	    transients: ['id', 'value', 'parent', 'source', 'target', 'children', 'links'],
 	
 	    constructor: function Cell(id, value, geometry, style) {
@@ -4073,8 +4074,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _commonUtils = __webpack_require__(1);
-	
 	var _Base = __webpack_require__(14);
 	
 	var _Base2 = _interopRequireDefault(_Base);
@@ -4085,14 +4084,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var Rectangle = _Base2['default'].extend({
 	
-	    constructor: function Rectangle(x, y, width, height) {
+	    constructor: function Rectangle() {
+	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	        var width = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	        var height = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
 	
 	        var that = this;
 	
-	        that.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
-	        that.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
-	        that.width = width ? width : 0;
-	        that.height = height ? height : 0;
+	        that.x = x;
+	        that.y = y;
+	        that.width = width;
+	        that.height = height;
 	    },
 	
 	    setRect: function setRect(x, y, width, height) {
@@ -4121,35 +4124,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    add: function add(rect) {
 	
-	        if (!rect) {
-	            return;
-	        }
-	
 	        var that = this;
 	
-	        var minX = Math.min(that.x, rect.x);
-	        var minY = Math.min(that.y, rect.y);
-	        var maxX = Math.max(that.x + that.width, rect.x + rect.width);
-	        var maxY = Math.max(that.y + that.height, rect.y + rect.height);
+	        if (rect) {
+	            var minX = Math.min(that.x, rect.x);
+	            var minY = Math.min(that.y, rect.y);
+	            var maxX = Math.max(that.x + that.width, rect.x + rect.width);
+	            var maxY = Math.max(that.y + that.height, rect.y + rect.height);
 	
-	        that.x = minX;
-	        that.y = minY;
-	        that.width = maxX - minX;
-	        that.height = maxY - minY;
+	            that.x = minX;
+	            that.y = minY;
+	            that.width = maxX - minX;
+	            that.height = maxY - minY;
+	        }
 	
 	        return that;
 	    },
 	
 	    grow: function grow(amount) {
 	
-	        var rect = this;
+	        var that = this;
 	
-	        rect.x -= amount;
-	        rect.y -= amount;
-	        rect.width += 2 * amount;
-	        rect.height += 2 * amount;
+	        that.x -= amount;
+	        that.y -= amount;
+	        that.width += 2 * amount;
+	        that.height += 2 * amount;
 	
-	        return rect;
+	        return that;
 	    },
 	
 	    rotate90: function rotate90() {
@@ -5478,9 +5479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    clear: function clear() {
 	        var that = this;
-	
 	        that.map = {};
-	
 	        return that;
 	    },
 	
@@ -5516,22 +5515,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getValues: function getValues() {
-	
 	        var result = [];
-	
 	        (0, _commonUtils.forIn)(this.map, function (value) {
 	            result.push(value);
 	        });
-	
 	        return result;
 	    },
 	
 	    each: function each(visitor, context) {
-	
 	        var that = this;
-	
 	        (0, _commonUtils.forIn)(that.map, visitor, context);
-	
 	        return that;
 	    }
 	});

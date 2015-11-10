@@ -9,15 +9,15 @@ export default Class.create({
 
     constructor: function Base() {},
 
-    toString: function () {
+    toString() {
         return '[Class ' + getFunctionName(this.constructor) + ']';
     },
 
-    getValue: function () {
+    getValue() {
         return this.toString();
     },
 
-    destroy: function () {
+    destroy() {
 
         var that = this;
 

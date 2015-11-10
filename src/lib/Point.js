@@ -1,25 +1,20 @@
-import {
-    isNullOrUndefined
-} from '../common/utils';
-
 import Base from './Base';
 
+const Point = Base.extend({
 
-var Point = Base.extend({
-
-    constructor: function Point(x, y) {
-        this.x = !isNullOrUndefined(x) ? x : 0;
-        this.y = !isNullOrUndefined(y) ? y : 0;
+    constructor: function Point(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
     },
 
-    equals: function (point) {
+    equals(point) {
         return point &&
             point instanceof Point &&
             point.x === this.x &&
             point.y === this.y;
     },
 
-    clone: function () {
+    clone() {
         return new Point(this.x, this.y);
     }
 });

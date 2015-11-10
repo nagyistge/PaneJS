@@ -12,8 +12,8 @@ import Base from '../lib/Base';
 
 export default Base.extend({
 
-    // 原型上的属性
-    visible: true, // 默认可见
+    // props on prototype
+    visible: true,
     transients: ['id', 'value', 'parent', 'source', 'target', 'children', 'links'],
 
     constructor: function Cell(id, value, geometry, style) {
