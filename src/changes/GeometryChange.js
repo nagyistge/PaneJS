@@ -16,7 +16,7 @@ export default Change.extend({
         var that = this;
 
         that.geometry = that.previous;
-        that.previous = that.model.geometryForCellChanged(that.cell, that.previous);
+        that.previous = that.model.geometryChanged(that.cell, that.previous);
 
         return that;
     }

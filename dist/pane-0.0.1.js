@@ -3065,7 +3065,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
 	
-	var _commonPerimeter = __webpack_require__(23);
+	var _commonPerimeter = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../common/perimeter\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var style = {};
 	
@@ -3081,569 +3081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _libPoint = __webpack_require__(24);
-	
-	var _libPoint2 = _interopRequireDefault(_libPoint);
-	
-	function rectanglePerimeter(bounds, vertex, next, orthogonal) {
-	    var cx = bounds.getCenterX();
-	    var cy = bounds.getCenterY();
-	    var dx = next.x - cx;
-	    var dy = next.y - cy;
-	    var alpha = Math.atan2(dy, dx);
-	    var p = new _libPoint2['default'](0, 0);
-	    var pi = Math.PI;
-	    var pi2 = Math.PI / 2;
-	    var beta = pi2 - alpha;
-	    var t = Math.atan2(bounds.height, bounds.width);
-	
-	    if (alpha < -pi + t || alpha > pi - t) {
-	        // Left edge
-	        p.x = bounds.x;
-	        p.y = cy - bounds.width * Math.tan(alpha) / 2;
-	    } else if (alpha < -t) {
-	        // Top Edge
-	        p.y = bounds.y;
-	        p.x = cx - bounds.height * Math.tan(beta) / 2;
-	    } else if (alpha < t) {
-	        // Right Edge
-	        p.x = bounds.x + bounds.width;
-	        p.y = cy + bounds.width * Math.tan(alpha) / 2;
-	    } else {
-	        // Bottom Edge
-	        p.y = bounds.y + bounds.height;
-	        p.x = cx + bounds.height * Math.tan(beta) / 2;
-	    }
-	
-	    if (orthogonal) {
-	        if (next.x >= bounds.x && next.x <= bounds.x + bounds.width) {
-	            p.x = next.x;
-	        } else if (next.y >= bounds.y && next.y <= bounds.y + bounds.height) {
-	            p.y = next.y;
-	        }
-	        if (next.x < bounds.x) {
-	            p.x = bounds.x;
-	        } else if (next.x > bounds.x + bounds.width) {
-	            p.x = bounds.x + bounds.width;
-	        }
-	        if (next.y < bounds.y) {
-	            p.y = bounds.y;
-	        } else if (next.y > bounds.y + bounds.height) {
-	            p.y = bounds.y + bounds.height;
-	        }
-	    }
-	
-	    return p;
-	}
-	
-	function ellipsePerimeter(bounds, vertex, next, orthogonal) {
-	    var x = bounds.x;
-	    var y = bounds.y;
-	    var a = bounds.width / 2;
-	    var b = bounds.height / 2;
-	    var cx = x + a;
-	    var cy = y + b;
-	    var px = next.x;
-	    var py = next.y;
-	
-	    // Calculates straight line equation through
-	    // point and ellipse center y = d * x + h
-	    var dx = parseInt(px - cx);
-	    var dy = parseInt(py - cy);
-	
-	    if (dx == 0 && dy != 0) {
-	        return new mxPoint(cx, cy + b * dy / Math.abs(dy));
-	    } else if (dx == 0 && dy == 0) {
-	        return new mxPoint(px, py);
-	    }
-	
-	    if (orthogonal) {
-	        if (py >= y && py <= y + bounds.height) {
-	            var ty = py - cy;
-	            var tx = Math.sqrt(a * a * (1 - ty * ty / (b * b))) || 0;
-	
-	            if (px <= x) {
-	                tx = -tx;
-	            }
-	
-	            return new mxPoint(cx + tx, py);
-	        }
-	
-	        if (px >= x && px <= x + bounds.width) {
-	            var tx = px - cx;
-	            var ty = Math.sqrt(b * b * (1 - tx * tx / (a * a))) || 0;
-	
-	            if (py <= y) {
-	                ty = -ty;
-	            }
-	
-	            return new mxPoint(px, cy + ty);
-	        }
-	    }
-	
-	    // Calculates intersection
-	    var d = dy / dx;
-	    var h = cy - d * cx;
-	    var e = a * a * d * d + b * b;
-	    var f = -2 * cx * e;
-	    var g = a * a * d * d * cx * cx + b * b * cx * cx - a * a * b * b;
-	    var det = Math.sqrt(f * f - 4 * e * g);
-	
-	    // Two solutions (perimeter points)
-	    var xout1 = (-f + det) / (2 * e);
-	    var xout2 = (-f - det) / (2 * e);
-	    var yout1 = d * xout1 + h;
-	    var yout2 = d * xout2 + h;
-	    var dist1 = Math.sqrt(Math.pow(xout1 - px, 2) + Math.pow(yout1 - py, 2));
-	    var dist2 = Math.sqrt(Math.pow(xout2 - px, 2) + Math.pow(yout2 - py, 2));
-	
-	    // Correct solution
-	    var xout = 0;
-	    var yout = 0;
-	
-	    if (dist1 < dist2) {
-	        xout = xout1;
-	        yout = yout1;
-	    } else {
-	        xout = xout2;
-	        yout = yout2;
-	    }
-	
-	    return new mxPoint(xout, yout);
-	}
-	
-	function rhombusPerimeter(bounds, vertex, next, orthogonal) {
-	    var x = bounds.x;
-	    var y = bounds.y;
-	    var w = bounds.width;
-	    var h = bounds.height;
-	
-	    var cx = x + w / 2;
-	    var cy = y + h / 2;
-	
-	    var px = next.x;
-	    var py = next.y;
-	
-	    // Special case for intersecting the diamond's corners
-	    if (cx == px) {
-	        if (cy > py) {
-	            return new mxPoint(cx, y); // top
-	        } else {
-	                return new mxPoint(cx, y + h); // bottom
-	            }
-	    } else if (cy == py) {
-	            if (cx > px) {
-	                return new mxPoint(x, cy); // left
-	            } else {
-	                    return new mxPoint(x + w, cy); // right
-	                }
-	        }
-	
-	    var tx = cx;
-	    var ty = cy;
-	
-	    if (orthogonal) {
-	        if (px >= x && px <= x + w) {
-	            tx = px;
-	        } else if (py >= y && py <= y + h) {
-	            ty = py;
-	        }
-	    }
-	
-	    // In which quadrant will the intersection be?
-	    // set the slope and offset of the border line accordingly
-	    if (px < cx) {
-	        if (py < cy) {
-	            return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
-	        } else {
-	            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
-	        }
-	    } else if (py < cy) {
-	        return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
-	    } else {
-	        return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
-	    }
-	}
-	
-	function trianglePerimeter(bounds, vertex, next, orthogonal) {
-	    var direction = vertex != null ? vertex.style[mxConstants.STYLE_DIRECTION] : null;
-	    var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
-	
-	    var x = bounds.x;
-	    var y = bounds.y;
-	    var w = bounds.width;
-	    var h = bounds.height;
-	
-	    var cx = x + w / 2;
-	    var cy = y + h / 2;
-	
-	    var start = new mxPoint(x, y);
-	    var corner = new mxPoint(x + w, cy);
-	    var end = new mxPoint(x, y + h);
-	
-	    if (direction == mxConstants.DIRECTION_NORTH) {
-	        start = end;
-	        corner = new mxPoint(cx, y);
-	        end = new mxPoint(x + w, y + h);
-	    } else if (direction == mxConstants.DIRECTION_SOUTH) {
-	        corner = new mxPoint(cx, y + h);
-	        end = new mxPoint(x + w, y);
-	    } else if (direction == mxConstants.DIRECTION_WEST) {
-	        start = new mxPoint(x + w, y);
-	        corner = new mxPoint(x, cy);
-	        end = new mxPoint(x + w, y + h);
-	    }
-	
-	    var dx = next.x - cx;
-	    var dy = next.y - cy;
-	
-	    var alpha = vertical ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
-	    var t = vertical ? Math.atan2(w, h) : Math.atan2(h, w);
-	
-	    var base = false;
-	
-	    if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_WEST) {
-	        base = alpha > -t && alpha < t;
-	    } else {
-	        base = alpha < -Math.PI + t || alpha > Math.PI - t;
-	    }
-	
-	    var result = null;
-	
-	    if (base) {
-	        if (orthogonal && (vertical && next.x >= start.x && next.x <= end.x || !vertical && next.y >= start.y && next.y <= end.y)) {
-	            if (vertical) {
-	                result = new mxPoint(next.x, start.y);
-	            } else {
-	                result = new mxPoint(start.x, next.y);
-	            }
-	        } else {
-	            if (direction == mxConstants.DIRECTION_NORTH) {
-	                result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2, y + h);
-	            } else if (direction == mxConstants.DIRECTION_SOUTH) {
-	                result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2, y);
-	            } else if (direction == mxConstants.DIRECTION_WEST) {
-	                result = new mxPoint(x + w, y + h / 2 + w * Math.tan(alpha) / 2);
-	            } else {
-	                result = new mxPoint(x, y + h / 2 - w * Math.tan(alpha) / 2);
-	            }
-	        }
-	    } else {
-	        if (orthogonal) {
-	            var pt = new mxPoint(cx, cy);
-	
-	            if (next.y >= y && next.y <= y + h) {
-	                pt.x = vertical ? cx : direction == mxConstants.DIRECTION_WEST ? x + w : x;
-	                pt.y = next.y;
-	            } else if (next.x >= x && next.x <= x + w) {
-	                pt.x = next.x;
-	                pt.y = !vertical ? cy : direction == mxConstants.DIRECTION_NORTH ? y + h : y;
-	            }
-	
-	            // Compute angle
-	            dx = next.x - pt.x;
-	            dy = next.y - pt.y;
-	
-	            cx = pt.x;
-	            cy = pt.y;
-	        }
-	
-	        if (vertical && next.x <= x + w / 2 || !vertical && next.y <= y + h / 2) {
-	            result = mxUtils.intersection(next.x, next.y, cx, cy, start.x, start.y, corner.x, corner.y);
-	        } else {
-	            result = mxUtils.intersection(next.x, next.y, cx, cy, corner.x, corner.y, end.x, end.y);
-	        }
-	    }
-	
-	    if (result == null) {
-	        result = new mxPoint(cx, cy);
-	    }
-	
-	    return result;
-	}
-	
-	function hexagonPerimeter(bounds, vertex, next, orthogonal) {
-	    var x = bounds.x;
-	    var y = bounds.y;
-	    var w = bounds.width;
-	    var h = bounds.height;
-	
-	    var cx = bounds.getCenterX();
-	    var cy = bounds.getCenterY();
-	    var px = next.x;
-	    var py = next.y;
-	    var dx = px - cx;
-	    var dy = py - cy;
-	    var alpha = -Math.atan2(dy, dx);
-	    var pi = Math.PI;
-	    var pi2 = Math.PI / 2;
-	
-	    var result = new mxPoint(cx, cy);
-	
-	    var direction = vertex != null ? mxUtils.getValue(vertex.style, mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-	    var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
-	    var a = new mxPoint();
-	    var b = new mxPoint();
-	
-	    //Only consider corrects quadrants for the orthogonal case.
-	    if (px < x && py < y || px < x && py > y + h || px > x + w && py < y || px > x + w && py > y + h) {
-	        orthogonal = false;
-	    }
-	
-	    if (orthogonal) {
-	        if (vertical) {
-	            //Special cases where intersects with hexagon corners
-	            if (px == cx) {
-	                if (py <= y) {
-	                    return new mxPoint(cx, y);
-	                } else if (py >= y + h) {
-	                    return new mxPoint(cx, y + h);
-	                }
-	            } else if (px < x) {
-	                if (py == y + h / 4) {
-	                    return new mxPoint(x, y + h / 4);
-	                } else if (py == y + 3 * h / 4) {
-	                    return new mxPoint(x, y + 3 * h / 4);
-	                }
-	            } else if (px > x + w) {
-	                if (py == y + h / 4) {
-	                    return new mxPoint(x + w, y + h / 4);
-	                } else if (py == y + 3 * h / 4) {
-	                    return new mxPoint(x + w, y + 3 * h / 4);
-	                }
-	            } else if (px == x) {
-	                if (py < cy) {
-	                    return new mxPoint(x, y + h / 4);
-	                } else if (py > cy) {
-	                    return new mxPoint(x, y + 3 * h / 4);
-	                }
-	            } else if (px == x + w) {
-	                if (py < cy) {
-	                    return new mxPoint(x + w, y + h / 4);
-	                } else if (py > cy) {
-	                    return new mxPoint(x + w, y + 3 * h / 4);
-	                }
-	            }
-	            if (py == y) {
-	                return new mxPoint(cx, y);
-	            } else if (py == y + h) {
-	                return new mxPoint(cx, y + h);
-	            }
-	
-	            if (px < cx) {
-	                if (py > y + h / 4 && py < y + 3 * h / 4) {
-	                    a = new mxPoint(x, y);
-	                    b = new mxPoint(x, y + h);
-	                } else if (py < y + h / 4) {
-	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
-	                } else if (py > y + 3 * h / 4) {
-	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
-	                }
-	            } else if (px > cx) {
-	                if (py > y + h / 4 && py < y + 3 * h / 4) {
-	                    a = new mxPoint(x + w, y);
-	                    b = new mxPoint(x + w, y + h);
-	                } else if (py < y + h / 4) {
-	                    a = new mxPoint(x, y - Math.floor(0.25 * h));
-	                    b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                } else if (py > y + 3 * h / 4) {
-	                    a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                    b = new mxPoint(x, y + Math.floor(1.25 * h));
-	                }
-	            }
-	        } else {
-	            //Special cases where intersects with hexagon corners
-	            if (py == cy) {
-	                if (px <= x) {
-	                    return new mxPoint(x, y + h / 2);
-	                } else if (px >= x + w) {
-	                    return new mxPoint(x + w, y + h / 2);
-	                }
-	            } else if (py < y) {
-	                if (px == x + w / 4) {
-	                    return new mxPoint(x + w / 4, y);
-	                } else if (px == x + 3 * w / 4) {
-	                    return new mxPoint(x + 3 * w / 4, y);
-	                }
-	            } else if (py > y + h) {
-	                if (px == x + w / 4) {
-	                    return new mxPoint(x + w / 4, y + h);
-	                } else if (px == x + 3 * w / 4) {
-	                    return new mxPoint(x + 3 * w / 4, y + h);
-	                }
-	            } else if (py == y) {
-	                if (px < cx) {
-	                    return new mxPoint(x + w / 4, y);
-	                } else if (px > cx) {
-	                    return new mxPoint(x + 3 * w / 4, y);
-	                }
-	            } else if (py == y + h) {
-	                if (px < cx) {
-	                    return new mxPoint(x + w / 4, y + h);
-	                } else if (py > cy) {
-	                    return new mxPoint(x + 3 * w / 4, y + h);
-	                }
-	            }
-	            if (px == x) {
-	                return new mxPoint(x, cy);
-	            } else if (px == x + w) {
-	                return new mxPoint(x + w, cy);
-	            }
-	
-	            if (py < cy) {
-	                if (px > x + w / 4 && px < x + 3 * w / 4) {
-	                    a = new mxPoint(x, y);
-	                    b = new mxPoint(x + w, y);
-	                } else if (px < x + w / 4) {
-	                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
-	                    b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                } else if (px > x + 3 * w / 4) {
-	                    a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
-	                }
-	            } else if (py > cy) {
-	                if (px > x + w / 4 && px < x + 3 * w / 4) {
-	                    a = new mxPoint(x, y + h);
-	                    b = new mxPoint(x + w, y + h);
-	                } else if (px < x + w / 4) {
-	                    a = new mxPoint(x - Math.floor(0.25 * w), y);
-	                    b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                } else if (px > x + 3 * w / 4) {
-	                    a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                    b = new mxPoint(x + Math.floor(1.25 * w), y);
-	                }
-	            }
-	        }
-	
-	        var tx = cx;
-	        var ty = cy;
-	
-	        if (px >= x && px <= x + w) {
-	            tx = px;
-	
-	            if (py < cy) {
-	                ty = y + h;
-	            } else {
-	                ty = y;
-	            }
-	        } else if (py >= y && py <= y + h) {
-	            ty = py;
-	
-	            if (px < cx) {
-	                tx = x + w;
-	            } else {
-	                tx = x;
-	            }
-	        }
-	
-	        result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
-	    } else {
-	        if (vertical) {
-	            var beta = Math.atan2(h / 4, w / 2);
-	
-	            //Special cases where intersects with hexagon corners
-	            if (alpha == beta) {
-	                return new mxPoint(x + w, y + Math.floor(0.25 * h));
-	            } else if (alpha == pi2) {
-	                return new mxPoint(x + Math.floor(0.5 * w), y);
-	            } else if (alpha == pi - beta) {
-	                return new mxPoint(x, y + Math.floor(0.25 * h));
-	            } else if (alpha == -beta) {
-	                return new mxPoint(x + w, y + Math.floor(0.75 * h));
-	            } else if (alpha == -pi2) {
-	                return new mxPoint(x + Math.floor(0.5 * w), y + h);
-	            } else if (alpha == -pi + beta) {
-	                return new mxPoint(x, y + Math.floor(0.75 * h));
-	            }
-	
-	            if (alpha < beta && alpha > -beta) {
-	                a = new mxPoint(x + w, y);
-	                b = new mxPoint(x + w, y + h);
-	            } else if (alpha > beta && alpha < pi2) {
-	                a = new mxPoint(x, y - Math.floor(0.25 * h));
-	                b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	            } else if (alpha > pi2 && alpha < pi - beta) {
-	                a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                b = new mxPoint(x + w, y - Math.floor(0.25 * h));
-	            } else if (alpha > pi - beta && alpha <= pi || alpha < -pi + beta && alpha >= -pi) {
-	                a = new mxPoint(x, y);
-	                b = new mxPoint(x, y + h);
-	            } else if (alpha < -beta && alpha > -pi2) {
-	                a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                b = new mxPoint(x, y + Math.floor(1.25 * h));
-	            } else if (alpha < -pi2 && alpha > -pi + beta) {
-	                a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                b = new mxPoint(x + w, y + Math.floor(1.25 * h));
-	            }
-	        } else {
-	            var beta = Math.atan2(h / 2, w / 4);
-	
-	            //Special cases where intersects with hexagon corners
-	            if (alpha == beta) {
-	                return new mxPoint(x + Math.floor(0.75 * w), y);
-	            } else if (alpha == pi - beta) {
-	                return new mxPoint(x + Math.floor(0.25 * w), y);
-	            } else if (alpha == pi || alpha == -pi) {
-	                return new mxPoint(x, y + Math.floor(0.5 * h));
-	            } else if (alpha == 0) {
-	                return new mxPoint(x + w, y + Math.floor(0.5 * h));
-	            } else if (alpha == -beta) {
-	                return new mxPoint(x + Math.floor(0.75 * w), y + h);
-	            } else if (alpha == -pi + beta) {
-	                return new mxPoint(x + Math.floor(0.25 * w), y + h);
-	            }
-	
-	            if (alpha > 0 && alpha < beta) {
-	                a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                b = new mxPoint(x + Math.floor(1.25 * w), y + h);
-	            } else if (alpha > beta && alpha < pi - beta) {
-	                a = new mxPoint(x, y);
-	                b = new mxPoint(x + w, y);
-	            } else if (alpha > pi - beta && alpha < pi) {
-	                a = new mxPoint(x - Math.floor(0.25 * w), y + h);
-	                b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	            } else if (alpha < 0 && alpha > -beta) {
-	                a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                b = new mxPoint(x + Math.floor(1.25 * w), y);
-	            } else if (alpha < -beta && alpha > -pi + beta) {
-	                a = new mxPoint(x, y + h);
-	                b = new mxPoint(x + w, y + h);
-	            } else if (alpha < -pi + beta && alpha > -pi) {
-	                a = new mxPoint(x - Math.floor(0.25 * w), y);
-	                b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	            }
-	        }
-	
-	        result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
-	    }
-	
-	    if (result == null) {
-	        return new mxPoint(cx, cy);
-	    }
-	
-	    return result;
-	}
-	
-	exports.rectanglePerimeter = rectanglePerimeter;
-	exports.ellipsePerimeter = ellipsePerimeter;
-	exports.rhombusPerimeter = rhombusPerimeter;
-	exports.trianglePerimeter = trianglePerimeter;
-	exports.hexagonPerimeter = hexagonPerimeter;
-
-/***/ },
+/* 23 */,
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3852,10 +3290,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    eachChild: function eachChild(iterator, context) {
 	
 	        var that = this;
+	        var children = that.children;
 	
-	        (0, _commonUtils.each)(that.children || [], iterator, context);
+	        children && (0, _commonUtils.each)(children, iterator, context);
 	
 	        return that;
+	    },
+	
+	    filterChild: function filterChild(iterator, context) {
+	        var children = this.children;
+	        return children ? (0, _commonUtils.filter)(children, iterator, context) : [];
 	    },
 	
 	    insertChild: function insertChild(child, index) {
@@ -3927,11 +3371,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    eachLink: function eachLink(iterator, context) {
-	        var that = this;
 	
-	        (0, _commonUtils.each)(that.links || [], iterator, context);
+	        var that = this;
+	        var links = that.links;
+	
+	        links && (0, _commonUtils.each)(links, iterator, context);
 	
 	        return that;
+	    },
+	
+	    filterLink: function filterLink(iterator, context) {
+	        var links = this.links;
+	        return links ? (0, _commonUtils.filter)(links, iterator, context) : [];
 	    },
 	
 	    insertLink: function insertLink(link, outgoing) {
@@ -4186,6 +3637,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	
 	        return Geometry.superclass.equals.call(that, geo) && that.relative === geo.relative && (0, _commonUtils.isEqualEntity)(that.sourcePoint, geom.sourcePoint) && (0, _commonUtils.isEqualEntity)(that.targetPoint, geom.targetPoint) && (0, _commonUtils.isEqualEntity)(that.offset, geom.offset) && (0, _commonUtils.isEqualEntities)(that.points, geom.points) && (0, _commonUtils.isEqualEntity)(that.alternateBounds, geom.alternateBounds);
+	    },
+	
+	    clone: function clone() {
+	        return (0, _commonUtils.clone)(this);
 	    }
 	});
 	
@@ -7745,6 +7200,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
+	var _commonObjectIdentity = __webpack_require__(31);
+	
+	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
+	
 	// events
 	
 	var _eventsAspect = __webpack_require__(45);
@@ -7769,9 +7228,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
+	var _changesValueChange = __webpack_require__(56);
+	
+	var _changesValueChange2 = _interopRequireDefault(_changesValueChange);
+	
+	var _changesStyleChange = __webpack_require__(58);
+	
+	var _changesStyleChange2 = _interopRequireDefault(_changesStyleChange);
+	
+	var _changesVisibleChange = __webpack_require__(59);
+	
+	var _changesVisibleChange2 = _interopRequireDefault(_changesVisibleChange);
+	
 	var _changesTerminalChange = __webpack_require__(54);
 	
 	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
+	
+	var _changesGeometryChange = __webpack_require__(57);
+	
+	var _changesGeometryChange2 = _interopRequireDefault(_changesGeometryChange);
+	
+	var _changesCollapseChange = __webpack_require__(60);
+	
+	var _changesCollapseChange2 = _interopRequireDefault(_changesCollapseChange);
 	
 	var _changesChangeCollection = __webpack_require__(50);
 	
@@ -7806,12 +7285,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    clear: function clear() {
-	        var that = this;
-	        that.setRoot(that.createRoot());
-	        return that;
+	        return this.setRoot(this.createRoot());
 	    },
 	
 	    isAncestor: function isAncestor(parent, child) {
+	
+	        if (!parent || !child) {
+	            return false;
+	        }
+	
 	        while (child && child !== parent) {
 	            child = child.parent;
 	        }
@@ -7827,8 +7309,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.cells ? this.cells[id] : null;
 	    },
 	
-	    // 按照层级获取所有父节点
-	    getParents: function getParents(child) {
+	    createId: function createId() {
+	        var that = this;
+	        var id = that.nextId;
+	
+	        that.nextId += 1;
+	
+	        return that.prefix + id + that.postfix;
+	    },
+	
+	    getAncestors: function getAncestors(child) {
 	
 	        var that = this;
 	        var result = [];
@@ -7836,13 +7326,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (parent) {
 	            result.push(parent);
-	            result = result.concat(that.getParents(parent));
+	            result = result.concat(that.getAncestors(parent));
 	        }
 	
 	        return result;
 	    },
 	
-	    // 获取子孙节点
 	    getDescendants: function getDescendants(parent) {
 	
 	        var that = this;
@@ -7855,6 +7344,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	
 	        return result;
+	    },
+	
+	    getParents: function getParents(cells) {
+	
+	        var parents = [];
+	
+	        if (cells) {
+	
+	            var hash = {};
+	
+	            (0, _commonUtils.each)(cells, function (cell) {
+	                var parent = cell.parent;
+	
+	                if (parent) {
+	                    var id = mxCellPath.create(parent);
+	
+	                    if (!hash[id]) {
+	                        hash[id] = parent;
+	                        parents.push(parent);
+	                    }
+	                }
+	            });
+	        }
+	
+	        return parents;
 	    },
 	
 	    // Root
@@ -7887,12 +7401,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    setRoot: function setRoot(root) {
-	        var that = this;
-	        that.digest(new _changesRootChange2['default'](that, root));
-	        return that;
+	        return this.digest(new _changesRootChange2['default'](this, root));
 	    },
 	
-	    // RootChange 的回调处理
 	    rootChanged: function rootChanged(newRoot) {
 	
 	        var that = this;
@@ -7908,21 +7419,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Layers
 	    // ------
+	
 	    isLayer: function isLayer(cell) {
 	        return cell && this.isRoot(cell.parent);
 	    },
 	
-	    // 获取所有图层
 	    getLayers: function getLayers() {
-	        // 根节点的所有子节点就是图层
 	        return this.getRoot().children || [];
 	    },
 	
-	    // Changes
-	    // -------
+	    // child
+	    // -----
 	
-	    //
-	    //
+	    getParent: function getParent(cell) {
+	        return cell ? cell.parent : null;
+	    },
 	
 	    add: function add(parent, child, index) {
 	
@@ -7938,26 +7449,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            that.digest(new _changesChildChange2['default'](that, parent, child, index));
 	
-	            // TODO: maintainEdgeParent
+	            // move the links into the nearest common ancestor of its terminals
 	            if (that.maintainEdgeParent && parentChanged) {
-	                that.updateEdgeParents(child);
+	                that.updateLinkParents(child);
 	            }
 	        }
 	
 	        return that;
 	    },
 	
-	    remove: function remove(cell) {
-	        if (cell == this.root) {
-	            this.setRoot(null);
-	        } else if (this.getParent(cell) != null) {
-	            this.execute(new _changesChildChange2['default'](this, null, cell));
-	        }
-	
-	        return cell;
-	    },
-	
-	    // cell 添加到画布后的处理工作
 	    cellAdded: function cellAdded(cell) {
 	
 	        var that = this;
@@ -7970,8 +7470,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                id = that.createId(cell);
 	            }
 	
-	            // 去重
 	            if (id) {
+	
+	                // distinct
 	                var collision = that.getCellById(id);
 	
 	                if (collision !== cell) {
@@ -7980,6 +7481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        collision = that.getCellById(id);
 	                    }
 	
+	                    // as lazy as possible
 	                    if (!that.cells) {
 	                        that.cells = {};
 	                    }
@@ -7989,7 +7491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            // 修正 nextId
+	            // fix nextId
 	            if ((0, _commonUtils.isNumeric)(id)) {
 	                that.nextId = Math.max(that.nextId, id);
 	            }
@@ -7998,36 +7500,167 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    // cell 移除画布后的清理工作
+	    updateLinkParents: function updateLinkParents(cell, root) {
+	
+	        var that = this;
+	
+	        root = root || that.getRoot(cell);
+	
+	        // update links on children first
+	        cell.eachChild(function (child) {
+	            that.updateEdgeParents(child, root);
+	        });
+	
+	        // update the parents of all connected links
+	        cell.eachLink(function (link) {
+	            // update edge parent if edge and child have
+	            // a common root node (does not need to be the
+	            // model root node)
+	            if (that.isAncestor(root, link)) {
+	                that.updateLinkParent(link, root);
+	            }
+	        });
+	    },
+	
+	    updateLinkParent: function updateLinkParent(link, root) {
+	
+	        var that = this;
+	        var cell = null;
+	        var source = link.getTerminal(true);
+	        var target = link.getTerminal(false);
+	
+	        // use the first non-relative descendants of the source terminal
+	        while (source && !source.isLink && source.geometry && source.geometry.relative) {
+	            source = source.parent;
+	        }
+	
+	        // use the first non-relative descendants of the target terminal
+	        while (target && !target.isLink && target.geometry && target.geometry.relative) {
+	            target = target.parent;
+	        }
+	
+	        if (that.isAncestor(root, source) && that.isAncestor(root, target)) {
+	
+	            if (source === target) {
+	                cell = source.parent;
+	            } else {
+	                cell = that.getNearestCommonAncestor(source, target);
+	            }
+	
+	            if (cell && (cell.parent !== that.root || that.isAncestor(cell, link)) && link.parent !== cell) {
+	
+	                var geo = link.geometry;
+	
+	                if (geo) {
+	                    var origin1 = that.getOrigin(link.parent);
+	                    var origin2 = that.getOrigin(cell);
+	
+	                    var dx = origin2.x - origin1.x;
+	                    var dy = origin2.y - origin1.y;
+	
+	                    geo = geo.clone();
+	                    geo.translate(-dx, -dy);
+	                    that.setGeometry(link, geo);
+	                }
+	
+	                that.add(cell, link);
+	            }
+	        }
+	    },
+	
+	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {
+	        if (cell1 && cell2) {
+	            var path = mxCellPath.create(cell2);
+	
+	            if (path && path.length > 0) {
+	                // Bubbles through the ancestors of the first
+	                // cell to find the nearest common ancestor.
+	                var cell = cell1;
+	                var current = mxCellPath.create(cell);
+	
+	                // Inverts arguments
+	                if (path.length < current.length) {
+	                    cell = cell2;
+	                    var tmp = current;
+	                    current = path;
+	                    path = tmp;
+	                }
+	
+	                while (cell) {
+	                    var parent = cell.parent;
+	
+	                    // Checks if the cell path is equal to the beginning of the given cell path
+	                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+	                        return cell;
+	                    }
+	
+	                    current = mxCellPath.getParentPath(current);
+	                    cell = parent;
+	                }
+	            }
+	        }
+	
+	        return null;
+	    },
+	
+	    // get the absolute, accumulated origin for the children
+	    // inside the given parent as an `Point`.
+	    getOrigin: function getOrigin(cell) {
+	
+	        var that = this;
+	        var result = null;
+	
+	        if (cell) {
+	            result = that.getOrigin(cell.parent);
+	
+	            if (!cell.isLink) {
+	                var geo = cell.geometry;
+	
+	                if (geo) {
+	                    result.x += geo.x;
+	                    result.y += geo.y;
+	                }
+	            }
+	        } else {
+	            result = new Point();
+	        }
+	
+	        return result;
+	    },
+	
+	    remove: function remove(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	            if (cell === that.root) {
+	                that.setRoot(null);
+	            } else if (cell.parent) {
+	                that.digest(new _changesChildChange2['default'](that, null, cell));
+	            }
+	        }
+	
+	        return cell;
+	    },
+	
 	    cellRemoved: function cellRemoved(cell) {
 	
 	        var that = this;
-	        var cells = that.cells;
 	
-	        if (cell && cells) {
+	        if (cell) {
 	
-	            if (cell.isNode) {
-	                cell.eachChild(function (child) {
-	                    that.cellRemoved(child);
-	                });
-	            }
+	            cell.eachChild(function (child) {
+	                that.cellRemoved(child);
+	            });
 	
 	            var id = cell.id;
-	            if (cells && !(0, _commonUtils.isUndefined)(id)) {
+	            var cells = that.cells;
+	            if (cells && id) {
 	                delete cells[id];
 	            }
 	        }
 	    },
 	
-	    updateEdgeParents: function updateEdgeParents(cell, root) {},
-	
-	    updateEdgeParent: function updateEdgeParent(edge, root) {},
-	
-	    getOrigin: function getOrigin(cell) {},
-	
-	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {},
-	
-	    // ChildChange 的回调处理
 	    childChanged: function childChanged(cell, newParent, newIndex) {
 	
 	        var that = this;
@@ -8041,7 +7674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            oldParent.removeChild(cell);
 	        }
 	
-	        // Checks if the previous parent was already in the
+	        // check if the previous parent was already in the
 	        // model and avoids calling cellAdded if it was.
 	        if (newParent && !that.contains(oldParent)) {
 	            that.cellAdded(cell);
@@ -8052,7 +7685,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return oldParent;
 	    },
 	
-	    // ChildChange 的回调处理，处理连线连接的节点
 	    linkChanged: function linkChanged(link, newNode, isSource) {
 	        var oldNode = link.getNode(isSource);
 	
@@ -8065,26 +7697,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return oldNode;
 	    },
 	
-	    collapsedStateForCellChanged: function collapsedStateForCellChanged(cell, collapsed) {},
+	    getChildNodes: function getChildNodes(parent) {
+	        return this.getChildCells(parent, true, false);
+	    },
+	
+	    getChildLinks: function getChildLinks(parent) {
+	        return this.getChildCells(parent, false, true);
+	    },
+	
+	    getChildCells: function getChildCells(parent, isNode, isLink) {
+	        return parent ? parent.filterChild(function (child) {
+	            return isNode && child.isNode || isLink && child.isLink;
+	        }) : [];
+	    },
+	
+	    // link
+	    // ----
 	
 	    getTerminal: function getTerminal(link, isSource) {
 	        return link ? link.getTerminal(isSource) : null;
 	    },
 	
 	    setTerminal: function setTerminal(link, node, isSource) {
-	        var terminalChanged = node !== this.getTerminal(link, isSource);
-	        this.digest(new _changesTerminalChange2['default'](this, link, node, isSource));
 	
-	        if (this.maintainEdgeParent && terminalChanged) {
-	            this.updateEdgeParent(link, this.getRoot());
+	        var that = this;
+	        var terminalChanged = node !== link.getTerminal(isSource);
+	        that.digest(new _changesTerminalChange2['default'](that, link, node, isSource));
+	
+	        if (that.maintainEdgeParent && terminalChanged) {
+	            that.updateEdgeParent(link, that.getRoot());
 	        }
 	
-	        return node;
+	        return that;
 	    },
 	
-	    // 连线的起点节点或终点节点改变后
-	    terminalForCellChanged: function terminalForCellChanged(link, node, isSource) {
-	        var previous = this.getTerminal(link, isSource);
+	    terminalChanged: function terminalChanged(link, node, isSource) {
+	
+	        var previous = link.getTerminal(isSource);
 	
 	        if (node) {
 	            node.insertLink(link, isSource);
@@ -8095,14 +7744,224 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return previous;
 	    },
 	
-	    createId: function createId() {
-	        var that = this;
-	        var id = that.nextId;
+	    getDirectedLinkCount: function getDirectedLinkCount(cell, outgoing, ignoredEdge) {
+	        var count = 0;
 	
-	        that.nextId += 1;
+	        cell.eachLink(function (link) {
+	            if (link !== ignoredEdge && link.getTerminal(outgoing) === cell) {
+	                count++;
+	            }
+	        });
 	
-	        return that.prefix + id + that.postfix;
+	        return count;
 	    },
+	
+	    getConnections: function getConnections(cell) {
+	        return this.getLinks(cell, true, true, false);
+	    },
+	
+	    getIncomingLinks: function getIncomingLinks(cell) {
+	        return this.getLinks(cell, true, false, false);
+	    },
+	
+	    getOutgoingLinks: function getOutgoingLinks(cell) {
+	        return this.getLinks(cell, false, true, false);
+	    },
+	
+	    getLinks: function getLinks(cell, incoming, outgoing, includeLoops) {
+	        return cell.filterLink(function (link) {
+	            var source = link.source;
+	            var target = link.target;
+	
+	            if (source !== target) {
+	                if (incoming && target === cell || outgoing && source === cell) {
+	                    return true;
+	                }
+	            } else {
+	                if (includeLoops) {
+	                    return true;
+	                }
+	            }
+	        });
+	    },
+	
+	    // Return all links between the given source and target pair.
+	    // If directed is true, then only links from the source to the target
+	    // are returned, otherwise, all edges between the two cells are returned.
+	    getLinksBetween: function getLinksBetween(source, target, directed) {
+	        var tmp1 = source.getLinkCount();
+	        var tmp2 = target.getLinkCount();
+	
+	        // use the smaller array of connected edges for searching
+	        var terminal = tmp1 < tmp2 ? source : target;
+	
+	        return terminal.filterLink(function (link) {
+	            var src = link.source;
+	            var trg = link.target;
+	
+	            var directedMatch = src == source && trg == target;
+	            var oppositeMatch = trg == source && src == target;
+	
+	            return directedMatch || !directed && oppositeMatch;
+	        });
+	    },
+	
+	    getOpposites: function getOpposites(links, terminal, isSource, isTarget) {
+	        var result = [];
+	
+	        links && (0, _commonUtils.each)(links, function (link) {
+	            var source = link.source;
+	            var target = link.target;
+	
+	            if (source === terminal && target && target !== terminal && isTarget) {
+	                result.push(target);
+	            } else if (target === terminal && source && source !== terminal && isSource) {
+	                result.push(source);
+	            }
+	        });
+	
+	        return result;
+	    },
+	
+	    getTopmostCells: function getTopmostCells(cells) {
+	        var result = [];
+	
+	        cells && (0, _commonUtils.each)(cells, function (cell) {
+	
+	            var topmost = true;
+	            var parent = cell.parent;
+	
+	            while (parent) {
+	                if ((0, _commonUtils.indexOf)(cells, parent) >= 0) {
+	                    topmost = false;
+	                    break;
+	                }
+	
+	                parent = parent.parent;
+	            }
+	
+	            if (topmost) {
+	                result.push(cell);
+	            }
+	        });
+	
+	        return result;
+	    },
+	
+	    // value
+	    // -----
+	    getValue: function getValue(cell) {
+	        return cell ? cell.value : null;
+	    },
+	
+	    setValue: function setValue(cell, value) {
+	        return this.digest(new _changesValueChange2['default'](this, cell, value));
+	    },
+	
+	    valueChanged: function valueChanged(cell, value) {
+	        var previous = cell.value;
+	        cell.value = value;
+	        return previous;
+	    },
+	
+	    // geometry
+	    // --------
+	
+	    getGeometry: function getGeometry(cell) {
+	        return cell ? cell.geometry : null;
+	    },
+	
+	    setGeometry: function setGeometry(cell, geometry) {
+	
+	        var that = this;
+	
+	        if (geometry !== cell.geometry) {
+	            that.digest(new _changesGeometryChange2['default'](that, cell, geometry));
+	        }
+	
+	        return that;
+	    },
+	
+	    geometryChanged: function geometryChanged(cell, geometry) {
+	        var previous = cell.geometry;
+	        cell.geometry = geometry;
+	        return previous;
+	    },
+	
+	    // style
+	    // -----
+	
+	    getStyle: function getStyle(cell) {
+	        return cell ? cell.style : null;
+	    },
+	
+	    setStyle: function setStyle(cell, style) {
+	
+	        var that = this;
+	
+	        if (style !== cell.style) {
+	            that.digest(new _changesStyleChange2['default'](that, cell, style));
+	        }
+	
+	        return that;
+	    },
+	
+	    styleChanged: function styleChanged(cell, style) {
+	        var previous = cell.geometry;
+	        cell.style = style;
+	        return previous;
+	    },
+	
+	    // collapse
+	    // --------
+	
+	    isCollapsed: function isCollapsed(cell) {
+	        return cell ? cell.collapsed : false;
+	    },
+	
+	    setCollapsed: function setCollapsed(cell, collapsed) {
+	
+	        var that = this;
+	
+	        if (collapsed !== cell.collapsed) {
+	            that.digest(new _changesCollapseChange2['default'](that, cell, collapsed));
+	        }
+	
+	        return that;
+	    },
+	
+	    collapseChanged: function collapseChanged(cell, collapsed) {
+	        var previous = cell.collapsed;
+	        cell.collapsed = collapsed;
+	        return previous;
+	    },
+	
+	    // visible
+	    // -------
+	
+	    isVisible: function isVisible(cell) {
+	        return cell ? cell.visible : false;
+	    },
+	
+	    setVisible: function setVisible(cell, visible) {
+	
+	        var that = this;
+	
+	        if (visible !== cell.visible) {
+	            that.digest(new _changesVisibleChange2['default'](that, cell, visible));
+	        }
+	
+	        return that;
+	    },
+	
+	    visibleChanged: function visibleChanged(cell, visible) {
+	        var previous = cell.visible;
+	        cell.visible = visible;
+	        return previous;
+	    },
+	
+	    // update
+	    // ------
 	
 	    digest: function digest(change) {
 	
@@ -8151,6 +8010,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            that.endingUpdate = false;
+	        }
+	    },
+	
+	    // clone
+	    // -----
+	
+	    cloneCell: function cloneCell(cell) {
+	        return cell ? this.cloneCells([cell], true) : null;
+	    },
+	
+	    cloneCells: function cloneCells(cells, recurse) {
+	
+	        var that = this;
+	        var clones = [];
+	        var mapping = {};
+	
+	        cells && (0, _commonUtils.each)(cells, function (cell) {
+	            if (cell) {
+	                clones.push(that.doCellClone(cell, mapping, recurse));
+	            } else {
+	                clones.push(null);
+	            }
+	        });
+	
+	        for (var i = 0; i < clones.length; i++) {
+	            if (clones[i]) {
+	                this.restoreClone(clones[i], cells[i], mapping);
+	            }
+	        }
+	
+	        return clones;
+	    },
+	
+	    doCellClone: function doCellClone(cell, mapping, recurse) {
+	
+	        var that = this;
+	        var cloned = cell.clone();
+	
+	        mapping[_commonObjectIdentity2['default'].get(cell)] = cloned;
+	
+	        if (recurse) {
+	            cell.eachChild(function (child) {
+	                var cloneChild = that.doCellClone(child, mapping, recurse);
+	                cloned.insert(cloneChild);
+	            });
+	        }
+	
+	        return cloned;
+	    },
+	
+	    restoreClone: function restoreClone(clone, cell, mapping) {
+	
+	        var that = this;
+	        var temp;
+	        var source = cell.source;
+	        if (source) {
+	            temp = mapping[_commonObjectIdentity2['default'].get(source)];
+	            if (temp) {
+	                temp.insertLink(clone, true);
+	            }
+	        }
+	
+	        var target = cell.target;
+	        if (target) {
+	            temp = mapping[_commonObjectIdentity2['default'].get(target)];
+	            if (temp) {
+	                temp.insertLink(clone, false);
+	            }
+	        }
+	
+	        clone.eachChild(function (child, index) {
+	            that.restoreClone(child, cell.getChildAt(index), mapping);
+	        });
+	
+	        var childCount = this.getChildCount(clone);
+	
+	        for (var i = 0; i < childCount; i++) {
+	            this.restoreClone(this.getChildAt(clone, i), this.getChildAt(cell, i), mapping);
 	        }
 	    }
 	});
@@ -8759,7 +8696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	
 	        that.terminal = that.previous;
-	        that.previous = that.model.terminalForCellChanged(that.cell, that.previous, that.isSource);
+	        that.previous = that.model.terminalChanged(that.cell, that.previous, that.isSource);
 	
 	        return that;
 	    }
@@ -9316,6 +9253,201 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return result;
 	    }
 	};
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(48);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function ValueChange(model, cell, value) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.value = value;
+	        that.previous = value;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.value = that.previous;
+	        that.previous = that.model.valueChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(48);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function GeometryChange(model, cell, geometry) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.geometry = geometry;
+	        that.previous = geometry;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.geometry = that.previous;
+	        that.previous = that.model.geometryChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(48);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function StyleChange(model, cell, style) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.style = style;
+	        that.previous = style;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.style = that.previous;
+	        that.previous = that.model.styleChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 59 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(48);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function VisibleChange(model, cell, visible) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.visible = visible;
+	        that.previous = visible;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.visible = that.previous;
+	        that.previous = that.model.visibleChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(48);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function CollapseChange(model, cell, collapsed) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.collapsed = collapsed;
+	        that.previous = collapsed;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.collapsed = that.previous;
+	        that.previous = that.model.collapseChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

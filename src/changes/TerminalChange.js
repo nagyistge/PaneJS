@@ -17,7 +17,7 @@ export default Change.extend({
         var that = this;
 
         that.terminal = that.previous;
-        that.previous = that.model.terminalForCellChanged(that.cell, that.previous, that.isSource);
+        that.previous = that.model.terminalChanged(that.cell, that.previous, that.isSource);
 
         return that;
     }

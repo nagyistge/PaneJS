@@ -16,7 +16,7 @@ export default Change.extend({
         var that = this;
 
         that.visible = that.previous;
-        that.previous = that.model.visibleStateForCellChanged(that.cell, that.previous);
+        that.previous = that.model.visibleChanged(that.cell, that.previous);
 
         return that;
     }

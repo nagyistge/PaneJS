@@ -16,7 +16,7 @@ export default Change.extend({
         var that = this;
 
         that.value = that.previous;
-        that.previous = that.model.valueForCellChanged(that.cell, that.previous);
+        that.previous = that.model.valueChanged(that.cell, that.previous);
 
         return that;
     }

@@ -16,7 +16,7 @@ export default Change.extend({
         var that = this;
 
         that.collapsed = that.previous;
-        that.previous = that.model.collapsedStateForCellChanged(that.cell, that.previous);
+        that.previous = that.model.collapseChanged(that.cell, that.previous);
 
         return that;
     }

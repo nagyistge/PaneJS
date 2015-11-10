@@ -1,5 +1,6 @@
 import {
     each,
+    clone,
     toFloat,
     toRadians,
     scalePoint,
@@ -168,6 +169,10 @@ var Geometry = Rectangle.extend({
             isEqualEntity(that.offset, geom.offset) &&
             isEqualEntities(that.points, geom.points) &&
             isEqualEntity(that.alternateBounds, geom.alternateBounds);
+    },
+
+    clone: function () {
+        return clone(this);
     }
 });
 

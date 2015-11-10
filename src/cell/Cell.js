@@ -1,5 +1,6 @@
 import {
     each,
+    filter,
     clone,
     indexOf,
     isNode,
@@ -89,10 +90,16 @@ export default Base.extend({
     eachChild: function (iterator, context) {
 
         var that = this;
+        var children = that.children;
 
-        each(that.children || [], iterator, context);
+        children && each(children, iterator, context);
 
         return that;
+    },
+
+    filterChild: function (iterator, context) {
+        var children = this.children;
+        return children ? filter(children, iterator, context) : [];
     },
 
     insertChild: function (child, index) {
@@ -167,11 +174,18 @@ export default Base.extend({
     },
 
     eachLink: function (iterator, context) {
-        var that = this;
 
-        each(that.links || [], iterator, context);
+        var that = this;
+        var links = that.links;
+
+        links && each(links, iterator, context);
 
         return that;
+    },
+
+    filterLink: function (iterator, context) {
+        var links = this.links;
+        return links ? filter(links, iterator, context) : [];
     },
 
     insertLink: function (link, outgoing) {
