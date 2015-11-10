@@ -1,8 +1,8 @@
 import {
     each,
     filter,
-    clone,
     indexOf,
+    clone,
     isNode,
     isFunction,
     isNullOrUndefined
@@ -25,7 +25,6 @@ export default Base.extend({
         that.style = style;
         that.geometry = geometry;
 
-
         // props
         // -----
         // that.parent = null;
@@ -39,12 +38,10 @@ export default Base.extend({
     // link
     // ----
 
-    // 获取连线连接的节点
     getTerminal(isSource) {
         return isSource ? this.source : this.target;
     },
 
-    // 设置连线连接的节点
     setTerminal(node, isSource) {
         if (isSource) {
             this.source = node;
@@ -55,7 +52,7 @@ export default Base.extend({
         return node;
     },
 
-    // 将连线从节点移除
+    // remove link from node
     removeFromTerminal(isSource) {
 
         var that = this;

@@ -66,7 +66,6 @@ module.exports = {
     link: {
         shape: 'connector',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
+        fillColor: '#2db7f5'
     }
-
-
 };

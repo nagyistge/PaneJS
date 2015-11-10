@@ -14,8 +14,15 @@ import Rectangle   from '../lib/Rectangle';
 import Dictionary  from '../lib/Dictionary';
 import State       from '../cell/State';
 import Renderer    from '../cell/Renderer';
+// events
+import aspect      from '../events/aspect';
+import EventSource from '../events/EventSource';
 
 export default Base.extend({
+
+    Extends: EventSource,
+    Implements: aspect,
+
 
     currentRoot: null,
     graphBounds: null,
@@ -35,40 +42,123 @@ export default Base.extend({
 
     },
 
-    getBounds: function () {},
+    getBounds(cells) {
 
-    setCurrentRoot: function () {},
+        var that = this;
+        var result = null;
 
-    scaleAndTranslate: function () {},
+        if (cells && cells.length) {
+            each(cells, function (cell) {
+                if (cell.isNode || cell.isLink) {
+                    var state = that.getState(cell);
+                    if (state) {
+                        if (result) {
+                            result.add(state);
+                        } else {
+                            result = new Rectangle(state.x, state.y, state.width, state.height);
+                        }
+                    }
+                }
+            });
+        }
 
-    setScale: function () {
+        return result;
+    },
+
+    setCurrentRoot: function () {
 
     },
 
-    setTranslate: function () {},
+    scaleAndTranslateTo: function (scale, dx, dy) {
 
-    refresh: function () {},
+        var that = this;
+        var translate = that.translate;
+        var previousScale = that.scale;
+        var previousTranslate = new Point(translate.x, translate.y);
 
-    revalidate: function () {
-        return this
-            .invalidate(null, true, true)
-            .validate(null);
+        if (previousScale !== scale || translate.x !== dx || translate.y !== dy) {
+            that.scale = scale;
+
+            translate.x = dx;
+            translate.y = dy;
+
+            that.revalidate();
+            that.graph.sizeDidChange();
+        }
+
+        that.emit('scaleAndTranslate', {
+            scale: scale,
+            translate: translate,
+            previousScale: previousScale,
+            previousTranslate: previousTranslate
+        });
+
+        return that;
     },
 
-    clear: function (cell, force, recurse) {
+    scaleTo(value) {
+
+        var that = this;
+        var previous = that.scale;
+
+        if (previous !== value) {
+            that.scale = value;
+            that.revalidate();
+            that.graph.sizeDidChange();
+        }
+
+        that.emit('scale', {
+            scale: value,
+            previous: previous
+        });
+
+        return that;
+    },
+
+    translateTo(dx, dy) {
+
+        var that = this;
+        var translate = that.translate;
+        var previous = new Point(translate.x, translate.y);
+
+        if (translate.x !== dx || translate.y !== dy) {
+            translate.x = dx;
+            translate.y = dy;
+            that.revalidate();
+            that.graph.sizeDidChange();
+        }
+
+        that.emit('translate', {
+            translate: translate,
+            previous: previous
+        });
+
+        return that;
+    },
+
+    // clear the view if `currentRoot` is not null and revalidate.
+    refresh() {
+        var that = this;
+        that.currentRoot && that.clear();
+        return that.revalidate();
+    },
+
+    revalidate() {
+        return this.invalidate().validate();
+    },
+
+    clear(cell, force = false, recurse = true) {
 
         var that = this;
         var model = that.graph.model;
 
         cell = cell || model.getRoot();
-        force = force ? force : false;
-        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
 
         that.removeState(cell);
 
         if (recurse && (force || cell !== that.currentRoot)) {
             cell.eachChild(function (child) {
-                that.clear(child, false, true);
+                that.clear(child, force, recurse);
             });
         } else {
             that.invalidate(cell, true, true);
@@ -77,14 +167,12 @@ export default Base.extend({
         return that;
     },
 
-    invalidate: function (cell, recurse, includeLink) {
+    invalidate(cell, recurse = true, includeLink = true) {
 
         var that = this;
         var model = that.graph.model;
 
         cell = cell || model.getRoot();
-        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
-        //includeLink = !isNullOrUndefined(includeLink) ? includeLink : true;
 
         var state = that.getState(cell);
 
@@ -113,98 +201,29 @@ export default Base.extend({
         return that;
     },
 
-    validate: function (cell) {
+    validate(cell) {
+
         var that = this;
 
         cell = cell || that.currentRoot || that.graph.model.getRoot();
 
-        that.resetValidationState();
+        that.resetValidationState()
+            .validateCell(cell)
+            .validateCellState(cell);
 
-        that.validateCell(cell, true);
-        that.validateCellState(cell, true);
+        that.graphBounds = that.getBoundingBox(cell) || that.getEmptyBounds();
 
-        that.graphBounds = that.getBoundingBox(cell, true) || that.getEmptyBounds();
+        that.validateBackground()
+            .resetValidationState();
 
-        that.validateBackground();
-        that.resetValidationState();
+        return that;
     },
 
-    // BackgroundPage
-    // ---------------
-    createBackgroundPageShape: function (bounds) {
-        return new RectangleShape(bounds, 'white', 'black');
-    },
-
-    validateBackground: function () {
-        this.validateBackgroundImage();
-        this.validateBackgroundPage();
-    },
-
-    validateBackgroundImage: function () {
-        var bg = this.graph.getBackgroundImage();
-
-        if (bg) {
-            if (this.backgroundImage == null || this.backgroundImage.image != bg.src) {
-                if (this.backgroundImage) {
-                    this.backgroundImage.destroy();
-                }
-
-                var bounds = new Rectangle(0, 0, 1, 1);
-
-                this.backgroundImage = new ImageShape(bounds, bg.src);
-                this.backgroundImage.dialect = this.graph.dialect;
-                this.backgroundImage.init(this.backgroundPane);
-                this.backgroundImage.redraw();
-
-                // Workaround for ignored event on background in IE8 standards mode
-                if (document.documentMode == 8 && !mxClient.IS_EM) {
-                    mxEvent.addGestureListeners(this.backgroundImage.node,
-                        mxUtils.bind(this, function (evt) {
-                            this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
-                        }),
-                        mxUtils.bind(this, function (evt) {
-                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
-                        }),
-                        mxUtils.bind(this, function (evt) {
-                            this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
-                        })
-                    );
-                }
-            }
-
-            this.redrawBackgroundImage(this.backgroundImage, bg);
-        }
-        else if (this.backgroundImage != null) {
-            this.backgroundImage.destroy();
-            this.backgroundImage = null;
-        }
-    },
-
-    validateBackgroundPage: function () {},
-
-    getBackgroundPageBounds: function () {
-        var view = this;
-        var scale = view.scale;
-        var translate = view.translate;
-        var fmt = view.graph.pageFormat;
-        var ps = scale * view.graph.pageScale;
-
-        return new Rectangle(scale * translate.x, scale * translate.y, fmt.width * ps, fmt.height * ps);
-    },
-
-    redrawBackgroundImage: function (backgroundImage, bg) {
-        backgroundImage.scale = this.scale;
-        backgroundImage.bounds.x = this.scale * this.translate.x;
-        backgroundImage.bounds.y = this.scale * this.translate.y;
-        backgroundImage.bounds.width = this.scale * bg.width;
-        backgroundImage.bounds.height = this.scale * bg.height;
-
-        backgroundImage.redraw();
-    },
 
     // Bounding
     // --------
-    getEmptyBounds: function () {
+
+    getEmptyBounds() {
 
         var that = this;
         var scale = that.scale;
@@ -212,7 +231,7 @@ export default Base.extend({
         return new Rectangle(translate.x * scale, translate.y * scale);
     },
 
-    getBoundingBox: function (cell, recurse) {
+    getBoundingBox(cell, recurse = true) {
 
         var that = this;
         var state = that.getState(cell);
@@ -251,15 +270,143 @@ export default Base.extend({
         return boundingBox;
     },
 
-    // 创建或移除 cell 对应的 state
-    validateCell: function (cell, visible) {
+
+    // BackgroundPage
+    // ---------------
+
+    createBackgroundPageShape: function (bounds) {
+        return new RectangleShape(bounds, 'white', 'black');
+    },
+
+    validateBackground: function () {
+        return this.validateBackgroundImage().validateBackgroundPage();
+    },
+
+    validateBackgroundImage: function () {
+
+        var that = this;
+        var backgroundImage = that.backgroundImage;
+        var bg = that.graph.getBackgroundImage();
+
+        if (bg) {
+
+            if (!backgroundImage || backgroundImage.image !== bg.src) {
+
+                if (backgroundImage) {
+                    backgroundImage.destroy();
+                }
+
+                var bounds = new Rectangle(0, 0, 1, 1);
+
+                backgroundImage = that.backgroundImage = new ImageShape(bounds, bg.src);
+                backgroundImage.init(that.backgroundPane);
+                backgroundImage.redraw();
+            }
+
+            that.redrawBackgroundImage(backgroundImage, bg);
+        } else if (backgroundImage) {
+            backgroundImage.destroy();
+            that.backgroundImage = null;
+        }
+
+        return that;
+    },
+
+    validateBackgroundPage: function () {
+
+        var that = this;
+        var backgroundPageShape = that.backgroundPageShape;
+
+        if (that.graph.pageVisible) {
+            var bounds = that.getBackgroundPageBounds();
+
+            if (!backgroundPageShape) {
+                backgroundPageShape = that.backgroundPageShape = that.createBackgroundPageShape(bounds);
+                backgroundPageShape.scale = this.scale;
+                backgroundPageShape.isShadow = true;
+                backgroundPageShape.init(that.backgroundPane);
+                backgroundPageShape.redraw();
+
+                // Adds listener for double click handling on background
+                if (this.graph.nativeDblClickEnabled) {
+                    mxEvent.addListener(backgroundPageShape.node, 'dblclick', mxUtils.bind(this, function (evt) {
+                        this.graph.dblClick(evt);
+                    }));
+                }
+
+                // Adds basic listeners for graph event dispatching outside of the
+                // container and finishing the handling of a single gesture
+                mxEvent.addGestureListeners(backgroundPageShape.node,
+                    mxUtils.bind(this, function (evt) {
+                        this.graph.fireMouseEvent(mxEvent.MOUSE_DOWN, new mxMouseEvent(evt));
+                    }),
+                    mxUtils.bind(this, function (evt) {
+                        // Hides the tooltip if mouse is outside container
+                        if (this.graph.tooltipHandler != null && this.graph.tooltipHandler.isHideOnHover()) {
+                            this.graph.tooltipHandler.hide();
+                        }
+
+                        if (this.graph.isMouseDown && !mxEvent.isConsumed(evt)) {
+                            this.graph.fireMouseEvent(mxEvent.MOUSE_MOVE, new mxMouseEvent(evt));
+                        }
+                    }),
+                    mxUtils.bind(this, function (evt) {
+                        this.graph.fireMouseEvent(mxEvent.MOUSE_UP, new mxMouseEvent(evt));
+                    })
+                );
+            }
+            else {
+                this.backgroundPageShape.scale = this.scale;
+                this.backgroundPageShape.bounds = bounds;
+                this.backgroundPageShape.redraw();
+            }
+        } else if (backgroundPageShape) {
+            backgroundPageShape.destroy();
+            that.backgroundPageShape = null;
+        }
+
+        return that;
+    },
+
+    getBackgroundPageBounds: function () {
+
+        var that = this;
+        var scale = that.scale;
+        var translate = that.translate;
+        var fmt = that.graph.pageFormat;
+        var ps = scale * that.graph.pageScale;
+
+        return new Rectangle(scale * translate.x, scale * translate.y, fmt.width * ps, fmt.height * ps);
+    },
+
+    redrawBackgroundImage: function (backgroundImage, bg) {
+
+        var that = this;
+        var scale = that.scale;
+        var translate = that.translate;
+
+        backgroundImage.scale = scale;
+        backgroundImage.bounds.x = scale * translate.x;
+        backgroundImage.bounds.y = scale * translate.y;
+        backgroundImage.bounds.width = scale * bg.width;
+        backgroundImage.bounds.height = scale * bg.height;
+        backgroundImage.redraw();
+
+        return that;
+    },
+
+
+    // Validate
+    // ---------
+
+    // create or remove cell state
+    validateCell(cell, visible = true) {
         var that = this;
 
         if (!cell) {
             return cell;
         }
 
-        //visible = !isNullOrUndefined(visible) ? visible : true;
         visible = visible && cell.visible;
 
         var state = that.getState(cell, visible);
@@ -276,59 +423,49 @@ export default Base.extend({
         return that;
     },
 
-    validateCellState: function (cell, recurse) {
+    validateCellState(cell, recurse = true) {
 
         var that = this;
-        var state = null;
+        var state = that.getState(cell);
 
-        if (!cell) {
-            return state;
-        }
+        if (state) {
+            if (state.invalid) {
+                state.invalid = false;
 
-        state = that.getState(cell);
+                if (cell !== that.currentRoot) {
+                    that.validateCellState(cell.parent, false);
+                }
 
-        if (!state) {
-            return state;
-        }
+                if (cell.isLink) {
+                    var sourceNode = that.getVisibleTerminal(cell, true);
+                    var targetNode = that.getVisibleTerminal(cell, false);
+                    var sourceState = that.validateCellState(sourceNode, false);
+                    var targetState = that.validateCellState(targetNode, false);
+                    state.setVisibleTerminalState(sourceState, true);
+                    state.setVisibleTerminalState(targetState, false);
+                }
 
-        //recurse = !isNullOrUndefined(recurse) ? recurse : true;
+                that.updateCellState(state);
 
-        if (state.invalid) {
-            state.invalid = false;
-
-            if (cell !== that.currentRoot) {
-                that.validateCellState(cell.parent, false);
+                if (cell !== that.currentRoot) {
+                    that.renderer.redraw(state, false, that.rendering);
+                }
             }
 
-            if (cell.isLink) {
-                var sourceNode = that.getVisibleTerminal(cell, true);
-                var targetNode = that.getVisibleTerminal(cell, false);
-                var sourceState = that.validateCellState(sourceNode, false);
-                var targetState = that.validateCellState(targetNode, false);
-                state.setVisibleTerminalState(sourceState, true);
-                state.setVisibleTerminalState(targetState, false);
+            if (recurse) {
+                // update `state.cellBounds` and `state.paintBounds`
+                state.updateCachedBounds();
+
+                // update order in DOM if recursively traversing
+                if (state.shape) {
+                    // TODO: stateValidated
+                    //that.stateValidated(state);
+                }
+
+                cell.eachChild(function (child) {
+                    that.validateCellState(child, true);
+                });
             }
-
-            // 更新 state 的大小、位置信息
-            that.updateCellState(state);
-
-            if (cell !== that.currentRoot) {
-                that.renderer.redraw(state, false, that.rendering);
-            }
-        }
-
-        if (recurse) {
-            // 更新 state.cellBounds 和 state.paintBounds
-            state.updateCachedBounds();
-
-            // 更新 DOM 的层级顺序
-            //if (state.shape) {
-            //    that.stateValidated(state);
-            //}
-
-            cell.eachChild(function (child) {
-                that.validateCellState(child, true);
-            });
         }
 
         return state;
@@ -340,11 +477,11 @@ export default Base.extend({
         var cell = state.cell;
         var currentRoot = that.currentRoot;
         var stateOrigin = state.origin;
-        var stateAbsoluteOffset = state.absoluteOffset;
+        var absoluteOffset = state.absoluteOffset;
 
         // 重置
-        stateAbsoluteOffset.x = 0;
-        stateAbsoluteOffset.y = 0;
+        absoluteOffset.x = 0;
+        absoluteOffset.y = 0;
         stateOrigin.x = 0;
         stateOrigin.y = 0;
         state.length = 0;
@@ -391,8 +528,8 @@ export default Base.extend({
                             stateOrigin.y += geo.y * parentState.height / scale + geoOffset.y;
                         }
                     } else {
-                        stateAbsoluteOffset.x = scale * geoOffset.x;
-                        stateAbsoluteOffset.y = scale * geoOffset.y;
+                        absoluteOffset.x = scale * geoOffset.x;
+                        absoluteOffset.y = scale * geoOffset.y;
                         stateOrigin.x += geo.x;
                         stateOrigin.y += geo.y;
                     }
@@ -474,7 +611,7 @@ export default Base.extend({
                 // 根据关键点更新 bounds
                 that.updateEdgeBounds(state);
                 // 更新标签位置
-                that.updateEdgeLabelOffset(state);
+                that.updateLinkLabelOffset(state);
             }
         }
 
@@ -530,7 +667,7 @@ export default Base.extend({
         return that;
     },
 
-    resetValidationState: function () {
+    resetValidationState() {
         var that = this;
         that.lastNode = null;
         that.lastHtmlNode = null;
@@ -917,7 +1054,7 @@ export default Base.extend({
 
     getRelativePoint: function (edgeState, x, y) {},
 
-    updateEdgeLabelOffset: function (state) {
+    updateLinkLabelOffset: function (state) {
         var points = state.absolutePoints;
 
         state.absoluteOffset = state.getCenter();
@@ -960,33 +1097,33 @@ export default Base.extend({
         }
     },
 
+
     // State
     // -----
-    getState: function (cell, create) {
 
-        if (!cell) {
-            return;
-        }
-
+    getState(cell, create) {
         var that = this;
-        var states = that.states;
-        var state = states.get(cell);
 
-        // TODO: that.updateStyle
-        if (create && (!state || that.updateStyle) && cell.visible) {
+        if (cell) {
+            var states = that.states;
+            var state = states.get(cell);
 
-            if (!state) {
-                state = that.createState(cell);
-                states.put(cell, state);
-            } else {
-                state.style = that.graph.getCellStyle(cell);
+            // TODO: that.updateStyle
+            if (create && (!state || that.updateStyle) && cell.visible) {
+
+                if (!state) {
+                    state = that.createState(cell);
+                    states.put(cell, state);
+                } else {
+                    state.style = that.graph.getCellStyle(cell);
+                }
             }
-        }
 
-        return state;
+            return state;
+        }
     },
 
-    createState: function (cell) {
+    createState(cell) {
 
         var that = this;
         var graph = that.graph;
@@ -1007,26 +1144,33 @@ export default Base.extend({
         return state;
     },
 
-    removeState: function (cell) {
+    removeState(cell) {
 
         var that = this;
-        var state = null;
 
         if (cell) {
-            state = that.states.remove(cell);
-
+            var state = that.states.remove(cell);
             if (state) {
                 that.graph.cellRenderer.destroy(state);
                 state.destroy();
             }
         }
 
-        return state;
+        return that;
     },
+
+
+    // DOM event
+    // ---------
 
     isContainerEvent: function (evt) {},
 
     isScrollEvent: function (evt) {},
+
+    installListeners: function () { },
+
+    // Life cycle
+    // ----------
 
     init: function () {
 
@@ -1078,7 +1222,29 @@ export default Base.extend({
         that.installListeners();
     },
 
-    installListeners: function () { },
+    destroy: function () {
 
-    destroy: function () { }
+        var that = this;
+        var root = that.canvas ? that.canvas.ownerSVGElement : null;
+
+        if (root == null) {
+            root = this.canvas;
+        }
+
+        if (root && root.parentNode) {
+            this.clear(this.currentRoot, true);
+            mxEvent.removeGestureListeners(document, null, this.moveHandler, this.endHandler);
+            mxEvent.release(this.graph.container);
+            root.parentNode.removeChild(root);
+
+            this.moveHandler = null;
+            this.endHandler = null;
+            this.canvas = null;
+            this.backgroundPane = null;
+            this.drawPane = null;
+            this.overlayPane = null;
+            this.decoratorPane = null;
+            that.foreignPane = null;
+        }
+    }
 });
