@@ -13,11 +13,11 @@ export default Base.extend({
     addOp: function () {
 
         var that = this;
-        var canvas = that.canvas;
         var paths = that.paths;
+        var canvas = that.canvas;
         var format = canvas.format;
-        var state = canvas.state;
-        var scale = state.scale;
+        var style = canvas.style;
+        var scale = style.scale;
         var length = arguments.length;
 
         if (paths) {
@@ -28,8 +28,8 @@ export default Base.extend({
                     that.lastX = arguments[i - 1];
                     that.lastY = arguments[i];
 
-                    paths.push(format((that.lastX + state.dx) * scale));
-                    paths.push(format((that.lastY + state.dy) * scale));
+                    paths.push(format((that.lastX + style.dx) * scale));
+                    paths.push(format((that.lastY + style.dy) * scale));
                 }
             }
         }
@@ -69,5 +69,11 @@ export default Base.extend({
         //that.canvas.node.setAttribute('d', paths.join(' '));
 
         return that.canvas; // 链式调用
+    },
+
+    flush: function () {
+        var that = this;
+        that.canvas.node.setAttribute('d', that.paths.join(' '));
+        return that;
     }
 });

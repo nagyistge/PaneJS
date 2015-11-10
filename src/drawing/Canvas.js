@@ -165,7 +165,7 @@ export default Base.extend({
 
             var path = that.path;
             if (path) {
-
+                path.flush();
             }
 
             // fill

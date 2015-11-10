@@ -33,21 +33,25 @@ function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) 
     pe.y += -unitY * f - endOffsetY;
 
     return function () {
-        canvas.begin();
-        canvas.moveTo(pt.x, pt.y);
-        canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+
+        var path = canvas.drawPath();
+
+        path.moveTo(pt.x, pt.y);
+        path.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
 
         if (type === 'classic') {
-            canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+            path.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
         }
 
-        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-        canvas.close();
+        path.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+        path.close();
 
         if (filled) {
-            canvas.fillAndStroke();
+            canvas.addNode(true, true);
+            //canvas.fillAndStroke();
         } else {
-            canvas.stroke();
+            canvas.addNode(false, true);
+            //canvas.stroke();
         }
     };
 }

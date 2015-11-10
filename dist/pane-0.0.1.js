@@ -6924,7 +6924,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (node) {
 	
 	            var path = that.path;
-	            if (path) {}
+	            if (path) {
+	                path.flush();
+	            }
 	
 	            // fill
 	            if (style.fillColor && style.gradientColor) {
@@ -7031,11 +7033,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    addOp: function addOp() {
 	
 	        var that = this;
-	        var canvas = that.canvas;
 	        var paths = that.paths;
+	        var canvas = that.canvas;
 	        var format = canvas.format;
-	        var state = canvas.state;
-	        var scale = state.scale;
+	        var style = canvas.style;
+	        var scale = style.scale;
 	        var length = arguments.length;
 	
 	        if (paths) {
@@ -7046,8 +7048,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    that.lastX = arguments[i - 1];
 	                    that.lastY = arguments[i];
 	
-	                    paths.push(format((that.lastX + state.dx) * scale));
-	                    paths.push(format((that.lastY + state.dy) * scale));
+	                    paths.push(format((that.lastX + style.dx) * scale));
+	                    paths.push(format((that.lastY + style.dy) * scale));
 	                }
 	            }
 	        }
@@ -7085,6 +7087,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //that.canvas.node.setAttribute('d', paths.join(' '));
 	
 	        return that.canvas; // 链式调用
+	    },
+	
+	    flush: function flush() {
+	        var that = this;
+	        that.canvas.node.setAttribute('d', that.paths.join(' '));
+	        return that;
 	    }
 	});
 	module.exports = exports['default'];
@@ -8603,9 +8611,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var style = that.style;
 	
-	        if (style && style.curved) {} else {}
+	        if (style && style.curved) {
+	            that.drawLine(canvas, points, this.isRounded);
+	        } else {
+	            that.drawCurve(canvas, points);
+	        }
 	
 	        return that;
+	    },
+	
+	    drawLine: function drawLine(c, pts, rounded) {},
+	
+	    drawCurve: function drawCurve(canvas, points) {
+	
+	        var path = canvas.drawPath();
+	        var pt = points[0];
+	        var n = points.length;
+	
+	        path.moveTo(pt.x, pt.y);
+	
+	        for (var i = 1; i < n - 2; i++) {
+	            var p0 = points[i];
+	            var p1 = points[i + 1];
+	            var ix = (p0.x + p1.x) / 2;
+	            var iy = (p0.y + p1.y) / 2;
+	
+	            path.quadTo(p0.x, p0.y, ix, iy);
+	        }
+	
+	        var p0 = points[n - 2];
+	        var p1 = points[n - 1];
+	
+	        path.quadTo(p0.x, p0.y, p1.x, p1.y);
+	
+	        canvas.addNode(false, true);
 	    }
 	});
 	module.exports = exports['default'];
@@ -8654,22 +8693,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    pe.y += -unitY * f - endOffsetY;
 	
 	    return function () {
-	        canvas.begin();
-	        canvas.moveTo(pt.x, pt.y);
-	        canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+	
+	        var path = canvas.drawPath();
+	
+	        path.moveTo(pt.x, pt.y);
+	        path.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
 	
 	        if (type === 'classic') {
-	            canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+	            path.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
 	        }
 	
-	        canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-	        canvas.close();
+	        path.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+	        path.close();
 	
 	        if (filled) {
-	            canvas.fillAndStroke();
+	            canvas.addNode(true, true);
+	            //canvas.fillAndStroke();
 	        } else {
-	            canvas.stroke();
-	        }
+	                canvas.addNode(false, true);
+	                //canvas.stroke();
+	            }
 	    };
 	}
 	
