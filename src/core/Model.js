@@ -8,10 +8,10 @@ import {
 
 import Class            from '../common/class';
 import Cell             from '../cell/Cell';
+import cellRoute        from '../cell/route';
 import objectIdentity   from '../common/objectIdentity';
 // events
 import aspect           from '../events/aspect';
-import eventNames       from '../events/eventNames';
 import EventSource      from '../events/EventSource';
 // changes
 import RootChange       from '../changes/RootChange';
@@ -127,7 +127,7 @@ export default Class.create({
                 var parent = cell.parent;
 
                 if (parent) {
-                    var id = mxCellPath.create(parent);
+                    var id = cellRoute.create(parent);
 
                     if (!hash[id]) {
                         hash[id] = parent;
@@ -342,33 +342,34 @@ export default Class.create({
     },
 
     getNearestCommonAncestor: function (cell1, cell2) {
+
         if (cell1 && cell2) {
-            var path = mxCellPath.create(cell2);
 
-            if (path && path.length > 0) {
-                // Bubbles through the ancestors of the first
-                // cell to find the nearest common ancestor.
+            var route1 = cellRoute.create(cell1);
+            var route2 = cellRoute.create(cell2);
+
+            if (route1 && route2) {
+
                 var cell = cell1;
-                var current = mxCellPath.create(cell);
+                var route = route2;
+                var current = route1;
 
-                // Inverts arguments
-                if (path.length < current.length) {
+                if (route1.length > route2.length) {
                     cell = cell2;
-                    var tmp = current;
-                    current = path;
-                    path = tmp;
+                    route = route1;
+                    current = route2;
                 }
 
                 while (cell) {
                     var parent = cell.parent;
 
-                    // Checks if the cell path is equal to the beginning of the given cell path
-                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+                    // check if the cell path is equal to the beginning of the given cell path
+                    if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
                         return cell;
                     }
 
-                    current = mxCellPath.getParentPath(current);
                     cell = parent;
+                    current = cellRoute.getParentRoute(current);
                 }
             }
         }
@@ -498,7 +499,7 @@ export default Class.create({
         that.digest(new TerminalChange(that, link, node, isSource));
 
         if (that.maintainEdgeParent && terminalChanged) {
-            that.updateEdgeParent(link, that.getRoot());
+            that.updateLinkParent(link, that.getRoot());
         }
 
         return that;
@@ -760,10 +761,10 @@ export default Class.create({
 
         var that = this;
         that.updateLevel += 1;
-        that.emit(eventNames.BEGIN_UPDATE);
+        that.emit('beginUpdate');
 
         if (that.updateLevel === 1) {
-            that.emit(eventNames.START_EDIT);
+            that.emit('startEdit');
         }
     },
 
@@ -774,7 +775,7 @@ export default Class.create({
         that.updateLevel -= 1;
 
         if (that.updateLevel === 0) {
-            that.emit(eventNames.END_EDIT);
+            that.emit('endEdit');
         }
 
         if (!that.endingUpdate) {
@@ -782,7 +783,7 @@ export default Class.create({
             var changeCollection = that.changeCollection;
 
             that.endingUpdate = that.updateLevel === 0;
-            that.emit(eventNames.END_UPDATE, {changes: changeCollection.changes});
+            that.emit('endUpdate', {changes: changeCollection.changes});
 
             // 触发重绘
             if (that.endingUpdate && changeCollection.hasChange()) {

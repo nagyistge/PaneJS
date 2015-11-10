@@ -59,8 +59,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var pane = {
 	    utils: __webpack_require__(1),
 	    Graph: __webpack_require__(11),
-	    Model: __webpack_require__(44),
-	    View: __webpack_require__(29)
+	    Model: __webpack_require__(43),
+	    View: __webpack_require__(24)
 	};
 	
 	module.exports = pane;
@@ -851,35 +851,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _stylesStylesheet2 = _interopRequireDefault(_stylesStylesheet);
 	
-	var _enumsStyleNames = __webpack_require__(18);
+	var _enumsStyleNames = __webpack_require__(20);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _cellCell = __webpack_require__(26);
+	var _cellCell = __webpack_require__(21);
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
-	var _cellGeometry = __webpack_require__(27);
+	var _cellGeometry = __webpack_require__(22);
 	
 	var _cellGeometry2 = _interopRequireDefault(_cellGeometry);
 	
-	var _View = __webpack_require__(29);
+	var _View = __webpack_require__(24);
 	
 	var _View2 = _interopRequireDefault(_View);
 	
-	var _Model = __webpack_require__(44);
+	var _Model = __webpack_require__(43);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _changesRootChange = __webpack_require__(47);
+	var _changesRootChange = __webpack_require__(46);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(49);
+	var _changesChildChange = __webpack_require__(48);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesTerminalChange = __webpack_require__(54);
+	var _changesTerminalChange = __webpack_require__(52);
 	
 	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
 	
@@ -2761,19 +2761,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _defaultLinkStyle = __webpack_require__(17);
-	
-	var _defaultLinkStyle2 = _interopRequireDefault(_defaultLinkStyle);
-	
-	var _defaultNodeStyle = __webpack_require__(22);
-	
-	var _defaultNodeStyle2 = _interopRequireDefault(_defaultNodeStyle);
-	
-	var _defaultStyle = __webpack_require__(25);
+	var _defaultStyle = __webpack_require__(17);
 	
 	var _defaultStyle2 = _interopRequireDefault(_defaultStyle);
 	
-	var _shapesPerimeter = __webpack_require__(55);
+	var _shapesPerimeter = __webpack_require__(18);
 	
 	var _shapesPerimeter2 = _interopRequireDefault(_shapesPerimeter);
 	
@@ -2825,46 +2817,678 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 17 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	
+	    common: {
+	        // translate
+	        dx: 0,
+	        dy: 0,
+	
+	        scale: 1,
+	
+	        // rotate
+	        rotation: 0,
+	        rotationCx: 0,
+	        rotationCy: 0,
+	
+	        opacity: 1,
+	
+	        // fill
+	        fillColor: '#e3f4ff',
+	        fillOpacity: 1,
+	        gradientColor: '',
+	        gradientOpacity: 1,
+	        gradientDirection: '',
+	
+	        // border
+	        strokeWidth: 1,
+	        strokeColor: '#2db7f5',
+	        dashed: false,
+	        dashPattern: '3 3',
+	        dashOffset: 0,
+	        lineCap: 'butt', // butt, round, square
+	        lineJoin: 'miter', // miter, round, bevel
+	        miterLimit: 10,
+	
+	        // shadow
+	        shadow: false,
+	        shadowColor: 'gray',
+	        shadowOpacity: 1,
+	        shadowDx: 2,
+	        shadowDy: 3,
+	
+	        glass: false,
+	        flipH: false, // 水平翻转
+	        flipV: false, // 垂直翻转
+	        visible: true, // 默认可见
+	        outline: false,
+	        antiAlias: true,
+	
+	        label: {
+	            shape: 'label',
+	            position: 'center', // top, right, bottom, left, center
+	            align: 'center', // left, center, right
+	            verticalAlign: 'middle', // top, middle, bottom
+	            overflow: '', // hidden, fill, width
+	            spacing: 5,
+	            vertical: false,
+	            verticalRotation: -90
+	        }
+	    },
+	
+	    node: {
+	        shape: 'rectangle',
+	        round: 0 // percentage
+	    },
+	
+	    link: {
+	        shape: 'connector',
+	        endArrow: 'classic' }
+	
+	};
+	// classic, block, open, oval, diamond, diamondThin
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, '__esModule', {
-	  value: true
+	    value: true
 	});
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _enumsStyleNames = __webpack_require__(18);
+	var _libPoint = __webpack_require__(19);
 	
-	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
+	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
-	var _enumsShapeNames = __webpack_require__(19);
+	var perimeter = {
+	    RectanglePerimeter: function RectanglePerimeter(bounds, vertex, next, orthogonal) {
+	        var cx = bounds.getCenterX();
+	        var cy = bounds.getCenterY();
+	        var dx = next.x - cx;
+	        var dy = next.y - cy;
+	        var alpha = Math.atan2(dy, dx);
+	        var p = new _libPoint2['default'](0, 0);
+	        var pi = Math.PI;
+	        var pi2 = Math.PI / 2;
+	        var beta = pi2 - alpha;
+	        var t = Math.atan2(bounds.height, bounds.width);
 	
-	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
+	        if (alpha < -pi + t || alpha > pi - t) {
+	            // Left edge
+	            p.x = bounds.x;
+	            p.y = cy - bounds.width * Math.tan(alpha) / 2;
+	        } else if (alpha < -t) {
+	            // Top Edge
+	            p.y = bounds.y;
+	            p.x = cx - bounds.height * Math.tan(beta) / 2;
+	        } else if (alpha < t) {
+	            // Right Edge
+	            p.x = bounds.x + bounds.width;
+	            p.y = cy + bounds.width * Math.tan(alpha) / 2;
+	        } else {
+	            // Bottom Edge
+	            p.y = bounds.y + bounds.height;
+	            p.x = cx + bounds.height * Math.tan(beta) / 2;
+	        }
 	
-	var _enumsAlignments = __webpack_require__(20);
+	        if (orthogonal) {
+	            if (next.x >= bounds.x && next.x <= bounds.x + bounds.width) {
+	                p.x = next.x;
+	            } else if (next.y >= bounds.y && next.y <= bounds.y + bounds.height) {
+	                p.y = next.y;
+	            }
+	            if (next.x < bounds.x) {
+	                p.x = bounds.x;
+	            } else if (next.x > bounds.x + bounds.width) {
+	                p.x = bounds.x + bounds.width;
+	            }
+	            if (next.y < bounds.y) {
+	                p.y = bounds.y;
+	            } else if (next.y > bounds.y + bounds.height) {
+	                p.y = bounds.y + bounds.height;
+	            }
+	        }
 	
-	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
+	        return p;
+	    },
+	    EllipsePerimeter: function EllipsePerimeter(bounds, vertex, next, orthogonal) {
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var a = bounds.width / 2;
+	        var b = bounds.height / 2;
+	        var cx = x + a;
+	        var cy = y + b;
+	        var px = next.x;
+	        var py = next.y;
 	
-	var _enumsArrowTypes = __webpack_require__(21);
+	        // Calculates straight line equation through
+	        // point and ellipse center y = d * x + h
+	        var dx = parseInt(px - cx);
+	        var dy = parseInt(py - cy);
 	
-	var _enumsArrowTypes2 = _interopRequireDefault(_enumsArrowTypes);
+	        if (dx == 0 && dy != 0) {
+	            return new mxPoint(cx, cy + b * dy / Math.abs(dy));
+	        } else if (dx == 0 && dy == 0) {
+	            return new mxPoint(px, py);
+	        }
 	
-	var style = {};
+	        if (orthogonal) {
+	            if (py >= y && py <= y + bounds.height) {
+	                var ty = py - cy;
+	                var tx = Math.sqrt(a * a * (1 - ty * ty / (b * b))) || 0;
 	
-	style[_enumsStyleNames2['default'].shape] = _enumsShapeNames2['default'].CONNECTOR;
-	style[_enumsStyleNames2['default'].END_ARROW] = _enumsArrowTypes2['default'].CLASSIC;
-	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
-	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
-	style[_enumsStyleNames2['default'].strokeColor] = '#289de9';
-	style[_enumsStyleNames2['default'].FONT_COLOR] = '#446299';
+	                if (px <= x) {
+	                    tx = -tx;
+	                }
 	
-	exports['default'] = style;
+	                return new mxPoint(cx + tx, py);
+	            }
+	
+	            if (px >= x && px <= x + bounds.width) {
+	                var tx = px - cx;
+	                var ty = Math.sqrt(b * b * (1 - tx * tx / (a * a))) || 0;
+	
+	                if (py <= y) {
+	                    ty = -ty;
+	                }
+	
+	                return new mxPoint(px, cy + ty);
+	            }
+	        }
+	
+	        // Calculates intersection
+	        var d = dy / dx;
+	        var h = cy - d * cx;
+	        var e = a * a * d * d + b * b;
+	        var f = -2 * cx * e;
+	        var g = a * a * d * d * cx * cx + b * b * cx * cx - a * a * b * b;
+	        var det = Math.sqrt(f * f - 4 * e * g);
+	
+	        // Two solutions (perimeter points)
+	        var xout1 = (-f + det) / (2 * e);
+	        var xout2 = (-f - det) / (2 * e);
+	        var yout1 = d * xout1 + h;
+	        var yout2 = d * xout2 + h;
+	        var dist1 = Math.sqrt(Math.pow(xout1 - px, 2) + Math.pow(yout1 - py, 2));
+	        var dist2 = Math.sqrt(Math.pow(xout2 - px, 2) + Math.pow(yout2 - py, 2));
+	
+	        // Correct solution
+	        var xout = 0;
+	        var yout = 0;
+	
+	        if (dist1 < dist2) {
+	            xout = xout1;
+	            yout = yout1;
+	        } else {
+	            xout = xout2;
+	            yout = yout2;
+	        }
+	
+	        return new mxPoint(xout, yout);
+	    },
+	    RhombusPerimeter: function RhombusPerimeter(bounds, vertex, next, orthogonal) {
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var w = bounds.width;
+	        var h = bounds.height;
+	
+	        var cx = x + w / 2;
+	        var cy = y + h / 2;
+	
+	        var px = next.x;
+	        var py = next.y;
+	
+	        // Special case for intersecting the diamond's corners
+	        if (cx == px) {
+	            if (cy > py) {
+	                return new mxPoint(cx, y); // top
+	            } else {
+	                    return new mxPoint(cx, y + h); // bottom
+	                }
+	        } else if (cy == py) {
+	                if (cx > px) {
+	                    return new mxPoint(x, cy); // left
+	                } else {
+	                        return new mxPoint(x + w, cy); // right
+	                    }
+	            }
+	
+	        var tx = cx;
+	        var ty = cy;
+	
+	        if (orthogonal) {
+	            if (px >= x && px <= x + w) {
+	                tx = px;
+	            } else if (py >= y && py <= y + h) {
+	                ty = py;
+	            }
+	        }
+	
+	        // In which quadrant will the intersection be?
+	        // set the slope and offset of the border line accordingly
+	        if (px < cx) {
+	            if (py < cy) {
+	                return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
+	            } else {
+	                return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
+	            }
+	        } else if (py < cy) {
+	            return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
+	        } else {
+	            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
+	        }
+	    },
+	    TrianglePerimeter: function TrianglePerimeter(bounds, vertex, next, orthogonal) {
+	        var direction = vertex != null ? vertex.style[mxConstants.STYLE_DIRECTION] : null;
+	        var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
+	
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var w = bounds.width;
+	        var h = bounds.height;
+	
+	        var cx = x + w / 2;
+	        var cy = y + h / 2;
+	
+	        var start = new mxPoint(x, y);
+	        var corner = new mxPoint(x + w, cy);
+	        var end = new mxPoint(x, y + h);
+	
+	        if (direction == mxConstants.DIRECTION_NORTH) {
+	            start = end;
+	            corner = new mxPoint(cx, y);
+	            end = new mxPoint(x + w, y + h);
+	        } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	            corner = new mxPoint(cx, y + h);
+	            end = new mxPoint(x + w, y);
+	        } else if (direction == mxConstants.DIRECTION_WEST) {
+	            start = new mxPoint(x + w, y);
+	            corner = new mxPoint(x, cy);
+	            end = new mxPoint(x + w, y + h);
+	        }
+	
+	        var dx = next.x - cx;
+	        var dy = next.y - cy;
+	
+	        var alpha = vertical ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
+	        var t = vertical ? Math.atan2(w, h) : Math.atan2(h, w);
+	
+	        var base = false;
+	
+	        if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_WEST) {
+	            base = alpha > -t && alpha < t;
+	        } else {
+	            base = alpha < -Math.PI + t || alpha > Math.PI - t;
+	        }
+	
+	        var result = null;
+	
+	        if (base) {
+	            if (orthogonal && (vertical && next.x >= start.x && next.x <= end.x || !vertical && next.y >= start.y && next.y <= end.y)) {
+	                if (vertical) {
+	                    result = new mxPoint(next.x, start.y);
+	                } else {
+	                    result = new mxPoint(start.x, next.y);
+	                }
+	            } else {
+	                if (direction == mxConstants.DIRECTION_NORTH) {
+	                    result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2, y + h);
+	                } else if (direction == mxConstants.DIRECTION_SOUTH) {
+	                    result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2, y);
+	                } else if (direction == mxConstants.DIRECTION_WEST) {
+	                    result = new mxPoint(x + w, y + h / 2 + w * Math.tan(alpha) / 2);
+	                } else {
+	                    result = new mxPoint(x, y + h / 2 - w * Math.tan(alpha) / 2);
+	                }
+	            }
+	        } else {
+	            if (orthogonal) {
+	                var pt = new mxPoint(cx, cy);
+	
+	                if (next.y >= y && next.y <= y + h) {
+	                    pt.x = vertical ? cx : direction == mxConstants.DIRECTION_WEST ? x + w : x;
+	                    pt.y = next.y;
+	                } else if (next.x >= x && next.x <= x + w) {
+	                    pt.x = next.x;
+	                    pt.y = !vertical ? cy : direction == mxConstants.DIRECTION_NORTH ? y + h : y;
+	                }
+	
+	                // Compute angle
+	                dx = next.x - pt.x;
+	                dy = next.y - pt.y;
+	
+	                cx = pt.x;
+	                cy = pt.y;
+	            }
+	
+	            if (vertical && next.x <= x + w / 2 || !vertical && next.y <= y + h / 2) {
+	                result = mxUtils.intersection(next.x, next.y, cx, cy, start.x, start.y, corner.x, corner.y);
+	            } else {
+	                result = mxUtils.intersection(next.x, next.y, cx, cy, corner.x, corner.y, end.x, end.y);
+	            }
+	        }
+	
+	        if (result == null) {
+	            result = new mxPoint(cx, cy);
+	        }
+	
+	        return result;
+	    },
+	    HexagonPerimeter: function HexagonPerimeter(bounds, vertex, next, orthogonal) {
+	        var x = bounds.x;
+	        var y = bounds.y;
+	        var w = bounds.width;
+	        var h = bounds.height;
+	
+	        var cx = bounds.getCenterX();
+	        var cy = bounds.getCenterY();
+	        var px = next.x;
+	        var py = next.y;
+	        var dx = px - cx;
+	        var dy = py - cy;
+	        var alpha = -Math.atan2(dy, dx);
+	        var pi = Math.PI;
+	        var pi2 = Math.PI / 2;
+	
+	        var result = new mxPoint(cx, cy);
+	
+	        var direction = vertex != null ? mxUtils.getValue(vertex.style, mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
+	        var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
+	        var a = new mxPoint();
+	        var b = new mxPoint();
+	
+	        //Only consider corrects quadrants for the orthogonal case.
+	        if (px < x && py < y || px < x && py > y + h || px > x + w && py < y || px > x + w && py > y + h) {
+	            orthogonal = false;
+	        }
+	
+	        if (orthogonal) {
+	            if (vertical) {
+	                //Special cases where intersects with hexagon corners
+	                if (px == cx) {
+	                    if (py <= y) {
+	                        return new mxPoint(cx, y);
+	                    } else if (py >= y + h) {
+	                        return new mxPoint(cx, y + h);
+	                    }
+	                } else if (px < x) {
+	                    if (py == y + h / 4) {
+	                        return new mxPoint(x, y + h / 4);
+	                    } else if (py == y + 3 * h / 4) {
+	                        return new mxPoint(x, y + 3 * h / 4);
+	                    }
+	                } else if (px > x + w) {
+	                    if (py == y + h / 4) {
+	                        return new mxPoint(x + w, y + h / 4);
+	                    } else if (py == y + 3 * h / 4) {
+	                        return new mxPoint(x + w, y + 3 * h / 4);
+	                    }
+	                } else if (px == x) {
+	                    if (py < cy) {
+	                        return new mxPoint(x, y + h / 4);
+	                    } else if (py > cy) {
+	                        return new mxPoint(x, y + 3 * h / 4);
+	                    }
+	                } else if (px == x + w) {
+	                    if (py < cy) {
+	                        return new mxPoint(x + w, y + h / 4);
+	                    } else if (py > cy) {
+	                        return new mxPoint(x + w, y + 3 * h / 4);
+	                    }
+	                }
+	                if (py == y) {
+	                    return new mxPoint(cx, y);
+	                } else if (py == y + h) {
+	                    return new mxPoint(cx, y + h);
+	                }
+	
+	                if (px < cx) {
+	                    if (py > y + h / 4 && py < y + 3 * h / 4) {
+	                        a = new mxPoint(x, y);
+	                        b = new mxPoint(x, y + h);
+	                    } else if (py < y + h / 4) {
+	                        a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                        b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+	                    } else if (py > y + 3 * h / 4) {
+	                        a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                        b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+	                    }
+	                } else if (px > cx) {
+	                    if (py > y + h / 4 && py < y + 3 * h / 4) {
+	                        a = new mxPoint(x + w, y);
+	                        b = new mxPoint(x + w, y + h);
+	                    } else if (py < y + h / 4) {
+	                        a = new mxPoint(x, y - Math.floor(0.25 * h));
+	                        b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                    } else if (py > y + 3 * h / 4) {
+	                        a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                        b = new mxPoint(x, y + Math.floor(1.25 * h));
+	                    }
+	                }
+	            } else {
+	                //Special cases where intersects with hexagon corners
+	                if (py == cy) {
+	                    if (px <= x) {
+	                        return new mxPoint(x, y + h / 2);
+	                    } else if (px >= x + w) {
+	                        return new mxPoint(x + w, y + h / 2);
+	                    }
+	                } else if (py < y) {
+	                    if (px == x + w / 4) {
+	                        return new mxPoint(x + w / 4, y);
+	                    } else if (px == x + 3 * w / 4) {
+	                        return new mxPoint(x + 3 * w / 4, y);
+	                    }
+	                } else if (py > y + h) {
+	                    if (px == x + w / 4) {
+	                        return new mxPoint(x + w / 4, y + h);
+	                    } else if (px == x + 3 * w / 4) {
+	                        return new mxPoint(x + 3 * w / 4, y + h);
+	                    }
+	                } else if (py == y) {
+	                    if (px < cx) {
+	                        return new mxPoint(x + w / 4, y);
+	                    } else if (px > cx) {
+	                        return new mxPoint(x + 3 * w / 4, y);
+	                    }
+	                } else if (py == y + h) {
+	                    if (px < cx) {
+	                        return new mxPoint(x + w / 4, y + h);
+	                    } else if (py > cy) {
+	                        return new mxPoint(x + 3 * w / 4, y + h);
+	                    }
+	                }
+	                if (px == x) {
+	                    return new mxPoint(x, cy);
+	                } else if (px == x + w) {
+	                    return new mxPoint(x + w, cy);
+	                }
+	
+	                if (py < cy) {
+	                    if (px > x + w / 4 && px < x + 3 * w / 4) {
+	                        a = new mxPoint(x, y);
+	                        b = new mxPoint(x + w, y);
+	                    } else if (px < x + w / 4) {
+	                        a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+	                        b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                    } else if (px > x + 3 * w / 4) {
+	                        a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                        b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+	                    }
+	                } else if (py > cy) {
+	                    if (px > x + w / 4 && px < x + 3 * w / 4) {
+	                        a = new mxPoint(x, y + h);
+	                        b = new mxPoint(x + w, y + h);
+	                    } else if (px < x + w / 4) {
+	                        a = new mxPoint(x - Math.floor(0.25 * w), y);
+	                        b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                    } else if (px > x + 3 * w / 4) {
+	                        a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                        b = new mxPoint(x + Math.floor(1.25 * w), y);
+	                    }
+	                }
+	            }
+	
+	            var tx = cx;
+	            var ty = cy;
+	
+	            if (px >= x && px <= x + w) {
+	                tx = px;
+	
+	                if (py < cy) {
+	                    ty = y + h;
+	                } else {
+	                    ty = y;
+	                }
+	            } else if (py >= y && py <= y + h) {
+	                ty = py;
+	
+	                if (px < cx) {
+	                    tx = x + w;
+	                } else {
+	                    tx = x;
+	                }
+	            }
+	
+	            result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
+	        } else {
+	            if (vertical) {
+	                var beta = Math.atan2(h / 4, w / 2);
+	
+	                //Special cases where intersects with hexagon corners
+	                if (alpha == beta) {
+	                    return new mxPoint(x + w, y + Math.floor(0.25 * h));
+	                } else if (alpha == pi2) {
+	                    return new mxPoint(x + Math.floor(0.5 * w), y);
+	                } else if (alpha == pi - beta) {
+	                    return new mxPoint(x, y + Math.floor(0.25 * h));
+	                } else if (alpha == -beta) {
+	                    return new mxPoint(x + w, y + Math.floor(0.75 * h));
+	                } else if (alpha == -pi2) {
+	                    return new mxPoint(x + Math.floor(0.5 * w), y + h);
+	                } else if (alpha == -pi + beta) {
+	                    return new mxPoint(x, y + Math.floor(0.75 * h));
+	                }
+	
+	                if (alpha < beta && alpha > -beta) {
+	                    a = new mxPoint(x + w, y);
+	                    b = new mxPoint(x + w, y + h);
+	                } else if (alpha > beta && alpha < pi2) {
+	                    a = new mxPoint(x, y - Math.floor(0.25 * h));
+	                    b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                } else if (alpha > pi2 && alpha < pi - beta) {
+	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
+	                } else if (alpha > pi - beta && alpha <= pi || alpha < -pi + beta && alpha >= -pi) {
+	                    a = new mxPoint(x, y);
+	                    b = new mxPoint(x, y + h);
+	                } else if (alpha < -beta && alpha > -pi2) {
+	                    a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x, y + Math.floor(1.25 * h));
+	                } else if (alpha < -pi2 && alpha > -pi + beta) {
+	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
+	                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
+	                }
+	            } else {
+	                var beta = Math.atan2(h / 2, w / 4);
+	
+	                //Special cases where intersects with hexagon corners
+	                if (alpha == beta) {
+	                    return new mxPoint(x + Math.floor(0.75 * w), y);
+	                } else if (alpha == pi - beta) {
+	                    return new mxPoint(x + Math.floor(0.25 * w), y);
+	                } else if (alpha == pi || alpha == -pi) {
+	                    return new mxPoint(x, y + Math.floor(0.5 * h));
+	                } else if (alpha == 0) {
+	                    return new mxPoint(x + w, y + Math.floor(0.5 * h));
+	                } else if (alpha == -beta) {
+	                    return new mxPoint(x + Math.floor(0.75 * w), y + h);
+	                } else if (alpha == -pi + beta) {
+	                    return new mxPoint(x + Math.floor(0.25 * w), y + h);
+	                }
+	
+	                if (alpha > 0 && alpha < beta) {
+	                    a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
+	                } else if (alpha > beta && alpha < pi - beta) {
+	                    a = new mxPoint(x, y);
+	                    b = new mxPoint(x + w, y);
+	                } else if (alpha > pi - beta && alpha < pi) {
+	                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
+	                    b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
+	                } else if (alpha < 0 && alpha > -beta) {
+	                    a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                    b = new mxPoint(x + Math.floor(1.25 * w), y);
+	                } else if (alpha < -beta && alpha > -pi + beta) {
+	                    a = new mxPoint(x, y + h);
+	                    b = new mxPoint(x + w, y + h);
+	                } else if (alpha < -pi + beta && alpha > -pi) {
+	                    a = new mxPoint(x - Math.floor(0.25 * w), y);
+	                    b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
+	                }
+	            }
+	
+	            result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
+	        }
+	
+	        if (result == null) {
+	            return new mxPoint(cx, cy);
+	        }
+	
+	        return result;
+	    }
+	};
+	
+	exports['default'] = perimeter;
 	module.exports = exports['default'];
 
 /***/ },
-/* 18 */
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Base = __webpack_require__(14);
+	
+	var _Base2 = _interopRequireDefault(_Base);
+	
+	var Point = _Base2['default'].extend({
+	
+	    constructor: function Point(x, y) {
+	        this.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
+	        this.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
+	    },
+	
+	    equals: function equals(point) {
+	        return point && point instanceof Point && point.x === this.x && point.y === this.y;
+	    },
+	
+	    clone: function clone() {
+	        return new Point(this.x, this.y);
+	    }
+	});
+	
+	exports['default'] = Point;
+	module.exports = exports['default'];
+
+/***/ },
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2988,215 +3612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    RECTANGLE: 'rectangle',
-	    ELLIPSE: 'ellipse',
-	    DOUBLE_ELLIPSE: 'doubleEllipse',
-	    RHOMBUS: 'rhombus',
-	    LINE: 'line',
-	    IMAGE: 'image',
-	    ARROW: 'arrow',
-	    LABEL: 'label',
-	    CYLINDER: 'cylinder',
-	    SWIMLANE: 'swimlane',
-	    CONNECTOR: 'connector',
-	    ACTOR: 'actor',
-	    CLOUD: 'cloud',
-	    TRIANGLE: 'triangle',
-	    HEXAGON: 'hexagon'
-	};
-
-/***/ },
-/* 20 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    left: 'left',
-	    center: 'center',
-	    right: 'right',
-	    top: 'top',
-	    middle: 'middle',
-	    bottom: 'bottom'
-	};
-
-/***/ },
 /* 21 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    CLASSIC: 'classic',
-	    BLOCK: 'block',
-	    OPEN: 'open',
-	    OVAL: 'oval',
-	    DIAMOND: 'diamond',
-	    DIAMOND_THIN: 'diamondThin'
-	};
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _enumsStyleNames = __webpack_require__(18);
-	
-	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
-	
-	var _enumsShapeNames = __webpack_require__(19);
-	
-	var _enumsShapeNames2 = _interopRequireDefault(_enumsShapeNames);
-	
-	var _enumsAlignments = __webpack_require__(20);
-	
-	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
-	
-	var _commonPerimeter = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../common/perimeter\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-	
-	var style = {};
-	
-	style[_enumsStyleNames2['default'].shape] = _enumsShapeNames2['default'].RECTANGLE;
-	style[_enumsStyleNames2['default'].perimeter] = _commonPerimeter.rectanglePerimeter;
-	style[_enumsStyleNames2['default'].VERTICAL_ALIGN] = _enumsAlignments2['default'].MIDDLE;
-	style[_enumsStyleNames2['default'].ALIGN] = _enumsAlignments2['default'].CENTER;
-	style[_enumsStyleNames2['default'].fillColor] = '#e3f4ff';
-	style[_enumsStyleNames2['default'].strokeColor] = '#289de9';
-	style[_enumsStyleNames2['default'].FONT_COLOR] = '#774400';
-	
-	exports['default'] = style;
-	module.exports = exports['default'];
-
-/***/ },
-/* 23 */,
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Base = __webpack_require__(14);
-	
-	var _Base2 = _interopRequireDefault(_Base);
-	
-	var Point = _Base2['default'].extend({
-	
-	    constructor: function Point(x, y) {
-	        this.x = !(0, _commonUtils.isNullOrUndefined)(x) ? x : 0;
-	        this.y = !(0, _commonUtils.isNullOrUndefined)(y) ? y : 0;
-	    },
-	
-	    equals: function equals(point) {
-	        return point && point instanceof Point && point.x === this.x && point.y === this.y;
-	    },
-	
-	    clone: function clone() {
-	        return new Point(this.x, this.y);
-	    }
-	});
-	
-	exports['default'] = Point;
-	module.exports = exports['default'];
-
-/***/ },
-/* 25 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	
-	    common: {
-	        // translate
-	        dx: 0,
-	        dy: 0,
-	
-	        scale: 1,
-	
-	        // rotate
-	        rotation: 0,
-	        rotationCx: 0,
-	        rotationCy: 0,
-	
-	        opacity: 1,
-	
-	        // fill
-	        fillColor: '#e3f4ff',
-	        fillOpacity: 1,
-	        gradientColor: '',
-	        gradientOpacity: 1,
-	        gradientDirection: '',
-	
-	        // border
-	        strokeWidth: 1,
-	        strokeColor: '#2db7f5',
-	        dashed: false,
-	        dashPattern: '3 3',
-	        dashOffset: 0,
-	        lineCap: 'butt', // butt, round, square
-	        lineJoin: 'miter', // miter, round, bevel
-	        miterLimit: 10,
-	
-	        // shadow
-	        shadow: false,
-	        shadowColor: 'gray',
-	        shadowOpacity: 1,
-	        shadowDx: 2,
-	        shadowDy: 3,
-	
-	        glass: false,
-	        flipH: false, // 水平翻转
-	        flipV: false, // 垂直翻转
-	        visible: true, // 默认可见
-	        outline: false,
-	        antiAlias: true,
-	
-	        label: {
-	            shape: 'label',
-	            position: 'center', // top, right, bottom, left, center
-	            align: 'center', // left, center, right
-	            verticalAlign: 'middle', // top, middle, bottom
-	            overflow: '', // hidden, fill, width
-	            spacing: 5,
-	            vertical: false,
-	            verticalRotation: -90
-	        }
-	    },
-	
-	    node: {
-	        shape: 'rectangle',
-	        round: 0 // percentage
-	    },
-	
-	    link: {
-	        shape: 'connector',
-	        endArrow: 'classic' }
-	
-	};
-	// classic, block, open, oval, diamond, diamondThin
-
-/***/ },
-/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3471,7 +3887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3484,7 +3900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libRectangle = __webpack_require__(28);
+	var _libRectangle = __webpack_require__(23);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
@@ -3648,7 +4064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 28 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3665,7 +4081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
-	var _Point = __webpack_require__(24);
+	var _Point = __webpack_require__(19);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
@@ -3770,7 +4186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3791,31 +4207,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _libPoint = __webpack_require__(24);
+	var _libPoint = __webpack_require__(19);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
-	var _libRectangle = __webpack_require__(28);
+	var _libRectangle = __webpack_require__(23);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
-	var _libDictionary = __webpack_require__(30);
+	var _libDictionary = __webpack_require__(25);
 	
 	var _libDictionary2 = _interopRequireDefault(_libDictionary);
 	
-	var _enumsStyleNames = __webpack_require__(18);
+	var _enumsStyleNames = __webpack_require__(20);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsAlignments = __webpack_require__(20);
+	var _enumsAlignments = __webpack_require__(27);
 	
 	var _enumsAlignments2 = _interopRequireDefault(_enumsAlignments);
 	
-	var _cellState = __webpack_require__(32);
+	var _cellState = __webpack_require__(28);
 	
 	var _cellState2 = _interopRequireDefault(_cellState);
 	
-	var _cellRenderer = __webpack_require__(33);
+	var _cellRenderer = __webpack_require__(29);
 	
 	var _cellRenderer2 = _interopRequireDefault(_cellRenderer);
 	
@@ -4869,7 +5285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4886,7 +5302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
-	var _commonObjectIdentity = __webpack_require__(31);
+	var _commonObjectIdentity = __webpack_require__(26);
 	
 	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
 	
@@ -4958,7 +5374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5008,7 +5424,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 32 */
+/* 27 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	    left: 'left',
+	    center: 'center',
+	    right: 'right',
+	    top: 'top',
+	    middle: 'middle',
+	    bottom: 'bottom'
+	};
+
+/***/ },
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5021,11 +5452,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libPoint = __webpack_require__(24);
+	var _libPoint = __webpack_require__(19);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
-	var _libRectangle = __webpack_require__(28);
+	var _libRectangle = __webpack_require__(23);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
@@ -5207,7 +5638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5224,23 +5655,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _enumsStyleNames = __webpack_require__(18);
+	var _enumsStyleNames = __webpack_require__(20);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _libRectangle = __webpack_require__(28);
+	var _libRectangle = __webpack_require__(23);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
-	var _shapesRect = __webpack_require__(34);
+	var _shapesRect = __webpack_require__(30);
 	
 	var _shapesRect2 = _interopRequireDefault(_shapesRect);
 	
-	var _shapesLabel = __webpack_require__(43);
+	var _shapesLabel = __webpack_require__(39);
 	
 	var _shapesLabel2 = _interopRequireDefault(_shapesLabel);
 	
-	var _shapesConnector = __webpack_require__(51);
+	var _shapesConnector = __webpack_require__(40);
 	
 	var _shapesConnector2 = _interopRequireDefault(_shapesConnector);
 	
@@ -5533,7 +5964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5546,7 +5977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Shape = __webpack_require__(35);
+	var _Shape = __webpack_require__(31);
 	
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
@@ -5587,7 +6018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5604,15 +6035,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _drawingCanvas = __webpack_require__(36);
+	var _drawingCanvas = __webpack_require__(32);
 	
 	var _drawingCanvas2 = _interopRequireDefault(_drawingCanvas);
 	
-	var _libPoint = __webpack_require__(24);
+	var _libPoint = __webpack_require__(19);
 	
 	var _libPoint2 = _interopRequireDefault(_libPoint);
 	
-	var _libRectangle = __webpack_require__(28);
+	var _libRectangle = __webpack_require__(23);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
 	
@@ -5620,11 +6051,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
-	var _enumsStyleNames = __webpack_require__(18);
+	var _enumsStyleNames = __webpack_require__(20);
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsDirections = __webpack_require__(42);
+	var _enumsDirections = __webpack_require__(38);
 	
 	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
 	
@@ -6198,7 +6629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6215,19 +6646,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _Path = __webpack_require__(37);
+	var _Path = __webpack_require__(33);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Pen = __webpack_require__(38);
+	var _Pen = __webpack_require__(34);
 	
 	var _Pen2 = _interopRequireDefault(_Pen);
 	
-	var _SolidBrush = __webpack_require__(39);
+	var _SolidBrush = __webpack_require__(35);
 	
 	var _SolidBrush2 = _interopRequireDefault(_SolidBrush);
 	
-	var _LinearGradientBrush = __webpack_require__(41);
+	var _LinearGradientBrush = __webpack_require__(37);
 	
 	var _LinearGradientBrush2 = _interopRequireDefault(_LinearGradientBrush);
 	
@@ -6459,7 +6890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6552,7 +6983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6650,7 +7081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 39 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6661,7 +7092,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Brush = __webpack_require__(40);
+	var _Brush = __webpack_require__(36);
 	
 	var _Brush2 = _interopRequireDefault(_Brush);
 	
@@ -6690,7 +7121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6739,7 +7170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6752,11 +7183,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Brush = __webpack_require__(40);
+	var _Brush = __webpack_require__(36);
 	
 	var _Brush2 = _interopRequireDefault(_Brush);
 	
-	var _enumsDirections = __webpack_require__(42);
+	var _enumsDirections = __webpack_require__(38);
 	
 	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
 	
@@ -6900,7 +7331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 38 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6913,7 +7344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 43 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6926,7 +7357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Shape = __webpack_require__(35);
+	var _Shape = __webpack_require__(31);
 	
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
@@ -7179,7 +7610,251 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _PolyLine = __webpack_require__(41);
+	
+	var _PolyLine2 = _interopRequireDefault(_PolyLine);
+	
+	var _marker = __webpack_require__(42);
+	
+	var _marker2 = _interopRequireDefault(_marker);
+	
+	var Connector = _PolyLine2['default'].extend({
+	
+	    constructor: function Connector(state, style, points) {
+	        Connector.superclass.constructor.call(this, state, style, points);
+	    },
+	
+	    drawLink: function drawLink(canvas, points) {
+	
+	        var that = this;
+	
+	        var sourceMarker = that.createMarker(canvas, points, true);
+	        var targetMarker = that.createMarker(canvas, points, false);
+	
+	        Connector.superclass.drawLink.call(that, canvas, points);
+	
+	        sourceMarker && sourceMarker();
+	        targetMarker && targetMarker();
+	
+	        return that;
+	    },
+	
+	    createMarker: function createMarker(canvas, points, isSource) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var result = null;
+	        var n = points.length;
+	        var type = isSource ? style.startArrow : style.endArrow;
+	        var p0 = isSource ? points[1] : points[n - 2];
+	        var pe = isSource ? points[0] : points[n - 1];
+	
+	        if (type && p0 && pe) {
+	            var count = 1;
+	
+	            // Uses next non-overlapping point
+	            while (count < n - 1 && Math.round(p0.x - pe.x) === 0 && Math.round(p0.y - pe.y) === 0) {
+	                p0 = isSource ? points[1 + count] : points[n - 2 - count];
+	                count++;
+	            }
+	
+	            // Computes the norm and the inverse norm
+	            var dx = pe.x - p0.x;
+	            var dy = pe.y - p0.y;
+	
+	            var dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+	
+	            var unitX = dx / dist;
+	            var unitY = dy / dist;
+	
+	            var size = 6; //mxUtils.getNumber(this.style, (isSource) ? mxConstants.STYLE_STARTSIZE : mxConstants.STYLE_ENDSIZE, mxConstants.DEFAULT_MARKERSIZE);
+	
+	            // Allow for stroke width in the end point used and the
+	            // orthogonal vectors describing the direction of the marker
+	            var filled = true; //this.style[(isSource) ? mxConstants.STYLE_STARTFILL : mxConstants.STYLE_ENDFILL] != 0;
+	
+	            result = _marker2['default'].createMarker(canvas, this, type, pe, unitX, unitY, size, isSource, 1, filled);
+	        }
+	
+	        return result;
+	    }
+	
+	});
+	
+	//augmentBoundingBox: function (bbox) {
+	//
+	//}
+	exports['default'] = Connector;
+	module.exports = exports['default'];
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _Shape = __webpack_require__(31);
+	
+	var _Shape2 = _interopRequireDefault(_Shape);
+	
+	exports['default'] = _Shape2['default'].extend({
+	
+	    constructor: function PolyLine(state, style, points) {
+	
+	        var that = this;
+	
+	        that.state = state;
+	        that.style = style;
+	        that.points = points;
+	    },
+	
+	    getRotation: function getRotation() {
+	        return 0;
+	    },
+	
+	    isPaintBoundsInverted: function isPaintBoundsInverted() {
+	        return false;
+	    },
+	
+	    drawLink: function drawLink(canvas, points) {
+	
+	        var that = this;
+	        var style = that.style;
+	
+	        if (style && style.curved) {
+	            that.drawLine(canvas, points, this.isRounded);
+	        } else {
+	            that.drawCurve(canvas, points);
+	        }
+	
+	        return that;
+	    },
+	
+	    drawLine: function drawLine(c, pts, rounded) {},
+	
+	    drawCurve: function drawCurve(canvas, points) {
+	
+	        var path = canvas.drawPath();
+	        var pt = points[0];
+	        var n = points.length;
+	
+	        path.moveTo(pt.x, pt.y);
+	
+	        for (var i = 1; i < n - 2; i++) {
+	            var p0 = points[i];
+	            var p1 = points[i + 1];
+	            var ix = (p0.x + p1.x) / 2;
+	            var iy = (p0.y + p1.y) / 2;
+	
+	            path.quadTo(p0.x, p0.y, ix, iy);
+	        }
+	
+	        var p0 = points[n - 2];
+	        var p1 = points[n - 1];
+	
+	        path.quadTo(p0.x, p0.y, p1.x, p1.y);
+	
+	        canvas.addNode(false, true);
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 42 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	var marker = {
+	
+	    markers: {},
+	
+	    addMarker: function addMarker(type, func) {
+	        marker.markers[type] = func;
+	    },
+	
+	    createMarker: function createMarker(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+	
+	        var func = marker.markers[type];
+	
+	        return func ? func(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) : null;
+	    }
+	};
+	
+	function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+	    // The angle of the forward facing arrow sides against the x axis is
+	    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+	    // only half the strokewidth is processed ).
+	    var endOffsetX = unitX * sw * 1.118;
+	    var endOffsetY = unitY * sw * 1.118;
+	
+	    unitX = unitX * (size + sw);
+	    unitY = unitY * (size + sw);
+	
+	    var pt = pe.clone();
+	    pt.x -= endOffsetX;
+	    pt.y -= endOffsetY;
+	
+	    var f = type !== 'classic' ? 1 : 3 / 4;
+	    pe.x += -unitX * f - endOffsetX;
+	    pe.y += -unitY * f - endOffsetY;
+	
+	    return function () {
+	
+	        var path = canvas.drawPath();
+	
+	        path.moveTo(pt.x, pt.y);
+	        path.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+	
+	        if (type === 'classic') {
+	            path.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+	        }
+	
+	        path.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+	        path.close();
+	
+	        if (filled) {
+	            canvas.addNode(true, true);
+	            //canvas.fillAndStroke();
+	        } else {
+	                canvas.addNode(false, true);
+	                //canvas.stroke();
+	            }
+	    };
+	}
+	
+	marker.addMarker('classic', arrow);
+	marker.addMarker('block', arrow);
+	
+	exports['default'] = marker;
+	module.exports = exports['default'];
+
+/***/ },
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7196,23 +7871,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _cellCell = __webpack_require__(26);
+	var _cellCell = __webpack_require__(21);
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
-	var _commonObjectIdentity = __webpack_require__(31);
+	var _cellRoute = __webpack_require__(56);
+	
+	var _cellRoute2 = _interopRequireDefault(_cellRoute);
+	
+	var _commonObjectIdentity = __webpack_require__(26);
 	
 	var _commonObjectIdentity2 = _interopRequireDefault(_commonObjectIdentity);
 	
 	// events
 	
-	var _eventsAspect = __webpack_require__(45);
+	var _eventsAspect = __webpack_require__(44);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
-	
-	var _eventsEventNames = __webpack_require__(46);
-	
-	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
 	var _eventsEventSource = __webpack_require__(13);
 	
@@ -7220,39 +7895,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// changes
 	
-	var _changesRootChange = __webpack_require__(47);
+	var _changesRootChange = __webpack_require__(46);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(49);
+	var _changesChildChange = __webpack_require__(48);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesValueChange = __webpack_require__(56);
+	var _changesValueChange = __webpack_require__(49);
 	
 	var _changesValueChange2 = _interopRequireDefault(_changesValueChange);
 	
-	var _changesStyleChange = __webpack_require__(58);
+	var _changesStyleChange = __webpack_require__(50);
 	
 	var _changesStyleChange2 = _interopRequireDefault(_changesStyleChange);
 	
-	var _changesVisibleChange = __webpack_require__(59);
+	var _changesVisibleChange = __webpack_require__(51);
 	
 	var _changesVisibleChange2 = _interopRequireDefault(_changesVisibleChange);
 	
-	var _changesTerminalChange = __webpack_require__(54);
+	var _changesTerminalChange = __webpack_require__(52);
 	
 	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
 	
-	var _changesGeometryChange = __webpack_require__(57);
+	var _changesGeometryChange = __webpack_require__(53);
 	
 	var _changesGeometryChange2 = _interopRequireDefault(_changesGeometryChange);
 	
-	var _changesCollapseChange = __webpack_require__(60);
+	var _changesCollapseChange = __webpack_require__(54);
 	
 	var _changesCollapseChange2 = _interopRequireDefault(_changesCollapseChange);
 	
-	var _changesChangeCollection = __webpack_require__(50);
+	var _changesChangeCollection = __webpack_require__(55);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
@@ -7358,7 +8033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var parent = cell.parent;
 	
 	                if (parent) {
-	                    var id = mxCellPath.create(parent);
+	                    var id = _cellRoute2['default'].create(parent);
 	
 	                    if (!hash[id]) {
 	                        hash[id] = parent;
@@ -7569,33 +8244,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {
+	
 	        if (cell1 && cell2) {
-	            var path = mxCellPath.create(cell2);
 	
-	            if (path && path.length > 0) {
-	                // Bubbles through the ancestors of the first
-	                // cell to find the nearest common ancestor.
+	            var route1 = _cellRoute2['default'].create(cell1);
+	            var route2 = _cellRoute2['default'].create(cell2);
+	
+	            if (route1 && route2) {
+	
 	                var cell = cell1;
-	                var current = mxCellPath.create(cell);
+	                var route = route2;
+	                var current = route1;
 	
-	                // Inverts arguments
-	                if (path.length < current.length) {
+	                if (route1.length > route2.length) {
 	                    cell = cell2;
-	                    var tmp = current;
-	                    current = path;
-	                    path = tmp;
+	                    route = route1;
+	                    current = route2;
 	                }
 	
 	                while (cell) {
 	                    var parent = cell.parent;
 	
-	                    // Checks if the cell path is equal to the beginning of the given cell path
-	                    if (path.indexOf(current + mxCellPath.PATH_SEPARATOR) == 0 && parent != null) {
+	                    // check if the cell path is equal to the beginning of the given cell path
+	                    if (route.indexOf(current + _cellRoute2['default'].separator) === 0 && parent) {
 	                        return cell;
 	                    }
 	
-	                    current = mxCellPath.getParentPath(current);
 	                    cell = parent;
+	                    current = _cellRoute2['default'].getParentRoute(current);
 	                }
 	            }
 	        }
@@ -7725,7 +8401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.digest(new _changesTerminalChange2['default'](that, link, node, isSource));
 	
 	        if (that.maintainEdgeParent && terminalChanged) {
-	            that.updateEdgeParent(link, that.getRoot());
+	            that.updateLinkParent(link, that.getRoot());
 	        }
 	
 	        return that;
@@ -7980,10 +8656,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        that.updateLevel += 1;
-	        that.emit(_eventsEventNames2['default'].BEGIN_UPDATE);
+	        that.emit('beginUpdate');
 	
 	        if (that.updateLevel === 1) {
-	            that.emit(_eventsEventNames2['default'].START_EDIT);
+	            that.emit('startEdit');
 	        }
 	    },
 	
@@ -7994,7 +8670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.updateLevel -= 1;
 	
 	        if (that.updateLevel === 0) {
-	            that.emit(_eventsEventNames2['default'].END_EDIT);
+	            that.emit('endEdit');
 	        }
 	
 	        if (!that.endingUpdate) {
@@ -8002,7 +8678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var changeCollection = that.changeCollection;
 	
 	            that.endingUpdate = that.updateLevel === 0;
-	            that.emit(_eventsEventNames2['default'].END_UPDATE, { changes: changeCollection.changes });
+	            that.emit('endUpdate', { changes: changeCollection.changes });
 	
 	            // 触发重绘
 	            if (that.endingUpdate && changeCollection.hasChange()) {
@@ -8023,24 +8699,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    cloneCells: function cloneCells(cells, recurse) {
 	
 	        var that = this;
-	        var clones = [];
+	        var result = [];
 	        var mapping = {};
 	
 	        cells && (0, _commonUtils.each)(cells, function (cell) {
-	            if (cell) {
-	                clones.push(that.doCellClone(cell, mapping, recurse));
-	            } else {
-	                clones.push(null);
-	            }
+	            var cloned = cell ? that.doCellClone(cell, mapping, recurse) : null;
+	            result.push(cloned);
 	        });
 	
-	        for (var i = 0; i < clones.length; i++) {
-	            if (clones[i]) {
-	                this.restoreClone(clones[i], cells[i], mapping);
-	            }
-	        }
+	        (0, _commonUtils.each)(result, function (cloned, index) {
+	            cloned && that.restoreClone(cloned, cells[index], mapping);
+	        });
 	
-	        return clones;
+	        return result;
 	    },
 	
 	    doCellClone: function doCellClone(cell, mapping, recurse) {
@@ -8048,6 +8719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var cloned = cell.clone();
 	
+	        // 用被克隆的对象来生成唯一 ID
 	        mapping[_commonObjectIdentity2['default'].get(cell)] = cloned;
 	
 	        if (recurse) {
@@ -8060,15 +8732,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cloned;
 	    },
 	
-	    restoreClone: function restoreClone(clone, cell, mapping) {
+	    restoreClone: function restoreClone(cloned, cell, mapping) {
 	
 	        var that = this;
 	        var temp;
+	
 	        var source = cell.source;
 	        if (source) {
 	            temp = mapping[_commonObjectIdentity2['default'].get(source)];
 	            if (temp) {
-	                temp.insertLink(clone, true);
+	                temp.insertLink(cloned, true);
 	            }
 	        }
 	
@@ -8076,25 +8749,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (target) {
 	            temp = mapping[_commonObjectIdentity2['default'].get(target)];
 	            if (temp) {
-	                temp.insertLink(clone, false);
+	                temp.insertLink(cloned, false);
 	            }
 	        }
 	
-	        clone.eachChild(function (child, index) {
+	        cloned.eachChild(function (child, index) {
 	            that.restoreClone(child, cell.getChildAt(index), mapping);
 	        });
-	
-	        var childCount = this.getChildCount(clone);
-	
-	        for (var i = 0; i < childCount; i++) {
-	            this.restoreClone(this.getChildAt(clone, i), this.getChildAt(cell, i), mapping);
-	        }
 	    }
 	});
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8181,26 +8848,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 45 */,
 /* 46 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	    //BEFORE_DIGEST: 'beforeDigest',
-	    //AFTER_DIGEST: 'afterDigest',
-	
-	    BEGIN_UPDATE: 'beginUpdate',
-	    END_UPDATE: 'endUpdate',
-	
-	    START_EDIT: 'startEdit',
-	    END_EDIT: 'endEdit',
-	
-	    CHANGE: 'change'
-	};
-
-/***/ },
-/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8211,7 +8860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(48);
+	var _Change = __webpack_require__(47);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -8240,7 +8889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8264,7 +8913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8275,7 +8924,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(48);
+	var _Change = __webpack_require__(47);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -8355,7 +9004,242 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(47);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function ValueChange(model, cell, value) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.value = value;
+	        that.previous = value;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.value = that.previous;
+	        that.previous = that.model.valueChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
 /* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(47);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function StyleChange(model, cell, style) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.style = style;
+	        that.previous = style;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.style = that.previous;
+	        that.previous = that.model.styleChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(47);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function VisibleChange(model, cell, visible) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.visible = visible;
+	        that.previous = visible;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.visible = that.previous;
+	        that.previous = that.model.visibleChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(47);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function TerminalChange(model, link, node, isSource) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = link;
+	        that.terminal = node;
+	        that.previous = node;
+	        that.isSource = isSource;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.terminal = that.previous;
+	        that.previous = that.model.terminalChanged(that.cell, that.previous, that.isSource);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(47);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function GeometryChange(model, cell, geometry) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.geometry = geometry;
+	        that.previous = geometry;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.geometry = that.previous;
+	        that.previous = that.model.geometryChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(47);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	    constructor: function CollapseChange(model, cell, collapsed) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.cell = cell;
+	        that.collapsed = collapsed;
+	        that.previous = collapsed;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	
+	        that.collapsed = that.previous;
+	        that.previous = that.model.collapseChanged(that.cell, that.previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8369,10 +9253,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
-	
-	var _eventsEventNames = __webpack_require__(46);
-	
-	var _eventsEventNames2 = _interopRequireDefault(_eventsEventNames);
 	
 	exports['default'] = _libBase2['default'].extend({
 	    constructor: function ChangeCollection(model) {
@@ -8411,187 +9291,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        that.model.emit(_eventsEventNames2['default'].CHANGE, { changes: that.changes });
+	        that.model.emit('change', { changes: that.changes });
 	
 	        return that;
-	    }
-	
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _PolyLine = __webpack_require__(52);
-	
-	var _PolyLine2 = _interopRequireDefault(_PolyLine);
-	
-	var _marker = __webpack_require__(53);
-	
-	var _marker2 = _interopRequireDefault(_marker);
-	
-	var Connector = _PolyLine2['default'].extend({
-	
-	    constructor: function Connector(state, style, points) {
-	        Connector.superclass.constructor.call(this, state, style, points);
-	    },
-	
-	    drawLink: function drawLink(canvas, points) {
-	
-	        var that = this;
-	
-	        var sourceMarker = that.createMarker(canvas, points, true);
-	        var targetMarker = that.createMarker(canvas, points, false);
-	
-	        Connector.superclass.drawLink.call(that, canvas, points);
-	
-	        sourceMarker && sourceMarker();
-	        targetMarker && targetMarker();
-	
-	        return that;
-	    },
-	
-	    createMarker: function createMarker(canvas, points, isSource) {
-	
-	        var that = this;
-	        var style = that.style;
-	        var result = null;
-	        var n = points.length;
-	        var type = isSource ? style.startArrow : style.endArrow;
-	        var p0 = isSource ? points[1] : points[n - 2];
-	        var pe = isSource ? points[0] : points[n - 1];
-	
-	        if (type && p0 && pe) {
-	            var count = 1;
-	
-	            // Uses next non-overlapping point
-	            while (count < n - 1 && Math.round(p0.x - pe.x) === 0 && Math.round(p0.y - pe.y) === 0) {
-	                p0 = isSource ? points[1 + count] : points[n - 2 - count];
-	                count++;
-	            }
-	
-	            // Computes the norm and the inverse norm
-	            var dx = pe.x - p0.x;
-	            var dy = pe.y - p0.y;
-	
-	            var dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
-	
-	            var unitX = dx / dist;
-	            var unitY = dy / dist;
-	
-	            var size = 6; //mxUtils.getNumber(this.style, (isSource) ? mxConstants.STYLE_STARTSIZE : mxConstants.STYLE_ENDSIZE, mxConstants.DEFAULT_MARKERSIZE);
-	
-	            // Allow for stroke width in the end point used and the
-	            // orthogonal vectors describing the direction of the marker
-	            var filled = true; //this.style[(isSource) ? mxConstants.STYLE_STARTFILL : mxConstants.STYLE_ENDFILL] != 0;
-	
-	            result = _marker2['default'].createMarker(canvas, this, type, pe, unitX, unitY, size, isSource, 1, filled);
-	        }
-	
-	        return result;
-	    }
-	
-	});
-	
-	//augmentBoundingBox: function (bbox) {
-	//
-	//}
-	exports['default'] = Connector;
-	module.exports = exports['default'];
-
-/***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Shape = __webpack_require__(35);
-	
-	var _Shape2 = _interopRequireDefault(_Shape);
-	
-	exports['default'] = _Shape2['default'].extend({
-	
-	    constructor: function PolyLine(state, style, points) {
-	
-	        var that = this;
-	
-	        that.state = state;
-	        that.style = style;
-	        that.points = points;
-	    },
-	
-	    getRotation: function getRotation() {
-	        return 0;
-	    },
-	
-	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return false;
-	    },
-	
-	    drawLink: function drawLink(canvas, points) {
-	
-	        var that = this;
-	        var style = that.style;
-	
-	        if (style && style.curved) {
-	            that.drawLine(canvas, points, this.isRounded);
-	        } else {
-	            that.drawCurve(canvas, points);
-	        }
-	
-	        return that;
-	    },
-	
-	    drawLine: function drawLine(c, pts, rounded) {},
-	
-	    drawCurve: function drawCurve(canvas, points) {
-	
-	        var path = canvas.drawPath();
-	        var pt = points[0];
-	        var n = points.length;
-	
-	        path.moveTo(pt.x, pt.y);
-	
-	        for (var i = 1; i < n - 2; i++) {
-	            var p0 = points[i];
-	            var p1 = points[i + 1];
-	            var ix = (p0.x + p1.x) / 2;
-	            var iy = (p0.y + p1.y) / 2;
-	
-	            path.quadTo(p0.x, p0.y, ix, iy);
-	        }
-	
-	        var p0 = points[n - 2];
-	        var p1 = points[n - 1];
-	
-	        path.quadTo(p0.x, p0.y, p1.x, p1.y);
-	
-	        canvas.addNode(false, true);
 	    }
 	});
 	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 56 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -8599,854 +9307,96 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	var marker = {
+	var cellRoute = {
 	
-	    markers: {},
+	    separator: '.',
 	
-	    addMarker: function addMarker(type, func) {
-	        marker.markers[type] = func;
-	    },
+	    create: function create(cell) {
 	
-	    createMarker: function createMarker(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
+	        var result = '';
 	
-	        var func = marker.markers[type];
+	        if (cell) {
+	            var parent = cell.parent;
 	
-	        return func ? func(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) : null;
-	    }
-	};
+	            while (parent) {
+	                var index = parent.getChildIndex(cell);
+	                result = index + cellRoute.separator + result;
 	
-	function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) {
-	    // The angle of the forward facing arrow sides against the x axis is
-	    // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
-	    // only half the strokewidth is processed ).
-	    var endOffsetX = unitX * sw * 1.118;
-	    var endOffsetY = unitY * sw * 1.118;
-	
-	    unitX = unitX * (size + sw);
-	    unitY = unitY * (size + sw);
-	
-	    var pt = pe.clone();
-	    pt.x -= endOffsetX;
-	    pt.y -= endOffsetY;
-	
-	    var f = type !== 'classic' ? 1 : 3 / 4;
-	    pe.x += -unitX * f - endOffsetX;
-	    pe.y += -unitY * f - endOffsetY;
-	
-	    return function () {
-	
-	        var path = canvas.drawPath();
-	
-	        path.moveTo(pt.x, pt.y);
-	        path.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
-	
-	        if (type === 'classic') {
-	            path.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
-	        }
-	
-	        path.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-	        path.close();
-	
-	        if (filled) {
-	            canvas.addNode(true, true);
-	            //canvas.fillAndStroke();
-	        } else {
-	                canvas.addNode(false, true);
-	                //canvas.stroke();
-	            }
-	    };
-	}
-	
-	marker.addMarker('classic', arrow);
-	marker.addMarker('block', arrow);
-	
-	exports['default'] = marker;
-	module.exports = exports['default'];
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(48);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function TerminalChange(model, link, node, isSource) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.cell = link;
-	        that.terminal = node;
-	        that.previous = node;
-	        that.isSource = isSource;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	
-	        that.terminal = that.previous;
-	        that.previous = that.model.terminalChanged(that.cell, that.previous, that.isSource);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _libPoint = __webpack_require__(24);
-	
-	var _libPoint2 = _interopRequireDefault(_libPoint);
-	
-	module.exports = {
-	    RectanglePerimeter: function RectanglePerimeter(bounds, vertex, next, orthogonal) {
-	        var cx = bounds.getCenterX();
-	        var cy = bounds.getCenterY();
-	        var dx = next.x - cx;
-	        var dy = next.y - cy;
-	        var alpha = Math.atan2(dy, dx);
-	        var p = new _libPoint2['default'](0, 0);
-	        var pi = Math.PI;
-	        var pi2 = Math.PI / 2;
-	        var beta = pi2 - alpha;
-	        var t = Math.atan2(bounds.height, bounds.width);
-	
-	        if (alpha < -pi + t || alpha > pi - t) {
-	            // Left edge
-	            p.x = bounds.x;
-	            p.y = cy - bounds.width * Math.tan(alpha) / 2;
-	        } else if (alpha < -t) {
-	            // Top Edge
-	            p.y = bounds.y;
-	            p.x = cx - bounds.height * Math.tan(beta) / 2;
-	        } else if (alpha < t) {
-	            // Right Edge
-	            p.x = bounds.x + bounds.width;
-	            p.y = cy + bounds.width * Math.tan(alpha) / 2;
-	        } else {
-	            // Bottom Edge
-	            p.y = bounds.y + bounds.height;
-	            p.x = cx + bounds.height * Math.tan(beta) / 2;
-	        }
-	
-	        if (orthogonal) {
-	            if (next.x >= bounds.x && next.x <= bounds.x + bounds.width) {
-	                p.x = next.x;
-	            } else if (next.y >= bounds.y && next.y <= bounds.y + bounds.height) {
-	                p.y = next.y;
-	            }
-	            if (next.x < bounds.x) {
-	                p.x = bounds.x;
-	            } else if (next.x > bounds.x + bounds.width) {
-	                p.x = bounds.x + bounds.width;
-	            }
-	            if (next.y < bounds.y) {
-	                p.y = bounds.y;
-	            } else if (next.y > bounds.y + bounds.height) {
-	                p.y = bounds.y + bounds.height;
+	                cell = parent;
+	                parent = cell.parent;
 	            }
 	        }
 	
-	        return p;
-	    },
-	    EllipsePerimeter: function EllipsePerimeter(bounds, vertex, next, orthogonal) {
-	        var x = bounds.x;
-	        var y = bounds.y;
-	        var a = bounds.width / 2;
-	        var b = bounds.height / 2;
-	        var cx = x + a;
-	        var cy = y + b;
-	        var px = next.x;
-	        var py = next.y;
-	
-	        // Calculates straight line equation through
-	        // point and ellipse center y = d * x + h
-	        var dx = parseInt(px - cx);
-	        var dy = parseInt(py - cy);
-	
-	        if (dx == 0 && dy != 0) {
-	            return new mxPoint(cx, cy + b * dy / Math.abs(dy));
-	        } else if (dx == 0 && dy == 0) {
-	            return new mxPoint(px, py);
-	        }
-	
-	        if (orthogonal) {
-	            if (py >= y && py <= y + bounds.height) {
-	                var ty = py - cy;
-	                var tx = Math.sqrt(a * a * (1 - ty * ty / (b * b))) || 0;
-	
-	                if (px <= x) {
-	                    tx = -tx;
-	                }
-	
-	                return new mxPoint(cx + tx, py);
-	            }
-	
-	            if (px >= x && px <= x + bounds.width) {
-	                var tx = px - cx;
-	                var ty = Math.sqrt(b * b * (1 - tx * tx / (a * a))) || 0;
-	
-	                if (py <= y) {
-	                    ty = -ty;
-	                }
-	
-	                return new mxPoint(px, cy + ty);
-	            }
-	        }
-	
-	        // Calculates intersection
-	        var d = dy / dx;
-	        var h = cy - d * cx;
-	        var e = a * a * d * d + b * b;
-	        var f = -2 * cx * e;
-	        var g = a * a * d * d * cx * cx + b * b * cx * cx - a * a * b * b;
-	        var det = Math.sqrt(f * f - 4 * e * g);
-	
-	        // Two solutions (perimeter points)
-	        var xout1 = (-f + det) / (2 * e);
-	        var xout2 = (-f - det) / (2 * e);
-	        var yout1 = d * xout1 + h;
-	        var yout2 = d * xout2 + h;
-	        var dist1 = Math.sqrt(Math.pow(xout1 - px, 2) + Math.pow(yout1 - py, 2));
-	        var dist2 = Math.sqrt(Math.pow(xout2 - px, 2) + Math.pow(yout2 - py, 2));
-	
-	        // Correct solution
-	        var xout = 0;
-	        var yout = 0;
-	
-	        if (dist1 < dist2) {
-	            xout = xout1;
-	            yout = yout1;
-	        } else {
-	            xout = xout2;
-	            yout = yout2;
-	        }
-	
-	        return new mxPoint(xout, yout);
-	    },
-	    RhombusPerimeter: function RhombusPerimeter(bounds, vertex, next, orthogonal) {
-	        var x = bounds.x;
-	        var y = bounds.y;
-	        var w = bounds.width;
-	        var h = bounds.height;
-	
-	        var cx = x + w / 2;
-	        var cy = y + h / 2;
-	
-	        var px = next.x;
-	        var py = next.y;
-	
-	        // Special case for intersecting the diamond's corners
-	        if (cx == px) {
-	            if (cy > py) {
-	                return new mxPoint(cx, y); // top
-	            } else {
-	                    return new mxPoint(cx, y + h); // bottom
-	                }
-	        } else if (cy == py) {
-	                if (cx > px) {
-	                    return new mxPoint(x, cy); // left
-	                } else {
-	                        return new mxPoint(x + w, cy); // right
-	                    }
-	            }
-	
-	        var tx = cx;
-	        var ty = cy;
-	
-	        if (orthogonal) {
-	            if (px >= x && px <= x + w) {
-	                tx = px;
-	            } else if (py >= y && py <= y + h) {
-	                ty = py;
-	            }
-	        }
-	
-	        // In which quadrant will the intersection be?
-	        // set the slope and offset of the border line accordingly
-	        if (px < cx) {
-	            if (py < cy) {
-	                return mxUtils.intersection(px, py, tx, ty, cx, y, x, cy);
-	            } else {
-	                return mxUtils.intersection(px, py, tx, ty, cx, y + h, x, cy);
-	            }
-	        } else if (py < cy) {
-	            return mxUtils.intersection(px, py, tx, ty, cx, y, x + w, cy);
-	        } else {
-	            return mxUtils.intersection(px, py, tx, ty, cx, y + h, x + w, cy);
-	        }
-	    },
-	    TrianglePerimeter: function TrianglePerimeter(bounds, vertex, next, orthogonal) {
-	        var direction = vertex != null ? vertex.style[mxConstants.STYLE_DIRECTION] : null;
-	        var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
-	
-	        var x = bounds.x;
-	        var y = bounds.y;
-	        var w = bounds.width;
-	        var h = bounds.height;
-	
-	        var cx = x + w / 2;
-	        var cy = y + h / 2;
-	
-	        var start = new mxPoint(x, y);
-	        var corner = new mxPoint(x + w, cy);
-	        var end = new mxPoint(x, y + h);
-	
-	        if (direction == mxConstants.DIRECTION_NORTH) {
-	            start = end;
-	            corner = new mxPoint(cx, y);
-	            end = new mxPoint(x + w, y + h);
-	        } else if (direction == mxConstants.DIRECTION_SOUTH) {
-	            corner = new mxPoint(cx, y + h);
-	            end = new mxPoint(x + w, y);
-	        } else if (direction == mxConstants.DIRECTION_WEST) {
-	            start = new mxPoint(x + w, y);
-	            corner = new mxPoint(x, cy);
-	            end = new mxPoint(x + w, y + h);
-	        }
-	
-	        var dx = next.x - cx;
-	        var dy = next.y - cy;
-	
-	        var alpha = vertical ? Math.atan2(dx, dy) : Math.atan2(dy, dx);
-	        var t = vertical ? Math.atan2(w, h) : Math.atan2(h, w);
-	
-	        var base = false;
-	
-	        if (direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_WEST) {
-	            base = alpha > -t && alpha < t;
-	        } else {
-	            base = alpha < -Math.PI + t || alpha > Math.PI - t;
-	        }
-	
-	        var result = null;
-	
-	        if (base) {
-	            if (orthogonal && (vertical && next.x >= start.x && next.x <= end.x || !vertical && next.y >= start.y && next.y <= end.y)) {
-	                if (vertical) {
-	                    result = new mxPoint(next.x, start.y);
-	                } else {
-	                    result = new mxPoint(start.x, next.y);
-	                }
-	            } else {
-	                if (direction == mxConstants.DIRECTION_NORTH) {
-	                    result = new mxPoint(x + w / 2 + h * Math.tan(alpha) / 2, y + h);
-	                } else if (direction == mxConstants.DIRECTION_SOUTH) {
-	                    result = new mxPoint(x + w / 2 - h * Math.tan(alpha) / 2, y);
-	                } else if (direction == mxConstants.DIRECTION_WEST) {
-	                    result = new mxPoint(x + w, y + h / 2 + w * Math.tan(alpha) / 2);
-	                } else {
-	                    result = new mxPoint(x, y + h / 2 - w * Math.tan(alpha) / 2);
-	                }
-	            }
-	        } else {
-	            if (orthogonal) {
-	                var pt = new mxPoint(cx, cy);
-	
-	                if (next.y >= y && next.y <= y + h) {
-	                    pt.x = vertical ? cx : direction == mxConstants.DIRECTION_WEST ? x + w : x;
-	                    pt.y = next.y;
-	                } else if (next.x >= x && next.x <= x + w) {
-	                    pt.x = next.x;
-	                    pt.y = !vertical ? cy : direction == mxConstants.DIRECTION_NORTH ? y + h : y;
-	                }
-	
-	                // Compute angle
-	                dx = next.x - pt.x;
-	                dy = next.y - pt.y;
-	
-	                cx = pt.x;
-	                cy = pt.y;
-	            }
-	
-	            if (vertical && next.x <= x + w / 2 || !vertical && next.y <= y + h / 2) {
-	                result = mxUtils.intersection(next.x, next.y, cx, cy, start.x, start.y, corner.x, corner.y);
-	            } else {
-	                result = mxUtils.intersection(next.x, next.y, cx, cy, corner.x, corner.y, end.x, end.y);
-	            }
-	        }
-	
-	        if (result == null) {
-	            result = new mxPoint(cx, cy);
+	        var l = result.length;
+	        if (l > 1) {
+	            result = result.substring(0, l - 1);
 	        }
 	
 	        return result;
 	    },
-	    HexagonPerimeter: function HexagonPerimeter(bounds, vertex, next, orthogonal) {
-	        var x = bounds.x;
-	        var y = bounds.y;
-	        var w = bounds.width;
-	        var h = bounds.height;
 	
-	        var cx = bounds.getCenterX();
-	        var cy = bounds.getCenterY();
-	        var px = next.x;
-	        var py = next.y;
-	        var dx = px - cx;
-	        var dy = py - cy;
-	        var alpha = -Math.atan2(dy, dx);
-	        var pi = Math.PI;
-	        var pi2 = Math.PI / 2;
+	    getParentRoute: function getParentRoute(path) {
 	
-	        var result = new mxPoint(cx, cy);
+	        if (path) {
+	            var index = path.lastIndexOf(cellRoute.separator);
 	
-	        var direction = vertex != null ? mxUtils.getValue(vertex.style, mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-	        var vertical = direction == mxConstants.DIRECTION_NORTH || direction == mxConstants.DIRECTION_SOUTH;
-	        var a = new mxPoint();
-	        var b = new mxPoint();
-	
-	        //Only consider corrects quadrants for the orthogonal case.
-	        if (px < x && py < y || px < x && py > y + h || px > x + w && py < y || px > x + w && py > y + h) {
-	            orthogonal = false;
+	            if (index >= 0) {
+	                return path.substring(0, index);
+	            } else if (path.length > 0) {
+	                return '';
+	            }
 	        }
 	
-	        if (orthogonal) {
-	            if (vertical) {
-	                //Special cases where intersects with hexagon corners
-	                if (px == cx) {
-	                    if (py <= y) {
-	                        return new mxPoint(cx, y);
-	                    } else if (py >= y + h) {
-	                        return new mxPoint(cx, y + h);
-	                    }
-	                } else if (px < x) {
-	                    if (py == y + h / 4) {
-	                        return new mxPoint(x, y + h / 4);
-	                    } else if (py == y + 3 * h / 4) {
-	                        return new mxPoint(x, y + 3 * h / 4);
-	                    }
-	                } else if (px > x + w) {
-	                    if (py == y + h / 4) {
-	                        return new mxPoint(x + w, y + h / 4);
-	                    } else if (py == y + 3 * h / 4) {
-	                        return new mxPoint(x + w, y + 3 * h / 4);
-	                    }
-	                } else if (px == x) {
-	                    if (py < cy) {
-	                        return new mxPoint(x, y + h / 4);
-	                    } else if (py > cy) {
-	                        return new mxPoint(x, y + 3 * h / 4);
-	                    }
-	                } else if (px == x + w) {
-	                    if (py < cy) {
-	                        return new mxPoint(x + w, y + h / 4);
-	                    } else if (py > cy) {
-	                        return new mxPoint(x + w, y + 3 * h / 4);
-	                    }
-	                }
-	                if (py == y) {
-	                    return new mxPoint(cx, y);
-	                } else if (py == y + h) {
-	                    return new mxPoint(cx, y + h);
-	                }
+	        return null;
+	    },
 	
-	                if (px < cx) {
-	                    if (py > y + h / 4 && py < y + 3 * h / 4) {
-	                        a = new mxPoint(x, y);
-	                        b = new mxPoint(x, y + h);
-	                    } else if (py < y + h / 4) {
-	                        a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                        b = new mxPoint(x + w, y - Math.floor(0.25 * h));
-	                    } else if (py > y + 3 * h / 4) {
-	                        a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                        b = new mxPoint(x + w, y + Math.floor(1.25 * h));
-	                    }
-	                } else if (px > cx) {
-	                    if (py > y + h / 4 && py < y + 3 * h / 4) {
-	                        a = new mxPoint(x + w, y);
-	                        b = new mxPoint(x + w, y + h);
-	                    } else if (py < y + h / 4) {
-	                        a = new mxPoint(x, y - Math.floor(0.25 * h));
-	                        b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                    } else if (py > y + 3 * h / 4) {
-	                        a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                        b = new mxPoint(x, y + Math.floor(1.25 * h));
-	                    }
-	                }
-	            } else {
-	                //Special cases where intersects with hexagon corners
-	                if (py == cy) {
-	                    if (px <= x) {
-	                        return new mxPoint(x, y + h / 2);
-	                    } else if (px >= x + w) {
-	                        return new mxPoint(x + w, y + h / 2);
-	                    }
-	                } else if (py < y) {
-	                    if (px == x + w / 4) {
-	                        return new mxPoint(x + w / 4, y);
-	                    } else if (px == x + 3 * w / 4) {
-	                        return new mxPoint(x + 3 * w / 4, y);
-	                    }
-	                } else if (py > y + h) {
-	                    if (px == x + w / 4) {
-	                        return new mxPoint(x + w / 4, y + h);
-	                    } else if (px == x + 3 * w / 4) {
-	                        return new mxPoint(x + 3 * w / 4, y + h);
-	                    }
-	                } else if (py == y) {
-	                    if (px < cx) {
-	                        return new mxPoint(x + w / 4, y);
-	                    } else if (px > cx) {
-	                        return new mxPoint(x + 3 * w / 4, y);
-	                    }
-	                } else if (py == y + h) {
-	                    if (px < cx) {
-	                        return new mxPoint(x + w / 4, y + h);
-	                    } else if (py > cy) {
-	                        return new mxPoint(x + 3 * w / 4, y + h);
-	                    }
-	                }
-	                if (px == x) {
-	                    return new mxPoint(x, cy);
-	                } else if (px == x + w) {
-	                    return new mxPoint(x + w, cy);
-	                }
+	    resolve: function resolve(root, path) {
+	        var parent = root;
 	
-	                if (py < cy) {
-	                    if (px > x + w / 4 && px < x + 3 * w / 4) {
-	                        a = new mxPoint(x, y);
-	                        b = new mxPoint(x + w, y);
-	                    } else if (px < x + w / 4) {
-	                        a = new mxPoint(x - Math.floor(0.25 * w), y + h);
-	                        b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                    } else if (px > x + 3 * w / 4) {
-	                        a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                        b = new mxPoint(x + Math.floor(1.25 * w), y + h);
-	                    }
-	                } else if (py > cy) {
-	                    if (px > x + w / 4 && px < x + 3 * w / 4) {
-	                        a = new mxPoint(x, y + h);
-	                        b = new mxPoint(x + w, y + h);
-	                    } else if (px < x + w / 4) {
-	                        a = new mxPoint(x - Math.floor(0.25 * w), y);
-	                        b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                    } else if (px > x + 3 * w / 4) {
-	                        a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                        b = new mxPoint(x + Math.floor(1.25 * w), y);
-	                    }
-	                }
+	        if (path) {
+	            var tokens = path.split(cellRoute.separator);
+	            for (var i = 0; i < tokens.length; i++) {
+	                parent = parent.getChildAt(parseInt(tokens[i]));
 	            }
+	        }
 	
-	            var tx = cx;
-	            var ty = cy;
+	        return parent;
+	    },
 	
-	            if (px >= x && px <= x + w) {
-	                tx = px;
+	    compare: function compare(p1, p2) {
+	        var min = Math.min(p1.length, p2.length);
+	        var comp = 0;
 	
-	                if (py < cy) {
-	                    ty = y + h;
+	        for (var i = 0; i < min; i++) {
+	            if (p1[i] != p2[i]) {
+	                if (p1[i].length == 0 || p2[i].length == 0) {
+	                    comp = p1[i] == p2[i] ? 0 : p1[i] > p2[i] ? 1 : -1;
 	                } else {
-	                    ty = y;
-	                }
-	            } else if (py >= y && py <= y + h) {
-	                ty = py;
+	                    var t1 = parseInt(p1[i]);
+	                    var t2 = parseInt(p2[i]);
 	
-	                if (px < cx) {
-	                    tx = x + w;
-	                } else {
-	                    tx = x;
+	                    comp = t1 == t2 ? 0 : t1 > t2 ? 1 : -1;
 	                }
+	
+	                break;
 	            }
-	
-	            result = mxUtils.intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y);
-	        } else {
-	            if (vertical) {
-	                var beta = Math.atan2(h / 4, w / 2);
-	
-	                //Special cases where intersects with hexagon corners
-	                if (alpha == beta) {
-	                    return new mxPoint(x + w, y + Math.floor(0.25 * h));
-	                } else if (alpha == pi2) {
-	                    return new mxPoint(x + Math.floor(0.5 * w), y);
-	                } else if (alpha == pi - beta) {
-	                    return new mxPoint(x, y + Math.floor(0.25 * h));
-	                } else if (alpha == -beta) {
-	                    return new mxPoint(x + w, y + Math.floor(0.75 * h));
-	                } else if (alpha == -pi2) {
-	                    return new mxPoint(x + Math.floor(0.5 * w), y + h);
-	                } else if (alpha == -pi + beta) {
-	                    return new mxPoint(x, y + Math.floor(0.75 * h));
-	                }
-	
-	                if (alpha < beta && alpha > -beta) {
-	                    a = new mxPoint(x + w, y);
-	                    b = new mxPoint(x + w, y + h);
-	                } else if (alpha > beta && alpha < pi2) {
-	                    a = new mxPoint(x, y - Math.floor(0.25 * h));
-	                    b = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                } else if (alpha > pi2 && alpha < pi - beta) {
-	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                    b = new mxPoint(x + w, y - Math.floor(0.25 * h));
-	                } else if (alpha > pi - beta && alpha <= pi || alpha < -pi + beta && alpha >= -pi) {
-	                    a = new mxPoint(x, y);
-	                    b = new mxPoint(x, y + h);
-	                } else if (alpha < -beta && alpha > -pi2) {
-	                    a = new mxPoint(x + Math.floor(1.5 * w), y + Math.floor(0.5 * h));
-	                    b = new mxPoint(x, y + Math.floor(1.25 * h));
-	                } else if (alpha < -pi2 && alpha > -pi + beta) {
-	                    a = new mxPoint(x - Math.floor(0.5 * w), y + Math.floor(0.5 * h));
-	                    b = new mxPoint(x + w, y + Math.floor(1.25 * h));
-	                }
-	            } else {
-	                var beta = Math.atan2(h / 2, w / 4);
-	
-	                //Special cases where intersects with hexagon corners
-	                if (alpha == beta) {
-	                    return new mxPoint(x + Math.floor(0.75 * w), y);
-	                } else if (alpha == pi - beta) {
-	                    return new mxPoint(x + Math.floor(0.25 * w), y);
-	                } else if (alpha == pi || alpha == -pi) {
-	                    return new mxPoint(x, y + Math.floor(0.5 * h));
-	                } else if (alpha == 0) {
-	                    return new mxPoint(x + w, y + Math.floor(0.5 * h));
-	                } else if (alpha == -beta) {
-	                    return new mxPoint(x + Math.floor(0.75 * w), y + h);
-	                } else if (alpha == -pi + beta) {
-	                    return new mxPoint(x + Math.floor(0.25 * w), y + h);
-	                }
-	
-	                if (alpha > 0 && alpha < beta) {
-	                    a = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                    b = new mxPoint(x + Math.floor(1.25 * w), y + h);
-	                } else if (alpha > beta && alpha < pi - beta) {
-	                    a = new mxPoint(x, y);
-	                    b = new mxPoint(x + w, y);
-	                } else if (alpha > pi - beta && alpha < pi) {
-	                    a = new mxPoint(x - Math.floor(0.25 * w), y + h);
-	                    b = new mxPoint(x + Math.floor(0.5 * w), y - Math.floor(0.5 * h));
-	                } else if (alpha < 0 && alpha > -beta) {
-	                    a = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                    b = new mxPoint(x + Math.floor(1.25 * w), y);
-	                } else if (alpha < -beta && alpha > -pi + beta) {
-	                    a = new mxPoint(x, y + h);
-	                    b = new mxPoint(x + w, y + h);
-	                } else if (alpha < -pi + beta && alpha > -pi) {
-	                    a = new mxPoint(x - Math.floor(0.25 * w), y);
-	                    b = new mxPoint(x + Math.floor(0.5 * w), y + Math.floor(1.5 * h));
-	                }
-	            }
-	
-	            result = mxUtils.intersection(cx, cy, next.x, next.y, a.x, a.y, b.x, b.y);
 	        }
 	
-	        if (result == null) {
-	            return new mxPoint(cx, cy);
+	        // Compares path length if both paths are equal to this point
+	        if (comp == 0) {
+	            var t1 = p1.length;
+	            var t2 = p2.length;
+	
+	            if (t1 != t2) {
+	                comp = t1 > t2 ? 1 : -1;
+	            }
 	        }
 	
-	        return result;
+	        return comp;
 	    }
 	};
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
 	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(48);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function ValueChange(model, cell, value) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.cell = cell;
-	        that.value = value;
-	        that.previous = value;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	
-	        that.value = that.previous;
-	        that.previous = that.model.valueChanged(that.cell, that.previous);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(48);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function GeometryChange(model, cell, geometry) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.cell = cell;
-	        that.geometry = geometry;
-	        that.previous = geometry;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	
-	        that.geometry = that.previous;
-	        that.previous = that.model.geometryChanged(that.cell, that.previous);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 58 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(48);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function StyleChange(model, cell, style) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.cell = cell;
-	        that.style = style;
-	        that.previous = style;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	
-	        that.style = that.previous;
-	        that.previous = that.model.styleChanged(that.cell, that.previous);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 59 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(48);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function VisibleChange(model, cell, visible) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.cell = cell;
-	        that.visible = visible;
-	        that.previous = visible;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	
-	        that.visible = that.previous;
-	        that.previous = that.model.visibleChanged(that.cell, that.previous);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 60 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(48);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	    constructor: function CollapseChange(model, cell, collapsed) {
-	
-	        var that = this;
-	
-	        that.model = model;
-	        that.cell = cell;
-	        that.collapsed = collapsed;
-	        that.previous = collapsed;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	
-	        that.collapsed = that.previous;
-	        that.previous = that.model.collapseChanged(that.cell, that.previous);
-	
-	        return that;
-	    }
-	});
+	exports['default'] = cellRoute;
 	module.exports = exports['default'];
 
 /***/ }

@@ -1,5 +1,4 @@
-import Base       from '../lib/Base';
-import eventNames from '../events/eventNames';
+import Base from '../lib/Base';
 
 export default Base.extend({
     constructor: function ChangeCollection(model) {
@@ -38,9 +37,8 @@ export default Base.extend({
 
         var that = this;
 
-        that.model.emit(eventNames.CHANGE, {changes: that.changes});
+        that.model.emit('change', {changes: that.changes});
 
         return that;
     }
-
 });

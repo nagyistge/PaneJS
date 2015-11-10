@@ -1,7 +1,6 @@
 import Point from '../lib/Point';
 
-module.exports =
-{
+var perimeter = {
     RectanglePerimeter: function (bounds, vertex, next, orthogonal) {
         var cx = bounds.getCenterX();
         var cy = bounds.getCenterY();
@@ -665,3 +664,4 @@ module.exports =
     }
 };
 
+export default perimeter;
