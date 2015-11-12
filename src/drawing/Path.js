@@ -2,34 +2,36 @@ import Base from '../lib/Base';
 
 export default Base.extend({
     constructor: function Path(canvas) {
-
         var that = this;
         that.canvas = canvas;
+        that.cache = [];
         that.lastX = 0;
         that.lastY = 0;
-        that.paths = [];
     },
 
-    addOp: function () {
+    isEmpty() {
+        return this.cache.length === 0;
+    },
 
+    addOp() {
         var that = this;
-        var paths = that.paths;
+        var cache = that.cache;
         var canvas = that.canvas;
-        var format = canvas.format;
         var style = canvas.style;
         var scale = style.scale;
+        var format = canvas.format;
         var length = arguments.length;
 
-        if (paths) {
-            paths.push(arguments[0]);
+        if (cache) {
+            cache.push(arguments[0]);
 
             if (length > 2) {
                 for (var i = 2; i < length; i += 2) {
                     that.lastX = arguments[i - 1];
                     that.lastY = arguments[i];
 
-                    paths.push(format((that.lastX + style.dx) * scale));
-                    paths.push(format((that.lastY + style.dy) * scale));
+                    cache.push(format((that.lastX + style.dx) * scale));
+                    cache.push(format((that.lastY + style.dy) * scale));
                 }
             }
         }
@@ -37,43 +39,44 @@ export default Base.extend({
         return that;
     },
 
-    moveTo: function (x, y) {
+    moveTo(x, y) {
         return this.addOp('M', x, y);
     },
 
-    lineTo: function (x, y) {
+    lineTo(x, y) {
         return this.addOp('L', x, y);
     },
 
-    // 二次贝塞尔曲线
-    quadTo: function (x1, y1, x2, y2) {
+    // quadratic bezier curve
+    quadTo(x1, y1, x2, y2) {
         return this.addOp('Q', x1, y1, x2, y2);
     },
 
-    // 三次贝塞尔曲线
-    curveTo: function (x1, y1, x2, y2, x3, y3) {
+    // cubic bezeir curve
+    curveTo(x1, y1, x2, y2, x3, y3) {
         return this.addOp('C', x1, y1, x2, y2, x3, y3);
     },
 
-    // 圆弧
-    arcTo: function (/*rx, ry, angle, largeArcFlag, sweepFlag, x, y*/) {
+    arcTo(/*rx, ry, angle, largeArcFlag, sweepFlag, x, y*/) {
 
     },
 
-    close: function () {
+    close() {
 
         var that = this;
 
         that.addOp('Z');
         that.closed = true;
-        //that.canvas.node.setAttribute('d', paths.join(' '));
 
-        return that.canvas; // 链式调用
+        return that;
     },
 
-    flush: function () {
+    flush() {
+
         var that = this;
-        that.canvas.node.setAttribute('d', that.paths.join(' '));
+
+        that.canvas.node.setAttribute('d', that.cache.join(' '));
+
         return that;
     }
 });

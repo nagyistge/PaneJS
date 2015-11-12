@@ -1,10 +1,8 @@
 module.exports = {
 
     common: {
-        // translate
         dx: 0,
         dy: 0,
-
         scale: 1,
 
         // rotate
@@ -12,18 +10,22 @@ module.exports = {
         rotationCx: 0,
         rotationCy: 0,
 
-        opacity: 1,
+        //opacity: 1,
 
         // fill
         fillColor: '#e3f4ff',
         fillOpacity: 1,
-        gradientColor: '',
-        gradientOpacity: 1,
-        gradientDirection: '',
+        fillRule: '',      // nonzero, evenodd
+        gradient: false,
+        gradientColor1: '#f5f5f5',
+        gradientOpacity1: 1,
+        gradientColor2: '#e3f4ff',
+        gradientOpacity2: 1,
+        gradientDirection: 'south', // south, north, west, east
 
         // border
         strokeWidth: 1,
-        strokeColor: '#2db7f5',
+        strokeColor: '#1ba1e2',
         dashed: false,
         dashPattern: '3 3',
         dashOffset: 0,
@@ -66,6 +68,6 @@ module.exports = {
     link: {
         shape: 'connector',
         endArrow: 'classic',  // classic, block, open, oval, diamond, diamondThin
-        fillColor: '#2db7f5'
+        fillColor: '#1ba1e2'
     }
 };

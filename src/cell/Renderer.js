@@ -171,7 +171,7 @@ var Renderer = Base.extend({
 
     },
 
-    installLabelListener: function () {},
+    setupLabel: function () {},
 
     redrawLabel: function (state, forced) {
 
@@ -201,6 +201,15 @@ var Renderer = Base.extend({
         return that;
     },
 
+    destroyLabel: function (state) {
+
+        if (state.label) {
+            state.label.destroy();
+            state.label = null;
+        }
+
+        return this;
+    },
 
     // indicator
     // ---------
@@ -239,7 +248,7 @@ var Renderer = Base.extend({
                     temp.preserveImageAspect = false;
                     temp.overlay = overlay;
                     that.initOverlay(state, temp);
-                    that.installOverlayListener(state, overlay, temp);
+                    that.setupOverlay(state, overlay, temp);
 
                     if (overlay.cursor) {
                         temp.node.style.cursor = overlay.cursor;
@@ -269,12 +278,24 @@ var Renderer = Base.extend({
         return this;
     },
 
-    installOverlayListener: function (state, overlay, shape) {
+    setupOverlay: function (state, overlay, shape) {
 
     },
 
     redrawOverlays: function (state, forced) {},
 
+    destroyOverlays: function (state) {
+
+        if (state.overlays) {
+            state.overlays.each(function (shape) {
+                shape.destroy();
+            });
+
+            state.overlays = null;
+        }
+
+        return this;
+    },
 
     // control
     // -------
@@ -288,6 +309,8 @@ var Renderer = Base.extend({
     initControl: function (state, control, handleEvents, clickHandler) {
 
     },
+
+    setupControl: function () {},
 
     redrawControl: function (state, forced) {
         var graph = state.view.graph;
@@ -314,6 +337,7 @@ var Renderer = Base.extend({
         }
     },
 
+    destroyControl: function (state) {},
 
     // shape
     // -----
@@ -371,7 +395,7 @@ var Renderer = Base.extend({
                 that.createIndicator(state);    //
                 that.initShape(state);          // append shape to drawPane
                 that.createOverlays(state);
-                that.installListeners(state);
+                that.setupShape(state);
             }
 
             // Handles changes of the collapse icon
@@ -415,31 +439,28 @@ var Renderer = Base.extend({
         return shapeChanged;
     },
 
-    installListeners: function (state) {},
+    setupShape: function (state) {},
 
-    destroy: function (state) {
+    destroyShape: function (state) {
         if (state.shape) {
-            if (state.label) {
-                state.label.destroy();
-                state.label = null;
-            }
-
-            if (state.overlays) {
-                state.overlays.each(function (shape) {
-                    shape.destroy();
-                });
-
-                state.overlays = null;
-            }
-
-            if (state.control) {
-                state.control.destroy();
-                state.control = null;
-            }
-
             state.shape.destroy();
             state.shape = null;
         }
+
+        return this;
+    },
+
+    insertShapesAfter: function () {},
+
+    destroy: function (state) {
+        if (state.shape) {
+            this.destroyLabel(state)
+                .destroyOverlays(state)
+                .destroyControl(state)
+                .destroyShape(state);
+        }
+
+        return this;
     }
 });
 

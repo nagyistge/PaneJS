@@ -6,7 +6,7 @@ export default Base.extend({
         this.canvas = canvas;
     },
 
-    fill: function (filled) {
+    fill(filled) {
 
         var that = this;
         var canvas = that.canvas;
@@ -15,8 +15,12 @@ export default Base.extend({
 
         if (filled) {
 
-            if (style.alpha < 1) {
-                node.setAttribute('fill-opacity', style.alpha);
+            if (style.fillOpacity < 1) {
+                node.setAttribute('fill-opacity', style.fillOpacity);
+            }
+
+            if (style.fillRule) {
+                node.setAttribute('fill-rule', style.fillRule);
             }
 
             that.doFill();
@@ -28,7 +32,7 @@ export default Base.extend({
         return that;
     },
 
-    doFill: function () {
+    doFill() {
         return this;
     }
 });

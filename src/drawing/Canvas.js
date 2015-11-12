@@ -1,4 +1,5 @@
 import {
+    map,
     each,
     clone,
     ucFirst,
@@ -29,30 +30,20 @@ export default Base.extend({
             };
     },
 
-    // Draw
-    // ----
-
     createElement: function (tagName, namespace) {
         return createSvgElement(tagName, this.root.ownerDocument, namespace);
     },
 
-    drawPath: function () {
 
-        var that = this;
-        var path = new Path(that);
-
-        that.node = that.createElement('path');
-        that.path = path;
-
-        return path;
-    },
+    // Draw
+    // ----
 
     drawRect: function (x, y, w, h, rx, ry) {
 
         var that = this;
         var style = that.style;
         var scale = style.scale;
-        var format = that.format.bind(that);
+        var format = that.format;
         var node = that.createElement('rect');
 
         node.setAttribute('x', format((x + style.dx) * scale));
@@ -73,22 +64,104 @@ export default Base.extend({
         return that;
     },
 
+    drawCircle: function (x, y, w, h) {
+
+        var that = this;
+        var style = that.style;
+        var scale = style.scale;
+        var format = that.format;
+        var node = that.createElement('circle');
+
+        node.setAttribute('cx', format((x + w / 2 + style.dx) * scale));
+        node.setAttribute('cy', format((y + h / 2 + style.dy) * scale));
+        node.setAttribute('r', format(Math.min(w, h) / 2 * scale));
+
+        that.node = node;
+
+        return that;
+
+    },
+
     drawEllipse: function (x, y, w, h) {
 
-        var canvas = this;
-        var style = canvas.style;
+        var that = this;
+        var style = that.style;
         var scale = style.scale;
+        var format = that.format;
+        var node = that.createElement('ellipse');
 
-        var node = canvas.createElement('ellipse');
+        node.setAttribute('cx', format((x + w / 2 + style.dx) * scale));
+        node.setAttribute('cy', format((y + h / 2 + style.dy) * scale));
+        node.setAttribute('rx', format(w / 2 * scale));
+        node.setAttribute('ry', format(h / 2 * scale));
 
-        node.setAttribute('cx', Math.round((x + w / 2 + style.dx) * scale));
-        node.setAttribute('cy', Math.round((y + h / 2 + style.dy) * scale));
-        node.setAttribute('rx', w / 2 * scale);
-        node.setAttribute('ry', h / 2 * scale);
+        that.node = node;
 
-        canvas.node = node;
+        return that;
+    },
 
-        return canvas;
+    drawLine: function (x1, y1, x2, y2) {
+
+        var that = this;
+        var style = that.style;
+        var scale = style.scale;
+        var format = that.format;
+        var node = that.createElement('line');
+
+        node.setAttribute('x1', format((x1 + style.dx) * scale));
+        node.setAttribute('y1', format((y1 + style.dy) * scale));
+        node.setAttribute('x2', format((x2 + style.dx) * scale));
+        node.setAttribute('y2', format((y2 + style.dy) * scale));
+
+        that.node = node;
+
+        return that;
+    },
+
+    drawPolyline: function (points) {
+
+        var that = this;
+        var style = that.style;
+        var scale = style.scale;
+        var format = that.format;
+        var node = that.createElement('polyline');
+
+        var arr = map(points || [], function (p) {
+            return format((p.x + style.dx) * scale) + ',' + format((p.y + style.dx) * scale);
+        });
+
+        node.setAttribute('points', arr.join(' '));
+        that.node = node;
+
+        return that;
+    },
+
+    drawPolygon: function (points) {
+        var that = this;
+        var style = that.style;
+        var scale = style.scale;
+        var format = that.format;
+        var node = that.createElement('polygon');
+
+        var arr = map(points || [], function (p) {
+            return format((p.x + style.dx) * scale) + ',' + format((p.y + style.dx) * scale);
+        });
+
+        node.setAttribute('points', arr.join(' '));
+        that.node = node;
+
+        return that;
+    },
+
+    drawPath: function () {
+
+        var that = this;
+        var path = new Path(that);
+
+        that.node = that.createElement('path');
+        that.path = path;
+
+        return path;
     },
 
     drawImage: function () {},
@@ -154,6 +227,10 @@ export default Base.extend({
         that.root.appendChild(node);
     },
 
+
+    // apply styles
+    // ------------
+
     addNode: function (filled, stroked) {
 
         var that = this;
@@ -163,13 +240,18 @@ export default Base.extend({
 
         if (node) {
 
+            // set path attr
             var path = that.path;
             if (path) {
-                path.flush();
+                if (!path.isEmpty()) {
+                    path.flush();
+                } else {
+                    return;
+                }
             }
 
             // fill
-            if (style.fillColor && style.gradientColor) {
+            if (style.gradient) {
                 new LinearGradientBrush(that).fill(filled);
             } else {
                 new SolidBrush(that).fill(filled);

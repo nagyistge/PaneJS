@@ -3,12 +3,11 @@ import Base    from '../lib/Base';
 
 export default Base.extend({
 
-    // 创建一个描边画笔的实例
     constructor: function Pen(canvas) {
         this.canvas = canvas;
     },
 
-    stroke: function (stroked) {
+    stroke(stroked) {
 
         var that = this;
         var canvas = that.canvas;
@@ -23,57 +22,44 @@ export default Base.extend({
                 node.setAttribute('stroke-opacity', style.alpha);
             }
 
-            var strokeWidth = style.strokeWidth * style.scale;
-            var fixedStrokeWidth = Math.max(1, strokeWidth);
+            var sw = Math.max(1, canvas.format(style.strokeWidth * style.scale));
+            node.setAttribute('stroke-width', sw);
 
-            if (fixedStrokeWidth !== 1) {
-                node.setAttribute('stroke-width', fixedStrokeWidth);
+            if (style.fillRule) {
+                node.setAttribute('fill-rule', style.fillRule);
             }
 
-            // 更新路径样式
             if (node.nodeName.toLowerCase() === 'path') {
-
-                // lineJoin
                 var lineJoin = style.lineJoin;
-                // 'miter' is default in SVG
-                if (lineJoin && lineJoin !== 'miter') {
+                if (lineJoin && lineJoin !== 'miter') { // 'miter' is default in SVG
                     node.setAttribute('stroke-linejoin', lineJoin);
                 }
 
-                // lineCap
                 var lineCap = style.lineCap;
-                // 'butt' is default in SVG
-                if (lineCap && lineCap !== 'butt') {
+                if (lineCap && lineCap !== 'butt') { // 'butt' is default in SVG
                     node.setAttribute('stroke-linecap', lineCap);
                 }
-
-                // miterLimit
-                var miterLimit = style.miterLimit;
-                // 10 is default in our document
-                if (miterLimit && miterLimit !== 10) {
-                    this.node.setAttribute('stroke-miterlimit', miterLimit);
-                }
-
             }
-
 
             if (style.dashed) {
 
-                // dashPattern
                 var dashPattern = style.dashPattern;
                 var dash = ('' + dashPattern).split(' ');
                 var pattern = map(dash, function (pat) {
-                    return pat * strokeWidth;
+                    return pat * sw;
                 });
 
                 node.setAttribute('stroke-dasharray', pattern.join(' '));
 
-                // dashOffset
-                var dashOffset = style.dashOffset;
+                var dashOffset = '' + style.dashOffset;
                 if (dashOffset) {
                     node.setAttribute('stroke-dashoffset', dashOffset);
                 }
 
+                var miterLimit = '' + style.miterLimit;
+                if (miterLimit) {
+                    node.setAttribute('stroke-miterlimit', miterLimit);
+                }
             }
         } else {
             node.setAttribute('stroke', 'none');

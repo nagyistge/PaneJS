@@ -2824,10 +2824,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	
 	    common: {
-	        // translate
 	        dx: 0,
 	        dy: 0,
-	
 	        scale: 1,
 	
 	        // rotate
@@ -2835,18 +2833,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        rotationCx: 0,
 	        rotationCy: 0,
 	
-	        opacity: 1,
+	        //opacity: 1,
 	
 	        // fill
 	        fillColor: '#e3f4ff',
 	        fillOpacity: 1,
-	        gradientColor: '',
-	        gradientOpacity: 1,
-	        gradientDirection: '',
+	        fillRule: '', // nonzero, evenodd
+	        gradient: false,
+	        gradientColor1: '#f5f5f5',
+	        gradientOpacity1: 1,
+	        gradientColor2: '#e3f4ff',
+	        gradientOpacity2: 1,
+	        gradientDirection: 'south', // south, north, west, east
 	
 	        // border
 	        strokeWidth: 1,
-	        strokeColor: '#2db7f5',
+	        strokeColor: '#1ba1e2',
 	        dashed: false,
 	        dashPattern: '3 3',
 	        dashOffset: 0,
@@ -2888,7 +2890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    link: {
 	        shape: 'connector',
 	        endArrow: 'classic', // classic, block, open, oval, diamond, diamondThin
-	        fillColor: '#2db7f5'
+	        fillColor: '#1ba1e2'
 	    }
 	};
 
@@ -5373,7 +5375,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    isScrollEvent: function isScrollEvent(evt) {},
 	
-	    installListeners: function installListeners() {},
+	    setupShape: function setupShape() {},
 	
 	    // Life cycle
 	    // ----------
@@ -5424,7 +5426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            container.appendChild(foreignPane);
 	        }
 	
-	        that.installListeners();
+	        that.setupShape();
 	    },
 	
 	    destroy: function destroy() {
@@ -5985,7 +5987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    initLabel: function initLabel(state) {},
 	
-	    installLabelListener: function installLabelListener() {},
+	    setupLabel: function setupLabel() {},
 	
 	    redrawLabel: function redrawLabel(state, forced) {
 	
@@ -6012,6 +6014,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        return that;
+	    },
+	
+	    destroyLabel: function destroyLabel(state) {
+	
+	        if (state.label) {
+	            state.label.destroy();
+	            state.label = null;
+	        }
+	
+	        return this;
 	    },
 	
 	    // indicator
@@ -6050,7 +6062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    temp.preserveImageAspect = false;
 	                    temp.overlay = overlay;
 	                    that.initOverlay(state, temp);
-	                    that.installOverlayListener(state, overlay, temp);
+	                    that.setupOverlay(state, overlay, temp);
 	
 	                    if (overlay.cursor) {
 	                        temp.node.style.cursor = overlay.cursor;
@@ -6080,9 +6092,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this;
 	    },
 	
-	    installOverlayListener: function installOverlayListener(state, overlay, shape) {},
+	    setupOverlay: function setupOverlay(state, overlay, shape) {},
 	
 	    redrawOverlays: function redrawOverlays(state, forced) {},
+	
+	    destroyOverlays: function destroyOverlays(state) {
+	
+	        if (state.overlays) {
+	            state.overlays.each(function (shape) {
+	                shape.destroy();
+	            });
+	
+	            state.overlays = null;
+	        }
+	
+	        return this;
+	    },
 	
 	    // control
 	    // -------
@@ -6092,6 +6117,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    createControl: function createControl() {},
 	
 	    initControl: function initControl(state, control, handleEvents, clickHandler) {},
+	
+	    setupControl: function setupControl() {},
 	
 	    redrawControl: function redrawControl(state, forced) {
 	        var graph = state.view.graph;
@@ -6116,6 +6143,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            state.control = null;
 	        }
 	    },
+	
+	    destroyControl: function destroyControl(state) {},
 	
 	    // shape
 	    // -----
@@ -6170,7 +6199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                that.createIndicator(state); //
 	                that.initShape(state); // append shape to drawPane
 	                that.createOverlays(state);
-	                that.installListeners(state);
+	                that.setupShape(state);
 	            }
 	
 	            // Handles changes of the collapse icon
@@ -6212,31 +6241,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return shapeChanged;
 	    },
 	
-	    installListeners: function installListeners(state) {},
+	    setupShape: function setupShape(state) {},
 	
-	    destroy: function destroy(state) {
+	    destroyShape: function destroyShape(state) {
 	        if (state.shape) {
-	            if (state.label) {
-	                state.label.destroy();
-	                state.label = null;
-	            }
-	
-	            if (state.overlays) {
-	                state.overlays.each(function (shape) {
-	                    shape.destroy();
-	                });
-	
-	                state.overlays = null;
-	            }
-	
-	            if (state.control) {
-	                state.control.destroy();
-	                state.control = null;
-	            }
-	
 	            state.shape.destroy();
 	            state.shape = null;
 	        }
+	
+	        return this;
+	    },
+	
+	    insertShapesAfter: function insertShapesAfter() {},
+	
+	    destroy: function destroy(state) {
+	        if (state.shape) {
+	            this.destroyLabel(state).destroyOverlays(state).destroyControl(state).destroyShape(state);
+	        }
+	
+	        return this;
 	    }
 	});
 	
@@ -6389,8 +6412,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
+	    // clear the root node
 	    clear: function clear() {
-	
 	        var that = this;
 	        var node = that.node;
 	
@@ -6419,9 +6442,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = that.node;
 	        var style = that.style;
 	
-	        that.updateLinkBounds();
+	        that.updateBoundsFromPoints();
 	
-	        if (style.visible && that.checkBounds()) {
+	        if (style.visible && that.isValidBounds()) {
 	            node.style.visibility = 'visible';
 	            that.clear();
 	            that.redrawShape();
@@ -6460,7 +6483,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var h = bounds.height / scale;
 	
 	        if (that.isPaintBoundsInverted()) {
-	
 	            var t = (w - h) / 2;
 	            x += t;
 	            y -= t;
@@ -6485,7 +6507,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        if (that.points) {
-	
 	            var pts = [];
 	            for (var i = 0; i < that.points.length; i++) {
 	                if (that.points[i]) {
@@ -6511,10 +6532,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.drawNodeForeground(canvas, x, y, w, h);
 	    },
 	
-	    // 绘制 node 背景
 	    drawNodeBackground: function drawNodeBackground(canvas, x, y, w, h) {},
 	
-	    // 绘制 node 前景
 	    drawNodeForeground: function drawNodeForeground(canvas, x, y, w, h) {},
 	
 	    drawLink: function drawLink(canvas, points) {},
@@ -6618,20 +6637,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    checkBounds: function checkBounds() {
+	    isValidBounds: function isValidBounds() {
 	
 	        var bounds = this.bounds;
 	
 	        return bounds && !isNaN(bounds.x) && !isNaN(bounds.y) && !isNaN(bounds.width) && !isNaN(bounds.height) && bounds.width > 0 && bounds.height > 0;
 	    },
 	
-	    updateLinkBounds: function updateLinkBounds() {
+	    updateBoundsFromPoints: function updateBoundsFromPoints() {
 	
 	        var that = this;
 	        var points = that.points;
 	        var bounds;
 	
-	        points && (0, _commonUtils.each)(points, function (point, index) {
+	        points && (0, _commonUtils.each)(points, function (point) {
 	
 	            var rect = new _libRectangle2['default'](point.x, point.y, 1, 1);
 	
@@ -6825,16 +6844,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    setCursor: function setCursor(cursor) {
-	
 	        var that = this;
 	        var node = that.node;
 	
-	        cursor = cursor || '';
-	
-	        that.cursor = cursor;
-	
 	        if (node) {
-	            node.style.cursor = cursor;
+	            node.style.cursor = cursor || '';
 	        }
 	
 	        return that;
@@ -6964,30 +6978,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    },
 	
-	    // Draw
-	    // ----
-	
 	    createElement: function createElement(tagName, namespace) {
 	        return (0, _commonUtils.createSvgElement)(tagName, this.root.ownerDocument, namespace);
 	    },
 	
-	    drawPath: function drawPath() {
-	
-	        var that = this;
-	        var path = new _Path2['default'](that);
-	
-	        that.node = that.createElement('path');
-	        that.path = path;
-	
-	        return path;
-	    },
+	    // Draw
+	    // ----
 	
 	    drawRect: function drawRect(x, y, w, h, rx, ry) {
 	
 	        var that = this;
 	        var style = that.style;
 	        var scale = style.scale;
-	        var format = that.format.bind(that);
+	        var format = that.format;
 	        var node = that.createElement('rect');
 	
 	        node.setAttribute('x', format((x + style.dx) * scale));
@@ -7008,22 +7011,103 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
+	    drawCircle: function drawCircle(x, y, w, h) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var scale = style.scale;
+	        var format = that.format;
+	        var node = that.createElement('circle');
+	
+	        node.setAttribute('cx', format((x + w / 2 + style.dx) * scale));
+	        node.setAttribute('cy', format((y + h / 2 + style.dy) * scale));
+	        node.setAttribute('r', format(Math.min(w, h) / 2 * scale));
+	
+	        that.node = node;
+	
+	        return that;
+	    },
+	
 	    drawEllipse: function drawEllipse(x, y, w, h) {
 	
-	        var canvas = this;
-	        var style = canvas.style;
+	        var that = this;
+	        var style = that.style;
 	        var scale = style.scale;
+	        var format = that.format;
+	        var node = that.createElement('ellipse');
 	
-	        var node = canvas.createElement('ellipse');
+	        node.setAttribute('cx', format((x + w / 2 + style.dx) * scale));
+	        node.setAttribute('cy', format((y + h / 2 + style.dy) * scale));
+	        node.setAttribute('rx', format(w / 2 * scale));
+	        node.setAttribute('ry', format(h / 2 * scale));
 	
-	        node.setAttribute('cx', Math.round((x + w / 2 + style.dx) * scale));
-	        node.setAttribute('cy', Math.round((y + h / 2 + style.dy) * scale));
-	        node.setAttribute('rx', w / 2 * scale);
-	        node.setAttribute('ry', h / 2 * scale);
+	        that.node = node;
 	
-	        canvas.node = node;
+	        return that;
+	    },
 	
-	        return canvas;
+	    drawLine: function drawLine(x1, y1, x2, y2) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var scale = style.scale;
+	        var format = that.format;
+	        var node = that.createElement('line');
+	
+	        node.setAttribute('x1', format((x1 + style.dx) * scale));
+	        node.setAttribute('y1', format((y1 + style.dy) * scale));
+	        node.setAttribute('x2', format((x2 + style.dx) * scale));
+	        node.setAttribute('y2', format((y2 + style.dy) * scale));
+	
+	        that.node = node;
+	
+	        return that;
+	    },
+	
+	    drawPolyline: function drawPolyline(points) {
+	
+	        var that = this;
+	        var style = that.style;
+	        var scale = style.scale;
+	        var format = that.format;
+	        var node = that.createElement('polyline');
+	
+	        var arr = (0, _commonUtils.map)(points || [], function (p) {
+	            return format((p.x + style.dx) * scale) + ',' + format((p.y + style.dx) * scale);
+	        });
+	
+	        node.setAttribute('points', arr.join(' '));
+	        that.node = node;
+	
+	        return that;
+	    },
+	
+	    drawPolygon: function drawPolygon(points) {
+	        var that = this;
+	        var style = that.style;
+	        var scale = style.scale;
+	        var format = that.format;
+	        var node = that.createElement('polygon');
+	
+	        var arr = (0, _commonUtils.map)(points || [], function (p) {
+	            return format((p.x + style.dx) * scale) + ',' + format((p.y + style.dx) * scale);
+	        });
+	
+	        node.setAttribute('points', arr.join(' '));
+	        that.node = node;
+	
+	        return that;
+	    },
+	
+	    drawPath: function drawPath() {
+	
+	        var that = this;
+	        var path = new _Path2['default'](that);
+	
+	        that.node = that.createElement('path');
+	        that.path = path;
+	
+	        return path;
 	    },
 	
 	    drawImage: function drawImage() {},
@@ -7086,6 +7170,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.root.appendChild(node);
 	    },
 	
+	    // apply styles
+	    // ------------
+	
 	    addNode: function addNode(filled, stroked) {
 	
 	        var that = this;
@@ -7095,13 +7182,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (node) {
 	
+	            // set path attr
 	            var path = that.path;
 	            if (path) {
-	                path.flush();
+	                if (!path.isEmpty()) {
+	                    path.flush();
+	                } else {
+	                    return;
+	                }
 	            }
 	
 	            // fill
-	            if (style.fillColor && style.gradientColor) {
+	            if (style.gradient) {
 	                new _LinearGradientBrush2['default'](that).fill(filled);
 	            } else {
 	                new _SolidBrush2['default'](that).fill(filled);
@@ -7194,34 +7286,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	    constructor: function Path(canvas) {
-	
 	        var that = this;
 	        that.canvas = canvas;
+	        that.cache = [];
 	        that.lastX = 0;
 	        that.lastY = 0;
-	        that.paths = [];
+	    },
+	
+	    isEmpty: function isEmpty() {
+	        return this.cache.length === 0;
 	    },
 	
 	    addOp: function addOp() {
-	
 	        var that = this;
-	        var paths = that.paths;
+	        var cache = that.cache;
 	        var canvas = that.canvas;
-	        var format = canvas.format;
 	        var style = canvas.style;
 	        var scale = style.scale;
+	        var format = canvas.format;
 	        var length = arguments.length;
 	
-	        if (paths) {
-	            paths.push(arguments[0]);
+	        if (cache) {
+	            cache.push(arguments[0]);
 	
 	            if (length > 2) {
 	                for (var i = 2; i < length; i += 2) {
 	                    that.lastX = arguments[i - 1];
 	                    that.lastY = arguments[i];
 	
-	                    paths.push(format((that.lastX + style.dx) * scale));
-	                    paths.push(format((that.lastY + style.dy) * scale));
+	                    cache.push(format((that.lastX + style.dx) * scale));
+	                    cache.push(format((that.lastY + style.dy) * scale));
 	                }
 	            }
 	        }
@@ -7237,17 +7331,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.addOp('L', x, y);
 	    },
 	
-	    // 二次贝塞尔曲线
+	    // quadratic bezier curve
 	    quadTo: function quadTo(x1, y1, x2, y2) {
 	        return this.addOp('Q', x1, y1, x2, y2);
 	    },
 	
-	    // 三次贝塞尔曲线
+	    // cubic bezeir curve
 	    curveTo: function curveTo(x1, y1, x2, y2, x3, y3) {
 	        return this.addOp('C', x1, y1, x2, y2, x3, y3);
 	    },
 	
-	    // 圆弧
 	    arcTo: function arcTo() /*rx, ry, angle, largeArcFlag, sweepFlag, x, y*/{},
 	
 	    close: function close() {
@@ -7256,14 +7349,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.addOp('Z');
 	        that.closed = true;
-	        //that.canvas.node.setAttribute('d', paths.join(' '));
 	
-	        return that.canvas; // 链式调用
+	        return that;
 	    },
 	
 	    flush: function flush() {
+	
 	        var that = this;
-	        that.canvas.node.setAttribute('d', that.paths.join(' '));
+	
+	        that.canvas.node.setAttribute('d', that.cache.join(' '));
+	
 	        return that;
 	    }
 	});
@@ -7289,7 +7384,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    // 创建一个描边画笔的实例
 	    constructor: function Pen(canvas) {
 	        this.canvas = canvas;
 	    },
@@ -7309,53 +7403,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	                node.setAttribute('stroke-opacity', style.alpha);
 	            }
 	
-	            var strokeWidth = style.strokeWidth * style.scale;
-	            var fixedStrokeWidth = Math.max(1, strokeWidth);
+	            var sw = Math.max(1, canvas.format(style.strokeWidth * style.scale));
+	            node.setAttribute('stroke-width', sw);
 	
-	            if (fixedStrokeWidth !== 1) {
-	                node.setAttribute('stroke-width', fixedStrokeWidth);
+	            if (style.fillRule) {
+	                node.setAttribute('fill-rule', style.fillRule);
 	            }
 	
-	            // 更新路径样式
 	            if (node.nodeName.toLowerCase() === 'path') {
-	
-	                // lineJoin
 	                var lineJoin = style.lineJoin;
-	                // 'miter' is default in SVG
 	                if (lineJoin && lineJoin !== 'miter') {
+	                    // 'miter' is default in SVG
 	                    node.setAttribute('stroke-linejoin', lineJoin);
 	                }
 	
-	                // lineCap
 	                var lineCap = style.lineCap;
-	                // 'butt' is default in SVG
 	                if (lineCap && lineCap !== 'butt') {
+	                    // 'butt' is default in SVG
 	                    node.setAttribute('stroke-linecap', lineCap);
-	                }
-	
-	                // miterLimit
-	                var miterLimit = style.miterLimit;
-	                // 10 is default in our document
-	                if (miterLimit && miterLimit !== 10) {
-	                    this.node.setAttribute('stroke-miterlimit', miterLimit);
 	                }
 	            }
 	
 	            if (style.dashed) {
 	
-	                // dashPattern
 	                var dashPattern = style.dashPattern;
 	                var dash = ('' + dashPattern).split(' ');
 	                var pattern = (0, _commonUtils.map)(dash, function (pat) {
-	                    return pat * strokeWidth;
+	                    return pat * sw;
 	                });
 	
 	                node.setAttribute('stroke-dasharray', pattern.join(' '));
 	
-	                // dashOffset
-	                var dashOffset = style.dashOffset;
+	                var dashOffset = '' + style.dashOffset;
 	                if (dashOffset) {
 	                    node.setAttribute('stroke-dashoffset', dashOffset);
+	                }
+	
+	                var miterLimit = '' + style.miterLimit;
+	                if (miterLimit) {
+	                    node.setAttribute('stroke-miterlimit', miterLimit);
 	                }
 	            }
 	        } else {
@@ -7397,7 +7483,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = canvas.node;
 	
 	        var fillColor = style.fillColor;
-	
 	        if (fillColor) {
 	            node.setAttribute('fill', fillColor.toLowerCase());
 	        }
@@ -7438,8 +7523,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (filled) {
 	
-	            if (style.alpha < 1) {
-	                node.setAttribute('fill-opacity', style.alpha);
+	            if (style.fillOpacity < 1) {
+	                node.setAttribute('fill-opacity', style.fillOpacity);
+	            }
+	
+	            if (style.fillRule) {
+	                node.setAttribute('fill-rule', style.fillRule);
 	            }
 	
 	            that.doFill();
@@ -7480,89 +7569,89 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var LinearGradientBrush = _Brush2['default'].extend({
 	
-	    gradients: {},
+	    Statics: {
+	        gradients: {}
+	    },
 	
 	    constructor: function LinearGradientBrush(canvas) {
 	        LinearGradientBrush.superclass.constructor.call(this, canvas);
 	    },
 	
-	    createGradientId: function createGradientId(start, end, alpha1, alpha2, direction) {
+	    createGradientId: function createGradientId(color1, color2, opacity1, opacity2, direction) {
 	
-	        if (start.charAt(0) === '#') {
-	            start = start.substring(1);
+	        if (color1.charAt(0) === '#') {
+	            color1 = color1.substring(1);
 	        }
 	
-	        if (end.charAt(0) === '#') {
-	            end = end.substring(1);
+	        if (color2.charAt(0) === '#') {
+	            color2 = color2.substring(1);
 	        }
 	
-	        // Workaround for gradient IDs not working in Safari 5 / Chrome 6
-	        // if they contain uppercase characters
-	        start = start.toLowerCase() + '-' + alpha1;
-	        end = end.toLowerCase() + '-' + alpha2;
+	        color1 = color1.toLowerCase() + '-' + opacity1;
+	        color2 = color2.toLowerCase() + '-' + opacity2;
 	
 	        var dir = '';
 	
-	        if (!direction || direction === _enumsDirections2['default'].south) {
-	            dir = 's'; // 从上到下
-	        } else if (direction === _enumsDirections2['default'].east) {
-	                dir = 'e'; // 从左到右
-	            } else {
-	                    var tmp = start;
-	                    start = end;
-	                    end = tmp;
+	        if (!direction || direction === 'south') {
+	            dir = 's';
+	        } else if (direction === 'east') {
+	            dir = 'e';
+	        } else {
+	            var tmp = color1;
+	            color1 = color2;
+	            color2 = tmp;
 	
-	                    if (direction === _enumsDirections2['default'].north) {
-	                        dir = 's'; // 从下到上
-	                    } else if (direction === _enumsDirections2['default'].west) {
-	                            dir = 'e'; // 从右到左
-	                        }
-	                }
+	            if (direction === 'north') {
+	                dir = 's';
+	            } else if (direction === 'west') {
+	                dir = 'e';
+	            }
+	        }
 	
-	        return 'gradient-' + start + '-' + end + '-' + dir;
+	        return 'gradient-' + color1 + '-' + color2 + '-' + dir;
 	    },
 	
-	    createGradient: function createGradient(start, end, alpha1, alpha2, direction) {
+	    createGradient: function createGradient(color1, color2, opacity1, opacity2, direction) {
 	
-	        var root = this.canvas.root;
-	        var gradient = (0, _commonUtils.createSvgElement)('linearGradient', root);
+	        var doc = this.canvas.root.ownerDocument;
+	        var gradient = (0, _commonUtils.createSvgElement)('linearGradient', doc);
 	
 	        gradient.setAttribute('x1', '0%');
 	        gradient.setAttribute('y1', '0%');
 	        gradient.setAttribute('x2', '0%');
 	        gradient.setAttribute('y2', '0%');
 	
-	        if (!direction || direction === _enumsDirections2['default'].south) {
+	        if (!direction || direction === 'south') {
 	            gradient.setAttribute('y2', '100%');
-	        } else if (direction === _enumsDirections2['default'].east) {
+	        } else if (direction === 'east') {
 	            gradient.setAttribute('x2', '100%');
-	        } else if (direction === _enumsDirections2['default'].north) {
+	        } else if (direction === 'north') {
 	            gradient.setAttribute('y1', '100%');
-	        } else if (direction === _enumsDirections2['default'].west) {
+	        } else if (direction === 'west') {
 	            gradient.setAttribute('x1', '100%');
 	        }
 	
-	        var op = alpha1 < 1 ? ';stop-opacity:' + alpha1 : '';
+	        var op = opacity1 < 1 ? ';stop-opacity:' + opacity1 : '';
 	
-	        var stop = (0, _commonUtils.createSvgElement)('stop', root);
+	        var stop = (0, _commonUtils.createSvgElement)('stop', doc);
 	        stop.setAttribute('offset', '0%');
-	        stop.setAttribute('style', 'stop-color:' + start + op);
+	        stop.setAttribute('style', 'stop-color:' + color1 + op);
 	        gradient.appendChild(stop);
 	
-	        op = alpha2 < 1 ? ';stop-opacity:' + alpha2 : '';
+	        op = opacity2 < 1 ? ';stop-opacity:' + opacity2 : '';
 	
-	        stop = (0, _commonUtils.createSvgElement)('stop', root);
+	        stop = (0, _commonUtils.createSvgElement)('stop', doc);
 	        stop.setAttribute('offset', '100%');
-	        stop.setAttribute('style', 'stop-color:' + end + op);
+	        stop.setAttribute('style', 'stop-color:' + color2 + op);
 	        gradient.appendChild(stop);
 	
 	        return gradient;
 	    },
 	
-	    getGradient: function getGradient(start, end, alpha1, alpha2, direction) {
+	    getGradient: function getGradient(color1, color2, opacity1, opacity2, direction) {
 	
 	        var that = this;
-	        var id = that.createGradientId(start, end, alpha1, alpha2, direction);
+	        var id = that.createGradientId(color1, color2, opacity1, opacity2, direction);
 	        var gradients = LinearGradientBrush.gradients;
 	        var gradient = gradients[id];
 	
@@ -7582,7 +7671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (!gradient) {
-	                gradient = that.createGradient(start, end, alpha1, alpha2, direction);
+	                gradient = that.createGradient(color1, color2, opacity1, opacity2, direction);
 	                gradient.setAttribute('id', tmpId);
 	
 	                svg.appendChild(gradient);
@@ -7600,11 +7689,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var canvas = that.canvas;
 	        var style = canvas.style;
 	        var node = canvas.node;
-	        var fillColor = style.fillColor;
-	        var gradientColor = style.gradientColor;
+	        var color1 = style.gradientColor1;
+	        var color2 = style.gradientColor2;
 	
-	        if (fillColor && gradientColor) {
-	            var id = that.getGradient(fillColor, gradientColor, style.fillAlpha, style.gradientAlpha, style.gradientDirection);
+	        if (style.gradient && color1 && color2) {
+	            var id = that.getGradient(color1, color2, style.gradientOpacity1, style.gradientOpacity2, style.gradientDirection);
 	            var base = (0, _commonUtils.getBaseUrl)().replace(/([\(\)])/g, '\\$1');
 	
 	            node.setAttribute('fill', 'url(' + base + '#' + id + ')');

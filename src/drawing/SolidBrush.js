@@ -6,7 +6,7 @@ export default Brush.extend({
         SolidBrush.superclass.constructor.call(this, canvas);
     },
 
-    doFill: function () {
+    doFill() {
 
         var that = this;
         var canvas = that.canvas;
@@ -14,7 +14,6 @@ export default Brush.extend({
         var node = canvas.node;
 
         var fillColor = style.fillColor;
-
         if (fillColor) {
             node.setAttribute('fill', fillColor.toLowerCase());
         }

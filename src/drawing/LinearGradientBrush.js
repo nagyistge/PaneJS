@@ -9,90 +9,89 @@ import directions from '../enums/directions';
 
 var LinearGradientBrush = Brush.extend({
 
-    gradients: {},
+    Statics: {
+        gradients: {}
+    },
 
     constructor: function LinearGradientBrush(canvas) {
         LinearGradientBrush.superclass.constructor.call(this, canvas);
     },
 
-    createGradientId: function (start, end, alpha1, alpha2, direction) {
+    createGradientId(color1, color2, opacity1, opacity2, direction) {
 
-        if (start.charAt(0) === '#') {
-            start = start.substring(1);
+        if (color1.charAt(0) === '#') {
+            color1 = color1.substring(1);
         }
 
-        if (end.charAt(0) === '#') {
-            end = end.substring(1);
+        if (color2.charAt(0) === '#') {
+            color2 = color2.substring(1);
         }
 
-        // Workaround for gradient IDs not working in Safari 5 / Chrome 6
-        // if they contain uppercase characters
-        start = start.toLowerCase() + '-' + alpha1;
-        end = end.toLowerCase() + '-' + alpha2;
+        color1 = color1.toLowerCase() + '-' + opacity1;
+        color2 = color2.toLowerCase() + '-' + opacity2;
 
         var dir = '';
 
-        if (!direction || direction === directions.south) {
-            dir = 's';     // 从上到下
-        } else if (direction === directions.east) {
-            dir = 'e';     // 从左到右
+        if (!direction || direction === 'south') {
+            dir = 's';
+        } else if (direction === 'east') {
+            dir = 'e';
         } else {
-            var tmp = start;
-            start = end;
-            end = tmp;
+            var tmp = color1;
+            color1 = color2;
+            color2 = tmp;
 
-            if (direction === directions.north) {
-                dir = 's'; // 从下到上
-            }
-            else if (direction === directions.west) {
-                dir = 'e'; // 从右到左
+            if (direction === 'north') {
+                dir = 's';
+            } else if (direction === 'west') {
+                dir = 'e';
             }
         }
 
-        return 'gradient-' + start + '-' + end + '-' + dir;
+        return 'gradient-' + color1 + '-' + color2 + '-' + dir;
     },
 
-    createGradient: function (start, end, alpha1, alpha2, direction) {
+    createGradient(color1, color2, opacity1, opacity2, direction) {
 
-        var root = this.canvas.root;
-        var gradient = createSvgElement('linearGradient', root);
+        var doc = this.canvas.root.ownerDocument;
+        var gradient = createSvgElement('linearGradient', doc);
 
         gradient.setAttribute('x1', '0%');
         gradient.setAttribute('y1', '0%');
         gradient.setAttribute('x2', '0%');
         gradient.setAttribute('y2', '0%');
 
-        if (!direction || direction === directions.south) {
+        if (!direction || direction === 'south') {
             gradient.setAttribute('y2', '100%');
-        } else if (direction === directions.east) {
+        } else if (direction === 'east') {
             gradient.setAttribute('x2', '100%');
-        } else if (direction === directions.north) {
+        } else if (direction === 'north') {
             gradient.setAttribute('y1', '100%');
-        } else if (direction === directions.west) {
+        } else if (direction === 'west') {
             gradient.setAttribute('x1', '100%');
         }
 
-        var op = (alpha1 < 1) ? ';stop-opacity:' + alpha1 : '';
+        var op = (opacity1 < 1) ? ';stop-opacity:' + opacity1 : '';
 
-        var stop = createSvgElement('stop', root);
+        var stop = createSvgElement('stop', doc);
         stop.setAttribute('offset', '0%');
-        stop.setAttribute('style', 'stop-color:' + start + op);
+        stop.setAttribute('style', 'stop-color:' + color1 + op);
         gradient.appendChild(stop);
 
-        op = (alpha2 < 1) ? ';stop-opacity:' + alpha2 : '';
+        op = (opacity2 < 1) ? ';stop-opacity:' + opacity2 : '';
 
-        stop = createSvgElement('stop', root);
+        stop = createSvgElement('stop', doc);
         stop.setAttribute('offset', '100%');
-        stop.setAttribute('style', 'stop-color:' + end + op);
+        stop.setAttribute('style', 'stop-color:' + color2 + op);
         gradient.appendChild(stop);
 
         return gradient;
     },
 
-    getGradient: function (start, end, alpha1, alpha2, direction) {
+    getGradient(color1, color2, opacity1, opacity2, direction) {
 
         var that = this;
-        var id = that.createGradientId(start, end, alpha1, alpha2, direction);
+        var id = that.createGradientId(color1, color2, opacity1, opacity2, direction);
         var gradients = LinearGradientBrush.gradients;
         var gradient = gradients[id];
 
@@ -113,7 +112,7 @@ var LinearGradientBrush = Brush.extend({
             }
 
             if (!gradient) {
-                gradient = that.createGradient(start, end, alpha1, alpha2, direction);
+                gradient = that.createGradient(color1, color2, opacity1, opacity2, direction);
                 gradient.setAttribute('id', tmpId);
 
                 svg.appendChild(gradient);
@@ -122,21 +121,20 @@ var LinearGradientBrush = Brush.extend({
             gradients[id] = gradient;
         }
 
-
         return gradient.getAttribute('id');
     },
 
-    doFill: function () {
+    doFill() {
 
         var that = this;
         var canvas = that.canvas;
         var style = canvas.style;
         var node = canvas.node;
-        var fillColor = style.fillColor;
-        var gradientColor = style.gradientColor;
+        var color1 = style.gradientColor1;
+        var color2 = style.gradientColor2;
 
-        if (fillColor && gradientColor) {
-            var id = that.getGradient(fillColor, gradientColor, style.fillAlpha, style.gradientAlpha, style.gradientDirection);
+        if (style.gradient && color1 && color2) {
+            var id = that.getGradient(color1, color2, style.gradientOpacity1, style.gradientOpacity2, style.gradientDirection);
             var base = getBaseUrl().replace(/([\(\)])/g, '\\$1');
 
             node.setAttribute('fill', 'url(' + base + '#' + id + ')');

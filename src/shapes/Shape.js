@@ -59,8 +59,8 @@ var Shape = Base.extend({
         }
     },
 
+    // clear the root node
     clear: function () {
-
         var that = this;
         var node = that.node;
 
@@ -89,9 +89,9 @@ var Shape = Base.extend({
         var node = that.node;
         var style = that.style;
 
-        that.updateLinkBounds();
+        that.updateBoundsFromPoints();
 
-        if (style.visible && that.checkBounds()) {
+        if (style.visible && that.isValidBounds()) {
             node.style.visibility = 'visible';
             that.clear();
             that.redrawShape();
@@ -131,7 +131,6 @@ var Shape = Base.extend({
         var h = bounds.height / scale;
 
         if (that.isPaintBoundsInverted()) {
-
             var t = (w - h) / 2;
             x += t;
             y -= t;
@@ -156,7 +155,6 @@ var Shape = Base.extend({
         }
 
         if (that.points) {
-
             var pts = [];
             for (var i = 0; i < that.points.length; i++) {
                 if (that.points[i]) {
@@ -182,10 +180,8 @@ var Shape = Base.extend({
         this.drawNodeForeground(canvas, x, y, w, h);
     },
 
-    // 绘制 node 背景
     drawNodeBackground: function (canvas, x, y, w, h) { },
 
-    // 绘制 node 前景
     drawNodeForeground: function (canvas, x, y, w, h) { },
 
     drawLink: function (canvas, points) {},
@@ -291,7 +287,7 @@ var Shape = Base.extend({
         }
     },
 
-    checkBounds: function () {
+    isValidBounds: function () {
 
         var bounds = this.bounds;
 
@@ -304,13 +300,13 @@ var Shape = Base.extend({
             && bounds.height > 0;
     },
 
-    updateLinkBounds: function () {
+    updateBoundsFromPoints: function () {
 
         var that = this;
         var points = that.points;
         var bounds;
 
-        points && each(points, function (point, index) {
+        points && each(points, function (point) {
 
             var rect = new Rectangle(point.x, point.y, 1, 1);
 
@@ -507,16 +503,11 @@ var Shape = Base.extend({
     },
 
     setCursor: function (cursor) {
-
         var that = this;
         var node = that.node;
 
-        cursor = cursor || '';
-
-        that.cursor = cursor;
-
         if (node) {
-            node.style.cursor = cursor;
+            node.style.cursor = cursor || '';
         }
 
         return that;
@@ -531,11 +522,9 @@ var Shape = Base.extend({
         if (direction) {
             if (direction === 'north') {
                 rot += 270;
-            }
-            else if (direction === 'west') {
+            } else if (direction === 'west') {
                 rot += 180;
-            }
-            else if (direction === 'south') {
+            } else if (direction === 'south') {
                 rot += 90;
             }
         }

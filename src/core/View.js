@@ -1167,7 +1167,7 @@ export default Base.extend({
 
     isScrollEvent: function (evt) {},
 
-    installListeners: function () { },
+    setupShape: function () { },
 
     // Life cycle
     // ----------
@@ -1219,7 +1219,7 @@ export default Base.extend({
             container.appendChild(foreignPane);
         }
 
-        that.installListeners();
+        that.setupShape();
     },
 
     destroy: function () {
