@@ -2833,8 +2833,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        rotationCx: 0,
 	        rotationCy: 0,
 	
-	        //opacity: 1,
-	
 	        // fill
 	        fillColor: '#e3f4ff',
 	        fillOpacity: 1,
@@ -2849,6 +2847,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // border
 	        strokeWidth: 1,
 	        strokeColor: '#1ba1e2',
+	        strokeOpacity: 1,
 	        dashed: false,
 	        dashPattern: '3 3',
 	        dashOffset: 0,
@@ -7413,12 +7412,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            node.setAttribute('stroke', style.strokeColor.toLowerCase());
 	
-	            if (style.alpha < 1) {
-	                node.setAttribute('stroke-opacity', style.alpha);
-	            }
-	
 	            var sw = Math.max(1, canvas.format(style.strokeWidth * style.scale));
 	            node.setAttribute('stroke-width', sw);
+	
+	            if (style.strokeOpacity < 1) {
+	                node.setAttribute('stroke-opacity', style.strokeOpacity);
+	            }
 	
 	            if (style.fillRule) {
 	                node.setAttribute('fill-rule', style.fillRule);

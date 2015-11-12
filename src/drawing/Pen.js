@@ -18,12 +18,13 @@ export default Base.extend({
 
             node.setAttribute('stroke', style.strokeColor.toLowerCase());
 
-            if (style.alpha < 1) {
-                node.setAttribute('stroke-opacity', style.alpha);
-            }
-
             var sw = Math.max(1, canvas.format(style.strokeWidth * style.scale));
             node.setAttribute('stroke-width', sw);
+
+
+            if (style.strokeOpacity < 1) {
+                node.setAttribute('stroke-opacity', style.strokeOpacity);
+            }
 
             if (style.fillRule) {
                 node.setAttribute('fill-rule', style.fillRule);

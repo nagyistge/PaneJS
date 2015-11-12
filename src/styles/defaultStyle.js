@@ -10,8 +10,6 @@ module.exports = {
         rotationCx: 0,
         rotationCy: 0,
 
-        //opacity: 1,
-
         // fill
         fillColor: '#e3f4ff',
         fillOpacity: 1,
@@ -26,6 +24,7 @@ module.exports = {
         // border
         strokeWidth: 1,
         strokeColor: '#1ba1e2',
+        strokeOpacity: 1,
         dashed: false,
         dashPattern: '3 3',
         dashOffset: 0,
