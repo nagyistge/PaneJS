@@ -22,25 +22,29 @@ var Geometry = Rectangle.extend({
 
         Geometry.superclass.constructor.call(that, x, y, width, height);
 
-        // relative 为 true 时，即相对定位，x 和 y 是相对父节点 w 和 h 上的百分比；
-        // 绝对定位时，x 和 y 是相对于父节点左上角的坐标
+        // 相对定位时，x 和 y 是相对父节点 w 和 h 上的百分比；
+        // 绝对定位时，x 和 y 是相对于父节点左上角的坐标。
         that.relative = !!relative;
 
 
         // props
         // -----
-        // that.alternateBounds = null; //
-        // that.sourcePoint = null;     // 连线的起点坐标。如果一个连线没有对应的起点
-        //                              // 节点，用该点来指定该连线的起点；否则，就忽
-        //                              // 略该点，连线的起点坐标将自动计算得到。
-        // that.targetPoint = null;     // 连线的终点坐标。
-        // that.points = null;          // 连线中的控制点坐标，这些点不包含连线的起点和终点的坐标。
-        // that.offset = null;          // 对于连线，是相对于 x 和 y 的偏移量
-        //                              // 对于节点，
+        // that.alternateBounds = null;
 
+        // 连线的起点/终点坐标。
+        // 如果一个连线没有对应的起点/终点节点，用该坐标来指定该连线的起点/终点；
+        // 否则，将忽略该点，连线的起点/终点坐标将自动计算得到。
+        // that.sourcePoint = null;
+        // that.targetPoint = null;
+
+        // 连线中间的控制点坐标，不包含连线的起点和终点的坐标。
+        // that.points = null;
+
+        // 对于连线，是相对于 x 和 y 的偏移量
+        // that.offset = null;
     },
 
-    swap: function () {
+    swap() {
 
         var that = this;
         var alternateBounds = that.alternateBounds;
@@ -59,11 +63,11 @@ var Geometry = Rectangle.extend({
         return that;
     },
 
-    getTerminalPoint: function (isSource) {
+    getTerminalPoint(isSource) {
         return isSource ? this.sourcePoint : this.targetPoint;
     },
 
-    setTerminalPoint: function (point, isSource) {
+    setTerminalPoint(point, isSource) {
 
         var that = this;
 
@@ -76,8 +80,7 @@ var Geometry = Rectangle.extend({
         return that;
     },
 
-    // 根据给定的旋转中心旋转给定的角度
-    rotate: function (angle, center) {
+    rotate(angle, center) {
 
         var that = this;
 
@@ -87,7 +90,7 @@ var Geometry = Rectangle.extend({
 
         // 只有绝对定位时才旋转 x 和 y
         if (!that.relative) {
-            // 按照几何中心旋转
+            // 按照自身的几何中心旋转
             var geoCenter = rotatePointEx(that.getCenter(), cos, sin, center);
 
             that.x = Math.round(geoCenter.x - that.width / 2);
@@ -102,8 +105,7 @@ var Geometry = Rectangle.extend({
         });
     },
 
-    // 平移
-    translate: function (dx, dy) {
+    translate(dx, dy) {
 
         var that = this;
 
@@ -127,13 +129,26 @@ var Geometry = Rectangle.extend({
         return that;
     },
 
-    // 缩放
-    scale: function (sx, sy, sameRatio) {
+    scale(sx, sy, fixedAspect) {
 
         var that = this;
 
         sx = toFloat(sx);
         sy = toFloat(sy);
+
+        // scale the geometry
+        if (!that.relative) {
+            that.x = toFloat(that.x) * sx;
+            that.y = toFloat(that.y) * sy;
+
+            // 长宽按固定比例缩放
+            if (fixedAspect) {
+                sy = sx = Math.min(sx, sy);
+            }
+
+            that.width = toFloat(that.width) * sx;
+            that.height = toFloat(that.height) * sy;
+        }
 
         that.sourcePoint && scalePoint(that.sourcePoint, sx, sy);
         that.targetPoint && scalePoint(that.targetPoint, sx, sy);
@@ -142,27 +157,15 @@ var Geometry = Rectangle.extend({
             scalePoint(point, sx, sy);
         });
 
-        if (!that.relative) {
-            that.x = toFloat(that.x) * sx;
-            that.y = toFloat(that.y) * sy;
-
-            // 长宽按固定比例缩放
-            if (sameRatio) {
-                sy = sx = Math.min(sx, sy);
-            }
-
-            that.width = toFloat(that.width) * sx;
-            that.height = toFloat(that.height) * sy;
-        }
-
         return that;
     },
 
-    equals: function (geom) {
+    equals(geom) {
 
         var that = this;
 
-        return Geometry.superclass.equals.call(that, geo) &&
+        return geom instanceof Geometry &&
+            Geometry.superclass.equals.call(that, geo) &&
             that.relative === geo.relative &&
             isEqualEntity(that.sourcePoint, geom.sourcePoint) &&
             isEqualEntity(that.targetPoint, geom.targetPoint) &&
@@ -171,7 +174,7 @@ var Geometry = Rectangle.extend({
             isEqualEntity(that.alternateBounds, geom.alternateBounds);
     },
 
-    clone: function () {
+    clone() {
         return clone(this);
     }
 });

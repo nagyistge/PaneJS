@@ -19,15 +19,15 @@ export default Base.extend({
         return that;
     },
 
-    get(key) {
-        var id = objectIdentity.get(key);
+    get(obj) {
+        var id = objectIdentity.get(obj);
         return this.map[id];
     },
 
-    put(key, value) {
+    put(obj, value) {
 
         var map = this.map;
-        var id = objectIdentity.get(key);
+        var id = objectIdentity.get(obj);
         var previous = map[id];
 
         map[id] = value;
@@ -35,10 +35,10 @@ export default Base.extend({
         return previous;
     },
 
-    remove(key) {
+    remove(obj) {
 
         var map = this.map;
-        var id = objectIdentity.get(key);
+        var id = objectIdentity.get(obj);
         var previous = map[id];
 
         delete map[id];

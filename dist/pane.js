@@ -1889,7 +1889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return result;
 	    },
-	    getCellLabel: function getCellLabel(cell) {
+	    getLabelValue: function getLabelValue(cell) {
 	        return cell.value;
 	    },
 	    isHtmlLabel: function isHtmlLabel() {
@@ -3812,6 +3812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
 	            if (!links || that.getLinkIndex(link) < 0 || link.getNode(!outgoing) !== that) {
+	
 	                if (!links) {
 	                    links = that.links = [];
 	                }
@@ -3830,7 +3831,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (link) {
 	
-	            // 连线的起点和终点是同一个节点时，不需要移除
+	            // 连线的起点和终点是同一个节点时不需要移除
 	            if (links && link.getTerminal(!outgoing) !== that) {
 	                var index = that.getLinkIndex(link);
 	
@@ -3849,6 +3850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ------
 	
 	    removeFromParent: function removeFromParent() {
+	
 	        var that = this;
 	        var parent = that.parent;
 	
@@ -3860,8 +3862,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    cloneValue: function cloneValue() {
-	        var value = this.value;
 	
+	        var value = this.value;
 	        if (value) {
 	            if (value.clone && (0, _commonUtils.isFunction)(value.clone)) {
 	                return value.clone();
@@ -3872,10 +3874,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	
-	        return value;
+	        return (0, _commonUtils.clone)(value);
 	    },
 	
 	    clone: function clone() {
+	
 	        var that = this;
 	        var cloned = (0, _commonUtils.clone)(that, that.transients);
 	        cloned.value = that.cloneValue();
@@ -3913,20 +3916,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        Geometry.superclass.constructor.call(that, x, y, width, height);
 	
-	        // relative 为 true 时，即相对定位，x 和 y 是相对父节点 w 和 h 上的百分比；
-	        // 绝对定位时，x 和 y 是相对于父节点左上角的坐标
+	        // 相对定位时，x 和 y 是相对父节点 w 和 h 上的百分比；
+	        // 绝对定位时，x 和 y 是相对于父节点左上角的坐标。
 	        that.relative = !!relative;
 	
 	        // props
 	        // -----
-	        // that.alternateBounds = null; //
-	        // that.sourcePoint = null;     // 连线的起点坐标。如果一个连线没有对应的起点
-	        //                              // 节点，用该点来指定该连线的起点；否则，就忽
-	        //                              // 略该点，连线的起点坐标将自动计算得到。
-	        // that.targetPoint = null;     // 连线的终点坐标。
-	        // that.points = null;          // 连线中的控制点坐标，这些点不包含连线的起点和终点的坐标。
-	        // that.offset = null;          // 对于连线，是相对于 x 和 y 的偏移量
-	        //                              // 对于节点，
+	        // that.alternateBounds = null;
+	
+	        // 连线的起点/终点坐标。
+	        // 如果一个连线没有对应的起点/终点节点，用该坐标来指定该连线的起点/终点；
+	        // 否则，将忽略该点，连线的起点/终点坐标将自动计算得到。
+	        // that.sourcePoint = null;
+	        // that.targetPoint = null;
+	
+	        // 连线中间的控制点坐标，不包含连线的起点和终点的坐标。
+	        // that.points = null;
+	
+	        // 对于连线，是相对于 x 和 y 的偏移量
+	        // that.offset = null;
 	    },
 	
 	    swap: function swap() {
@@ -3965,7 +3973,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    // 根据给定的旋转中心旋转给定的角度
 	    rotate: function rotate(angle, center) {
 	
 	        var that = this;
@@ -3976,7 +3983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // 只有绝对定位时才旋转 x 和 y
 	        if (!that.relative) {
-	            // 按照几何中心旋转
+	            // 按照自身的几何中心旋转
 	            var geoCenter = (0, _commonUtils.rotatePointEx)(that.getCenter(), cos, sin, center);
 	
 	            that.x = Math.round(geoCenter.x - that.width / 2);
@@ -3991,7 +3998,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    },
 	
-	    // 平移
 	    translate: function translate(dx, dy) {
 	
 	        var that = this;
@@ -4016,13 +4022,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    // 缩放
-	    scale: function scale(sx, sy, sameRatio) {
+	    scale: function scale(sx, sy, fixedAspect) {
 	
 	        var that = this;
 	
 	        sx = (0, _commonUtils.toFloat)(sx);
 	        sy = (0, _commonUtils.toFloat)(sy);
+	
+	        // scale the geometry
+	        if (!that.relative) {
+	            that.x = (0, _commonUtils.toFloat)(that.x) * sx;
+	            that.y = (0, _commonUtils.toFloat)(that.y) * sy;
+	
+	            // 长宽按固定比例缩放
+	            if (fixedAspect) {
+	                sy = sx = Math.min(sx, sy);
+	            }
+	
+	            that.width = (0, _commonUtils.toFloat)(that.width) * sx;
+	            that.height = (0, _commonUtils.toFloat)(that.height) * sy;
+	        }
 	
 	        that.sourcePoint && (0, _commonUtils.scalePoint)(that.sourcePoint, sx, sy);
 	        that.targetPoint && (0, _commonUtils.scalePoint)(that.targetPoint, sx, sy);
@@ -4031,19 +4050,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (0, _commonUtils.scalePoint)(point, sx, sy);
 	        });
 	
-	        if (!that.relative) {
-	            that.x = (0, _commonUtils.toFloat)(that.x) * sx;
-	            that.y = (0, _commonUtils.toFloat)(that.y) * sy;
-	
-	            // 长宽按固定比例缩放
-	            if (sameRatio) {
-	                sy = sx = Math.min(sx, sy);
-	            }
-	
-	            that.width = (0, _commonUtils.toFloat)(that.width) * sx;
-	            that.height = (0, _commonUtils.toFloat)(that.height) * sy;
-	        }
-	
 	        return that;
 	    },
 	
@@ -4051,7 +4057,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        return Geometry.superclass.equals.call(that, geo) && that.relative === geo.relative && (0, _commonUtils.isEqualEntity)(that.sourcePoint, geom.sourcePoint) && (0, _commonUtils.isEqualEntity)(that.targetPoint, geom.targetPoint) && (0, _commonUtils.isEqualEntity)(that.offset, geom.offset) && (0, _commonUtils.isEqualEntities)(that.points, geom.points) && (0, _commonUtils.isEqualEntity)(that.alternateBounds, geom.alternateBounds);
+	        return geom instanceof Geometry && Geometry.superclass.equals.call(that, geo) && that.relative === geo.relative && (0, _commonUtils.isEqualEntity)(that.sourcePoint, geom.sourcePoint) && (0, _commonUtils.isEqualEntity)(that.targetPoint, geom.targetPoint) && (0, _commonUtils.isEqualEntity)(that.offset, geom.offset) && (0, _commonUtils.isEqualEntities)(that.points, geom.points) && (0, _commonUtils.isEqualEntity)(that.alternateBounds, geom.alternateBounds);
 	    },
 	
 	    clone: function clone() {
@@ -5483,15 +5489,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    get: function get(key) {
-	        var id = _commonObjectIdentity2['default'].get(key);
+	    get: function get(obj) {
+	        var id = _commonObjectIdentity2['default'].get(obj);
 	        return this.map[id];
 	    },
 	
-	    put: function put(key, value) {
+	    put: function put(obj, value) {
 	
 	        var map = this.map;
-	        var id = _commonObjectIdentity2['default'].get(key);
+	        var id = _commonObjectIdentity2['default'].get(obj);
 	        var previous = map[id];
 	
 	        map[id] = value;
@@ -5499,10 +5505,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return previous;
 	    },
 	
-	    remove: function remove(key) {
+	    remove: function remove(obj) {
 	
 	        var map = this.map;
-	        var id = _commonObjectIdentity2['default'].get(key);
+	        var id = _commonObjectIdentity2['default'].get(obj);
 	        var previous = map[id];
 	
 	        delete map[id];
@@ -5605,8 +5611,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var State = _libRectangle2['default'].extend({
 	
-	    invalid: true, // 默认为无效，需要重绘
-	
 	    constructor: function State(view, cell, style) {
 	
 	        var that = this;
@@ -5615,6 +5619,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.cell = cell;
 	        that.style = style;
 	
+	        // 默认为无效，需要重绘
+	        that.invalid = true;
 	        // cell 在画布上的原始（scale 和 translate）坐标，在 view.validateCellState() 过程中更新
 	        that.origin = new _libPoint2['default']();
 	        // 对于连线来说，这是 label 的绝对位置，对于节点来说，这是 label 相对于节点左上角的位置
@@ -5623,14 +5629,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // props
 	        // -----
 	        // that.shape = null;
-	        // that.text = null;
+	        // that.label = null;
 	        // that.cellBounds = null;        // 缩放和平移之前的边界
 	        // that.paintBounds = null;       // 缩放和平移之前的绘图边界，cellBounds 或旋转 90° 之后的 cellBounds
+	
+	        // 联系相关
 	        // that.absolutePoints = null;    // 连线关键点的坐标数组
 	        // that.visibleSourceState =null;
 	        // that.visibleTargetState =null;
 	        // that.terminalDistance = 0;     // 连线起点和终点之间的距离
-	        // that.segments = null;          // 连线每个片段的长度
+	        // that.segments = null;          // 连线每个片段的长度数组
 	        // that.length = 0;               // 连线的长度
 	    },
 	
@@ -5650,6 +5658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // 设置连线起点或终点的坐标
 	    setAbsolutePoint: function setAbsolutePoint(point, isSource) {
+	
 	        var that = this;
 	        var absolutePoints = that.absolutePoints;
 	
@@ -5681,7 +5690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	
 	        that.shape && that.shape.setCursor(cursor);
-	        that.text && that.text.setCursor(cursor);
+	        that.label && that.label.setCursor(cursor);
 	
 	        return that;
 	    },
@@ -5748,8 +5757,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (that.absolutePoints) {
 	            cloned.absolutePoints = [];
 	
-	            for (var i = 0, l = this.absolutePoints.length; i < l; i++) {
-	                cloned.absolutePoints[i] = this.absolutePoints[i].clone();
+	            for (var i = 0, l = that.absolutePoints.length; i < l; i++) {
+	                cloned.absolutePoints[i] = that.absolutePoints[i].clone();
 	            }
 	        }
 	
@@ -5765,8 +5774,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            cloned.boundingBox = that.boundingBox.clone();
 	        }
 	
+	        if (that.segments) {
+	            cloned.segments = that.segments.slice();
+	        }
+	
 	        cloned.terminalDistance = that.terminalDistance;
-	        cloned.segments = that.segments;
 	        cloned.length = that.length;
 	        cloned.x = that.x;
 	        cloned.y = that.y;
@@ -5798,13 +5810,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _enumsStyleNames = __webpack_require__(20);
-	
-	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
-	
 	var _libRectangle = __webpack_require__(23);
 	
 	var _libRectangle2 = _interopRequireDefault(_libRectangle);
+	
+	var _libDictionary = __webpack_require__(25);
+	
+	var _libDictionary2 = _interopRequireDefault(_libDictionary);
+	
+	// shapes
 	
 	var _shapesRect = __webpack_require__(30);
 	
@@ -5830,14 +5844,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
+	    // default shapes
 	    defaultNodeShape: _shapesRect2['default'],
 	    defaultLinkShape: _shapesConnector2['default'],
 	    defaultLabelShape: _shapesLabel2['default'],
 	
 	    constructor: function Renderer() {},
 	
+	    // get shape's Constructor by shape name
 	    getShape: function getShape(shapeName) {
 	        return shapeName ? Renderer.getShape(shapeName) : null;
+	    },
+	
+	    // label
+	    // -----
+	
+	    getLabelValue: function getLabelValue(state) {
+	        return state.view.graph.getLabelValue(state.cell);
 	    },
 	
 	    getLabelBounds: function getLabelBounds(state) {
@@ -5947,6 +5970,169 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
+	    createLabel: function createLabel(state, bounds) {
+	
+	        var that = this;
+	        var style = state.style.label;
+	
+	        if (style) {
+	            var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
+	            state.label = new Constructor(state, style, bounds);
+	        }
+	
+	        return that;
+	    },
+	
+	    initLabel: function initLabel(state) {},
+	
+	    installLabelListener: function installLabelListener() {},
+	
+	    redrawLabel: function redrawLabel(state, forced) {
+	
+	        var that = this;
+	        var content = that.getLabelValue(state);
+	
+	        if (!state.label && content) {
+	            that.createLabel(state, bounds);
+	            var bounds = that.getLabelBounds(state);
+	            state.label.bounds = bounds;
+	        } else if (state.label && !content) {
+	            state.label.destroy();
+	            state.label = null;
+	        }
+	
+	        if (state.label) {
+	
+	            var label = state.label;
+	
+	            if (forced || label.content !== content) {
+	                label.content = content;
+	                label.redraw();
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    // indicator
+	    // ---------
+	
+	    createIndicator: function createIndicator(state) {
+	
+	        var that = this;
+	        var shapeName = state.view.graph.getIndicatorShape(state);
+	
+	        state.shape.indicatorShape = that.getShape(shapeName);
+	
+	        return that;
+	    },
+	
+	    // overlays
+	    // --------
+	
+	    createOverlays: function createOverlays(state) {
+	
+	        var that = this;
+	        var cellOverlays = state.cell.overlays; // graph.getCellOverlays(state.cell);
+	        var stateOverlays = state.overlays;
+	        var dict = null;
+	
+	        if (cellOverlays) {
+	
+	            dict = new _libDictionary2['default']();
+	
+	            (0, _commonUtils.each)(cellOverlays, function (overlay) {
+	
+	                var shape = stateOverlays ? stateOverlays.remove(overlay) : null;
+	
+	                if (shape) {
+	                    var temp = new ImageShape(new _libRectangle2['default'](), overlay.image.src);
+	                    temp.preserveImageAspect = false;
+	                    temp.overlay = overlay;
+	                    that.initOverlay(state, temp);
+	                    that.installOverlayListener(state, overlay, temp);
+	
+	                    if (overlay.cursor) {
+	                        temp.node.style.cursor = overlay.cursor;
+	                    }
+	
+	                    dict.put(cellOverlays[i], temp);
+	                } else {
+	                    dict.put(overlay, shape);
+	                }
+	            });
+	        }
+	
+	        // remove unused
+	        if (stateOverlays) {
+	            stateOverlays.each(function (shape) {
+	                shape.destroy();
+	            });
+	        }
+	
+	        state.overlays = dict;
+	
+	        return that;
+	    },
+	
+	    initOverlay: function initOverlay(state, overlay) {
+	        overlay.init(state.view.overlayPane);
+	        return this;
+	    },
+	
+	    installOverlayListener: function installOverlayListener(state, overlay, shape) {},
+	
+	    redrawOverlays: function redrawOverlays(state, forced) {},
+	
+	    // control
+	    // -------
+	
+	    getControlBounds: function getControlBounds(state, w, h) {},
+	
+	    createControl: function createControl() {},
+	
+	    initControl: function initControl(state, control, handleEvents, clickHandler) {},
+	
+	    redrawControl: function redrawControl(state, forced) {
+	        var graph = state.view.graph;
+	        var image = graph.getFoldingImage(state);
+	
+	        if (graph.foldingEnabled && image) {
+	            if (!state.control) {
+	                var b = new _libRectangle2['default'](0, 0, image.width, image.height);
+	                state.control = new ImageShape(b, image.src);
+	                state.control.preserveImageAspect = false;
+	
+	                this.initControl(state, state.control, true, function (evt) {
+	                    if (graph.isEnabled()) {
+	                        var collapse = !graph.isCellCollapsed(state.cell);
+	                        graph.foldCells(collapse, false, [state.cell]);
+	                        mxEvent.consume(evt);
+	                    }
+	                });
+	            }
+	        } else if (state.control != null) {
+	            state.control.destroy();
+	            state.control = null;
+	        }
+	    },
+	
+	    // shape
+	    // -----
+	
+	    redraw: function redraw(state, force, rendering) {
+	
+	        var that = this;
+	        // 处理 force, 检查样式是否更新，因为下面就更新样式了
+	        var shapeChanged = that.redrawShape(state, force, rendering);
+	
+	        if (state.shape && rendering) {
+	            that.redrawLabel(state, shapeChanged);
+	            that.redrawOverlays(state, shapeChanged);
+	            that.redrawControl(state, shapeChanged);
+	        }
+	    },
+	
 	    // try to create state's shape after the state be created
 	    createShape: function createShape(state) {
 	
@@ -5968,47 +6154,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    createLabel: function createLabel(state, bounds) {
-	
-	        var that = this;
-	        var style = state.style.label;
-	
-	        if (style) {
-	            var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
-	            state.label = new Constructor(state, style, bounds);
-	        }
-	    },
-	
-	    createIndicator: function createIndicator(state) {
-	
-	        var that = this;
-	        var shapeName = state.view.graph.getIndicatorShape(state);
-	
-	        state.shape.indicatorShape = that.getShape(shapeName);
-	
-	        return that;
-	    },
-	
-	    createOverlays: function createOverlays() {},
-	
-	    createControl: function createControl() {},
-	
-	    appendShape: function appendShape(state) {
+	    initShape: function initShape(state) {
 	        state.shape.init(state.view.drawPane);
 	        return this;
-	    },
-	
-	    redraw: function redraw(state, force, rendering) {
-	
-	        var that = this;
-	        // 处理 force, 检查样式是否更新，因为下面就更新样式了
-	        var shapeChanged = that.redrawShape(state, force, rendering);
-	
-	        if (state.shape && rendering) {
-	            that.redrawLabel(state, shapeChanged);
-	            that.redrawOverlays(state, shapeChanged);
-	            that.redrawControl(state, shapeChanged);
-	        }
 	    },
 	
 	    redrawShape: function redrawShape(state, force, rendering) {
@@ -6019,8 +6167,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (shape) {
 	            if (!shape.node) {
-	                that.createIndicator(state);
-	                that.appendShape(state);
+	                that.createIndicator(state); //
+	                that.initShape(state); // append shape to drawPane
 	                that.createOverlays(state);
 	                that.installListeners(state);
 	            }
@@ -6034,7 +6182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            //    force = true;
 	            //}
 	
-	            // Redraws the cell if required, ignores changes to bounds if points are
+	            // redraw the cell if required, ignores changes to bounds if points are
 	            // defined as the bounds are updated for the given points inside the shape
 	            if (force || !shape.bounds || shape.scale !== state.view.scale || !state.absolutePoints && !state.equalToBounds(shape.bounds) || state.absolutePoints && !utils.equalPoints(state.shape.points, state.absolutePoints)) {
 	
@@ -6064,36 +6212,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return shapeChanged;
 	    },
 	
-	    redrawLabel: function redrawLabel(state, forced) {
+	    installListeners: function installListeners(state) {},
 	
-	        var that = this;
-	        var content = state.view.graph.getCellLabel(state.cell);
-	
-	        if (!state.label && content) {
-	            that.createLabel(state, bounds);
-	            var bounds = that.getLabelBounds(state);
-	            state.label.bounds = bounds;
-	        } else if (state.label && !content) {
-	            state.label.destroy();
-	            state.label = null;
-	        }
-	
-	        if (state.label) {
-	
-	            var label = state.label;
-	
-	            if (forced || label.content !== content) {
-	                label.content = content;
-	                label.redraw();
+	    destroy: function destroy(state) {
+	        if (state.shape) {
+	            if (state.label) {
+	                state.label.destroy();
+	                state.label = null;
 	            }
+	
+	            if (state.overlays) {
+	                state.overlays.each(function (shape) {
+	                    shape.destroy();
+	                });
+	
+	                state.overlays = null;
+	            }
+	
+	            if (state.control) {
+	                state.control.destroy();
+	                state.control = null;
+	            }
+	
+	            state.shape.destroy();
+	            state.shape = null;
 	        }
-	    },
-	
-	    redrawOverlays: function redrawOverlays() {},
-	
-	    redrawControl: function redrawControl() {},
-	
-	    installListeners: function installListeners() {}
+	    }
 	});
 	
 	// 注册图形
@@ -8972,32 +9116,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return parent;
 	    },
 	
-	    compare: function compare(p1, p2) {
-	        var min = Math.min(p1.length, p2.length);
+	    compare: function compare(arr1, arr2) {
+	
 	        var comp = 0;
+	        var l1 = arr1.length;
+	        var l2 = arr2.length;
+	        var min = Math.min(l1, l2);
 	
 	        for (var i = 0; i < min; i++) {
-	            if (p1[i] != p2[i]) {
-	                if (p1[i].length == 0 || p2[i].length == 0) {
-	                    comp = p1[i] == p2[i] ? 0 : p1[i] > p2[i] ? 1 : -1;
-	                } else {
-	                    var t1 = parseInt(p1[i]);
-	                    var t2 = parseInt(p2[i]);
 	
-	                    comp = t1 == t2 ? 0 : t1 > t2 ? 1 : -1;
-	                }
+	            if (arr1[i] !== arr2[i]) {
+	
+	                var v1 = arr1[i].length ? parseInt(arr1[i]) : -1;
+	                var v2 = arr2[i].length ? parseInt(arr2[i]) : -1;
+	
+	                comp = v1 > v2 ? 1 : -1;
 	
 	                break;
 	            }
 	        }
 	
-	        // Compares path length if both paths are equal to this point
-	        if (comp == 0) {
-	            var t1 = p1.length;
-	            var t2 = p2.length;
+	        // compare path length if both paths are equal to this point
+	        if (comp === 0) {
+	            l1 = arr1.length;
+	            l2 = arr2.length;
 	
-	            if (t1 != t2) {
-	                comp = t1 > t2 ? 1 : -1;
+	            if (l1 !== l1) {
+	                comp = l1 > l2 ? 1 : -1;
 	            }
 	        }
 	

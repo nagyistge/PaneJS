@@ -2,7 +2,7 @@ var cellRoute = {
 
     separator: '.',
 
-    create: function (cell) {
+    create(cell) {
 
         var result = '';
 
@@ -26,7 +26,7 @@ var cellRoute = {
         return result;
     },
 
-    getParentRoute: function (path) {
+    getParentRoute(path) {
 
         if (path) {
             var index = path.lastIndexOf(cellRoute.separator);
@@ -41,7 +41,7 @@ var cellRoute = {
         return null;
     },
 
-    resolve: function (root, path) {
+    resolve(root, path) {
         var parent = root;
 
         if (path) {
@@ -54,34 +54,33 @@ var cellRoute = {
         return parent;
     },
 
-    compare: function (p1, p2) {
-        var min = Math.min(p1.length, p2.length);
+    compare(arr1, arr2) {
+
         var comp = 0;
+        var l1 = arr1.length;
+        var l2 = arr2.length;
+        var min = Math.min(l1, l2);
 
         for (var i = 0; i < min; i++) {
-            if (p1[i] != p2[i]) {
-                if (p1[i].length == 0 ||
-                    p2[i].length == 0) {
-                    comp = (p1[i] == p2[i]) ? 0 : ((p1[i] > p2[i]) ? 1 : -1);
-                }
-                else {
-                    var t1 = parseInt(p1[i]);
-                    var t2 = parseInt(p2[i]);
 
-                    comp = (t1 == t2) ? 0 : ((t1 > t2) ? 1 : -1);
-                }
+            if (arr1[i] !== arr2[i]) {
+
+                var v1 = arr1[i].length ? parseInt(arr1[i]) : -1;
+                var v2 = arr2[i].length ? parseInt(arr2[i]) : -1;
+
+                comp = v1 > v2 ? 1 : -1;
 
                 break;
             }
         }
 
-        // Compares path length if both paths are equal to this point
-        if (comp == 0) {
-            var t1 = p1.length;
-            var t2 = p2.length;
+        // compare path length if both paths are equal to this point
+        if (comp === 0) {
+            l1 = arr1.length;
+            l2 = arr2.length;
 
-            if (t1 != t2) {
-                comp = (t1 > t2) ? 1 : -1;
+            if (l1 !== l1) {
+                comp = l1 > l2 ? 1 : -1;
             }
         }
 

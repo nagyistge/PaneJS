@@ -196,7 +196,9 @@ export default Base.extend({
             var links = that.links;
 
             // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
-            if (!links || that.getLinkIndex(link) < 0 || link.getNode(!outgoing) !== that) {
+            if (!links || that.getLinkIndex(link) < 0 ||
+                link.getNode(!outgoing) !== that) {
+
                 if (!links) {
                     links = that.links = [];
                 }
@@ -215,7 +217,7 @@ export default Base.extend({
 
         if (link) {
 
-            // 连线的起点和终点是同一个节点时，不需要移除
+            // 连线的起点和终点是同一个节点时不需要移除
             if (links && link.getTerminal(!outgoing) !== that) {
                 var index = that.getLinkIndex(link);
 
@@ -235,6 +237,7 @@ export default Base.extend({
     // ------
 
     removeFromParent() {
+
         var that = this;
         var parent = that.parent;
 
@@ -246,8 +249,8 @@ export default Base.extend({
     },
 
     cloneValue() {
-        var value = this.value;
 
+        var value = this.value;
         if (value) {
             if (value.clone && isFunction(value.clone)) {
                 return value.clone();
@@ -258,10 +261,11 @@ export default Base.extend({
             }
         }
 
-        return value;
+        return clone(value);
     },
 
     clone() {
+
         var that = this;
         var cloned = clone(that, that.transients);
         cloned.value = that.cloneValue();

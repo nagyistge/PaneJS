@@ -1,4 +1,4 @@
-import { toFloat }           from './number';
+import { toFloat }  from './number';
 
 
 function toRadians(deg) {

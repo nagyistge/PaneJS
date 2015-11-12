@@ -4,9 +4,6 @@ import Rectangle from '../lib/Rectangle';
 
 var State = Rectangle.extend({
 
-
-    invalid: true, // 默认为无效，需要重绘
-
     constructor: function State(view, cell, style) {
 
         var that = this;
@@ -15,6 +12,8 @@ var State = Rectangle.extend({
         that.cell = cell;
         that.style = style;
 
+        // 默认为无效，需要重绘
+        that.invalid = true;
         // cell 在画布上的原始（scale 和 translate）坐标，在 view.validateCellState() 过程中更新
         that.origin = new Point();
         // 对于连线来说，这是 label 的绝对位置，对于节点来说，这是 label 相对于节点左上角的位置
@@ -24,18 +23,20 @@ var State = Rectangle.extend({
         // props
         // -----
         // that.shape = null;
-        // that.text = null;
+        // that.label = null;
         // that.cellBounds = null;        // 缩放和平移之前的边界
         // that.paintBounds = null;       // 缩放和平移之前的绘图边界，cellBounds 或旋转 90° 之后的 cellBounds
+
+        // 联系相关
         // that.absolutePoints = null;    // 连线关键点的坐标数组
         // that.visibleSourceState =null;
         // that.visibleTargetState =null;
         // that.terminalDistance = 0;     // 连线起点和终点之间的距离
-        // that.segments = null;          // 连线每个片段的长度
+        // that.segments = null;          // 连线每个片段的长度数组
         // that.length = 0;               // 连线的长度
     },
 
-    getPerimeterBounds: function (border, bounds) {
+    getPerimeterBounds(border, bounds) {
 
         var that = this;
 
@@ -50,7 +51,8 @@ var State = Rectangle.extend({
     },
 
     // 设置连线起点或终点的坐标
-    setAbsolutePoint: function (point, isSource) {
+    setAbsolutePoint(point, isSource) {
+
         var that = this;
         var absolutePoints = that.absolutePoints;
 
@@ -79,27 +81,27 @@ var State = Rectangle.extend({
     },
 
     // 设置鼠标样式
-    setCursor: function (cursor) {
+    setCursor(cursor) {
 
         var that = this;
 
         that.shape && that.shape.setCursor(cursor);
-        that.text && that.text.setCursor(cursor);
+        that.label && that.label.setCursor(cursor);
 
         return that;
     },
 
     // 获取连线连接的可见起点/终点节点
-    getVisibleTerminal: function (isSource) {
+    getVisibleTerminal(isSource) {
         var state = this.getVisibleTerminalState(isSource);
         return state ? state.cell : null;
     },
 
-    getVisibleTerminalState: function (isSource) {
+    getVisibleTerminalState(isSource) {
         return isSource ? this.visibleSourceState : this.visibleTargetState;
     },
 
-    setVisibleTerminalState: function (state, isSource) {
+    setVisibleTerminalState(state, isSource) {
 
         var that = this;
 
@@ -112,7 +114,7 @@ var State = Rectangle.extend({
         return that;
     },
 
-    updateCachedBounds: function () {
+    updateCachedBounds() {
 
         var that = this;
         var view = that.view;
@@ -135,18 +137,18 @@ var State = Rectangle.extend({
         }
     },
 
-    equalToBounds: function (bounds) {
+    equalToBounds(bounds) {
 
         var that = this;
         return that.x === bounds.x &&
             that.y === bounds.y &&
             that.width === bounds.width &&
-            that.height === bounds.height
+            that.height === bounds.height;
     },
 
-    destroy: function () {},
+    destroy() {},
 
-    clone: function () {
+    clone() {
 
         var that = this;
         var cloned = new State(that.view, that.cell, that.style);
@@ -154,8 +156,8 @@ var State = Rectangle.extend({
         if (that.absolutePoints) {
             cloned.absolutePoints = [];
 
-            for (var i = 0, l = this.absolutePoints.length; i < l; i++) {
-                cloned.absolutePoints[i] = this.absolutePoints[i].clone();
+            for (var i = 0, l = that.absolutePoints.length; i < l; i++) {
+                cloned.absolutePoints[i] = that.absolutePoints[i].clone();
             }
         }
 
@@ -171,8 +173,11 @@ var State = Rectangle.extend({
             cloned.boundingBox = that.boundingBox.clone();
         }
 
+        if (that.segments) {
+            cloned.segments = that.segments.slice();
+        }
+
         cloned.terminalDistance = that.terminalDistance;
-        cloned.segments = that.segments;
         cloned.length = that.length;
         cloned.x = that.x;
         cloned.y = that.y;

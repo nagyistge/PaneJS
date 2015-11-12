@@ -1,4 +1,5 @@
 import {
+    each,
     extend,
     getCurrentStyle,
     rotatePoint,
@@ -6,11 +7,12 @@ import {
 } from '../common/utils';
 
 import Base       from '../lib/Base';
-import styleNames from '../enums/styleNames';
 import Rectangle  from '../lib/Rectangle';
+import Dictionary from '../lib/Dictionary';
 
-import Rect  from '../shapes/Rect';
-import Label from '../shapes/Label';
+// shapes
+import Rect      from '../shapes/Rect';
+import Label     from '../shapes/Label';
 import Connector from '../shapes/Connector';
 
 var Renderer = Base.extend({
@@ -25,14 +27,24 @@ var Renderer = Base.extend({
         }
     },
 
+    // default shapes
     defaultNodeShape: Rect,
     defaultLinkShape: Connector,
     defaultLabelShape: Label,
 
     constructor: function Renderer() {},
 
-    getShape: function (shapeName) {
+    // get shape's Constructor by shape name
+    getShape(shapeName) {
         return shapeName ? Renderer.getShape(shapeName) : null;
+    },
+
+
+    // label
+    // -----
+
+    getLabelValue: function (state) {
+        return state.view.graph.getLabelValue(state.cell);
     },
 
     getLabelBounds: function (state) {
@@ -142,8 +154,185 @@ var Renderer = Base.extend({
         }
     },
 
+    createLabel: function (state, bounds) {
+
+        var that = this;
+        var style = state.style.label;
+
+        if (style) {
+            var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
+            state.label = new Constructor(state, style, bounds);
+        }
+
+        return that;
+    },
+
+    initLabel: function (state) {
+
+    },
+
+    installLabelListener: function () {},
+
+    redrawLabel: function (state, forced) {
+
+        var that = this;
+        var content = that.getLabelValue(state);
+
+
+        if (!state.label && content) {
+            that.createLabel(state, bounds);
+            var bounds = that.getLabelBounds(state);
+            state.label.bounds = bounds;
+        } else if (state.label && !content) {
+            state.label.destroy();
+            state.label = null;
+        }
+
+        if (state.label) {
+
+            var label = state.label;
+
+            if (forced || label.content !== content) {
+                label.content = content;
+                label.redraw();
+            }
+        }
+
+        return that;
+    },
+
+
+    // indicator
+    // ---------
+
+    createIndicator: function (state) {
+
+        var that = this;
+        var shapeName = state.view.graph.getIndicatorShape(state);
+
+        state.shape.indicatorShape = that.getShape(shapeName);
+
+        return that;
+    },
+
+
+    // overlays
+    // --------
+
+    createOverlays: function (state) {
+
+        var that = this;
+        var cellOverlays = state.cell.overlays;// graph.getCellOverlays(state.cell);
+        var stateOverlays = state.overlays;
+        var dict = null;
+
+        if (cellOverlays) {
+
+            dict = new Dictionary();
+
+            each(cellOverlays, function (overlay) {
+
+                var shape = stateOverlays ? stateOverlays.remove(overlay) : null;
+
+                if (shape) {
+                    var temp = new ImageShape(new Rectangle(), overlay.image.src);
+                    temp.preserveImageAspect = false;
+                    temp.overlay = overlay;
+                    that.initOverlay(state, temp);
+                    that.installOverlayListener(state, overlay, temp);
+
+                    if (overlay.cursor) {
+                        temp.node.style.cursor = overlay.cursor;
+                    }
+
+                    dict.put(cellOverlays[i], temp);
+                } else {
+                    dict.put(overlay, shape);
+                }
+            });
+        }
+
+        // remove unused
+        if (stateOverlays) {
+            stateOverlays.each(function (shape) {
+                shape.destroy();
+            });
+        }
+
+        state.overlays = dict;
+
+        return that;
+    },
+
+    initOverlay: function (state, overlay) {
+        overlay.init(state.view.overlayPane);
+        return this;
+    },
+
+    installOverlayListener: function (state, overlay, shape) {
+
+    },
+
+    redrawOverlays: function (state, forced) {},
+
+
+    // control
+    // -------
+
+    getControlBounds: function (state, w, h) {
+
+    },
+
+    createControl: function () {},
+
+    initControl: function (state, control, handleEvents, clickHandler) {
+
+    },
+
+    redrawControl: function (state, forced) {
+        var graph = state.view.graph;
+        var image = graph.getFoldingImage(state);
+
+        if (graph.foldingEnabled && image) {
+            if (!state.control) {
+                var b = new Rectangle(0, 0, image.width, image.height);
+                state.control = new ImageShape(b, image.src);
+                state.control.preserveImageAspect = false;
+
+                this.initControl(state, state.control, true, function (evt) {
+                    if (graph.isEnabled()) {
+                        var collapse = !graph.isCellCollapsed(state.cell);
+                        graph.foldCells(collapse, false, [state.cell]);
+                        mxEvent.consume(evt);
+                    }
+                });
+            }
+        }
+        else if (state.control != null) {
+            state.control.destroy();
+            state.control = null;
+        }
+    },
+
+
+    // shape
+    // -----
+
+    redraw: function (state, force, rendering) {
+
+        var that = this;
+        // 处理 force, 检查样式是否更新，因为下面就更新样式了
+        var shapeChanged = that.redrawShape(state, force, rendering);
+
+        if (state.shape && rendering) {
+            that.redrawLabel(state, shapeChanged);
+            that.redrawOverlays(state, shapeChanged);
+            that.redrawControl(state, shapeChanged);
+        }
+    },
+
     // try to create state's shape after the state be created
-    createShape: function (state) {
+    createShape(state) {
 
         var that = this;
 
@@ -166,47 +355,9 @@ var Renderer = Base.extend({
         return that;
     },
 
-    createLabel: function (state, bounds) {
-
-        var that = this;
-        var style = state.style.label;
-
-        if (style) {
-            var Constructor = that.getShape(style.shape) || that.defaultLabelShape;
-            state.label = new Constructor(state, style, bounds);
-        }
-    },
-
-    createIndicator: function (state) {
-
-        var that = this;
-        var shapeName = state.view.graph.getIndicatorShape(state);
-
-        state.shape.indicatorShape = that.getShape(shapeName);
-
-        return that;
-    },
-
-    createOverlays: function () {},
-
-    createControl: function () {},
-
-    appendShape: function (state) {
+    initShape: function (state) {
         state.shape.init(state.view.drawPane);
         return this;
-    },
-
-    redraw: function (state, force, rendering) {
-
-        var that = this;
-        // 处理 force, 检查样式是否更新，因为下面就更新样式了
-        var shapeChanged = that.redrawShape(state, force, rendering);
-
-        if (state.shape && rendering) {
-            that.redrawLabel(state, shapeChanged);
-            that.redrawOverlays(state, shapeChanged);
-            that.redrawControl(state, shapeChanged);
-        }
     },
 
     redrawShape: function (state, force, rendering) {
@@ -217,8 +368,8 @@ var Renderer = Base.extend({
 
         if (shape) {
             if (!shape.node) {
-                that.createIndicator(state);
-                that.appendShape(state);
+                that.createIndicator(state);    //
+                that.initShape(state);          // append shape to drawPane
                 that.createOverlays(state);
                 that.installListeners(state);
             }
@@ -232,7 +383,7 @@ var Renderer = Base.extend({
             //    force = true;
             //}
 
-            // Redraws the cell if required, ignores changes to bounds if points are
+            // redraw the cell if required, ignores changes to bounds if points are
             // defined as the bounds are updated for the given points inside the shape
             if (force || !shape.bounds || shape.scale !== state.view.scale ||
                 (!state.absolutePoints && !state.equalToBounds(shape.bounds)) ||
@@ -264,37 +415,32 @@ var Renderer = Base.extend({
         return shapeChanged;
     },
 
-    redrawLabel: function (state, forced) {
+    installListeners: function (state) {},
 
-        var that = this;
-        var content = state.view.graph.getCellLabel(state.cell);
-
-
-        if (!state.label && content) {
-            that.createLabel(state, bounds);
-            var bounds = that.getLabelBounds(state);
-            state.label.bounds = bounds;
-        } else if (state.label && !content) {
-            state.label.destroy();
-            state.label = null;
-        }
-
-        if (state.label) {
-
-            var label = state.label;
-
-            if (forced || label.content !== content) {
-                label.content = content;
-                label.redraw();
+    destroy: function (state) {
+        if (state.shape) {
+            if (state.label) {
+                state.label.destroy();
+                state.label = null;
             }
+
+            if (state.overlays) {
+                state.overlays.each(function (shape) {
+                    shape.destroy();
+                });
+
+                state.overlays = null;
+            }
+
+            if (state.control) {
+                state.control.destroy();
+                state.control = null;
+            }
+
+            state.shape.destroy();
+            state.shape = null;
         }
-    },
-
-    redrawOverlays: function () {},
-
-    redrawControl: function () {},
-
-    installListeners: function () {}
+    }
 });
 
 // 注册图形
