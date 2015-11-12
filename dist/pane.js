@@ -2864,9 +2864,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        shadowDy: 3,
 	
 	        glass: false,
-	        flipH: false, // 水平翻转
-	        flipV: false, // 垂直翻转
-	        visible: true, // 默认可见
+	        flipH: false,
+	        flipV: false,
+	        visible: true,
 	        outline: false,
 	        antiAlias: true,
 	
@@ -6943,6 +6943,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
+	var _commonDetector = __webpack_require__(9);
+	
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
+	
 	var _libBase = __webpack_require__(14);
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
@@ -7194,9 +7198,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // fill
 	            if (style.gradient) {
-	                new _LinearGradientBrush2['default'](that).fill(filled);
+	                filled = new _LinearGradientBrush2['default'](that).fill(filled);
 	            } else {
-	                new _SolidBrush2['default'](that).fill(filled);
+	                filled = new _SolidBrush2['default'](that).fill(filled);
 	            }
 	
 	            // stroke
@@ -7214,7 +7218,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            // strokeTolerance
-	            filled = filled && style.fillColor ? true : false;
 	            if (that.strokeTolerance > 0 && !filled) {
 	                root.appendChild(that.createTolerance(node));
 	            }
@@ -7246,24 +7249,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	            shadow.setAttribute('stroke', style.shadowColor);
 	        }
 	
-	        shadow.setAttribute('transform', 'translate(' + that.format(style.shadowDx * style.scale) + ',' + this.format(style.shadowDy * style.scale) + ')' + (style.transform || ''));
-	        shadow.setAttribute('opacity', style.shadowAlpha);
+	        var dx = that.format(style.shadowDx * style.scale);
+	        var dy = that.format(style.shadowDy * style.scale);
+	
+	        shadow.setAttribute('transform', 'translate(' + dx + ',' + dy + ')' + (style.transform || ''));
+	
+	        if (style.shadowOpacity < 1) {
+	            shadow.setAttribute('opacity', style.shadowOpacity);
+	        }
 	
 	        return shadow;
 	    },
 	
 	    createTolerance: function createTolerance(node) {
 	
-	        var ele = node.cloneNode(true);
-	        var sw = parseFloat(ele.getAttribute('stroke-width') || 1) + this.strokeTolerance;
-	        ele.setAttribute('pointer-events', 'stroke');
-	        ele.setAttribute('visibility', 'hidden');
-	        ele.setAttribute('stroke-width', sw);
-	        ele.setAttribute('fill', 'none');
-	        ele.setAttribute('stroke', 'white');
-	        ele.removeAttribute('stroke-dasharray');
+	        var elem = node.cloneNode(true);
+	        var sw = parseFloat(elem.getAttribute('stroke-width') || 1) + this.strokeTolerance;
 	
-	        return ele;
+	        elem.setAttribute('pointer-events', 'stroke');
+	        elem.setAttribute('visibility', 'hidden');
+	        elem.setAttribute('stroke-width', sw);
+	        elem.setAttribute('fill', 'none');
+	        elem.setAttribute('stroke', _commonDetector2['default'].IS_OP ? 'none' : 'white');
+	
+	        // remove dashed attr
+	        elem.removeAttribute('stroke-dasharray');
+	        elem.removeAttribute('stroke-dashoffset');
+	        elem.removeAttribute('stroke-miterlimit');
+	
+	        return elem;
 	    }
 	});
 	module.exports = exports['default'];
@@ -7444,11 +7458,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    node.setAttribute('stroke-miterlimit', miterLimit);
 	                }
 	            }
-	        } else {
-	            node.setAttribute('stroke', 'none');
+	
+	            return true;
 	        }
 	
-	        return that;
+	        node.setAttribute('stroke', 'none');
+	
+	        return false;
 	    }
 	});
 	module.exports = exports['default'];
@@ -7485,9 +7501,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var fillColor = style.fillColor;
 	        if (fillColor) {
 	            node.setAttribute('fill', fillColor.toLowerCase());
+	            return true;
 	        }
 	
-	        return that;
+	        return false;
 	    }
 	});
 	module.exports = exports['default'];
@@ -7531,16 +7548,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                node.setAttribute('fill-rule', style.fillRule);
 	            }
 	
-	            that.doFill();
-	        } else {
-	            node.setAttribute('fill', 'none');
+	            filled = that.doFill();
 	        }
 	
-	        return that;
+	        if (filled) {
+	            return true;
+	        }
+	
+	        node.setAttribute('fill', 'none');
+	        return false;
 	    },
 	
 	    doFill: function doFill() {
-	        return this;
+	        return false;
 	    }
 	});
 	module.exports = exports['default'];
@@ -7697,9 +7717,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var base = (0, _commonUtils.getBaseUrl)().replace(/([\(\)])/g, '\\$1');
 	
 	            node.setAttribute('fill', 'url(' + base + '#' + id + ')');
+	
+	            return true;
 	        }
 	
-	        return that;
+	        return false;
 	    }
 	});
 	

@@ -41,9 +41,9 @@ module.exports = {
         shadowDy: 3,
 
         glass: false,
-        flipH: false,       // 水平翻转
-        flipV: false,       // 垂直翻转
-        visible: true,      // 默认可见
+        flipH: false,
+        flipV: false,
+        visible: true,
         outline: false,
         antiAlias: true,
 

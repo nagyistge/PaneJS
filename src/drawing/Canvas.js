@@ -7,9 +7,11 @@ import {
     write,
     createSvgElement
 } from '../common/utils'
-import Base  from '../lib/Base';
-import Path  from './Path';
-import Pen   from './Pen';
+
+import detector from '../common/detector';
+import Base     from '../lib/Base';
+import Path     from './Path';
+import Pen      from './Pen';
 import SolidBrush          from './SolidBrush';
 import LinearGradientBrush from './LinearGradientBrush';
 
@@ -252,9 +254,9 @@ export default Base.extend({
 
             // fill
             if (style.gradient) {
-                new LinearGradientBrush(that).fill(filled);
+                filled = new LinearGradientBrush(that).fill(filled);
             } else {
-                new SolidBrush(that).fill(filled);
+                filled = new SolidBrush(that).fill(filled);
             }
 
             // stroke
@@ -272,7 +274,6 @@ export default Base.extend({
             }
 
             // strokeTolerance
-            filled = filled && style.fillColor ? true : false;
             if (that.strokeTolerance > 0 && !filled) {
                 root.appendChild(that.createTolerance(node));
             }
@@ -304,25 +305,35 @@ export default Base.extend({
             shadow.setAttribute('stroke', style.shadowColor);
         }
 
-        shadow.setAttribute('transform', 'translate(' + that.format(style.shadowDx * style.scale) +
-            ',' + this.format(style.shadowDy * style.scale) + ')' + (style.transform || ''));
-        shadow.setAttribute('opacity', style.shadowAlpha);
+        var dx = that.format(style.shadowDx * style.scale);
+        var dy = that.format(style.shadowDy * style.scale);
+
+        shadow.setAttribute('transform', 'translate(' + dx + ',' + dy + ')' + (style.transform || ''));
+
+        if (style.shadowOpacity < 1) {
+            shadow.setAttribute('opacity', style.shadowOpacity);
+        }
 
         return shadow;
     },
 
     createTolerance: function (node) {
 
-        var ele = node.cloneNode(true);
-        var sw = parseFloat(ele.getAttribute('stroke-width') || 1) + this.strokeTolerance;
-        ele.setAttribute('pointer-events', 'stroke');
-        ele.setAttribute('visibility', 'hidden');
-        ele.setAttribute('stroke-width', sw);
-        ele.setAttribute('fill', 'none');
-        ele.setAttribute('stroke', 'white');
-        ele.removeAttribute('stroke-dasharray');
+        var elem = node.cloneNode(true);
+        var sw = parseFloat(elem.getAttribute('stroke-width') || 1) + this.strokeTolerance;
+
+        elem.setAttribute('pointer-events', 'stroke');
+        elem.setAttribute('visibility', 'hidden');
+        elem.setAttribute('stroke-width', sw);
+        elem.setAttribute('fill', 'none');
+        elem.setAttribute('stroke', detector.IS_OP ? 'none' : 'white');
+
+        // remove dashed attr
+        elem.removeAttribute('stroke-dasharray');
+        elem.removeAttribute('stroke-dashoffset');
+        elem.removeAttribute('stroke-miterlimit');
 
 
-        return ele;
+        return elem;
     }
 });

@@ -16,9 +16,10 @@ export default Brush.extend({
         var fillColor = style.fillColor;
         if (fillColor) {
             node.setAttribute('fill', fillColor.toLowerCase());
+            return true;
         }
 
-        return that;
+        return false;
     }
 });
 

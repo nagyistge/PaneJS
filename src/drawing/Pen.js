@@ -61,10 +61,12 @@ export default Base.extend({
                     node.setAttribute('stroke-miterlimit', miterLimit);
                 }
             }
-        } else {
-            node.setAttribute('stroke', 'none');
+
+            return true;
         }
 
-        return that;
+        node.setAttribute('stroke', 'none');
+
+        return false;
     }
 });

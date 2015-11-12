@@ -138,9 +138,11 @@ var LinearGradientBrush = Brush.extend({
             var base = getBaseUrl().replace(/([\(\)])/g, '\\$1');
 
             node.setAttribute('fill', 'url(' + base + '#' + id + ')');
+
+            return true;
         }
 
-        return that;
+        return false;
     }
 });
 

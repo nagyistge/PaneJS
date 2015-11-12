@@ -23,16 +23,18 @@ export default Base.extend({
                 node.setAttribute('fill-rule', style.fillRule);
             }
 
-            that.doFill();
-
-        } else {
-            node.setAttribute('fill', 'none');
+            filled = that.doFill();
         }
 
-        return that;
+        if (filled) {
+            return true;
+        }
+
+        node.setAttribute('fill', 'none');
+        return false;
     },
 
     doFill() {
-        return this;
+        return false;
     }
 });
