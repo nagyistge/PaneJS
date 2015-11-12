@@ -58,6 +58,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var pane = {
 	    utils: __webpack_require__(1),
+	    'class': __webpack_require__(12),
+	    detector: __webpack_require__(9),
 	    Graph: __webpack_require__(11),
 	    Model: __webpack_require__(43),
 	    View: __webpack_require__(24)
