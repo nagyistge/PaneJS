@@ -2,7 +2,7 @@ import Base from '../lib/Base';
 
 export default Base.extend({
     constructor: function Change() {},
-    digest: function () {
+    digest() {
         return this;
     }
 });

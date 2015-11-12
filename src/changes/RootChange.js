@@ -10,7 +10,7 @@ export default Change.extend({
         that.previous = root;
     },
 
-    digest: function () {
+    digest() {
 
         var that = this;
         var model = that.model;

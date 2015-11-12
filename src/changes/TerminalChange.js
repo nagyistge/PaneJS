@@ -12,7 +12,7 @@ export default Change.extend({
         that.isSource = isSource;
     },
 
-    digest: function () {
+    digest() {
 
         var that = this;
 

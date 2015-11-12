@@ -11,7 +11,7 @@ export default Change.extend({
         that.previous = visible;
     },
 
-    digest: function () {
+    digest() {
 
         var that = this;
 

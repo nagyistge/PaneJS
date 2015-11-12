@@ -14,7 +14,7 @@ export default Change.extend({
         that.previousIndex = index;
     },
 
-    digest: function () {
+    digest() {
 
         var that = this;
         var model = that.model;
@@ -44,7 +44,7 @@ export default Change.extend({
         return that;
     },
 
-    connect: function (cell, connected) {
+    connect(cell, connected) {
 
         var that = this;
         var model = that.model;
