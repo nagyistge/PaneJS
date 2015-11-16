@@ -304,3 +304,5 @@ var domEvent = {
         e.consumed = true;
     }
 };
+
+export default domEvent;
