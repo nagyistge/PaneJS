@@ -23,11 +23,11 @@ var State = Rectangle.extend({
         // props
         // -----
         // that.shape = null;
-        // that.label = null;
+        // that.label = null;             // Label 的实例
         // that.cellBounds = null;        // 缩放和平移之前的边界
         // that.paintBounds = null;       // 缩放和平移之前的绘图边界，cellBounds 或旋转 90° 之后的 cellBounds
 
-        // 联系相关
+        // 连线相关
         // that.absolutePoints = null;    // 连线关键点的坐标数组
         // that.visibleSourceState =null;
         // that.visibleTargetState =null;

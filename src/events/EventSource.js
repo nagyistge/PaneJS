@@ -10,9 +10,9 @@ var eventSplitter = /\s+/;
 
 export default Base.extend({
 
-    eventEnabled: true,
-
-    constructor: function EventSource() {},
+    constructor: function EventSource() {
+        this.eventEnabled = true;
+    },
 
     enableEvent: function () {
         this.eventsEnabled = true;

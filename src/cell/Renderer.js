@@ -15,6 +15,11 @@ import Rect      from '../shapes/Rect';
 import Label     from '../shapes/Label';
 import Connector from '../shapes/Connector';
 
+// DOM event
+import domEvent   from '../events/domEvent';
+import MouseEvent from '../events/MouseEvent';
+import detector   from '../common/detector';
+
 var Renderer = Base.extend({
 
     Statics: {
@@ -171,7 +176,59 @@ var Renderer = Base.extend({
 
     },
 
-    setupLabel: function () {},
+    setupLabel: function (state) {
+
+        var that = this;
+        var graph = state.view.graph;
+        var forceGetCell = false;
+
+        var getState = function (evt) {
+            var result = state;
+
+            if (detector.IS_TOUCH || forceGetCell) {
+                var x = mxEvent.getClientX(evt);
+                var y = mxEvent.getClientY(evt);
+
+                // Dispatches the drop event to the graph which
+                // consumes and executes the source function
+                var pt = mxUtils.convertPoint(graph.container, x, y);
+                result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+            }
+
+            return result;
+        };
+
+        domEvent.addGestureListeners(state.label.node,
+            function (e) {
+                if (that.isLabelEvent(state, e)) {
+                    graph.fireMouseEvent('mouseDown', new MouseEvent(e, state));
+                    forceGetCell = graph.dialect != mxConstants.DIALECT_SVG &&
+                        mxEvent.getSource(e).nodeName == 'IMG';
+                }
+            },
+            function (e) {
+                if (that.isLabelEvent(state, e)) {
+                    graph.fireMouseEvent('mouseMove', new MouseEvent(e, getState(e)));
+                }
+            },
+            function (e) {
+                if (that.isLabelEvent(state, e)) {
+                    graph.fireMouseEvent('mouseUp', new MouseEvent(e, getState(e)));
+                    forceGetCell = false;
+                }
+            }
+        );
+
+        // Uses double click timeout in mxGraph for quirks mode
+        if (graph.nativeDblClickEnabled) {
+            domEvent.addListener(state.text.node, 'dblclick', function (e) {
+                if (that.isLabelEvent(state, e)) {
+                    graph.dblClick(e, state.cell);
+                    domEvent.consume(e);
+                }
+            });
+        }
+    },
 
     redrawLabel: function (state, forced) {
 
@@ -439,7 +496,62 @@ var Renderer = Base.extend({
         return shapeChanged;
     },
 
-    setupShape: function (state) {},
+    setupShape: function (state) {
+
+        var that = this;
+        var graph = state.view.graph;
+
+        function getState(evt) {
+            var result = state;
+
+            if (detector.IS_TOUCH) {
+                var x = domEvent.getClientX(evt);
+                var y = domEvent.getClientY(evt);
+
+                // Dispatches the drop event to the graph which
+                // consumes and executes the source function
+                var pt = mxUtils.convertPoint(graph.container, x, y);
+                result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+            }
+
+            return result;
+        }
+
+        domEvent.addGestureListeners(state.shape.node,
+            function (e) {
+                if (that.isShapeEvent(state, e)) {
+                    graph.fireMouseEvent('mouseDown',
+                        new MouseEvent(e, state.shape && domEvent.getSource(e) === state.shape.content
+                            ? null
+                            : state));
+                }
+            },
+            function (e) {
+                if (that.isShapeEvent(state, e)) {
+                    graph.fireMouseEvent('mouseMove',
+                        new MouseEvent(e, state.shape && domEvent.getSource(e) === state.shape.content
+                            ? null
+                            : getState(e)));
+                }
+            },
+            function (e) {
+                if (that.isShapeEvent(state, e)) {
+                    graph.fireMouseEvent('mouseUp',
+                        new MouseEvent(e, state.shape && domEvent.getSource(e) === state.shape.content
+                            ? null
+                            : getState(e)));
+                }
+            });
+
+        if (graph.nativeDblClickEnabled) {
+            domEvent.addListener(state.shape.node, 'dblclick', function (e) {
+                if (that.isShapeEvent(state, e)) {
+                    graph.dblClick(e, state.cell);
+                    domEvent.consume(e);
+                }
+            });
+        }
+    },
 
     destroyShape: function (state) {
         if (state.shape) {
