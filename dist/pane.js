@@ -58,10 +58,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var pane = {
 	    utils: __webpack_require__(1),
-	    'class': __webpack_require__(12),
+	    'class': __webpack_require__(11),
 	    detector: __webpack_require__(9),
-	    Graph: __webpack_require__(11),
-	    Model: __webpack_require__(43),
+	    Graph: __webpack_require__(12),
+	    Model: __webpack_require__(45),
 	    View: __webpack_require__(24)
 	};
 	
@@ -837,11 +837,166 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(1);
+	
+	function Class(fn) {
+	    if (!(this instanceof Class) && (0, _utils.isFunction)(fn)) {
+	        return classify(fn);
+	    }
+	}
+	
+	Class.create = function (parent, properties) {
+	    if (!(0, _utils.isFunction)(parent)) {
+	        properties = parent;
+	        parent = null;
+	    }
+	
+	    properties || (properties = {});
+	    parent || (parent = properties.Extends || Class);
+	    properties.Extends = parent;
+	
+	    var SubClass = properties.constructor;
+	    if (SubClass === Object.prototype.constructor) {
+	        SubClass = function Superclass() {};
+	    }
+	
+	    // Inherit class (static) properties from parent.
+	    if (parent !== Class) {
+	        mix(SubClass, parent, parent.StaticsWhiteList);
+	    }
+	
+	    // Add instance properties to the subclass.
+	    implement.call(SubClass, properties);
+	
+	    // Make subclass extendable.
+	    return classify(SubClass);
+	};
+	
+	// Create a sub Class based on `Class`.
+	Class.extend = function (properties) {
+	    properties || (properties = {});
+	    properties.Extends = this;
+	
+	    return Class.create(properties);
+	};
+	
+	// define special properties.
+	Class.Mutators = {
+	
+	    // 继承
+	    'Extends': function Extends(parent) {
+	        var existed = this.prototype;
+	        var parentProto = parent.prototype;
+	        var proto = createProto(parentProto);
+	
+	        // Keep existed properties.
+	        mix(proto, existed);
+	
+	        // Enforce the constructor to be what we expect.
+	        proto.constructor = this;
+	
+	        this.prototype = proto;
+	        this.superclass = parentProto;
+	    },
+	
+	    // 实现
+	    'Implements': function Implements(items) {
+	
+	        var list = (0, _utils.isArray)(items) ? items : [items];
+	        var proto = this.prototype;
+	
+	        (0, _utils.each)(list, function (item) {
+	            mix(proto, item.prototype || item);
+	        });
+	    },
+	
+	    // 属性访问器
+	    'Accessors': function Accessors(propNames) {
+	
+	        var props = (0, _utils.isArray)(propNames) ? propNames : [propNames];
+	        var proto = this.prototype;
+	
+	        (0, _utils.each)(props, function (prop) {
+	
+	            var uc = (0, _utils.ucFirst)(prop);
+	
+	            proto['set' + uc] = function (value) {
+	                this[prop] = value;
+	                return this;
+	            };
+	
+	            proto['get' + uc] = function () {
+	                return this[prop];
+	            };
+	        });
+	    },
+	
+	    'Statics': function Statics(staticProperties) {
+	        mix(this, staticProperties);
+	    }
+	};
+	
+	function classify(cls) {
+	    cls.extend = Class.extend;
+	    cls.implement = implement;
+	    return cls;
+	}
+	
+	function implement(properties) {
+	
+	    var that = this;
+	    var mutators = Class.Mutators;
+	
+	    (0, _utils.forIn)(properties, function (value, key) {
+	        if ((0, _utils.hasKey)(mutators, key)) {
+	            mutators[key].call(that, value);
+	        } else {
+	            that.prototype[key] = value;
+	        }
+	    });
+	}
+	
+	// Helpers
+	// -------
+	
+	var createProto = Object.__proto__ ? function (proto) {
+	    return { __proto__: proto };
+	} : function (proto) {
+	    function Ctor() {}
+	
+	    Ctor.prototype = proto;
+	    return new Ctor();
+	};
+	
+	function mix(receiver, supplier, whiteList) {
+	
+	    (0, _utils.forIn)(supplier, function (value, key) {
+	        if (whiteList && indexOf(whiteList, key) === -1) {
+	            return;
+	        }
+	
+	        receiver[key] = value;
+	    });
+	}
+	
+	exports['default'] = Class;
+	module.exports = exports['default'];
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonClass = __webpack_require__(12);
+	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
@@ -869,19 +1024,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _View2 = _interopRequireDefault(_View);
 	
-	var _Model = __webpack_require__(43);
+	var _Model = __webpack_require__(45);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _changesRootChange = __webpack_require__(46);
+	var _changesRootChange = __webpack_require__(47);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(48);
+	var _changesChildChange = __webpack_require__(49);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesTerminalChange = __webpack_require__(52);
+	var _changesTerminalChange = __webpack_require__(53);
 	
 	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
 	
@@ -1070,7 +1225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else if (change instanceof _changesChildChange2['default']) {
 	            that.processChildChange(change);
 	        } else if (change instanceof _changesTerminalChange2['default'] || change instanceof GeometryChange) {
-	            if (change instanceof _changesTerminalChange2['default'] || (change.previous == null && change.geometry != null || change.previous != null && !change.previous.equals(change.geometry))) {
+	            if (change instanceof _changesTerminalChange2['default'] || change.previous == null && change.geometry != null || change.previous != null && !change.previous.equals(change.geometry)) {
 	                this.view.invalidate(change.cell);
 	            }
 	        }
@@ -2355,161 +2510,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	function Class(fn) {
-	    if (!(this instanceof Class) && (0, _utils.isFunction)(fn)) {
-	        return classify(fn);
-	    }
-	}
-	
-	Class.create = function (parent, properties) {
-	    if (!(0, _utils.isFunction)(parent)) {
-	        properties = parent;
-	        parent = null;
-	    }
-	
-	    properties || (properties = {});
-	    parent || (parent = properties.Extends || Class);
-	    properties.Extends = parent;
-	
-	    var SubClass = properties.constructor;
-	    if (SubClass === Object.prototype.constructor) {
-	        SubClass = function Superclass() {};
-	    }
-	
-	    // Inherit class (static) properties from parent.
-	    if (parent !== Class) {
-	        mix(SubClass, parent, parent.StaticsWhiteList);
-	    }
-	
-	    // Add instance properties to the subclass.
-	    implement.call(SubClass, properties);
-	
-	    // Make subclass extendable.
-	    return classify(SubClass);
-	};
-	
-	// Create a sub Class based on `Class`.
-	Class.extend = function (properties) {
-	    properties || (properties = {});
-	    properties.Extends = this;
-	
-	    return Class.create(properties);
-	};
-	
-	// define special properties.
-	Class.Mutators = {
-	
-	    // 继承
-	    'Extends': function Extends(parent) {
-	        var existed = this.prototype;
-	        var parentProto = parent.prototype;
-	        var proto = createProto(parentProto);
-	
-	        // Keep existed properties.
-	        mix(proto, existed);
-	
-	        // Enforce the constructor to be what we expect.
-	        proto.constructor = this;
-	
-	        this.prototype = proto;
-	        this.superclass = parentProto;
-	    },
-	
-	    // 实现
-	    'Implements': function Implements(items) {
-	
-	        var list = (0, _utils.isArray)(items) ? items : [items];
-	        var proto = this.prototype;
-	
-	        (0, _utils.each)(list, function (item) {
-	            mix(proto, item.prototype || item);
-	        });
-	    },
-	
-	    // 属性访问器
-	    'Accessors': function Accessors(propNames) {
-	
-	        var props = (0, _utils.isArray)(propNames) ? propNames : [propNames];
-	        var proto = this.prototype;
-	
-	        (0, _utils.each)(props, function (prop) {
-	
-	            var uc = (0, _utils.ucFirst)(prop);
-	
-	            proto['set' + uc] = function (value) {
-	                this[prop] = value;
-	                return this;
-	            };
-	
-	            proto['get' + uc] = function () {
-	                return this[prop];
-	            };
-	        });
-	    },
-	
-	    'Statics': function Statics(staticProperties) {
-	        mix(this, staticProperties);
-	    }
-	};
-	
-	function classify(cls) {
-	    cls.extend = Class.extend;
-	    cls.implement = implement;
-	    return cls;
-	}
-	
-	function implement(properties) {
-	
-	    var that = this;
-	    var mutators = Class.Mutators;
-	
-	    (0, _utils.forIn)(properties, function (value, key) {
-	        if ((0, _utils.hasKey)(mutators, key)) {
-	            mutators[key].call(that, value);
-	        } else {
-	            that.prototype[key] = value;
-	        }
-	    });
-	}
-	
-	// Helpers
-	// -------
-	
-	var createProto = Object.__proto__ ? function (proto) {
-	    return { __proto__: proto };
-	} : function (proto) {
-	    function Ctor() {}
-	
-	    Ctor.prototype = proto;
-	    return new Ctor();
-	};
-	
-	function mix(receiver, supplier, whiteList) {
-	
-	    (0, _utils.forIn)(supplier, function (value, key) {
-	        if (whiteList && indexOf(whiteList, key) === -1) {
-	            return;
-	        }
-	
-	        receiver[key] = value;
-	    });
-	}
-	
-	exports['default'] = Class;
-	module.exports = exports['default'];
-
-/***/ },
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2535,9 +2535,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    eventEnabled: true,
-	
-	    constructor: function EventSource() {},
+	    constructor: function EventSource() {
+	        this.eventEnabled = true;
+	    },
 	
 	    enableEvent: function enableEvent() {
 	        this.eventsEnabled = true;
@@ -2663,7 +2663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonClass = __webpack_require__(12);
+	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
@@ -4227,17 +4227,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libDictionary2 = _interopRequireDefault(_libDictionary);
 	
-	var _cellState = __webpack_require__(28);
+	var _cellState = __webpack_require__(27);
 	
 	var _cellState2 = _interopRequireDefault(_cellState);
 	
-	var _cellRenderer = __webpack_require__(29);
+	var _cellRenderer = __webpack_require__(28);
 	
 	var _cellRenderer2 = _interopRequireDefault(_cellRenderer);
 	
 	// events
 	
-	var _eventsAspect = __webpack_require__(45);
+	var _eventsAspect = __webpack_require__(44);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
 	
@@ -5590,8 +5590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */,
-/* 28 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5632,11 +5631,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // props
 	        // -----
 	        // that.shape = null;
-	        // that.label = null;
+	        // that.label = null;             // Label 的实例
 	        // that.cellBounds = null;        // 缩放和平移之前的边界
 	        // that.paintBounds = null;       // 缩放和平移之前的绘图边界，cellBounds 或旋转 90° 之后的 cellBounds
 	
-	        // 联系相关
+	        // 连线相关
 	        // that.absolutePoints = null;    // 连线关键点的坐标数组
 	        // that.visibleSourceState =null;
 	        // that.visibleTargetState =null;
@@ -5796,7 +5795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5823,17 +5822,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// shapes
 	
-	var _shapesRect = __webpack_require__(30);
+	var _shapesRect = __webpack_require__(29);
 	
 	var _shapesRect2 = _interopRequireDefault(_shapesRect);
 	
-	var _shapesLabel = __webpack_require__(39);
+	var _shapesLabel = __webpack_require__(38);
 	
 	var _shapesLabel2 = _interopRequireDefault(_shapesLabel);
 	
-	var _shapesConnector = __webpack_require__(40);
+	var _shapesConnector = __webpack_require__(39);
 	
 	var _shapesConnector2 = _interopRequireDefault(_shapesConnector);
+	
+	// DOM event
+	
+	var _eventsDomEvent = __webpack_require__(42);
+	
+	var _eventsDomEvent2 = _interopRequireDefault(_eventsDomEvent);
+	
+	var _eventsMouseEvent = __webpack_require__(43);
+	
+	var _eventsMouseEvent2 = _interopRequireDefault(_eventsMouseEvent);
+	
+	var _commonDetector = __webpack_require__(9);
+	
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
 	var Renderer = _libBase2['default'].extend({
 	
@@ -5988,7 +6001,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    initLabel: function initLabel(state) {},
 	
-	    setupLabel: function setupLabel() {},
+	    setupLabel: function setupLabel(state) {
+	
+	        var that = this;
+	        var graph = state.view.graph;
+	        var forceGetCell = false;
+	
+	        var getState = function getState(evt) {
+	            var result = state;
+	
+	            if (_commonDetector2['default'].IS_TOUCH || forceGetCell) {
+	                var x = mxEvent.getClientX(evt);
+	                var y = mxEvent.getClientY(evt);
+	
+	                // Dispatches the drop event to the graph which
+	                // consumes and executes the source function
+	                var pt = mxUtils.convertPoint(graph.container, x, y);
+	                result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+	            }
+	
+	            return result;
+	        };
+	
+	        _eventsDomEvent2['default'].addGestureListeners(state.label.node, function (e) {
+	            if (that.isLabelEvent(state, e)) {
+	                graph.fireMouseEvent('mouseDown', new _eventsMouseEvent2['default'](e, state));
+	                forceGetCell = graph.dialect != mxConstants.DIALECT_SVG && mxEvent.getSource(e).nodeName == 'IMG';
+	            }
+	        }, function (e) {
+	            if (that.isLabelEvent(state, e)) {
+	                graph.fireMouseEvent('mouseMove', new _eventsMouseEvent2['default'](e, getState(e)));
+	            }
+	        }, function (e) {
+	            if (that.isLabelEvent(state, e)) {
+	                graph.fireMouseEvent('mouseUp', new _eventsMouseEvent2['default'](e, getState(e)));
+	                forceGetCell = false;
+	            }
+	        });
+	
+	        // Uses double click timeout in mxGraph for quirks mode
+	        if (graph.nativeDblClickEnabled) {
+	            _eventsDomEvent2['default'].addListener(state.text.node, 'dblclick', function (e) {
+	                if (that.isLabelEvent(state, e)) {
+	                    graph.dblClick(e, state.cell);
+	                    _eventsDomEvent2['default'].consume(e);
+	                }
+	            });
+	        }
+	    },
 	
 	    redrawLabel: function redrawLabel(state, forced) {
 	
@@ -6242,7 +6302,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return shapeChanged;
 	    },
 	
-	    setupShape: function setupShape(state) {},
+	    setupShape: function setupShape(state) {
+	
+	        var that = this;
+	        var graph = state.view.graph;
+	
+	        function getState(evt) {
+	            var result = state;
+	
+	            if (_commonDetector2['default'].IS_TOUCH) {
+	                var x = _eventsDomEvent2['default'].getClientX(evt);
+	                var y = _eventsDomEvent2['default'].getClientY(evt);
+	
+	                // Dispatches the drop event to the graph which
+	                // consumes and executes the source function
+	                var pt = mxUtils.convertPoint(graph.container, x, y);
+	                result = graph.view.getState(graph.getCellAt(pt.x, pt.y));
+	            }
+	
+	            return result;
+	        }
+	
+	        _eventsDomEvent2['default'].addGestureListeners(state.shape.node, function (e) {
+	            if (that.isShapeEvent(state, e)) {
+	                graph.fireMouseEvent('mouseDown', new _eventsMouseEvent2['default'](e, state.shape && _eventsDomEvent2['default'].getSource(e) === state.shape.content ? null : state));
+	            }
+	        }, function (e) {
+	            if (that.isShapeEvent(state, e)) {
+	                graph.fireMouseEvent('mouseMove', new _eventsMouseEvent2['default'](e, state.shape && _eventsDomEvent2['default'].getSource(e) === state.shape.content ? null : getState(e)));
+	            }
+	        }, function (e) {
+	            if (that.isShapeEvent(state, e)) {
+	                graph.fireMouseEvent('mouseUp', new _eventsMouseEvent2['default'](e, state.shape && _eventsDomEvent2['default'].getSource(e) === state.shape.content ? null : getState(e)));
+	            }
+	        });
+	
+	        if (graph.nativeDblClickEnabled) {
+	            _eventsDomEvent2['default'].addListener(state.shape.node, 'dblclick', function (e) {
+	                if (that.isShapeEvent(state, e)) {
+	                    graph.dblClick(e, state.cell);
+	                    _eventsDomEvent2['default'].consume(e);
+	                }
+	            });
+	        }
+	    },
 	
 	    destroyShape: function destroyShape(state) {
 	        if (state.shape) {
@@ -6275,7 +6378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6288,7 +6391,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Shape = __webpack_require__(31);
+	var _Shape = __webpack_require__(30);
 	
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
@@ -6329,7 +6432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6346,7 +6449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _drawingCanvas = __webpack_require__(32);
+	var _drawingCanvas = __webpack_require__(31);
 	
 	var _drawingCanvas2 = _interopRequireDefault(_drawingCanvas);
 	
@@ -6366,7 +6469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enumsStyleNames2 = _interopRequireDefault(_enumsStyleNames);
 	
-	var _enumsDirections = __webpack_require__(38);
+	var _enumsDirections = __webpack_require__(37);
 	
 	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
 	
@@ -6931,7 +7034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6952,19 +7055,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
-	var _Path = __webpack_require__(33);
+	var _Path = __webpack_require__(32);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Pen = __webpack_require__(34);
+	var _Pen = __webpack_require__(33);
 	
 	var _Pen2 = _interopRequireDefault(_Pen);
 	
-	var _SolidBrush = __webpack_require__(35);
+	var _SolidBrush = __webpack_require__(34);
 	
 	var _SolidBrush2 = _interopRequireDefault(_SolidBrush);
 	
-	var _LinearGradientBrush = __webpack_require__(37);
+	var _LinearGradientBrush = __webpack_require__(36);
 	
 	var _LinearGradientBrush2 = _interopRequireDefault(_LinearGradientBrush);
 	
@@ -7284,7 +7387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7380,7 +7483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7471,7 +7574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7482,7 +7585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Brush = __webpack_require__(36);
+	var _Brush = __webpack_require__(35);
 	
 	var _Brush2 = _interopRequireDefault(_Brush);
 	
@@ -7511,7 +7614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7567,7 +7670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7580,11 +7683,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Brush = __webpack_require__(36);
+	var _Brush = __webpack_require__(35);
 	
 	var _Brush2 = _interopRequireDefault(_Brush);
 	
-	var _enumsDirections = __webpack_require__(38);
+	var _enumsDirections = __webpack_require__(37);
 	
 	var _enumsDirections2 = _interopRequireDefault(_enumsDirections);
 	
@@ -7730,7 +7833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7743,7 +7846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7756,7 +7859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Shape = __webpack_require__(31);
+	var _Shape = __webpack_require__(30);
 	
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
@@ -8009,7 +8112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8022,11 +8125,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _PolyLine = __webpack_require__(41);
+	var _PolyLine = __webpack_require__(40);
 	
 	var _PolyLine2 = _interopRequireDefault(_PolyLine);
 	
-	var _marker = __webpack_require__(42);
+	var _marker = __webpack_require__(41);
 	
 	var _marker2 = _interopRequireDefault(_marker);
 	
@@ -8100,7 +8203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8113,7 +8216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Shape = __webpack_require__(31);
+	var _Shape = __webpack_require__(30);
 	
 	var _Shape2 = _interopRequireDefault(_Shape);
 	
@@ -8180,7 +8283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -8253,6 +8356,314 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _commonDetector = __webpack_require__(9);
+	
+	var _commonDetector2 = _interopRequireDefault(_commonDetector);
+	
+	var MOUSE_DOWN = _commonDetector2['default'].IS_POINTER ? 'MSPointerDown' : _commonDetector2['default'].IS_TOUCH ? 'touchstart' : 'mousedown';
+	var MOUSE_MOVE = _commonDetector2['default'].IS_POINTER ? 'MSPointerMove' : _commonDetector2['default'].IS_TOUCH ? 'touchmove' : 'mousemove';
+	var MOUSE_UP = _commonDetector2['default'].IS_POINTER ? 'MSPointerUp' : _commonDetector2['default'].IS_TOUCH ? 'touchend' : 'mouseup';
+	
+	var domEvent = {
+	
+	    cache: [],
+	
+	    addListener: (function () {
+	
+	        function updateListenerList(element, eventName, handler) {
+	            if (!element.listeners) {
+	                element.listeners = [];
+	                domEvent.cache.push(element);
+	            }
+	
+	            element.listeners.push({
+	                name: eventName,
+	                handler: handler
+	            });
+	        }
+	
+	        if (window.addEventListener) {
+	            return function (element, eventName, handler) {
+	                element.addEventListener(eventName, handler, false);
+	                updateListenerList(element, eventName, handler);
+	            };
+	        } else {
+	            return function (element, eventName, handler) {
+	                element.attachEvent('on' + eventName, handler);
+	                updateListenerList(element, eventName, handler);
+	            };
+	        }
+	    })(),
+	
+	    removeListener: (function () {
+	
+	        function updateListener(element, eventName, handler) {
+	
+	            var listeners = element.listeners;
+	
+	            if (listeners) {
+	
+	                for (var i = listeners.length - 1; i >= 0; i--) {
+	                    var entry = listeners[i];
+	
+	                    if (entry.name === eventName && entry.handler === handler) {
+	                        listeners.splice(i, 1);
+	                        break;
+	                    }
+	                }
+	
+	                if (listeners.length === 0) {
+	                    element.listeners = null;
+	
+	                    var idx = (0, _commonUtils.indexOf)(domEvent.cache, element);
+	
+	                    if (idx >= 0) {
+	                        domEvent.cache.splice(idx, 1);
+	                    }
+	                }
+	            }
+	        }
+	
+	        if (window.removeEventListener) {
+	            return function (element, eventName, handler) {
+	                element.removeEventListener(eventName, handler, false);
+	                updateListener(element, eventName, handler);
+	            };
+	        } else {
+	            return function (element, eventName, handler) {
+	                element.detachEvent('on' + eventName, handler);
+	                updateListener(element, eventName, handler);
+	            };
+	        }
+	    })(),
+	
+	    removeAllListeners: function removeAllListeners(element) {
+	        var list = element.listeners;
+	
+	        list && (0, _commonUtils.each)(list, function (entry) {
+	            domEvent.removeListener(element, entry.name, entry.handler);
+	        });
+	    },
+	
+	    addGestureListeners: function addGestureListeners(node, startListener, moveListener, endListener) {
+	        if (startListener) {
+	            domEvent.addListener(node, MOUSE_DOWN, startListener);
+	        }
+	
+	        if (moveListener) {
+	            domEvent.addListener(node, MOUSE_MOVE, moveListener);
+	        }
+	
+	        if (endListener) {
+	            domEvent.addListener(node, MOUSE_UP, endListener);
+	        }
+	    },
+	
+	    removeGestureListeners: function removeGestureListeners(node, startListener, moveListener, endListener) {
+	        if (startListener) {
+	            mxEvent.removeListener(node, MOUSE_DOWN, startListener);
+	        }
+	
+	        if (moveListener) {
+	            mxEvent.removeListener(node, MOUSE_MOVE, moveListener);
+	        }
+	
+	        if (endListener) {
+	            mxEvent.removeListener(node, MOUSE_UP, endListener);
+	        }
+	    },
+	
+	    redirectMouseEvents: function redirectMouseEvents(node, graph, state, down, move, up, dblClick) {
+	
+	        var getState = function getState(e) {
+	            return (0, _commonUtils.isFunction)(state) ? state(e) : state;
+	        };
+	
+	        domEvent.addGestureListeners(node, function (e) {
+	            if (down) {
+	                down(e);
+	            } else if (!domEvent.isConsumed(e)) {
+	                graph.fireMouseEvent('mouseDown', new MouseEvent(e, getState(e)));
+	            }
+	        }, function (e) {
+	            if (move) {
+	                move(e);
+	            } else if (!domEvent.isConsumed(e)) {
+	                graph.fireMouseEvent('mouseMove', new MouseEvent(e, getState(e)));
+	            }
+	        }, function (e) {
+	            if (up) {
+	                up(e);
+	            } else if (!domEvent.isConsumed(e)) {
+	                graph.fireMouseEvent('mouseUp', new MouseEvent(e, getState(e)));
+	            }
+	        });
+	
+	        domEvent.addListener(node, 'dblclick', function (e) {
+	            if (dblClick) {
+	                dblClick(e);
+	            } else if (!domEvent.isConsumed(e)) {
+	                var state = getState(e);
+	                graph.dblClick(e, state ? state.cell : null);
+	            }
+	        });
+	    },
+	
+	    release: function release(element) {
+	        if (element) {
+	            domEvent.removeAllListeners(element);
+	
+	            var children = element.childNodes;
+	
+	            if (children) {
+	                for (var i = 0, l = children.length; i < l; i++) {
+	                    domEvent.release(children[i]);
+	                }
+	            }
+	        }
+	    },
+	
+	    addMouseWheelListener: function addMouseWheelListener(handler) {
+	        if (handler) {
+	            var wheelHandler = function wheelHandler(e) {
+	
+	                e = e || window.event;
+	
+	                var delta = 0;
+	
+	                if (_commonDetector2['default'].IS_FF) {
+	                    delta = -e.detail / 2;
+	                } else {
+	                    delta = e.wheelDelta / 120;
+	                }
+	
+	                // handle the event using the given function
+	                if (delta !== 0) {
+	                    handler(e, delta > 0);
+	                }
+	            };
+	
+	            // Webkit has NS event API, but IE event name and details
+	            if (_commonDetector2['default'].IS_NS && !document.documentMode) {
+	                var eventName = _commonDetector2['default'].IS_SF || _commonDetector2['default'].IS_GC ? 'mousewheel' : 'DOMMouseScroll';
+	                domEvent.addListener(window, eventName, wheelHandler);
+	            } else {
+	                domEvent.addListener(document, 'mousewheel', wheelHandler);
+	            }
+	        }
+	    },
+	
+	    getSource: function getSource(e) {
+	        return e.srcElement ? e.srcElement : e.target;
+	    },
+	
+	    getMainEvent: function getMainEvent(e) {
+	        if ((e.type === 'touchstart' || e.type === 'touchmove') && e.touches && e.touches[0]) {
+	            e = e.touches[0];
+	        } else if (e.type === 'touchend' && e.changedTouches && e.changedTouches[0]) {
+	            e = e.changedTouches[0];
+	        }
+	
+	        return e;
+	    },
+	
+	    getClientX: function getClientX(e) {
+	        return domEvent.getMainEvent(e).clientX;
+	    },
+	
+	    getClientY: function getClientY(e) {
+	        return domEvent.getMainEvent(e).clientY;
+	    },
+	
+	    isConsumed: function isConsumed(e) {
+	        return e.consumed === true;
+	    },
+	
+	    isTouchEvent: function isTouchEvent(e) {
+	        return e.pointerType ? e.pointerType === 'touch' || e.pointerType === e.MSPOINTER_TYPE_TOUCH : e.mozInputSource ? e.mozInputSource === 5 : e.type.indexOf('touch') === 0;
+	    },
+	
+	    isMultiTouchEvent: function isMultiTouchEvent(e) {
+	        return e.type && e.type.indexOf('touch') === 0 && e.touches && e.touches.length > 1;
+	    },
+	
+	    isMouseEvent: function isMouseEvent(e) {
+	        return e.pointerType ? e.pointerType === 'mouse' || e.pointerType === e.MSPOINTER_TYPE_MOUSE : e.mozInputSource ? e.mozInputSource === 1 : e.type.indexOf('mouse') === 0;
+	    },
+	
+	    isLeftMouseButton: function isLeftMouseButton(e) {
+	        return e.button === 0;
+	    },
+	
+	    isMiddleMouseButton: function isMiddleMouseButton(e) {
+	        return e.button === 1;
+	    },
+	
+	    isRightMouseButton: function isRightMouseButton(e) {
+	        return e.button === 2;
+	    },
+	
+	    isPopupTrigger: function isPopupTrigger(e) {
+	        return domEvent.isRightMouseButton(e) || _commonDetector2['default'].IS_MAC && domEvent.isControlDown(e) && !domEvent.isShiftDown(e) && !domEvent.isMetaDown(e) && !domEvent.isAltDown(e);
+	    },
+	
+	    isShiftDown: function isShiftDown(e) {
+	        return e ? e.shiftKey : false;
+	    },
+	
+	    isAltDown: function isAltDown(e) {
+	        return e ? e.altKey : false;
+	    },
+	
+	    isControlDown: function isControlDown(e) {
+	        return e ? e.ctrlKey : false;
+	    },
+	
+	    isMetaDown: function isMetaDown(e) {
+	        return e ? e.metaKey : false;
+	    },
+	
+	    consume: function consume(e) {
+	        var preventDefault = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	        var stopPropagation = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+	
+	        if (preventDefault) {
+	            if (e.preventDefault) {
+	                e.preventDefault();
+	            } else {
+	                e.returnValue = false;
+	            }
+	        }
+	
+	        if (stopPropagation) {
+	            if (e.stopPropagation) {
+	                e.stopPropagation();
+	            }
+	
+	            e.cancelBubble = true;
+	        }
+	
+	        e.consumed = true;
+	    }
+	};
+	
+	exports['default'] = domEvent;
+	module.exports = exports['default'];
+
+/***/ },
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -8266,7 +8677,188 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _commonClass = __webpack_require__(12);
+	var _libBase = __webpack_require__(14);
+	
+	var _libBase2 = _interopRequireDefault(_libBase);
+	
+	var _domEvent = __webpack_require__(42);
+	
+	var _domEvent2 = _interopRequireDefault(_domEvent);
+	
+	exports['default'] = _libBase2['default'].extend({
+	    constructor: function Cell(evt, state) {
+	
+	        var that = this;
+	
+	        that.event = evt;
+	        that.state = state;
+	        that.consumed = false;
+	    },
+	
+	    getEvent: function getEvent() {
+	        return this.event;
+	    },
+	
+	    getState: function getState() {
+	        return this.state;
+	    },
+	
+	    getCell: function getCell() {
+	        return this.state ? this.state.cell : null;
+	    },
+	
+	    getSource: function getSource() {
+	        return _domEvent2['default'].getSource(this.event);
+	    },
+	
+	    isSource: function isSource(shape) {},
+	
+	    getClientX: function getClientX() {
+	        return _domEvent2['default'].getClientX(this.event);
+	    },
+	
+	    getClientY: function getClientY() {
+	        return _domEvent2['default'].getClientY(this.event);
+	    },
+	
+	    getGraphX: function getGraphX() {
+	        return this.graphX;
+	    },
+	
+	    getGraphY: function getGraphY() {
+	        return this.graphY;
+	    },
+	
+	    isPopupTrigger: function isPopupTrigger() {
+	        return _domEvent2['default'].isPopupTrigger(this.event);
+	    },
+	
+	    isConsumed: function isConsumed() {
+	        return this.consumed;
+	    },
+	
+	    consume: function consume() {
+	        var preventDefault = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	
+	        var that = this;
+	
+	        if (preventDefault) {
+	            var e = that.event;
+	            if (e.preventDefault) {
+	                e.preventDefault();
+	            } else {
+	                e.returnValue = false;
+	            }
+	        }
+	        that.consumed = true;
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var eventSplitter = /\s+/;
+	
+	function weave(when, methodName, callback, context) {
+	
+	    var that = this;
+	    var names = methodName.split(eventSplitter);
+	
+	    (0, _commonUtils.each)(names, function (name) {
+	        var method = that[name];
+	
+	        if (!method || !(0, _commonUtils.isFunction)(method)) {
+	            throw new Error('Event handler must be function, event name: ' + name);
+	        }
+	
+	        if (!method.__aspected) {
+	            wrap.call(that, name);
+	        }
+	
+	        that.on(when + ':' + name, callback, context);
+	    });
+	
+	    return that;
+	}
+	
+	function wrap(methodName) {
+	
+	    var that = this;
+	    var originMethod = that[methodName];
+	
+	    that[methodName] = function () {
+	        var that = this;
+	        var args = (0, _commonUtils.toArray)(arguments);
+	        var beforeArgs = ['before:' + methodName].concat(args);
+	
+	        // 检查每个回调的返回值，如果任何一个结果为 false，则直接返回
+	        var results = (0, _commonUtils.invoke)(that.emit, beforeArgs, that);
+	        var returned = (0, _commonUtils.some)(results || [], function (result) {
+	            return result === false;
+	        });
+	        if (returned) {
+	            return;
+	        }
+	
+	        // 调用原方法
+	        var ret = originMethod.apply(this, arguments);
+	        var afterArgs = ['after:' + methodName, ret].concat(args);
+	        //
+	        (0, _commonUtils.invoke)(that.emit, afterArgs, that);
+	
+	        return ret;
+	    };
+	
+	    that[methodName].__aspected = true;
+	}
+	
+	var aspect = {
+	
+	    before: function before(methodName, callback, context) {
+	        return weave.call(this, 'before', methodName, callback, context);
+	    },
+	
+	    after: function after(methodName, callback, context) {
+	        return weave.call(this, 'after', methodName, callback, context);
+	    },
+	
+	    around: function around(methodName, callback, context) {
+	        weave.call(this, 'before', methodName, callback, context);
+	        weave.call(this, 'after', methodName, callback, context);
+	        return this;
+	    }
+	};
+	
+	exports['default'] = aspect;
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(1);
+	
+	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
@@ -8274,7 +8866,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _cellCell2 = _interopRequireDefault(_cellCell);
 	
-	var _cellRoute = __webpack_require__(44);
+	var _cellRoute = __webpack_require__(46);
 	
 	var _cellRoute2 = _interopRequireDefault(_cellRoute);
 	
@@ -8288,7 +8880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// events
 	
-	var _eventsAspect = __webpack_require__(45);
+	var _eventsAspect = __webpack_require__(44);
 	
 	var _eventsAspect2 = _interopRequireDefault(_eventsAspect);
 	
@@ -8298,39 +8890,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// changes
 	
-	var _changesRootChange = __webpack_require__(46);
+	var _changesRootChange = __webpack_require__(47);
 	
 	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
 	
-	var _changesChildChange = __webpack_require__(48);
+	var _changesChildChange = __webpack_require__(49);
 	
 	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
-	var _changesValueChange = __webpack_require__(49);
+	var _changesValueChange = __webpack_require__(50);
 	
 	var _changesValueChange2 = _interopRequireDefault(_changesValueChange);
 	
-	var _changesStyleChange = __webpack_require__(50);
+	var _changesStyleChange = __webpack_require__(51);
 	
 	var _changesStyleChange2 = _interopRequireDefault(_changesStyleChange);
 	
-	var _changesVisibleChange = __webpack_require__(51);
+	var _changesVisibleChange = __webpack_require__(52);
 	
 	var _changesVisibleChange2 = _interopRequireDefault(_changesVisibleChange);
 	
-	var _changesTerminalChange = __webpack_require__(52);
+	var _changesTerminalChange = __webpack_require__(53);
 	
 	var _changesTerminalChange2 = _interopRequireDefault(_changesTerminalChange);
 	
-	var _changesGeometryChange = __webpack_require__(53);
+	var _changesGeometryChange = __webpack_require__(54);
 	
 	var _changesGeometryChange2 = _interopRequireDefault(_changesGeometryChange);
 	
-	var _changesCollapseChange = __webpack_require__(54);
+	var _changesCollapseChange = __webpack_require__(55);
 	
 	var _changesCollapseChange2 = _interopRequireDefault(_changesCollapseChange);
 	
-	var _changesChangeCollection = __webpack_require__(55);
+	var _changesChangeCollection = __webpack_require__(56);
 	
 	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
@@ -9164,7 +9756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -9266,94 +9858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var eventSplitter = /\s+/;
-	
-	function weave(when, methodName, callback, context) {
-	
-	    var that = this;
-	    var names = methodName.split(eventSplitter);
-	
-	    (0, _commonUtils.each)(names, function (name) {
-	        var method = that[name];
-	
-	        if (!method || !(0, _commonUtils.isFunction)(method)) {
-	            throw new Error('Event handler must be function, event name: ' + name);
-	        }
-	
-	        if (!method.__aspected) {
-	            wrap.call(that, name);
-	        }
-	
-	        that.on(when + ':' + name, callback, context);
-	    });
-	
-	    return that;
-	}
-	
-	function wrap(methodName) {
-	
-	    var that = this;
-	    var originMethod = that[methodName];
-	
-	    that[methodName] = function () {
-	        var that = this;
-	        var args = (0, _commonUtils.toArray)(arguments);
-	        var beforeArgs = ['before:' + methodName].concat(args);
-	
-	        // 检查每个回调的返回值，如果任何一个结果为 false，则直接返回
-	        var results = (0, _commonUtils.invoke)(that.emit, beforeArgs, that);
-	        var returned = (0, _commonUtils.some)(results || [], function (result) {
-	            return result === false;
-	        });
-	        if (returned) {
-	            return;
-	        }
-	
-	        // 调用原方法
-	        var ret = originMethod.apply(this, arguments);
-	        var afterArgs = ['after:' + methodName, ret].concat(args);
-	        //
-	        (0, _commonUtils.invoke)(that.emit, afterArgs, that);
-	
-	        return ret;
-	    };
-	
-	    that[methodName].__aspected = true;
-	}
-	
-	var aspect = {
-	
-	    before: function before(methodName, callback, context) {
-	        return weave.call(this, 'before', methodName, callback, context);
-	    },
-	
-	    after: function after(methodName, callback, context) {
-	        return weave.call(this, 'after', methodName, callback, context);
-	    },
-	
-	    around: function around(methodName, callback, context) {
-	        weave.call(this, 'before', methodName, callback, context);
-	        weave.call(this, 'after', methodName, callback, context);
-	        return this;
-	    }
-	};
-	
-	exports['default'] = aspect;
-	module.exports = exports['default'];
-
-/***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9364,7 +9869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9393,7 +9898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9417,7 +9922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9428,7 +9933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9508,7 +10013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9519,7 +10024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9547,7 +10052,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9558,7 +10063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9586,7 +10091,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9597,7 +10102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9625,7 +10130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9636,7 +10141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9665,7 +10170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9676,7 +10181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9704,7 +10209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 54 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9715,7 +10220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Change = __webpack_require__(47);
+	var _Change = __webpack_require__(48);
 	
 	var _Change2 = _interopRequireDefault(_Change);
 	
@@ -9743,7 +10248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 55 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
