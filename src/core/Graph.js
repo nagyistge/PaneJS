@@ -1366,8 +1366,23 @@ export default Class.create({
 
     // Graph events
     // ------------
-    addMouseListener: function () {},
-    removeMouseListener: function () {},
+    addMouseListener: function (listener) {
+        if (this.mouseListeners == null) {
+            this.mouseListeners = [];
+        }
+
+        this.mouseListeners.push(listener);
+    },
+    removeMouseListener: function (listener) {
+        if (this.mouseListeners != null) {
+            for (var i = 0; i < this.mouseListeners.length; i++) {
+                if (this.mouseListeners[i] == listener) {
+                    this.mouseListeners.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    },
     updateMouseEvent: function (me) {
         if (me.graphX == null || me.graphY == null) {
             var pt = mxUtils.convertPoint(this.container, me.getX(), me.getY());
