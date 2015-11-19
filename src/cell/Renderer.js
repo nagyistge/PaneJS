@@ -361,7 +361,28 @@ var Renderer = Base.extend({
 
     },
 
-    createControl: function () {},
+    createControl: function (state) {
+        var graph = state.view.graph;
+        var image = graph.getFoldingImage(state);
+
+        if (graph.foldingEnabled && image) {
+            if (!state.control) {
+                var b = new Rectangle(0, 0, image.width, image.height);
+                state.control = new ImageShape(b, image.src);
+                state.control.preserveImageAspect = false;
+
+                this.initControl(state, state.control, true, function (evt) {
+                    if (graph.isEnabled()) {
+                        var collapse = !graph.isCellCollapsed(state.cell);
+                        graph.foldCells(collapse, false, [state.cell]);
+                        mxEvent.consume(evt);
+                    }
+                });
+            }
+        } else {
+            this.destroyControl(state);
+        }
+    },
 
     initControl: function (state, control, handleEvents, clickHandler) {
 
@@ -394,7 +415,14 @@ var Renderer = Base.extend({
         }
     },
 
-    destroyControl: function (state) {},
+    destroyControl: function (state) {
+        if (state.control) {
+            state.control.destroy();
+            state.control = null;
+        }
+
+        return this;
+    },
 
     // shape
     // -----
@@ -449,13 +477,13 @@ var Renderer = Base.extend({
 
         if (shape) {
             if (!shape.node) {
-                that.createIndicator(state);    //
-                that.initShape(state);          // append shape to drawPane
+                that.createIndicator(state);
                 that.createOverlays(state);
+                that.initShape(state);
                 that.setupShape(state);
             }
 
-            // Handles changes of the collapse icon
+            // handle changes of the collapse icon
             that.createControl(state);
 
             // 检查样式是否有更新
@@ -500,6 +528,7 @@ var Renderer = Base.extend({
 
         var that = this;
         var graph = state.view.graph;
+        var shape = state.shape;
 
         function getState(evt) {
             var result = state;
@@ -517,35 +546,41 @@ var Renderer = Base.extend({
             return result;
         }
 
-        domEvent.addGestureListeners(state.shape.node,
+        domEvent.addGestureListeners(shape.node,
             function (e) {
-                if (that.isShapeEvent(state, e)) {
-                    graph.fireMouseEvent('mouseDown',
-                        new MouseEvent(e, state.shape && domEvent.getSource(e) === state.shape.content
-                            ? null
-                            : state));
+                if (that.isShapeEvent(e, state)) {
+
+                    var s = shape && domEvent.getSource(e) === shape.content
+                        ? null
+                        : state;
+
+                    graph.fireMouseEvent('mouseDown', e, s);
                 }
             },
             function (e) {
-                if (that.isShapeEvent(state, e)) {
-                    graph.fireMouseEvent('mouseMove',
-                        new MouseEvent(e, state.shape && domEvent.getSource(e) === state.shape.content
-                            ? null
-                            : getState(e)));
+                if (that.isShapeEvent(e, state)) {
+
+                    var s = shape && domEvent.getSource(e) === shape.content
+                        ? null
+                        : getState(e);
+
+                    graph.fireMouseEvent('mouseMove', e, s);
                 }
             },
             function (e) {
-                if (that.isShapeEvent(state, e)) {
-                    graph.fireMouseEvent('mouseUp',
-                        new MouseEvent(e, state.shape && domEvent.getSource(e) === state.shape.content
-                            ? null
-                            : getState(e)));
+                if (that.isShapeEvent(e, state)) {
+
+                    var s = shape && domEvent.getSource(e) === shape.content
+                        ? null
+                        : getState(e);
+
+                    graph.fireMouseEvent('mouseUp', e, s);
                 }
             });
 
         if (graph.nativeDblClickEnabled) {
-            domEvent.addListener(state.shape.node, 'dblclick', function (e) {
-                if (that.isShapeEvent(state, e)) {
+            domEvent.addListener(shape.node, 'dblclick', function (e) {
+                if (that.isShapeEvent(e, state)) {
                     graph.dblClick(e, state.cell);
                     domEvent.consume(e);
                 }
@@ -560,6 +595,16 @@ var Renderer = Base.extend({
         }
 
         return this;
+    },
+
+    //
+
+    isShapeEvent: function (e, state) {
+        return true;
+    },
+
+    isLabelEvent: function (e, state) {
+        return true;
     },
 
     insertShapesAfter: function () {},

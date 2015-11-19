@@ -2314,8 +2314,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Graph events
 	    // ------------
-	    addMouseListener: function addMouseListener() {},
-	    removeMouseListener: function removeMouseListener() {},
+	    addMouseListener: function addMouseListener(listener) {
+	        if (this.mouseListeners == null) {
+	            this.mouseListeners = [];
+	        }
+	
+	        this.mouseListeners.push(listener);
+	    },
+	    removeMouseListener: function removeMouseListener(listener) {
+	        if (this.mouseListeners != null) {
+	            for (var i = 0; i < this.mouseListeners.length; i++) {
+	                if (this.mouseListeners[i] == listener) {
+	                    this.mouseListeners.splice(i, 1);
+	                    break;
+	                }
+	            }
+	        }
+	    },
 	    updateMouseEvent: function updateMouseEvent(me) {
 	        if (me.graphX == null || me.graphY == null) {
 	            var pt = mxUtils.convertPoint(this.container, me.getX(), me.getY());
@@ -2535,9 +2550,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _libBase2['default'].extend({
 	
-	    constructor: function EventSource() {
-	        this.eventEnabled = true;
-	    },
+	    eventEnabled: true,
+	
+	    constructor: function EventSource() {},
 	
 	    enableEvent: function enableEvent() {
 	        this.eventsEnabled = true;
@@ -6175,7 +6190,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    getControlBounds: function getControlBounds(state, w, h) {},
 	
-	    createControl: function createControl() {},
+	    createControl: function createControl(state) {
+	        var graph = state.view.graph;
+	        var image = graph.getFoldingImage(state);
+	
+	        if (graph.foldingEnabled && image) {
+	            if (!state.control) {
+	                var b = new _libRectangle2['default'](0, 0, image.width, image.height);
+	                state.control = new ImageShape(b, image.src);
+	                state.control.preserveImageAspect = false;
+	
+	                this.initControl(state, state.control, true, function (evt) {
+	                    if (graph.isEnabled()) {
+	                        var collapse = !graph.isCellCollapsed(state.cell);
+	                        graph.foldCells(collapse, false, [state.cell]);
+	                        mxEvent.consume(evt);
+	                    }
+	                });
+	            }
+	        } else {
+	            this.destroyControl(state);
+	        }
+	    },
 	
 	    initControl: function initControl(state, control, handleEvents, clickHandler) {},
 	
@@ -6205,7 +6241,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    destroyControl: function destroyControl(state) {},
+	    destroyControl: function destroyControl(state) {
+	        if (state.control) {
+	            state.control.destroy();
+	            state.control = null;
+	        }
+	
+	        return this;
+	    },
 	
 	    // shape
 	    // -----
@@ -6257,13 +6300,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (shape) {
 	            if (!shape.node) {
-	                that.createIndicator(state); //
-	                that.initShape(state); // append shape to drawPane
+	                that.createIndicator(state);
 	                that.createOverlays(state);
+	                that.initShape(state);
 	                that.setupShape(state);
 	            }
 	
-	            // Handles changes of the collapse icon
+	            // handle changes of the collapse icon
 	            that.createControl(state);
 	
 	            // 检查样式是否有更新
@@ -6306,6 +6349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	        var graph = state.view.graph;
+	        var shape = state.shape;
 	
 	        function getState(evt) {
 	            var result = state;
@@ -6323,23 +6367,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return result;
 	        }
 	
-	        _eventsDomEvent2['default'].addGestureListeners(state.shape.node, function (e) {
-	            if (that.isShapeEvent(state, e)) {
-	                graph.fireMouseEvent('mouseDown', new _eventsMouseEvent2['default'](e, state.shape && _eventsDomEvent2['default'].getSource(e) === state.shape.content ? null : state));
+	        _eventsDomEvent2['default'].addGestureListeners(shape.node, function (e) {
+	            if (that.isShapeEvent(e, state)) {
+	
+	                var s = shape && _eventsDomEvent2['default'].getSource(e) === shape.content ? null : state;
+	
+	                graph.fireMouseEvent('mouseDown', e, s);
 	            }
 	        }, function (e) {
-	            if (that.isShapeEvent(state, e)) {
-	                graph.fireMouseEvent('mouseMove', new _eventsMouseEvent2['default'](e, state.shape && _eventsDomEvent2['default'].getSource(e) === state.shape.content ? null : getState(e)));
+	            if (that.isShapeEvent(e, state)) {
+	
+	                var s = shape && _eventsDomEvent2['default'].getSource(e) === shape.content ? null : getState(e);
+	
+	                graph.fireMouseEvent('mouseMove', e, s);
 	            }
 	        }, function (e) {
-	            if (that.isShapeEvent(state, e)) {
-	                graph.fireMouseEvent('mouseUp', new _eventsMouseEvent2['default'](e, state.shape && _eventsDomEvent2['default'].getSource(e) === state.shape.content ? null : getState(e)));
+	            if (that.isShapeEvent(e, state)) {
+	
+	                var s = shape && _eventsDomEvent2['default'].getSource(e) === shape.content ? null : getState(e);
+	
+	                graph.fireMouseEvent('mouseUp', e, s);
 	            }
 	        });
 	
 	        if (graph.nativeDblClickEnabled) {
-	            _eventsDomEvent2['default'].addListener(state.shape.node, 'dblclick', function (e) {
-	                if (that.isShapeEvent(state, e)) {
+	            _eventsDomEvent2['default'].addListener(shape.node, 'dblclick', function (e) {
+	                if (that.isShapeEvent(e, state)) {
 	                    graph.dblClick(e, state.cell);
 	                    _eventsDomEvent2['default'].consume(e);
 	                }
@@ -6354,6 +6407,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        return this;
+	    },
+	
+	    //
+	
+	    isShapeEvent: function isShapeEvent(e, state) {
+	        return true;
+	    },
+	
+	    isLabelEvent: function isLabelEvent(e, state) {
+	        return true;
 	    },
 	
 	    insertShapesAfter: function insertShapesAfter() {},
