@@ -35,19 +35,8 @@ function invoke(fn, args, context) {
 }
 
 function bind(fn, context /* [,arg1[,arg2[,argN]]] */) {
-
-    if (isFunction(fn)) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        if (args.length) {
-            return invoke(Function.prototype.bind, args, fn);
-        } else {
-            return fn.bind(context);
-        }
-    }
-
-    return fn;
+    return isFunction(fn) ? Function.prototype.bind.apply(arguments) : fn;
 }
-
 
 export {
     bind,

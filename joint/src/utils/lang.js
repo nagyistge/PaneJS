@@ -6,6 +6,14 @@ function isUndefined(obj) {
     return typeof obj === 'undefined';
 }
 
+function isString(obj) {
+    return typeof obj === 'string';
+}
+
+function isBoolean(obj) {
+    return typeof obj === 'boolean';
+}
+
 function isNullOrUndefined(obj) {
     return isUndefined(obj) || isNull(obj);
 }
@@ -57,13 +65,15 @@ function isNumeric(obj) {
 
 export {
     isNull,
+    isType,
+    isArray,
+    isObject,
+    isString,
+    isWindow,
+    isBoolean,
+    isNumeric,
+    isFunction,
+    isArrayLike,
     isUndefined,
     isNullOrUndefined,
-    isType,
-    isObject,
-    isFunction,
-    isWindow,
-    isArray,
-    isArrayLike,
-    isNumeric
 };

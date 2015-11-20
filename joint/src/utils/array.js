@@ -1,46 +1,48 @@
 import { isArray, isArrayLike } from './lang';
 
+var proto = Array.prototype;
+
 function toArray(obj) {
     return isArray(obj)
         ? obj : isArrayLike(obj)
-        ? Array.prototype.slice.call(obj)
+        ? proto.slice.call(obj)
         : [obj];
 }
 
 function indexOf(arr, item) {
-    return arr ? arr.indexOf(item) : -1;
+    return arr ? proto.indexOf.call(arr, item) : -1;
 }
 
 function lastIndexOf(arr, item) {
-    return arr ? arr.lastIndexOf(item) : -1;
+    return arr ? proto.lastIndexOf.call(arr, item) : -1;
 }
 
 function every(arr, iterator, context) {
-    return arr ? arr.every(iterator, context) : false;
+    return arr ? proto.every.call(arr, iterator, context) : false;
 }
 
 function some(arr, iterator, context) {
-    return arr ? arr.some(iterator, context) : false;
+    return arr ? proto.some.call(arr, iterator, context) : false;
 }
 
 function forEach(arr, iterator, context) {
-    arr && arr.forEach(iterator, context);
+    arr && proto.forEach.call(arr, iterator, context);
 }
 
 function map(arr, iterator, context) {
-    return arr ? arr.map(iterator, context) : [];
+    return arr ? proto.map.call(arr, iterator, context) : [];
 }
 
 function filter(arr, iterator, context) {
-    return arr ? arr.filter(iterator, context) : [];
+    return arr ? proto.filter.call(arr, iterator, context) : [];
 }
 
 function reduce(arr, iterator, initialValue) {
-    return arr ? arr.reduce(iterator, initialValue) : initialValue;
+    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
 }
 
 function reduceRight(arr, iterator, initialValue) {
-    return arr ? arr.reduceRight(iterator, initialValue) : initialValue;
+    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
 }
 
 
