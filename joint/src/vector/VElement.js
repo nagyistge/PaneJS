@@ -53,7 +53,7 @@ function vectorize(node) {
     return new VElement(node);
 }
 
-function normalise(elem) {
+function normalize(elem) {
     return elem instanceof VElement ? elem.node : elem;
 }
 
@@ -204,7 +204,7 @@ VElement.prototype = {
         var that = this;
 
         elem && forEach(toArray(elem), function (item) {
-            that.node.appendChild(normalise(item));
+            that.node.appendChild(normalize(item));
         });
 
         return that;
@@ -215,7 +215,7 @@ VElement.prototype = {
         var that = this;
         var node = that.node;
 
-        elem && node.insertBefore(normalise(elem), node.firstChild);
+        elem && node.insertBefore(normalize(elem), node.firstChild);
 
         return that;
     },
@@ -414,9 +414,44 @@ VElement.prototype = {
 
     animateAlongPath: function () {},
 
-    sample: function () {},
+    sample: function (interval) {
 
-    convertToPath: function () {
+        // Interpolate path by discrete points.
+        // The precision of the sampling is controlled by `interval`.
+        // In other words, `sample()` will generate a point on the path
+        // starting at the beginning of the path going to the end every
+        // `interval` pixels.
+        // The sampler can be very useful. E.g. finding intersection between
+        // two paths (finding the two closest points from two samples).
+
+
+        // `path.getTotalLength()`
+        // Returns the computed value for the total length of the path using
+        // the browser's distance-along-a-path algorithm, as a distance in the
+        // current user coordinate system.
+
+        // `path.getPointAtLength(distance)`
+        // Returns the (x,y) coordinate in user space which is distance units
+        // along the path, utilizing the browser's distance-along-a-path algorithm.
+
+        interval = interval || 1;
+
+        var node = this.node;
+        var length = node.getTotalLength();
+        var distance = 0;
+        var samples = [];
+        var sample;
+
+        while (distance < length) {
+            sample = node.getPointAtLength(distance);
+            samples.push({x: sample.x, y: sample.y, distance: distance});
+            distance += interval;
+        }
+
+        return samples;
+    },
+
+    toPath: function () {
 
         var that = this;
         var path = vectorize(createSvgElement('path'));
@@ -455,5 +490,97 @@ VElement.prototype = {
         throw new Error(tagName + ' cannot be converted to PATH.');
     },
 
-    findIntersection: function () {}
+    findIntersection: function (ref, target) {
+
+        // Find the intersection of a line starting in the center
+        // of the SVG `node` ending in the point `ref`.
+        // `target` is an SVG element to which `node`s transformations are relative to.
+        // In JointJS, `target` is the `paper.viewport` SVG group element.
+        // Note that `ref` point must be in the coordinate system of the `target` for this function to work properly.
+        // Returns a point in the `target` coordinate system (the same system as `ref` is in) if
+        // an intersection is found. Returns `undefined` otherwise.
+
+        var that = this;
+        var svg = that.svg().node;
+
+        target = target || svg;
+
+        var bbox = g.rect(this.bbox(false, target));
+        var center = bbox.center();
+        var spot = bbox.intersectionWithLineFromCenterToPoint(ref);
+
+        if (!spot) {
+            return undefined;
+        }
+
+        var tagName = this.node.localName.toUpperCase();
+
+        // Little speed up optimalization for `<rect>` element. We do not do conversion
+        // to path element and sampling but directly calculate the intersection through
+        // a transformed geometrical rectangle.
+        if (tagName === 'RECT') {
+
+            var gRect = g.rect(
+                parseFloat(this.attr('x') || 0),
+                parseFloat(this.attr('y') || 0),
+                parseFloat(this.attr('width')),
+                parseFloat(this.attr('height'))
+            );
+            // Get the rect transformation matrix with regards to the SVG document.
+            var rectMatrix = this.node.getTransformToElement(target);
+            // Decompose the matrix to find the rotation angle.
+            var rectMatrixComponents = V.decomposeMatrix(rectMatrix);
+            // Now we want to rotate the rectangle back so that we
+            // can use `intersectionWithLineFromCenterToPoint()` passing the angle as the second argument.
+            var resetRotation = svg.createSVGTransform();
+            resetRotation.setRotate(-rectMatrixComponents.rotation, center.x, center.y);
+            var rect = V.transformRect(gRect, resetRotation.matrix.multiply(rectMatrix));
+            spot = g.rect(rect).intersectionWithLineFromCenterToPoint(ref, rectMatrixComponents.rotation);
+
+        } else if (tagName === 'PATH'
+            || tagName === 'POLYGON'
+            || tagName === 'POLYLINE'
+            || tagName === 'CIRCLE'
+            || tagName === 'ELLIPSE') {
+
+            var pathNode = (tagName === 'PATH') ? that : that.toPath();
+            var samples = pathNode.sample();
+            var minDistance = Infinity;
+            var closestSamples = [];
+
+            for (var i = 0, len = samples.length; i < len; i++) {
+
+                var sample = samples[i];
+                // Convert the sample point in the local coordinate system to the global coordinate system.
+                var gp = V.createSVGPoint(sample.x, sample.y);
+                gp = gp.matrixTransform(this.node.getTransformToElement(target));
+                sample = g.point(gp);
+                var centerDistance = sample.distance(center);
+                // Penalize a higher distance to the reference point by 10%.
+                // This gives better results. This is due to
+                // inaccuracies introduced by rounding errors and getPointAtLength() returns.
+                var refDistance = sample.distance(ref) * 1.1;
+                var distance = centerDistance + refDistance;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestSamples = [{
+                        sample: sample,
+                        refDistance: refDistance
+                    }];
+                } else if (distance < minDistance + 1) {
+                    closestSamples.push({
+                        sample: sample,
+                        refDistance: refDistance
+                    });
+                }
+            }
+
+            closestSamples.sort(function (a, b) {
+                return a.refDistance - b.refDistance;
+            });
+            spot = closestSamples[0].sample;
+        }
+
+        return spot;
+    }
 };
