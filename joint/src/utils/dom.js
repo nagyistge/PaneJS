@@ -63,6 +63,10 @@ function setAttribute(elem, name, value) {
     }
 }
 
+
+// parse transform
+// ---------------
+
 function parseTranslate(transform) {
 
     var translate = {tx: 0, ty: 0};
@@ -146,6 +150,10 @@ function parseTransform(transform) {
         scale: parseScale(transform)
     };
 }
+
+
+// path data
+// ---------
 
 function lineToPathData(line) {
     return [

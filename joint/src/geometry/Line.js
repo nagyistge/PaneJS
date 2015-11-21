@@ -118,3 +118,5 @@ Line.prototype = {
         return new Line(this);
     }
 };
+
+export default Line;
