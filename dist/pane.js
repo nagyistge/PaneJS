@@ -2538,7 +2538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -2665,49 +2665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _commonClass = __webpack_require__(11);
-	
-	var _commonClass2 = _interopRequireDefault(_commonClass);
-	
-	exports['default'] = _commonClass2['default'].create({
-	
-	    constructor: function Base() {},
-	
-	    toString: function toString() {
-	        return '[Class ' + (0, _commonUtils.getFunctionName)(this.constructor) + ']';
-	    },
-	
-	    getValue: function getValue() {
-	        return this.toString();
-	    },
-	
-	    destroy: function destroy() {
-	
-	        var that = this;
-	
-	        (0, _commonUtils.forIn)(that, function (val, key) {
-	            delete that[key];
-	        });
-	
-	        that.destroyed = true;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
+/* 14 */,
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2721,7 +2679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -2774,7 +2732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -3480,7 +3438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Base = __webpack_require__(14);
+	var _Base = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
@@ -3644,7 +3602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -4098,7 +4056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Base = __webpack_require__(14);
+	var _Base = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
@@ -4226,7 +4184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -5487,7 +5445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _Base = __webpack_require__(14);
+	var _Base = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _Base2 = _interopRequireDefault(_Base);
 	
@@ -5823,7 +5781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -6508,7 +6466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -7114,7 +7072,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonDetector2 = _interopRequireDefault(_commonDetector);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -7461,7 +7419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -7559,7 +7517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -7688,7 +7646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -8188,7 +8146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _PolyLine = __webpack_require__(40);
+	var _PolyLine = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./PolyLine\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _PolyLine2 = _interopRequireDefault(_PolyLine);
 	
@@ -8266,86 +8224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(1);
-	
-	var _Shape = __webpack_require__(30);
-	
-	var _Shape2 = _interopRequireDefault(_Shape);
-	
-	exports['default'] = _Shape2['default'].extend({
-	
-	    constructor: function PolyLine(state, style, points) {
-	
-	        var that = this;
-	
-	        that.state = state;
-	        that.style = style;
-	        that.points = points;
-	    },
-	
-	    getRotation: function getRotation() {
-	        return 0;
-	    },
-	
-	    isPaintBoundsInverted: function isPaintBoundsInverted() {
-	        return false;
-	    },
-	
-	    drawLink: function drawLink(canvas, points) {
-	
-	        var that = this;
-	        var style = that.style;
-	
-	        if (style && style.curved) {
-	            that.drawLine(canvas, points, this.isRounded);
-	        } else {
-	            that.drawCurve(canvas, points);
-	        }
-	
-	        return that;
-	    },
-	
-	    drawLine: function drawLine(c, pts, rounded) {},
-	
-	    drawCurve: function drawCurve(canvas, points) {
-	
-	        var path = canvas.drawPath();
-	        var pt = points[0];
-	        var n = points.length;
-	
-	        path.moveTo(pt.x, pt.y);
-	
-	        for (var i = 1; i < n - 2; i++) {
-	            var p0 = points[i];
-	            var p1 = points[i + 1];
-	            var ix = (p0.x + p1.x) / 2;
-	            var iy = (p0.y + p1.y) / 2;
-	
-	            path.quadTo(p0.x, p0.y, ix, iy);
-	        }
-	
-	        var p0 = points[n - 2];
-	        var p1 = points[n - 1];
-	
-	        path.quadTo(p0.x, p0.y, p1.x, p1.y);
-	
-	        canvas.addNode(false, true);
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
+/* 40 */,
 /* 41 */
 /***/ function(module, exports) {
 
@@ -8740,7 +8619,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(1);
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -9972,7 +9851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	
@@ -10322,7 +10201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _libBase = __webpack_require__(14);
+	var _libBase = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/Base\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _libBase2 = _interopRequireDefault(_libBase);
 	

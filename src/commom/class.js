@@ -15,6 +15,7 @@ function Class(fn) {
 }
 
 Class.create = function (parent, properties) {
+
     if (!isFunction(parent)) {
         properties = parent;
         parent = null;
@@ -41,18 +42,19 @@ Class.create = function (parent, properties) {
     return classify(SubClass);
 };
 
-// Create a sub Class based on `Class`.
 Class.extend = function (properties) {
+
+    // Create a sub Class based on `Class`.
+
     properties || (properties = {});
     properties.Extends = this;
 
     return Class.create(properties);
 };
 
-// define special properties.
 Class.Mutators = {
+    // define special properties.
 
-    // 继承
     'Extends': function (parent) {
         var that = this;
         var existed = that.prototype;
@@ -69,7 +71,6 @@ Class.Mutators = {
         that.superclass = parentProto;
     },
 
-    // 实现
     'Implements': function (items) {
 
         var proto = this.prototype;
@@ -81,13 +82,13 @@ Class.Mutators = {
 
     },
 
-
     'Statics': function (staticProperties) {
         mix(this, staticProperties);
     }
 };
 
 function classify(cls) {
+
     cls.extend = Class.extend;
     cls.implement = implement;
     return cls;
