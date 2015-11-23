@@ -584,3 +584,5 @@ VElement.prototype = {
         return spot;
     }
 };
+
+export default VElement;

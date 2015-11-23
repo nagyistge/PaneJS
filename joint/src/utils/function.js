@@ -1,12 +1,9 @@
 import { isFunction } from './lang';
-import { toArray    } from './array';
 
 function invoke(fn, args, context) {
     if (!fn || !isFunction(fn)) {
         return;
     }
-
-    args = toArray(args);
 
     var ret;
     var a1 = args[0];

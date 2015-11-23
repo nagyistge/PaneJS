@@ -1,4 +1,5 @@
-import Base from '../lib/Base';
+import Base  from '../lib/Base';
+import Graph from './Graph';
 
 Base.extend({
 
@@ -9,27 +10,68 @@ Base.extend({
         height: 600
     },
 
-    constructor: function Paper(options) {
+    constructor: function Paper(container, model, options) {
 
+        var that = this;
+
+        that.model = model || new Graph;
+
+        that.configure(options);
+
+        if (container) {
+            that.init(container)
+                .setup()
+                .resize()
+                .translate();
+        }
     },
 
     configure: function (options) {
         // 应用 options 选项
+
+        var that = this;
+
+        that.trigger('paper:config', options);
+
+        return that;
+
     },
 
 
     // lift cycle
     // ----------
 
-    init: function () {
+    init: function (container) {
         // 创建根节点等
+
+        var that = this;
+
+        that.container = container;
+        //that.canvas =
+        //that.root=
+        //that.root=
+        that.trigger('paper:render', {container: container});
+
+        return that;
     },
 
     setup: function () {
         // 事件绑定, 事件代理, 所有事件绑定到容器上
+
+        var that = this;
+
+        that.trigger('paper:setup');
+
+        return that;
     },
 
-    destroy: function () {},
+    destroy: function () {
+        var that = this;
+
+        that.trigger('paper:destroy');
+
+        return that;
+    },
 
 
     // transform

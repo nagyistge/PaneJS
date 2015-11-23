@@ -9,6 +9,9 @@ var ns = {
 // svg version.
 var svgVersion = '1.1';
 
+function isNode() {
+
+}
 
 function parseXML(str, async) {
 

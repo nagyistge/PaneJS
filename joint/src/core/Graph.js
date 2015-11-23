@@ -1,6 +1,6 @@
 import Base from '../lib/Base';
 
-Base.extend({
+export default Base.extend({
 
     constructor: function Graph(root) {
 
