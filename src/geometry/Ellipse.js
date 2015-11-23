@@ -72,13 +72,24 @@ Ellipse.prototype = {
     },
 
     toString: function () {
-        return this.valueOf().join(' ');
+        return this.valueOf().join(', ');
     },
 
     clone: function () {
-        var that = this;
-        return new Ellipse(that.x, that.y, that.a, that.b);
+        return Ellipse.fromEllipse(this);
     }
 };
 
+
+Ellipse.equals = function (e1, e2) {
+
+};
+
+Ellipse.fromEllipse = function (ellipse) {
+    return new Ellipse(ellipse.x, ellipse.y, ellipse.a, ellipse.b);
+};
+
+
+// exports
+// -------
 export default Ellipse;

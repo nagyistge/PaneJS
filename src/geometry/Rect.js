@@ -1,23 +1,21 @@
 import {
     toFixed,
 } from '../commom/utils';
+
 import Point from './Point';
 
 var mmin = math.min;
 var mmax = math.max;
 var round = math.round;
 
-function Rect(x, y, width, height) {
-    if (y === undefined) {
-        y = x.y;
-        width = x.width;
-        height = x.height;
-        x = x.x;
-    }
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+function Rect(x = 0, y = 0, width = 0, height = 0) {
+
+    var that = this;
+
+    that.x = x;
+    that.y = y;
+    that.width = width;
+    that.height = height;
 }
 
 Rect.prototype = {
@@ -25,8 +23,7 @@ Rect.prototype = {
     constructor: Rect,
 
     origin: function () {
-        var that = this;
-        return new Point(that.x, that.y);
+        return new Point(this.x, this.y);
     },
 
     center: function () {
@@ -72,7 +69,7 @@ Rect.prototype = {
         return new Rect(x, y, w, h);
     },
 
-    sideNearestToPoint: function (p) {
+    nearestSideToPoint: function (p) {
 
         // get (left|right|top|bottom) side which is nearest to point
 
@@ -102,6 +99,29 @@ Rect.prototype = {
         }
 
         return side;
+    },
+
+    nearestPointToPoint: function (p) {
+
+        // get a point on my boundary nearest to `p`
+
+        var that = this;
+
+        if (that.containsPoint(p)) {
+            var side = that.sideNearestToPoint(p);
+            switch (side) {
+                case 'right':
+                    return new Point(that.x + that.width, p.y);
+                case 'left':
+                    return new Point(that.x, p.y);
+                case 'bottom':
+                    return new Point(p.x, that.y + that.height);
+                case 'top':
+                    return new Point(p.x, that.y);
+            }
+        }
+
+        return p.adhereToRect(that);
     },
 
     containsPoint: function (p) {
@@ -166,29 +186,6 @@ Rect.prototype = {
         }
 
         return true;
-    },
-
-    pointNearestToPoint: function (p) {
-
-        // get a point on my boundary nearest to `p`
-
-        var that = this;
-
-        if (that.containsPoint(p)) {
-            var side = that.sideNearestToPoint(p);
-            switch (side) {
-                case 'right':
-                    return new Point(that.x + that.width, p.y);
-                case 'left':
-                    return new Point(that.x, p.y);
-                case 'bottom':
-                    return new Point(p.x, that.y + that.height);
-                case 'top':
-                    return new Point(p.x, that.y);
-            }
-        }
-
-        return p.adhereToRect(that);
     },
 
     // Find point on my boundary where line starting
@@ -306,20 +303,37 @@ Rect.prototype = {
         return this;
     },
 
-    toString: function () {
-        return this.origin().toString() + ' ' + this.corner().toString();
-    },
-
-    // @return {boolean} true if rectangles are equal.
-    equals: function (r) {
+    equals: function (rect) {
         var mr = g.rect(this).normalize();
-        var nr = g.rect(r).normalize();
+        var nr = g.rect(rect).normalize();
         return mr.x === nr.x && mr.y === nr.y && mr.width === nr.width && mr.height === nr.height;
     },
 
+    valueOf: function () {
+        var that = this;
+        return [that.x, that.y, that.width, that.height];
+    },
+
+    toString: function () {
+        return this.valueOf().join(', ');
+    },
+
     clone: function () {
-        return Rect(this);
+        return Rect.fromRect(this);
     }
 };
 
+
+Rect.equals = function (rect1, rect2) {
+    return rect1 instanceof Rect
+        && rect2 instanceof Rect;
+};
+
+Rect.fromRect = function (rect) {
+    return new Rect(rect.x, rect.y, rect.width, rect.height);
+};
+
+
+// exports
+// -------
 export default Rect;

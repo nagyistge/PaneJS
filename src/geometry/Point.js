@@ -20,47 +20,12 @@ var floor = math.floor;
 var random = math.random;
 
 
-function Point(x, y) {
-
-    // Point is the most basic object consisting of x/y coordinate,.
-
-    // Possible instantiations are:
-    //   `Point(10, 20)`
-    //   `new Point(10, 20)`
-    //   `Point('10 20')`
-    //   `Point(Point(10, 20))`
+function Point(x = 0, y = 0) {
 
     var that = this;
 
-    if (arguments.length === 1) {
-        if (isString(x)) {
-
-            var arr = x.split(x.indexOf('@') === -1 ? ' ' : '@');
-            that.x = toFloat(arr[0]);
-            that.y = toFloat(arr[1]);
-
-        } else if (isObject(x)) {
-            that.x = x.x;
-            that.y = x.y;
-        }
-    } else {
-        that.x = x;
-        that.y = y;
-    }
-
-    var xy;
-
-    if (isUndefined(y) && isString(x)) {
-        xy = x.split(x.indexOf('@') === -1 ? ' ' : '@');
-        that.x = toFloat(xy[0]);
-        that.y = toFloat(xy[1]);
-    } else if (isObject(x)) {
-        that.x = x.x;
-        that.y = x.y;
-    } else {
-        that.x = x;
-        that.y = y;
-    }
+    that.x = x;
+    that.y = y;
 }
 
 Point.prototype = {
@@ -126,14 +91,13 @@ Point.prototype = {
         // (cartesian-to-polar coordinates conversion)
         // Return theta angle in degrees.
 
-        p = new Point(p);
         // Invert the y-axis.
         var y = -(p.y - this.y);
         var x = p.x - this.x;
         // Makes sure that the comparison with zero takes rounding errors into account.
         var PRECISION = 10;
         // Note that `atan2` is not defined for `x`, `y` both equal zero.
-        var rad = (toFixed(y, PRECISION) === 0 && toFixed(x, PRECISION) === 0) ? 0 : atan2(y, x);
+        var rad = toFixed(y, PRECISION) === 0 && toFixed(x, PRECISION) === 0 ? 0 : atan2(y, x);
 
         // Correction for III. and IV. quadrant.
         if (rad < 0) {
@@ -167,13 +131,27 @@ Point.prototype = {
 
         // Scale the line segment between (0,0) and me to have a length of len.
 
-        // 可以通过 x 和 y 的比例来求?
-
         var that = this;
-        var s = (len || 1) / that.magnitude();
+        var x = that.x;
+        var y = that.y;
 
-        that.x = s * that.x;
-        that.y = s * that.y;
+        if (x === 0 && y === 0) {
+            return that;
+        }
+
+        var l = len || 1;
+        var s;
+
+        if (x === 0) {
+            s = l / y;
+        } else if (y === 0) {
+            s = l / x;
+        } else {
+            s = l / that.distance(new Point);
+        }
+
+        that.x = s * x;
+        that.y = s * y;
 
         return that;
     },
@@ -252,20 +230,33 @@ Point.prototype = {
     },
 
     toString: function () {
-        return this.valueOf().join('@');
+        return this.valueOf().join(', ');
     },
 
     equals: function (p) {
-        return p instanceof Point
-            && this.x === p.x
-            && this.y === p.y;
+        return Point.equals(this, p);
     },
 
     clone: function () {
-        return new Point(this);
+        return Point.fromPoint(this);
     }
 };
 
+Point.equals = function (p1, p2) {
+    return p1 instanceof Point
+        && p2 instanceof Point
+        && p1.x === p2.x
+        && p1.y === p2.y;
+};
+
+Point.fromPoint = function (p) {
+    return new Point(p.x, p.y);
+};
+
+Point.fromString = function (str) {
+    var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+    return new Point(toFloat(arr[0]), toFloat(arr[1]));
+};
 
 Point.fromPolar = function (r, angle, o) {
 
@@ -294,8 +285,14 @@ Point.fromPolar = function (r, angle, o) {
 Point.random = function (x1, x2, y1, y2) {
     // Create a point with random coordinates that fall
     // into the range `[x1, x2]` and `[y1, y2]`.
-    return new Point(floor(random() * (x2 - x1 + 1) + x1), floor(random() * (y2 - y1 + 1) + y1));
+
+    var x = floor(random() * (x2 - x1 + 1) + x1);
+    var y = floor(random() * (y2 - y1 + 1) + y1);
+
+    return new Point(x, y);
 };
 
 
+// exports
+// -------
 export default Point;

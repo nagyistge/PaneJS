@@ -147,4 +147,7 @@ Line.prototype = {
     }
 };
 
+
+// exports
+// -------
 export default Line;
