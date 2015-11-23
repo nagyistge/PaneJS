@@ -32,8 +32,20 @@ function Point(x, y) {
 
     var that = this;
 
-    if (!(that instanceof Point)) {
-        return new Point(x, y);
+    if (arguments.length === 1) {
+        if (isString(x)) {
+
+            var arr = x.split(x.indexOf('@') === -1 ? ' ' : '@');
+            that.x = toFloat(arr[0]);
+            that.y = toFloat(arr[1]);
+
+        } else if (isObject(x)) {
+            that.x = x.x;
+            that.y = x.y;
+        }
+    } else {
+        that.x = x;
+        that.y = y;
     }
 
     var xy;
@@ -55,24 +67,24 @@ Point.prototype = {
 
     constructor: Point,
 
-    update: function (x, y) {
+    update: function (x = 0, y = 0) {
 
         var that = this;
 
-        that.x = x || 0;
-        that.y = y || 0;
+        that.x = x;
+        that.y = y;
 
         return that;
     },
 
-    offset: function (dx, dy) {
+    offset: function (dx = 0, dy = 0) {
 
         // Offset me by the specified amount.
 
         var that = this;
 
-        that.x += dx || 0;
-        that.y += dy || 0;
+        that.x += dx;
+        that.y += dy;
 
         return that;
     },
@@ -166,12 +178,10 @@ Point.prototype = {
         return that;
     },
 
-
     // Return the bearing between me and point `p`.
     bearing: function (p) {
         return line(this, p).bearing();
     },
-
 
     toPolar: function (o) {
 
@@ -209,7 +219,6 @@ Point.prototype = {
         return that;
     },
 
-
     move: function (ref, distance) {
 
         // Move point on line starting from ref
@@ -225,7 +234,6 @@ Point.prototype = {
         // Revert the translation and measure the change in angle around x-axis.
         return point(this).offset(-dx, -dy).theta(ref) - this.theta(ref);
     },
-
 
     snapToGrid: function (gx, gy) {
         this.x = snapToGrid(this.x, gx);
@@ -248,7 +256,9 @@ Point.prototype = {
     },
 
     equals: function (p) {
-        return this.x === p.x && this.y === p.y;
+        return p instanceof Point
+            && this.x === p.x
+            && this.y === p.y;
     },
 
     clone: function () {

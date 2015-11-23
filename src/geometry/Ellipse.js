@@ -1,21 +1,27 @@
-function Ellipse(c, a, b) {
-    if (!(this instanceof Ellipse)) {
-        return new Ellipse(c, a, b);
-    }
-    c = point(c);
-    this.x = c.x;
-    this.y = c.y;
-    this.a = a;
-    this.b = b;
+import Rect  from './Rect';
+import Point from './Point';
+
+function Ellipse(x, y, a, b) {
+
+    var that = this;
+
+    that.x = x;
+    that.y = y;
+    that.a = a;
+    that.b = b;
 }
 
 Ellipse.prototype = {
-    toString: function () {
-        return point(this.x, this.y).toString() + ' ' + this.a + ' ' + this.b;
+
+    center: function () {
+        return new Point(this.x, this.y);
     },
+
     bbox: function () {
-        return rect(this.x - this.a, this.y - this.b, 2 * this.a, 2 * this.b);
+        var that = this;
+        return new Rect(that.x - that.a, that.y - that.b, 2 * that.a, 2 * that.b);
     },
+
     // Find point on me where line from my center to
     // point p intersects my boundary.
     // @param {number} angle If angle is specified, intersection with rotated ellipse is computed.
@@ -48,8 +54,30 @@ Ellipse.prototype = {
         }
         return result;
     },
+
+    equals: function (e) {
+
+        var that = this;
+
+        return e instanceof Ellipse
+            && e.x === that.x
+            && e.y === that.y
+            && e.a === that.a
+            && e.b === that.b
+    },
+
+    valueOf: function () {
+        var that = this;
+        return [that.x, that.y, that.a, that.b];
+    },
+
+    toString: function () {
+        return this.valueOf().join(' ');
+    },
+
     clone: function () {
-        return Ellipse(this);
+        var that = this;
+        return new Ellipse(that.x, that.y, that.a, that.b);
     }
 };
 

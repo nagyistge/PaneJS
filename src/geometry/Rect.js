@@ -1,82 +1,88 @@
-function Rect(x, y, w, h) {
-    if (!(this instanceof Rect)) {
-        return new Rect(x, y, w, h);
-    }
+import {
+    toFixed,
+} from '../commom/utils';
+import Point from './Point';
+
+var mmin = math.min;
+var mmax = math.max;
+var round = math.round;
+
+function Rect(x, y, width, height) {
     if (y === undefined) {
         y = x.y;
-        w = x.width;
-        h = x.height;
+        width = x.width;
+        height = x.height;
         x = x.x;
     }
     this.x = x;
     this.y = y;
-    this.width = w;
-    this.height = h;
+    this.width = width;
+    this.height = height;
 }
 
 Rect.prototype = {
 
-    toString: function () {
-        return this.origin().toString() + ' ' + this.corner().toString();
-    },
+    constructor: Rect,
 
-    // @return {boolean} true if rectangles are equal.
-    equals: function (r) {
-        var mr = g.rect(this).normalize();
-        var nr = g.rect(r).normalize();
-        return mr.x === nr.x && mr.y === nr.y && mr.width === nr.width && mr.height === nr.height;
+    origin: function () {
+        var that = this;
+        return new Point(that.x, that.y);
     },
 
     center: function () {
-        return point(this.x + this.width / 2, this.y + this.height / 2);
-    },
-
-    origin: function () {
-        return point(this.x, this.y);
+        var that = this;
+        return new Point(that.x + that.width / 2, that.y + that.height / 2);
     },
 
     corner: function () {
-        return point(this.x + this.width, this.y + this.height);
+        var that = this;
+        return new Point(that.x + that.width, that.y + that.height);
     },
 
     topRight: function () {
-        return point(this.x + this.width, this.y);
+        var that = this;
+        return new Point(that.x + that.width, that.y);
     },
 
     bottomLeft: function () {
-        return point(this.x, this.y + this.height);
+        var that = this;
+        return new Point(that.x, that.y + that.height);
     },
 
-
-    // @return {rect} if rectangles intersect, {null} if not.
-    intersect: function (r) {
-        var myOrigin = this.origin();
-        var myCorner = this.corner();
-        var rOrigin = r.origin();
-        var rCorner = r.corner();
+    intersect: function (rect) {
+        var that = this;
+        var origin1 = that.origin();
+        var corner1 = that.corner();
+        var origin2 = rect.origin();
+        var corner2 = rect.corner();
 
         // No intersection found
-        if (rCorner.x <= myOrigin.x ||
-            rCorner.y <= myOrigin.y ||
-            rOrigin.x >= myCorner.x ||
-            rOrigin.y >= myCorner.y) {
+        if (origin1.x >= corner2.x ||
+            origin1.y >= corner2.y ||
+            origin2.x >= corner1.x ||
+            origin2.y >= corner1.y) {
             return null;
         }
 
-        var x = Math.max(myOrigin.x, rOrigin.x);
-        var y = Math.max(myOrigin.y, rOrigin.y);
+        var x = mmax(origin1.x, origin2.x);
+        var y = mmax(origin1.y, origin2.y);
+        var w = mmin(corner1.x, corner2.x) - x;
+        var h = mmin(corner1.y, corner2.y) - y;
 
-        return Rect(x, y, Math.min(myCorner.x, rCorner.x) - x, Math.min(myCorner.y, rCorner.y) - y);
+        return new Rect(x, y, w, h);
     },
 
-    // @return {string} (left|right|top|bottom) side which is nearest to point
-    // @see Squeak Smalltalk, Rectangle>>sideNearestTo:
     sideNearestToPoint: function (p) {
-        p = point(p);
-        var distToLeft = p.x - this.x;
-        var distToRight = (this.x + this.width) - p.x;
-        var distToTop = p.y - this.y;
-        var distToBottom = (this.y + this.height) - p.y;
+
+        // get (left|right|top|bottom) side which is nearest to point
+
+        var that = this;
+
+        var distToLeft = p.x - that.x;
+        var distToRight = (that.x + that.width) - p.x;
+        var distToTop = p.y - that.y;
+        var distToBottom = (that.y + that.height) - p.y;
+
         var closest = distToLeft;
         var side = 'left';
 
@@ -84,29 +90,35 @@ Rect.prototype = {
             closest = distToRight;
             side = 'right';
         }
+
         if (distToTop < closest) {
             closest = distToTop;
             side = 'top';
         }
+
         if (distToBottom < closest) {
-            closest = distToBottom;
+            //closest = distToBottom;
             side = 'bottom';
         }
+
         return side;
     },
-    // @return {bool} true if point p is insight me
+
     containsPoint: function (p) {
-        p = point(p);
-        if (p.x >= this.x && p.x <= this.x + this.width &&
-            p.y >= this.y && p.y <= this.y + this.height) {
-            return true;
-        }
-        return false;
+
+        var that = this;
+
+        return p.x >= that.x
+            && p.x <= that.x + that.width
+            && p.y >= that.y
+            && p.y <= that.y + that.height;
     },
+
     // Algorithm ported from java.awt.Rectangle from OpenJDK.
     // @return {bool} true if rectangle `r` is inside me.
-    containsRect: function (r) {
-        var nr = Rect(r).normalize();
+    containsRect: function (rect) {
+
+        var nr = Rect(rect).normalize();
         var W = nr.width;
         var H = nr.height;
         var X = nr.x;
@@ -152,27 +164,33 @@ Rect.prototype = {
                 return false;
             }
         }
+
         return true;
     },
-    // @return {point} a point on my boundary nearest to p
-    // @see Squeak Smalltalk, Rectangle>>pointNearestTo:
+
     pointNearestToPoint: function (p) {
-        p = point(p);
-        if (this.containsPoint(p)) {
-            var side = this.sideNearestToPoint(p);
+
+        // get a point on my boundary nearest to `p`
+
+        var that = this;
+
+        if (that.containsPoint(p)) {
+            var side = that.sideNearestToPoint(p);
             switch (side) {
                 case 'right':
-                    return point(this.x + this.width, p.y);
+                    return new Point(that.x + that.width, p.y);
                 case 'left':
-                    return point(this.x, p.y);
+                    return new Point(that.x, p.y);
                 case 'bottom':
-                    return point(p.x, this.y + this.height);
+                    return new Point(p.x, that.y + that.height);
                 case 'top':
-                    return point(p.x, this.y);
+                    return new Point(p.x, that.y);
             }
         }
-        return p.adhereToRect(this);
+
+        return p.adhereToRect(that);
     },
+
     // Find point on my boundary where line starting
     // from my center ending in point p intersects me.
     // @param {number} angle If angle is specified, intersection with rotated rectangle is computed.
@@ -205,46 +223,68 @@ Rect.prototype = {
         }
         return result;
     },
-    // Move and expand me.
-    // @param r {rectangle} representing deltas
-    moveAndExpand: function (r) {
-        this.x += r.x || 0;
-        this.y += r.y || 0;
-        this.width += r.width || 0;
-        this.height += r.height || 0;
-        return this;
-    },
-    round: function (decimals) {
-        this.x = decimals ? this.x.toFixed(decimals) : round(this.x);
-        this.y = decimals ? this.y.toFixed(decimals) : round(this.y);
-        this.width = decimals ? this.width.toFixed(decimals) : round(this.width);
-        this.height = decimals ? this.height.toFixed(decimals) : round(this.height);
-        return this;
+
+    moveAndExpand: function (rect) {
+
+        var that = this;
+
+        that.x += rect.x || 0;
+        that.y += rect.y || 0;
+        that.width += rect.width || 0;
+        that.height += rect.height || 0;
+
+        return that;
     },
 
-    // Normalize the rectangle; i.e., make it so that it has a non-negative width and height.
-    // If width < 0 the function swaps the left and right corners,
-    // and it swaps the top and bottom corners if height < 0
-    // like in http://qt-project.org/doc/qt-4.8/qrectf.html#normalized
-    normalize: function () {
-        var newx = this.x;
-        var newy = this.y;
-        var newwidth = this.width;
-        var newheight = this.height;
-        if (this.width < 0) {
-            newx = this.x + this.width;
-            newwidth = -this.width;
-        }
-        if (this.height < 0) {
-            newy = this.y + this.height;
-            newheight = -this.height;
-        }
-        this.x = newx;
-        this.y = newy;
-        this.width = newwidth;
-        this.height = newheight;
-        return this;
+    round: function (precision) {
+
+        var that = this;
+
+        var x = that.x;
+        var y = that.y;
+        var w = that.width;
+        var h = that.height;
+
+        that.x = precision ? toFixed(x, precision) : round(x);
+        that.y = precision ? toFixed(y, precision) : round(y);
+        that.width = precision ? toFixed(w, precision) : round(w);
+        that.height = precision ? toFixed(h, precision) : round(h);
+
+        return that;
     },
+
+    normalize: function () {
+
+        // Normalize the rectangle.
+        // i.e., make it so that it has a non-negative width and height.
+        // If width < 0 the function swaps the left and right corners,
+        // and it swaps the top and bottom corners if height < 0
+
+        var that = this;
+
+        var x = that.x;
+        var y = that.y;
+        var w = that.width;
+        var h = that.height;
+
+        if (w < 0) {
+            x = x + w;
+            w = -w;
+        }
+
+        if (h < 0) {
+            y = y + h;
+            h = -h;
+        }
+
+        that.x = x;
+        that.y = y;
+        that.width = w;
+        that.height = h;
+
+        return that;
+    },
+
     // Find my bounding box when I'm rotated with the center of rotation in the center of me.
     // @return r {rectangle} representing a bounding box
     bbox: function (angle) {
@@ -255,6 +295,7 @@ Rect.prototype = {
         var h = this.width * st + this.height * ct;
         return Rect(this.x + (this.width - w) / 2, this.y + (this.height - h) / 2, w, h);
     },
+
     snapToGrid: function (gx, gy) {
         var origin = this.origin().snapToGrid(gx, gy);
         var corner = this.corner().snapToGrid(gx, gy);
@@ -264,6 +305,18 @@ Rect.prototype = {
         this.height = corner.y - origin.y;
         return this;
     },
+
+    toString: function () {
+        return this.origin().toString() + ' ' + this.corner().toString();
+    },
+
+    // @return {boolean} true if rectangles are equal.
+    equals: function (r) {
+        var mr = g.rect(this).normalize();
+        var nr = g.rect(r).normalize();
+        return mr.x === nr.x && mr.y === nr.y && mr.width === nr.width && mr.height === nr.height;
+    },
+
     clone: function () {
         return Rect(this);
     }
