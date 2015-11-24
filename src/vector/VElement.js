@@ -4,6 +4,7 @@ import {
     forIn,
     reduce,
     forEach,
+    isArray,
     isObject,
     isString,
     isBoolean,
@@ -20,7 +21,9 @@ import {
     ellipseToPathData,
     polygonToPathData,
     polylineToPathData,
-} from '../commom/utils'
+    createSvgElement,
+    createSvgDocument,
+} from '../common/utils'
 
 var counter = 0;
 
@@ -584,5 +587,62 @@ VElement.prototype = {
         return spot;
     }
 };
+
+
+// statics
+// -------
+
+VElement.createVElement = function (elem, attrs, children) {
+
+    if (!elem) {
+        return null;
+    }
+
+    if (isObject(elem)) {
+        return vectorize(elem);
+    }
+
+    if (elem.toLowerCase() === 'svg') {
+        return vectorize(createSvgDocument());
+    } else if (elem[0] === '<') {
+        var svgDoc = createSvgDocument(elem);
+        if (svgDoc.childNodes.length > 1) {
+            return map(svgDoc.childNodes, function (childNode) {
+                return vectorize(document.importNode(childNode, true));
+            });
+        }
+
+        return vectorize(document.importNode(svgDoc.firstChild, true));
+    }
+
+
+    // create svg node by tagName.
+    elem = createSvgElement(elem);
+
+    // set attributes.
+    attrs && forIn(attrs, function (attr, value) {
+        setAttribute(elem, attr, value);
+    });
+
+    // append children.
+    if (children) {
+        children = isArray(children) ? children : [children];
+
+        forEach(children, function (child) {
+            elem.appendChild(child instanceof VElement ? child.node : child);
+        });
+    }
+
+    return vectorize(elem);
+
+};
+
+VElement.isVElement = function (obj) {
+    return obj instanceof VElement;
+};
+
+
+// exports
+// -------
 
 export default VElement;

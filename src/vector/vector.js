@@ -1,3 +1,5 @@
+import VElement from './VElement';
+
 import {
     map,
     forIn,
@@ -7,9 +9,8 @@ import {
     setAttribute,
     createSvgElement,
     createSvgDocument,
-} from '../commom/utils';
+} from '../common/utils';
 
-import VElement from './VElement';
 
 function createElement(elem, attrs, children) {
 
