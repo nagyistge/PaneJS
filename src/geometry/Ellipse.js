@@ -1,7 +1,7 @@
 import Rect  from './Rect';
 import Point from './Point';
 
-function Ellipse(x, y, a, b) {
+function Ellipse(x = 0, y = 0, a = 0, b = 0) {
 
     var that = this;
 
@@ -13,11 +13,13 @@ function Ellipse(x, y, a, b) {
 
 Ellipse.prototype = {
 
-    center: function () {
+    constructor: Ellipse,
+
+    getCenter: function () {
         return new Point(this.x, this.y);
     },
 
-    bbox: function () {
+    getBBox: function () {
         var that = this;
         return new Rect(that.x - that.a, that.y - that.b, 2 * that.a, 2 * that.b);
     },
@@ -57,13 +59,7 @@ Ellipse.prototype = {
 
     equals: function (e) {
 
-        var that = this;
-
-        return e instanceof Ellipse
-            && e.x === that.x
-            && e.y === that.y
-            && e.a === that.a
-            && e.b === that.b
+        return Ellipse.equals(this, e);
     },
 
     valueOf: function () {
@@ -81,12 +77,21 @@ Ellipse.prototype = {
 };
 
 
-Ellipse.equals = function (e1, e2) {
+// statics
+// -------
 
+Ellipse.equals = function (e1, e2) {
+    return e1 && e1
+        && e1 instanceof Ellipse
+        && e2 instanceof Ellipse
+        && e1.x === e2.x
+        && e1.y === e2.y
+        && e1.a === e2.a
+        && e1.b === e2.b;
 };
 
-Ellipse.fromEllipse = function (ellipse) {
-    return new Ellipse(ellipse.x, ellipse.y, ellipse.a, ellipse.b);
+Ellipse.fromEllipse = function (e) {
+    return new Ellipse(e.x, e.y, e.a, e.b);
 };
 
 

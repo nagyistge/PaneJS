@@ -1,10 +1,12 @@
 import {
+    toDeg,
     toFloat,
     toFixed,
     isString,
     isObject,
+    snapToGrid,
     isUndefined,
-} from '../commom/utils';
+} from '../common/utils';
 
 var math = Math;
 var PI = math.PI;
@@ -42,10 +44,7 @@ Point.prototype = {
         return that;
     },
 
-    offset: function (dx = 0, dy = 0) {
-
-        // Offset me by the specified amount.
-
+    translate: function (dx = 0, dy = 0) {
         var that = this;
 
         that.x += dx;
@@ -64,7 +63,7 @@ Point.prototype = {
         return that;
     },
 
-    difference: function (p) {
+    diff: function (p) {
         return new Point(this.x - p.x, this.y - p.y);
     },
 
@@ -72,7 +71,6 @@ Point.prototype = {
 
         // If point lies outside rectangle `rect`, return the nearest point on
         // the boundary of rect `rect`, otherwise return point itself.
-        // (see Squeak Smalltalk, Point>>adhereTo:)
 
         var that = this;
         if (rect.containsPoint(that)) {
@@ -104,7 +102,7 @@ Point.prototype = {
             rad = 2 * PI + rad;
         }
 
-        return 180 * rad / PI;
+        return toDeg(rad);
     },
 
     distance: function (p) {
@@ -121,10 +119,6 @@ Point.prototype = {
         // Returns a manhattan (taxi-cab) distance between me and point `p`.
 
         return abs(p.x - this.x) + abs(p.y - this.y);
-    },
-
-    magnitude: function () {
-        return sqrt((this.x * this.x) + (this.y * this.y)) || 0.0001;
     },
 
     normalize: function (len) {
@@ -154,11 +148,6 @@ Point.prototype = {
         that.y = s * y;
 
         return that;
-    },
-
-    // Return the bearing between me and point `p`.
-    bearing: function (p) {
-        return line(this, p).bearing();
     },
 
     toPolar: function (o) {
@@ -201,28 +190,35 @@ Point.prototype = {
 
         // Move point on line starting from ref
         // ending at me by distance distance.
-
-        var theta = toRad(point(ref).theta(this));
-        return this.offset(cos(theta) * distance, -sin(theta) * distance);
+        var that = this;
+        var rad = toRad(ref.theta(that));
+        return that.translate(cos(rad) * distance, -sin(rad) * distance);
     },
 
-    // Returns change in angle from my previous position (-dx, -dy) to my new position
-    // relative to ref point.
+    reflect: function (ref) {
+
+        // Returns a point that is the reflection of me with
+        // the center of inversion in ref point.
+
+        return ref.move(this, this.distance(ref));
+    },
+
     changeInAngle: function (dx, dy, ref) {
+        // Returns change in angle from my previous position (-dx, -dy) to
+        // my new position relative to ref point.
+
         // Revert the translation and measure the change in angle around x-axis.
-        return point(this).offset(-dx, -dy).theta(ref) - this.theta(ref);
+        return this.translate(-dx, -dy).theta(ref) - this.theta(ref);
     },
 
     snapToGrid: function (gx, gy) {
-        this.x = snapToGrid(this.x, gx);
-        this.y = snapToGrid(this.y, gy || gx);
-        return this;
-    },
 
-    // Returns a point that is the reflection of me with
-    // the center of inversion in ref point.
-    reflection: function (ref) {
-        return point(ref).move(this, this.distance(ref));
+        var that = this;
+
+        that.x = snapToGrid(that.x, gx);
+        that.y = snapToGrid(that.y, gy || gx);
+
+        return that;
     },
 
     valueOf: function () {
@@ -242,8 +238,13 @@ Point.prototype = {
     }
 };
 
+
+// statics
+// -------
+
 Point.equals = function (p1, p2) {
-    return p1 instanceof Point
+    return p1 && p2
+        && p1 instanceof Point
         && p2 instanceof Point
         && p1.x === p2.x
         && p1.y === p2.y;

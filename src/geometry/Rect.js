@@ -1,12 +1,19 @@
 import {
+    toRad,
     toFixed,
-} from '../commom/utils';
+} from '../common/utils';
 
 import Point from './Point';
+import Line from './Line';
 
+var math = Math;
+var abs = math.abs;
+var cos = math.cos;
+var sin = math.sin;
 var mmin = math.min;
 var mmax = math.max;
 var round = math.round;
+
 
 function Rect(x = 0, y = 0, width = 0, height = 0) {
 
@@ -22,63 +29,40 @@ Rect.prototype = {
 
     constructor: Rect,
 
-    origin: function () {
+    getOrigin: function () {
         return new Point(this.x, this.y);
     },
 
-    center: function () {
+    getCenter: function () {
         var that = this;
         return new Point(that.x + that.width / 2, that.y + that.height / 2);
     },
 
-    corner: function () {
+    getCorner: function () {
         var that = this;
         return new Point(that.x + that.width, that.y + that.height);
     },
 
-    topRight: function () {
+    getTopRight: function () {
         var that = this;
         return new Point(that.x + that.width, that.y);
     },
 
-    bottomLeft: function () {
+    getBottomLeft: function () {
         var that = this;
         return new Point(that.x, that.y + that.height);
     },
 
-    intersect: function (rect) {
-        var that = this;
-        var origin1 = that.origin();
-        var corner1 = that.corner();
-        var origin2 = rect.origin();
-        var corner2 = rect.corner();
-
-        // No intersection found
-        if (origin1.x >= corner2.x ||
-            origin1.y >= corner2.y ||
-            origin2.x >= corner1.x ||
-            origin2.y >= corner1.y) {
-            return null;
-        }
-
-        var x = mmax(origin1.x, origin2.x);
-        var y = mmax(origin1.y, origin2.y);
-        var w = mmin(corner1.x, corner2.x) - x;
-        var h = mmin(corner1.y, corner2.y) - y;
-
-        return new Rect(x, y, w, h);
-    },
-
-    nearestSideToPoint: function (p) {
+    getNearestSideToPoint: function (point) {
 
         // get (left|right|top|bottom) side which is nearest to point
 
         var that = this;
 
-        var distToLeft = p.x - that.x;
-        var distToRight = (that.x + that.width) - p.x;
-        var distToTop = p.y - that.y;
-        var distToBottom = (that.y + that.height) - p.y;
+        var distToLeft = point.x - that.x;
+        var distToRight = (that.x + that.width) - point.x;
+        var distToTop = point.y - that.y;
+        var distToBottom = (that.y + that.height) - point.y;
 
         var closest = distToLeft;
         var side = 'left';
@@ -101,27 +85,27 @@ Rect.prototype = {
         return side;
     },
 
-    nearestPointToPoint: function (p) {
+    getNearestPointToPoint: function (point) {
 
-        // get a point on my boundary nearest to `p`
+        // get a point on my boundary nearest to `point`
 
         var that = this;
 
-        if (that.containsPoint(p)) {
-            var side = that.sideNearestToPoint(p);
+        if (that.containsPoint(point)) {
+            var side = that.getNearestSideToPoint(point);
             switch (side) {
                 case 'right':
-                    return new Point(that.x + that.width, p.y);
+                    return new Point(that.x + that.width, point.y);
                 case 'left':
-                    return new Point(that.x, p.y);
+                    return new Point(that.x, point.y);
                 case 'bottom':
-                    return new Point(p.x, that.y + that.height);
+                    return new Point(point.x, that.y + that.height);
                 case 'top':
-                    return new Point(p.x, that.y);
+                    return new Point(point.x, that.y);
             }
         }
 
-        return p.adhereToRect(that);
+        return point.adhereToRect(that);
     },
 
     containsPoint: function (p) {
@@ -134,90 +118,88 @@ Rect.prototype = {
             && p.y <= that.y + that.height;
     },
 
-    // Algorithm ported from java.awt.Rectangle from OpenJDK.
-    // @return {bool} true if rectangle `r` is inside me.
     containsRect: function (rect) {
 
-        var nr = Rect(rect).normalize();
-        var W = nr.width;
-        var H = nr.height;
-        var X = nr.x;
-        var Y = nr.y;
-        var w = this.width;
-        var h = this.height;
-        if ((w | h | W | H) < 0) {
-            // At least one of the dimensions is negative...
-            return false;
-        }
-        // Note: if any dimension is zero, tests below must return false...
-        var x = this.x;
-        var y = this.y;
-        if (X < x || Y < y) {
-            return false;
-        }
-        w += x;
-        W += X;
-        if (W <= X) {
-            // X+W overflowed or W was zero, return false if...
-            // either original w or W was zero or
-            // x+w did not overflow or
-            // the overflowed x+w is smaller than the overflowed X+W
-            if (w >= x || W > w) {
-                return false;
-            }
-        } else {
-            // X+W did not overflow and W was not zero, return false if...
-            // original w was zero or
-            // x+w did not overflow and x+w is smaller than X+W
-            if (w >= x && W > w) {
-                return false;
-            }
-        }
-        h += y;
-        H += Y;
-        if (H <= Y) {
-            if (h >= y || H > h) {
-                return false;
-            }
-        } else {
-            if (h >= y && H > h) {
-                return false;
-            }
-        }
+        var that = this;
 
-        return true;
+        that.normalize();
+        rect.normalize();
+
+        var x2 = rect.x;
+        var y2 = rect.y;
+        var w2 = rect.width;
+        var h2 = rect.height;
+
+        var x1 = that.x;
+        var y1 = that.y;
+        var w1 = that.width;
+        var h1 = that.height;
+
+        return x2 >= x1
+            && y2 >= y1
+            && (x2 + w2) <= (x1 + w1)
+            && (y2 + h2) <= (y1 + h1);
     },
 
-    // Find point on my boundary where line starting
-    // from my center ending in point p intersects me.
-    // @param {number} angle If angle is specified, intersection with rotated rectangle is computed.
+    intersect: function (rect) {
+        var that = this;
+        var origin1 = that.getOrigin();
+        var corner1 = that.getCorner();
+        var origin2 = rect.getOrigin();
+        var corner2 = rect.getCorner();
+
+        // No intersection found
+        if (origin1.x >= corner2.x ||
+            origin1.y >= corner2.y ||
+            origin2.x >= corner1.x ||
+            origin2.y >= corner1.y) {
+            return null;
+        }
+
+        var x = mmax(origin1.x, origin2.x);
+        var y = mmax(origin1.y, origin2.y);
+        var w = mmin(corner1.x, corner2.x) - x;
+        var h = mmin(corner1.y, corner2.y) - y;
+
+        return new Rect(x, y, w, h);
+    },
+
     intersectionWithLineFromCenterToPoint: function (p, angle) {
-        p = point(p);
-        var center = point(this.x + this.width / 2, this.y + this.height / 2);
+
+        // Find point on my boundary where line starting from my center
+        // ending in point p intersects me. If angle is specified, intersection
+        // with rotated rectangle is computed.
+
+        var that = this;
         var result;
+        var center = that.getCenter();
+
         if (angle) {
             p.rotate(center, angle);
         }
 
         // (clockwise, starting from the top side)
         var sides = [
-            line(this.origin(), this.topRight()),
-            line(this.topRight(), this.corner()),
-            line(this.corner(), this.bottomLeft()),
-            line(this.bottomLeft(), this.origin())
+            new Line(that.getOrigin(), that.getTopRight()),
+            new Line(that.getTopRight(), that.getCorner()),
+            new Line(that.getCorner(), that.getBottomLeft()),
+            new Line(that.getBottomLeft(), that.getOrigin())
         ];
-        var connector = line(center, p);
+
+        var connector = new Line(center, p);
 
         for (var i = sides.length - 1; i >= 0; --i) {
             var intersection = sides[i].intersection(connector);
-            if (intersection !== null) {
+            if (intersection) {
                 result = intersection;
                 break;
             }
         }
+
         if (result && angle) {
             result.rotate(center, -angle);
         }
+
         return result;
     },
 
@@ -282,31 +264,41 @@ Rect.prototype = {
         return that;
     },
 
-    // Find my bounding box when I'm rotated with the center of rotation in the center of me.
-    // @return r {rectangle} representing a bounding box
-    bbox: function (angle) {
+    getBBox: function (angle) {
+
+        var that = this;
+        //var x = that.x;
+        //var y = that.y;
+        //var w = that.width;
+        //var h = that.height;
+
         var theta = toRad(angle || 0);
         var st = abs(sin(theta));
         var ct = abs(cos(theta));
-        var w = this.width * ct + this.height * st;
-        var h = this.width * st + this.height * ct;
-        return Rect(this.x + (this.width - w) / 2, this.y + (this.height - h) / 2, w, h);
+        var w = that.width * ct + that.height * st;
+        var h = that.width * st + that.height * ct;
+        return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
     },
 
     snapToGrid: function (gx, gy) {
-        var origin = this.origin().snapToGrid(gx, gy);
-        var corner = this.corner().snapToGrid(gx, gy);
-        this.x = origin.x;
-        this.y = origin.y;
-        this.width = corner.x - origin.x;
-        this.height = corner.y - origin.y;
-        return this;
+
+        var that = this;
+        var origin = that.getOrigin();
+        var corner = that.getCorner();
+
+        origin = origin.snapToGrid(gx, gy);
+        corner = corner.snapToGrid(gx, gy);
+
+        that.x = origin.x;
+        that.y = origin.y;
+        that.width = corner.x - origin.x;
+        that.height = corner.y - origin.y;
+
+        return that;
     },
 
     equals: function (rect) {
-        var mr = g.rect(this).normalize();
-        var nr = g.rect(rect).normalize();
-        return mr.x === nr.x && mr.y === nr.y && mr.width === nr.width && mr.height === nr.height;
+        return Rect.equals(this, rect);
     },
 
     valueOf: function () {
@@ -324,9 +316,21 @@ Rect.prototype = {
 };
 
 
+// statics
+// -------
+
 Rect.equals = function (rect1, rect2) {
-    return rect1 instanceof Rect
-        && rect2 instanceof Rect;
+    var result = rect1 && rect2 && rect1 instanceof Rect && rect2 instanceof Rect;
+    if (result) {
+        rect1.normalize();
+        rect2.normalize();
+        result = rect1.x === rect2.x
+            && rect1.y === rect2.y
+            && rect1.width === rect2.width
+            && rect1.height === rect2.height;
+    }
+
+    return result;
 };
 
 Rect.fromRect = function (rect) {

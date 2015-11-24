@@ -476,7 +476,7 @@ export default Base.extend({
         var that = this;
         var cell = state.cell;
         var currentRoot = that.currentRoot;
-        var stateOrigin = state.origin;
+        var stateOrigin = state.getOrigin;
         var absoluteOffset = state.absoluteOffset;
 
         // 重置
@@ -496,8 +496,8 @@ export default Base.extend({
 
             // 父节点的 origin
             if (parentState && parent !== currentRoot) {
-                stateOrigin.x += parentState.origin.x;
-                stateOrigin.y += parentState.origin.y;
+                stateOrigin.x += parentState.getOrigin.x;
+                stateOrigin.y += parentState.getOrigin.y;
             }
 
             // 获取 cell 的 offset
@@ -519,8 +519,8 @@ export default Base.extend({
                             var origin = that.getPoint(parentState, geo);
 
                             if (origin) {
-                                stateOrigin.x += (origin.x / scale) - parentState.origin.x - translate.x;
-                                stateOrigin.y += (origin.y / scale) - parentState.origin.y - translate.y;
+                                stateOrigin.x += (origin.x / scale) - parentState.getOrigin.x - translate.x;
+                                stateOrigin.y += (origin.y / scale) - parentState.getOrigin.y - translate.y;
                             }
                         } else {
                             // 相对定位时 geo.x 和 geo.y 是相对于父元素 w 和 h 的百分比
@@ -721,7 +721,7 @@ export default Base.extend({
         if (pt && terminalState) {
             var s = this.scale;
             var tr = this.translate;
-            var orig = linkState.origin;
+            var orig = linkState.getOrigin;
             var geo = this.graph.getCellGeometry(linkState.cell);
             pt = geo.getTerminalPoint(isSource);
 

@@ -626,7 +626,7 @@ export default Class.create({
             model.beginUpdate();
 
             var parentState = absolute ? this.view.getState(parent) : null;
-            var parentOrigin = parentState ? parentState.origin : null;
+            var parentOrigin = parentState ? parentState.getOrigin : null;
 
             each(cells, function (cell, i) {
 
@@ -1000,7 +1000,7 @@ export default Class.create({
     zoomOut: function () {},
     zoomActual: function () {},
     zoomTo: function () {},
-    center: function () {},
+    getCenter: function () {},
     zoom: function () {},
     zoomToRect: function () {},
     fit: function () {},

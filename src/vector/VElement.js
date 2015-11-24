@@ -506,7 +506,7 @@ VElement.prototype = {
         target = target || svg;
 
         var bbox = g.rect(this.bbox(false, target));
-        var center = bbox.center();
+        var center = bbox.getCenter();
         var spot = bbox.intersectionWithLineFromCenterToPoint(ref);
 
         if (!spot) {

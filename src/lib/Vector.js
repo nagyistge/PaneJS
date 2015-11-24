@@ -538,11 +538,11 @@ var Vector = (function (window) {
         if (!rx && !ry) {
 
             d = [
-                'M', bbox.origin().x, bbox.origin().y,
-                'H', bbox.corner().x,
-                'V', bbox.corner().y,
-                'H', bbox.origin().x,
-                'V', bbox.origin().y,
+                'M', bbox.getOrigin().x, bbox.getOrigin().y,
+                'H', bbox.getCorner().x,
+                'V', bbox.getCorner().y,
+                'H', bbox.getOrigin().x,
+                'V', bbox.getOrigin().y,
                 'Z'
             ].join(' ');
 

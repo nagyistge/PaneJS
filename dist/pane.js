@@ -720,112 +720,38 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	var math = Math;
+	var PI = math.PI;
+	var round = math.round;
 	
-	var _number = __webpack_require__(4);
-	
-	function toRadians(deg) {
-	    return Math.PI * deg / 180;
+	function toDeg(rad) {
+	    return 180 * rad / PI % 360;
 	}
 	
-	function roundPoint(point) {
-	    point.x = Math.round(point.x);
-	    point.y = Math.round(point.y);
-	    return point;
+	function toRad(deg, over360) {
+	    deg = over360 ? deg : deg % 360;
+	    return deg * PI / 180;
 	}
 	
-	function rotatePoint(point, deg, center, rounded) {
-	    var rad = toRadians(deg);
-	    var cos = Math.cos(rad);
-	    var sin = Math.sin(rad);
-	
-	    return rotatePointEx(point, cos, sin, center, rounded);
+	function snapToGrid(val, gridSize) {
+	    return gridSize * round(val / gridSize);
 	}
 	
-	function rotatePointEx(point, cos, sin, center, rounded) {
-	    var centerX = center ? center.x : 0;
-	    var centerY = center ? center.y : 0;
-	    var dx = point.x - centerX;
-	    var dy = point.y - centerY;
-	
-	    var x1 = dx * cos - dy * sin;
-	    var y1 = dy * cos + dx * sin;
-	
-	    point.x = x1 + centerX;
-	    point.y = y1 + centerY;
-	
-	    return rounded ? roundPoint(point) : point;
+	function normalizeAngle(angle) {
+	    return angle % 360 + (angle < 0 ? 360 : 0);
 	}
 	
-	function translatePoint(point, dx, dy) {
-	    point.x = (0, _number.toFloat)(point.x) + dx;
-	    point.y = (0, _number.toFloat)(point.y) + dy;
-	    return point;
-	}
-	
-	function scalePoint(point, sx, sy) {
-	    point.x = (0, _number.toFloat)(point.x) * sx;
-	    point.y = (0, _number.toFloat)(point.y) * sy;
-	    return point;
-	}
-	
-	function isEqualEntity(o1, o2) {
-	    return !o1 && !o2 || o1 && o1.equals(o2);
-	}
-	
-	function isEqualEntities(arr1, arr2) {
-	    if (!arr1 && arr2 || !arr2 && arr1 || !arr1 && !arr2 && arr1.length != arr2.length) {
-	        return false;
-	    } else if (arr1 && arr2) {
-	        for (var i = 0, l = arr1.length; i < l; i++) {
-	            if (!isEqualEntity(arr1[i], arr2[i])) {
-	                return false;
-	            }
-	        }
-	    }
-	
-	    return true;
-	}
-	
-	function getAlignments(align, valign) {
-	    var dx = 0;
-	    var dy = 0;
-	
-	    // Horizontal alignment
-	    if (align === 'center') {
-	        dx = -0.5;
-	    } else if (align === 'right') {
-	        dx = -1;
-	    }
-	
-	    // Vertical alignment
-	    if (valign === 'middle') {
-	        dy = -0.5;
-	    } else if (valign === 'bottom') {
-	        dy = -1;
-	    }
-	
-	    return {
-	        x: dx,
-	        y: dy
-	    };
-	}
-	
-	exports.toRadians = toRadians;
-	exports.roundPoint = roundPoint;
-	exports.scalePoint = scalePoint;
-	exports.rotatePoint = rotatePoint;
-	exports.rotatePointEx = rotatePointEx;
-	exports.translatePoint = translatePoint;
-	exports.isEqualEntity = isEqualEntity;
-	exports.isEqualEntities = isEqualEntities;
-	exports.getAlignments = getAlignments;
+	exports.toDeg = toDeg;
+	exports.toRad = toRad;
+	exports.snapToGrid = snapToGrid;
+	exports.normalizeAngle = normalizeAngle;
 
 /***/ },
 /* 11 */

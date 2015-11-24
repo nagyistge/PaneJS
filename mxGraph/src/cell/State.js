@@ -161,8 +161,8 @@ var State = Rectangle.extend({
             }
         }
 
-        if (that.origin) {
-            cloned.origin = that.origin.clone();
+        if (that.getOrigin) {
+            cloned.getOrigin = that.getOrigin.clone();
         }
 
         if (that.absoluteOffset) {

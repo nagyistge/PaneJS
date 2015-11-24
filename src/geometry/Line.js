@@ -1,25 +1,32 @@
+import {
+    toRad
+} from '../common/utils'
+
 import Point from './Point';
 
+var math = Math;
+var cos = math.cos;
+var sin = math.sin;
 var sqrt = math.sqrt;
+var atan2 = math.atan2;
 
-
-function Line(p1, p2) {
+function Line(start, end) {
 
     var that = this;
 
-    that.start = new Point(p1);
-    that.end = new Point(p2);
+    that.start = start;
+    that.end = end;
 }
 
 Line.prototype = {
 
     constructor: Line,
 
-    length: function () {
-        return sqrt(this.squaredLength());
+    getLength: function () {
+        return sqrt(this.getSquaredLength());
     },
 
-    squaredLength: function () {
+    getSquaredLength: function () {
 
         // Return the line's length without sqrt.
         // Note that for applications where the exact length
@@ -27,15 +34,13 @@ Line.prototype = {
 
         var that = this;
 
-        var x0 = that.start.x;
-        var y0 = that.start.y;
-        var x1 = that.end.x;
-        var y1 = that.end.y;
+        var dx = that.end.x - that.start.x;
+        var dy = that.end.y - that.end.x;
 
-        return (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
+        return dx * dx + dy * dy;
     },
 
-    midPoint: function () {
+    getMidpoint: function () {
 
         var that = this;
 
@@ -45,20 +50,18 @@ Line.prototype = {
         return new Point(x, y);
     },
 
-    pointAt: function (t) {
+    getPointAt: function (percent) {
 
-        // get point at `t` (0~1).
+        // get point at `percent` (0~1).
 
         var that = this;
 
-        var x = (1 - t) * that.start.x + t * that.end.x;
-        var y = (1 - t) * that.start.y + t * that.end.y;
+        var x = (1 - percent) * that.start.x + percent * that.end.x;
+        var y = (1 - percent) * that.start.y + percent * that.end.y;
 
         return new Point(x, y);
     },
 
-    // @return {point} Point where I'm intersecting l.
-    // @see Squeak Smalltalk, LineSegment>>intersectionWith:
     intersection: function (l) {
         var pt1Dir = point(this.end.x - this.start.x, this.end.y - this.start.y);
         var pt2Dir = point(l.end.x - l.start.x, l.end.y - l.start.y);
@@ -90,8 +93,9 @@ Line.prototype = {
 
     // @return the bearing (cardinal direction) of the line. For example N, W, or SE.
     // @returns {String} One of the following bearings : NE, E, SE, S, SW, W, NW, N.
-    bearing: function () {
+    getDirection: function () {
 
+        var that = this;
         var lat1 = toRad(this.start.y);
         var lat2 = toRad(this.end.y);
         var lon1 = this.start.x;
@@ -112,7 +116,6 @@ Line.prototype = {
         return bearings[index];
     },
 
-
     pointOffset: function (p) {
 
         // get the offset of the point `p` from the line.
@@ -127,9 +130,8 @@ Line.prototype = {
         return ((end.x - start.x) * (p.y - start.y) - (end.y - start.y) * (p.x - start.x)) / 2;
     },
 
-
     valueOf: function () {
-        return [this.satrt.x, this.start.y, this.end.x, this.end.y];
+        return [this.satrt.valueOf(), this.end.valueOf()];
     },
 
     toString: function () {
@@ -137,14 +139,28 @@ Line.prototype = {
     },
 
     equals: function (line) {
-        return line instanceof Line
-            && line.start && line.start.equals(this.start)
-            && line.end && line.end.equals(this.end);
+        return Line.equals(this, line);
     },
 
     clone: function () {
-        return new Line(this.start, this.end);
+        return Line.fromLine(this);
     }
+};
+
+
+// statics
+// -------
+
+Line.equals = function (line1, line2) {
+    return line1 && line2
+        && line1 instanceof Line
+        && line2 instanceof Line
+        && ((line1.start && line1.start.equals(line2.start)) || (!line1.start && line1.start === line2.start))
+        && ((line1.end && line1.end.equals(line2.end)) || (!line1.end && line1.end === line2.end));
+};
+
+Line.fromLine = function (line) {
+    return new Line(line.start, line.end);
 };
 
 
