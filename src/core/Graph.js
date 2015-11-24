@@ -1,12 +1,15 @@
-import Base from '../lib/Base';
+import Class  from '../common/Class';
+import Events from '../common/Events';
 
-export default Base.extend({
+export default Class.create({
+
+    Extends: Events,
 
     constructor: function Graph(root) {
 
         var that = this;
 
-        that.changeCollection = new ChangeCollection(that);
+        //that.changeCollection = new ChangeCollection(that);
 
         if (root) {
             that.setRoot(root);

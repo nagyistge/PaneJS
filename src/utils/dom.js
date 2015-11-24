@@ -13,6 +13,10 @@ function isNode() {
 
 }
 
+function getClassName(elem) {
+    return elem.getAttribute && elem.getAttribute('class') || '';
+}
+
 function parseXML(str, async) {
 
     var xml;
@@ -273,6 +277,7 @@ export {
     createSvgDocument,
     createSvgElement,
     setAttribute,
+    getClassName,
     parseScale,
     parseRotate,
     parseTransform,

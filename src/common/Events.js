@@ -2,9 +2,9 @@ import {
     keys,
     invoke,
     forEach,
-} from '../commom/utils';
+} from '../common/utils';
 
-import Class from '../commom/class';
+import Class from '../common/Class';
 
 var splitter = /\s+/;
 

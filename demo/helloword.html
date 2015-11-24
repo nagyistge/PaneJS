@@ -13,23 +13,26 @@
 <script>
 
     var container = document.getElementById('graphContainer');
-    var graph = new pane.Graph(container);
 
-    console.log(graph);
+    var paper = new pane.Paper(container);
 
-    var parent = graph.getDefaultParent();
-
-    graph.getModel().beginUpdate();
-
-    try {
-        var node1 = graph.insertNode(parent, null, 'Hello, ', 40, 40, 100, 30);
-        var node2 = graph.insertNode(parent, null, 'Pane.', 160, 200, 100, 30);
-        var link1 = graph.insertLink(parent, null, '', node1, node2);
-
-    }
-    finally {
-        graph.getModel().endUpdate();
-    }
+    //    var graph = new pane.Graph(container);
+    //
+    //    console.log(graph);
+    //
+    //    var parent = graph.getDefaultParent();
+    //
+    //    graph.getModel().beginUpdate();
+    //
+    //    try {
+    //        var node1 = graph.insertNode(parent, null, 'Hello, ', 40, 40, 100, 30);
+    //        var node2 = graph.insertNode(parent, null, 'Pane.', 160, 200, 100, 30);
+    //        var link1 = graph.insertLink(parent, null, '', node1, node2);
+    //
+    //    }
+    //    finally {
+    //        graph.getModel().endUpdate();
+    //    }
 
 </script>
 </body>

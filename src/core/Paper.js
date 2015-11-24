@@ -1,20 +1,25 @@
-import Base  from '../lib/Base';
-import Graph from './Graph';
+import Class  from '../common/Class';
+import Events from '../common/Events';
+import vector from '../common/vector';
+import Graph  from './Graph';
 
-Base.extend({
+export default Class.create({
+
+    Extends: Events,
 
     options: {
         x: 0,
         y: 0,
-        width: 800,
-        height: 600
+        width: '100%',
+        height: '100%',
+        gridSize: 1,
     },
 
     constructor: function Paper(container, model, options) {
 
         var that = this;
 
-        that.model = model || new Graph;
+        //that.model = model || new Graph();
 
         that.configure(options);
 
@@ -46,11 +51,26 @@ Base.extend({
 
         var that = this;
 
-        that.container = container;
-        //that.canvas =
-        //that.root=
-        //that.root=
-        that.trigger('paper:render', {container: container});
+        if (container) {
+
+            var svg = vector('svg');
+            var root = vector('g');
+            var backgroundPane = vector('g');
+            var drawPane = vector('g');
+
+            root.append([backgroundPane, drawPane]);
+            svg.append(root);
+            container.appendChild(svg.node);
+
+            that.container = container;
+            that.svg = svg.node;
+            that.root = root.node;
+            that.backgroundPane = backgroundPane.node;
+            that.drawPane = drawPane.node;
+
+            //that.root=
+            that.trigger('paper:render', container);
+        }
 
         return that;
     },
@@ -85,7 +105,7 @@ Base.extend({
         width = options.width = width || options.width;
         height = options.height = height || options.height;
 
-        V(that.svg).attr({width: width, height: height});
+        vector(that.svg).attr({width: width, height: height});
 
         that.trigger('paper:resize', width, height);
 
@@ -100,7 +120,7 @@ Base.extend({
         x = options.x = x || options.x;
         y = options.y = y || options.y;
 
-        V(that.viewport).translate(x, y, absolute);
+        vector(that.root).translate(x, y, absolute);
 
         that.trigger('paper:translate', x, y);
 

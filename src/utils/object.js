@@ -9,9 +9,10 @@ function keys(obj) {
 }
 
 function forIn(obj, iterator, context) {
-    forEach(keys(obj), iterator, context);
+    forEach(keys(obj), function (key) {
+        iterator.call(context, obj[key], key);
+    });
 }
-
 
 function extend(dist) {
 
