@@ -1212,6 +1212,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
+	        that.nextId = 0;
+	        that.updateLevel = 0;
+	        that.endingUpdate = false;
 	        that.changes = new _changesChangeCollection2['default'](that);
 	
 	        if (root) {
@@ -1249,10 +1252,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    createCellId: function createCellId() {
 	        var that = this;
 	        var id = that.nextId;
-	
-	        if (!id) {
-	            id = that.nextId = 0;
-	        }
 	
 	        that.nextId += 1;
 	
@@ -1669,10 +1668,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        if (!that.updateLevel) {
-	            that.updateLevel = 0;
-	        }
-	
 	        that.updateLevel += 1;
 	        that.trigger('beginUpdate');
 	
@@ -1867,6 +1862,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
+	var _commonUtils = __webpack_require__(2);
+	
 	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
@@ -1901,9 +1898,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        width: '100%',
 	        height: '100%',
 	        gridSize: 1,
-	        linkView: _viewsLinkView2['default'],
-	        nodeView: _viewsNodeView2['default']
+	        viewportClassName: 'pane-viewport',
+	        linkClassName: '',
+	        nodeClassName: '',
+	        getCellClassName: function getCellClassName(cell) {},
+	        getCellView: function getCellView(cell) {}
 	    },
+	
+	    // events
+	    //  - paper:configure
+	    //  - paper:init
+	    //  - paper:setup
+	    //  - paper:destroy
+	    //  - paper:resize
 	
 	    constructor: function Paper(container, graph, options) {
 	
@@ -1916,16 +1923,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (container) {
 	            that.init(container).setup().resize().translate();
 	        }
-	
-	        that.graph.on('change', function () {});
 	    },
 	
 	    configure: function configure(options) {
-	        // 应用 options 选项
 	
 	        var that = this;
 	
-	        that.trigger('paper:config', options);
+	        that.trigger('paper:configure', options);
 	
 	        return that;
 	    },
@@ -1934,7 +1938,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ----------
 	
 	    init: function init(container) {
-	        // 创建根节点等
+	
+	        // create svg
 	
 	        var that = this;
 	
@@ -1942,30 +1947,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var svg = (0, _commonVector2['default'])('svg');
 	            var root = (0, _commonVector2['default'])('g');
-	            var backgroundPane = (0, _commonVector2['default'])('g');
 	            var drawPane = (0, _commonVector2['default'])('g');
 	
-	            root.append([backgroundPane, drawPane]);
+	            root.append(drawPane);
 	            svg.append(root);
 	            container.appendChild(svg.node);
 	
 	            that.container = container;
 	            that.svg = svg.node;
 	            that.root = root.node;
-	            that.backgroundPane = backgroundPane.node;
 	            that.drawPane = drawPane.node;
 	
-	            //that.root=
-	            that.trigger('paper:render', container);
+	            that.trigger('paper:init', container);
 	        }
 	
 	        return that;
 	    },
 	
 	    setup: function setup() {
-	        // 事件绑定, 事件代理, 所有事件绑定到容器上
+	
+	        // install event listeners.
 	
 	        var that = this;
+	
+	        that.graph.on('change', that.processChanges, that);
 	
 	        that.trigger('paper:setup');
 	
@@ -1980,6 +1985,172 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.trigger('paper:destroy');
 	
 	        return that;
+	    },
+	
+	    revalidate: function revalidate() {
+	        return this.invalidate().validate();
+	    },
+	
+	    clear: function clear(cell) {
+	        var force = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	        var recurse = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+	
+	        var that = this;
+	        var model = that.graph.model;
+	
+	        cell = cell || model.getRoot();
+	
+	        that.removeState(cell);
+	
+	        if (recurse && (force || cell !== that.currentRoot)) {
+	            cell.eachChild(function (child) {
+	                that.clear(child, force, recurse);
+	            });
+	        } else {
+	            that.invalidate(cell, true, true);
+	        }
+	
+	        return that;
+	    },
+	
+	    invalidate: function invalidate(cell) {
+	        var recurse = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	        var includeLink = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+	
+	        var that = this;
+	        var graph = that.graph;
+	
+	        cell = cell || graph.getRoot();
+	
+	        var view = that.getCellView(cell);
+	
+	        if (view) {
+	            view.invalid = true;
+	        }
+	
+	        if (!cell.invalidating) {
+	
+	            cell.invalidating = true;
+	
+	            if (recurse) {
+	                cell.eachChild(function (child) {
+	                    that.invalidate(child, recurse, includeLink);
+	                });
+	            }
+	
+	            if (includeLink) {
+	                cell.eachLink(function (link) {
+	                    that.invalidate(link, recurse, includeLink);
+	                });
+	            }
+	
+	            cell.invalidating = false;
+	        }
+	
+	        return that;
+	    },
+	
+	    validate: function validate(cell) {
+	
+	        var that = this;
+	
+	        cell = cell || that.graph.getRoot();
+	
+	        that.validateCell(cell).validateCellView(cell);
+	
+	        return that;
+	    },
+	
+	    validateCell: function validateCell(cell) {
+	        var visible = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	
+	        // create or remove view for cell
+	
+	        var that = this;
+	
+	        if (!cell) {
+	            return cell;
+	        }
+	
+	        visible = visible && cell.isVisible();
+	
+	        var view = that.getCellView(cell, visible);
+	
+	        if (view && !visible) {
+	            // remove the cell view, or wo can just hide it?
+	            that.removeCellView(cell);
+	        }
+	
+	        cell.eachChild(function (child) {
+	            that.validateCell(child, visible);
+	        });
+	
+	        return that;
+	    },
+	
+	    validateCellView: function validateCellView(cell) {
+	        var recurse = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	
+	        var that = this;
+	        var view = that.getCellView(cell);
+	
+	        if (view) {
+	            if (view.invalid) {
+	                view.invalid = false;
+	
+	                // render
+	            }
+	        }
+	
+	        if (recurse) {
+	            cell.eachChild(function (child) {
+	                that.validateCellView(child, recurse);
+	            });
+	        }
+	
+	        var state = that.getState(cell);
+	
+	        if (state) {
+	            if (state.invalid) {
+	                state.invalid = false;
+	
+	                if (cell !== that.currentRoot) {
+	                    that.validateCellState(cell.parent, false);
+	                }
+	
+	                if (cell.isLink) {
+	                    var sourceNode = that.getVisibleTerminal(cell, true);
+	                    var targetNode = that.getVisibleTerminal(cell, false);
+	                    var sourceState = that.validateCellState(sourceNode, false);
+	                    var targetState = that.validateCellState(targetNode, false);
+	                    state.setVisibleTerminalState(sourceState, true);
+	                    state.setVisibleTerminalState(targetState, false);
+	                }
+	
+	                that.updateCellState(state);
+	
+	                if (cell !== that.currentRoot) {
+	                    that.renderer.redraw(state, false, that.rendering);
+	                }
+	            }
+	
+	            if (recurse) {
+	                // update `state.cellBounds` and `state.paintBounds`
+	                state.updateCachedBounds();
+	
+	                // update order in DOM if recursively traversing
+	                if (state.shape) {
+	                    // TODO: stateValidated
+	                    //that.stateValidated(state);
+	                }
+	
+	                cell.eachChild(function (child) {
+	                    that.validateCellState(child, true);
+	                });
+	            }
+	        }
+	
+	        return state;
 	    },
 	
 	    // transform
@@ -2015,20 +2186,101 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    scale: function scale(sx, sy, ox, oy) {},
+	    translateTo: function translateTo(x, y) {
+	        return this.translate(x, y, true);
+	    },
 	
-	    rotate: function rotate(deg, ox, oy) {},
+	    scale: function scale(sx, sy) {
+	        var ox = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	        var oy = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+	    },
+	
+	    rotate: function rotate(deg) {
+	        var ox = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	        var oy = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	    },
 	
 	    // view
 	    // ----
 	
-	    createView: function createView(cell) {},
+	    getCellView: function getCellView(cell, create) {
 	
-	    removeView: function removeView(cell) {},
+	        var that = this;
+	        var views = that.views;
 	
-	    renderView: function renderView(cell) {},
+	        if (cell) {
+	            var view = views ? views[cell.id] : null;
 	
-	    onCellAdded: function onCellAdded() {},
+	            if (!view && create && cell.visible) {
+	                view = that.createCellView(cell);
+	            }
+	
+	            return view;
+	        }
+	    },
+	
+	    createCellView: function createCellView(cell) {
+	
+	        var that = this;
+	        var options = that.options;
+	
+	        // get view constructor from options.
+	        var ViewClass = options.getCellView.call(that, cell);
+	
+	        // get default view constructor.
+	        if (!ViewClass) {
+	            ViewClass = cell.isLink() ? _viewsLinkView2['default'] : cell.isNode() ? _viewsNodeView2['default'] : null;
+	        }
+	
+	        if (ViewClass) {
+	
+	            var view = new ViewClass(cell);
+	            var views = that.views;
+	
+	            if (!views) {
+	                views = that.views = {};
+	            }
+	
+	            views[cell.id] = view;
+	
+	            return view;
+	        }
+	    },
+	
+	    removeCellView: function removeCellView(cell) {},
+	
+	    renderCellView: function renderCellView(cell) {},
+	
+	    // changes
+	    // -------
+	
+	    processChanges: function processChanges(changes) {
+	
+	        var that = this;
+	
+	        console.log(changes);
+	
+	        (0, _commonUtils.forEach)(changes, function (change) {
+	            that.distributeChange(change);
+	        });
+	
+	        return that;
+	    },
+	
+	    distributeChange: function distributeChange(change) {
+	
+	        var that = this;
+	
+	        if (change instanceof RootChange) {
+	            that.onRootChanged(change);
+	        } else if (change instanceof ChildChange) {
+	            that.onChildChanged(change);
+	        }
+	    },
+	
+	    onRootChanged: function onRootChanged(rootChange) {},
+	
+	    onChildChanged: function onChildChanged(childChange) {},
 	
 	    // event handlers
 	    // --------------
@@ -2746,9 +2998,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _commonClass2['default'].create({
 	
-	    constructor: function Cell(options) {},
+	    constructor: function Cell(options) {
 	
-	    clear: function clear() {},
+	        var that = this;
+	    },
+	
+	    isVisible: function isVisible() {
+	        return true;
+	    },
 	
 	    isNode: function isNode() {
 	        return false;
@@ -2756,6 +3013,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    isLink: function isLink() {
 	        return false;
+	    },
+	
+	    // link
+	    // ----
+	
+	    getTerminal: function getTerminal(isSource) {
+	        return isSource ? this.source : this.target;
+	    },
+	
+	    setTerminal: function setTerminal(node, isSource) {
+	        if (isSource) {
+	            this.source = node;
+	        } else {
+	            this.target = node;
+	        }
+	
+	        return node;
+	    },
+	
+	    removeFromTerminal: function removeFromTerminal(isSource) {
+	
+	        // remove link from node
+	
+	        var that = this;
+	
+	        var node = that.getTerminal(isSource);
+	
+	        if (node) {
+	            node.removeLink(that, isSource);
+	        }
+	
+	        return that;
 	    },
 	
 	    // children
@@ -2841,8 +3130,90 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return child;
 	    },
 	
-	    // common
+	    // node
+	    // -----
+	
+	    getLinkCount: function getLinkCount() {
+	        var links = this.links;
+	        return links ? links.length : 0;
+	    },
+	
+	    getLinkIndex: function getLinkIndex(link) {
+	        return (0, _commonUtils.indexOf)(this.links || [], link);
+	    },
+	
+	    getLinkAt: function getLinkAt(index) {
+	        var links = this.links;
+	        return links ? links[index] : null;
+	    },
+	
+	    eachLink: function eachLink(iterator, context) {
+	
+	        var that = this;
+	        var links = that.links;
+	
+	        links && (0, _commonUtils.forEach)(links, iterator, context);
+	
+	        return that;
+	    },
+	
+	    filterLink: function filterLink(iterator, context) {
+	        var links = this.links;
+	        return links ? (0, _commonUtils.filter)(links, iterator, context) : [];
+	    },
+	
+	    insertLink: function insertLink(link, outgoing) {
+	
+	        var that = this;
+	
+	        if (link) {
+	            link.removeFromTerminal(outgoing);
+	            link.setTerminal(that, outgoing);
+	
+	            var links = that.links;
+	
+	            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
+	            if (!links || that.getLinkIndex(link) < 0 || link.getTerminal(!outgoing) !== that) {
+	
+	                if (!links) {
+	                    links = that.links = [];
+	                }
+	
+	                links.push(link);
+	            }
+	        }
+	
+	        return link;
+	    },
+	
+	    removeLink: function removeLink(link, outgoing) {
+	
+	        var that = this;
+	        var links = that.links;
+	
+	        if (link) {
+	
+	            // 连线的起点和终点是同一个节点时不需要移除
+	            if (links && link.getTerminal(!outgoing) !== that) {
+	                var index = that.getLinkIndex(link);
+	
+	                if (index >= 0) {
+	                    links.splice(index, 1);
+	                }
+	            }
+	
+	            link.setTerminal(null, outgoing);
+	        }
+	
+	        return link;
+	    },
+	
+	    // parent
 	    // ------
+	
+	    getParent: function getParent() {
+	        return this.parent;
+	    },
 	
 	    removeFromParent: function removeFromParent() {
 	
@@ -2855,6 +3226,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return that;
 	    },
+	
+	    // common
+	    // ------
 	
 	    valueOf: function valueOf() {},
 	

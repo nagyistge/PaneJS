@@ -19,6 +19,9 @@ export default Class.create({
 
         var that = this;
 
+        that.nextId = 0;
+        that.updateLevel = 0;
+        that.endingUpdate = false;
         that.changes = new ChangeCollection(that);
 
         if (root) {
@@ -56,10 +59,6 @@ export default Class.create({
     createCellId() {
         var that = this;
         var id = that.nextId;
-
-        if (!id) {
-            id = that.nextId = 0;
-        }
 
         that.nextId += 1;
 
@@ -479,10 +478,6 @@ export default Class.create({
     beginUpdate() {
 
         var that = this;
-
-        if (!that.updateLevel) {
-            that.updateLevel = 0;
-        }
 
         that.updateLevel += 1;
         that.trigger('beginUpdate');

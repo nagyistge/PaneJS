@@ -175,7 +175,7 @@ export default Class.create({
         return this.model;
     },
 
-    getView: function () {
+    getCellView: function () {
         return this.view;
     },
 
@@ -188,7 +188,7 @@ export default Class.create({
         var that = this;
 
         each(changes, function (change) {
-            that.processChange(change);
+            that.distributeChange(change);
         });
 
 
@@ -198,7 +198,7 @@ export default Class.create({
         that.sizeDidChange();
     },
 
-    processChange: function (change) {
+    distributeChange: function (change) {
 
         var that = this;
 

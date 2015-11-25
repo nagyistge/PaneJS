@@ -1,3 +1,7 @@
+import {
+    forEach,
+} from '../common/utils';
+
 import Class  from '../common/Class';
 import Events from '../common/Events';
 import vector from '../common/vector';
@@ -17,9 +21,19 @@ export default Class.create({
         width: '100%',
         height: '100%',
         gridSize: 1,
-        linkView: LinkView,
-        nodeView: NodeView,
+        viewportClassName: 'pane-viewport',
+        linkClassName: '',
+        nodeClassName: '',
+        getCellClassName: function (cell) {},
+        getCellView: function (cell) {},
     },
+
+    // events
+    //  - paper:configure
+    //  - paper:init
+    //  - paper:setup
+    //  - paper:destroy
+    //  - paper:resize
 
     constructor: function Paper(container, graph, options) {
 
@@ -35,19 +49,15 @@ export default Class.create({
                 .resize()
                 .translate();
         }
-
-        that.graph.on('change', function () {});
     },
 
     configure: function (options) {
-        // 应用 options 选项
 
         var that = this;
 
-        that.trigger('paper:config', options);
+        that.trigger('paper:configure', options);
 
         return that;
-
     },
 
 
@@ -55,7 +65,8 @@ export default Class.create({
     // ----------
 
     init: function (container) {
-        // 创建根节点等
+
+        // create svg
 
         var that = this;
 
@@ -63,30 +74,30 @@ export default Class.create({
 
             var svg = vector('svg');
             var root = vector('g');
-            var backgroundPane = vector('g');
             var drawPane = vector('g');
 
-            root.append([backgroundPane, drawPane]);
+            root.append(drawPane);
             svg.append(root);
             container.appendChild(svg.node);
 
             that.container = container;
             that.svg = svg.node;
             that.root = root.node;
-            that.backgroundPane = backgroundPane.node;
             that.drawPane = drawPane.node;
 
-            //that.root=
-            that.trigger('paper:render', container);
+            that.trigger('paper:init', container);
         }
 
         return that;
     },
 
     setup: function () {
-        // 事件绑定, 事件代理, 所有事件绑定到容器上
+
+        // install event listeners.
 
         var that = this;
+
+        that.graph.on('change', that.processChanges, that);
 
         that.trigger('paper:setup');
 
@@ -103,6 +114,167 @@ export default Class.create({
         that.trigger('paper:destroy');
 
         return that;
+    },
+
+    revalidate() {
+        return this.invalidate().validate();
+    },
+
+    clear(cell, force = false, recurse = true) {
+
+        var that = this;
+        var model = that.graph.model;
+
+        cell = cell || model.getRoot();
+
+        that.removeState(cell);
+
+        if (recurse && (force || cell !== that.currentRoot)) {
+            cell.eachChild(function (child) {
+                that.clear(child, force, recurse);
+            });
+        } else {
+            that.invalidate(cell, true, true);
+        }
+
+        return that;
+    },
+
+    invalidate(cell, recurse = true, includeLink = true) {
+
+        var that = this;
+        var graph = that.graph;
+
+        cell = cell || graph.getRoot();
+
+        var view = that.getCellView(cell);
+
+        if (view) {
+            view.invalid = true;
+        }
+
+        if (!cell.invalidating) {
+
+            cell.invalidating = true;
+
+            if (recurse) {
+                cell.eachChild(function (child) {
+                    that.invalidate(child, recurse, includeLink);
+                });
+            }
+
+            if (includeLink) {
+                cell.eachLink(function (link) {
+                    that.invalidate(link, recurse, includeLink);
+                });
+            }
+
+            cell.invalidating = false;
+        }
+
+        return that;
+    },
+
+    validate(cell) {
+
+        var that = this;
+
+        cell = cell || that.graph.getRoot();
+
+        that.validateCell(cell)
+            .validateCellView(cell);
+
+        return that;
+    },
+
+    validateCell(cell, visible = true) {
+
+        // create or remove view for cell
+
+        var that = this;
+
+        if (!cell) {
+            return cell;
+        }
+
+        visible = visible && cell.isVisible();
+
+        var view = that.getCellView(cell, visible);
+
+        if (view && !visible) {
+            // remove the cell view, or wo can just hide it?
+            that.removeCellView(cell);
+        }
+
+        cell.eachChild(function (child) {
+            that.validateCell(child, visible);
+        });
+
+        return that;
+    },
+
+    validateCellView(cell, recurse = true) {
+
+        var that = this;
+        var view = that.getCellView(cell);
+
+        if (view) {
+            if (view.invalid) {
+                view.invalid = false;
+
+                // render
+            }
+        }
+
+        if (recurse) {
+            cell.eachChild(function (child) {
+                that.validateCellView(child, recurse);
+            });
+        }
+
+        var state = that.getState(cell);
+
+        if (state) {
+            if (state.invalid) {
+                state.invalid = false;
+
+                if (cell !== that.currentRoot) {
+                    that.validateCellState(cell.parent, false);
+                }
+
+                if (cell.isLink) {
+                    var sourceNode = that.getVisibleTerminal(cell, true);
+                    var targetNode = that.getVisibleTerminal(cell, false);
+                    var sourceState = that.validateCellState(sourceNode, false);
+                    var targetState = that.validateCellState(targetNode, false);
+                    state.setVisibleTerminalState(sourceState, true);
+                    state.setVisibleTerminalState(targetState, false);
+                }
+
+                that.updateCellState(state);
+
+                if (cell !== that.currentRoot) {
+                    that.renderer.redraw(state, false, that.rendering);
+                }
+            }
+
+            if (recurse) {
+                // update `state.cellBounds` and `state.paintBounds`
+                state.updateCachedBounds();
+
+                // update order in DOM if recursively traversing
+                if (state.shape) {
+                    // TODO: stateValidated
+                    //that.stateValidated(state);
+                }
+
+                cell.eachChild(function (child) {
+                    that.validateCellState(child, true);
+                });
+            }
+        }
+
+        return state;
     },
 
 
@@ -139,11 +311,15 @@ export default Class.create({
         return that;
     },
 
-    scale: function (sx, sy, ox, oy) {
+    translateTo: function (x, y) {
+        return this.translate(x, y, true);
+    },
+
+    scale: function (sx, sy, ox = 0, oy = 0) {
 
     },
 
-    rotate: function (deg, ox, oy) {
+    rotate: function (deg, ox = 0, oy = 0) {
 
     },
 
@@ -151,19 +327,95 @@ export default Class.create({
     // view
     // ----
 
-    createView: function (cell) {
+    getCellView: function (cell, create) {
+
+        var that = this;
+        var views = that.views;
+
+        if (cell) {
+            var view = views ? views[cell.id] : null;
+
+            if (!view && create && cell.visible) {
+                view = that.createCellView(cell);
+            }
+
+            return view;
+        }
+    },
+
+    createCellView: function (cell) {
+
+        var that = this;
+        var options = that.options;
+
+        // get view constructor from options.
+        var ViewClass = options.getCellView.call(that, cell);
+
+        // get default view constructor.
+        if (!ViewClass) {
+            ViewClass = cell.isLink()
+                ? LinkView : cell.isNode()
+                ? NodeView
+                : null;
+        }
+
+        if (ViewClass) {
+
+            var view = new ViewClass(cell);
+            var views = that.views;
+
+            if (!views) {
+                views = that.views = {};
+            }
+
+            views[cell.id] = view;
+
+            return view;
+        }
+    },
+
+    removeCellView: function (cell) {
 
     },
 
-    removeView: function (cell) {
+    renderCellView: function (cell) {
 
     },
 
-    renderView: function (cell) {
+
+    // changes
+    // -------
+
+    processChanges: function (changes) {
+
+        var that = this;
+
+        console.log(changes);
+
+        forEach(changes, function (change) {
+            that.distributeChange(change);
+        });
+
+        return that;
+    },
+
+    distributeChange: function (change) {
+
+        var that = this;
+
+        if (change instanceof RootChange) {
+            that.onRootChanged(change);
+        } else if (change instanceof ChildChange) {
+            that.onChildChanged(change);
+        }
+    },
+
+    onRootChanged: function (rootChange) {
+
 
     },
 
-    onCellAdded: function () {
+    onChildChanged: function (childChange) {
 
     },
 

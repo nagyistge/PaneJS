@@ -12,10 +12,12 @@ export default Class.create({
 
     constructor: function Cell(options) {
 
+        var that = this;
+
     },
 
-    clear: function () {
-
+    isVisible: function () {
+        return true;
     },
 
     isNode: function () {
@@ -24,6 +26,38 @@ export default Class.create({
 
     isLink: function () {
         return false;
+    },
+
+    // link
+    // ----
+
+    getTerminal(isSource) {
+        return isSource ? this.source : this.target;
+    },
+
+    setTerminal(node, isSource) {
+        if (isSource) {
+            this.source = node;
+        } else {
+            this.target = node;
+        }
+
+        return node;
+    },
+
+    removeFromTerminal(isSource) {
+
+        // remove link from node
+
+        var that = this;
+
+        var node = that.getTerminal(isSource);
+
+        if (node) {
+            node.removeLink(that, isSource);
+        }
+
+        return that;
     },
 
 
@@ -113,8 +147,92 @@ export default Class.create({
     },
 
 
-    // common
+    // node
+    // -----
+
+    getLinkCount() {
+        var links = this.links;
+        return links ? links.length : 0;
+    },
+
+    getLinkIndex(link) {
+        return indexOf(this.links || [], link);
+    },
+
+    getLinkAt(index) {
+        var links = this.links;
+        return links ? links[index] : null;
+    },
+
+    eachLink(iterator, context) {
+
+        var that = this;
+        var links = that.links;
+
+        links && forEach(links, iterator, context);
+
+        return that;
+    },
+
+    filterLink(iterator, context) {
+        var links = this.links;
+        return links ? filter(links, iterator, context) : [];
+    },
+
+    insertLink(link, outgoing) {
+
+        var that = this;
+
+        if (link) {
+            link.removeFromTerminal(outgoing);
+            link.setTerminal(that, outgoing);
+
+            var links = that.links;
+
+            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
+            if (!links || that.getLinkIndex(link) < 0 ||
+                link.getTerminal(!outgoing) !== that) {
+
+                if (!links) {
+                    links = that.links = [];
+                }
+
+                links.push(link);
+            }
+        }
+
+        return link;
+    },
+
+    removeLink(link, outgoing) {
+
+        var that = this;
+        var links = that.links;
+
+        if (link) {
+
+            // 连线的起点和终点是同一个节点时不需要移除
+            if (links && link.getTerminal(!outgoing) !== that) {
+                var index = that.getLinkIndex(link);
+
+                if (index >= 0) {
+                    links.splice(index, 1);
+                }
+            }
+
+            link.setTerminal(null, outgoing);
+        }
+
+        return link;
+    },
+
+
+    // parent
     // ------
+
+    getParent: function () {
+        return this.parent;
+    },
 
     removeFromParent() {
 
@@ -127,6 +245,10 @@ export default Class.create({
 
         return that;
     },
+
+
+    // common
+    // ------
 
     valueOf: function () {
 
