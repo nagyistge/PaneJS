@@ -27,7 +27,9 @@ Class.create = function (parent, properties) {
 
     var SubClass = properties.constructor;
     if (SubClass === Object.prototype.constructor) {
-        SubClass = function Superclass() {};
+        SubClass = function Superclass() {
+            parent.apply(this, arguments);
+        };
     }
 
     // Inherit class (static) properties from parent.

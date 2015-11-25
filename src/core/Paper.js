@@ -1,4 +1,5 @@
 import {
+    merge,
     forEach,
 } from '../common/utils';
 
@@ -55,7 +56,8 @@ export default Class.create({
 
         var that = this;
 
-        that.trigger('paper:configure', options);
+        that.options = merge({}, that.options, options);
+        that.trigger('paper:configure', that.options);
 
         return that;
     },
@@ -222,6 +224,7 @@ export default Class.create({
             if (view.invalid) {
                 view.invalid = false;
 
+                that.validateCellView(cell.getParent(), recurse);
                 // render
             }
         }
@@ -231,50 +234,6 @@ export default Class.create({
                 that.validateCellView(child, recurse);
             });
         }
-
-        var state = that.getState(cell);
-
-        if (state) {
-            if (state.invalid) {
-                state.invalid = false;
-
-                if (cell !== that.currentRoot) {
-                    that.validateCellState(cell.parent, false);
-                }
-
-                if (cell.isLink) {
-                    var sourceNode = that.getVisibleTerminal(cell, true);
-                    var targetNode = that.getVisibleTerminal(cell, false);
-                    var sourceState = that.validateCellState(sourceNode, false);
-                    var targetState = that.validateCellState(targetNode, false);
-                    state.setVisibleTerminalState(sourceState, true);
-                    state.setVisibleTerminalState(targetState, false);
-                }
-
-                that.updateCellState(state);
-
-                if (cell !== that.currentRoot) {
-                    that.renderer.redraw(state, false, that.rendering);
-                }
-            }
-
-            if (recurse) {
-                // update `state.cellBounds` and `state.paintBounds`
-                state.updateCachedBounds();
-
-                // update order in DOM if recursively traversing
-                if (state.shape) {
-                    // TODO: stateValidated
-                    //that.stateValidated(state);
-                }
-
-                cell.eachChild(function (child) {
-                    that.validateCellState(child, true);
-                });
-            }
-        }
-
-        return state;
     },
 
 
@@ -348,10 +307,9 @@ export default Class.create({
         var that = this;
         var options = that.options;
 
-        // get view constructor from options.
+        // get view's constructor from options.
         var ViewClass = options.getCellView.call(that, cell);
 
-        // get default view constructor.
         if (!ViewClass) {
             ViewClass = cell.isLink()
                 ? LinkView : cell.isNode()
@@ -361,7 +319,7 @@ export default Class.create({
 
         if (ViewClass) {
 
-            var view = new ViewClass(cell);
+            var view = new ViewClass(that, cell);
             var views = that.views;
 
             if (!views) {
@@ -408,10 +366,11 @@ export default Class.create({
         } else if (change instanceof ChildChange) {
             that.onChildChanged(change);
         }
+
+        return that;
     },
 
     onRootChanged: function (rootChange) {
-
 
     },
 

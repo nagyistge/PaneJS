@@ -6,7 +6,13 @@ var pane = {
     Class: require('./common/Class'),
     Events: require('./common/Events'),
     Graph: require('./core/Graph'),
-    Paper: require('./core/Paper')
+    Paper: require('./core/Paper'),
+    shapes: {
+        basic: {
+            Generic: require('./shapes/basic/Generic'),
+            Rect: require('./shapes/basic/Rect'),
+        }
+    }
 };
 
 module.exports = pane;

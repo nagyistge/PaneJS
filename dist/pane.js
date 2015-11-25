@@ -64,7 +64,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Class: __webpack_require__(11),
 	    Events: __webpack_require__(13),
 	    Graph: __webpack_require__(12),
-	    Paper: __webpack_require__(15)
+	    Paper: __webpack_require__(15),
+	    shapes: {
+	        basic: {
+	            Generic: __webpack_require__(25),
+	            Rect: __webpack_require__(27)
+	        }
+	    }
 	};
 	
 	module.exports = pane;
@@ -426,6 +432,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
+	var objProto = Object.prototype;
+	var toString = objProto.toString;
+	var hasOwn = objProto.hasOwnProperty;
+	
 	function isNull(obj) {
 	    return obj === null;
 	}
@@ -447,7 +457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function isType(obj, type) {
-	    return Object.prototype.toString.call(obj) === '[object ' + type + ']';
+	    return toString.call(obj) === '[object ' + type + ']';
 	}
 	
 	function isObject(obj) {
@@ -490,6 +500,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return !isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
 	}
 	
+	function isPlainObject(obj) {
+	
+	    // Not plain objects:
+	    // - Any object or value whose internal [[Class]] property is not "[object Object]"
+	    // - DOM nodes
+	    // - window
+	    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
+	        return false;
+	    }
+	
+	    if (obj.constructor && !hasOwn.call(obj.constructor.prototype, 'isPrototypeOf')) {
+	        return false;
+	    }
+	
+	    // If the function hasn't returned already, we're confident that
+	    // |obj| is a plain object, created by {} or constructed with new Object
+	    return true;
+	}
+	
+	function isEmptyObject(obj) {
+	    var name;
+	    for (name in obj) {
+	        return false;
+	    }
+	    return true;
+	}
+	
 	exports.isNull = isNull;
 	exports.isType = isType;
 	exports.isArray = isArray;
@@ -501,6 +538,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isFunction = isFunction;
 	exports.isArrayLike = isArrayLike;
 	exports.isUndefined = isUndefined;
+	exports.isPlainObject = isPlainObject;
+	exports.isEmptyObject = isEmptyObject;
 	exports.isNullOrUndefined = isNullOrUndefined;
 
 /***/ },
@@ -518,6 +557,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return '' + str;
 	}
 	
+	function uc(str) {
+	    return ('' + str).toUpperCase();
+	}
+	
+	function lc(str) {
+	    return ('' + str).toLowerCase();
+	}
+	
 	function sanitizeText(text) {
 	
 	    // Replace all spaces with the Unicode No-break space.
@@ -530,9 +577,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function trim(str) {
-	    return proto.trim.call(str);
+	    return str ? proto.trim.call('' + str) : '';
 	}
 	
+	exports.lc = lc;
+	exports.uc = uc;
 	exports.trim = trim;
 	exports.toString = toString;
 	exports.sanitizeText = sanitizeText;
@@ -575,6 +624,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _array = __webpack_require__(7);
 	
+	var _lang = __webpack_require__(3);
+	
 	function hasKey(obj, key) {
 	    return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
 	}
@@ -589,25 +640,65 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	
-	function extend(dist) {
+	function extend(target) {
 	
-	    if (!dist) {
-	        dist = {};
+	    if (!target) {
+	        target = {};
 	    }
 	
-	    for (var i = 1, length = arguments.length; i < length; i++) {
+	    for (var i = 1, l = arguments.length; i < l; i++) {
 	        var source = arguments[i];
-	        source && forIn(source, function (value, key) {
-	            dist[key] = value;
-	        });
+	
+	        if (source) {
+	            for (var key in source) {
+	                target[key] = source[key];
+	            }
+	        }
 	    }
 	
-	    return dist;
+	    return target;
+	}
+	
+	function merge(target) {
+	
+	    if (!target) {
+	        target = {};
+	    }
+	
+	    for (var i = 1, l = arguments.length; i < l; i++) {
+	
+	        var source = arguments[i];
+	        if (source) {
+	            for (var name in source) {
+	
+	                var src = target[name];
+	                var copy = source[name];
+	                var copyIsArray = (0, _lang.isArray)(copy);
+	
+	                if (copyIsArray || (0, _lang.isPlainObject)(copy)) {
+	
+	                    var clone;
+	                    if (copyIsArray) {
+	                        clone = src && (0, _lang.isArray)(src) ? src : [];
+	                    } else {
+	                        clone = src && (0, _lang.isPlainObject)(src) ? src : {};
+	                    }
+	
+	                    target[name] = merge(clone, copy);
+	                } else {
+	                    target[name] = copy;
+	                }
+	            }
+	        }
+	    }
+	
+	    return target;
 	}
 	
 	exports.hasKey = hasKey;
 	exports.keys = keys;
 	exports.forIn = forIn;
+	exports.merge = merge;
 	exports.extend = extend;
 
 /***/ },
@@ -747,10 +838,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	// svg version.
 	var svgVersion = '1.1';
 	
-	function isNode() {}
+	function isNode(elem, nodeName, attrName, attrValue) {
+	    var ret = elem && !isNaN(elem.nodeType);
+	
+	    if (ret) {
+	        ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+	    }
+	
+	    if (ret) {
+	        ret = isNullOrUndefined(attrName) || elem.getAttribute(attrName) === attrValue;
+	    }
+	
+	    return ret;
+	}
 	
 	function getClassName(elem) {
 	    return elem.getAttribute && elem.getAttribute('class') || '';
+	}
+	
+	function getNodeName(elem) {
+	    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
 	}
 	
 	function parseXML(str, async) {
@@ -980,10 +1087,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    'Z'].join(' ');
 	}
 	
+	exports.isNode = isNode;
 	exports.createSvgDocument = createSvgDocument;
 	exports.createSvgElement = createSvgElement;
 	exports.setAttribute = setAttribute;
 	exports.getClassName = getClassName;
+	exports.getNodeName = getNodeName;
 	exports.parseScale = parseScale;
 	exports.parseRotate = parseRotate;
 	exports.parseTransform = parseTransform;
@@ -1061,7 +1170,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var SubClass = properties.constructor;
 	    if (SubClass === Object.prototype.constructor) {
-	        SubClass = function Superclass() {};
+	        SubClass = function Superclass() {
+	            parent.apply(this, arguments);
+	        };
 	    }
 	
 	    // Inherit class (static) properties from parent.
@@ -1228,6 +1339,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.setRoot(this.createRoot());
 	    },
 	
+	    getDefaultParent: function getDefaultParent() {
+	        return this.getRoot().getChildAt(0); // the first layer
+	    },
+	
 	    isAncestor: function isAncestor(parent, child) {
 	
 	        if (!parent || !child) {
@@ -1375,25 +1490,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cell ? cell.parent : null;
 	    },
 	
-	    add: function add(parent, child, index) {
+	    addCell: function addCell(child, parent, index) {
+	        return this.addCells([child], parent, index);
+	    },
+	
+	    addCells: function addCells(cells, parent, index) {
 	
 	        var that = this;
+	        var model = that.model;
 	
-	        if (parent && child && parent !== child) {
+	        parent = parent || that.getDefaultParent();
+	        index = (0, _commonUtils.isNullOrUndefined)(index) ? parent.getChildCount() : index;
 	
-	            if (isNullOrUndefined(index)) {
-	                index = parent.getChildCount();
-	            }
-	
-	            var parentChanged = parent !== child.parent;
-	
-	            that.digest(new ChildChange(that, parent, child, index));
-	
-	            // move the links into the nearest common ancestor of its terminals
-	            if (that.maintainEdgeParent && parentChanged) {
-	                that.updateLinkParents(child);
-	            }
-	        }
+	        model.beginUpdate();
+	        that.cellsAdded(cells, parent, index, false, true);
+	        model.endUpdate();
 	
 	        return that;
 	    },
@@ -1929,7 +2040,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        that.trigger('paper:configure', options);
+	        that.options = (0, _commonUtils.merge)({}, that.options, options);
+	        that.trigger('paper:configure', that.options);
 	
 	        return that;
 	    },
@@ -2098,6 +2210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (view.invalid) {
 	                view.invalid = false;
 	
+	                that.validateCellView(cell.getParent(), recurse);
 	                // render
 	            }
 	        }
@@ -2107,50 +2220,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                that.validateCellView(child, recurse);
 	            });
 	        }
-	
-	        var state = that.getState(cell);
-	
-	        if (state) {
-	            if (state.invalid) {
-	                state.invalid = false;
-	
-	                if (cell !== that.currentRoot) {
-	                    that.validateCellState(cell.parent, false);
-	                }
-	
-	                if (cell.isLink) {
-	                    var sourceNode = that.getVisibleTerminal(cell, true);
-	                    var targetNode = that.getVisibleTerminal(cell, false);
-	                    var sourceState = that.validateCellState(sourceNode, false);
-	                    var targetState = that.validateCellState(targetNode, false);
-	                    state.setVisibleTerminalState(sourceState, true);
-	                    state.setVisibleTerminalState(targetState, false);
-	                }
-	
-	                that.updateCellState(state);
-	
-	                if (cell !== that.currentRoot) {
-	                    that.renderer.redraw(state, false, that.rendering);
-	                }
-	            }
-	
-	            if (recurse) {
-	                // update `state.cellBounds` and `state.paintBounds`
-	                state.updateCachedBounds();
-	
-	                // update order in DOM if recursively traversing
-	                if (state.shape) {
-	                    // TODO: stateValidated
-	                    //that.stateValidated(state);
-	                }
-	
-	                cell.eachChild(function (child) {
-	                    that.validateCellState(child, true);
-	                });
-	            }
-	        }
-	
-	        return state;
 	    },
 	
 	    // transform
@@ -2224,17 +2293,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var that = this;
 	        var options = that.options;
 	
-	        // get view constructor from options.
+	        // get view's constructor from options.
 	        var ViewClass = options.getCellView.call(that, cell);
 	
-	        // get default view constructor.
 	        if (!ViewClass) {
 	            ViewClass = cell.isLink() ? _viewsLinkView2['default'] : cell.isNode() ? _viewsNodeView2['default'] : null;
 	        }
 	
 	        if (ViewClass) {
 	
-	            var view = new ViewClass(cell);
+	            var view = new ViewClass(that, cell);
 	            var views = that.views;
 	
 	            if (!views) {
@@ -2276,6 +2344,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else if (change instanceof ChildChange) {
 	            that.onChildChanged(change);
 	        }
+	
+	        return that;
 	    },
 	
 	    onRootChanged: function onRootChanged(rootChange) {},
@@ -2404,6 +2474,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
+	    removeAttr: function removeAttr(name) {
+	
+	        var that = this;
+	        var node = that.node;
+	
+	        if (node && name) {
+	            node.removeAttribute(name);
+	        }
+	
+	        return that;
+	    },
+	
 	    text: function text() {},
 	
 	    hasClass: function hasClass(selector) {
@@ -2506,6 +2588,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (node && node.parentNode) {
 	            node.parentNode.removeChild(node);
+	        }
+	
+	        return that;
+	    },
+	
+	    empty: function empty() {
+	
+	        var that = this;
+	        var node = that.node;
+	
+	        if (node) {
+	            while (node.lastChild) {
+	                node.removeChild(node.lastChild);
+	            }
 	        }
 	
 	        return that;
@@ -2998,10 +3094,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _commonClass2['default'].create({
 	
-	    constructor: function Cell(options) {
+	    constructor: function Cell(attributes) {
 	
 	        var that = this;
+	
+	        that.attributes = (0, _commonUtils.merge)({}, that.defaults, attributes);
 	    },
+	
+	    get: function get(name) {
+	        return this.attributes[name];
+	    },
+	
+	    getPosition: function getPosition() {},
+	
+	    getSize: function getSize() {},
 	
 	    isVisible: function isVisible() {
 	        return true;
@@ -3315,9 +3421,314 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 23 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _CellView = __webpack_require__(24);
+	
+	var _CellView2 = _interopRequireDefault(_CellView);
+	
+	var _commonVector = __webpack_require__(17);
+	
+	var _commonVector2 = _interopRequireDefault(_commonVector);
+	
+	exports['default'] = _CellView2['default'].extend({
+	
+	    constructor: function NodeView() {},
+	
+	    update: function update() {
+	
+	        var that = this;
+	
+	        return that;
+	    },
+	
+	    render: function render() {
+	
+	        var that = this;
+	        var vel = that.vel;
+	
+	        vel.empty();
+	
+	        that.renderMarkup();
+	
+	        that.scalableNode = vel.findOne('.pane-scalable');
+	        that.rotatableNode = vel.findOne('.pane-rotatable');
+	
+	        return that.update().resize().rotate().translate();
+	    },
+	
+	    renderMarkup: function renderMarkup() {
+	
+	        var that = this;
+	        var cell = that.cell;
+	        var markup = cell.get('markup') || cell.markup;
+	
+	        if (markup) {
+	            that.vel.append((0, _commonVector2['default'])(markup));
+	        } else {
+	            throw new Error('invalid markup');
+	        }
+	
+	        return that;
+	    },
+	
+	    scale: function scale() {
+	
+	        var that = this;
+	
+	        return that;
+	    },
+	
+	    resize: function resize() {
+	
+	        var that = this;
+	
+	        return that;
+	    },
+	
+	    rotate: function rotate() {
+	
+	        var that = this;
+	        var node = that.rotatableNode;
+	
+	        if (node) {
+	
+	            var cell = that.cell;
+	            var angle = cell.get('angle');
+	
+	            if (angle) {
+	
+	                var size = cell.get('size') || { width: 1, height: 1 };
+	                var ox = size.width / 2;
+	                var oy = size.height / 2;
+	
+	                node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
+	            } else {
+	                node.removeAttr('transform');
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    translate: function translate() {
+	
+	        var that = this;
+	
+	        return that;
+	    },
+	
+	    getBBox: function getBBox() {}
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	var _commonEvents = __webpack_require__(13);
+	
+	var _commonEvents2 = _interopRequireDefault(_commonEvents);
+	
+	var _commonVector = __webpack_require__(17);
+	
+	var _commonVector2 = _interopRequireDefault(_commonVector);
+	
+	exports['default'] = _commonClass2['default'].create({
+	
+	    tagName: 'g',
+	
+	    constructor: function CellView(paper, cell, options) {
+	
+	        var that = this;
+	
+	        that.cell = cell;
+	        that.paper = paper;
+	
+	        that.ensureElement();
+	    },
+	
+	    ensureElement: function ensureElement() {
+	
+	        var that = this;
+	
+	        var vel = (0, _commonVector2['default'])(that.tagName);
+	
+	        that.el = vel.node;
+	        that.vel = vel;
+	
+	        that.paper.drawPane.appendChild(that.el);
+	
+	        return that;
+	    },
+	
+	    find: function find(selector) {},
+	
+	    onDblClick: function onDblClick() {},
+	
+	    onClick: function onClick() {},
+	
+	    onPointerDown: function onPointerDown() {},
+	
+	    onPointerMove: function onPointerMove() {},
+	
+	    onPointerUp: function onPointerUp() {},
+	
+	    onMouseOver: function onMouseOver() {},
+	
+	    onMouseOut: function onMouseOut() {},
+	
+	    onContextMenu: function onContextMenu() {}
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(2);
+	
+	var _cellsNode = __webpack_require__(26);
+	
+	var _cellsNode2 = _interopRequireDefault(_cellsNode);
+	
+	exports['default'] = _cellsNode2['default'].extend({
+	    defaults: (0, _commonUtils.merge)({
+	        attrs: {
+	            '.': {
+	                fill: '#fff',
+	                stroke: 'none'
+	            }
+	        }
+	    }, _cellsNode2['default'].prototype.defaults)
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Cell = __webpack_require__(19);
+	
+	var _Cell2 = _interopRequireDefault(_Cell);
+	
+	exports['default'] = _Cell2['default'].extend({
+	
+	    defaults: {
+	        x: 0,
+	        y: 0,
+	        width: 1,
+	        height: 1,
+	        angle: 0
+	    },
+	
+	    constructor: function Node(attributes) {
+	        Node.superclass.constructor.call(this, attributes);
+	    },
+	
+	    getPosition: function getPosition(relative) {},
+	
+	    setPosition: function setPosition(x, y, relative) {},
+	
+	    translate: function translate() {},
+	
+	    resize: function resize(width, height) {},
+	
+	    rotate: function rotate() {},
+	
+	    isNode: function isNode() {
+	        return true;
+	    },
+	
+	    getBBox: function getBBox() {
+	        return false;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(2);
+	
+	var _Generic = __webpack_require__(25);
+	
+	var _Generic2 = _interopRequireDefault(_Generic);
+	
+	exports['default'] = _Generic2['default'].extend({
+	
+	    markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
+	
+	    defaults: (0, _commonUtils.merge)({
+	
+	        type: 'basic.Rect',
+	        attrs: {
+	            'rect': {
+	                fill: '#ffffff',
+	                stroke: '#000000',
+	                width: 100,
+	                height: 60
+	            },
+	            'text': {
+	                fill: '#000000',
+	                text: '',
+	                'font-size': 14,
+	                'ref-x': .5,
+	                'ref-y': .5,
+	                'text-anchor': 'middle',
+	                'y-alignment': 'middle',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	
+	    }, _Generic2['default'].prototype.defaults)
+	});
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

@@ -1,4 +1,5 @@
 import {
+    merge,
     filter,
     forEach,
     indexOf,
@@ -10,11 +11,21 @@ import Events from '../common/Events';
 
 export default Class.create({
 
-    constructor: function Cell(options) {
+    constructor: function Cell(attributes) {
 
         var that = this;
 
+        that.attributes = merge({}, that.defaults, attributes);
+
     },
+
+    get: function (name) {
+        return this.attributes[name];
+    },
+
+    getPosition: function () {},
+
+    getSize: function () {},
 
     isVisible: function () {
         return true;

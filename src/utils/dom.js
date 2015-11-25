@@ -9,12 +9,26 @@ var ns = {
 // svg version.
 var svgVersion = '1.1';
 
-function isNode() {
+function isNode(elem, nodeName, attrName, attrValue) {
+    var ret = elem && !isNaN(elem.nodeType);
 
+    if (ret) {
+        ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+    }
+
+    if (ret) {
+        ret = isNullOrUndefined(attrName) || elem.getAttribute(attrName) === attrValue;
+    }
+
+    return ret;
 }
 
 function getClassName(elem) {
     return elem.getAttribute && elem.getAttribute('class') || '';
+}
+
+function getNodeName(elem) {
+    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
 }
 
 function parseXML(str, async) {
@@ -274,10 +288,12 @@ function ellipseToPathData(ellipse) {
 }
 
 export {
+    isNode,
     createSvgDocument,
     createSvgElement,
     setAttribute,
     getClassName,
+    getNodeName,
     parseScale,
     parseRotate,
     parseTransform,

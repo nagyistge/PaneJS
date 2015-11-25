@@ -4,6 +4,14 @@ function toString(str) {
     return '' + str;
 }
 
+function uc(str) {
+    return ('' + str).toUpperCase();
+}
+
+function lc(str) {
+    return ('' + str).toLowerCase();
+}
+
 function sanitizeText(text) {
 
     // Replace all spaces with the Unicode No-break space.
@@ -16,10 +24,12 @@ function sanitizeText(text) {
 }
 
 function trim(str) {
-    return proto.trim.call(str);
+    return str ? proto.trim.call('' + str) : '';
 }
 
 export {
+    lc,
+    uc,
     trim,
     toString,
     sanitizeText

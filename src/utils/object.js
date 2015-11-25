@@ -1,4 +1,5 @@
 import { forEach } from './array'
+import { isArray, isPlainObject } from './lang';
 
 function hasKey(obj, key) {
     return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
@@ -14,25 +15,66 @@ function forIn(obj, iterator, context) {
     });
 }
 
-function extend(dist) {
+function extend(target) {
 
-    if (!dist) {
-        dist = {};
+    if (!target) {
+        target = {};
     }
 
-    for (var i = 1, length = arguments.length; i < length; i++) {
+    for (var i = 1, l = arguments.length; i < l; i++) {
         var source = arguments[i];
-        source && forIn(source, function (value, key) {
-            dist[key] = value;
-        });
+
+        if (source) {
+            for (var key in source) {
+                target[key] = source[key];
+            }
+        }
     }
 
-    return dist;
+    return target;
+}
+
+function merge(target) {
+
+    if (!target) {
+        target = {};
+    }
+
+    for (var i = 1, l = arguments.length; i < l; i++) {
+
+        var source = arguments[i];
+        if (source) {
+            for (var name in source) {
+
+                var src = target[name];
+                var copy = source[name];
+                var copyIsArray = isArray(copy);
+
+                if (copyIsArray || isPlainObject(copy)) {
+
+                    var clone;
+                    if (copyIsArray) {
+                        clone = src && isArray(src) ? src : [];
+                    } else {
+                        clone = src && isPlainObject(src) ? src : {};
+                    }
+
+                    target[name] = merge(clone, copy);
+
+                } else {
+                    target[name] = copy;
+                }
+            }
+        }
+    }
+
+    return target;
 }
 
 export {
     hasKey,
     keys,
     forIn,
+    merge,
     extend
 };

@@ -1,3 +1,7 @@
+var objProto = Object.prototype;
+var toString = objProto.toString;
+var hasOwn = objProto.hasOwnProperty;
+
 function isNull(obj) {
     return obj === null;
 }
@@ -19,7 +23,7 @@ function isNullOrUndefined(obj) {
 }
 
 function isType(obj, type) {
-    return Object.prototype.toString.call(obj) === '[object ' + type + ']';
+    return toString.call(obj) === '[object ' + type + ']';
 }
 
 function isObject(obj) {
@@ -63,6 +67,34 @@ function isNumeric(obj) {
     return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
 }
 
+function isPlainObject(obj) {
+
+    // Not plain objects:
+    // - Any object or value whose internal [[Class]] property is not "[object Object]"
+    // - DOM nodes
+    // - window
+    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
+        return false;
+    }
+
+    if (obj.constructor && !hasOwn.call(obj.constructor.prototype, 'isPrototypeOf')) {
+        return false;
+    }
+
+    // If the function hasn't returned already, we're confident that
+    // |obj| is a plain object, created by {} or constructed with new Object
+    return true;
+}
+
+function isEmptyObject(obj) {
+    var name;
+    for (name in obj) {
+        return false;
+    }
+    return true;
+}
+
+
 export {
     isNull,
     isType,
@@ -75,5 +107,7 @@ export {
     isFunction,
     isArrayLike,
     isUndefined,
+    isPlainObject,
+    isEmptyObject,
     isNullOrUndefined,
 };

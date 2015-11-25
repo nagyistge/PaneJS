@@ -126,6 +126,18 @@ VElement.prototype = {
         return that;
     },
 
+    removeAttr: function (name) {
+
+        var that = this;
+        var node = that.node;
+
+        if (node && name) {
+            node.removeAttribute(name);
+        }
+
+        return that;
+    },
+
     text: function () {},
 
     hasClass: function (selector) {
@@ -229,6 +241,20 @@ VElement.prototype = {
 
         if (node && node.parentNode) {
             node.parentNode.removeChild(node);
+        }
+
+        return that;
+    },
+
+    empty: function () {
+
+        var that = this;
+        var node = that.node;
+
+        if (node) {
+            while (node.lastChild) {
+                node.removeChild(node.lastChild);
+            }
         }
 
         return that;

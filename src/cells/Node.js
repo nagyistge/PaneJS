@@ -10,8 +10,8 @@ export default Cell.extend({
         angle: 0
     },
 
-    constructor: function Node(options) {
-
+    constructor: function Node(attributes) {
+        Node.superclass.constructor.call(this, attributes);
     },
 
     getPosition: function (relative) {

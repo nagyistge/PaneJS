@@ -1,5 +1,7 @@
 import {
-    isNumeric
+    isNumeric,
+    isUndefined,
+    isNullOrUndefined,
 } from '../common/utils';
 
 import Class  from '../common/Class';
@@ -33,6 +35,10 @@ export default Class.create({
 
     clear: function () {
         return this.setRoot(this.createRoot());
+    },
+
+    getDefaultParent: function () {
+        return this.getRoot().getChildAt(0);  // the first layer
     },
 
     isAncestor(parent, child) {
@@ -165,6 +171,7 @@ export default Class.create({
         return oldRoot;
     },
 
+
     // Layers
     // ------
 
@@ -176,6 +183,7 @@ export default Class.create({
         return this.getRoot().children || [];
     },
 
+
     // child
     // -----
 
@@ -183,25 +191,22 @@ export default Class.create({
         return cell ? cell.parent : null;
     },
 
-    add(parent, child, index) {
+    addCell(child, parent, index) {
+        return this.addCells([child], parent, index);
+
+    },
+
+    addCells: function (cells, parent, index) {
 
         var that = this;
+        var model = that.model;
 
-        if (parent && child && parent !== child) {
+        parent = parent || that.getDefaultParent();
+        index = isNullOrUndefined(index) ? parent.getChildCount() : index;
 
-            if (isNullOrUndefined(index)) {
-                index = parent.getChildCount();
-            }
-
-            var parentChanged = parent !== child.parent;
-
-            that.digest(new ChildChange(that, parent, child, index));
-
-            // move the links into the nearest common ancestor of its terminals
-            if (that.maintainEdgeParent && parentChanged) {
-                that.updateLinkParents(child);
-            }
-        }
+        model.beginUpdate();
+        that.cellsAdded(cells, parent, index, false, true);
+        model.endUpdate();
 
         return that;
     },
