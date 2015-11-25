@@ -239,7 +239,7 @@ export default Class.create({
             var id = cell.id;
 
             if (!id && that.createIds) {
-                id = that.createId(cell);
+                id = that.createCellId(cell);
             }
 
             if (id) {
@@ -249,7 +249,7 @@ export default Class.create({
 
                 if (collision !== cell) {
                     while (collision) {
-                        id = that.createId(cell);
+                        id = that.createCellId(cell);
                         collision = that.getCellById(id);
                     }
 

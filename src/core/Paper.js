@@ -1,7 +1,11 @@
 import Class  from '../common/Class';
 import Events from '../common/Events';
 import vector from '../common/vector';
-import Graph  from './Graph';
+
+import LinkView from '../views/LinkView';
+import NodeView from '../views/NodeView';
+import Graph    from './Graph';
+
 
 export default Class.create({
 
@@ -13,13 +17,15 @@ export default Class.create({
         width: '100%',
         height: '100%',
         gridSize: 1,
+        linkView: LinkView,
+        nodeView: NodeView,
     },
 
-    constructor: function Paper(container, model, options) {
+    constructor: function Paper(container, graph, options) {
 
         var that = this;
 
-        //that.model = model || new Graph();
+        that.graph = graph || new Graph();
 
         that.configure(options);
 
@@ -29,6 +35,8 @@ export default Class.create({
                 .resize()
                 .translate();
         }
+
+        that.graph.on('change', function () {});
     },
 
     configure: function (options) {
@@ -85,6 +93,10 @@ export default Class.create({
         return that;
     },
 
+    remove: function () {
+
+    },
+
     destroy: function () {
         var that = this;
 
@@ -127,21 +139,33 @@ export default Class.create({
         return that;
     },
 
+    scale: function (sx, sy, ox, oy) {
+
+    },
+
+    rotate: function (deg, ox, oy) {
+
+    },
+
 
     // view
     // ----
 
-    createView: function (cell) {},
+    createView: function (cell) {
 
-    removeView: function (cell) {},
+    },
 
-    renderView: function (cell) {},
+    removeView: function (cell) {
 
-    onCellAdded: function () {},
+    },
 
-    scale: function () {},
+    renderView: function (cell) {
 
-    rotate: function () {},
+    },
+
+    onCellAdded: function () {
+
+    },
 
 
     // event handlers

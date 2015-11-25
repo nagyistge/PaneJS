@@ -1182,6 +1182,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
+	var _commonUtils = __webpack_require__(2);
+	
 	var _commonClass = __webpack_require__(11);
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
@@ -1189,6 +1191,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _commonEvents = __webpack_require__(13);
 	
 	var _commonEvents2 = _interopRequireDefault(_commonEvents);
+	
+	var _cellsCell = __webpack_require__(19);
+	
+	var _cellsCell2 = _interopRequireDefault(_cellsCell);
+	
+	var _changesRootChange = __webpack_require__(20);
+	
+	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
+	
+	var _changesChangeCollection = __webpack_require__(18);
+	
+	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
 	
 	exports['default'] = _commonClass2['default'].create({
 	
@@ -1198,7 +1212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        //that.changeCollection = new ChangeCollection(that);
+	        that.changes = new _changesChangeCollection2['default'](that);
 	
 	        if (root) {
 	            that.setRoot(root);
@@ -1211,6 +1225,93 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.setRoot(this.createRoot());
 	    },
 	
+	    isAncestor: function isAncestor(parent, child) {
+	
+	        if (!parent || !child) {
+	            return false;
+	        }
+	
+	        while (child && child !== parent) {
+	            child = child.parent;
+	        }
+	
+	        return child === parent;
+	    },
+	
+	    contains: function contains(cell) {
+	        return this.isAncestor(this.root, cell);
+	    },
+	
+	    getCellById: function getCellById(id) {
+	        return this.cells ? this.cells[id] : null;
+	    },
+	
+	    createCellId: function createCellId() {
+	        var that = this;
+	        var id = that.nextId;
+	
+	        if (!id) {
+	            id = that.nextId = 0;
+	        }
+	
+	        that.nextId += 1;
+	
+	        return 'cell-' + id;
+	    },
+	
+	    getAncestors: function getAncestors(child) {
+	
+	        var that = this;
+	        var result = [];
+	        var parent = child ? child.parent : null;
+	
+	        if (parent) {
+	            result.push(parent);
+	            result = result.concat(that.getAncestors(parent));
+	        }
+	
+	        return result;
+	    },
+	
+	    getDescendants: function getDescendants(parent) {
+	
+	        var that = this;
+	        var result = [];
+	
+	        parent = parent || that.getRoot();
+	        parent.eachChild(function (child) {
+	            result.push(child);
+	            result = result.concat(that.getDescendants(child));
+	        });
+	
+	        return result;
+	    },
+	
+	    getParents: function getParents(cells) {
+	
+	        var parents = [];
+	
+	        if (cells) {
+	
+	            var hash = {};
+	
+	            each(cells, function (cell) {
+	                var parent = cell.parent;
+	
+	                if (parent) {
+	                    var id = cellRoute.create(parent);
+	
+	                    if (!hash[id]) {
+	                        hash[id] = parent;
+	                        parents.push(parent);
+	                    }
+	                }
+	            });
+	        }
+	
+	        return parents;
+	    },
+	
 	    // root
 	    // ----
 	
@@ -1219,9 +1320,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    createRoot: function createRoot() {
-	        var root = new Cell();
+	        var root = new _cellsCell2['default']();
 	
-	        root.insertChild(new Cell());
+	        root.insertChild(new _cellsCell2['default']());
 	
 	        return root;
 	    },
@@ -1241,9 +1342,370 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    setRoot: function setRoot(root) {
-	        return this.digest(new RootChange(this, root));
-	    }
+	        return this.digest(new _changesRootChange2['default'](this, root));
+	    },
 	
+	    rootChanged: function rootChanged(newRoot) {
+	
+	        var that = this;
+	        var oldRoot = that.root;
+	
+	        that.root = newRoot;
+	        that.cells = null;
+	        that.nextId = 0;
+	        that.cellAdded(newRoot);
+	
+	        return oldRoot;
+	    },
+	
+	    // Layers
+	    // ------
+	
+	    isLayer: function isLayer(cell) {
+	        return cell && this.isRoot(cell.parent);
+	    },
+	
+	    getLayers: function getLayers() {
+	        return this.getRoot().children || [];
+	    },
+	
+	    // child
+	    // -----
+	
+	    getParent: function getParent(cell) {
+	        return cell ? cell.parent : null;
+	    },
+	
+	    add: function add(parent, child, index) {
+	
+	        var that = this;
+	
+	        if (parent && child && parent !== child) {
+	
+	            if (isNullOrUndefined(index)) {
+	                index = parent.getChildCount();
+	            }
+	
+	            var parentChanged = parent !== child.parent;
+	
+	            that.digest(new ChildChange(that, parent, child, index));
+	
+	            // move the links into the nearest common ancestor of its terminals
+	            if (that.maintainEdgeParent && parentChanged) {
+	                that.updateLinkParents(child);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    cellAdded: function cellAdded(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	
+	            var id = cell.id || that.createCellId(cell);
+	
+	            if (id) {
+	
+	                // distinct
+	                var collision = that.getCellById(id);
+	
+	                if (collision !== cell) {
+	                    while (collision) {
+	                        id = that.createCellId(cell);
+	                        collision = that.getCellById(id);
+	                    }
+	
+	                    // as lazy as possible
+	                    if (!that.cells) {
+	                        that.cells = {};
+	                    }
+	
+	                    cell.id = id;
+	                    that.cells[id] = cell;
+	                }
+	            }
+	
+	            // fix nextId
+	            if ((0, _commonUtils.isNumeric)(id)) {
+	                that.nextId = Math.max(that.nextId, id);
+	            }
+	
+	            cell.eachChild(that.cellAdded, that);
+	        }
+	    },
+	
+	    updateLinkParents: function updateLinkParents(cell, root) {
+	
+	        var that = this;
+	
+	        root = root || that.getRoot(cell);
+	
+	        // update links on children first
+	        cell.eachChild(function (child) {
+	            that.updateLinkParents(child, root);
+	        });
+	
+	        // update the parents of all connected links
+	        cell.eachLink(function (link) {
+	            // update edge parent if edge and child have
+	            // a common root node (does not need to be the
+	            // model root node)
+	            if (that.isAncestor(root, link)) {
+	                that.updateLinkParent(link, root);
+	            }
+	        });
+	    },
+	
+	    updateLinkParent: function updateLinkParent(link, root) {
+	
+	        var that = this;
+	        var cell = null;
+	        var source = link.getTerminal(true);
+	        var target = link.getTerminal(false);
+	
+	        // use the first non-relative descendants of the source terminal
+	        while (source && !source.isLink && source.geometry && source.geometry.relative) {
+	            source = source.parent;
+	        }
+	
+	        // use the first non-relative descendants of the target terminal
+	        while (target && !target.isLink && target.geometry && target.geometry.relative) {
+	            target = target.parent;
+	        }
+	
+	        if (that.isAncestor(root, source) && that.isAncestor(root, target)) {
+	
+	            if (source === target) {
+	                cell = source.parent;
+	            } else {
+	                cell = that.getNearestCommonAncestor(source, target);
+	            }
+	
+	            if (cell && (cell.parent !== that.root || that.isAncestor(cell, link)) && link.parent !== cell) {
+	
+	                var geo = link.geometry;
+	
+	                if (geo) {
+	                    var origin1 = that.getOrigin(link.parent);
+	                    var origin2 = that.getOrigin(cell);
+	
+	                    var dx = origin2.x - origin1.x;
+	                    var dy = origin2.y - origin1.y;
+	
+	                    geo = geo.clone();
+	                    geo.translate(-dx, -dy);
+	                    that.setGeometry(link, geo);
+	                }
+	
+	                that.add(cell, link);
+	            }
+	        }
+	    },
+	
+	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {
+	
+	        if (cell1 && cell2) {
+	
+	            var route1 = cellRoute.create(cell1);
+	            var route2 = cellRoute.create(cell2);
+	
+	            if (route1 && route2) {
+	
+	                var cell = cell1;
+	                var route = route2;
+	                var current = route1;
+	
+	                if (route1.length > route2.length) {
+	                    cell = cell2;
+	                    route = route1;
+	                    current = route2;
+	                }
+	
+	                while (cell) {
+	                    var parent = cell.parent;
+	
+	                    // check if the cell path is equal to the beginning of the given cell path
+	                    if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
+	                        return cell;
+	                    }
+	
+	                    cell = parent;
+	                    current = cellRoute.getParentRoute(current);
+	                }
+	            }
+	        }
+	
+	        return null;
+	    },
+	
+	    // get the absolute, accumulated origin for the children
+	    // inside the given parent as an `Point`.
+	    getOrigin: function getOrigin(cell) {
+	
+	        var that = this;
+	        var result = null;
+	
+	        if (cell) {
+	            result = that.getOrigin(cell.parent);
+	
+	            if (!cell.isLink) {
+	                var geo = cell.geometry;
+	
+	                if (geo) {
+	                    result.x += geo.x;
+	                    result.y += geo.y;
+	                }
+	            }
+	        } else {
+	            result = new Point();
+	        }
+	
+	        return result;
+	    },
+	
+	    remove: function remove(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	            if (cell === that.root) {
+	                that.setRoot(null);
+	            } else if (cell.parent) {
+	                that.digest(new ChildChange(that, null, cell));
+	            }
+	        }
+	
+	        return cell;
+	    },
+	
+	    cellRemoved: function cellRemoved(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	
+	            cell.eachChild(function (child) {
+	                that.cellRemoved(child);
+	            });
+	
+	            var id = cell.id;
+	            var cells = that.cells;
+	            if (cells && id) {
+	                delete cells[id];
+	            }
+	        }
+	    },
+	
+	    childChanged: function childChanged(cell, newParent, newIndex) {
+	
+	        var that = this;
+	        var oldParent = cell.parent;
+	
+	        if (newParent) {
+	            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+	                newParent.insertChild(cell, newIndex);
+	            }
+	        } else if (oldParent) {
+	            oldParent.removeChild(cell);
+	        }
+	
+	        // check if the previous parent was already in the
+	        // model and avoids calling cellAdded if it was.
+	        if (newParent && !that.contains(oldParent)) {
+	            that.cellAdded(cell);
+	        } else if (!newParent) {
+	            that.cellRemoved(cell);
+	        }
+	
+	        return oldParent;
+	    },
+	
+	    linkChanged: function linkChanged(link, newNode, isSource) {
+	        var oldNode = link.getNode(isSource);
+	
+	        if (newNode) {
+	            newNode.insertLink(link, isSource);
+	        } else if (oldNode) {
+	            oldNode.removeLink(link, isSource);
+	        }
+	
+	        return oldNode;
+	    },
+	
+	    getChildNodes: function getChildNodes(parent) {
+	        return this.getChildCells(parent, true, false);
+	    },
+	
+	    getChildLinks: function getChildLinks(parent) {
+	        return this.getChildCells(parent, false, true);
+	    },
+	
+	    getChildCells: function getChildCells(parent, isNode, isLink) {
+	        return parent ? parent.filterChild(function (child) {
+	            return isNode && child.isNode || isLink && child.isLink;
+	        }) : [];
+	    },
+	
+	    // update
+	    // ------
+	
+	    digest: function digest(change) {
+	
+	        var that = this;
+	
+	        change.digest();
+	
+	        that.beginUpdate();
+	        that.changes.add(change);
+	        that.endUpdate();
+	
+	        return that;
+	    },
+	
+	    beginUpdate: function beginUpdate() {
+	
+	        var that = this;
+	
+	        if (!that.updateLevel) {
+	            that.updateLevel = 0;
+	        }
+	
+	        that.updateLevel += 1;
+	        that.trigger('beginUpdate');
+	
+	        if (that.updateLevel === 1) {
+	            that.trigger('startEdit');
+	        }
+	    },
+	
+	    endUpdate: function endUpdate() {
+	
+	        var that = this;
+	
+	        that.updateLevel -= 1;
+	
+	        if (that.updateLevel === 0) {
+	            that.trigger('endEdit');
+	        }
+	
+	        if (!that.endingUpdate) {
+	
+	            var changeCollection = that.changes;
+	
+	            that.endingUpdate = that.updateLevel === 0;
+	            that.trigger('endUpdate', changeCollection.changes);
+	
+	            // 触发重绘
+	            if (that.endingUpdate && changeCollection.hasChange()) {
+	                changeCollection.notify().clear();
+	            }
+	
+	            that.endingUpdate = false;
+	        }
+	    }
 	});
 	module.exports = exports['default'];
 
@@ -1417,6 +1879,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonVector2 = _interopRequireDefault(_commonVector);
 	
+	var _viewsLinkView = __webpack_require__(22);
+	
+	var _viewsLinkView2 = _interopRequireDefault(_viewsLinkView);
+	
+	var _viewsNodeView = __webpack_require__(23);
+	
+	var _viewsNodeView2 = _interopRequireDefault(_viewsNodeView);
+	
 	var _Graph = __webpack_require__(12);
 	
 	var _Graph2 = _interopRequireDefault(_Graph);
@@ -1430,20 +1900,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        y: 0,
 	        width: '100%',
 	        height: '100%',
-	        gridSize: 1
+	        gridSize: 1,
+	        linkView: _viewsLinkView2['default'],
+	        nodeView: _viewsNodeView2['default']
 	    },
 	
-	    constructor: function Paper(container, model, options) {
+	    constructor: function Paper(container, graph, options) {
 	
 	        var that = this;
 	
-	        //that.model = model || new Graph();
+	        that.graph = graph || new _Graph2['default']();
 	
 	        that.configure(options);
 	
 	        if (container) {
 	            that.init(container).setup().resize().translate();
 	        }
+	
+	        that.graph.on('change', function () {});
 	    },
 	
 	    configure: function configure(options) {
@@ -1498,6 +1972,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
+	    remove: function remove() {},
+	
 	    destroy: function destroy() {
 	        var that = this;
 	
@@ -1539,6 +2015,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
+	    scale: function scale(sx, sy, ox, oy) {},
+	
+	    rotate: function rotate(deg, ox, oy) {},
+	
 	    // view
 	    // ----
 	
@@ -1549,10 +2029,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    renderView: function renderView(cell) {},
 	
 	    onCellAdded: function onCellAdded() {},
-	
-	    scale: function scale() {},
-	
-	    rotate: function rotate() {},
 	
 	    // event handlers
 	    // --------------
@@ -2185,6 +2661,289 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports['default'] = vector;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	exports['default'] = _commonClass2['default'].create({
+	    constructor: function ChangeCollection(graph) {
+	
+	        var that = this;
+	        that.graph = graph;
+	    },
+	
+	    hasChange: function hasChange() {
+	        var changes = this.changes;
+	        return changes && changes.length;
+	    },
+	
+	    add: function add(change) {
+	
+	        var that = this;
+	        var changes = that.changes;
+	
+	        if (change) {
+	            if (!changes) {
+	                changes = that.changes = [];
+	            }
+	
+	            changes.push(change);
+	        }
+	
+	        return change;
+	    },
+	
+	    clear: function clear() {
+	        this.changes = null;
+	        return this;
+	    },
+	
+	    notify: function notify() {
+	
+	        var that = this;
+	
+	        that.graph.trigger('change', that.changes);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(2);
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	var _commonEvents = __webpack_require__(13);
+	
+	var _commonEvents2 = _interopRequireDefault(_commonEvents);
+	
+	exports['default'] = _commonClass2['default'].create({
+	
+	    constructor: function Cell(options) {},
+	
+	    clear: function clear() {},
+	
+	    isNode: function isNode() {
+	        return false;
+	    },
+	
+	    isLink: function isLink() {
+	        return false;
+	    },
+	
+	    // children
+	    // --------
+	
+	    getChildCount: function getChildCount() {
+	        var children = this.children;
+	        return children ? children.length : 0;
+	    },
+	
+	    getChildIndex: function getChildIndex(child) {
+	        return (0, _commonUtils.indexOf)(this.children || [], child);
+	    },
+	
+	    getChildAt: function getChildAt(index) {
+	        var children = this.children;
+	        return children ? children[index] : null;
+	    },
+	
+	    eachChild: function eachChild(iterator, context) {
+	
+	        var that = this;
+	        var children = that.children;
+	
+	        children && (0, _commonUtils.forEach)(children, iterator, context);
+	
+	        return that;
+	    },
+	
+	    filterChild: function filterChild(iterator, context) {
+	        var children = this.children;
+	        return children ? (0, _commonUtils.filter)(children, iterator, context) : [];
+	    },
+	
+	    insertChild: function insertChild(child, index) {
+	        var that = this;
+	
+	        if (child) {
+	
+	            // fix index
+	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
+	                index = that.getChildCount();
+	
+	                if (child.parent === that) {
+	                    index--;
+	                }
+	            }
+	
+	            child.removeFromParent();
+	            child.parent = that;
+	
+	            var children = that.children;
+	
+	            if (children) {
+	                children.splice(index, 0, child);
+	            } else {
+	                children = that.children = [];
+	                children.push(child);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    removeChild: function removeChild(child) {
+	        return this.removeChildAt(this.getChildIndex(child));
+	    },
+	
+	    removeChildAt: function removeChildAt(index) {
+	        var that = this;
+	        var child = null;
+	        var children = that.children;
+	
+	        if (children && index >= 0) {
+	            child = that.getChildAt(index);
+	
+	            if (child) {
+	                children.splice(index, 1);
+	                child.parent = null;
+	            }
+	        }
+	
+	        return child;
+	    },
+	
+	    // common
+	    // ------
+	
+	    removeFromParent: function removeFromParent() {
+	
+	        var that = this;
+	        var parent = that.parent;
+	
+	        if (parent) {
+	            parent.removeChild(that);
+	        }
+	
+	        return that;
+	    },
+	
+	    valueOf: function valueOf() {},
+	
+	    toString: function toString() {},
+	
+	    clone: function clone() {},
+	
+	    destroy: function destroy() {}
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(21);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	
+	    constructor: function RootChange(graph, root) {
+	
+	        var that = this;
+	
+	        that.graph = graph;
+	        that.root = root;
+	        that.previous = root;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var graph = that.graph;
+	        var previous = that.previous;
+	
+	        that.root = previous;
+	        that.previous = graph.rootChanged(previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	exports['default'] = _commonClass2['default'].create({
+	
+	    constructor: function Change() {},
+	
+	    digest: function digest() {
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+	"use strict";
 
 /***/ }
 /******/ ])

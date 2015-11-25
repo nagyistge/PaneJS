@@ -1,6 +1,7 @@
-import Base from '../lib/Base';
+import Class from '../common/Class';
+import Events from '../common/Events';
 
-Base.extend({
+export default Class.create({
 
     constructor: function CellView(options) {
 
@@ -11,6 +12,10 @@ Base.extend({
     },
 
     createShape: function () {},
+
+    find: function (selector) {
+
+    },
 
     onDblClick: function () {},
 
