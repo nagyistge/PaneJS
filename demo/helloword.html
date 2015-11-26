@@ -14,8 +14,8 @@
 
     var container = document.getElementById('graphContainer');
 
-    var graph = new pane.Graph();
-    var paper = new pane.Paper(container, graph);
+    var model = new pane.Model();
+    var paper = new pane.Paper(container, model);
 
     var rb = new pane.shapes.basic.Rect({
         position: {x: 50, y: 50},
@@ -25,7 +25,7 @@
 
     console.log(rb);
 
-    graph.addCell();
+    model.addCell(rb);
 
 
     //    var graph = new pane.Graph(container);

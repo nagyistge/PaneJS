@@ -62,13 +62,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    utils: __webpack_require__(2),
 	    Class: __webpack_require__(11),
-	    Events: __webpack_require__(13),
-	    Graph: __webpack_require__(12),
-	    Paper: __webpack_require__(15),
+	    Events: __webpack_require__(12),
+	    Model: __webpack_require__(27),
+	    Paper: __webpack_require__(19),
 	    shapes: {
 	        basic: {
-	            Generic: __webpack_require__(25),
-	            Rect: __webpack_require__(27)
+	            Generic: __webpack_require__(24),
+	            Rect: __webpack_require__(26)
 	        }
 	    }
 	};
@@ -1299,554 +1299,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _commonEvents = __webpack_require__(13);
-	
-	var _commonEvents2 = _interopRequireDefault(_commonEvents);
-	
-	var _cellsCell = __webpack_require__(19);
-	
-	var _cellsCell2 = _interopRequireDefault(_cellsCell);
-	
-	var _changesRootChange = __webpack_require__(20);
-	
-	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
-	
-	var _changesChangeCollection = __webpack_require__(18);
-	
-	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
-	
-	exports['default'] = _commonClass2['default'].create({
-	
-	    Extends: _commonEvents2['default'],
-	
-	    constructor: function Graph(root) {
-	
-	        var that = this;
-	
-	        that.nextId = 0;
-	        that.updateLevel = 0;
-	        that.endingUpdate = false;
-	        that.changes = new _changesChangeCollection2['default'](that);
-	
-	        if (root) {
-	            that.setRoot(root);
-	        } else {
-	            that.clear();
-	        }
-	    },
-	
-	    clear: function clear() {
-	        return this.setRoot(this.createRoot());
-	    },
-	
-	    getDefaultParent: function getDefaultParent() {
-	        return this.getRoot().getChildAt(0); // the first layer
-	    },
-	
-	    isAncestor: function isAncestor(parent, child) {
-	
-	        if (!parent || !child) {
-	            return false;
-	        }
-	
-	        while (child && child !== parent) {
-	            child = child.parent;
-	        }
-	
-	        return child === parent;
-	    },
-	
-	    contains: function contains(cell) {
-	        return this.isAncestor(this.root, cell);
-	    },
-	
-	    getCellById: function getCellById(id) {
-	        return this.cells ? this.cells[id] : null;
-	    },
-	
-	    createCellId: function createCellId() {
-	        var that = this;
-	        var id = that.nextId;
-	
-	        that.nextId += 1;
-	
-	        return 'cell-' + id;
-	    },
-	
-	    getAncestors: function getAncestors(child) {
-	
-	        var that = this;
-	        var result = [];
-	        var parent = child ? child.parent : null;
-	
-	        if (parent) {
-	            result.push(parent);
-	            result = result.concat(that.getAncestors(parent));
-	        }
-	
-	        return result;
-	    },
-	
-	    getDescendants: function getDescendants(parent) {
-	
-	        var that = this;
-	        var result = [];
-	
-	        parent = parent || that.getRoot();
-	        parent.eachChild(function (child) {
-	            result.push(child);
-	            result = result.concat(that.getDescendants(child));
-	        });
-	
-	        return result;
-	    },
-	
-	    getParents: function getParents(cells) {
-	
-	        var parents = [];
-	
-	        if (cells) {
-	
-	            var hash = {};
-	
-	            each(cells, function (cell) {
-	                var parent = cell.parent;
-	
-	                if (parent) {
-	                    var id = cellRoute.create(parent);
-	
-	                    if (!hash[id]) {
-	                        hash[id] = parent;
-	                        parents.push(parent);
-	                    }
-	                }
-	            });
-	        }
-	
-	        return parents;
-	    },
-	
-	    // root
-	    // ----
-	
-	    isRoot: function isRoot(cell) {
-	        return cell && this.root === cell;
-	    },
-	
-	    createRoot: function createRoot() {
-	        var root = new _cellsCell2['default']();
-	
-	        root.insertChild(this.createLayer());
-	
-	        return root;
-	    },
-	
-	    getRoot: function getRoot(cell) {
-	
-	        var root = cell || this.root;
-	
-	        if (cell) {
-	            while (cell) {
-	                root = cell;
-	                cell = cell.parent;
-	            }
-	        }
-	
-	        return root;
-	    },
-	
-	    setRoot: function setRoot(root) {
-	        return this.digest(new _changesRootChange2['default'](this, root));
-	    },
-	
-	    rootChanged: function rootChanged(newRoot) {
-	
-	        var that = this;
-	        var oldRoot = that.root;
-	
-	        that.root = newRoot;
-	        that.cells = null;
-	        that.nextId = 0;
-	        that.cellAdded(newRoot);
-	
-	        return oldRoot;
-	    },
-	
-	    // Layers
-	    // ------
-	
-	    isLayer: function isLayer(cell) {
-	        return cell && this.isRoot(cell.parent);
-	    },
-	
-	    getLayers: function getLayers() {
-	        return this.getRoot().children || [];
-	    },
-	
-	    createLayer: function createLayer() {
-	        return new _cellsCell2['default']();
-	    },
-	
-	    // child
-	    // -----
-	
-	    getParent: function getParent(cell) {
-	        return cell ? cell.parent : null;
-	    },
-	
-	    addCell: function addCell(child, parent, index) {
-	        return this.addCells([child], parent, index);
-	    },
-	
-	    addCells: function addCells(cells, parent, index) {
-	
-	        var that = this;
-	
-	        parent = parent || that.getDefaultParent();
-	        index = (0, _commonUtils.isNullOrUndefined)(index) ? parent.getChildCount() : index;
-	
-	        that.beginUpdate();
-	
-	        (0, _commonUtils.forEach)(cells, function (cell) {
-	            if (cell && parent && cell !== parent) {
-	                that.cellAdded(cell);
-	                that.digest(new ChildChange(that, parent, cell, index));
-	                index += 1;
-	            } else {
-	                index -= 1;
-	            }
-	        });
-	
-	        that.endUpdate();
-	
-	        return that;
-	    },
-	
-	    cellAdded: function cellAdded(cell) {
-	
-	        var that = this;
-	
-	        if (cell) {
-	
-	            var id = cell.id || that.createCellId(cell);
-	
-	            if (id) {
-	
-	                // distinct
-	                var collision = that.getCellById(id);
-	
-	                if (collision !== cell) {
-	                    while (collision) {
-	                        id = that.createCellId(cell);
-	                        collision = that.getCellById(id);
-	                    }
-	
-	                    // as lazy as possible
-	                    if (!that.cells) {
-	                        that.cells = {};
-	                    }
-	
-	                    cell.id = id;
-	                    that.cells[id] = cell;
-	                }
-	            }
-	
-	            // fix nextId
-	            if ((0, _commonUtils.isNumeric)(id)) {
-	                that.nextId = Math.max(that.nextId, id);
-	            }
-	
-	            cell.eachChild(that.cellAdded, that);
-	        }
-	    },
-	
-	    updateLinkParents: function updateLinkParents(cell, root) {
-	
-	        var that = this;
-	
-	        root = root || that.getRoot(cell);
-	
-	        // update links on children first
-	        cell.eachChild(function (child) {
-	            that.updateLinkParents(child, root);
-	        });
-	
-	        // update the parents of all connected links
-	        cell.eachLink(function (link) {
-	            // update edge parent if edge and child have
-	            // a common root node (does not need to be the
-	            // model root node)
-	            if (that.isAncestor(root, link)) {
-	                that.updateLinkParent(link, root);
-	            }
-	        });
-	    },
-	
-	    updateLinkParent: function updateLinkParent(link, root) {
-	
-	        var that = this;
-	        var cell = null;
-	        var source = link.getTerminal(true);
-	        var target = link.getTerminal(false);
-	
-	        // use the first non-relative descendants of the source terminal
-	        while (source && !source.isLink && source.geometry && source.geometry.relative) {
-	            source = source.parent;
-	        }
-	
-	        // use the first non-relative descendants of the target terminal
-	        while (target && !target.isLink && target.geometry && target.geometry.relative) {
-	            target = target.parent;
-	        }
-	
-	        if (that.isAncestor(root, source) && that.isAncestor(root, target)) {
-	
-	            if (source === target) {
-	                cell = source.parent;
-	            } else {
-	                cell = that.getNearestCommonAncestor(source, target);
-	            }
-	
-	            if (cell && (cell.parent !== that.root || that.isAncestor(cell, link)) && link.parent !== cell) {
-	
-	                var geo = link.geometry;
-	
-	                if (geo) {
-	                    var origin1 = that.getOrigin(link.parent);
-	                    var origin2 = that.getOrigin(cell);
-	
-	                    var dx = origin2.x - origin1.x;
-	                    var dy = origin2.y - origin1.y;
-	
-	                    geo = geo.clone();
-	                    geo.translate(-dx, -dy);
-	                    that.setGeometry(link, geo);
-	                }
-	
-	                that.add(cell, link);
-	            }
-	        }
-	    },
-	
-	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {
-	
-	        if (cell1 && cell2) {
-	
-	            var route1 = cellRoute.create(cell1);
-	            var route2 = cellRoute.create(cell2);
-	
-	            if (route1 && route2) {
-	
-	                var cell = cell1;
-	                var route = route2;
-	                var current = route1;
-	
-	                if (route1.length > route2.length) {
-	                    cell = cell2;
-	                    route = route1;
-	                    current = route2;
-	                }
-	
-	                while (cell) {
-	                    var parent = cell.parent;
-	
-	                    // check if the cell path is equal to the beginning of the given cell path
-	                    if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
-	                        return cell;
-	                    }
-	
-	                    cell = parent;
-	                    current = cellRoute.getParentRoute(current);
-	                }
-	            }
-	        }
-	
-	        return null;
-	    },
-	
-	    // get the absolute, accumulated origin for the children
-	    // inside the given parent as an `Point`.
-	    getOrigin: function getOrigin(cell) {
-	
-	        var that = this;
-	        var result = null;
-	
-	        if (cell) {
-	            result = that.getOrigin(cell.parent);
-	
-	            if (!cell.isLink) {
-	                var geo = cell.geometry;
-	
-	                if (geo) {
-	                    result.x += geo.x;
-	                    result.y += geo.y;
-	                }
-	            }
-	        } else {
-	            result = new Point();
-	        }
-	
-	        return result;
-	    },
-	
-	    remove: function remove(cell) {
-	
-	        var that = this;
-	
-	        if (cell) {
-	            if (cell === that.root) {
-	                that.setRoot(null);
-	            } else if (cell.parent) {
-	                that.digest(new ChildChange(that, null, cell));
-	            }
-	        }
-	
-	        return cell;
-	    },
-	
-	    cellRemoved: function cellRemoved(cell) {
-	
-	        var that = this;
-	
-	        if (cell) {
-	
-	            cell.eachChild(function (child) {
-	                that.cellRemoved(child);
-	            });
-	
-	            var id = cell.id;
-	            var cells = that.cells;
-	            if (cells && id) {
-	                delete cells[id];
-	            }
-	        }
-	    },
-	
-	    childChanged: function childChanged(cell, newParent, newIndex) {
-	
-	        var that = this;
-	        var oldParent = cell.parent;
-	
-	        if (newParent) {
-	            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
-	                newParent.insertChild(cell, newIndex);
-	            }
-	        } else if (oldParent) {
-	            oldParent.removeChild(cell);
-	        }
-	
-	        // check if the previous parent was already in the
-	        // model and avoids calling cellAdded if it was.
-	        if (newParent && !that.contains(oldParent)) {
-	            that.cellAdded(cell);
-	        } else if (!newParent) {
-	            that.cellRemoved(cell);
-	        }
-	
-	        return oldParent;
-	    },
-	
-	    linkChanged: function linkChanged(link, newNode, isSource) {
-	        var oldNode = link.getNode(isSource);
-	
-	        if (newNode) {
-	            newNode.insertLink(link, isSource);
-	        } else if (oldNode) {
-	            oldNode.removeLink(link, isSource);
-	        }
-	
-	        return oldNode;
-	    },
-	
-	    getChildNodes: function getChildNodes(parent) {
-	        return this.getChildCells(parent, true, false);
-	    },
-	
-	    getChildLinks: function getChildLinks(parent) {
-	        return this.getChildCells(parent, false, true);
-	    },
-	
-	    getChildCells: function getChildCells(parent, isNode, isLink) {
-	        return parent ? parent.filterChild(function (child) {
-	            return isNode && child.isNode || isLink && child.isLink;
-	        }) : [];
-	    },
-	
-	    // update
-	    // ------
-	
-	    digest: function digest(change) {
-	
-	        var that = this;
-	
-	        change.digest();
-	
-	        that.beginUpdate();
-	        that.changes.add(change);
-	        that.endUpdate();
-	
-	        return that;
-	    },
-	
-	    beginUpdate: function beginUpdate() {
-	
-	        var that = this;
-	
-	        that.updateLevel += 1;
-	        that.trigger('beginUpdate');
-	
-	        if (that.updateLevel === 1) {
-	            that.trigger('startEdit');
-	        }
-	    },
-	
-	    endUpdate: function endUpdate() {
-	
-	        var that = this;
-	
-	        that.updateLevel -= 1;
-	
-	        if (that.updateLevel === 0) {
-	            that.trigger('endEdit');
-	        }
-	
-	        if (!that.endingUpdate) {
-	
-	            var changeCollection = that.changes;
-	
-	            that.endingUpdate = that.updateLevel === 0;
-	            that.trigger('endUpdate', changeCollection.changes);
-	
-	            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 所以需要一种机制来管理
-	
-	            if (that.endingUpdate && changeCollection.hasChange()) {
-	                changeCollection.notify().clear();
-	            }
-	
-	            that.endingUpdate = false;
-	        }
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(2);
-	
-	var _commonClass = __webpack_require__(11);
-	
-	var _commonClass2 = _interopRequireDefault(_commonClass);
-	
 	var splitter = /\s+/;
 	
 	function triggerEvents(callbacks, args, context) {
@@ -1975,8 +1427,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */,
-/* 15 */
+/* 13 */,
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1993,25 +1445,527 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _commonEvents = __webpack_require__(13);
+	var _commonEvents = __webpack_require__(12);
 	
 	var _commonEvents2 = _interopRequireDefault(_commonEvents);
 	
-	var _commonVector = __webpack_require__(17);
+	exports['default'] = _commonClass2['default'].create({
+	
+	    constructor: function Cell(attributes) {
+	
+	        var that = this;
+	
+	        that.attributes = (0, _commonUtils.merge)({}, that.defaults, attributes);
+	    },
+	
+	    get: function get(name) {
+	        return this.attributes[name];
+	    },
+	
+	    getPosition: function getPosition() {},
+	
+	    getSize: function getSize() {},
+	
+	    isVisible: function isVisible() {
+	        return true;
+	    },
+	
+	    isNode: function isNode() {
+	        return false;
+	    },
+	
+	    isLink: function isLink() {
+	        return false;
+	    },
+	
+	    // link
+	    // ----
+	
+	    getTerminal: function getTerminal(isSource) {
+	        return isSource ? this.source : this.target;
+	    },
+	
+	    setTerminal: function setTerminal(node, isSource) {
+	        if (isSource) {
+	            this.source = node;
+	        } else {
+	            this.target = node;
+	        }
+	
+	        return node;
+	    },
+	
+	    removeFromTerminal: function removeFromTerminal(isSource) {
+	
+	        // remove link from node
+	
+	        var that = this;
+	
+	        var node = that.getTerminal(isSource);
+	
+	        if (node) {
+	            node.removeLink(that, isSource);
+	        }
+	
+	        return that;
+	    },
+	
+	    // children
+	    // --------
+	
+	    getChildCount: function getChildCount() {
+	        var children = this.children;
+	        return children ? children.length : 0;
+	    },
+	
+	    getChildIndex: function getChildIndex(child) {
+	        return (0, _commonUtils.indexOf)(this.children || [], child);
+	    },
+	
+	    getChildAt: function getChildAt(index) {
+	        var children = this.children;
+	        return children ? children[index] : null;
+	    },
+	
+	    eachChild: function eachChild(iterator, context) {
+	
+	        var that = this;
+	        var children = that.children;
+	
+	        children && (0, _commonUtils.forEach)(children, iterator, context);
+	
+	        return that;
+	    },
+	
+	    filterChild: function filterChild(iterator, context) {
+	        var children = this.children;
+	        return children ? (0, _commonUtils.filter)(children, iterator, context) : [];
+	    },
+	
+	    insertChild: function insertChild(child, index) {
+	        var that = this;
+	
+	        if (child) {
+	
+	            // fix index
+	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
+	                index = that.getChildCount();
+	
+	                if (child.parent === that) {
+	                    index--;
+	                }
+	            }
+	
+	            child.removeFromParent();
+	            child.parent = that;
+	
+	            var children = that.children;
+	
+	            if (children) {
+	                children.splice(index, 0, child);
+	            } else {
+	                children = that.children = [];
+	                children.push(child);
+	            }
+	        }
+	
+	        return that;
+	    },
+	
+	    removeChild: function removeChild(child) {
+	        return this.removeChildAt(this.getChildIndex(child));
+	    },
+	
+	    removeChildAt: function removeChildAt(index) {
+	        var that = this;
+	        var child = null;
+	        var children = that.children;
+	
+	        if (children && index >= 0) {
+	            child = that.getChildAt(index);
+	
+	            if (child) {
+	                children.splice(index, 1);
+	                child.parent = null;
+	            }
+	        }
+	
+	        return child;
+	    },
+	
+	    // node
+	    // -----
+	
+	    getLinkCount: function getLinkCount() {
+	        var links = this.links;
+	        return links ? links.length : 0;
+	    },
+	
+	    getLinkIndex: function getLinkIndex(link) {
+	        return (0, _commonUtils.indexOf)(this.links || [], link);
+	    },
+	
+	    getLinkAt: function getLinkAt(index) {
+	        var links = this.links;
+	        return links ? links[index] : null;
+	    },
+	
+	    eachLink: function eachLink(iterator, context) {
+	
+	        var that = this;
+	        var links = that.links;
+	
+	        links && (0, _commonUtils.forEach)(links, iterator, context);
+	
+	        return that;
+	    },
+	
+	    filterLink: function filterLink(iterator, context) {
+	        var links = this.links;
+	        return links ? (0, _commonUtils.filter)(links, iterator, context) : [];
+	    },
+	
+	    insertLink: function insertLink(link, outgoing) {
+	
+	        var that = this;
+	
+	        if (link) {
+	            link.removeFromTerminal(outgoing);
+	            link.setTerminal(that, outgoing);
+	
+	            var links = that.links;
+	
+	            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
+	            if (!links || that.getLinkIndex(link) < 0 || link.getTerminal(!outgoing) !== that) {
+	
+	                if (!links) {
+	                    links = that.links = [];
+	                }
+	
+	                links.push(link);
+	            }
+	        }
+	
+	        return link;
+	    },
+	
+	    removeLink: function removeLink(link, outgoing) {
+	
+	        var that = this;
+	        var links = that.links;
+	
+	        if (link) {
+	
+	            // 连线的起点和终点是同一个节点时不需要移除
+	            if (links && link.getTerminal(!outgoing) !== that) {
+	                var index = that.getLinkIndex(link);
+	
+	                if (index >= 0) {
+	                    links.splice(index, 1);
+	                }
+	            }
+	
+	            link.setTerminal(null, outgoing);
+	        }
+	
+	        return link;
+	    },
+	
+	    // parent
+	    // ------
+	
+	    getParent: function getParent() {
+	        return this.parent;
+	    },
+	
+	    removeFromParent: function removeFromParent() {
+	
+	        var that = this;
+	        var parent = that.parent;
+	
+	        if (parent) {
+	            parent.removeChild(that);
+	        }
+	
+	        return that;
+	    },
+	
+	    // common
+	    // ------
+	
+	    valueOf: function valueOf() {},
+	
+	    toString: function toString() {},
+	
+	    clone: function clone() {},
+	
+	    destroy: function destroy() {}
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(16);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	
+	    constructor: function RootChange(model, root) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.root = root;
+	        that.previous = root;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var model = that.model;
+	        var previous = that.previous;
+	
+	        that.root = previous;
+	        that.previous = model.rootChanged(previous);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	exports['default'] = _commonClass2['default'].create({
+	
+	    constructor: function Change() {},
+	
+	    digest: function digest() {
+	        return this;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _Change = __webpack_require__(16);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	exports['default'] = _Change2['default'].extend({
+	
+	    constructor: function ChildChange(model, parent, child, index) {
+	
+	        var that = this;
+	
+	        that.model = model;
+	        that.child = child;
+	        that.parent = parent;
+	        that.index = index;
+	        that.previous = parent;
+	        that.previousIndex = index;
+	    },
+	
+	    digest: function digest() {
+	
+	        var that = this;
+	        var model = that.model;
+	        var child = that.child;
+	        var newParent = that.previous;
+	        var newIndex = that.previousIndex;
+	        var oldParent = child.parent;
+	        var oldIndex = oldParent ? oldParent.getChildIndex(child) : 0;
+	
+	        // 移除连线时，需要移除连线和节点的关联关系
+	        if (!newParent) {
+	            that.connect(child, false);
+	        }
+	
+	        oldParent = model.childChanged(child, newParent, newIndex);
+	
+	        // 更新连线的父节点时，同时更新连线的关联节点
+	        if (newParent) {
+	            that.connect(child, true);
+	        }
+	
+	        that.parent = newParent;
+	        that.index = newIndex;
+	        that.previous = oldParent;
+	        that.previousIndex = oldIndex;
+	
+	        return that;
+	    },
+	
+	    connect: function connect(cell, connected) {
+	
+	        var that = this;
+	        var model = that.model;
+	
+	        if (cell.isLink()) {
+	
+	            var source = cell.getTerminal(true);
+	            var target = cell.getTerminal(false);
+	
+	            if (source) {
+	                model.linkChanged(cell, connected ? source : null, true);
+	            }
+	
+	            if (target) {
+	                model.linkChanged(cell, connected ? target : null, false);
+	            }
+	
+	            cell.setTerminal(source, true);
+	            cell.setTerminal(target, false);
+	        }
+	
+	        cell.eachChild(function (child) {
+	            that.connect(child, connected);
+	        });
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	exports['default'] = _commonClass2['default'].create({
+	    constructor: function ChangeCollection(graph) {
+	
+	        var that = this;
+	        that.graph = graph;
+	    },
+	
+	    hasChange: function hasChange() {
+	        var changes = this.changes;
+	        return changes && changes.length;
+	    },
+	
+	    add: function add(change) {
+	
+	        var that = this;
+	        var changes = that.changes;
+	
+	        if (change) {
+	            if (!changes) {
+	                changes = that.changes = [];
+	            }
+	
+	            changes.push(change);
+	        }
+	
+	        return change;
+	    },
+	
+	    clear: function clear() {
+	        this.changes = null;
+	        return this;
+	    },
+	
+	    notify: function notify() {
+	
+	        var that = this;
+	
+	        that.graph.trigger('change', that.changes);
+	
+	        return that;
+	    }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(2);
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	var _commonEvents = __webpack_require__(12);
+	
+	var _commonEvents2 = _interopRequireDefault(_commonEvents);
+	
+	var _commonVector = __webpack_require__(20);
 	
 	var _commonVector2 = _interopRequireDefault(_commonVector);
 	
-	var _viewsLinkView = __webpack_require__(22);
+	var _Model = __webpack_require__(27);
+	
+	var _Model2 = _interopRequireDefault(_Model);
+	
+	var _viewsLinkView = __webpack_require__(21);
 	
 	var _viewsLinkView2 = _interopRequireDefault(_viewsLinkView);
 	
-	var _viewsNodeView = __webpack_require__(23);
+	var _viewsNodeView = __webpack_require__(22);
 	
 	var _viewsNodeView2 = _interopRequireDefault(_viewsNodeView);
 	
-	var _Graph = __webpack_require__(12);
+	var _changesRootChange = __webpack_require__(15);
 	
-	var _Graph2 = _interopRequireDefault(_Graph);
+	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
+	
+	var _changesChildChange = __webpack_require__(17);
+	
+	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
 	
 	exports['default'] = _commonClass2['default'].create({
 	
@@ -2037,11 +1991,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //  - paper:destroy
 	    //  - paper:resize
 	
-	    constructor: function Paper(container, graph, options) {
+	    constructor: function Paper(container, model, options) {
 	
 	        var that = this;
 	
-	        that.graph = graph || new _Graph2['default']();
+	        that.model = model || new _Model2['default']();
 	
 	        that.configure(options);
 	
@@ -2096,7 +2050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        that.graph.on('change', that.processChanges, that);
+	        that.model.on('change', that.processChanges, that);
 	
 	        that.trigger('paper:setup');
 	
@@ -2122,7 +2076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var recurse = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
 	
 	        var that = this;
-	        var model = that.graph.model;
+	        var model = that.model;
 	
 	        cell = cell || model.getRoot();
 	
@@ -2144,9 +2098,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var includeLink = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
 	
 	        var that = this;
-	        var graph = that.graph;
+	        var model = that.model;
 	
-	        cell = cell || graph.getRoot();
+	        cell = cell || model.getRoot();
 	
 	        var view = that.getCellView(cell);
 	
@@ -2180,7 +2134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        cell = cell || that.graph.getRoot();
+	        cell = cell || that.model.getRoot();
 	
 	        that.validateCell(cell).validateCellView(cell);
 	
@@ -2353,9 +2307,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        if (change instanceof RootChange) {
+	        if (change instanceof _changesRootChange2['default']) {
 	            that.onRootChanged(change);
-	        } else if (change instanceof ChildChange) {
+	        } else if (change instanceof _changesChildChange2['default']) {
 	            that.onChildChanged(change);
 	        }
 	
@@ -2378,8 +2332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 16 */,
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3025,416 +2978,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = vector;
 
 /***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonClass = __webpack_require__(11);
-	
-	var _commonClass2 = _interopRequireDefault(_commonClass);
-	
-	exports['default'] = _commonClass2['default'].create({
-	    constructor: function ChangeCollection(graph) {
-	
-	        var that = this;
-	        that.graph = graph;
-	    },
-	
-	    hasChange: function hasChange() {
-	        var changes = this.changes;
-	        return changes && changes.length;
-	    },
-	
-	    add: function add(change) {
-	
-	        var that = this;
-	        var changes = that.changes;
-	
-	        if (change) {
-	            if (!changes) {
-	                changes = that.changes = [];
-	            }
-	
-	            changes.push(change);
-	        }
-	
-	        return change;
-	    },
-	
-	    clear: function clear() {
-	        this.changes = null;
-	        return this;
-	    },
-	
-	    notify: function notify() {
-	
-	        var that = this;
-	
-	        that.graph.trigger('change', that.changes);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonUtils = __webpack_require__(2);
-	
-	var _commonClass = __webpack_require__(11);
-	
-	var _commonClass2 = _interopRequireDefault(_commonClass);
-	
-	var _commonEvents = __webpack_require__(13);
-	
-	var _commonEvents2 = _interopRequireDefault(_commonEvents);
-	
-	exports['default'] = _commonClass2['default'].create({
-	
-	    constructor: function Cell(attributes) {
-	
-	        var that = this;
-	
-	        that.attributes = (0, _commonUtils.merge)({}, that.defaults, attributes);
-	    },
-	
-	    get: function get(name) {
-	        return this.attributes[name];
-	    },
-	
-	    getPosition: function getPosition() {},
-	
-	    getSize: function getSize() {},
-	
-	    isVisible: function isVisible() {
-	        return true;
-	    },
-	
-	    isNode: function isNode() {
-	        return false;
-	    },
-	
-	    isLink: function isLink() {
-	        return false;
-	    },
-	
-	    // link
-	    // ----
-	
-	    getTerminal: function getTerminal(isSource) {
-	        return isSource ? this.source : this.target;
-	    },
-	
-	    setTerminal: function setTerminal(node, isSource) {
-	        if (isSource) {
-	            this.source = node;
-	        } else {
-	            this.target = node;
-	        }
-	
-	        return node;
-	    },
-	
-	    removeFromTerminal: function removeFromTerminal(isSource) {
-	
-	        // remove link from node
-	
-	        var that = this;
-	
-	        var node = that.getTerminal(isSource);
-	
-	        if (node) {
-	            node.removeLink(that, isSource);
-	        }
-	
-	        return that;
-	    },
-	
-	    // children
-	    // --------
-	
-	    getChildCount: function getChildCount() {
-	        var children = this.children;
-	        return children ? children.length : 0;
-	    },
-	
-	    getChildIndex: function getChildIndex(child) {
-	        return (0, _commonUtils.indexOf)(this.children || [], child);
-	    },
-	
-	    getChildAt: function getChildAt(index) {
-	        var children = this.children;
-	        return children ? children[index] : null;
-	    },
-	
-	    eachChild: function eachChild(iterator, context) {
-	
-	        var that = this;
-	        var children = that.children;
-	
-	        children && (0, _commonUtils.forEach)(children, iterator, context);
-	
-	        return that;
-	    },
-	
-	    filterChild: function filterChild(iterator, context) {
-	        var children = this.children;
-	        return children ? (0, _commonUtils.filter)(children, iterator, context) : [];
-	    },
-	
-	    insertChild: function insertChild(child, index) {
-	        var that = this;
-	
-	        if (child) {
-	
-	            // fix index
-	            if ((0, _commonUtils.isNullOrUndefined)(index)) {
-	                index = that.getChildCount();
-	
-	                if (child.parent === that) {
-	                    index--;
-	                }
-	            }
-	
-	            child.removeFromParent();
-	            child.parent = that;
-	
-	            var children = that.children;
-	
-	            if (children) {
-	                children.splice(index, 0, child);
-	            } else {
-	                children = that.children = [];
-	                children.push(child);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    removeChild: function removeChild(child) {
-	        return this.removeChildAt(this.getChildIndex(child));
-	    },
-	
-	    removeChildAt: function removeChildAt(index) {
-	        var that = this;
-	        var child = null;
-	        var children = that.children;
-	
-	        if (children && index >= 0) {
-	            child = that.getChildAt(index);
-	
-	            if (child) {
-	                children.splice(index, 1);
-	                child.parent = null;
-	            }
-	        }
-	
-	        return child;
-	    },
-	
-	    // node
-	    // -----
-	
-	    getLinkCount: function getLinkCount() {
-	        var links = this.links;
-	        return links ? links.length : 0;
-	    },
-	
-	    getLinkIndex: function getLinkIndex(link) {
-	        return (0, _commonUtils.indexOf)(this.links || [], link);
-	    },
-	
-	    getLinkAt: function getLinkAt(index) {
-	        var links = this.links;
-	        return links ? links[index] : null;
-	    },
-	
-	    eachLink: function eachLink(iterator, context) {
-	
-	        var that = this;
-	        var links = that.links;
-	
-	        links && (0, _commonUtils.forEach)(links, iterator, context);
-	
-	        return that;
-	    },
-	
-	    filterLink: function filterLink(iterator, context) {
-	        var links = this.links;
-	        return links ? (0, _commonUtils.filter)(links, iterator, context) : [];
-	    },
-	
-	    insertLink: function insertLink(link, outgoing) {
-	
-	        var that = this;
-	
-	        if (link) {
-	            link.removeFromTerminal(outgoing);
-	            link.setTerminal(that, outgoing);
-	
-	            var links = that.links;
-	
-	            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
-	            if (!links || that.getLinkIndex(link) < 0 || link.getTerminal(!outgoing) !== that) {
-	
-	                if (!links) {
-	                    links = that.links = [];
-	                }
-	
-	                links.push(link);
-	            }
-	        }
-	
-	        return link;
-	    },
-	
-	    removeLink: function removeLink(link, outgoing) {
-	
-	        var that = this;
-	        var links = that.links;
-	
-	        if (link) {
-	
-	            // 连线的起点和终点是同一个节点时不需要移除
-	            if (links && link.getTerminal(!outgoing) !== that) {
-	                var index = that.getLinkIndex(link);
-	
-	                if (index >= 0) {
-	                    links.splice(index, 1);
-	                }
-	            }
-	
-	            link.setTerminal(null, outgoing);
-	        }
-	
-	        return link;
-	    },
-	
-	    // parent
-	    // ------
-	
-	    getParent: function getParent() {
-	        return this.parent;
-	    },
-	
-	    removeFromParent: function removeFromParent() {
-	
-	        var that = this;
-	        var parent = that.parent;
-	
-	        if (parent) {
-	            parent.removeChild(that);
-	        }
-	
-	        return that;
-	    },
-	
-	    // common
-	    // ------
-	
-	    valueOf: function valueOf() {},
-	
-	    toString: function toString() {},
-	
-	    clone: function clone() {},
-	
-	    destroy: function destroy() {}
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _Change = __webpack_require__(21);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	exports['default'] = _Change2['default'].extend({
-	
-	    constructor: function RootChange(graph, root) {
-	
-	        var that = this;
-	
-	        that.graph = graph;
-	        that.root = root;
-	        that.previous = root;
-	    },
-	
-	    digest: function digest() {
-	
-	        var that = this;
-	        var graph = that.graph;
-	        var previous = that.previous;
-	
-	        that.root = previous;
-	        that.previous = graph.rootChanged(previous);
-	
-	        return that;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
 /* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _commonClass = __webpack_require__(11);
-	
-	var _commonClass2 = _interopRequireDefault(_commonClass);
-	
-	exports['default'] = _commonClass2['default'].create({
-	
-	    constructor: function Change() {},
-	
-	    digest: function digest() {
-	        return this;
-	    }
-	});
-	module.exports = exports['default'];
-
-/***/ },
-/* 22 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3445,11 +2995,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _CellView = __webpack_require__(24);
+	var _CellView = __webpack_require__(23);
 	
 	var _CellView2 = _interopRequireDefault(_CellView);
 	
-	var _commonVector = __webpack_require__(17);
+	var _commonVector = __webpack_require__(20);
 	
 	var _commonVector2 = _interopRequireDefault(_commonVector);
 	
@@ -3545,7 +3095,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3560,11 +3110,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonClass2 = _interopRequireDefault(_commonClass);
 	
-	var _commonEvents = __webpack_require__(13);
+	var _commonEvents = __webpack_require__(12);
 	
 	var _commonEvents2 = _interopRequireDefault(_commonEvents);
 	
-	var _commonVector = __webpack_require__(17);
+	var _commonVector = __webpack_require__(20);
 	
 	var _commonVector2 = _interopRequireDefault(_commonVector);
 	
@@ -3617,7 +3167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3630,7 +3180,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(2);
 	
-	var _cellsNode = __webpack_require__(26);
+	var _cellsNode = __webpack_require__(25);
 	
 	var _cellsNode2 = _interopRequireDefault(_cellsNode);
 	
@@ -3647,7 +3197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3658,7 +3208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _Cell = __webpack_require__(19);
+	var _Cell = __webpack_require__(14);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
@@ -3711,7 +3261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3724,7 +3274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _commonUtils = __webpack_require__(2);
 	
-	var _Generic = __webpack_require__(25);
+	var _Generic = __webpack_require__(24);
 	
 	var _Generic2 = _interopRequireDefault(_Generic);
 	
@@ -3755,6 +3305,557 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	    }, _Generic2['default'].prototype.defaults)
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _commonUtils = __webpack_require__(2);
+	
+	var _commonClass = __webpack_require__(11);
+	
+	var _commonClass2 = _interopRequireDefault(_commonClass);
+	
+	var _commonEvents = __webpack_require__(12);
+	
+	var _commonEvents2 = _interopRequireDefault(_commonEvents);
+	
+	var _cellsCell = __webpack_require__(14);
+	
+	var _cellsCell2 = _interopRequireDefault(_cellsCell);
+	
+	var _changesRootChange = __webpack_require__(15);
+	
+	var _changesRootChange2 = _interopRequireDefault(_changesRootChange);
+	
+	var _changesChildChange = __webpack_require__(17);
+	
+	var _changesChildChange2 = _interopRequireDefault(_changesChildChange);
+	
+	var _changesChangeCollection = __webpack_require__(18);
+	
+	var _changesChangeCollection2 = _interopRequireDefault(_changesChangeCollection);
+	
+	exports['default'] = _commonClass2['default'].create({
+	
+	    Extends: _commonEvents2['default'],
+	
+	    constructor: function Model(root) {
+	
+	        var that = this;
+	
+	        that.nextId = 0;
+	        that.updateLevel = 0;
+	        that.endingUpdate = false;
+	        that.changes = new _changesChangeCollection2['default'](that);
+	
+	        if (root) {
+	            that.setRoot(root);
+	        } else {
+	            that.clear();
+	        }
+	    },
+	
+	    clear: function clear() {
+	        return this.setRoot(this.createRoot());
+	    },
+	
+	    getDefaultParent: function getDefaultParent() {
+	        return this.getRoot().getChildAt(0); // the first layer
+	    },
+	
+	    isAncestor: function isAncestor(parent, child) {
+	
+	        if (!parent || !child) {
+	            return false;
+	        }
+	
+	        while (child && child !== parent) {
+	            child = child.parent;
+	        }
+	
+	        return child === parent;
+	    },
+	
+	    contains: function contains(cell) {
+	        return this.isAncestor(this.root, cell);
+	    },
+	
+	    getCellById: function getCellById(id) {
+	        return this.cells ? this.cells[id] : null;
+	    },
+	
+	    createCellId: function createCellId() {
+	        var that = this;
+	        var id = that.nextId;
+	
+	        that.nextId += 1;
+	
+	        return 'cell-' + id;
+	    },
+	
+	    getAncestors: function getAncestors(child) {
+	
+	        var that = this;
+	        var result = [];
+	        var parent = child ? child.parent : null;
+	
+	        if (parent) {
+	            result.push(parent);
+	            result = result.concat(that.getAncestors(parent));
+	        }
+	
+	        return result;
+	    },
+	
+	    getDescendants: function getDescendants(parent) {
+	
+	        var that = this;
+	        var result = [];
+	
+	        parent = parent || that.getRoot();
+	        parent.eachChild(function (child) {
+	            result.push(child);
+	            result = result.concat(that.getDescendants(child));
+	        });
+	
+	        return result;
+	    },
+	
+	    getParents: function getParents(cells) {
+	
+	        var parents = [];
+	
+	        if (cells) {
+	
+	            var hash = {};
+	
+	            each(cells, function (cell) {
+	                var parent = cell.parent;
+	
+	                if (parent) {
+	                    var id = cellRoute.create(parent);
+	
+	                    if (!hash[id]) {
+	                        hash[id] = parent;
+	                        parents.push(parent);
+	                    }
+	                }
+	            });
+	        }
+	
+	        return parents;
+	    },
+	
+	    // root
+	    // ----
+	
+	    isRoot: function isRoot(cell) {
+	        return cell && this.root === cell;
+	    },
+	
+	    createRoot: function createRoot() {
+	        var root = new _cellsCell2['default']();
+	
+	        root.insertChild(this.createLayer());
+	
+	        return root;
+	    },
+	
+	    getRoot: function getRoot(cell) {
+	
+	        var root = cell || this.root;
+	
+	        if (cell) {
+	            while (cell) {
+	                root = cell;
+	                cell = cell.parent;
+	            }
+	        }
+	
+	        return root;
+	    },
+	
+	    setRoot: function setRoot(root) {
+	        return this.digest(new _changesRootChange2['default'](this, root));
+	    },
+	
+	    rootChanged: function rootChanged(newRoot) {
+	
+	        var that = this;
+	        var oldRoot = that.root;
+	
+	        that.root = newRoot;
+	        that.cells = null;
+	        that.nextId = 0;
+	        that.cellAdded(newRoot);
+	
+	        return oldRoot;
+	    },
+	
+	    // Layers
+	    // ------
+	
+	    isLayer: function isLayer(cell) {
+	        return cell && this.isRoot(cell.parent);
+	    },
+	
+	    getLayers: function getLayers() {
+	        return this.getRoot().children || [];
+	    },
+	
+	    createLayer: function createLayer() {
+	        return new _cellsCell2['default']();
+	    },
+	
+	    // child
+	    // -----
+	
+	    getParent: function getParent(cell) {
+	        return cell ? cell.parent : null;
+	    },
+	
+	    addCell: function addCell(child, parent, index) {
+	        return this.addCells([child], parent, index);
+	    },
+	
+	    addCells: function addCells(cells, parent, index) {
+	
+	        var that = this;
+	
+	        parent = parent || that.getDefaultParent();
+	        index = (0, _commonUtils.isNullOrUndefined)(index) ? parent.getChildCount() : index;
+	
+	        that.beginUpdate();
+	
+	        (0, _commonUtils.forEach)(cells, function (cell) {
+	            if (cell && parent && cell !== parent) {
+	                that.digest(new _changesChildChange2['default'](that, parent, cell, index));
+	                index += 1;
+	            } else {
+	                index -= 1;
+	            }
+	        });
+	
+	        that.endUpdate();
+	
+	        return that;
+	    },
+	
+	    childChanged: function childChanged(cell, newParent, newIndex) {
+	
+	        var that = this;
+	        var oldParent = cell.parent;
+	
+	        if (newParent) {
+	            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+	                newParent.insertChild(cell, newIndex);
+	            }
+	        } else if (oldParent) {
+	            oldParent.removeChild(cell);
+	        }
+	
+	        // check if the previous parent was already in the
+	        // model and avoids calling cellAdded if it was.
+	        if (newParent && !that.contains(oldParent)) {
+	            that.cellAdded(cell);
+	        } else if (!newParent) {
+	            that.cellRemoved(cell);
+	        }
+	
+	        return oldParent;
+	    },
+	
+	    linkChanged: function linkChanged(link, newNode, isSource) {
+	        var oldNode = link.getNode(isSource);
+	
+	        if (newNode) {
+	            newNode.insertLink(link, isSource);
+	        } else if (oldNode) {
+	            oldNode.removeLink(link, isSource);
+	        }
+	
+	        return oldNode;
+	    },
+	
+	    cellAdded: function cellAdded(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	
+	            var id = cell.id || that.createCellId(cell);
+	
+	            if (id) {
+	
+	                // distinct
+	                var collision = that.getCellById(id);
+	
+	                if (collision !== cell) {
+	                    while (collision) {
+	                        id = that.createCellId(cell);
+	                        collision = that.getCellById(id);
+	                    }
+	
+	                    // as lazy as possible
+	                    if (!that.cells) {
+	                        that.cells = {};
+	                    }
+	
+	                    cell.id = id;
+	                    that.cells[id] = cell;
+	                }
+	            }
+	
+	            // fix nextId
+	            if ((0, _commonUtils.isNumeric)(id)) {
+	                that.nextId = Math.max(that.nextId, id);
+	            }
+	
+	            cell.eachChild(that.cellAdded, that);
+	        }
+	    },
+	
+	    updateLinkParents: function updateLinkParents(cell, root) {
+	
+	        var that = this;
+	
+	        root = root || that.getRoot(cell);
+	
+	        // update links on children first
+	        cell.eachChild(function (child) {
+	            that.updateLinkParents(child, root);
+	        });
+	
+	        // update the parents of all connected links
+	        cell.eachLink(function (link) {
+	            // update edge parent if edge and child have
+	            // a common root node (does not need to be the
+	            // model root node)
+	            if (that.isAncestor(root, link)) {
+	                that.updateLinkParent(link, root);
+	            }
+	        });
+	    },
+	
+	    updateLinkParent: function updateLinkParent(link, root) {
+	
+	        var that = this;
+	        var cell = null;
+	        var source = link.getTerminal(true);
+	        var target = link.getTerminal(false);
+	
+	        // use the first non-relative descendants of the source terminal
+	        while (source && !source.isLink && source.geometry && source.geometry.relative) {
+	            source = source.parent;
+	        }
+	
+	        // use the first non-relative descendants of the target terminal
+	        while (target && !target.isLink && target.geometry && target.geometry.relative) {
+	            target = target.parent;
+	        }
+	
+	        if (that.isAncestor(root, source) && that.isAncestor(root, target)) {
+	
+	            if (source === target) {
+	                cell = source.parent;
+	            } else {
+	                cell = that.getNearestCommonAncestor(source, target);
+	            }
+	
+	            if (cell && (cell.parent !== that.root || that.isAncestor(cell, link)) && link.parent !== cell) {
+	
+	                var geo = link.geometry;
+	
+	                if (geo) {
+	                    var origin1 = that.getOrigin(link.parent);
+	                    var origin2 = that.getOrigin(cell);
+	
+	                    var dx = origin2.x - origin1.x;
+	                    var dy = origin2.y - origin1.y;
+	
+	                    geo = geo.clone();
+	                    geo.translate(-dx, -dy);
+	                    that.setGeometry(link, geo);
+	                }
+	
+	                that.add(cell, link);
+	            }
+	        }
+	    },
+	
+	    getNearestCommonAncestor: function getNearestCommonAncestor(cell1, cell2) {
+	
+	        if (cell1 && cell2) {
+	
+	            var route1 = cellRoute.create(cell1);
+	            var route2 = cellRoute.create(cell2);
+	
+	            if (route1 && route2) {
+	
+	                var cell = cell1;
+	                var route = route2;
+	                var current = route1;
+	
+	                if (route1.length > route2.length) {
+	                    cell = cell2;
+	                    route = route1;
+	                    current = route2;
+	                }
+	
+	                while (cell) {
+	                    var parent = cell.parent;
+	
+	                    // check if the cell path is equal to the beginning of the given cell path
+	                    if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
+	                        return cell;
+	                    }
+	
+	                    cell = parent;
+	                    current = cellRoute.getParentRoute(current);
+	                }
+	            }
+	        }
+	
+	        return null;
+	    },
+	
+	    // get the absolute, accumulated origin for the children
+	    // inside the given parent as an `Point`.
+	    getOrigin: function getOrigin(cell) {
+	
+	        var that = this;
+	        var result = null;
+	
+	        if (cell) {
+	            result = that.getOrigin(cell.parent);
+	
+	            if (!cell.isLink) {
+	                var geo = cell.geometry;
+	
+	                if (geo) {
+	                    result.x += geo.x;
+	                    result.y += geo.y;
+	                }
+	            }
+	        } else {
+	            result = new Point();
+	        }
+	
+	        return result;
+	    },
+	
+	    remove: function remove(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	            if (cell === that.root) {
+	                that.setRoot(null);
+	            } else if (cell.parent) {
+	                that.digest(new _changesChildChange2['default'](that, null, cell));
+	            }
+	        }
+	
+	        return cell;
+	    },
+	
+	    cellRemoved: function cellRemoved(cell) {
+	
+	        var that = this;
+	
+	        if (cell) {
+	
+	            cell.eachChild(function (child) {
+	                that.cellRemoved(child);
+	            });
+	
+	            var id = cell.id;
+	            var cells = that.cells;
+	            if (cells && id) {
+	                delete cells[id];
+	            }
+	        }
+	    },
+	
+	    getChildNodes: function getChildNodes(parent) {
+	        return this.getChildCells(parent, true, false);
+	    },
+	
+	    getChildLinks: function getChildLinks(parent) {
+	        return this.getChildCells(parent, false, true);
+	    },
+	
+	    getChildCells: function getChildCells(parent, isNode, isLink) {
+	        return parent ? parent.filterChild(function (child) {
+	            return isNode && child.isNode || isLink && child.isLink;
+	        }) : [];
+	    },
+	
+	    // update
+	    // ------
+	
+	    digest: function digest(change) {
+	
+	        var that = this;
+	
+	        change.digest();
+	
+	        that.beginUpdate();
+	        that.changes.add(change);
+	        that.endUpdate();
+	
+	        return that;
+	    },
+	
+	    beginUpdate: function beginUpdate() {
+	
+	        var that = this;
+	
+	        that.updateLevel += 1;
+	        that.trigger('beginUpdate');
+	
+	        if (that.updateLevel === 1) {
+	            that.trigger('startEdit');
+	        }
+	    },
+	
+	    endUpdate: function endUpdate() {
+	
+	        var that = this;
+	
+	        that.updateLevel -= 1;
+	
+	        if (that.updateLevel === 0) {
+	            that.trigger('endEdit');
+	        }
+	
+	        if (!that.endingUpdate) {
+	
+	            var changeCollection = that.changes;
+	
+	            that.endingUpdate = that.updateLevel === 0;
+	            that.trigger('endUpdate', changeCollection.changes);
+	
+	            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 所以需要一种机制来管理
+	
+	            if (that.endingUpdate && changeCollection.hasChange()) {
+	                changeCollection.notify().clear();
+	            }
+	
+	            that.endingUpdate = false;
+	        }
+	    }
 	});
 	module.exports = exports['default'];
 

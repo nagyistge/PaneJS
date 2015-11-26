@@ -2,11 +2,11 @@ import Change from './Change';
 
 export default Change.extend({
 
-    constructor: function ChildChange(graph, parent, child, index) {
+    constructor: function ChildChange(model, parent, child, index) {
 
         var that = this;
 
-        that.model = graph;
+        that.model = model;
         that.child = child;
         that.parent = parent;
         that.index = index;
@@ -49,7 +49,7 @@ export default Change.extend({
         var that = this;
         var model = that.model;
 
-        if (cell.isLink) {
+        if (cell.isLink()) {
 
             var source = cell.getTerminal(true);
             var target = cell.getTerminal(false);

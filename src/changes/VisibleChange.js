@@ -1,11 +1,11 @@
 import Change from './Change';
 
 export default Change.extend({
-    constructor: function VisibleChange(graph, cell, visible) {
+    constructor: function VisibleChange(model, cell, visible) {
 
         var that = this;
 
-        that.graph = graph;
+        that.model = model;
         that.cell = cell;
         that.visible = visible;
         that.previous = visible;
@@ -16,7 +16,7 @@ export default Change.extend({
         var that = this;
 
         that.visible = that.previous;
-        that.previous = that.graph.visibleChanged(that.cell, that.previous);
+        that.previous = that.model.visibleChanged(that.cell, that.previous);
 
         return that;
     }

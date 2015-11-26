@@ -5,7 +5,7 @@ var pane = {
     utils: require('./common/utils'),
     Class: require('./common/Class'),
     Events: require('./common/Events'),
-    Graph: require('./core/Graph'),
+    Model: require('./core/Model'),
     Paper: require('./core/Paper'),
     shapes: {
         basic: {

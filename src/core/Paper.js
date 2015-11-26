@@ -7,9 +7,12 @@ import Class  from '../common/Class';
 import Events from '../common/Events';
 import vector from '../common/vector';
 
+import Model    from './Model';
 import LinkView from '../views/LinkView';
 import NodeView from '../views/NodeView';
-import Graph    from './Graph';
+
+import RootChange  from '../changes/RootChange';
+import ChildChange from '../changes/ChildChange';
 
 
 export default Class.create({
@@ -36,11 +39,11 @@ export default Class.create({
     //  - paper:destroy
     //  - paper:resize
 
-    constructor: function Paper(container, graph, options) {
+    constructor: function Paper(container, model, options) {
 
         var that = this;
 
-        that.graph = graph || new Graph();
+        that.model = model || new Model();
 
         that.configure(options);
 
@@ -99,7 +102,7 @@ export default Class.create({
 
         var that = this;
 
-        that.graph.on('change', that.processChanges, that);
+        that.model.on('change', that.processChanges, that);
 
         that.trigger('paper:setup');
 
@@ -125,7 +128,7 @@ export default Class.create({
     clear(cell, force = false, recurse = true) {
 
         var that = this;
-        var model = that.graph.model;
+        var model = that.model;
 
         cell = cell || model.getRoot();
 
@@ -145,9 +148,9 @@ export default Class.create({
     invalidate(cell, recurse = true, includeLink = true) {
 
         var that = this;
-        var graph = that.graph;
+        var model = that.model;
 
-        cell = cell || graph.getRoot();
+        cell = cell || model.getRoot();
 
         var view = that.getCellView(cell);
 
@@ -181,7 +184,7 @@ export default Class.create({
 
         var that = this;
 
-        cell = cell || that.graph.getRoot();
+        cell = cell || that.model.getRoot();
 
         that.validateCell(cell)
             .validateCellView(cell);

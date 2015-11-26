@@ -2,11 +2,11 @@ import Change from './Change';
 
 export default Change.extend({
 
-    constructor: function RootChange(graph, root) {
+    constructor: function RootChange(model, root) {
 
         var that = this;
 
-        that.graph = graph;
+        that.model = model;
         that.root = root;
         that.previous = root;
     },
@@ -14,11 +14,11 @@ export default Change.extend({
     digest() {
 
         var that = this;
-        var graph = that.graph;
+        var model = that.model;
         var previous = that.previous;
 
         that.root = previous;
-        that.previous = graph.rootChanged(previous);
+        that.previous = model.rootChanged(previous);
 
         return that;
     }

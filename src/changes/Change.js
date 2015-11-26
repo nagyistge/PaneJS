@@ -4,7 +4,5 @@ export default Class.create({
 
     constructor: function Change() {},
 
-    digest() {
-        return this;
-    }
+    digest() { return this; }
 });

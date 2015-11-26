@@ -12,6 +12,7 @@ import Events from '../common/Events';
 import Cell from '../cells/Cell';
 
 import RootChange       from '../changes/RootChange';
+import ChildChange      from '../changes/ChildChange';
 import ChangeCollection from '../changes/ChangeCollection'
 
 
@@ -19,7 +20,7 @@ export default Class.create({
 
     Extends: Events,
 
-    constructor: function Graph(root) {
+    constructor: function Model(root) {
 
         var that = this;
 
@@ -212,7 +213,6 @@ export default Class.create({
 
         forEach(cells, function (cell) {
             if (cell && parent && cell !== parent) {
-                that.cellAdded(cell);
                 that.digest(new ChildChange(that, parent, cell, index));
                 index += 1;
             } else {
@@ -223,6 +223,42 @@ export default Class.create({
         that.endUpdate();
 
         return that;
+    },
+
+    childChanged(cell, newParent, newIndex) {
+
+        var that = this;
+        var oldParent = cell.parent;
+
+        if (newParent) {
+            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+                newParent.insertChild(cell, newIndex);
+            }
+        } else if (oldParent) {
+            oldParent.removeChild(cell);
+        }
+
+        // check if the previous parent was already in the
+        // model and avoids calling cellAdded if it was.
+        if (newParent && !that.contains(oldParent)) {
+            that.cellAdded(cell);
+        } else if (!newParent) {
+            that.cellRemoved(cell);
+        }
+
+        return oldParent;
+    },
+
+    linkChanged(link, newNode, isSource) {
+        var oldNode = link.getNode(isSource);
+
+        if (newNode) {
+            newNode.insertLink(link, isSource);
+        } else if (oldNode) {
+            oldNode.removeLink(link, isSource);
+        }
+
+        return oldNode;
     },
 
     cellAdded(cell) {
@@ -425,42 +461,6 @@ export default Class.create({
                 delete cells[id];
             }
         }
-    },
-
-    childChanged(cell, newParent, newIndex) {
-
-        var that = this;
-        var oldParent = cell.parent;
-
-        if (newParent) {
-            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
-                newParent.insertChild(cell, newIndex);
-            }
-        } else if (oldParent) {
-            oldParent.removeChild(cell);
-        }
-
-        // check if the previous parent was already in the
-        // model and avoids calling cellAdded if it was.
-        if (newParent && !that.contains(oldParent)) {
-            that.cellAdded(cell);
-        } else if (!newParent) {
-            that.cellRemoved(cell);
-        }
-
-        return oldParent;
-    },
-
-    linkChanged(link, newNode, isSource) {
-        var oldNode = link.getNode(isSource);
-
-        if (newNode) {
-            newNode.insertLink(link, isSource);
-        } else if (oldNode) {
-            oldNode.removeLink(link, isSource);
-        }
-
-        return oldNode;
     },
 
     getChildNodes(parent) {
