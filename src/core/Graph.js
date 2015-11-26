@@ -1,4 +1,6 @@
 import {
+    filter,
+    forEach,
     isNumeric,
     isUndefined,
     isNullOrUndefined,
@@ -135,7 +137,7 @@ export default Class.create({
     createRoot: function () {
         var root = new Cell();
 
-        root.insertChild(new Cell());
+        root.insertChild(this.createLayer());
 
         return root;
     },
@@ -183,6 +185,10 @@ export default Class.create({
         return this.getRoot().children || [];
     },
 
+    createLayer: function () {
+        return new Cell();
+    },
+
 
     // child
     // -----
@@ -193,20 +199,28 @@ export default Class.create({
 
     addCell(child, parent, index) {
         return this.addCells([child], parent, index);
-
     },
 
     addCells: function (cells, parent, index) {
 
         var that = this;
-        var model = that.model;
 
         parent = parent || that.getDefaultParent();
         index = isNullOrUndefined(index) ? parent.getChildCount() : index;
 
-        model.beginUpdate();
-        that.cellsAdded(cells, parent, index, false, true);
-        model.endUpdate();
+        that.beginUpdate();
+
+        forEach(cells, function (cell) {
+            if (cell && parent && cell !== parent) {
+                that.cellAdded(cell);
+                that.digest(new ChildChange(that, parent, cell, index));
+                index += 1;
+            } else {
+                index -= 1;
+            }
+        });
+
+        that.endUpdate();
 
         return that;
     },
@@ -509,7 +523,8 @@ export default Class.create({
             that.endingUpdate = that.updateLevel === 0;
             that.trigger('endUpdate', changeCollection.changes);
 
-            // 触发重绘
+            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 所以需要一种机制来管理
+
             if (that.endingUpdate && changeCollection.hasChange()) {
                 changeCollection.notify().clear();
             }

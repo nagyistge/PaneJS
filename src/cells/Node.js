@@ -3,6 +3,20 @@ import Cell from './Cell';
 export default Cell.extend({
 
     defaults: {
+        position: {
+            x: 0,
+            y: 0,
+            relative: false
+        },
+        size: {
+            width: 1,
+            height: 1,
+            relative: false
+        },
+        rotation: {
+            angle: 0,
+            relative: false
+        },
         x: 0,
         y: 0,
         width: 1,

@@ -1436,7 +1436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    createRoot: function createRoot() {
 	        var root = new _cellsCell2['default']();
 	
-	        root.insertChild(new _cellsCell2['default']());
+	        root.insertChild(this.createLayer());
 	
 	        return root;
 	    },
@@ -1483,6 +1483,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.getRoot().children || [];
 	    },
 	
+	    createLayer: function createLayer() {
+	        return new _cellsCell2['default']();
+	    },
+	
 	    // child
 	    // -----
 	
@@ -1497,14 +1501,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    addCells: function addCells(cells, parent, index) {
 	
 	        var that = this;
-	        var model = that.model;
 	
 	        parent = parent || that.getDefaultParent();
 	        index = (0, _commonUtils.isNullOrUndefined)(index) ? parent.getChildCount() : index;
 	
-	        model.beginUpdate();
-	        that.cellsAdded(cells, parent, index, false, true);
-	        model.endUpdate();
+	        that.beginUpdate();
+	
+	        (0, _commonUtils.forEach)(cells, function (cell) {
+	            if (cell && parent && cell !== parent) {
+	                that.cellAdded(cell);
+	                that.digest(new ChildChange(that, parent, cell, index));
+	                index += 1;
+	            } else {
+	                index -= 1;
+	            }
+	        });
+	
+	        that.endUpdate();
 	
 	        return that;
 	    },
@@ -1804,7 +1817,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            that.endingUpdate = that.updateLevel === 0;
 	            that.trigger('endUpdate', changeCollection.changes);
 	
-	            // 触发重绘
+	            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 所以需要一种机制来管理
+	
 	            if (that.endingUpdate && changeCollection.hasChange()) {
 	                changeCollection.notify().clear();
 	            }
@@ -3651,6 +3665,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = _Cell2['default'].extend({
 	
 	    defaults: {
+	        position: {
+	            x: 0,
+	            y: 0,
+	            relative: false
+	        },
+	        size: {
+	            width: 1,
+	            height: 1,
+	            relative: false
+	        },
+	        rotation: {
+	            angle: 0,
+	            relative: false
+	        },
 	        x: 0,
 	        y: 0,
 	        width: 1,
