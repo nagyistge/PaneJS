@@ -12,6 +12,11 @@ var pane = {
             Generic: require('./shapes/basic/Generic'),
             Rect: require('./shapes/basic/Rect'),
         }
+    },
+
+    test: {
+        Base: require('./test/Base'),
+        Point: require('./test/Point'),
     }
 };
 

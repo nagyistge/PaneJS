@@ -7,7 +7,7 @@ export default Class.create({
 
     tagName: 'g',
 
-    constructor: function CellView(paper, cell, options) {
+    constructor: function CellView(paper, cell) {
 
         var that = this;
 

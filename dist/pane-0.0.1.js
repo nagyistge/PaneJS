@@ -70,6 +70,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            Generic: __webpack_require__(24),
 	            Rect: __webpack_require__(26)
 	        }
+	    },
+	
+	    test: {
+	        Base: __webpack_require__(29),
+	        Point: __webpack_require__(30)
 	    }
 	};
 	
@@ -1981,7 +1986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        linkClassName: '',
 	        nodeClassName: '',
 	        getCellClassName: function getCellClassName(cell) {},
-	        getCellView: function getCellView(cell) {}
+	        getView: function getView(cell) {}
 	    },
 	
 	    // events
@@ -2102,7 +2107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        cell = cell || model.getRoot();
 	
-	        var view = that.getCellView(cell);
+	        var view = that.getView(cell);
 	
 	        if (view) {
 	            view.invalid = true;
@@ -2136,7 +2141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        cell = cell || that.model.getRoot();
 	
-	        that.validateCell(cell).validateCellView(cell);
+	        that.validateCell(cell).validateView(cell);
 	
 	        return that;
 	    },
@@ -2148,46 +2153,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
-	        if (!cell) {
-	            return cell;
+	        if (cell) {
+	
+	            visible = visible && cell.isVisible();
+	
+	            var view = that.getView(cell, visible);
+	
+	            if (view && !visible) {
+	                that.removeView(cell);
+	            }
+	
+	            cell.eachChild(function (child) {
+	                that.validateCell(child, visible);
+	            });
 	        }
-	
-	        visible = visible && cell.isVisible();
-	
-	        var view = that.getCellView(cell, visible);
-	
-	        if (view && !visible) {
-	            // remove the cell view, or wo can just hide it?
-	            that.removeCellView(cell);
-	        }
-	
-	        cell.eachChild(function (child) {
-	            that.validateCell(child, visible);
-	        });
 	
 	        return that;
 	    },
 	
-	    validateCellView: function validateCellView(cell) {
+	    validateView: function validateView(cell) {
 	        var recurse = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 	
 	        var that = this;
-	        var view = that.getCellView(cell);
 	
-	        if (view) {
-	            if (view.invalid) {
-	                view.invalid = false;
+	        if (cell) {
 	
-	                that.validateCellView(cell.getParent(), recurse);
-	                // render
+	            var view = that.getView(cell);
+	
+	            if (view) {
+	                if (view.invalid) {
+	                    view.invalid = false;
+	
+	                    that.validateView(cell.getParent(), recurse);
+	
+	                    // render
+	                    that.renderView(cell);
+	                }
+	            }
+	
+	            if (recurse) {
+	                cell.eachChild(function (child) {
+	                    that.validateView(child, recurse);
+	                });
 	            }
 	        }
 	
-	        if (recurse) {
-	            cell.eachChild(function (child) {
-	                that.validateCellView(child, recurse);
-	            });
-	        }
+	        return that;
 	    },
 	
 	    // transform
@@ -2240,7 +2251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // view
 	    // ----
 	
-	    getCellView: function getCellView(cell, create) {
+	    getView: function getView(cell, create) {
 	
 	        var that = this;
 	        var views = that.views;
@@ -2249,20 +2260,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var view = views ? views[cell.id] : null;
 	
 	            if (!view && create && cell.visible) {
-	                view = that.createCellView(cell);
+	                view = that.createView(cell);
 	            }
 	
 	            return view;
 	        }
 	    },
 	
-	    createCellView: function createCellView(cell) {
+	    createView: function createView(cell) {
 	
 	        var that = this;
 	        var options = that.options;
 	
 	        // get view's constructor from options.
-	        var ViewClass = options.getCellView.call(that, cell);
+	        var ViewClass = options.getView.call(that, cell);
 	
 	        if (!ViewClass) {
 	            ViewClass = cell.isLink() ? _viewsLinkView2['default'] : cell.isNode() ? _viewsNodeView2['default'] : null;
@@ -2283,9 +2294,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	
-	    removeCellView: function removeCellView(cell) {},
+	    removeView: function removeView(cell) {
 	
-	    renderCellView: function renderCellView(cell) {},
+	        var that = this;
+	        var view = that.getView(cell);
+	
+	        if (view) {
+	            delete that.views[cell.id];
+	            view.destroy();
+	        }
+	
+	        return that;
+	    },
+	
+	    renderView: function renderView(cell) {
+	
+	        var that = this;
+	        var view = that.getView(cell);
+	
+	        if (view) {
+	            view.render();
+	        }
+	    },
 	
 	    // changes
 	    // -------
@@ -2299,6 +2329,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (0, _commonUtils.forEach)(changes, function (change) {
 	            that.distributeChange(change);
 	        });
+	
+	        that.validate();
 	
 	        return that;
 	    },
@@ -2316,9 +2348,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return that;
 	    },
 	
-	    onRootChanged: function onRootChanged(rootChange) {},
+	    onRootChanged: function onRootChanged(change) {},
 	
-	    onChildChanged: function onChildChanged(childChange) {},
+	    onChildChanged: function onChildChanged(change) {
+	
+	        var that = this;
+	
+	        var newParent = change.parent;
+	        var oldParent = change.previous;
+	
+	        that.invalidate(change.child, true, true);
+	
+	        //if (newParent == null || this.isCellCollapsed(newParent)) {
+	        //    this.view.invalidate(change.child, true, true);
+	        //    this.removeStateForCell(change.child);
+	        //
+	        //    // Handles special case of current root of view being removed
+	        //    if (this.view.currentRoot == change.child) {
+	        //        this.home();
+	        //    }
+	        //}
+	
+	        if (newParent !== oldParent) {
+	            // Refreshes the collapse/expand icons on the parents
+	            if (newParent) {
+	                that.invalidate(newParent, false, false);
+	            }
+	
+	            if (oldParent) {
+	                that.invalidate(oldParent, false, false);
+	            }
+	        }
+	    },
 	
 	    // event handlers
 	    // --------------
@@ -3005,7 +3066,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = _CellView2['default'].extend({
 	
-	    constructor: function NodeView() {},
+	    constructor: function NodeView(paper, cell) {
+	        NodeView.superclass.constructor.call(this, paper, cell);
+	    },
 	
 	    update: function update() {
 	
@@ -3122,7 +3185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    tagName: 'g',
 	
-	    constructor: function CellView(paper, cell, options) {
+	    constructor: function CellView(paper, cell) {
 	
 	        var that = this;
 	
@@ -3857,6 +3920,94 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 28 */,
+/* 29 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Base = (function () {
+	    function Base(name) {
+	        _classCallCheck(this, Base);
+	
+	        this.name = name;
+	    }
+	
+	    _createClass(Base, [{
+	        key: "valueOf",
+	        value: function valueOf() {
+	            return this.name;
+	        }
+	    }, {
+	        key: "toString",
+	        value: function toString() {
+	            return this.name;
+	        }
+	    }]);
+	
+	    return Base;
+	})();
+	
+	exports["default"] = Base;
+	module.exports = exports["default"];
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Base2 = __webpack_require__(29);
+	
+	var _Base3 = _interopRequireDefault(_Base2);
+	
+	var Point = (function (_Base) {
+	    _inherits(Point, _Base);
+	
+	    function Point(x, y) {
+	        _classCallCheck(this, Point);
+	
+	        _get(Object.getPrototypeOf(Point.prototype), 'constructor', this).call(this, 'Point');
+	        this.x = x;
+	        this.y = y;
+	    }
+	
+	    _createClass(Point, [{
+	        key: 'toString',
+	        value: function toString() {
+	            console.log(_get(Object.getPrototypeOf(Point.prototype), 'toString', this).call(this) + this.x + ' - ' + this.y);
+	        }
+	    }]);
+	
+	    return Point;
+	})(_Base3['default']);
+	
+	exports['default'] = Point;
 	module.exports = exports['default'];
 
 /***/ }

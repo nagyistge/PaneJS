@@ -4,7 +4,9 @@ import vector from '../common/vector';
 
 export  default CellView.extend({
 
-    constructor: function NodeView() {},
+    constructor: function NodeView(paper, cell) {
+        NodeView.superclass.constructor.call(this, paper, cell);
+    },
 
     update: function () {
 

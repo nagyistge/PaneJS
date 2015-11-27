@@ -175,7 +175,7 @@ export default Class.create({
         return this.model;
     },
 
-    getCellView: function () {
+    getView: function () {
         return this.view;
     },
 

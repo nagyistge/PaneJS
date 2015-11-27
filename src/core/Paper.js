@@ -29,7 +29,7 @@ export default Class.create({
         linkClassName: '',
         nodeClassName: '',
         getCellClassName: function (cell) {},
-        getCellView: function (cell) {},
+        getView: function (cell) {},
     },
 
     // events
@@ -152,7 +152,7 @@ export default Class.create({
 
         cell = cell || model.getRoot();
 
-        var view = that.getCellView(cell);
+        var view = that.getView(cell);
 
         if (view) {
             view.invalid = true;
@@ -187,7 +187,7 @@ export default Class.create({
         cell = cell || that.model.getRoot();
 
         that.validateCell(cell)
-            .validateCellView(cell);
+            .validateView(cell);
 
         return that;
     },
@@ -198,45 +198,51 @@ export default Class.create({
 
         var that = this;
 
-        if (!cell) {
-            return cell;
+        if (cell) {
+
+            visible = visible && cell.isVisible();
+
+            var view = that.getView(cell, visible);
+
+            if (view && !visible) {
+                that.removeView(cell);
+            }
+
+            cell.eachChild(function (child) {
+                that.validateCell(child, visible);
+            });
         }
-
-        visible = visible && cell.isVisible();
-
-        var view = that.getCellView(cell, visible);
-
-        if (view && !visible) {
-            // remove the cell view, or wo can just hide it?
-            that.removeCellView(cell);
-        }
-
-        cell.eachChild(function (child) {
-            that.validateCell(child, visible);
-        });
 
         return that;
     },
 
-    validateCellView(cell, recurse = true) {
+    validateView(cell, recurse = true) {
 
         var that = this;
-        var view = that.getCellView(cell);
 
-        if (view) {
-            if (view.invalid) {
-                view.invalid = false;
+        if (cell) {
 
-                that.validateCellView(cell.getParent(), recurse);
-                // render
+            var view = that.getView(cell);
+
+            if (view) {
+                if (view.invalid) {
+                    view.invalid = false;
+
+                    that.validateView(cell.getParent(), recurse);
+
+                    // render
+                    that.renderView(cell);
+                }
+            }
+
+            if (recurse) {
+                cell.eachChild(function (child) {
+                    that.validateView(child, recurse);
+                });
             }
         }
 
-        if (recurse) {
-            cell.eachChild(function (child) {
-                that.validateCellView(child, recurse);
-            });
-        }
+        return that;
     },
 
 
@@ -289,7 +295,7 @@ export default Class.create({
     // view
     // ----
 
-    getCellView: function (cell, create) {
+    getView: function (cell, create) {
 
         var that = this;
         var views = that.views;
@@ -298,20 +304,20 @@ export default Class.create({
             var view = views ? views[cell.id] : null;
 
             if (!view && create && cell.visible) {
-                view = that.createCellView(cell);
+                view = that.createView(cell);
             }
 
             return view;
         }
     },
 
-    createCellView: function (cell) {
+    createView: function (cell) {
 
         var that = this;
         var options = that.options;
 
         // get view's constructor from options.
-        var ViewClass = options.getCellView.call(that, cell);
+        var ViewClass = options.getView.call(that, cell);
 
         if (!ViewClass) {
             ViewClass = cell.isLink()
@@ -335,12 +341,27 @@ export default Class.create({
         }
     },
 
-    removeCellView: function (cell) {
+    removeView: function (cell) {
 
+        var that = this;
+        var view = that.getView(cell);
+
+        if (view) {
+            delete that.views[cell.id];
+            view.destroy();
+        }
+
+        return that;
     },
 
-    renderCellView: function (cell) {
+    renderView: function (cell) {
 
+        var that = this;
+        var view = that.getView(cell);
+
+        if (view) {
+            view.render();
+        }
     },
 
 
@@ -356,6 +377,9 @@ export default Class.create({
         forEach(changes, function (change) {
             that.distributeChange(change);
         });
+
+
+        that.validate();
 
         return that;
     },
@@ -373,12 +397,39 @@ export default Class.create({
         return that;
     },
 
-    onRootChanged: function (rootChange) {
+    onRootChanged: function (change) {
 
     },
 
-    onChildChanged: function (childChange) {
+    onChildChanged: function (change) {
 
+        var that = this;
+
+        var newParent = change.parent;
+        var oldParent = change.previous;
+
+        that.invalidate(change.child, true, true);
+
+        //if (newParent == null || this.isCellCollapsed(newParent)) {
+        //    this.view.invalidate(change.child, true, true);
+        //    this.removeStateForCell(change.child);
+        //
+        //    // Handles special case of current root of view being removed
+        //    if (this.view.currentRoot == change.child) {
+        //        this.home();
+        //    }
+        //}
+
+        if (newParent !== oldParent) {
+            // Refreshes the collapse/expand icons on the parents
+            if (newParent) {
+                that.invalidate(newParent, false, false);
+            }
+
+            if (oldParent) {
+                that.invalidate(oldParent, false, false);
+            }
+        }
     },
 
 
