@@ -12,7 +12,6 @@ entry[pkg.name] = './src/index.js';
 entry[pkg.name + '-' + pkg.version] = './src/index.js';
 
 module.exports = {
-
   entry: entry,
 
   resolve: {
@@ -31,10 +30,12 @@ module.exports = {
   module: {
     loaders: [
       {
-      test: /\.js?$/,
-      include: paths.src,
-      loader: 'babel'
-    }
+        test: /\.js?$/,
+        loader: 'babel',
+        query: {
+          presets: ['es2015', 'stage-1']
+        }
+      }
     ]
   },
 
@@ -42,7 +43,3 @@ module.exports = {
 
   devtool: 'source-map'
 };
-
-"babel-core": "^5.8.29",
-    "babel-eslint": "^4.1.3",
-    "babel-loader": "^5.3.2",
