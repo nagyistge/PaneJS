@@ -22,19 +22,69 @@ var floor = math.floor;
 var random = math.random;
 
 
-function Point(x = 0, y = 0) {
+class Point {
 
-    var that = this;
+    constructor(x = 0, y = 0) {
+        var that = this;
 
-    that.x = x;
-    that.y = y;
-}
+        that.x = x;
+        that.y = y;
+    }
 
-Point.prototype = {
 
-    constructor: Point,
+    static equals(p1, p2) {
+        return p1 && p2
+            && p1 instanceof Point
+            && p2 instanceof Point
+            && p1.x === p2.x
+            && p1.y === p2.y;
+    }
 
-    update: function (x = 0, y = 0) {
+    static fromPoint(p) {
+        return new Point(p.x, p.y);
+    }
+
+    static fromString(str) {
+        var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+        return new Point(toFloat(arr[0]), toFloat(arr[1]));
+    }
+
+    static fromPolar(r, angle, o) {
+
+        // Alternative constructor, from polar coordinates.
+        // @param {number} r Distance.
+        // @param {number} angle Angle in radians.
+        // @param {point} [optional] o Origin.
+
+        o = (o && point(o)) || point(0, 0);
+        var x = abs(r * cos(angle));
+        var y = abs(r * sin(angle));
+        var deg = normalizeAngle(toDeg(angle));
+
+        if (deg < 90) {
+            y = -y;
+        } else if (deg < 180) {
+            x = -x;
+            y = -y;
+        } else if (deg < 270) {
+            x = -x;
+        }
+
+        return point(o.x + x, o.y + y);
+    }
+
+    static random(x1, x2, y1, y2) {
+        // Create a point with random coordinates that fall
+        // into the range `[x1, x2]` and `[y1, y2]`.
+
+        var x = floor(random() * (x2 - x1 + 1) + x1);
+        var y = floor(random() * (y2 - y1 + 1) + y1);
+
+        return new Point(x, y);
+    }
+
+
+    update(x = 0, y = 0) {
 
         var that = this;
 
@@ -42,18 +92,18 @@ Point.prototype = {
         that.y = y;
 
         return that;
-    },
+    }
 
-    translate: function (dx = 0, dy = 0) {
+    translate(dx = 0, dy = 0) {
         var that = this;
 
         that.x += dx;
         that.y += dy;
 
         return that;
-    },
+    }
 
-    round: function (precision) {
+    round(precision) {
 
         var that = this;
 
@@ -61,13 +111,13 @@ Point.prototype = {
         that.y = precision ? toFixed(that.y, precision) : round(that.y);
 
         return that;
-    },
+    }
 
-    diff: function (p) {
+    diff(p) {
         return new Point(this.x - p.x, this.y - p.y);
-    },
+    }
 
-    adhereToRect: function (rect) {
+    adhereToRect(rect) {
 
         // If point lies outside rectangle `rect`, return the nearest point on
         // the boundary of rect `rect`, otherwise return point itself.
@@ -81,9 +131,9 @@ Point.prototype = {
         that.y = mmin(mmax(that.y, rect.y), rect.y + rect.height);
 
         return that;
-    },
+    }
 
-    theta: function (p) {
+    theta(p) {
 
         // Compute the angle between me and `p` and the x axis.
         // (cartesian-to-polar coordinates conversion)
@@ -103,25 +153,25 @@ Point.prototype = {
         }
 
         return toDeg(rad);
-    },
+    }
 
-    distance: function (p) {
+    distance(p) {
 
         // Returns distance between me and point `p`.
 
         var dx = p.x - this.x;
         var dy = p.y - this.y;
         return sqrt(dx * dx + dy * dy);
-    },
+    }
 
-    manhattanDistance: function (p) {
+    manhattanDistance(p) {
 
         // Returns a manhattan (taxi-cab) distance between me and point `p`.
 
         return abs(p.x - this.x) + abs(p.y - this.y);
-    },
+    }
 
-    normalize: function (len) {
+    normalize(len) {
 
         // Scale the line segment between (0,0) and me to have a length of len.
 
@@ -148,9 +198,9 @@ Point.prototype = {
         that.y = s * y;
 
         return that;
-    },
+    }
 
-    toPolar: function (o) {
+    toPolar(o) {
 
         // Converts rectangular to polar coordinates.
         // An origin can be specified, otherwise it's `0 0`.
@@ -166,9 +216,9 @@ Point.prototype = {
         that.y = toRad(o.theta(point(x, y)));
 
         return that;
-    },
+    }
 
-    rotate: function (o, angle) {
+    rotate(o, angle) {
 
         // Rotate point by angle around origin o.
 
@@ -184,34 +234,34 @@ Point.prototype = {
         that.x = p.x;
         that.y = p.y;
         return that;
-    },
+    }
 
-    move: function (ref, distance) {
+    move(ref, distance) {
 
         // Move point on line starting from ref
         // ending at me by distance distance.
         var that = this;
         var rad = toRad(ref.theta(that));
         return that.translate(cos(rad) * distance, -sin(rad) * distance);
-    },
+    }
 
-    reflect: function (ref) {
+    reflect(ref) {
 
         // Returns a point that is the reflection of me with
         // the center of inversion in ref point.
 
         return ref.move(this, this.distance(ref));
-    },
+    }
 
-    changeInAngle: function (dx, dy, ref) {
+    changeInAngle(dx, dy, ref) {
         // Returns change in angle from my previous position (-dx, -dy) to
         // my new position relative to ref point.
 
         // Revert the translation and measure the change in angle around x-axis.
         return this.translate(-dx, -dy).theta(ref) - this.theta(ref);
-    },
+    }
 
-    snapToGrid: function (gx, gy) {
+    snapToGrid(gx, gy) {
 
         var that = this;
 
@@ -219,81 +269,24 @@ Point.prototype = {
         that.y = snapToGrid(that.y, gy || gx);
 
         return that;
-    },
+    }
 
-    valueOf: function () {
+    valueOf() {
         return [this.x, this.y];
-    },
+    }
 
-    toString: function () {
+    toString() {
         return this.valueOf().join(', ');
-    },
+    }
 
-    equals: function (p) {
+    equals(p) {
         return Point.equals(this, p);
-    },
+    }
 
-    clone: function () {
+    clone() {
         return Point.fromPoint(this);
     }
-};
+}
 
 
-// statics
-// -------
-
-Point.equals = function (p1, p2) {
-    return p1 && p2
-        && p1 instanceof Point
-        && p2 instanceof Point
-        && p1.x === p2.x
-        && p1.y === p2.y;
-};
-
-Point.fromPoint = function (p) {
-    return new Point(p.x, p.y);
-};
-
-Point.fromString = function (str) {
-    var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
-    return new Point(toFloat(arr[0]), toFloat(arr[1]));
-};
-
-Point.fromPolar = function (r, angle, o) {
-
-    // Alternative constructor, from polar coordinates.
-    // @param {number} r Distance.
-    // @param {number} angle Angle in radians.
-    // @param {point} [optional] o Origin.
-
-    o = (o && point(o)) || point(0, 0);
-    var x = abs(r * cos(angle));
-    var y = abs(r * sin(angle));
-    var deg = normalizeAngle(toDeg(angle));
-
-    if (deg < 90) {
-        y = -y;
-    } else if (deg < 180) {
-        x = -x;
-        y = -y;
-    } else if (deg < 270) {
-        x = -x;
-    }
-
-    return point(o.x + x, o.y + y);
-};
-
-Point.random = function (x1, x2, y1, y2) {
-    // Create a point with random coordinates that fall
-    // into the range `[x1, x2]` and `[y1, y2]`.
-
-    var x = floor(random() * (x2 - x1 + 1) + x1);
-    var y = floor(random() * (y2 - y1 + 1) + y1);
-
-    return new Point(x, y);
-};
-
-
-// exports
-// -------
 export default Point;

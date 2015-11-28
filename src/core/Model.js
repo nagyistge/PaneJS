@@ -6,7 +6,6 @@ import {
     isNullOrUndefined,
 } from '../common/utils';
 
-import Class  from '../common/Class';
 import Events from '../common/Events';
 
 import Cell from '../cells/Cell';
@@ -15,12 +14,10 @@ import RootChange       from '../changes/RootChange';
 import ChildChange      from '../changes/ChildChange';
 import ChangeCollection from '../changes/ChangeCollection'
 
+class Model extends Events {
+    constructor(root) {
 
-export default Class.create({
-
-    Extends: Events,
-
-    constructor: function Model(root) {
+        super();
 
         var that = this;
 
@@ -34,15 +31,15 @@ export default Class.create({
         } else {
             that.clear();
         }
-    },
+    }
 
-    clear: function () {
+    clear() {
         return this.setRoot(this.createRoot());
-    },
+    }
 
-    getDefaultParent: function () {
+    getDefaultParent() {
         return this.getRoot().getChildAt(0);  // the first layer
-    },
+    }
 
     isAncestor(parent, child) {
 
@@ -55,15 +52,15 @@ export default Class.create({
         }
 
         return child === parent;
-    },
+    }
 
     contains(cell) {
         return this.isAncestor(this.root, cell);
-    },
+    }
 
     getCellById(id) {
         return this.cells ? this.cells[id] : null;
-    },
+    }
 
     createCellId() {
         var that = this;
@@ -72,7 +69,7 @@ export default Class.create({
         that.nextId += 1;
 
         return 'cell-' + id;
-    },
+    }
 
     getAncestors(child) {
 
@@ -86,7 +83,7 @@ export default Class.create({
         }
 
         return result;
-    },
+    }
 
     getDescendants(parent) {
 
@@ -100,7 +97,7 @@ export default Class.create({
         });
 
         return result;
-    },
+    }
 
     getParents(cells) {
 
@@ -125,25 +122,25 @@ export default Class.create({
         }
 
         return parents;
-    },
+    }
 
 
     // root
     // ----
 
-    isRoot: function (cell) {
+    isRoot(cell) {
         return cell && this.root === cell;
-    },
+    }
 
-    createRoot: function () {
+    createRoot() {
         var root = new Cell();
 
         root.insertChild(this.createLayer());
 
         return root;
-    },
+    }
 
-    getRoot: function (cell) {
+    getRoot(cell) {
 
         var root = cell || this.root;
 
@@ -155,11 +152,11 @@ export default Class.create({
         }
 
         return root;
-    },
+    }
 
-    setRoot: function (root) {
+    setRoot(root) {
         return this.digest(new RootChange(this, root));
-    },
+    }
 
     rootChanged(newRoot) {
 
@@ -172,7 +169,7 @@ export default Class.create({
         that.cellAdded(newRoot);
 
         return oldRoot;
-    },
+    }
 
 
     // Layers
@@ -180,15 +177,15 @@ export default Class.create({
 
     isLayer(cell) {
         return cell && this.isRoot(cell.parent);
-    },
+    }
 
     getLayers() {
         return this.getRoot().children || [];
-    },
+    }
 
-    createLayer: function () {
+    createLayer() {
         return new Cell();
-    },
+    }
 
 
     // child
@@ -196,13 +193,13 @@ export default Class.create({
 
     getParent(cell) {
         return cell ? cell.parent : null;
-    },
+    }
 
     addCell(child, parent, index) {
         return this.addCells([child], parent, index);
-    },
+    }
 
-    addCells: function (cells, parent, index) {
+    addCells(cells, parent, index) {
 
         var that = this;
 
@@ -223,7 +220,7 @@ export default Class.create({
         that.endUpdate();
 
         return that;
-    },
+    }
 
     childChanged(cell, newParent, newIndex) {
 
@@ -247,7 +244,7 @@ export default Class.create({
         }
 
         return oldParent;
-    },
+    }
 
     linkChanged(link, newNode, isSource) {
         var oldNode = link.getNode(isSource);
@@ -259,7 +256,7 @@ export default Class.create({
         }
 
         return oldNode;
-    },
+    }
 
     cellAdded(cell) {
 
@@ -297,7 +294,7 @@ export default Class.create({
 
             cell.eachChild(that.cellAdded, that);
         }
-    },
+    }
 
     updateLinkParents(cell, root) {
 
@@ -319,7 +316,7 @@ export default Class.create({
                 that.updateLinkParent(link, root);
             }
         });
-    },
+    }
 
     updateLinkParent(link, root) {
 
@@ -367,7 +364,7 @@ export default Class.create({
                 that.add(cell, link);
             }
         }
-    },
+    }
 
     getNearestCommonAncestor(cell1, cell2) {
 
@@ -403,7 +400,7 @@ export default Class.create({
         }
 
         return null;
-    },
+    }
 
     // get the absolute, accumulated origin for the children
     // inside the given parent as an `Point`.
@@ -428,7 +425,7 @@ export default Class.create({
         }
 
         return result;
-    },
+    }
 
     remove(cell) {
 
@@ -443,7 +440,7 @@ export default Class.create({
         }
 
         return cell;
-    },
+    }
 
     cellRemoved(cell) {
 
@@ -461,21 +458,21 @@ export default Class.create({
                 delete cells[id];
             }
         }
-    },
+    }
 
     getChildNodes(parent) {
         return this.getChildCells(parent, true, false);
-    },
+    }
 
     getChildLinks(parent) {
         return this.getChildCells(parent, false, true);
-    },
+    }
 
     getChildCells(parent, isNode, isLink) {
         return parent ? parent.filterChild(function (child) {
             return (isNode && child.isNode) || (isLink && child.isLink);
         }) : [];
-    },
+    }
 
 
     // update
@@ -492,7 +489,7 @@ export default Class.create({
         that.endUpdate();
 
         return that;
-    },
+    }
 
     beginUpdate() {
 
@@ -504,7 +501,7 @@ export default Class.create({
         if (that.updateLevel === 1) {
             that.trigger('startEdit');
         }
-    },
+    }
 
     endUpdate() {
 
@@ -532,4 +529,6 @@ export default Class.create({
             that.endingUpdate = false;
         }
     }
-});
+}
+
+export default Model;

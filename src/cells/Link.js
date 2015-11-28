@@ -1,14 +1,10 @@
 import Cell from './Cell';
 
-export default Cell.extend({
 
-    constructor: function Link() {
+class Link extends Cell {
 
-    },
-
-    isLink: function () {
+    isLink() {
         return true;
-    },
-
-
-});
+    }
+}
+export default Link;

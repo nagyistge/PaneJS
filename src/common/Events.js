@@ -7,17 +7,17 @@ import {
 const splitter = /\s+/;
 
 function triggerEvents(callbacks, args, context) {
+
     var result = true;
 
-    for (var i = 0, l = callbacks.length; i < l; i += 2) {
+    for (let i = 0, l = callbacks.length; i < l; i += 2) {
         result = invoke(callbacks[i], args, callbacks[i + 1] || context) && result;
     }
 
     return result;
 }
 
-
-export default class Events {
+class Events {
 
     on(events, callback, context) {
 
@@ -82,7 +82,7 @@ export default class Events {
                 return;
             }
 
-            for (var i = list.length - 2; i >= 0; i -= 2) {
+            for (let i = list.length - 2; i >= 0; i -= 2) {
                 if (!(callback && list[i] !== callback ||
                     context && list[i + 1] !== context)) {
                     list.splice(i, 2);
@@ -93,7 +93,7 @@ export default class Events {
         return that;
     }
 
-    trigger(eventName) {
+    trigger(eventName, ...args) {
 
         var that = this;
         var listeners = that.__events;
@@ -101,11 +101,6 @@ export default class Events {
         // No events.
         if (!listeners || !eventName) {
             return null;
-        }
-
-        var args = [];
-        for (var i = 1, l = arguments.length; i < l; i++) {
-            args[i - 1] = arguments[i]
         }
 
         var result = true;
@@ -130,3 +125,5 @@ export default class Events {
         return result;
     }
 }
+
+export default Events;

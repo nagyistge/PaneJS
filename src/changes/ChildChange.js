@@ -1,8 +1,6 @@
-import Change from './Change';
+class ChildChange {
 
-export default Change.extend({
-
-    constructor: function ChildChange(model, parent, child, index) {
+    constructor(model, parent, child, index) {
 
         var that = this;
 
@@ -12,7 +10,7 @@ export default Change.extend({
         that.index = index;
         that.previous = parent;
         that.previousIndex = index;
-    },
+    }
 
     digest() {
 
@@ -42,7 +40,7 @@ export default Change.extend({
         that.previousIndex = oldIndex;
 
         return that;
-    },
+    }
 
     connect(cell, connected) {
 
@@ -72,4 +70,6 @@ export default Change.extend({
 
         return that;
     }
-});
+}
+
+export default ChildChange;

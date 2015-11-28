@@ -1,33 +1,47 @@
-import Rect  from './Rect';
-import Point from './Point';
+import Rect  from './Rect'
+import Point from './Point'
 
-function Ellipse(x = 0, y = 0, a = 0, b = 0) {
+class Ellipse {
 
-    var that = this;
+    constructor(x = 0, y = 0, a = 0, b = 0) {
 
-    that.x = x;
-    that.y = y;
-    that.a = a;
-    that.b = b;
-}
+        var that = this;
 
-Ellipse.prototype = {
+        that.x = x;
+        that.y = y;
+        that.a = a;
+        that.b = b;
+    }
 
-    constructor: Ellipse,
 
-    getCenter: function () {
+    static equals(e1, e2) {
+        return e1 && e1
+            && e1 instanceof Ellipse
+            && e2 instanceof Ellipse
+            && e1.x === e2.x
+            && e1.y === e2.y
+            && e1.a === e2.a
+            && e1.b === e2.b;
+    }
+
+    static fromEllipse(e) {
+        return new Ellipse(e.x, e.y, e.a, e.b);
+    }
+
+
+    getCenter() {
         return new Point(this.x, this.y);
-    },
+    }
 
-    getBBox: function () {
+    getBBox() {
         var that = this;
         return new Rect(that.x - that.a, that.y - that.b, 2 * that.a, 2 * that.b);
-    },
+    }
 
     // Find point on me where line from my center to
     // point p intersects my boundary.
     // @param {number} angle If angle is specified, intersection with rotated ellipse is computed.
-    intersectionWithLineFromCenterToPoint: function (p, angle) {
+    intersectionWithLineFromCenterToPoint(p, angle) {
         p = point(p);
         if (angle) {
             p.rotate(point(this.x, this.y), angle);
@@ -55,46 +69,25 @@ Ellipse.prototype = {
             return result.rotate(point(this.x, this.y), -angle);
         }
         return result;
-    },
+    }
 
-    equals: function (e) {
+    equals(e) {
 
         return Ellipse.equals(this, e);
-    },
+    }
 
-    valueOf: function () {
+    valueOf() {
         var that = this;
         return [that.x, that.y, that.a, that.b];
-    },
+    }
 
-    toString: function () {
+    toString() {
         return this.valueOf().join(', ');
-    },
+    }
 
-    clone: function () {
+    clone() {
         return Ellipse.fromEllipse(this);
     }
-};
+}
 
-
-// statics
-// -------
-
-Ellipse.equals = function (e1, e2) {
-    return e1 && e1
-        && e1 instanceof Ellipse
-        && e2 instanceof Ellipse
-        && e1.x === e2.x
-        && e1.y === e2.y
-        && e1.a === e2.a
-        && e1.b === e2.b;
-};
-
-Ellipse.fromEllipse = function (e) {
-    return new Ellipse(e.x, e.y, e.a, e.b);
-};
-
-
-// exports
-// -------
 export default Ellipse;

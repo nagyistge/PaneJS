@@ -15,45 +15,63 @@ var mmax = math.max;
 var round = math.round;
 
 
-function Rect(x = 0, y = 0, width = 0, height = 0) {
+class Rect {
 
-    var that = this;
+    constructor(x = 0, y = 0, width = 0, height = 0) {
 
-    that.x = x;
-    that.y = y;
-    that.width = width;
-    that.height = height;
-}
+        var that = this;
 
-Rect.prototype = {
+        that.x = x;
+        that.y = y;
+        that.width = width;
+        that.height = height;
+    }
 
-    constructor: Rect,
 
-    getOrigin: function () {
+    static equals(rect1, rect2) {
+        var result = rect1 && rect2 && rect1 instanceof Rect && rect2 instanceof Rect;
+        if (result) {
+            rect1.normalize();
+            rect2.normalize();
+            result = rect1.x === rect2.x
+                && rect1.y === rect2.y
+                && rect1.width === rect2.width
+                && rect1.height === rect2.height;
+        }
+
+        return result;
+    }
+
+    static fromRect(rect) {
+        return new Rect(rect.x, rect.y, rect.width, rect.height);
+    }
+
+
+    getOrigin() {
         return new Point(this.x, this.y);
-    },
+    }
 
-    getCenter: function () {
+    getCenter() {
         var that = this;
         return new Point(that.x + that.width / 2, that.y + that.height / 2);
-    },
+    }
 
-    getCorner: function () {
+    getCorner() {
         var that = this;
         return new Point(that.x + that.width, that.y + that.height);
-    },
+    }
 
-    getTopRight: function () {
+    getTopRight() {
         var that = this;
         return new Point(that.x + that.width, that.y);
-    },
+    }
 
-    getBottomLeft: function () {
+    getBottomLeft() {
         var that = this;
         return new Point(that.x, that.y + that.height);
-    },
+    }
 
-    getNearestSideToPoint: function (point) {
+    getNearestSideToPoint(point) {
 
         // get (left|right|top|bottom) side which is nearest to point
 
@@ -83,9 +101,9 @@ Rect.prototype = {
         }
 
         return side;
-    },
+    }
 
-    getNearestPointToPoint: function (point) {
+    getNearestPointToPoint(point) {
 
         // get a point on my boundary nearest to `point`
 
@@ -106,9 +124,9 @@ Rect.prototype = {
         }
 
         return point.adhereToRect(that);
-    },
+    }
 
-    containsPoint: function (p) {
+    containsPoint(p) {
 
         var that = this;
 
@@ -116,9 +134,9 @@ Rect.prototype = {
             && p.x <= that.x + that.width
             && p.y >= that.y
             && p.y <= that.y + that.height;
-    },
+    }
 
-    containsRect: function (rect) {
+    containsRect(rect) {
 
         var that = this;
 
@@ -139,9 +157,9 @@ Rect.prototype = {
             && y2 >= y1
             && (x2 + w2) <= (x1 + w1)
             && (y2 + h2) <= (y1 + h1);
-    },
+    }
 
-    intersect: function (rect) {
+    intersect(rect) {
         var that = this;
         var origin1 = that.getOrigin();
         var corner1 = that.getCorner();
@@ -162,9 +180,9 @@ Rect.prototype = {
         var h = mmin(corner1.y, corner2.y) - y;
 
         return new Rect(x, y, w, h);
-    },
+    }
 
-    intersectionWithLineFromCenterToPoint: function (p, angle) {
+    intersectionWithLineFromCenterToPoint(p, angle) {
 
         // Find point on my boundary where line starting from my center
         // ending in point p intersects me. If angle is specified, intersection
@@ -201,9 +219,9 @@ Rect.prototype = {
         }
 
         return result;
-    },
+    }
 
-    moveAndExpand: function (rect) {
+    moveAndExpand(rect) {
 
         var that = this;
 
@@ -213,9 +231,9 @@ Rect.prototype = {
         that.height += rect.height || 0;
 
         return that;
-    },
+    }
 
-    round: function (precision) {
+    round(precision) {
 
         var that = this;
 
@@ -230,9 +248,9 @@ Rect.prototype = {
         that.height = precision ? toFixed(h, precision) : round(h);
 
         return that;
-    },
+    }
 
-    normalize: function () {
+    normalize() {
 
         // Normalize the rectangle.
         // i.e., make it so that it has a non-negative width and height.
@@ -262,9 +280,9 @@ Rect.prototype = {
         that.height = h;
 
         return that;
-    },
+    }
 
-    getBBox: function (angle) {
+    getBBox(angle) {
 
         var that = this;
         //var x = that.x;
@@ -278,9 +296,9 @@ Rect.prototype = {
         var w = that.width * ct + that.height * st;
         var h = that.width * st + that.height * ct;
         return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
-    },
+    }
 
-    snapToGrid: function (gx, gy) {
+    snapToGrid(gx, gy) {
 
         var that = this;
         var origin = that.getOrigin();
@@ -295,49 +313,25 @@ Rect.prototype = {
         that.height = corner.y - origin.y;
 
         return that;
-    },
+    }
 
-    equals: function (rect) {
+    equals(rect) {
         return Rect.equals(this, rect);
-    },
+    }
 
-    valueOf: function () {
+    valueOf() {
         var that = this;
         return [that.x, that.y, that.width, that.height];
-    },
+    }
 
-    toString: function () {
+    toString() {
         return this.valueOf().join(', ');
-    },
+    }
 
-    clone: function () {
+    clone() {
         return Rect.fromRect(this);
     }
-};
+}
 
 
-// statics
-// -------
-
-Rect.equals = function (rect1, rect2) {
-    var result = rect1 && rect2 && rect1 instanceof Rect && rect2 instanceof Rect;
-    if (result) {
-        rect1.normalize();
-        rect2.normalize();
-        result = rect1.x === rect2.x
-            && rect1.y === rect2.y
-            && rect1.width === rect2.width
-            && rect1.height === rect2.height;
-    }
-
-    return result;
-};
-
-Rect.fromRect = function (rect) {
-    return new Rect(rect.x, rect.y, rect.width, rect.height);
-};
-
-
-// exports
-// -------
 export default Rect;

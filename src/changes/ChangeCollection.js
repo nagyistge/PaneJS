@@ -1,23 +1,21 @@
-import Class from '../common/Class';
+class ChangeCollection {
 
-export default Class.create({
-    constructor: function ChangeCollection(graph) {
+    constructor(model) {
+        this.model = model;
+    }
 
-        var that = this;
-        that.graph = graph;
-    },
-
-    hasChange: function () {
+    hasChange() {
         var changes = this.changes;
         return changes && changes.length;
-    },
+    }
 
-    add: function (change) {
+    add(change) {
 
         var that = this;
         var changes = that.changes;
 
         if (change) {
+
             if (!changes) {
                 changes = that.changes = [];
             }
@@ -26,19 +24,22 @@ export default Class.create({
         }
 
         return change;
-    },
+    }
 
-    clear: function () {
+    clear() {
         this.changes = null;
         return this;
-    },
+    }
 
-    notify: function () {
+    notify() {
 
         var that = this;
 
-        that.graph.trigger('change', that.changes);
+        that.model.trigger('change', that.changes);
 
         return that;
     }
-});
+}
+
+
+export default ChangeCollection;

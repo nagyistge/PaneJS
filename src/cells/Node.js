@@ -1,8 +1,8 @@
 import Cell from './Cell';
 
-export default Cell.extend({
+class Node extends Cell {
 
-    defaults: {
+    defaults = {
         position: {
             x: 0,
             y: 0,
@@ -22,35 +22,31 @@ export default Cell.extend({
         width: 1,
         height: 1,
         angle: 0
-    },
+    };
 
-    constructor: function Node(attributes) {
-        Node.superclass.constructor.call(this, attributes);
-    },
+    getPosition(relative) {
 
-    getPosition: function (relative) {
+    }
 
-    },
+    setPosition(x, y, relative) {
 
-    setPosition: function (x, y, relative) {
+    }
 
-    },
+    translate() {
 
-    translate: function () {
+    }
 
-    },
+    resize(width, height) {}
 
-    resize: function (width, height) {},
+    rotate() { }
 
-    rotate: function () {
-
-    },
-
-    isNode: function () {
+    isNode() {
         return true;
-    },
+    }
 
-    getBBox: function () {
+    getBBox() {
         return false;
     }
-});
+}
+
+export default Node;

@@ -1,15 +1,13 @@
-import Change from './Change';
+class RootChange {
 
-export default Change.extend({
-
-    constructor: function RootChange(model, root) {
+    constructor(model, root) {
 
         var that = this;
 
         that.model = model;
         that.root = root;
         that.previous = root;
-    },
+    }
 
     digest() {
 
@@ -22,4 +20,6 @@ export default Change.extend({
 
         return that;
     }
-});
+}
+
+export default RootChange;

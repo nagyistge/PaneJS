@@ -3,7 +3,6 @@ import {
     forEach,
 } from '../common/utils';
 
-import Class  from '../common/Class';
 import Events from '../common/Events';
 import vector from '../common/vector';
 
@@ -15,31 +14,25 @@ import RootChange  from '../changes/RootChange';
 import ChildChange from '../changes/ChildChange';
 
 
-export default Class.create({
+// the default options for paper
+const OPTIONS = {
+    x: 0,
+    y: 0,
+    width: '100%',
+    height: '100%',
+    gridSize: 1,
+    viewportClassName: 'pane-viewport',
+    linkClassName: '',
+    nodeClassName: '',
+    getCellClassName (cell) {},
+    getView (cell) {}
+};
 
-    Extends: Events,
+class Paper extends Events {
 
-    options: {
-        x: 0,
-        y: 0,
-        width: '100%',
-        height: '100%',
-        gridSize: 1,
-        viewportClassName: 'pane-viewport',
-        linkClassName: '',
-        nodeClassName: '',
-        getCellClassName: function (cell) {},
-        getView: function (cell) {},
-    },
+    constructor(container, model, options) {
 
-    // events
-    //  - paper:configure
-    //  - paper:init
-    //  - paper:setup
-    //  - paper:destroy
-    //  - paper:resize
-
-    constructor: function Paper(container, model, options) {
+        super();
 
         var that = this;
 
@@ -53,23 +46,30 @@ export default Class.create({
                 .resize()
                 .translate();
         }
-    },
+    }
 
-    configure: function (options) {
+    // events
+    //  - paper:configure
+    //  - paper:init
+    //  - paper:setup
+    //  - paper:destroy
+    //  - paper:resize
+
+    configure(options) {
 
         var that = this;
 
-        that.options = merge({}, that.options, options);
+        that.options = merge({}, OPTIONS, options);
         that.trigger('paper:configure', that.options);
 
         return that;
-    },
+    }
 
 
     // lift cycle
     // ----------
 
-    init: function (container) {
+    init(container) {
 
         // create svg
 
@@ -94,9 +94,9 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
-    setup: function () {
+    setup() {
 
         // install event listeners.
 
@@ -107,23 +107,23 @@ export default Class.create({
         that.trigger('paper:setup');
 
         return that;
-    },
+    }
 
-    remove: function () {
+    remove() {
 
-    },
+    }
 
-    destroy: function () {
+    destroy() {
         var that = this;
 
         that.trigger('paper:destroy');
 
         return that;
-    },
+    }
 
     revalidate() {
         return this.invalidate().validate();
-    },
+    }
 
     clear(cell, force = false, recurse = true) {
 
@@ -143,7 +143,7 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
     invalidate(cell, recurse = true, includeLink = true) {
 
@@ -178,7 +178,7 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
     validate(cell) {
 
@@ -190,7 +190,7 @@ export default Class.create({
             .validateView(cell);
 
         return that;
-    },
+    }
 
     validateCell(cell, visible = true) {
 
@@ -214,7 +214,7 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
     validateView(cell, recurse = true) {
 
@@ -243,13 +243,13 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
 
     // transform
     // ---------
 
-    resize: function (width, height) {
+    resize(width, height) {
 
         var that = this;
         var options = that.options;
@@ -262,9 +262,9 @@ export default Class.create({
         that.trigger('paper:resize', width, height);
 
         return that;
-    },
+    }
 
-    translate: function (x, y, absolute) {
+    translate(x, y, absolute) {
 
         var that = this;
         var options = that.options;
@@ -277,25 +277,25 @@ export default Class.create({
         that.trigger('paper:translate', x, y);
 
         return that;
-    },
+    }
 
-    translateTo: function (x, y) {
+    translateTo(x, y) {
         return this.translate(x, y, true);
-    },
+    }
 
-    scale: function (sx, sy, ox = 0, oy = 0) {
+    scale(sx, sy, ox = 0, oy = 0) {
 
-    },
+    }
 
-    rotate: function (deg, ox = 0, oy = 0) {
+    rotate(deg, ox = 0, oy = 0) {
 
-    },
+    }
 
 
     // view
     // ----
 
-    getView: function (cell, create) {
+    getView(cell, create) {
 
         var that = this;
         var views = that.views;
@@ -309,9 +309,9 @@ export default Class.create({
 
             return view;
         }
-    },
+    }
 
-    createView: function (cell) {
+    createView(cell) {
 
         var that = this;
         var options = that.options;
@@ -339,9 +339,9 @@ export default Class.create({
 
             return view;
         }
-    },
+    }
 
-    removeView: function (cell) {
+    removeView(cell) {
 
         var that = this;
         var view = that.getView(cell);
@@ -352,9 +352,9 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
-    renderView: function (cell) {
+    renderView(cell) {
 
         var that = this;
         var view = that.getView(cell);
@@ -362,13 +362,13 @@ export default Class.create({
         if (view) {
             view.render();
         }
-    },
+    }
 
 
     // changes
     // -------
 
-    processChanges: function (changes) {
+    processChanges(changes) {
 
         var that = this;
 
@@ -382,9 +382,9 @@ export default Class.create({
         that.validate();
 
         return that;
-    },
+    }
 
-    distributeChange: function (change) {
+    distributeChange(change) {
 
         var that = this;
 
@@ -395,13 +395,13 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
-    onRootChanged: function (change) {
+    onRootChanged(change) {
 
-    },
+    }
 
-    onChildChanged: function (change) {
+    onChildChanged(change) {
 
         var that = this;
 
@@ -430,15 +430,17 @@ export default Class.create({
                 that.invalidate(oldParent, false, false);
             }
         }
-    },
+    }
 
 
     // event handlers
     // --------------
 
-    onPointerDown: function (e) {},
+    onPointerDown(e) {}
 
-    onPointerMove: function (e) {},
+    onPointerMove(e) {}
 
-    onPointerUp: function (e) {}
-});
+    onPointerUp(e) {}
+}
+
+export default Paper;

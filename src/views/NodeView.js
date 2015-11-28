@@ -1,21 +1,16 @@
+import vector   from '../common/vector';
 import CellView from './CellView';
-import vector from '../common/vector';
 
+class NodeView extends CellView {
 
-export  default CellView.extend({
-
-    constructor: function NodeView(paper, cell) {
-        NodeView.superclass.constructor.call(this, paper, cell);
-    },
-
-    update: function () {
+    update() {
 
         var that = this;
 
         return that;
-    },
+    }
 
-    render: function () {
+    render() {
 
         var that = this;
         var vel = that.vel;
@@ -31,9 +26,9 @@ export  default CellView.extend({
             .resize()
             .rotate()
             .translate();
-    },
+    }
 
-    renderMarkup: function () {
+    renderMarkup() {
 
         var that = this;
         var cell = that.cell;
@@ -46,23 +41,23 @@ export  default CellView.extend({
         }
 
         return that;
-    },
+    }
 
-    scale: function () {
-
-        var that = this;
-
-        return that;
-    },
-
-    resize: function () {
+    scale() {
 
         var that = this;
 
         return that;
-    },
+    }
 
-    rotate: function () {
+    resize() {
+
+        var that = this;
+
+        return that;
+    }
+
+    rotate() {
 
         var that = this;
         var node = that.rotatableNode;
@@ -85,14 +80,17 @@ export  default CellView.extend({
         }
 
         return that;
-    },
+    }
 
-    translate: function () {
+    translate() {
 
         var that = this;
 
         return that;
-    },
+    }
 
-    getBBox: function () {},
-});
+    getBBox() {}
+}
+
+
+export default NodeView;

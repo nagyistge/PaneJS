@@ -1,13 +1,10 @@
-import Class  from '../common/Class';
-import Events from '../common/Events';
-import vector from '../common/vector';
+import Events from '../common/Events'
+import vector from '../common/vector'
 
 
-export default Class.create({
+class CellView {
 
-    tagName: 'g',
-
-    constructor: function CellView(paper, cell) {
+    constructor(paper, cell) {
 
         var that = this;
 
@@ -15,13 +12,13 @@ export default Class.create({
         that.paper = paper;
 
         that.ensureElement();
-    },
+    }
 
-    ensureElement: function () {
+    ensureElement() {
 
         var that = this;
 
-        var vel = vector(that.tagName);
+        var vel = vector('g');
 
         that.el = vel.node;
         that.vel = vel;
@@ -29,25 +26,27 @@ export default Class.create({
         that.paper.drawPane.appendChild(that.el);
 
         return that;
-    },
+    }
 
-    find: function (selector) {
+    find(selector) {
 
-    },
+    }
 
-    onDblClick: function () {},
+    onDblClick() {}
 
-    onClick: function () {},
+    onClick() {}
 
-    onPointerDown: function () {},
+    onPointerDown() {}
 
-    onPointerMove: function () {},
+    onPointerMove() {}
 
-    onPointerUp: function () {},
+    onPointerUp() {}
 
-    onMouseOver: function () {},
+    onMouseOver() {}
 
-    onMouseOut: function () {},
+    onMouseOut() {}
 
-    onContextMenu: function () {}
-});
+    onContextMenu() {}
+}
+
+export default CellView;

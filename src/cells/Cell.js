@@ -6,45 +6,37 @@ import {
     isNullOrUndefined
 } from '../common/utils';
 
-import Class  from '../common/Class';
 import Events from '../common/Events';
 
-export default Class.create({
+class Cell {
 
-    constructor: function Cell(attributes) {
+    constructor(attributes) {
 
         var that = this;
 
         that.attributes = merge({}, that.defaults, attributes);
+        that.visible = true;
 
-    },
+    }
 
-    get: function (name) {
-        return this.attributes[name];
-    },
+    getPosition() {}
 
-    getPosition: function () {},
+    getSize() {}
 
-    getSize: function () {},
-
-    isVisible: function () {
-        return true;
-    },
-
-    isNode: function () {
+    isNode() {
         return false;
-    },
+    }
 
-    isLink: function () {
+    isLink() {
         return false;
-    },
+    }
 
     // link
     // ----
 
     getTerminal(isSource) {
         return isSource ? this.source : this.target;
-    },
+    }
 
     setTerminal(node, isSource) {
         if (isSource) {
@@ -54,7 +46,7 @@ export default Class.create({
         }
 
         return node;
-    },
+    }
 
     removeFromTerminal(isSource) {
 
@@ -69,7 +61,7 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
 
     // children
@@ -78,16 +70,16 @@ export default Class.create({
     getChildCount() {
         var children = this.children;
         return children ? children.length : 0;
-    },
+    }
 
     getChildIndex(child) {
         return indexOf(this.children || [], child);
-    },
+    }
 
     getChildAt(index) {
         var children = this.children;
         return children ? children[index] : null;
-    },
+    }
 
     eachChild(iterator, context) {
 
@@ -97,12 +89,12 @@ export default Class.create({
         children && forEach(children, iterator, context);
 
         return that;
-    },
+    }
 
     filterChild(iterator, context) {
         var children = this.children;
         return children ? filter(children, iterator, context) : [];
-    },
+    }
 
     insertChild(child, index) {
         var that = this;
@@ -134,11 +126,11 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
     removeChild(child) {
         return this.removeChildAt(this.getChildIndex(child));
-    },
+    }
 
     removeChildAt(index) {
         var that = this;
@@ -155,7 +147,7 @@ export default Class.create({
         }
 
         return child;
-    },
+    }
 
 
     // node
@@ -164,16 +156,16 @@ export default Class.create({
     getLinkCount() {
         var links = this.links;
         return links ? links.length : 0;
-    },
+    }
 
     getLinkIndex(link) {
         return indexOf(this.links || [], link);
-    },
+    }
 
     getLinkAt(index) {
         var links = this.links;
         return links ? links[index] : null;
-    },
+    }
 
     eachLink(iterator, context) {
 
@@ -183,12 +175,12 @@ export default Class.create({
         links && forEach(links, iterator, context);
 
         return that;
-    },
+    }
 
     filterLink(iterator, context) {
         var links = this.links;
         return links ? filter(links, iterator, context) : [];
-    },
+    }
 
     insertLink(link, outgoing) {
 
@@ -213,7 +205,7 @@ export default Class.create({
         }
 
         return link;
-    },
+    }
 
     removeLink(link, outgoing) {
 
@@ -235,15 +227,15 @@ export default Class.create({
         }
 
         return link;
-    },
+    }
 
 
     // parent
     // ------
 
-    getParent: function () {
+    getParent() {
         return this.parent;
-    },
+    }
 
     removeFromParent() {
 
@@ -255,25 +247,27 @@ export default Class.create({
         }
 
         return that;
-    },
+    }
 
 
     // common
     // ------
 
-    valueOf: function () {
-
-    },
-
-    toString: function () {
-
-    },
-
-    clone: function () {
-
-    },
-
-    destroy: function () {
+    valueOf() {
 
     }
-});
+
+    toString() {
+
+    }
+
+    clone() {
+
+    }
+
+    destroy() {
+
+    }
+}
+
+export default Cell;
