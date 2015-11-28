@@ -1,96 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f44d8d5e-15e5-44e3-9756-19f6b7369818" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.editorconfig" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.eslintrc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.gitignore" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.travis.yml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/CHANGELOG.yml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/LICENSE" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/README.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TODO.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/demo/helloword.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/demo/images/grid.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/pane-0.0.1.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/pane-0.0.1.js.map" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/pane-0.0.1.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/pane.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/pane.js.map" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/package.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/scripts/install.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/cell/Cell.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/cell/Geometry.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/cell/Renderer.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/cell/Selections.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/cell/State.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/cell/route.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/Change.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/ChangeCollection.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/ChildChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/CollapseChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/CurrentRootChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/GeometryChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/RootChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/SelectionChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/StyleChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/TerminalChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/ValueChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/changes/VisibleChange.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/common/class.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/common/detector.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/common/objectIdentity.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/common/utils.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/core/Graph.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/core/Model.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/core/View.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/drawing/Brush.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/drawing/Canvas.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/drawing/LinearGradientBrush.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/drawing/Path.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/drawing/Pen.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/drawing/SolidBrush.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/alignments.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/arrowTypes.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/constants.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/directions.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/fontStyle.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/shapeNames.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/enums/styleNames.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/events/EventObject.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/events/EventSource.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/events/MouseEvent.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/events/aspect.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/events/domEvent.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/index.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/lib/Base.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/lib/Dictionary.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/lib/Point.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/lib/Rectangle.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/Connector.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/Ellipse.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/Label.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/Polyline.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/Rect.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/Shape.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/marker.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/shapes/perimeter.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/styles/Stylesheet.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/styles/defaultLinkStyle.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/styles/defaultNodeStyle.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/styles/defaultStyle.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/array.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/bow.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/function.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/geom.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/lang.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/number.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/object.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/utils/string.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/webpack.config.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/webpack.config.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/webpack.config.production.js" afterPath="" />
-    </list>
+    <list default="true" id="f44d8d5e-15e5-44e3-9756-19f6b7369818" name="Default" comment="" />
     <ignored path="PaneJS.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -109,7 +20,7 @@
     <favorites_list name="PaneJS" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -218,6 +129,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -227,9 +139,18 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PaneJS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PaneJS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -297,12 +218,12 @@
     <frame x="0" y="23" width="1280" height="745" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20095314" sideWeight="0.4946565" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20095314" sideWeight="0.4946565" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924962" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494043" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45496184" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45496184" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
