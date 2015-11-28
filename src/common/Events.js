@@ -4,9 +4,7 @@ import {
     forEach,
 } from '../common/utils';
 
-import Class from '../common/Class';
-
-var splitter = /\s+/;
+const splitter = /\s+/;
 
 function triggerEvents(callbacks, args, context) {
     var result = true;
@@ -18,11 +16,11 @@ function triggerEvents(callbacks, args, context) {
     return result;
 }
 
-export default Class.create({
 
-    constructor: function Events() {},
+export default class Events {
 
-    on: function (events, callback, context) {
+    on(events, callback, context) {
+
         var that = this;
 
         if (!callback) {
@@ -39,9 +37,9 @@ export default Class.create({
         });
 
         return that;
-    },
+    }
 
-    once: function (events, callback, context) {
+    once(events, callback, context) {
 
         var that = this;
         var cb = function () {
@@ -50,9 +48,9 @@ export default Class.create({
         };
 
         return that.on(events, cb, context);
-    },
+    }
 
-    off: function (events, callback, context) {
+    off(events, callback, context) {
 
         var that = this;
         var listeners = that.__events;
@@ -93,9 +91,9 @@ export default Class.create({
         });
 
         return that;
-    },
+    }
 
-    trigger: function (eventName) {
+    trigger(eventName) {
 
         var that = this;
         var listeners = that.__events;
@@ -131,4 +129,4 @@ export default Class.create({
 
         return result;
     }
-});
+}
