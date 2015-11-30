@@ -33,34 +33,34 @@ class NodeView extends CellView {
 
         forIn(specifiedAttrs || allAttrs, function (attrs, selector) {
 
-            var vNodes = that.find(selector);
+            var vElements = that.find(selector);
 
-            if (!vNodes.length) {
+            if (!vElements.length) {
                 return;
             }
 
-            nodesBySelector[selector] = vNodes;
+            nodesBySelector[selector] = vElements;
 
             var specialAttributes = NodeView.specialAttributes.slice();
 
             if (isObject(attrs.filter)) {
                 specialAttributes.push('filter');
-                that.applyFilter(vNodes, attrs.filter);
+                that.applyFilter(vElements, attrs.filter);
             }
 
             if (isObject(attrs.fill)) {
                 specialAttributes.push('fill');
-                that.applyGradient(vNodes, 'fill', attrs.fill);
+                that.applyGradient(vElements, 'fill', attrs.fill);
             }
 
             if (isObject(attrs.stroke)) {
                 specialAttributes.push('stroke');
-                that.applyGradient(vNodes, 'stroke', attrs.stroke);
+                that.applyGradient(vElements, 'stroke', attrs.stroke);
             }
 
             if (!isUndefined(attrs.text)) {
                 specialAttributes.push('lineHeight', 'textPath', 'annotations');
-                forEach(vNodes, function (vel) {
+                forEach(vElements, function (vel) {
                     vel.text(attrs.text + '', {
                         lineHeight: attrs.lineHeight,
                         textPath: attrs.textPath,
@@ -78,24 +78,24 @@ class NodeView extends CellView {
             });
 
             // set regular attributes
-            forEach(vNodes, function (vel) {
+            forEach(vElements, function (vel) {
                 vel.attr(finalAttributes);
             });
 
             if (attrs.port) {
-                forEach(vNodes, function (vel) {
+                forEach(vElements, function (vel) {
                     vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
                 });
             }
 
             if (attrs.style) {
-                forEach(vNodes, function (vel) {
+                forEach(vElements, function (vel) {
                     vel.css(attrs.style);
                 });
             }
 
             if (!isUndefined(attrs.html)) {
-                forEach(vNodes, function (vel) {
+                forEach(vElements, function (vel) {
 
                 });
             }
