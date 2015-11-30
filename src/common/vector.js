@@ -1,5 +1,6 @@
 import {
     map,
+    some,
     trim,
     toInt,
     forIn,
@@ -25,6 +26,7 @@ import {
     createSvgElement,
     setAttribute,
     getClassName,
+    isNode,
     sanitizeText,
 } from '../common/utils'
 
@@ -426,7 +428,7 @@ export class VElement {
 
     }
 
-    getSVGElement() {
+    getSVG() {
         var that = this;
         var node = that.node;
 
@@ -434,8 +436,23 @@ export class VElement {
     }
 
     getDefs() {
-        var defs = this.svg().node.getElementsByTagName('defs');
-        return defs && defs.length ? vectorize(defs[0]) : null;
+
+        var defs = null;
+        var svg = this.getSVG();
+
+        some(svg.node.childNodes, function (node) {
+            if (isNode(node, 'defs')) {
+                defs = vectorize(node);
+                return true;
+            }
+        });
+
+        if (!defs) {
+            defs = createElement('defs');
+            svg.append(defs);
+        }
+
+        return defs;
     }
 
     clone() {
