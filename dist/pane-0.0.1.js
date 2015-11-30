@@ -1900,7 +1900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    elem = (0, _utils.createSvgElement)(elem);
 	
 	    // set attributes.
-	    attrs && (0, _utils.forIn)(attrs, function (attr, value) {
+	    attrs && (0, _utils.forIn)(attrs, function (value, attr) {
 	        (0, _utils.setAttribute)(elem, attr, value);
 	    });
 	

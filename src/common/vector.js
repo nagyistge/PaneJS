@@ -837,7 +837,7 @@ function createElement(elem, attrs, children) {
     elem = createSvgElement(elem);
 
     // set attributes.
-    attrs && forIn(attrs, function (attr, value) {
+    attrs && forIn(attrs, function (value, attr) {
         setAttribute(elem, attr, value);
     });
 
