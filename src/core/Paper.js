@@ -13,6 +13,7 @@ import NodeView from '../views/NodeView';
 import RootChange  from '../changes/RootChange';
 import ChildChange from '../changes/ChildChange';
 
+var counter = 0;
 
 // the default options for paper
 var defaultOptions = {
@@ -36,6 +37,7 @@ class Paper extends Events {
 
         var that = this;
 
+        that.id = 'paper' + counter++;
         that.model = model || new Model();
 
         that.configure(options);
