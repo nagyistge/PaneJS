@@ -14,9 +14,12 @@ class Cell {
 
         var that = this;
 
-        that.attributes = merge({}, that.defaults, attributes);
+        that.attributes = merge({}, that.constructor.defaults, attributes);
         that.visible = true;
+    }
 
+    get defaults() {
+        return this.constructor.defaults;
     }
 
     getPosition() {}

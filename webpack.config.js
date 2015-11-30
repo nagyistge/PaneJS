@@ -31,9 +31,29 @@ module.exports = {
     loaders: [
       {
         test: /\.js?$/,
+        include: paths.src,
         loader: 'babel',
         query: {
-          presets: ['es2015', 'stage-1']
+          presets: ['es2015'],
+          plugins: [
+
+            // Syntax
+            'syntax-class-properties',
+            'syntax-export-extensions',
+
+            // Experimental
+            'transform-class-properties',
+            'transform-export-extensions',
+
+            // Minification
+            //'transform-member-expression-literals',
+            //'transform-merge-sibling-variables',
+            //'transform-minify-booleans',
+            //'transform-property-literals',
+            //'transform-remove-console',
+            //'transform-remove-debugger',
+            //'transform-simplify-comparison-operators'
+          ]
         }
       }
     ]
