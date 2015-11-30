@@ -59,13 +59,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.shapes = exports.Paper = exports.Model = exports.ChildChange = exports.RootChange = exports.Change = exports.NodeView = exports.LinkView = exports.CellView = exports.Node = exports.Link = exports.Cell = exports.Events = exports.vector = exports.utils = undefined;
+	exports.shapes = exports.Paper = exports.Model = exports.ChildChange = exports.RootChange = exports.Change = exports.NodeView = exports.LinkView = exports.CellView = exports.Node = exports.Link = exports.Cell = exports.Events = exports.VElement = exports.vector = exports.utils = undefined;
+	
+	var _vector2 = __webpack_require__(10);
+	
+	Object.defineProperty(exports, 'VElement', {
+	    enumerable: true,
+	    get: function get() {
+	        return _vector2.VElement;
+	    }
+	});
 	
 	var _utils2 = __webpack_require__(1);
 	
 	var _utils = _interopRequireWildcard(_utils2);
-	
-	var _vector2 = __webpack_require__(10);
 	
 	var _vector3 = _interopRequireDefault(_vector2);
 	
@@ -175,7 +182,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.ChildChange = _ChildChange3.default;
 	exports.Model = _Model3.default;
 	exports.Paper = _Paper3.default;
-	var shapes = exports.shapes = {
+	
+	var shapes = {
 	    basic: {
 	        Generic: _Generic2.default,
 	        Text: _Text2.default,
@@ -189,6 +197,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Rhombus: _Rhombus2.default
 	    }
 	};
+	
+	exports.shapes = shapes;
 
 /***/ },
 /* 1 */

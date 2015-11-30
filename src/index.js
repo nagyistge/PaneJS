@@ -1,6 +1,6 @@
-export * as utils from './common/utils';
-export vector     from './common/vector';
-export Events     from './common/Events';
+export * as utils         from './common/utils';
+export vector, {VElement} from './common/vector';
+export Events             from './common/Events';
 
 
 export Cell from './cells/Cell';
@@ -33,7 +33,7 @@ import Polygon  from './shapes/basic/Polygon';
 import Polyline from './shapes/basic/Polyline';
 import Rhombus  from './shapes/basic/Rhombus';
 
-export var shapes = {
+var shapes = {
     basic: {
         Generic: Generic,
         Text: Text,
@@ -47,3 +47,7 @@ export var shapes = {
         Rhombus: Rhombus,
     }
 };
+
+export {
+    shapes
+}
