@@ -1,6 +1,10 @@
-class ChildChange {
+import Change from './Change';
+
+class ChildChange extends Change {
 
     constructor(model, parent, child, index) {
+
+        super();
 
         var that = this;
 
@@ -71,5 +75,6 @@ class ChildChange {
         return that;
     }
 }
+
 
 export default ChildChange;

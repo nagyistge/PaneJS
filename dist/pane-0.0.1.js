@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.shapes = exports.Paper = exports.Model = exports.NodeView = exports.LinkView = exports.CellView = exports.Node = exports.Link = exports.Cell = exports.Events = exports.vector = exports.utils = undefined;
+	exports.shapes = exports.Paper = exports.Model = exports.ChildChange = exports.RootChange = exports.Change = exports.NodeView = exports.LinkView = exports.CellView = exports.Node = exports.Link = exports.Cell = exports.Events = exports.vector = exports.utils = undefined;
 	
 	var _utils2 = __webpack_require__(1);
 	
@@ -97,19 +97,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _NodeView3 = _interopRequireDefault(_NodeView2);
 	
+	var _Change2 = __webpack_require__(20);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	var _RootChange2 = __webpack_require__(19);
+	
+	var _RootChange3 = _interopRequireDefault(_RootChange2);
+	
+	var _ChildChange2 = __webpack_require__(21);
+	
+	var _ChildChange3 = _interopRequireDefault(_ChildChange2);
+	
 	var _Model2 = __webpack_require__(18);
 	
 	var _Model3 = _interopRequireDefault(_Model2);
 	
-	var _Paper2 = __webpack_require__(22);
+	var _Paper2 = __webpack_require__(23);
 	
 	var _Paper3 = _interopRequireDefault(_Paper2);
 	
-	var _Generic = __webpack_require__(23);
+	var _Generic = __webpack_require__(24);
 	
 	var _Generic2 = _interopRequireDefault(_Generic);
 	
-	var _Rect = __webpack_require__(24);
+	var _Rect = __webpack_require__(25);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -126,6 +138,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.CellView = _CellView3.default;
 	exports.LinkView = _LinkView3.default;
 	exports.NodeView = _NodeView3.default;
+	exports.Change = _Change3.default;
+	exports.RootChange = _RootChange3.default;
+	exports.ChildChange = _ChildChange3.default;
 	exports.Model = _Model3.default;
 	exports.Paper = _Paper3.default;
 	var shapes = exports.shapes = {
@@ -1020,24 +1035,620 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.VElement = VElement;
+	exports.VElement = undefined;
 	
 	var _utils = __webpack_require__(1);
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var rclass = /[\t\r\n\f]/g;
 	var rnotwhite = /\S+/g;
 	
-	function VElement(elem) {
+	var VElement = exports.VElement = (function () {
+	    function VElement(elem) {
+	        _classCallCheck(this, VElement);
 	
-	    if (elem instanceof VElement) {
-	        elem = elem.node;
+	        if (elem instanceof VElement) {
+	            elem = elem.node;
+	        }
+	
+	        this.node = elem;
 	    }
 	
-	    this.node = elem;
-	}
+	    _createClass(VElement, [{
+	        key: 'attr',
+	        value: function attr(name, value) {
+	
+	            var that = this;
+	            var node = that.node;
+	            var length = arguments.length;
+	
+	            // Return all attributes.
+	            if (!length) {
+	                var attrs = {};
+	                (0, _utils.forEach)(node.attributes, function (attr) {
+	                    attrs[attr.nodeName] = attr.nodeValue;
+	                });
+	                return attrs;
+	            }
+	
+	            if (length === 1) {
+	                if ((0, _utils.isObject)(name)) {
+	                    (0, _utils.forIn)(name, function (attrValue, attrName) {
+	                        (0, _utils.setAttribute)(node, attrName, attrValue);
+	                    });
+	                } else {
+	                    return node.getAttribute(name);
+	                }
+	            } else {
+	                (0, _utils.setAttribute)(node, name, value);
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'removeAttr',
+	        value: function removeAttr(name) {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            if (node && name) {
+	                node.removeAttribute(name);
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'text',
+	        value: function text() {}
+	    }, {
+	        key: 'hasClass',
+	        value: function hasClass(selector) {
+	
+	            var that = this;
+	            var node = that.node;
+	            var className = ' ' + selector + ' ';
+	
+	            if (node.nodeType === 1) {
+	                return (' ' + (0, _utils.getClassName)(node) + ' ').replace(rclass, ' ').indexOf(className) > -1;
+	            }
+	            return false;
+	        }
+	    }, {
+	        key: 'addClass',
+	        value: function addClass(value) {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            if ((0, _utils.isFunction)(value)) {
+	                return that.addClass(value.call(node, (0, _utils.getClassName)(node)));
+	            }
+	
+	            if (value && (0, _utils.isString)(value) && node.nodeType === 1) {
+	
+	                var classes = value.match(rnotwhite) || [];
+	                var oldValue = (' ' + (0, _utils.getClassName)(node) + ' ').replace(rclass, ' ');
+	                var newValue = (0, _utils.reduce)(classes, function (ret, cls) {
+	                    if (ret.indexOf(' ' + cls + ' ') < 0) {
+	                        ret += cls + ' ';
+	                    }
+	                    return ret;
+	                }, oldValue);
+	
+	                newValue = (0, _utils.trim)(newValue);
+	                if (oldValue !== newValue) {
+	                    node.setAttribute('class', newValue);
+	                }
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'removeClass',
+	        value: function removeClass(value) {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            if ((0, _utils.isFunction)(value)) {
+	                return that.removeClass(value.call(node, (0, _utils.getClassName)(node)));
+	            }
+	
+	            if ((!value || (0, _utils.isString)(value)) && node.nodeType === 1) {
+	
+	                var classes = (value || '').match(rnotwhite) || [];
+	                var oldValue = (' ' + (0, _utils.getClassName)(node) + ' ').replace(rclass, ' ');
+	                var newValue = (0, _utils.reduce)(classes, function (ret, cls) {
+	                    if (ret.indexOf(' ' + cls + ' ') > -1) {
+	                        ret = ret.replace(' ' + cls + ' ', ' ');
+	                    }
+	                    return ret;
+	                }, oldValue);
+	
+	                newValue = value ? (0, _utils.trim)(newValue) : '';
+	                if (oldValue !== newValue) {
+	                    node.setAttribute('class', newValue);
+	                }
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'toggleClass',
+	        value: function toggleClass(value, stateVal) {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            if ((0, _utils.isBoolean)(stateVal) && (0, _utils.isString)(value)) {
+	                return stateVal ? that.addClass(value) : that.removeClass(value);
+	            }
+	
+	            if ((0, _utils.isFunction)(value)) {
+	                return that.toggleClass(value.call(node, (0, _utils.getClassName)(node), stateVal), stateVal);
+	            }
+	
+	            if (value && (0, _utils.isString)(value)) {
+	                var classes = value.match(rnotwhite) || [];
+	                (0, _utils.forEach)(classes, function (cls) {
+	                    that.hasClass(cls) ? that.removeClass(cls) : that.addClass(cls);
+	                });
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'remove',
+	        value: function remove() {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            if (node && node.parentNode) {
+	                node.parentNode.removeChild(node);
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'empty',
+	        value: function empty() {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            if (node) {
+	                while (node.lastChild) {
+	                    node.removeChild(node.lastChild);
+	                }
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'append',
+	        value: function append(elem) {
+	
+	            var that = this;
+	
+	            elem && (0, _utils.forEach)((0, _utils.toArray)(elem), function (item) {
+	                that.node.appendChild(normalize(item));
+	            });
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'prepend',
+	        value: function prepend(elem) {
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            elem && node.insertBefore(normalize(elem), node.firstChild);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'appendTo',
+	        value: function appendTo(elem) {
+	            //elem.appendChild(this.node);
+	            //return this;
+	        }
+	    }, {
+	        key: 'prependTo',
+	        value: function prependTo(elem) {}
+	    }, {
+	        key: 'before',
+	        value: function before(elem) {}
+	    }, {
+	        key: 'after',
+	        value: function after(elem) {}
+	    }, {
+	        key: 'getSVGElement',
+	        value: function getSVGElement() {
+	            var that = this;
+	            var node = that.node;
+	
+	            return node instanceof window.SVGSVGElement ? that : vectorize(node.ownerSVGElement);
+	        }
+	    }, {
+	        key: 'getDefs',
+	        value: function getDefs() {
+	            var defs = this.svg().node.getElementsByTagName('defs');
+	            return defs && defs.length ? vectorize(defs[0]) : null;
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone() {
+	            var node = this.node;
+	
+	            var cloned = vectorize(node.cloneNode(true));
+	
+	            if (node.id) {
+	                cloned.node.removeAttribute('id');
+	            }
+	            return cloned;
+	        }
+	    }, {
+	        key: 'find',
+	        value: function find(selector) {
+	            return (0, _utils.map)(this.node.querySelectorAll(selector), vectorize);
+	        }
+	    }, {
+	        key: 'findOne',
+	        value: function findOne(selector) {
+	            var found = this.node.querySelector(selector);
+	            return found ? vectorize(found) : null;
+	        }
+	    }, {
+	        key: 'findParent',
+	        value: function findParent(className, terminator) {
+	
+	            var node = this.node;
+	            var stop = terminator || node.ownerSVGElement;
+	
+	            node = node.parentNode;
+	
+	            while (node && node !== stop) {
+	                var vElem = vectorize(node);
+	                if (vElem.hasClass(className)) {
+	                    return vElem;
+	                }
+	
+	                node = node.parentNode;
+	            }
+	
+	            return null;
+	        }
+	    }, {
+	        key: 'index',
+	        value: function index() {
+	
+	            var index = 0;
+	            var node = this.node.previousSibling;
+	
+	            while (node) {
+	                // nodeType 1 for ELEMENT_NODE
+	                if (node.nodeType === 1) {
+	                    index++;
+	                }
+	                node = node.previousSibling;
+	            }
+	
+	            return index;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate(tx, ty, relative) {
+	
+	            var that = this;
+	            var transformAttr = that.attr('transform') || '';
+	            var translate = (0, _utils.parseTranslate)(transformAttr);
+	
+	            if (!arguments.length) {
+	                return translate;
+	            }
+	
+	            transformAttr = (0, _utils.trim)(transformAttr.replace(/translate\([^\)]*\)/g, ''));
+	
+	            var dx = relative ? translate.tx + tx : tx;
+	            var dy = relative ? translate.ty + ty : ty;
+	
+	            var newTranslate = 'translate(' + dx + ',' + dy + ')';
+	
+	            return that.attr('transform', newTranslate + ' ' + transformAttr);
+	        }
+	    }, {
+	        key: 'rotate',
+	        value: function rotate(angle, cx, cy, relative) {
+	
+	            var transformAttr = that.attr('transform') || '';
+	            var rotate = (0, _utils.parseRotate)(transformAttr);
+	
+	            if (!arguments.length) {
+	                return rotate;
+	            }
+	
+	            transformAttr = (0, _utils.trim)(transformAttr.replace(/rotate\([^\)]*\)/g, ''));
+	
+	            angle %= 360;
+	
+	            var newAngle = relative ? rotate.angle + angle : angle;
+	            var newOrigin = (0, _utils.isUndefined)(cx) || (0, _utils.isUndefined)(cy) ? '' : ',' + cx + ',' + cy;
+	            var newRotate = 'rotate(' + newAngle + newOrigin + ')';
+	
+	            return this.attr('transform', transformAttr + ' ' + newRotate);
+	        }
+	    }, {
+	        key: 'scale',
+	        value: function scale(sx, sy, relative) {
+	
+	            var transformAttr = this.attr('transform') || '';
+	            var scale = (0, _utils.parseScale)(transformAttr);
+	            var length = arguments.length;
+	
+	            if (!length) {
+	                return scale;
+	            }
+	
+	            transformAttr = (0, _utils.trim)(transformAttr.replace(/scale\([^\)]*\)/g, ''));
+	
+	            if (length === 1) {
+	                sy = sx;
+	            } else if (length === 2) {
+	                if ((0, _utils.isBoolean)(sy)) {
+	                    relative = sy;
+	                    sy = sx;
+	                }
+	            }
+	
+	            sx = relative ? scale.sx * sx : sx;
+	            sy = relative ? scale.sy * sy : sy;
+	
+	            var newScale = 'scale(' + sx + ',' + sy + ')';
+	
+	            return this.attr('transform', transformAttr + ' ' + newScale);
+	        }
+	    }, {
+	        key: 'bbox',
+	        value: function bbox(withoutTransformations, target) {
+	            // Get SVGRect that contains coordinates and dimension of the real
+	            // bounding box, i.e. after transformations are applied.
+	            // If `target` is specified, bounding box will be computed
+	            // relatively to `target` element.
+	
+	            var that = this;
+	            var node = that.node;
+	
+	            // If the element is not in the live DOM, it does not have a bounding
+	            // box defined and so fall back to 'zero' dimension element.
+	            if (!node.ownerSVGElement) {
+	                return {
+	                    x: 0,
+	                    y: 0,
+	                    width: 0,
+	                    height: 0
+	                };
+	            }
+	
+	            var box;
+	            try {
+	                box = node.getBBox();
+	                // We are creating a new object as the standard says that you can't
+	                // modify the attributes of a bbox.
+	                box = {
+	                    x: box.x,
+	                    y: box.y,
+	                    width: box.width,
+	                    height: box.height
+	                };
+	            } catch (e) {
+	                // Fallback for IE.
+	                box = {
+	                    x: node.clientLeft,
+	                    y: node.clientTop,
+	                    width: node.clientWidth,
+	                    height: node.clientHeight
+	                };
+	            }
+	
+	            if (withoutTransformations) {
+	                return box;
+	            }
+	
+	            var matrix = node.getTransformToElement(target || node.ownerSVGElement);
+	
+	            return V.transformRect(box, matrix);
+	        }
+	    }, {
+	        key: 'toLocalPoint',
+	        value: function toLocalPoint(x, y) {
+	            // Convert global point into the coordinate space of this element.
+	
+	        }
+	    }, {
+	        key: 'translateCenterToPoint',
+	        value: function translateCenterToPoint() {}
+	    }, {
+	        key: 'translateAndAutoOrient',
+	        value: function translateAndAutoOrient() {}
+	    }, {
+	        key: 'animateAlongPath',
+	        value: function animateAlongPath() {}
+	    }, {
+	        key: 'sample',
+	        value: function sample(interval) {
+	
+	            // Interpolate path by discrete points.
+	            // The precision of the sampling is controlled by `interval`.
+	            // In other words, `sample()` will generate a point on the path
+	            // starting at the beginning of the path going to the end every
+	            // `interval` pixels.
+	            // The sampler can be very useful. E.g. finding intersection between
+	            // two paths (finding the two closest points from two samples).
+	
+	            // `path.getTotalLength()`
+	            // Returns the computed value for the total length of the path using
+	            // the browser's distance-along-a-path algorithm, as a distance in the
+	            // current user coordinate system.
+	
+	            // `path.getPointAtLength(distance)`
+	            // Returns the (x,y) coordinate in user space which is distance units
+	            // along the path, utilizing the browser's distance-along-a-path algorithm.
+	
+	            interval = interval || 1;
+	
+	            var node = this.node;
+	            var length = node.getTotalLength();
+	            var distance = 0;
+	            var samples = [];
+	            var sample;
+	
+	            while (distance < length) {
+	                sample = node.getPointAtLength(distance);
+	                samples.push({ x: sample.x, y: sample.y, distance: distance });
+	                distance += interval;
+	            }
+	
+	            return samples;
+	        }
+	    }, {
+	        key: 'toPath',
+	        value: function toPath() {
+	
+	            var that = this;
+	            var path = vectorize((0, _utils.createSvgElement)('path'));
+	            var d = that.toPathData();
+	
+	            path.attr(that.attr());
+	
+	            d && path.attr('d', d);
+	
+	            return path;
+	        }
+	    }, {
+	        key: 'toPathData',
+	        value: function toPathData() {
+	
+	            var that = this;
+	            var node = that.node;
+	            var tagName = node.tagName.toUpperCase();
+	
+	            switch (tagName) {
+	                case 'PATH':
+	                    return that.attr('d');
+	                case 'LINE':
+	                    return (0, _utils.lineToPathData)(node);
+	                case 'POLYGON':
+	                    return (0, _utils.polygonToPathData)(node);
+	                case 'POLYLINE':
+	                    return (0, _utils.polylineToPathData)(node);
+	                case 'ELLIPSE':
+	                    return (0, _utils.ellipseToPathData)(node);
+	                case 'CIRCLE':
+	                    return (0, _utils.circleToPathData)(node);
+	                case 'RECT':
+	                    return (0, _utils.rectToPathData)(node);
+	            }
+	
+	            throw new Error(tagName + ' cannot be converted to PATH.');
+	        }
+	    }, {
+	        key: 'findIntersection',
+	        value: function findIntersection(ref, target) {
+	
+	            // Find the intersection of a line starting in the center
+	            // of the SVG `node` ending in the point `ref`.
+	            // `target` is an SVG element to which `node`s transformations are relative to.
+	            // In JointJS, `target` is the `paper.viewport` SVG group element.
+	            // Note that `ref` point must be in the coordinate system of the `target` for this function to work properly.
+	            // Returns a point in the `target` coordinate system (the same system as `ref` is in) if
+	            // an intersection is found. Returns `undefined` otherwise.
+	
+	            var that = this;
+	            var svg = that.svg().node;
+	
+	            target = target || svg;
+	
+	            var bbox = g.rect(this.bbox(false, target));
+	            var center = bbox.getCenter();
+	            var spot = bbox.intersectionWithLineFromCenterToPoint(ref);
+	
+	            if (!spot) {
+	                return undefined;
+	            }
+	
+	            var tagName = this.node.localName.toUpperCase();
+	
+	            // Little speed up optimalization for `<rect>` element. We do not do conversion
+	            // to path element and sampling but directly calculate the intersection through
+	            // a transformed geometrical rectangle.
+	            if (tagName === 'RECT') {
+	
+	                var gRect = g.rect(parseFloat(this.attr('x') || 0), parseFloat(this.attr('y') || 0), parseFloat(this.attr('width')), parseFloat(this.attr('height')));
+	                // Get the rect transformation matrix with regards to the SVG document.
+	                var rectMatrix = this.node.getTransformToElement(target);
+	                // Decompose the matrix to find the rotation angle.
+	                var rectMatrixComponents = V.decomposeMatrix(rectMatrix);
+	                // Now we want to rotate the rectangle back so that we
+	                // can use `intersectionWithLineFromCenterToPoint()` passing the angle as the second argument.
+	                var resetRotation = svg.createSVGTransform();
+	                resetRotation.setRotate(-rectMatrixComponents.rotation, center.x, center.y);
+	                var rect = V.transformRect(gRect, resetRotation.matrix.multiply(rectMatrix));
+	                spot = g.rect(rect).intersectionWithLineFromCenterToPoint(ref, rectMatrixComponents.rotation);
+	            } else if (tagName === 'PATH' || tagName === 'POLYGON' || tagName === 'POLYLINE' || tagName === 'CIRCLE' || tagName === 'ELLIPSE') {
+	
+	                var pathNode = tagName === 'PATH' ? that : that.toPath();
+	                var samples = pathNode.sample();
+	                var minDistance = Infinity;
+	                var closestSamples = [];
+	
+	                for (var i = 0, len = samples.length; i < len; i++) {
+	
+	                    var sample = samples[i];
+	                    // Convert the sample point in the local coordinate system to the global coordinate system.
+	                    var gp = V.createSVGPoint(sample.x, sample.y);
+	                    gp = gp.matrixTransform(this.node.getTransformToElement(target));
+	                    sample = g.point(gp);
+	                    var centerDistance = sample.distance(center);
+	                    // Penalize a higher distance to the reference point by 10%.
+	                    // This gives better results. This is due to
+	                    // inaccuracies introduced by rounding errors and getPointAtLength() returns.
+	                    var refDistance = sample.distance(ref) * 1.1;
+	                    var distance = centerDistance + refDistance;
+	                    if (distance < minDistance) {
+	                        minDistance = distance;
+	                        closestSamples = [{
+	                            sample: sample,
+	                            refDistance: refDistance
+	                        }];
+	                    } else if (distance < minDistance + 1) {
+	                        closestSamples.push({
+	                            sample: sample,
+	                            refDistance: refDistance
+	                        });
+	                    }
+	                }
+	
+	                closestSamples.sort(function (a, b) {
+	                    return a.refDistance - b.refDistance;
+	                });
+	                spot = closestSamples[0].sample;
+	            }
+	
+	            return spot;
+	        }
+	    }]);
+	
+	    return VElement;
+	})();
 	
 	function vectorize(node) {
 	    return new VElement(node);
@@ -1089,562 +1700,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return vectorize(elem);
 	}
-	
-	VElement.prototype = {
-	
-	    constructor: VElement,
-	
-	    attr: function attr(name, value) {
-	
-	        var that = this;
-	        var node = that.node;
-	        var length = arguments.length;
-	
-	        // Return all attributes.
-	        if (!length) {
-	            var attrs = {};
-	            (0, _utils.forEach)(node.attributes, function (attr) {
-	                attrs[attr.nodeName] = attr.nodeValue;
-	            });
-	            return attrs;
-	        }
-	
-	        if (length === 1) {
-	            if ((0, _utils.isObject)(name)) {
-	                (0, _utils.forIn)(name, function (attrValue, attrName) {
-	                    (0, _utils.setAttribute)(node, attrName, attrValue);
-	                });
-	            } else {
-	                return node.getAttribute(name);
-	            }
-	        } else {
-	            (0, _utils.setAttribute)(node, name, value);
-	        }
-	
-	        return that;
-	    },
-	
-	    removeAttr: function removeAttr(name) {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if (node && name) {
-	            node.removeAttribute(name);
-	        }
-	
-	        return that;
-	    },
-	
-	    text: function text() {},
-	
-	    hasClass: function hasClass(selector) {
-	
-	        var that = this;
-	        var node = that.node;
-	        var className = ' ' + selector + ' ';
-	
-	        if (node.nodeType === 1) {
-	            return (' ' + (0, _utils.getClassName)(node) + ' ').replace(rclass, ' ').indexOf(className) > -1;
-	        }
-	        return false;
-	    },
-	
-	    addClass: function addClass(value) {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if ((0, _utils.isFunction)(value)) {
-	            return that.addClass(value.call(node, (0, _utils.getClassName)(node)));
-	        }
-	
-	        if (value && (0, _utils.isString)(value) && node.nodeType === 1) {
-	
-	            var classes = value.match(rnotwhite) || [];
-	            var oldValue = (' ' + (0, _utils.getClassName)(node) + ' ').replace(rclass, ' ');
-	            var newValue = (0, _utils.reduce)(classes, function (ret, cls) {
-	                if (ret.indexOf(' ' + cls + ' ') < 0) {
-	                    ret += cls + ' ';
-	                }
-	                return ret;
-	            }, oldValue);
-	
-	            newValue = (0, _utils.trim)(newValue);
-	            if (oldValue !== newValue) {
-	                node.setAttribute('class', newValue);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    removeClass: function removeClass(value) {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if ((0, _utils.isFunction)(value)) {
-	            return that.removeClass(value.call(node, (0, _utils.getClassName)(node)));
-	        }
-	
-	        if ((!value || (0, _utils.isString)(value)) && node.nodeType === 1) {
-	
-	            var classes = (value || '').match(rnotwhite) || [];
-	            var oldValue = (' ' + (0, _utils.getClassName)(node) + ' ').replace(rclass, ' ');
-	            var newValue = (0, _utils.reduce)(classes, function (ret, cls) {
-	                if (ret.indexOf(' ' + cls + ' ') > -1) {
-	                    ret = ret.replace(' ' + cls + ' ', ' ');
-	                }
-	                return ret;
-	            }, oldValue);
-	
-	            newValue = value ? (0, _utils.trim)(newValue) : '';
-	            if (oldValue !== newValue) {
-	                node.setAttribute('class', newValue);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    toggleClass: function toggleClass(value, stateVal) {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if ((0, _utils.isBoolean)(stateVal) && (0, _utils.isString)(value)) {
-	            return stateVal ? that.addClass(value) : that.removeClass(value);
-	        }
-	
-	        if ((0, _utils.isFunction)(value)) {
-	            return that.toggleClass(value.call(node, (0, _utils.getClassName)(node), stateVal), stateVal);
-	        }
-	
-	        if (value && (0, _utils.isString)(value)) {
-	            var classes = value.match(rnotwhite) || [];
-	            (0, _utils.forEach)(classes, function (cls) {
-	                that.hasClass(cls) ? that.removeClass(cls) : that.addClass(cls);
-	            });
-	        }
-	
-	        return that;
-	    },
-	
-	    remove: function remove() {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if (node && node.parentNode) {
-	            node.parentNode.removeChild(node);
-	        }
-	
-	        return that;
-	    },
-	
-	    empty: function empty() {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        if (node) {
-	            while (node.lastChild) {
-	                node.removeChild(node.lastChild);
-	            }
-	        }
-	
-	        return that;
-	    },
-	
-	    append: function append(elem) {
-	
-	        var that = this;
-	
-	        elem && (0, _utils.forEach)((0, _utils.toArray)(elem), function (item) {
-	            that.node.appendChild(normalize(item));
-	        });
-	
-	        return that;
-	    },
-	
-	    prepend: function prepend(elem) {
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        elem && node.insertBefore(normalize(elem), node.firstChild);
-	
-	        return that;
-	    },
-	
-	    appendTo: function appendTo(elem) {
-	        //elem.appendChild(this.node);
-	        //return this;
-	    },
-	
-	    prependTo: function prependTo(elem) {},
-	
-	    before: function before(elem) {},
-	
-	    after: function after(elem) {},
-	
-	    getSVGElement: function getSVGElement() {
-	        var that = this;
-	        var node = that.node;
-	
-	        return node instanceof window.SVGSVGElement ? that : vectorize(node.ownerSVGElement);
-	    },
-	
-	    getDefs: function getDefs() {
-	        var defs = this.svg().node.getElementsByTagName('defs');
-	        return defs && defs.length ? vectorize(defs[0]) : null;
-	    },
-	
-	    clone: function clone() {
-	        var node = this.node;
-	
-	        var cloned = vectorize(node.cloneNode(true));
-	
-	        if (node.id) {
-	            cloned.node.removeAttribute('id');
-	        }
-	        return cloned;
-	    },
-	
-	    find: function find(selector) {
-	        return (0, _utils.map)(this.node.querySelectorAll(selector), vectorize);
-	    },
-	
-	    findOne: function findOne(selector) {
-	        var found = this.node.querySelector(selector);
-	        return found ? vectorize(found) : null;
-	    },
-	
-	    findParent: function findParent(className, terminator) {
-	
-	        var node = this.node;
-	        var stop = terminator || node.ownerSVGElement;
-	
-	        node = node.parentNode;
-	
-	        while (node && node !== stop) {
-	            var vElem = vectorize(node);
-	            if (vElem.hasClass(className)) {
-	                return vElem;
-	            }
-	
-	            node = node.parentNode;
-	        }
-	
-	        return null;
-	    },
-	
-	    index: function index() {
-	
-	        var index = 0;
-	        var node = this.node.previousSibling;
-	
-	        while (node) {
-	            // nodeType 1 for ELEMENT_NODE
-	            if (node.nodeType === 1) {
-	                index++;
-	            }
-	            node = node.previousSibling;
-	        }
-	
-	        return index;
-	    },
-	
-	    translate: function translate(tx, ty, relative) {
-	
-	        var that = this;
-	        var transformAttr = that.attr('transform') || '';
-	        var translate = (0, _utils.parseTranslate)(transformAttr);
-	
-	        if (!arguments.length) {
-	            return translate;
-	        }
-	
-	        transformAttr = (0, _utils.trim)(transformAttr.replace(/translate\([^\)]*\)/g, ''));
-	
-	        var dx = relative ? translate.tx + tx : tx;
-	        var dy = relative ? translate.ty + ty : ty;
-	
-	        var newTranslate = 'translate(' + dx + ',' + dy + ')';
-	
-	        return that.attr('transform', newTranslate + ' ' + transformAttr);
-	    },
-	
-	    rotate: function rotate(angle, cx, cy, relative) {
-	
-	        var transformAttr = that.attr('transform') || '';
-	        var rotate = (0, _utils.parseRotate)(transformAttr);
-	
-	        if (!arguments.length) {
-	            return rotate;
-	        }
-	
-	        transformAttr = (0, _utils.trim)(transformAttr.replace(/rotate\([^\)]*\)/g, ''));
-	
-	        angle %= 360;
-	
-	        var newAngle = relative ? rotate.angle + angle : angle;
-	        var newOrigin = (0, _utils.isUndefined)(cx) || (0, _utils.isUndefined)(cy) ? '' : ',' + cx + ',' + cy;
-	        var newRotate = 'rotate(' + newAngle + newOrigin + ')';
-	
-	        return this.attr('transform', transformAttr + ' ' + newRotate);
-	    },
-	
-	    scale: function scale(sx, sy, relative) {
-	
-	        var transformAttr = this.attr('transform') || '';
-	        var scale = (0, _utils.parseScale)(transformAttr);
-	        var length = arguments.length;
-	
-	        if (!length) {
-	            return scale;
-	        }
-	
-	        transformAttr = (0, _utils.trim)(transformAttr.replace(/scale\([^\)]*\)/g, ''));
-	
-	        if (length === 1) {
-	            sy = sx;
-	        } else if (length === 2) {
-	            if ((0, _utils.isBoolean)(sy)) {
-	                relative = sy;
-	                sy = sx;
-	            }
-	        }
-	
-	        sx = relative ? scale.sx * sx : sx;
-	        sy = relative ? scale.sy * sy : sy;
-	
-	        var newScale = 'scale(' + sx + ',' + sy + ')';
-	
-	        return this.attr('transform', transformAttr + ' ' + newScale);
-	    },
-	
-	    bbox: function bbox(withoutTransformations, target) {
-	        // Get SVGRect that contains coordinates and dimension of the real
-	        // bounding box, i.e. after transformations are applied.
-	        // If `target` is specified, bounding box will be computed
-	        // relatively to `target` element.
-	
-	        var that = this;
-	        var node = that.node;
-	
-	        // If the element is not in the live DOM, it does not have a bounding
-	        // box defined and so fall back to 'zero' dimension element.
-	        if (!node.ownerSVGElement) {
-	            return {
-	                x: 0,
-	                y: 0,
-	                width: 0,
-	                height: 0
-	            };
-	        }
-	
-	        var box;
-	        try {
-	            box = node.getBBox();
-	            // We are creating a new object as the standard says that you can't
-	            // modify the attributes of a bbox.
-	            box = {
-	                x: box.x,
-	                y: box.y,
-	                width: box.width,
-	                height: box.height
-	            };
-	        } catch (e) {
-	            // Fallback for IE.
-	            box = {
-	                x: node.clientLeft,
-	                y: node.clientTop,
-	                width: node.clientWidth,
-	                height: node.clientHeight
-	            };
-	        }
-	
-	        if (withoutTransformations) {
-	            return box;
-	        }
-	
-	        var matrix = node.getTransformToElement(target || node.ownerSVGElement);
-	
-	        return V.transformRect(box, matrix);
-	    },
-	
-	    toLocalPoint: function toLocalPoint(x, y) {
-	        // Convert global point into the coordinate space of this element.
-	
-	    },
-	
-	    translateCenterToPoint: function translateCenterToPoint() {},
-	
-	    translateAndAutoOrient: function translateAndAutoOrient() {},
-	
-	    animateAlongPath: function animateAlongPath() {},
-	
-	    sample: function sample(interval) {
-	
-	        // Interpolate path by discrete points.
-	        // The precision of the sampling is controlled by `interval`.
-	        // In other words, `sample()` will generate a point on the path
-	        // starting at the beginning of the path going to the end every
-	        // `interval` pixels.
-	        // The sampler can be very useful. E.g. finding intersection between
-	        // two paths (finding the two closest points from two samples).
-	
-	        // `path.getTotalLength()`
-	        // Returns the computed value for the total length of the path using
-	        // the browser's distance-along-a-path algorithm, as a distance in the
-	        // current user coordinate system.
-	
-	        // `path.getPointAtLength(distance)`
-	        // Returns the (x,y) coordinate in user space which is distance units
-	        // along the path, utilizing the browser's distance-along-a-path algorithm.
-	
-	        interval = interval || 1;
-	
-	        var node = this.node;
-	        var length = node.getTotalLength();
-	        var distance = 0;
-	        var samples = [];
-	        var sample;
-	
-	        while (distance < length) {
-	            sample = node.getPointAtLength(distance);
-	            samples.push({ x: sample.x, y: sample.y, distance: distance });
-	            distance += interval;
-	        }
-	
-	        return samples;
-	    },
-	
-	    toPath: function toPath() {
-	
-	        var that = this;
-	        var path = vectorize((0, _utils.createSvgElement)('path'));
-	        var d = that.toPathData();
-	
-	        path.attr(that.attr());
-	
-	        d && path.attr('d', d);
-	
-	        return path;
-	    },
-	
-	    toPathData: function toPathData() {
-	
-	        var that = this;
-	        var node = that.node;
-	        var tagName = node.tagName.toUpperCase();
-	
-	        switch (tagName) {
-	            case 'PATH':
-	                return that.attr('d');
-	            case 'LINE':
-	                return (0, _utils.lineToPathData)(node);
-	            case 'POLYGON':
-	                return (0, _utils.polygonToPathData)(node);
-	            case 'POLYLINE':
-	                return (0, _utils.polylineToPathData)(node);
-	            case 'ELLIPSE':
-	                return (0, _utils.ellipseToPathData)(node);
-	            case 'CIRCLE':
-	                return (0, _utils.circleToPathData)(node);
-	            case 'RECT':
-	                return (0, _utils.rectToPathData)(node);
-	        }
-	
-	        throw new Error(tagName + ' cannot be converted to PATH.');
-	    },
-	
-	    findIntersection: function findIntersection(ref, target) {
-	
-	        // Find the intersection of a line starting in the center
-	        // of the SVG `node` ending in the point `ref`.
-	        // `target` is an SVG element to which `node`s transformations are relative to.
-	        // In JointJS, `target` is the `paper.viewport` SVG group element.
-	        // Note that `ref` point must be in the coordinate system of the `target` for this function to work properly.
-	        // Returns a point in the `target` coordinate system (the same system as `ref` is in) if
-	        // an intersection is found. Returns `undefined` otherwise.
-	
-	        var that = this;
-	        var svg = that.svg().node;
-	
-	        target = target || svg;
-	
-	        var bbox = g.rect(this.bbox(false, target));
-	        var center = bbox.getCenter();
-	        var spot = bbox.intersectionWithLineFromCenterToPoint(ref);
-	
-	        if (!spot) {
-	            return undefined;
-	        }
-	
-	        var tagName = this.node.localName.toUpperCase();
-	
-	        // Little speed up optimalization for `<rect>` element. We do not do conversion
-	        // to path element and sampling but directly calculate the intersection through
-	        // a transformed geometrical rectangle.
-	        if (tagName === 'RECT') {
-	
-	            var gRect = g.rect(parseFloat(this.attr('x') || 0), parseFloat(this.attr('y') || 0), parseFloat(this.attr('width')), parseFloat(this.attr('height')));
-	            // Get the rect transformation matrix with regards to the SVG document.
-	            var rectMatrix = this.node.getTransformToElement(target);
-	            // Decompose the matrix to find the rotation angle.
-	            var rectMatrixComponents = V.decomposeMatrix(rectMatrix);
-	            // Now we want to rotate the rectangle back so that we
-	            // can use `intersectionWithLineFromCenterToPoint()` passing the angle as the second argument.
-	            var resetRotation = svg.createSVGTransform();
-	            resetRotation.setRotate(-rectMatrixComponents.rotation, center.x, center.y);
-	            var rect = V.transformRect(gRect, resetRotation.matrix.multiply(rectMatrix));
-	            spot = g.rect(rect).intersectionWithLineFromCenterToPoint(ref, rectMatrixComponents.rotation);
-	        } else if (tagName === 'PATH' || tagName === 'POLYGON' || tagName === 'POLYLINE' || tagName === 'CIRCLE' || tagName === 'ELLIPSE') {
-	
-	            var pathNode = tagName === 'PATH' ? that : that.toPath();
-	            var samples = pathNode.sample();
-	            var minDistance = Infinity;
-	            var closestSamples = [];
-	
-	            for (var i = 0, len = samples.length; i < len; i++) {
-	
-	                var sample = samples[i];
-	                // Convert the sample point in the local coordinate system to the global coordinate system.
-	                var gp = V.createSVGPoint(sample.x, sample.y);
-	                gp = gp.matrixTransform(this.node.getTransformToElement(target));
-	                sample = g.point(gp);
-	                var centerDistance = sample.distance(center);
-	                // Penalize a higher distance to the reference point by 10%.
-	                // This gives better results. This is due to
-	                // inaccuracies introduced by rounding errors and getPointAtLength() returns.
-	                var refDistance = sample.distance(ref) * 1.1;
-	                var distance = centerDistance + refDistance;
-	                if (distance < minDistance) {
-	                    minDistance = distance;
-	                    closestSamples = [{
-	                        sample: sample,
-	                        refDistance: refDistance
-	                    }];
-	                } else if (distance < minDistance + 1) {
-	                    closestSamples.push({
-	                        sample: sample,
-	                        refDistance: refDistance
-	                    });
-	                }
-	            }
-	
-	            closestSamples.sort(function (a, b) {
-	                return a.refDistance - b.refDistance;
-	            });
-	            spot = closestSamples[0].sample;
-	        }
-	
-	        return spot;
-	    }
-	};
 	
 	// vector
 	// ------
@@ -2511,11 +2566,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(20);
+	var _ChildChange = __webpack_require__(21);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _ChangeCollection = __webpack_require__(21);
+	var _ChangeCollection = __webpack_require__(22);
 	
 	var _ChangeCollection2 = _interopRequireDefault(_ChangeCollection);
 	
@@ -3091,9 +3146,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 19 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
@@ -3101,21 +3156,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _Change2 = __webpack_require__(20);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var RootChange = (function () {
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var RootChange = (function (_Change) {
+	    _inherits(RootChange, _Change);
+	
 	    function RootChange(model, root) {
 	        _classCallCheck(this, RootChange);
 	
-	        var that = this;
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
+	
+	        var that = _this;
 	
 	        that.model = model;
 	        that.root = root;
 	        that.previous = root;
+	        return _this;
 	    }
 	
 	    _createClass(RootChange, [{
-	        key: "digest",
+	        key: 'digest',
 	        value: function digest() {
 	
 	            var that = this;
@@ -3130,7 +3200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return RootChange;
-	})();
+	})(_Change3.default);
 	
 	exports.default = RootChange;
 
@@ -3138,7 +3208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 20 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
@@ -3148,11 +3218,60 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var ChildChange = (function () {
+	var Change = (function () {
+	    function Change() {
+	        _classCallCheck(this, Change);
+	
+	        if (new.target === Change) {
+	            throw new Error('`Change` is an abstract class that cannot be instantiated.');
+	        }
+	    }
+	
+	    _createClass(Change, [{
+	        key: 'digest',
+	        value: function digest() {
+	            return this;
+	        }
+	    }]);
+	
+	    return Change;
+	})();
+	
+	exports.default = Change;
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Change2 = __webpack_require__(20);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ChildChange = (function (_Change) {
+	    _inherits(ChildChange, _Change);
+	
 	    function ChildChange(model, parent, child, index) {
 	        _classCallCheck(this, ChildChange);
 	
-	        var that = this;
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
+	
+	        var that = _this;
 	
 	        that.model = model;
 	        that.child = child;
@@ -3160,10 +3279,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.index = index;
 	        that.previous = parent;
 	        that.previousIndex = index;
+	        return _this;
 	    }
 	
 	    _createClass(ChildChange, [{
-	        key: "digest",
+	        key: 'digest',
 	        value: function digest() {
 	
 	            var that = this;
@@ -3194,7 +3314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
-	        key: "connect",
+	        key: 'connect',
 	        value: function connect(cell, connected) {
 	
 	            var that = this;
@@ -3226,12 +3346,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return ChildChange;
-	})();
+	})(_Change3.default);
 	
 	exports.default = ChildChange;
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3299,7 +3419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChangeCollection;
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3336,7 +3456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(20);
+	var _ChildChange = __webpack_require__(21);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
@@ -3810,7 +3930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Paper;
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3855,7 +3975,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Generic;
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3866,7 +3986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(1);
 	
-	var _Generic2 = __webpack_require__(23);
+	var _Generic2 = __webpack_require__(24);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	

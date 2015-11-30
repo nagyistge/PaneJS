@@ -1,6 +1,10 @@
-class RootChange {
+import Change from './Change';
+
+class RootChange extends Change {
 
     constructor(model, root) {
+
+        super();
 
         var that = this;
 
@@ -21,5 +25,6 @@ class RootChange {
         return that;
     }
 }
+
 
 export default RootChange;
