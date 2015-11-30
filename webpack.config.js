@@ -38,11 +38,11 @@ module.exports = {
           plugins: [
 
             // Syntax
-            'syntax-class-properties',
+            //'syntax-class-properties',
             'syntax-export-extensions',
 
             // Experimental
-            'transform-class-properties',
+            //'transform-class-properties',
             'transform-export-extensions',
 
             // Minification
