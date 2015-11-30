@@ -30,73 +30,17 @@ import {
 var rclass = /[\t\r\n\f]/g;
 var rnotwhite = (/\S+/g);
 
-export function VElement(elem) {
+export class VElement {
 
-    if (elem instanceof VElement) {
-        elem = elem.node;
-    }
-
-    this.node = elem;
-}
-
-function vectorize(node) {
-    return new VElement(node);
-}
-
-function normalize(elem) {
-    return elem instanceof VElement ? elem.node : elem;
-}
-
-function createElement(elem, attrs, children) {
-
-    if (!elem) {
-        return null;
-    }
-
-    if (isObject(elem)) {
-        return vectorize(elem);
-    }
-
-    if (elem.toLowerCase() === 'svg') {
-        return vectorize(createSvgDocument());
-    } else if (elem[0] === '<') {
-        var svgDoc = createSvgDocument(elem);
-        if (svgDoc.childNodes.length > 1) {
-            return map(svgDoc.childNodes, function (childNode) {
-                return vectorize(document.importNode(childNode, true));
-            });
+    constructor(elem) {
+        if (elem instanceof VElement) {
+            elem = elem.node;
         }
 
-        return vectorize(document.importNode(svgDoc.firstChild, true));
+        this.node = elem;
     }
 
-
-    // create svg node by tagName.
-    elem = createSvgElement(elem);
-
-    // set attributes.
-    attrs && forIn(attrs, function (attr, value) {
-        setAttribute(elem, attr, value);
-    });
-
-    // append children.
-    if (children) {
-        children = isArray(children) ? children : [children];
-
-        forEach(children, function (child) {
-            elem.appendChild(child instanceof VElement ? child.node : child);
-        });
-    }
-
-    return vectorize(elem);
-
-}
-
-VElement.prototype = {
-
-    constructor: VElement,
-
-    attr: function (name, value) {
+    attr(name, value) {
 
         var that = this;
         var node = that.node;
@@ -124,9 +68,9 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    removeAttr: function (name) {
+    removeAttr(name) {
 
         var that = this;
         var node = that.node;
@@ -136,11 +80,11 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    text: function () {},
+    text() {}
 
-    hasClass: function (selector) {
+    hasClass(selector) {
 
         var that = this;
         var node = that.node;
@@ -151,9 +95,9 @@ VElement.prototype = {
 
         }
         return false;
-    },
+    }
 
-    addClass: function (value) {
+    addClass(value) {
 
         var that = this;
         var node = that.node;
@@ -180,9 +124,9 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    removeClass: function (value) {
+    removeClass(value) {
 
         var that = this;
         var node = that.node;
@@ -209,9 +153,9 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    toggleClass: function (value, stateVal) {
+    toggleClass(value, stateVal) {
 
         var that = this;
         var node = that.node;
@@ -232,9 +176,9 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    remove: function () {
+    remove() {
 
         var that = this;
         var node = that.node;
@@ -244,9 +188,9 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    empty: function () {
+    empty() {
 
         var that = this;
         var node = that.node;
@@ -258,9 +202,9 @@ VElement.prototype = {
         }
 
         return that;
-    },
+    }
 
-    append: function (elem) {
+    append(elem) {
 
         var that = this;
 
@@ -269,9 +213,9 @@ VElement.prototype = {
         });
 
         return that;
-    },
+    }
 
-    prepend: function (elem) {
+    prepend(elem) {
 
         var that = this;
         var node = that.node;
@@ -279,38 +223,38 @@ VElement.prototype = {
         elem && node.insertBefore(normalize(elem), node.firstChild);
 
         return that;
-    },
+    }
 
-    appendTo: function (elem) {
+    appendTo(elem) {
         //elem.appendChild(this.node);
         //return this;
-    },
+    }
 
-    prependTo: function (elem) {
+    prependTo(elem) {
 
-    },
+    }
 
-    before: function (elem) {
+    before(elem) {
 
-    },
+    }
 
-    after: function (elem) {
+    after(elem) {
 
-    },
+    }
 
-    getSVGElement: function () {
+    getSVGElement() {
         var that = this;
         var node = that.node;
 
         return node instanceof window.SVGSVGElement ? that : vectorize(node.ownerSVGElement);
-    },
+    }
 
-    getDefs: function () {
+    getDefs() {
         var defs = this.svg().node.getElementsByTagName('defs');
         return defs && defs.length ? vectorize(defs[0]) : null;
-    },
+    }
 
-    clone: function () {
+    clone() {
         var node = this.node;
 
         var cloned = vectorize(node.cloneNode(true));
@@ -319,18 +263,18 @@ VElement.prototype = {
             cloned.node.removeAttribute('id');
         }
         return cloned;
-    },
+    }
 
-    find: function (selector) {
+    find(selector) {
         return map(this.node.querySelectorAll(selector), vectorize);
-    },
+    }
 
-    findOne: function (selector) {
+    findOne(selector) {
         var found = this.node.querySelector(selector);
         return found ? vectorize(found) : null;
-    },
+    }
 
-    findParent: function (className, terminator) {
+    findParent(className, terminator) {
 
         var node = this.node;
         var stop = terminator || node.ownerSVGElement;
@@ -347,9 +291,9 @@ VElement.prototype = {
         }
 
         return null;
-    },
+    }
 
-    index: function () {
+    index() {
 
         var index = 0;
         var node = this.node.previousSibling;
@@ -363,9 +307,9 @@ VElement.prototype = {
         }
 
         return index;
-    },
+    }
 
-    translate: function (tx, ty, relative) {
+    translate(tx, ty, relative) {
 
         var that = this;
         var transformAttr = that.attr('transform') || '';
@@ -383,9 +327,9 @@ VElement.prototype = {
         var newTranslate = 'translate(' + dx + ',' + dy + ')';
 
         return that.attr('transform', newTranslate + ' ' + transformAttr);
-    },
+    }
 
-    rotate: function (angle, cx, cy, relative) {
+    rotate(angle, cx, cy, relative) {
 
         var transformAttr = that.attr('transform') || '';
         var rotate = parseRotate(transformAttr);
@@ -403,9 +347,9 @@ VElement.prototype = {
         var newRotate = 'rotate(' + newAngle + newOrigin + ')';
 
         return this.attr('transform', transformAttr + ' ' + newRotate);
-    },
+    }
 
-    scale: function (sx, sy, relative) {
+    scale(sx, sy, relative) {
 
         var transformAttr = this.attr('transform') || '';
         var scale = parseScale(transformAttr);
@@ -432,9 +376,9 @@ VElement.prototype = {
         var newScale = 'scale(' + sx + ',' + sy + ')';
 
         return this.attr('transform', transformAttr + ' ' + newScale);
-    },
+    }
 
-    bbox: function (withoutTransformations, target) {
+    bbox(withoutTransformations, target) {
         // Get SVGRect that contains coordinates and dimension of the real
         // bounding box, i.e. after transformations are applied.
         // If `target` is specified, bounding box will be computed
@@ -484,21 +428,21 @@ VElement.prototype = {
 
         return V.transformRect(box, matrix);
 
-    },
+    }
 
-    toLocalPoint: function (x, y) {
+    toLocalPoint(x, y) {
         // Convert global point into the coordinate space of this element.
 
 
-    },
+    }
 
-    translateCenterToPoint: function () {},
+    translateCenterToPoint() {}
 
-    translateAndAutoOrient: function () {},
+    translateAndAutoOrient() {}
 
-    animateAlongPath: function () {},
+    animateAlongPath() {}
 
-    sample: function (interval) {
+    sample(interval) {
 
         // Interpolate path by discrete points.
         // The precision of the sampling is controlled by `interval`.
@@ -533,9 +477,9 @@ VElement.prototype = {
         }
 
         return samples;
-    },
+    }
 
-    toPath: function () {
+    toPath() {
 
         var that = this;
         var path = vectorize(createSvgElement('path'));
@@ -546,9 +490,9 @@ VElement.prototype = {
         d && path.attr('d', d);
 
         return path;
-    },
+    }
 
-    toPathData: function () {
+    toPathData() {
 
         var that = this;
         var node = that.node;
@@ -572,9 +516,9 @@ VElement.prototype = {
         }
 
         throw new Error(tagName + ' cannot be converted to PATH.');
-    },
+    }
 
-    findIntersection: function (ref, target) {
+    findIntersection(ref, target) {
 
         // Find the intersection of a line starting in the center
         // of the SVG `node` ending in the point `ref`.
@@ -667,7 +611,61 @@ VElement.prototype = {
 
         return spot;
     }
-};
+}
+
+
+function vectorize(node) {
+    return new VElement(node);
+}
+
+function normalize(elem) {
+    return elem instanceof VElement ? elem.node : elem;
+}
+
+function createElement(elem, attrs, children) {
+
+    if (!elem) {
+        return null;
+    }
+
+    if (isObject(elem)) {
+        return vectorize(elem);
+    }
+
+    if (elem.toLowerCase() === 'svg') {
+        return vectorize(createSvgDocument());
+    } else if (elem[0] === '<') {
+        var svgDoc = createSvgDocument(elem);
+        if (svgDoc.childNodes.length > 1) {
+            return map(svgDoc.childNodes, function (childNode) {
+                return vectorize(document.importNode(childNode, true));
+            });
+        }
+
+        return vectorize(document.importNode(svgDoc.firstChild, true));
+    }
+
+
+    // create svg node by tagName.
+    elem = createSvgElement(elem);
+
+    // set attributes.
+    attrs && forIn(attrs, function (attr, value) {
+        setAttribute(elem, attr, value);
+    });
+
+    // append children.
+    if (children) {
+        children = isArray(children) ? children : [children];
+
+        forEach(children, function (child) {
+            elem.appendChild(child instanceof VElement ? child.node : child);
+        });
+    }
+
+    return vectorize(elem);
+
+}
 
 
 // vector
