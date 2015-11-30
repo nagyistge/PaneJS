@@ -1084,6 +1084,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	var rclass = /[\t\r\n\f]/g;
 	var rnotwhite = /\S+/g;
 	
+	var pathCount = 0;
+	function createPathId() {
+	
+	    var id;
+	
+	    do {
+	        pathCount += 1;
+	        id = 'pane-path-' + pathCount;
+	    } while (document.getElementById(id));
+	
+	    return id;
+	}
+	
 	var VElement = exports.VElement = (function () {
 	    function VElement(elem) {
 	        _classCallCheck(this, VElement);
@@ -1144,7 +1157,169 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function css(style) {}
 	    }, {
 	        key: 'text',
-	        value: function text() {}
+	        value: function text(content, options) {
+	
+	            var that = this;
+	            var textNode = that.node;
+	
+	            content = (0, _utils.sanitizeText)(content);
+	            options = options || {};
+	
+	            // `alignment-baseline` does not work in Firefox.
+	            // Setting `dominant-baseline` on the `<text>` element doesn't work in IE9.
+	            // In order to have the 0,0 coordinate of the `<text>` element (or the first `<tspan>`)
+	            // in the top left corner we translate the `<text>` element by `0.8em`.
+	            // See `http://www.w3.org/Graphics/SVG/WG/wiki/How_to_determine_dominant_baseline`.
+	            // See also `http://apike.ca/prog_svg_text_style.html`.
+	            var y = that.attr('y');
+	            if (!y) {
+	                that.attr('y', '0.8em');
+	            }
+	
+	            // An empty text gets rendered into the DOM in webkit-based browsers.
+	            // In order to unify this behaviour across all browsers
+	            // we rather hide the text element when it's empty.
+	            that.attr('display', content ? null : 'none');
+	
+	            // Preserve spaces. In other words, we do not want consecutive spaces to get collapsed to one.
+	            textNode.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+	
+	            // clear all `<tspan>` children
+	            textNode.textContent = '';
+	
+	            var textPathOptions = options.textPath;
+	            if (textPathOptions) {
+	
+	                // Wrap the text in the SVG <textPath> element that points to a path
+	                // defined by `options.textPath` inside the internal `<defs>` element.
+	                var defs = that.find('defs');
+	                if (!defs.length) {
+	                    defs = createElement('defs');
+	                    that.append(defs);
+	                }
+	
+	                // If `opt.textPath` is a plain string, consider it to be directly
+	                // the SVG path data for the text to go along (this is a shortcut).
+	                // Otherwise if it is an object and contains the `d` property,
+	                // then this is our path.
+	                var isTextPathObject = (0, _utils.isObject)(textPathOptions);
+	                var d = isTextPathObject ? textPathOptions.d : textPathOptions;
+	                var vPath;
+	
+	                if (d) {
+	                    vPath = createElement('path', { d: d, id: createPathId() });
+	                    defs.append(vPath);
+	                }
+	
+	                var vTextPath = createElement('textPath');
+	
+	                // Set attributes on the `<textPath>`. The most important one
+	                // is the `xlink:href` that points to our newly created `<path/>` element in `<defs/>`.
+	                // Note that we also allow the following construct:
+	                // `t.text('my text', {textPath: {'xlink:href': '#my-other-path'}})`.
+	                // In other words, one can completely skip the auto-creation of the path
+	                // and use any other arbitrary path that is in the document.
+	                if (isTextPathObject) {
+	
+	                    if (!textPathOptions['xlink:href'] && vPath) {
+	                        vTextPath.attr('xlink:href', '#' + vPath.node.id);
+	                    }
+	
+	                    vTextPath.attr(textPathOptions);
+	                }
+	
+	                that.append(vTextPath);
+	                textNode = vTextPath.node;
+	            }
+	
+	            var offset = 0;
+	            var lines = content.split('\n');
+	            var lineHeight = options.lineHeight;
+	            var annotations = options.annotations;
+	            var includeAnnotationIndices = options.includeAnnotationIndices;
+	
+	            if (annotations) {
+	                annotations = (0, _utils.isArray)(annotations) ? annotations : [annotations];
+	            }
+	
+	            lineHeight = lineHeight === 'auto' ? '1.5em' : lineHeight || '1em';
+	
+	            (0, _utils.forEach)(lines, function (line, i) {
+	
+	                var vLine = createElement('tspan', {
+	                    dy: i ? lineHeight : '0',
+	                    x: that.attr('x') || 0
+	                });
+	
+	                vLine.addClass('pane-text-line');
+	
+	                if (line) {
+	
+	                    if (annotations) {
+	
+	                        // Get the line height based on the biggest font size
+	                        // in the annotations for this line.
+	                        var maxFontSize = 0;
+	
+	                        // Find the *compacted* annotations for this line.
+	                        var lineAnnotations = vector.annotateString(line, annotations, {
+	                            offset: -offset,
+	                            includeAnnotationIndices: includeAnnotationIndices
+	                        });
+	
+	                        (0, _utils.forEach)(lineAnnotations, function (annotation) {
+	
+	                            if ((0, _utils.isObject)(annotation)) {
+	
+	                                var fontSize = (0, _utils.toInt)(annotation.attrs['font-size']);
+	                                if (fontSize && fontSize > maxFontSize) {
+	                                    maxFontSize = fontSize;
+	                                }
+	
+	                                var tspan = createElement('tspan', annotation.attrs);
+	                                if (includeAnnotationIndices) {
+	                                    // If `options.includeAnnotationIndices` is `true`,
+	                                    // set the list of indices of all the applied annotations
+	                                    // in the `annotations` attribute. This list is a comma
+	                                    // separated list of indices.
+	                                    tspan.attr('annotations', annotation.annotations);
+	                                }
+	
+	                                if (annotation.attrs.class) {
+	                                    tspan.addClass(annotation.attrs.class);
+	                                }
+	
+	                                tspan.node.textContent = annotation.t;
+	                            } else {
+	                                tspan = document.createTextNode(annotation || ' ');
+	                            }
+	                            vLine.append(tspan);
+	                        });
+	
+	                        if (options.lineHeight === 'auto' && maxFontSize && i !== 0) {
+	                            vLine.attr('dy', maxFontSize * 1.2 + 'px');
+	                        }
+	                    } else {
+	                        vLine.node.textContent = line;
+	                    }
+	                } else {
+	
+	                    // Make sure the textContent is never empty.
+	                    // If it is, add a dummy character and make it invisible,
+	                    // making the following lines correctly relatively positioned.
+	                    // `dy=1em` won't work with empty lines otherwise.
+	                    vLine.addClass('pane-text-empty');
+	                    vLine.node.style.opacity = 0;
+	                    vLine.node.textContent = '-';
+	                }
+	
+	                textNode.appendChild(vLine.node);
+	
+	                offset += line.length + 1; // + 1 = newline character.
+	            });
+	
+	            return that;
+	        }
 	    }, {
 	        key: 'hasClass',
 	        value: function hasClass(selector) {
