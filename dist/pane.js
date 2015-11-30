@@ -1116,7 +1116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var node = that.node;
 	            var length = arguments.length;
 	
-	            // Return all attributes.
+	            // return all attributes
 	            if (!length) {
 	                var attrs = {};
 	                (0, _utils.forEach)(node.attributes, function (attr) {
@@ -1256,7 +1256,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (line) {
 	
 	                    if (annotations) {
-	
 	                        // Get the line height based on the biggest font size
 	                        // in the annotations for this line.
 	                        var maxFontSize = 0;
@@ -1278,7 +1277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                                var tspan = createElement('tspan', annotation.attrs);
 	                                if (includeAnnotationIndices) {
-	                                    // If `options.includeAnnotationIndices` is `true`,
+	                                    // If `includeAnnotationIndices` is `true`,
 	                                    // set the list of indices of all the applied annotations
 	                                    // in the `annotations` attribute. This list is a comma
 	                                    // separated list of indices.
@@ -1972,6 +1971,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
 	
 	    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+	};
+	
+	vector.styleToObject = function (styleString) {
+	    var ret = {};
+	    (0, _utils.forEach)(styleString.split(';'), function (style) {
+	        var pair = style.split('=');
+	        ret[(0, _utils.trim)(pair[0])] = (0, _utils.trim)(pair[1]);
+	    });
+	    return ret;
 	};
 	
 	// exports

@@ -61,7 +61,7 @@ export class VElement {
         var node = that.node;
         var length = arguments.length;
 
-        // Return all attributes.
+        // return all attributes
         if (!length) {
             var attrs = {};
             forEach(node.attributes, function (attr) {
@@ -202,7 +202,6 @@ export class VElement {
             if (line) {
 
                 if (annotations) {
-
                     // Get the line height based on the biggest font size
                     // in the annotations for this line.
                     var maxFontSize = 0;
@@ -224,7 +223,7 @@ export class VElement {
 
                             var tspan = createElement('tspan', annotation.attrs);
                             if (includeAnnotationIndices) {
-                                // If `options.includeAnnotationIndices` is `true`,
+                                // If `includeAnnotationIndices` is `true`,
                                 // set the list of indices of all the applied annotations
                                 // in the `annotations` attribute. This list is a comma
                                 // separated list of indices.
@@ -851,7 +850,6 @@ function createElement(elem, attrs, children) {
     }
 
     return vectorize(elem);
-
 }
 
 
@@ -913,6 +911,14 @@ vector.transformRect = function (rect, matrix) {
     return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
 };
 
+vector.styleToObject = function (styleString) {
+    var ret = {};
+    forEach(styleString.split(';'), function (style) {
+        var pair = style.split('=');
+        ret[trim(pair[0])] = trim(pair[1]);
+    });
+    return ret;
+};
 
 // exports
 // -------
