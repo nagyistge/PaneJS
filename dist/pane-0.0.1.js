@@ -121,9 +121,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Generic2 = _interopRequireDefault(_Generic);
 	
+	var _Text = __webpack_require__(33);
+	
+	var _Text2 = _interopRequireDefault(_Text);
+	
 	var _Rect = __webpack_require__(25);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
+	
+	var _Circle = __webpack_require__(26);
+	
+	var _Circle2 = _interopRequireDefault(_Circle);
+	
+	var _Ellipse = __webpack_require__(27);
+	
+	var _Ellipse2 = _interopRequireDefault(_Ellipse);
+	
+	var _Image = __webpack_require__(28);
+	
+	var _Image2 = _interopRequireDefault(_Image);
+	
+	var _Path = __webpack_require__(29);
+	
+	var _Path2 = _interopRequireDefault(_Path);
+	
+	var _Polygon = __webpack_require__(30);
+	
+	var _Polygon2 = _interopRequireDefault(_Polygon);
+	
+	var _Polyline = __webpack_require__(31);
+	
+	var _Polyline2 = _interopRequireDefault(_Polyline);
+	
+	var _Rhombus = __webpack_require__(32);
+	
+	var _Rhombus2 = _interopRequireDefault(_Rhombus);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -146,7 +178,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var shapes = exports.shapes = {
 	    basic: {
 	        Generic: _Generic2.default,
-	        Rect: _Rect2.default
+	        Text: _Text2.default,
+	        Rect: _Rect2.default,
+	        Circle: _Circle2.default,
+	        Ellipse: _Ellipse2.default,
+	        Image: _Image2.default,
+	        Path: _Path2.default,
+	        Polygon: _Polygon2.default,
+	        Polyline: _Polyline2.default,
+	        Rhombus: _Rhombus2.default
 	    }
 	};
 
@@ -4617,6 +4657,468 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = Rect;
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Circle = (function (_Generic) {
+	    _inherits(Circle, _Generic);
+	
+	    function Circle() {
+	        _classCallCheck(this, Circle);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Circle).apply(this, arguments));
+	    }
+	
+	    return Circle;
+	})(_Generic3.default);
+	
+	Circle.markup = '<g class="pane-rotatable"><g class="pane-scalable"><circle/></g><text/></g>';
+	Circle.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Circle',
+	    size: { width: 60, height: 60 },
+	    attrs: {
+	        'circle': {
+	            fill: '#ffffff',
+	            stroke: '#000000',
+	            r: 30,
+	            cx: 30,
+	            cy: 30
+	        },
+	        'text': {
+	            'font-size': 14,
+	            text: '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-y': .5,
+	            'y-alignment': 'middle',
+	            fill: '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
+	        }
+	    }
+	});
+	
+	exports.default = Circle;
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Ellipse = (function (_Generic) {
+	    _inherits(Ellipse, _Generic);
+	
+	    function Ellipse() {
+	        _classCallCheck(this, Ellipse);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Ellipse).apply(this, arguments));
+	    }
+	
+	    return Ellipse;
+	})(_Generic3.default);
+	
+	Ellipse.markup = '<g class="pane-rotatable"><g class="pane-scalable"><ellipse/></g><text/></g>';
+	Ellipse.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Ellipse',
+	    size: { width: 60, height: 40 },
+	    attrs: {
+	        'ellipse': {
+	            fill: '#ffffff',
+	            stroke: '#000000',
+	            rx: 30,
+	            ry: 20,
+	            cx: 30,
+	            cy: 20
+	        },
+	        'text': {
+	            'font-size': 14,
+	            text: '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-y': .5,
+	            'y-alignment': 'middle',
+	            fill: '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
+	        }
+	    }
+	});
+	
+	exports.default = Ellipse;
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Image = (function (_Generic) {
+	    _inherits(Image, _Generic);
+	
+	    function Image() {
+	        _classCallCheck(this, Image);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Image).apply(this, arguments));
+	    }
+	
+	    return Image;
+	})(_Generic3.default);
+	
+	Image.markup = '<g class="pane-rotatable"><g class="pane-scalable"><image/></g><text/></g>';
+	Image.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Image',
+	    attrs: {
+	        'text': {
+	            'font-size': 14,
+	            text: '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-dy': 20,
+	            'y-alignment': 'middle',
+	            fill: '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
+	        }
+	    }
+	});
+	
+	exports.default = Image;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Path = (function (_Generic) {
+	    _inherits(Path, _Generic);
+	
+	    function Path() {
+	        _classCallCheck(this, Path);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Path).apply(this, arguments));
+	    }
+	
+	    return Path;
+	})(_Generic3.default);
+	
+	Path.markup = '<g class="pane-rotatable"><g class="pane-scalable"><path/></g><text/></g>';
+	Path.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Path',
+	    size: { width: 60, height: 60 },
+	    attrs: {
+	        'path': {
+	            fill: '#ffffff',
+	            stroke: '#000000'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            text: '',
+	            'text-anchor': 'middle',
+	            'ref': 'path',
+	            'ref-x': .5,
+	            'ref-dy': 10,
+	            fill: '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
+	        }
+	    }
+	});
+	
+	exports.default = Path;
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Polygon = (function (_Generic) {
+	    _inherits(Polygon, _Generic);
+	
+	    function Polygon() {
+	        _classCallCheck(this, Polygon);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Polygon).apply(this, arguments));
+	    }
+	
+	    return Polygon;
+	})(_Generic3.default);
+	
+	Polygon.markup = '<g class="pane-rotatable"><g class="pane-scalable"><polygon/></g><text/></g>';
+	Polygon.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Polygon',
+	    size: { width: 60, height: 40 },
+	    attrs: {
+	        'polygon': {
+	            fill: '#ffffff',
+	            stroke: '#000000'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            text: '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-dy': 20,
+	            'y-alignment': 'middle',
+	            fill: '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
+	        }
+	    }
+	});
+	
+	exports.default = Polygon;
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Polyline = (function (_Generic) {
+	    _inherits(Polyline, _Generic);
+	
+	    function Polyline() {
+	        _classCallCheck(this, Polyline);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Polyline).apply(this, arguments));
+	    }
+	
+	    return Polyline;
+	})(_Generic3.default);
+	
+	Polyline.markup = '<g class="pane-rotatable"><g class="pane-scalable"><polyline/></g><text/></g>';
+	Polyline.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Polyline',
+	    size: { width: 60, height: 40 },
+	    attrs: {
+	        'polyline': {
+	            fill: '#ffffff',
+	            stroke: '#000000'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            text: '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-dy': 20,
+	            'y-alignment': 'middle',
+	            fill: '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
+	        }
+	    }
+	});
+	
+	exports.default = Polyline;
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Path2 = __webpack_require__(29);
+	
+	var _Path3 = _interopRequireDefault(_Path2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Rhombus = (function (_Path) {
+	    _inherits(Rhombus, _Path);
+	
+	    function Rhombus() {
+	        _classCallCheck(this, Rhombus);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rhombus).apply(this, arguments));
+	    }
+	
+	    return Rhombus;
+	})(_Path3.default);
+	
+	Rhombus.defaults = (0, _utils.merge)({}, _Path3.default.defaults, {
+	    type: 'basic.Rhombus',
+	    attrs: {
+	        'path': {
+	            d: 'M 30 0 L 60 30 30 60 0 30 z'
+	        },
+	        'text': {
+	            'ref-y': 0.5,
+	            'y-alignment': 'middle'
+	        }
+	    }
+	});
+	
+	exports.default = Rhombus;
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _Generic2 = __webpack_require__(24);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Text = (function (_Generic) {
+	    _inherits(Text, _Generic);
+	
+	    function Text() {
+	        _classCallCheck(this, Text);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Text).apply(this, arguments));
+	    }
+	
+	    return Text;
+	})(_Generic3.default);
+	
+	Text.markup = '<g class="pane-rotatable"><g class="pane-scalable"><text/></g></g>';
+	Text.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
+	    type: 'basic.Text',
+	    attrs: {
+	        'text': {
+	            'font-size': 18,
+	            fill: '#000000'
+	        }
+	    }
+	});
+	
+	exports.default = Text;
 
 /***/ }
 /******/ ])

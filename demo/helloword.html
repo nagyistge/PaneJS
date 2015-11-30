@@ -23,29 +23,52 @@
         attrs: {text: {text: 'basic.Rect'}}
     });
 
-    console.log(rb);
-
     model.addCell(rb);
 
+    var tb = new pane.shapes.basic.Text({
+        position: {x: 170, y: 50},
+        size: {width: 100, height: 30},
+        attrs: {text: {text: 'basic.Text'}}
+    });
+    model.addCell(tb);
 
-    //    var graph = new pane.Graph(container);
-    //
-    //    console.log(graph);
-    //
-    //    var parent = graph.getDefaultParent();
-    //
-    //    graph.getModel().beginUpdate();
-    //
-    //    try {
-    //        var node1 = graph.insertNode(parent, null, 'Hello, ', 40, 40, 100, 30);
-    //        var node2 = graph.insertNode(parent, null, 'Pane.', 160, 200, 100, 30);
-    //        var link1 = graph.insertLink(parent, null, '', node1, node2);
-    //
-    //    }
-    //    finally {
-    //        graph.getModel().endUpdate();
-    //    }
+    var cb = new pane.shapes.basic.Circle({
+        position: {x: 300, y: 70},
+        size: {width: 100, height: 40},
+        attrs: {text: {text: 'basic.Circle'}}
+    });
+    model.addCell(cb);
 
+    var ib = new pane.shapes.basic.Image({
+        position: {x: 450, y: 50},
+        size: {width: 100, height: 100},
+        attrs: {
+            text: {text: 'basic.Image'},
+            image: {
+                'xlink:href': 'http://placehold.it/96x96',
+                width: 96,
+                height: 96
+            }
+        }
+    });
+    model.addCell(ib);
+
+    var pb = new pane.shapes.basic.Path({
+        position: {x: 50, y: 150},
+        size: {width: 40, height: 40},
+        attrs: {
+            path: {d: 'M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z'},
+            text: {text: 'basic.Path'}
+        }
+    });
+    model.addCell(pb);
+
+    var rh = new pane.shapes.basic.Rhombus({
+        position: {x: 50, y: 250},
+        size: {width: 70, height: 70},
+        attrs: {text: {text: 'basic.Rhombus', 'font-size': 8}}
+    });
+    model.addCell(rh);
 </script>
 </body>
 </html>

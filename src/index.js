@@ -22,12 +22,28 @@ export Model from './core/Model';
 export Paper from './core/Paper';
 
 
-import Generic from './shapes/basic/Generic';
-import Rect    from './shapes/basic/Rect';
+import Generic  from './shapes/basic/Generic';
+import Text     from './shapes/basic/Text';
+import Rect     from './shapes/basic/Rect';
+import Circle   from './shapes/basic/Circle';
+import Ellipse  from './shapes/basic/Ellipse';
+import Image    from './shapes/basic/Image';
+import Path     from './shapes/basic/Path';
+import Polygon  from './shapes/basic/Polygon';
+import Polyline from './shapes/basic/Polyline';
+import Rhombus  from './shapes/basic/Rhombus';
 
 export var shapes = {
     basic: {
         Generic: Generic,
-        Rect: Rect
+        Text: Text,
+        Rect: Rect,
+        Circle: Circle,
+        Ellipse: Ellipse,
+        Image: Image,
+        Path: Path,
+        Polygon: Polygon,
+        Polyline: Polyline,
+        Rhombus: Rhombus,
     }
 };
