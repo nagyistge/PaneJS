@@ -2,17 +2,16 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello, Graph</title>
+    <title>Basic shapes</title>
     <script src="../dist/pane.js"></script>
 </head>
 <body>
-<div id="graphContainer"
+<div id="container"
      style="position:relative; overflow:hidden; width:800px; height:600px; background:url('images/grid.gif'); cursor:default;">
 </div>
 <script>
 
-    var container = document.getElementById('graphContainer');
+    var container = document.getElementById('container');
 
     var model = new pane.Model();
     var paper = new pane.Paper(container, model);
