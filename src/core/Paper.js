@@ -15,7 +15,7 @@ import ChildChange from '../changes/ChildChange';
 
 
 // the default options for paper
-const OPTIONS = {
+var defaultOptions = {
     x: 0,
     y: 0,
     width: '100%',
@@ -48,18 +48,21 @@ class Paper extends Events {
         }
     }
 
+
     // events
+    // ------
     //  - paper:configure
     //  - paper:init
     //  - paper:setup
     //  - paper:destroy
     //  - paper:resize
 
+
     configure(options) {
 
         var that = this;
 
-        that.options = merge({}, OPTIONS, options);
+        that.options = merge({}, defaultOptions, options);
         that.trigger('paper:configure', that.options);
 
         return that;
@@ -200,7 +203,7 @@ class Paper extends Events {
 
         if (cell) {
 
-            visible = visible && cell.isVisible();
+            visible = visible && cell.visible;
 
             var view = that.getView(cell, visible);
 

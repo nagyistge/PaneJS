@@ -32,7 +32,7 @@ class NodeView extends CellView {
 
         var that = this;
         var cell = that.cell;
-        var markup = cell.get('markup') || cell.markup;
+        var markup = cell.markup;
 
         if (markup) {
             that.vel.append(vector(markup));

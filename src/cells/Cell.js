@@ -13,13 +13,17 @@ class Cell {
     constructor(attributes) {
 
         var that = this;
+        var raw = merge({}, that.constructor.defaults, attributes);
 
-        that.attributes = merge({}, that.constructor.defaults, attributes);
-        that.visible = true;
+        that.raw = raw;
+        that.data = raw.data;
+        that.visible = raw.visible !== false;
+        //that.attributes =
+
     }
 
-    get defaults() {
-        return this.constructor.defaults;
+    get markup() {
+        return this.constructor.markup;
     }
 
     getPosition() {}
@@ -33,6 +37,7 @@ class Cell {
     isLink() {
         return false;
     }
+
 
     // link
     // ----

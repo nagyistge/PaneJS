@@ -1895,9 +1895,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _classCallCheck(this, Cell);
 	
 	        var that = this;
+	        var raw = (0, _utils.merge)({}, that.constructor.defaults, attributes);
 	
-	        that.attributes = (0, _utils.merge)({}, that.constructor.defaults, attributes);
-	        that.visible = true;
+	        that.raw = raw;
+	        that.data = raw.data;
+	        that.visible = raw.visible !== false;
+	        //that.attributes =
 	    }
 	
 	    _createClass(Cell, [{
@@ -2169,9 +2172,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'destroy',
 	        value: function destroy() {}
 	    }, {
-	        key: 'defaults',
+	        key: 'markup',
 	        get: function get() {
-	            return this.constructor.defaults;
+	            return this.constructor.markup;
 	        }
 	    }]);
 	
@@ -2344,6 +2347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.cell = cell;
 	        that.paper = paper;
+	        that.invalid = true;
 	
 	        that.ensureElement();
 	    }
@@ -2470,7 +2474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	            var cell = that.cell;
-	            var markup = cell.get('markup') || cell.markup;
+	            var markup = cell.markup;
 	
 	            if (markup) {
 	                that.vel.append((0, _vector2.default)(markup));
@@ -3469,7 +3473,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	// the default options for paper
-	var OPTIONS = {
+	var defaultOptions = {
 	    x: 0,
 	    y: 0,
 	    width: '100%',
@@ -3503,6 +3507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // events
+	    // ------
 	    //  - paper:configure
 	    //  - paper:init
 	    //  - paper:setup
@@ -3515,7 +3520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	
-	            that.options = (0, _utils.merge)({}, OPTIONS, options);
+	            that.options = (0, _utils.merge)({}, defaultOptions, options);
 	            that.trigger('paper:configure', that.options);
 	
 	            return that;
@@ -3667,7 +3672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (cell) {
 	
-	                visible = visible && cell.isVisible();
+	                visible = visible && cell.visible;
 	
 	                var view = that.getView(cell, visible);
 	

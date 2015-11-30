@@ -10,6 +10,7 @@ class CellView {
 
         that.cell = cell;
         that.paper = paper;
+        that.invalid = true;
 
         that.ensureElement();
     }
@@ -48,5 +49,6 @@ class CellView {
 
     onContextMenu() {}
 }
+
 
 export default CellView;
