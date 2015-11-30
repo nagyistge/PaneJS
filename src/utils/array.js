@@ -45,6 +45,10 @@ function reduceRight(arr, iterator, initialValue) {
     return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
 }
 
+function contains(arr, item) {
+    return arr && indexOf(arr, item) >= 0;
+}
+
 
 export {
     toArray,
@@ -56,5 +60,6 @@ export {
     map,
     filter,
     reduce,
-    reduceRight
+    reduceRight,
+    contains
 };

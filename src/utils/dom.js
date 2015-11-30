@@ -1,5 +1,7 @@
-import { isUndefined } from './lang';
+import { trim        } from './string';
 import { forEach     } from './array';
+import { isUndefined } from './lang';
+
 
 // xml namespaces.
 var ns = {
@@ -173,6 +175,21 @@ function parseTransform(transform) {
 }
 
 
+// clear transform
+// ---------------
+
+function clearTranslate(transform) {
+    return transform && trim(transform.replace(/translate\([^)]*\)/g, '')) || '';
+}
+
+function clearScale(transform) {
+    return transform && trim(transform.replace(/scale\([^)]*\)/g, '')) || '';
+}
+
+function clearRotate(transform) {
+    return transform && trim(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+}
+
 // path data
 // ---------
 
@@ -298,6 +315,9 @@ export {
     parseRotate,
     parseTransform,
     parseTranslate,
+    clearScale,
+    clearRotate,
+    clearTranslate,
     lineToPathData,
     rectToPathData,
     circleToPathData,

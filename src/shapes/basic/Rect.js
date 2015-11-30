@@ -3,7 +3,7 @@ import Generic   from './Generic';
 
 class Rect extends Generic {}
 
-Rect.markup = '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>';
+Rect.markup = '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>';
 Rect.defaults = merge({}, Generic.defaults, {
     type: 'basic.Rect',
     attrs: {

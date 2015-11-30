@@ -29,9 +29,19 @@ class CellView {
         return that;
     }
 
+    render() { return this; }
+
+    update() { return this; }
+
     find(selector) {
+        return selector === '.' ? [this.vel] : this.vel.find(selector);
+    }
+
+    applyFilter(selector, filter) {
 
     }
+
+    applyGradient(selector, attr, gradient) {}
 
     onDblClick() {}
 

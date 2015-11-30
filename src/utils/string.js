@@ -27,6 +27,7 @@ function trim(str) {
     return str ? proto.trim.call('' + str) : '';
 }
 
+
 export {
     lc,
     uc,

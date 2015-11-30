@@ -1,9 +1,16 @@
+import { isString } from './lang';
+
+function isPercentage(str) {
+    return isString(str) && str.slice(-1) === '%';
+}
+
 function toInt(value) {
     return parseInt(value, 10);
 }
 
-function toFloat(value) {
-    return parseFloat(value);
+function toFloat(value, isPercentage) {
+    var v = parseFloat(value);
+    return isPercentage ? v / 100 : v;
 }
 
 function toFixed(value, precision) {
@@ -15,4 +22,5 @@ export {
     toInt,
     toFloat,
     toFixed,
+    isPercentage
 };

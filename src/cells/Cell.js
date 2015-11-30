@@ -17,18 +17,17 @@ class Cell {
 
         that.raw = raw;
         that.data = raw.data;
+        that.size = raw.size;
+        that.position = raw.position;
+        that.rotation = raw.rotation;
         that.visible = raw.visible !== false;
-        //that.attributes =
+        that.attrs = raw.attrs;
 
     }
 
     get markup() {
         return this.constructor.markup;
     }
-
-    getPosition() {}
-
-    getSize() {}
 
     isNode() {
         return false;

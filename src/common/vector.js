@@ -82,6 +82,10 @@ export class VElement {
         return that;
     }
 
+    css(style) {
+
+    }
+
     text() {}
 
     hasClass(selector) {
@@ -323,10 +327,11 @@ export class VElement {
 
         var dx = relative ? translate.tx + tx : tx;
         var dy = relative ? translate.ty + ty : ty;
+        var newTranslate = 'translate(' + dx + ',' + dy + ')' + ' ' + transformAttr;
 
-        var newTranslate = 'translate(' + dx + ',' + dy + ')';
+        that.attr('transform', newTranslate);
 
-        return that.attr('transform', newTranslate + ' ' + transformAttr);
+        return that;
     }
 
     rotate(angle, cx, cy, relative) {
@@ -379,6 +384,7 @@ export class VElement {
     }
 
     bbox(withoutTransformations, target) {
+
         // Get SVGRect that contains coordinates and dimension of the real
         // bounding box, i.e. after transformations are applied.
         // If `target` is specified, bounding box will be computed
@@ -402,8 +408,8 @@ export class VElement {
         var box;
         try {
             box = node.getBBox();
-            // We are creating a new object as the standard says that you can't
-            // modify the attributes of a bbox.
+            // We are creating a new object as the standard says that
+            // you can't modify the attributes of a bbox.
             box = {
                 x: box.x,
                 y: box.y,
@@ -411,7 +417,7 @@ export class VElement {
                 height: box.height
             };
         } catch (e) {
-            // Fallback for IE.
+            // fallback for IE
             box = {
                 x: node.clientLeft,
                 y: node.clientTop,
@@ -426,7 +432,7 @@ export class VElement {
 
         var matrix = node.getTransformToElement(target || node.ownerSVGElement);
 
-        return V.transformRect(box, matrix);
+        return vector.transformRect(box, matrix);
 
     }
 
@@ -672,9 +678,58 @@ function createElement(elem, attrs, children) {
 // ------
 
 var vector = VElement.createElement = createElement;
+var svgDocument = createElement('svg').node;
 
 vector.isVElement = function (obj) {
     return obj instanceof VElement;
+};
+
+vector.createSVGMatrix = function (matrix) {
+    var svgMatrix = svgDocument.createSVGMatrix();
+    for (var key in matrix) {
+        svgMatrix[key] = matrix[key];
+    }
+
+    return svgMatrix;
+};
+
+vector.createSVGTransform = function () {
+    return svgDocument.createSVGTransform();
+};
+
+vector.createSVGPoint = function (x, y) {
+    var point = svgDocument.createSVGPoint();
+    point.x = x;
+    point.y = y;
+    return point;
+};
+
+vector.transformRect = function (rect, matrix) {
+
+    var point = svgDocument.createSVGPoint();
+
+    point.x = rect.x;
+    point.y = rect.y;
+    var corner1 = point.matrixTransform(matrix);
+
+    point.x = rect.x + rect.width;
+    point.y = rect.y;
+    var corner2 = point.matrixTransform(matrix);
+
+    point.x = rect.x + rect.width;
+    point.y = rect.y + rect.height;
+    var corner3 = point.matrixTransform(matrix);
+
+    point.x = rect.x;
+    point.y = rect.y + rect.height;
+    var corner4 = point.matrixTransform(matrix);
+
+    var minX = Math.min(corner1.x, corner2.x, corner3.x, corner4.x);
+    var maxX = Math.max(corner1.x, corner2.x, corner3.x, corner4.x);
+    var minY = Math.min(corner1.y, corner2.y, corner3.y, corner4.y);
+    var maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
+
+    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
 };
 
 

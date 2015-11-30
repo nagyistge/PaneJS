@@ -474,19 +474,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.isPercentage = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	
+	var _lang = __webpack_require__(2);
+	
+	function isPercentage(str) {
+	    return (0, _lang.isString)(str) && str.slice(-1) === '%';
+	}
+	
 	function toInt(value) {
 	    return parseInt(value, 10);
 	}
 	
-	function toFloat(value) {
-	    return parseFloat(value);
+	function toFloat(value, isPercentage) {
+	    var v = parseFloat(value);
+	    return isPercentage ? v / 100 : v;
 	}
 	
 	function toFixed(value, precision) {
@@ -497,6 +506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toInt = toInt;
 	exports.toFloat = toFloat;
 	exports.toFixed = toFixed;
+	exports.isPercentage = isPercentage;
 
 /***/ },
 /* 5 */
@@ -507,7 +517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
+	exports.contains = exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
 	
 	var _lang = __webpack_require__(2);
 	
@@ -553,6 +563,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
 	}
 	
+	function contains(arr, item) {
+	    return arr && indexOf(arr, item) >= 0;
+	}
+	
 	exports.toArray = toArray;
 	exports.indexOf = indexOf;
 	exports.lastIndexOf = lastIndexOf;
@@ -563,6 +577,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.filter = filter;
 	exports.reduce = reduce;
 	exports.reduceRight = reduceRight;
+	exports.contains = contains;
 
 /***/ },
 /* 6 */
@@ -714,11 +729,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
+	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
 	
-	var _lang = __webpack_require__(2);
+	var _string = __webpack_require__(3);
 	
 	var _array = __webpack_require__(5);
+	
+	var _lang = __webpack_require__(2);
 	
 	// xml namespaces.
 	var ns = {
@@ -889,6 +906,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	
+	// clear transform
+	// ---------------
+	
+	function clearTranslate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearScale(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearRotate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+	}
+	
 	// path data
 	// ---------
 	
@@ -987,6 +1019,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.parseRotate = parseRotate;
 	exports.parseTransform = parseTransform;
 	exports.parseTranslate = parseTranslate;
+	exports.clearScale = clearScale;
+	exports.clearRotate = clearRotate;
+	exports.clearTranslate = clearTranslate;
 	exports.lineToPathData = lineToPathData;
 	exports.rectToPathData = rectToPathData;
 	exports.circleToPathData = circleToPathData;
@@ -1104,6 +1139,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return that;
 	        }
+	    }, {
+	        key: 'css',
+	        value: function css(style) {}
 	    }, {
 	        key: 'text',
 	        value: function text() {}
@@ -1360,10 +1398,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var dx = relative ? translate.tx + tx : tx;
 	            var dy = relative ? translate.ty + ty : ty;
+	            var newTranslate = 'translate(' + dx + ',' + dy + ')' + ' ' + transformAttr;
 	
-	            var newTranslate = 'translate(' + dx + ',' + dy + ')';
+	            that.attr('transform', newTranslate);
 	
-	            return that.attr('transform', newTranslate + ' ' + transformAttr);
+	            return that;
 	        }
 	    }, {
 	        key: 'rotate',
@@ -1419,6 +1458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'bbox',
 	        value: function bbox(withoutTransformations, target) {
+	
 	            // Get SVGRect that contains coordinates and dimension of the real
 	            // bounding box, i.e. after transformations are applied.
 	            // If `target` is specified, bounding box will be computed
@@ -1441,8 +1481,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var box;
 	            try {
 	                box = node.getBBox();
-	                // We are creating a new object as the standard says that you can't
-	                // modify the attributes of a bbox.
+	                // We are creating a new object as the standard says that
+	                // you can't modify the attributes of a bbox.
 	                box = {
 	                    x: box.x,
 	                    y: box.y,
@@ -1450,7 +1490,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    height: box.height
 	                };
 	            } catch (e) {
-	                // Fallback for IE.
+	                // fallback for IE
 	                box = {
 	                    x: node.clientLeft,
 	                    y: node.clientTop,
@@ -1465,7 +1505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var matrix = node.getTransformToElement(target || node.ownerSVGElement);
 	
-	            return V.transformRect(box, matrix);
+	            return vector.transformRect(box, matrix);
 	        }
 	    }, {
 	        key: 'toLocalPoint',
@@ -1705,9 +1745,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	// ------
 	
 	var vector = VElement.createElement = createElement;
+	var svgDocument = createElement('svg').node;
 	
 	vector.isVElement = function (obj) {
 	    return obj instanceof VElement;
+	};
+	
+	vector.createSVGMatrix = function (matrix) {
+	    var svgMatrix = svgDocument.createSVGMatrix();
+	    for (var key in matrix) {
+	        svgMatrix[key] = matrix[key];
+	    }
+	
+	    return svgMatrix;
+	};
+	
+	vector.createSVGTransform = function () {
+	    return svgDocument.createSVGTransform();
+	};
+	
+	vector.createSVGPoint = function (x, y) {
+	    var point = svgDocument.createSVGPoint();
+	    point.x = x;
+	    point.y = y;
+	    return point;
+	};
+	
+	vector.transformRect = function (rect, matrix) {
+	
+	    var point = svgDocument.createSVGPoint();
+	
+	    point.x = rect.x;
+	    point.y = rect.y;
+	    var corner1 = point.matrixTransform(matrix);
+	
+	    point.x = rect.x + rect.width;
+	    point.y = rect.y;
+	    var corner2 = point.matrixTransform(matrix);
+	
+	    point.x = rect.x + rect.width;
+	    point.y = rect.y + rect.height;
+	    var corner3 = point.matrixTransform(matrix);
+	
+	    point.x = rect.x;
+	    point.y = rect.y + rect.height;
+	    var corner4 = point.matrixTransform(matrix);
+	
+	    var minX = Math.min(corner1.x, corner2.x, corner3.x, corner4.x);
+	    var maxX = Math.max(corner1.x, corner2.x, corner3.x, corner4.x);
+	    var minY = Math.min(corner1.y, corner2.y, corner3.y, corner4.y);
+	    var maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
+	
+	    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 	};
 	
 	// exports
@@ -1899,17 +1988,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        that.raw = raw;
 	        that.data = raw.data;
+	        that.size = raw.size;
+	        that.position = raw.position;
+	        that.rotation = raw.rotation;
 	        that.visible = raw.visible !== false;
-	        //that.attributes =
+	        that.attrs = raw.attrs;
 	    }
 	
 	    _createClass(Cell, [{
-	        key: 'getPosition',
-	        value: function getPosition() {}
-	    }, {
-	        key: 'getSize',
-	        value: function getSize() {}
-	    }, {
 	        key: 'isNode',
 	        value: function isNode() {
 	            return false;
@@ -2368,8 +2454,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return this;
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            return this;
+	        }
+	    }, {
 	        key: 'find',
-	        value: function find(selector) {}
+	        value: function find(selector) {
+	            return selector === '.' ? [this.vel] : this.vel.find(selector);
+	        }
+	    }, {
+	        key: 'applyFilter',
+	        value: function applyFilter(selector, filter) {}
+	    }, {
+	        key: 'applyGradient',
+	        value: function applyGradient(selector, attr, gradient) {}
 	    }, {
 	        key: 'onDblClick',
 	        value: function onDblClick() {}
@@ -2419,6 +2523,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(1);
+	
 	var _vector = __webpack_require__(10);
 	
 	var _vector2 = _interopRequireDefault(_vector);
@@ -2446,9 +2552,258 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _createClass(NodeView, [{
 	        key: 'update',
-	        value: function update() {
+	        value: function update(specifiedAttrs) {
 	
 	            var that = this;
+	            var cell = that.cell;
+	            var allAttrs = cell.attrs;
+	            var rotatableNode = that.rotatableNode;
+	
+	            if (rotatableNode) {
+	                var rotationAttr = rotatableNode.attr('transform');
+	                rotatableNode.attr('transform', '');
+	            }
+	
+	            var relativelySelectors = [];
+	            var nodesBySelector = {};
+	
+	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
+	
+	                var vNodes = that.find(selector);
+	
+	                if (!vNodes.length) {
+	                    return;
+	                }
+	
+	                nodesBySelector[selector] = vNodes;
+	
+	                var specialAttributes = NodeView.specialAttributes.slice();
+	
+	                if ((0, _utils.isObject)(attrs.filter)) {
+	                    specialAttributes.push('filter');
+	                    that.applyFilter(vNodes, attrs.filter);
+	                }
+	
+	                if ((0, _utils.isObject)(attrs.fill)) {
+	                    specialAttributes.push('fill');
+	                    that.applyGradient(vNodes, 'fill', attrs.fill);
+	                }
+	
+	                if ((0, _utils.isObject)(attrs.stroke)) {
+	                    specialAttributes.push('stroke');
+	                    that.applyGradient(vNodes, 'stroke', attrs.stroke);
+	                }
+	
+	                if (!(0, _utils.isUndefined)(attrs.text)) {
+	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
+	                    (0, _utils.forEach)(vNodes, function (vel) {
+	                        vel.text(attrs.text + '', {
+	                            lineHeight: attrs.lineHeight,
+	                            textPath: attrs.textPath,
+	                            annotations: attrs.annotations
+	                        });
+	                    });
+	                }
+	
+	                var finalAttributes = {};
+	
+	                (0, _utils.forIn)(attrs, function (value, key) {
+	                    if (!(0, _utils.contains)(specialAttributes, key)) {
+	                        finalAttributes[key] = value;
+	                    }
+	                });
+	
+	                // set regular attributes
+	                (0, _utils.forEach)(vNodes, function (vel) {
+	                    vel.attr(finalAttributes);
+	                });
+	
+	                if (attrs.port) {
+	                    (0, _utils.forEach)(vNodes, function (vel) {
+	                        vel.attr('port', (0, _utils.isUndefined)(attrs.port.id) ? attrs.port : attrs.port.id);
+	                    });
+	                }
+	
+	                if (attrs.style) {
+	                    (0, _utils.forEach)(vNodes, function (vel) {
+	                        vel.css(attrs.style);
+	                    });
+	                }
+	
+	                if (!(0, _utils.isUndefined)(attrs.html)) {
+	                    (0, _utils.forEach)(vNodes, function (vel) {});
+	                }
+	
+	                // Special `ref-x` and `ref-y` attributes make it possible to
+	                // set both absolute or relative positioning of subElements.
+	                (0, _utils.some)(['ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'x-alignment', 'y-alignment', 'ref-width', 'ref-height'], function (key) {
+	                    return !(0, _utils.isUndefined)(attrs[key]);
+	                }) && relativelySelectors.push(selector);
+	            });
+	
+	            // Note that we're using the bounding box without transformation
+	            // because we are already inside a transformed coordinate system.
+	            var size = cell.size;
+	            var bbox = { x: 0, y: 0, width: size.width, height: size.height };
+	
+	            specifiedAttrs = specifiedAttrs || {};
+	
+	            (0, _utils.forEach)(relativelySelectors, function (selector) {
+	
+	                var specified = specifiedAttrs[selector];
+	                var all = allAttrs[selector];
+	                var attrs = specified ? (0, _utils.merge)({}, all, specified) : all;
+	
+	                (0, _utils.forEach)(nodesBySelector[selector], function (vel) {
+	                    that.positionRelative(vel, bbox, attrs, nodesBySelector);
+	                });
+	            });
+	
+	            if (rotatableNode) {
+	                rotatableNode.attr('transform', rotationAttr || '');
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'positionRelative',
+	        value: function positionRelative(vel, bbox, attributes, nodesBySelector) {
+	
+	            var that = this;
+	            var ref = attributes['ref'];
+	            var refDx = (0, _utils.toFloat)(attributes['ref-dx']);
+	            var refDy = (0, _utils.toFloat)(attributes['ref-dy']);
+	            var yAlignment = attributes['y-alignment'];
+	            var xAlignment = attributes['x-alignment'];
+	
+	            var refX = attributes['ref-x'];
+	            var refXPercentage = (0, _utils.isPercentage)(refX);
+	            refX = (0, _utils.toFloat)(refX, refXPercentage);
+	
+	            var refY = attributes['ref-y'];
+	            var refYPercentage = (0, _utils.isPercentage)(refY);
+	            refY = (0, _utils.toFloat)(refY, refYPercentage);
+	
+	            var refWidth = attributes['ref-width'];
+	            var refWidthPercentage = (0, _utils.isPercentage)(refWidth);
+	            refWidth = (0, _utils.toFloat)(refWidth, refWidthPercentage);
+	
+	            var refHeight = attributes['ref-height'];
+	            var refHeightPercentage = (0, _utils.isPercentage)(refHeight);
+	            refHeight = (0, _utils.toFloat)(refHeight, refHeightPercentage);
+	
+	            // Check if the node is a descendant of the scalable group.
+	            var scalableNode = vel.findParent('pane-scalable', that.el);
+	
+	            // `ref` is the selector of the reference element.
+	            // If no `ref` specified, reference element is the root element.
+	            if (ref) {
+	
+	                var vref;
+	
+	                if (nodesBySelector && nodesBySelector[ref]) {
+	                    vref = nodesBySelector[ref][0];
+	                } else {
+	                    vref = ref === '.' ? that.vel : that.vel.findOne(ref);
+	                }
+	
+	                if (!vref) {
+	                    throw new Error('NodeView: reference does not exists.');
+	                }
+	
+	                // Get the bounding box of the reference element
+	                // relative to the root `<g>` element.
+	                bbox = vref.bbox(false, that.el);
+	            }
+	
+	            // Remove the previous translate() from the transform attribute
+	            // and translate the element relative to the root bounding box
+	            // following the `ref-x` and `ref-y` attributes.
+	            var transformAttr = vel.attr('transform');
+	            if (transformAttr) {
+	                vel.attr('transform', (0, _utils.clearTranslate)(transformAttr));
+	            }
+	
+	            // `ref-width` and `ref-height` defines the width and height of the
+	            // subElement relatively to the reference element size.
+	            if (isFinite(refWidth)) {
+	                if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
+	                    vel.attr('width', refWidth * bbox.width);
+	                } else {
+	                    vel.attr('width', Math.max(refWidth + bbox.width, 0));
+	                }
+	            }
+	            if (isFinite(refHeight)) {
+	                if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
+	                    vel.attr('height', refHeight * bbox.height);
+	                } else {
+	                    vel.attr('height', Math.max(refHeight + bbox.height, 0));
+	                }
+	            }
+	
+	            // The final translation of the subElement.
+	            var tx = 0;
+	            var ty = 0;
+	            var scale;
+	
+	            // `ref-dx` and `ref-dy` define the offset of the subElement relative
+	            // to the right and/or bottom coordinate of the reference element.
+	            if (isFinite(refDx)) {
+	                if (scalableNode) {
+	                    scale = scalableNode.scale();
+	                    tx = bbox.x + bbox.width + refDx / scale.sx;
+	                } else {
+	                    tx = bbox.x + bbox.width + refDx;
+	                }
+	            }
+	            if (isFinite(refDy)) {
+	                if (scalableNode) {
+	                    scale = scale || scalableNode.scale();
+	                    ty = bbox.y + bbox.height + refDy / scale.sy;
+	                } else {
+	                    ty = bbox.y + bbox.height + refDy;
+	                }
+	            }
+	
+	            if (isFinite(refX)) {
+	                if (refXPercentage || refX > 0 && refX < 1) {
+	                    tx = bbox.x + bbox.width * refX;
+	                } else if (scalableNode) {
+	                    scale = scale || scalableNode.scale();
+	                    tx = bbox.x + refX / scale.sx;
+	                } else {
+	                    tx = bbox.x + refX;
+	                }
+	            }
+	            if (isFinite(refY)) {
+	                if (refXPercentage || refY > 0 && refY < 1) {
+	                    ty = bbox.y + bbox.height * refY;
+	                } else if (scalableNode) {
+	                    scale = scale || scalableNode.scale();
+	                    ty = bbox.y + refY / scale.sy;
+	                } else {
+	                    ty = bbox.y + refY;
+	                }
+	            }
+	
+	            if (!(0, _utils.isUndefined)(yAlignment) || !(0, _utils.isUndefined)(xAlignment)) {
+	
+	                var velBBox = vel.bbox(false, that.paper.drawPane);
+	
+	                if (yAlignment === 'middle') {
+	                    ty -= velBBox.height / 2;
+	                } else if (isFinite(yAlignment)) {
+	                    ty += yAlignment > -1 && yAlignment < 1 ? velBBox.height * yAlignment : yAlignment;
+	                }
+	
+	                if (xAlignment === 'middle') {
+	                    tx -= velBBox.width / 2;
+	                } else if (isFinite(xAlignment)) {
+	                    tx += xAlignment > -1 && xAlignment < 1 ? velBBox.width * xAlignment : xAlignment;
+	                }
+	            }
+	
+	            vel.translate(tx, ty);
 	
 	            return that;
 	        }
@@ -2485,19 +2840,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
-	        key: 'scale',
-	        value: function scale() {
-	
-	            var that = this;
-	
-	            return that;
-	        }
-	    }, {
 	        key: 'resize',
 	        value: function resize() {
 	
 	            var that = this;
+	            var size = that.cell.size || { width: 1, height: 1 };
 	
+	            var scalableNode = that.scalableNode;
+	            if (!scalableNode) {
+	                return;
+	            }
+	
+	            var scalableBBox = scalableNode.bbox(true);
+	
+	            // Make sure `scalableBBox.width` and `scalableBBox.height` are not
+	            // zero which can happen if the element does not have any content.
+	            // By making the width(height) 1, we prevent HTML errors of the type
+	            // `scale(Infinity, Infinity)`.
+	            var sx = size.width / (scalableBBox.width || 1);
+	            var sy = size.height / (scalableBBox.height || 1);
+	            scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
+	
+	            var rotation = that.cell.rotation || { angle: 0 };
+	            var angle = rotation.angle;
+	
+	            // Cancel the rotation but now around a different origin,
+	            // which is the center of the scaled object.
+	            var rotatableNode = that.rotatableNode;
+	            var rotateAttr = rotatableNode && rotatableNode.attr('transform');
+	
+	            if (rotateAttr && rotateAttr !== 'null') {
+	
+	                rotatableNode.attr('transform', rotateAttr + ' rotate(' + -angle + ',' + size.width / 2 + ',' + size.height / 2 + ')');
+	                var rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
+	
+	                // Store new x, y and perform rotate() again against the new rotation origin.
+	                that.position = {
+	                    x: rotatableBBox.x,
+	                    y: rotatableBBox.y
+	                };
+	                that.rotate();
+	            }
+	
+	            // Update must always be called on non-rotated element. Otherwise,
+	            // relative positioning would work with wrong (rotated) bounding boxes.
+	            that.update();
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate() {
+	
+	            var that = this;
+	            var position = that.cell.position || { x: 0, y: 0 };
+	
+	            that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
 	            return that;
 	        }
 	    }, {
@@ -2510,28 +2908,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (node) {
 	
 	                var cell = that.cell;
-	                var angle = cell.get('angle');
+	                var rotation = cell.rotation;
+	                var angle = rotation && rotation.angle || 0;
 	
-	                if (angle) {
+	                var size = cell.size || { width: 1, height: 1 };
+	                var ox = size.width / 2;
+	                var oy = size.height / 2;
 	
-	                    var size = cell.get('size') || { width: 1, height: 1 };
-	                    var ox = size.width / 2;
-	                    var oy = size.height / 2;
-	
-	                    node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
-	                } else {
-	                    node.removeAttr('transform');
-	                }
+	                node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
 	            }
 	
 	            return that;
 	        }
 	    }, {
-	        key: 'translate',
-	        value: function translate() {
-	
+	        key: 'scale',
+	        value: function scale(sx, sy) {
 	            var that = this;
-	
+	            that.vel.scale(sx, sy);
 	            return that;
 	        }
 	    }, {
@@ -2541,6 +2934,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return NodeView;
 	})(_CellView3.default);
+	
+	NodeView.specialAttributes = ['style', 'text', 'html', 'ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'ref-width', 'ref-height', 'ref', 'x-alignment', 'y-alignment', 'port'];
 	
 	exports.default = NodeView;
 
@@ -4015,7 +4410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Rect;
 	})(_Generic3.default);
 	
-	Rect.markup = '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>';
+	Rect.markup = '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>';
 	Rect.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
 	    type: 'basic.Rect',
 	    attrs: {
