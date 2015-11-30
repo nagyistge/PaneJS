@@ -1,5 +1,9 @@
 import { isString } from './lang';
 
+function isFinite(value) {
+    return window.isFinite(value) && !window.isNaN(parseFloat(value));
+}
+
 function isPercentage(str) {
     return isString(str) && str.slice(-1) === '%';
 }
@@ -22,5 +26,6 @@ export {
     toInt,
     toFloat,
     toFixed,
+    isFinite,
     isPercentage
 };
