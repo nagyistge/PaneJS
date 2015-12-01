@@ -228,7 +228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret === 'continue') continue;
 	}
 	
-	var _string = __webpack_require__(3);
+	var _string = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../utils/string\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _loop2 = function _loop2(_key10) {
 	  if (_key10 === "default") return 'continue';
@@ -479,50 +479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isNullOrUndefined = isNullOrUndefined;
 
 /***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var proto = String.prototype;
-	
-	function toString(str) {
-	    return '' + str;
-	}
-	
-	function uc(str) {
-	    return ('' + str).toUpperCase();
-	}
-	
-	function lc(str) {
-	    return ('' + str).toLowerCase();
-	}
-	
-	function sanitizeText(text) {
-	
-	    // Replace all spaces with the Unicode No-break space.
-	    // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
-	    // IE would otherwise collapse all spaces into one. This is useful
-	    // e.g. in tests when you want to compare the actual DOM text content
-	    // without having to add the unicode character in the place of all spaces.
-	
-	    return (text || '').replace(/ /g, ' ');
-	}
-	
-	function trim(str) {
-	    return str ? proto.trim.call('' + str) : '';
-	}
-	
-	exports.lc = lc;
-	exports.uc = uc;
-	exports.trim = trim;
-	exports.toString = toString;
-	exports.sanitizeText = sanitizeText;
-
-/***/ },
+/* 3 */,
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -531,9 +488,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.isPercentage = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
 	
 	var _lang = __webpack_require__(2);
+	
+	function isFinite(value) {
+	    return window.isFinite(value) && !window.isNaN(parseFloat(value));
+	}
 	
 	function isPercentage(str) {
 	    return (0, _lang.isString)(str) && str.slice(-1) === '%';
@@ -556,6 +517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toInt = toInt;
 	exports.toFloat = toFloat;
 	exports.toFixed = toFixed;
+	exports.isFinite = isFinite;
 	exports.isPercentage = isPercentage;
 
 /***/ },
@@ -638,7 +600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.extend = exports.merge = exports.forIn = exports.keys = exports.hasKey = undefined;
+	exports.getByPath = exports.extend = exports.merge = exports.forIn = exports.keys = exports.hasKey = undefined;
 	
 	var _array = __webpack_require__(5);
 	
@@ -713,11 +675,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return target;
 	}
 	
+	function getByPath(obj, path, delimiter) {
+	
+	    delimiter = delimiter || '.';
+	
+	    var keys = path.split(delimiter);
+	
+	    while (keys.length) {
+	
+	        var key = keys.shift();
+	
+	        if (Object(obj) === obj && key in obj) {
+	            obj = obj[key];
+	        } else {
+	            return undefined;
+	        }
+	    }
+	
+	    return obj;
+	}
+	
 	exports.hasKey = hasKey;
 	exports.keys = keys;
 	exports.forIn = forIn;
 	exports.merge = merge;
 	exports.extend = extend;
+	exports.getByPath = getByPath;
 
 /***/ },
 /* 7 */
@@ -781,7 +764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
 	
-	var _string = __webpack_require__(3);
+	var _string = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./string\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _array = __webpack_require__(5);
 	
@@ -1533,8 +1516,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'after',
 	        value: function after(elem) {}
 	    }, {
-	        key: 'getSVGElement',
-	        value: function getSVGElement() {
+	        key: 'getSVG',
+	        value: function getSVG() {
 	            var that = this;
 	            var node = that.node;
 	
@@ -1543,8 +1526,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getDefs',
 	        value: function getDefs() {
-	            var defs = this.svg().node.getElementsByTagName('defs');
-	            return defs && defs.length ? vectorize(defs[0]) : null;
+	
+	            var defs = null;
+	            var svg = this.getSVG();
+	
+	            (0, _utils.some)(svg.node.childNodes, function (node) {
+	                if ((0, _utils.isNode)(node, 'defs')) {
+	                    defs = vectorize(node);
+	                    return true;
+	                }
+	            });
+	
+	            if (!defs) {
+	                defs = createElement('defs');
+	                svg.append(defs);
+	            }
+	
+	            return defs;
 	        }
 	    }, {
 	        key: 'clone',
@@ -2646,6 +2644,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(1);
+	
+	var _filters = __webpack_require__(34);
+	
+	var _filters2 = _interopRequireDefault(_filters);
+	
 	var _Events = __webpack_require__(11);
 	
 	var _Events2 = _interopRequireDefault(_Events);
@@ -2703,10 +2707,119 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'applyFilter',
-	        value: function applyFilter(selector, filter) {}
+	        value: function applyFilter(selector, filter) {
+	
+	            // `selector` is a CSS selector or `'.'`.
+	            // `filter` must be in the special filter format:
+	            // `{ name: <name of the filter>, args: { <arguments>, ... }`.
+	            // An example is: `{ filter: { name: 'blur', args: { radius: 5 } } }`.
+	
+	            var that = this;
+	
+	            filter = filter || {};
+	
+	            var name = filter.name || '';
+	            var args = filter.args || {};
+	            var attrs = filter.attrs;
+	            var filterFn = _filters2.default[name];
+	
+	            if (!name || !filterFn) {
+	                throw new Error('Non-existing filter: ' + name);
+	            }
+	
+	            var vElements = (0, _utils.isString)(selector) ? that.find(selector) : selector;
+	
+	            if (!vElements.length) {
+	                return that;
+	            }
+	
+	            var paper = that.paper;
+	            var svg = paper.svg;
+	            var filterId = name + '-' + paper.id + '-' + (0, _utils.hashCode)(JSON.stringify(filter));
+	
+	            if (!svg.getElementById(filterId)) {
+	
+	                var vFilter = (0, _vector2.default)(filterFn(args));
+	                // Set the filter area to be 3x the bounding box of the cell
+	                // and center the filter around the cell.
+	                vFilter.attr({
+	                    filterUnits: 'objectBoundingBox',
+	                    x: -1,
+	                    y: -1,
+	                    width: 3,
+	                    height: 3
+	                });
+	
+	                if (attrs) {
+	                    vFilter.attr(attrs);
+	                }
+	
+	                vFilter.node.id = filterId;
+	
+	                (0, _vector2.default)(svg).getDefs().append(vFilter);
+	            }
+	
+	            (0, _utils.forEach)(vElements, function (vel) {
+	                vel.attr(filter, 'url(#' + filterId + ')');
+	            });
+	
+	            return that;
+	        }
 	    }, {
 	        key: 'applyGradient',
-	        value: function applyGradient(selector, attr, gradient) {}
+	        value: function applyGradient(selector, attrName, gradient) {
+	
+	            // `selector` is a CSS selector or `'.'`.
+	            // `attrName` is either a `'fill'` or `'stroke'`.
+	            // `gradient` must be in the special gradient format:
+	            // `{ type: <linearGradient|radialGradient>, stops: [ { offset: <offset>, color: <color> }, ... ]`.
+	            // An example is: `{ fill: { type: 'linearGradient', stops: [ { offset: '10%', color: 'green' }, { offset: '50%', color: 'blue' } ] } }`.
+	
+	            var that = this;
+	
+	            gradient = gradient || {};
+	
+	            var type = gradient.type;
+	            var stops = gradient.stops;
+	            var attrs = gradient.attrs;
+	
+	            if (!attrName || !type || !stops || !stops.length) {
+	                return that;
+	            }
+	
+	            var vElements = (0, _utils.isString)(selector) ? that.find(selector) : selector;
+	
+	            if (!vElements.length) {
+	                return that;
+	            }
+	
+	            var paper = that.paper;
+	            var svg = paper.svg;
+	            var gradientId = type + '-' + paper.id + '-' + (0, _utils.hashCode)(JSON.stringify(gradient));
+	
+	            if (!svg.getElementById(gradientId)) {
+	
+	                var gradientString = ['<' + type + '>', (0, _utils.map)(stops, function (stop) {
+	                    return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + ((0, _utils.isFinite)(stop.opacity) ? stop.opacity : 1) + '" />';
+	                }).join(''), '</' + type + '>'].join('');
+	
+	                var vGradient = (0, _vector2.default)(gradientString);
+	
+	                if (attrs) {
+	                    vGradient.attr(attrs);
+	                }
+	
+	                vGradient.node.id = gradientId;
+	
+	                (0, _vector2.default)(svg).getDefs().append(vGradient);
+	            }
+	
+	            (0, _utils.forEach)(vElements, function (vel) {
+	                vel.attr(attrName, 'url(#' + gradientId + ')');
+	            });
+	
+	            return that;
+	        }
 	    }, {
 	        key: 'onDblClick',
 	        value: function onDblClick() {}
@@ -2802,34 +2915,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
 	
-	                var vNodes = that.find(selector);
+	                var vElements = that.find(selector);
 	
-	                if (!vNodes.length) {
+	                if (!vElements.length) {
 	                    return;
 	                }
 	
-	                nodesBySelector[selector] = vNodes;
+	                nodesBySelector[selector] = vElements;
 	
 	                var specialAttributes = NodeView.specialAttributes.slice();
 	
 	                if ((0, _utils.isObject)(attrs.filter)) {
 	                    specialAttributes.push('filter');
-	                    that.applyFilter(vNodes, attrs.filter);
+	                    that.applyFilter(vElements, attrs.filter);
 	                }
 	
 	                if ((0, _utils.isObject)(attrs.fill)) {
 	                    specialAttributes.push('fill');
-	                    that.applyGradient(vNodes, 'fill', attrs.fill);
+	                    that.applyGradient(vElements, 'fill', attrs.fill);
 	                }
 	
 	                if ((0, _utils.isObject)(attrs.stroke)) {
 	                    specialAttributes.push('stroke');
-	                    that.applyGradient(vNodes, 'stroke', attrs.stroke);
+	                    that.applyGradient(vElements, 'stroke', attrs.stroke);
 	                }
 	
 	                if (!(0, _utils.isUndefined)(attrs.text)) {
 	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
-	                    (0, _utils.forEach)(vNodes, function (vel) {
+	                    (0, _utils.forEach)(vElements, function (vel) {
 	                        vel.text(attrs.text + '', {
 	                            lineHeight: attrs.lineHeight,
 	                            textPath: attrs.textPath,
@@ -2847,24 +2960,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	
 	                // set regular attributes
-	                (0, _utils.forEach)(vNodes, function (vel) {
+	                (0, _utils.forEach)(vElements, function (vel) {
 	                    vel.attr(finalAttributes);
 	                });
 	
 	                if (attrs.port) {
-	                    (0, _utils.forEach)(vNodes, function (vel) {
+	                    (0, _utils.forEach)(vElements, function (vel) {
 	                        vel.attr('port', (0, _utils.isUndefined)(attrs.port.id) ? attrs.port : attrs.port.id);
 	                    });
 	                }
 	
 	                if (attrs.style) {
-	                    (0, _utils.forEach)(vNodes, function (vel) {
+	                    (0, _utils.forEach)(vElements, function (vel) {
 	                        vel.css(attrs.style);
 	                    });
 	                }
 	
 	                if (!(0, _utils.isUndefined)(attrs.html)) {
-	                    (0, _utils.forEach)(vNodes, function (vel) {});
+	                    (0, _utils.forEach)(vElements, function (vel) {});
 	                }
 	
 	                // Special `ref-x` and `ref-y` attributes make it possible to
@@ -4100,6 +4213,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var counter = 0;
+	
 	// the default options for paper
 	var defaultOptions = {
 	    x: 0,
@@ -4124,6 +4239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = _this;
 	
+	        that.id = 'paper' + counter++;
 	        that.model = model || new _Model2.default();
 	
 	        that.configure(options);
@@ -5129,6 +5245,194 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = Text;
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var filters = {
+	
+	    outline: function outline(args) {
+	
+	        // `color` ... outline color
+	        // `width`... outline width
+	        // `opacity` ... outline opacity
+	        // `margin` ... gap between outline and the element
+	
+	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" /><feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" /><feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/><feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/><feMerge><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	
+	        var margin = (0, _utils.isFinite)(args.margin) ? args.margin : 2;
+	        var width = (0, _utils.isFinite)(args.width) ? args.width : 1;
+	
+	        return (0, _utils.format)(tpl)({
+	            color: args.color || 'blue',
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
+	            outerRadius: margin + width,
+	            innerRadius: margin
+	        });
+	    },
+	
+	    highlight: function highlight(args) {
+	
+	        // `color` ... color
+	        // `width`... width
+	        // `blur` ... blur
+	        // `opacity` ... opacity
+	
+	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/><feComposite result="composed" in="colored" in2="morphed" operator="in"/><feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/><feBlend in="SourceGraphic" in2="blured" mode="normal"/></filter>';
+	
+	        return (0, _utils.format)(tpl)({
+	            color: args.color || 'red',
+	            width: (0, _utils.isFinite)(args.width) ? args.width : 1,
+	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 0,
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1
+	        });
+	    },
+	
+	    blur: function blur(args) {
+	
+	        // `x` ... horizontal blur
+	        // `y` ... vertical blur (optional)
+	
+	        var x = (0, _utils.isFinite)(args.x) ? args.x : 2;
+	
+	        return (0, _utils.format)('<filter><feGaussianBlur stdDeviation="${stdDeviation}"/></filter>')({
+	            stdDeviation: (0, _utils.isFinite)(args.y) ? [x, args.y] : x
+	        });
+	    },
+	
+	    dropShadow: function dropShadow(args) {
+	
+	        // `dx` ... horizontal shift
+	        // `dy` ... vertical shift
+	        // `blur` ... blur
+	        // `color` ... color
+	        // `opacity` ... opacity
+	
+	        var tpl = 'SVGFEDropShadowElement' in window ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>' : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	
+	        return (0, _utils.format)(tpl)({
+	            dx: args.dx || 0,
+	            dy: args.dy || 0,
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
+	            color: args.color || 'black',
+	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 4
+	        });
+	    },
+	
+	    grayscale: function grayscale(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely grayscale.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/></filter>')({
+	            a: 0.2126 + 0.7874 * (1 - amount),
+	            b: 0.7152 - 0.7152 * (1 - amount),
+	            c: 0.0722 - 0.0722 * (1 - amount),
+	            d: 0.2126 - 0.2126 * (1 - amount),
+	            e: 0.7152 + 0.2848 * (1 - amount),
+	            f: 0.0722 - 0.0722 * (1 - amount),
+	            g: 0.2126 - 0.2126 * (1 - amount),
+	            h: 0.0722 + 0.9278 * (1 - amount)
+	        });
+	    },
+	
+	    sepia: function sepia(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely sepia.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/></filter>')({
+	            a: 0.393 + 0.607 * (1 - amount),
+	            b: 0.769 - 0.769 * (1 - amount),
+	            c: 0.189 - 0.189 * (1 - amount),
+	            d: 0.349 - 0.349 * (1 - amount),
+	            e: 0.686 + 0.314 * (1 - amount),
+	            f: 0.168 - 0.168 * (1 - amount),
+	            g: 0.272 - 0.272 * (1 - amount),
+	            h: 0.534 - 0.534 * (1 - amount),
+	            i: 0.131 + 0.869 * (1 - amount)
+	        });
+	    },
+	
+	    saturate: function saturate(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 0 is completely un-saturated.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="saturate" values="${amount}"/></filter>')({
+	            amount: 1 - amount
+	        });
+	    },
+	
+	    hueRotate: function hueRotate(args) {
+	
+	        // `angle` ...  the number of degrees around the color
+	        // circle the input samples will be adjusted.
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="hueRotate" values="${angle}"/></filter>')({
+	            angle: args.angle || 0
+	        });
+	    },
+	
+	    invert: function invert(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely inverted.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="table" tableValues="${amount} ${amount2}"/><feFuncG type="table" tableValues="${amount} ${amount2}"/><feFuncB type="table" tableValues="${amount} ${amount2}"/></feComponentTransfer></filter>')({
+	            amount: amount,
+	            amount2: 1 - amount
+	        });
+	    },
+	
+	    brightness: function brightness(args) {
+	
+	        // `amount` ... proportion of the conversion.
+	        // A value of 0 will create an image that is completely black.
+	        // A value of 1 leaves the input unchanged.
+	
+	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}"/><feFuncG type="linear" slope="${amount}"/><feFuncB type="linear" slope="${amount}"/></feComponentTransfer></filter>')({
+	            amount: (0, _utils.isFinite)(args.amount) ? args.amount : 1
+	        });
+	    },
+	
+	    contrast: function contrast(args) {
+	
+	        // `amount` ... proportion of the conversion.
+	        // A value of 0 will create an image that is completely black.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}" intercept="${amount2}"/><feFuncG type="linear" slope="${amount}" intercept="${amount2}"/><feFuncB type="linear" slope="${amount}" intercept="${amount2}"/></feComponentTransfer></filter>')({
+	            amount: amount,
+	            amount2: .5 - amount / 2
+	        });
+	    }
+	};
+	
+	exports.default = filters;
 
 /***/ }
 /******/ ])
