@@ -71,10 +71,31 @@ function merge(target) {
     return target;
 }
 
+function getByPath(obj, path, delimiter) {
+
+    delimiter = delimiter || '.';
+
+    var keys = path.split(delimiter);
+
+    while (keys.length) {
+
+        var key = keys.shift();
+
+        if (Object(obj) === obj && key in obj) {
+            obj = obj[key];
+        } else {
+            return undefined;
+        }
+    }
+
+    return obj;
+}
+
 export {
     hasKey,
     keys,
     forIn,
     merge,
-    extend
+    extend,
+    getByPath
 };
