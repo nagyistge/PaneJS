@@ -76,7 +76,7 @@ export {
     uc,
     trim,
     uuid,
-    format
+    format,
     hashCode,
     toString,
     sanitizeText
