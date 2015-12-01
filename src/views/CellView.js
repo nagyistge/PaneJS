@@ -179,6 +179,17 @@ class CellView {
     onMouseOut() {}
 
     onContextMenu() {}
+
+    destroy() {
+
+        var that = this;
+        var el = that.el;
+
+        if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
+
+    }
 }
 
 

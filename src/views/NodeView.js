@@ -404,7 +404,6 @@ class NodeView extends CellView {
         return that;
     }
 
-
     getBBox() {}
 }
 

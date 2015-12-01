@@ -91,11 +91,26 @@ function getByPath(obj, path, delimiter) {
     return obj;
 }
 
+function destroy(obj) {
+    if (obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                delete obj[prop];
+            }
+        }
+        if (obj) {
+            obj.prototype = obj['__proto__'] = null;
+        }
+        obj.destroyed = true;
+    }
+}
+
 export {
     hasKey,
     keys,
     forIn,
     merge,
     extend,
+    destroy,
     getByPath
 };

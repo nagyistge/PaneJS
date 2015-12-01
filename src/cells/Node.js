@@ -42,11 +42,9 @@ Node.defaults = {
         angle: 0,
         relative: false
     },
-    x: 0,
-    y: 0,
-    width: 1,
-    height: 1,
-    angle: 0
+    attrs: {
+
+    }
 };
 
 

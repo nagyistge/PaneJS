@@ -1,14 +1,25 @@
 import {
     merge,
     filter,
+    forIn,
     forEach,
     indexOf,
     isNullOrUndefined
 } from '../common/utils';
 
-import Events from '../common/Events';
-
 class Cell {
+
+    static configure(attributes) {
+
+        var that = this;
+
+        attributes && forIn(attributes, function (val, key) {
+            if (key === 'defaults') {
+                val = merge({}, that.defaults, val);
+            }
+            that[key] = val;
+        });
+    }
 
     constructor(attributes) {
 

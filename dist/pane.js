@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.shapes = exports.Paper = exports.Model = exports.ChildChange = exports.RootChange = exports.Change = exports.NodeView = exports.LinkView = exports.CellView = exports.Node = exports.Link = exports.Cell = exports.Events = exports.VElement = exports.vector = exports.utils = undefined;
 	
-	var _vector2 = __webpack_require__(10);
+	var _vector2 = __webpack_require__(1);
 	
 	Object.defineProperty(exports, 'VElement', {
 	    enumerable: true,
@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	});
 	
-	var _utils2 = __webpack_require__(1);
+	var _utils2 = __webpack_require__(2);
 	
 	var _utils = _interopRequireWildcard(_utils2);
 	
@@ -96,19 +96,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
-	var _LinkView2 = __webpack_require__(16);
+	var _LinkView2 = __webpack_require__(17);
 	
 	var _LinkView3 = _interopRequireDefault(_LinkView2);
 	
-	var _NodeView2 = __webpack_require__(17);
+	var _NodeView2 = __webpack_require__(18);
 	
 	var _NodeView3 = _interopRequireDefault(_NodeView2);
 	
-	var _Change2 = __webpack_require__(20);
+	var _Change2 = __webpack_require__(19);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
-	var _RootChange2 = __webpack_require__(19);
+	var _RootChange2 = __webpack_require__(20);
 	
 	var _RootChange3 = _interopRequireDefault(_RootChange2);
 	
@@ -116,51 +116,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ChildChange3 = _interopRequireDefault(_ChildChange2);
 	
-	var _Model2 = __webpack_require__(18);
+	var _Model2 = __webpack_require__(22);
 	
 	var _Model3 = _interopRequireDefault(_Model2);
 	
-	var _Paper2 = __webpack_require__(23);
+	var _Paper2 = __webpack_require__(24);
 	
 	var _Paper3 = _interopRequireDefault(_Paper2);
 	
-	var _Generic = __webpack_require__(24);
+	var _Generic = __webpack_require__(25);
 	
 	var _Generic2 = _interopRequireDefault(_Generic);
 	
-	var _Text = __webpack_require__(33);
+	var _Text = __webpack_require__(26);
 	
 	var _Text2 = _interopRequireDefault(_Text);
 	
-	var _Rect = __webpack_require__(25);
+	var _Rect = __webpack_require__(27);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Circle = __webpack_require__(26);
+	var _Circle = __webpack_require__(28);
 	
 	var _Circle2 = _interopRequireDefault(_Circle);
 	
-	var _Ellipse = __webpack_require__(27);
+	var _Ellipse = __webpack_require__(29);
 	
 	var _Ellipse2 = _interopRequireDefault(_Ellipse);
 	
-	var _Image = __webpack_require__(28);
+	var _Image = __webpack_require__(30);
 	
 	var _Image2 = _interopRequireDefault(_Image);
 	
-	var _Path = __webpack_require__(29);
+	var _Path = __webpack_require__(31);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Polygon = __webpack_require__(30);
+	var _Polygon = __webpack_require__(32);
 	
 	var _Polygon2 = _interopRequireDefault(_Polygon);
 	
-	var _Polyline = __webpack_require__(31);
+	var _Polyline = __webpack_require__(33);
 	
 	var _Polyline2 = _interopRequireDefault(_Polyline);
 	
-	var _Rhombus = __webpack_require__(32);
+	var _Rhombus = __webpack_require__(34);
 	
 	var _Rhombus2 = _interopRequireDefault(_Rhombus);
 	
@@ -206,995 +206,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _lang = __webpack_require__(2);
-	
-	var _loop = function _loop(_key9) {
-	  if (_key9 === "default") return 'continue';
-	  Object.defineProperty(exports, _key9, {
-	    enumerable: true,
-	    get: function get() {
-	      return _lang[_key9];
-	    }
-	  });
-	};
-	
-	for (var _key9 in _lang) {
-	  var _ret = _loop(_key9);
-	
-	  if (_ret === 'continue') continue;
-	}
-	
-	var _string = __webpack_require__(3);
-	
-	var _loop2 = function _loop2(_key10) {
-	  if (_key10 === "default") return 'continue';
-	  Object.defineProperty(exports, _key10, {
-	    enumerable: true,
-	    get: function get() {
-	      return _string[_key10];
-	    }
-	  });
-	};
-	
-	for (var _key10 in _string) {
-	  var _ret2 = _loop2(_key10);
-	
-	  if (_ret2 === 'continue') continue;
-	}
-	
-	var _number = __webpack_require__(4);
-	
-	var _loop3 = function _loop3(_key11) {
-	  if (_key11 === "default") return 'continue';
-	  Object.defineProperty(exports, _key11, {
-	    enumerable: true,
-	    get: function get() {
-	      return _number[_key11];
-	    }
-	  });
-	};
-	
-	for (var _key11 in _number) {
-	  var _ret3 = _loop3(_key11);
-	
-	  if (_ret3 === 'continue') continue;
-	}
-	
-	var _array = __webpack_require__(5);
-	
-	var _loop4 = function _loop4(_key12) {
-	  if (_key12 === "default") return 'continue';
-	  Object.defineProperty(exports, _key12, {
-	    enumerable: true,
-	    get: function get() {
-	      return _array[_key12];
-	    }
-	  });
-	};
-	
-	for (var _key12 in _array) {
-	  var _ret4 = _loop4(_key12);
-	
-	  if (_ret4 === 'continue') continue;
-	}
-	
-	var _object = __webpack_require__(6);
-	
-	var _loop5 = function _loop5(_key13) {
-	  if (_key13 === "default") return 'continue';
-	  Object.defineProperty(exports, _key13, {
-	    enumerable: true,
-	    get: function get() {
-	      return _object[_key13];
-	    }
-	  });
-	};
-	
-	for (var _key13 in _object) {
-	  var _ret5 = _loop5(_key13);
-	
-	  if (_ret5 === 'continue') continue;
-	}
-	
-	var _function = __webpack_require__(7);
-	
-	var _loop6 = function _loop6(_key14) {
-	  if (_key14 === "default") return 'continue';
-	  Object.defineProperty(exports, _key14, {
-	    enumerable: true,
-	    get: function get() {
-	      return _function[_key14];
-	    }
-	  });
-	};
-	
-	for (var _key14 in _function) {
-	  var _ret6 = _loop6(_key14);
-	
-	  if (_ret6 === 'continue') continue;
-	}
-	
-	var _dom = __webpack_require__(8);
-	
-	var _loop7 = function _loop7(_key15) {
-	  if (_key15 === "default") return 'continue';
-	  Object.defineProperty(exports, _key15, {
-	    enumerable: true,
-	    get: function get() {
-	      return _dom[_key15];
-	    }
-	  });
-	};
-	
-	for (var _key15 in _dom) {
-	  var _ret7 = _loop7(_key15);
-	
-	  if (_ret7 === 'continue') continue;
-	}
-	
-	var _geom = __webpack_require__(9);
-	
-	var _loop8 = function _loop8(_key16) {
-	  if (_key16 === "default") return 'continue';
-	  Object.defineProperty(exports, _key16, {
-	    enumerable: true,
-	    get: function get() {
-	      return _geom[_key16];
-	    }
-	  });
-	};
-	
-	for (var _key16 in _geom) {
-	  var _ret8 = _loop8(_key16);
-	
-	  if (_ret8 === 'continue') continue;
-	}
-	
-	exports.default = {};
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-	
-	var objProto = Object.prototype;
-	var toString = objProto.toString;
-	var hasOwn = objProto.hasOwnProperty;
-	
-	function isNull(obj) {
-	    return obj === null;
-	}
-	
-	function isUndefined(obj) {
-	    return typeof obj === 'undefined';
-	}
-	
-	function isString(obj) {
-	    return typeof obj === 'string';
-	}
-	
-	function isBoolean(obj) {
-	    return typeof obj === 'boolean';
-	}
-	
-	function isNullOrUndefined(obj) {
-	    return isUndefined(obj) || isNull(obj);
-	}
-	
-	function isType(obj, type) {
-	    return toString.call(obj) === '[object ' + type + ']';
-	}
-	
-	function isObject(obj) {
-	    if (!obj) {
-	        return false;
-	    }
-	
-	    var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
-	
-	    return type === 'function' || type === 'object';
-	}
-	
-	function isFunction(obj) {
-	    return isType(obj, 'Function');
-	}
-	
-	function isWindow(obj) {
-	    return obj && obj === obj.window;
-	}
-	
-	function isArray(obj) {
-	    return Array.isArray(obj);
-	}
-	
-	function isArrayLike(obj) {
-	    if (isArray(obj)) {
-	        return true;
-	    }
-	
-	    if (isFunction(obj) || isWindow(obj)) {
-	        return false;
-	    }
-	
-	    var length = !!obj && 'length' in obj && obj.length;
-	
-	    return length === 0 || typeof length === 'number' && length > 0 && length - 1 in obj;
-	}
-	
-	function isNumeric(obj) {
-	    return !isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
-	}
-	
-	function isPlainObject(obj) {
-	
-	    // Not plain objects:
-	    // - Any object or value whose internal [[Class]] property is not "[object Object]"
-	    // - DOM nodes
-	    // - window
-	    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
-	        return false;
-	    }
-	
-	    if (obj.constructor && !hasOwn.call(obj.constructor.prototype, 'isPrototypeOf')) {
-	        return false;
-	    }
-	
-	    // If the function hasn't returned already, we're confident that
-	    // |obj| is a plain object, created by {} or constructed with new Object
-	    return true;
-	}
-	
-	function isEmptyObject(obj) {
-	    var name;
-	    for (name in obj) {
-	        return false;
-	    }
-	    return true;
-	}
-	
-	exports.isNull = isNull;
-	exports.isType = isType;
-	exports.isArray = isArray;
-	exports.isObject = isObject;
-	exports.isString = isString;
-	exports.isWindow = isWindow;
-	exports.isBoolean = isBoolean;
-	exports.isNumeric = isNumeric;
-	exports.isFunction = isFunction;
-	exports.isArrayLike = isArrayLike;
-	exports.isUndefined = isUndefined;
-	exports.isPlainObject = isPlainObject;
-	exports.isEmptyObject = isEmptyObject;
-	exports.isNullOrUndefined = isNullOrUndefined;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.sanitizeText = exports.toString = exports.hashCode = exports.format = exports.uuid = exports.trim = exports.uc = exports.lc = undefined;
-	
-	var _object = __webpack_require__(6);
-	
-	var proto = String.prototype;
-	
-	function toString(str) {
-	    return '' + str;
-	}
-	
-	function uc(str) {
-	    return ('' + str).toUpperCase();
-	}
-	
-	function lc(str) {
-	    return ('' + str).toLowerCase();
-	}
-	
-	function trim(str) {
-	    return str ? proto.trim.call('' + str) : '';
-	}
-	
-	function uuid() {
-	
-	    // credit: http://stackoverflow.com/posts/2117523/revisions
-	
-	    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-	        var r = Math.random() * 16 | 0;
-	        var v = c == 'x' ? r : r & 0x3 | 0x8;
-	        return v.toString(16);
-	    });
-	}
-	
-	function hashCode(str) {
-	
-	    // Return a simple hash code from a string.
-	    // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
-	
-	    var hash = 0;
-	    var length = str.length;
-	
-	    if (length === 0) {
-	        return hash;
-	    }
-	
-	    for (var i = 0; i < length; i++) {
-	        var c = str.charCodeAt(i);
-	        hash = (hash << 5) - hash + c;
-	        hash = hash & hash; // Convert to 32bit integer
-	    }
-	
-	    return hash;
-	}
-	
-	function format(tpl, data) {
-	
-	    data = data || {};
-	
-	    return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
-	        var val = (0, _object.getByPath)(data, key);
-	        return val !== undefined ? val : input;
-	    });
-	}
-	
-	function sanitizeText(text) {
-	
-	    // Replace all spaces with the Unicode No-break space.
-	    // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
-	    // IE would otherwise collapse all spaces into one. This is useful
-	    // e.g. in tests when you want to compare the actual DOM text content
-	    // without having to add the unicode character in the place of all spaces.
-	
-	    return (text || '').replace(/ /g, ' ');
-	}
-	
-	exports.lc = lc;
-	exports.uc = uc;
-	exports.trim = trim;
-	exports.uuid = uuid;
-	exports.format = format;
-	exports.hashCode = hashCode;
-	exports.toString = toString;
-	exports.sanitizeText = sanitizeText;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
-	
-	var _lang = __webpack_require__(2);
-	
-	function isFinite(value) {
-	    return window.isFinite(value) && !window.isNaN(parseFloat(value));
-	}
-	
-	function isPercentage(str) {
-	    return (0, _lang.isString)(str) && str.slice(-1) === '%';
-	}
-	
-	function toInt(value) {
-	    return parseInt(value, 10);
-	}
-	
-	function toFloat(value, isPercentage) {
-	    var v = parseFloat(value);
-	    return isPercentage ? v / 100 : v;
-	}
-	
-	function toFixed(value, precision) {
-	    var power = Math.pow(10, precision);
-	    return toFloat((Math.round(value * power) / power).toFixed(precision));
-	}
-	
-	exports.toInt = toInt;
-	exports.toFloat = toFloat;
-	exports.toFixed = toFixed;
-	exports.isFinite = isFinite;
-	exports.isPercentage = isPercentage;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.contains = exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
-	
-	var _lang = __webpack_require__(2);
-	
-	var proto = Array.prototype;
-	
-	function toArray(obj) {
-	    return (0, _lang.isArray)(obj) ? obj : (0, _lang.isArrayLike)(obj) ? proto.slice.call(obj) : [obj];
-	}
-	
-	function indexOf(arr, item) {
-	    return arr ? proto.indexOf.call(arr, item) : -1;
-	}
-	
-	function lastIndexOf(arr, item) {
-	    return arr ? proto.lastIndexOf.call(arr, item) : -1;
-	}
-	
-	function every(arr, iterator, context) {
-	    return arr ? proto.every.call(arr, iterator, context) : false;
-	}
-	
-	function some(arr, iterator, context) {
-	    return arr ? proto.some.call(arr, iterator, context) : false;
-	}
-	
-	function forEach(arr, iterator, context) {
-	    arr && proto.forEach.call(arr, iterator, context);
-	}
-	
-	function map(arr, iterator, context) {
-	    return arr ? proto.map.call(arr, iterator, context) : [];
-	}
-	
-	function filter(arr, iterator, context) {
-	    return arr ? proto.filter.call(arr, iterator, context) : [];
-	}
-	
-	function reduce(arr, iterator, initialValue) {
-	    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
-	}
-	
-	function reduceRight(arr, iterator, initialValue) {
-	    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
-	}
-	
-	function contains(arr, item) {
-	    return arr && indexOf(arr, item) >= 0;
-	}
-	
-	exports.toArray = toArray;
-	exports.indexOf = indexOf;
-	exports.lastIndexOf = lastIndexOf;
-	exports.every = every;
-	exports.some = some;
-	exports.forEach = forEach;
-	exports.map = map;
-	exports.filter = filter;
-	exports.reduce = reduce;
-	exports.reduceRight = reduceRight;
-	exports.contains = contains;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.getByPath = exports.extend = exports.merge = exports.forIn = exports.keys = exports.hasKey = undefined;
-	
-	var _array = __webpack_require__(5);
-	
-	var _lang = __webpack_require__(2);
-	
-	function hasKey(obj, key) {
-	    return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
-	}
-	
-	function keys(obj) {
-	    return obj ? Object.keys(obj) : [];
-	}
-	
-	function forIn(obj, iterator, context) {
-	    (0, _array.forEach)(keys(obj), function (key) {
-	        iterator.call(context, obj[key], key);
-	    });
-	}
-	
-	function extend(target) {
-	
-	    if (!target) {
-	        target = {};
-	    }
-	
-	    for (var i = 1, l = arguments.length; i < l; i++) {
-	        var source = arguments[i];
-	
-	        if (source) {
-	            for (var key in source) {
-	                target[key] = source[key];
-	            }
-	        }
-	    }
-	
-	    return target;
-	}
-	
-	function merge(target) {
-	
-	    if (!target) {
-	        target = {};
-	    }
-	
-	    for (var i = 1, l = arguments.length; i < l; i++) {
-	
-	        var source = arguments[i];
-	        if (source) {
-	            for (var name in source) {
-	
-	                var src = target[name];
-	                var copy = source[name];
-	                var copyIsArray = (0, _lang.isArray)(copy);
-	
-	                if (copyIsArray || (0, _lang.isPlainObject)(copy)) {
-	
-	                    var clone;
-	                    if (copyIsArray) {
-	                        clone = src && (0, _lang.isArray)(src) ? src : [];
-	                    } else {
-	                        clone = src && (0, _lang.isPlainObject)(src) ? src : {};
-	                    }
-	
-	                    target[name] = merge(clone, copy);
-	                } else {
-	                    target[name] = copy;
-	                }
-	            }
-	        }
-	    }
-	
-	    return target;
-	}
-	
-	function getByPath(obj, path, delimiter) {
-	
-	    delimiter = delimiter || '.';
-	
-	    var keys = path.split(delimiter);
-	
-	    while (keys.length) {
-	
-	        var key = keys.shift();
-	
-	        if (Object(obj) === obj && key in obj) {
-	            obj = obj[key];
-	        } else {
-	            return undefined;
-	        }
-	    }
-	
-	    return obj;
-	}
-	
-	exports.hasKey = hasKey;
-	exports.keys = keys;
-	exports.forIn = forIn;
-	exports.merge = merge;
-	exports.extend = extend;
-	exports.getByPath = getByPath;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.invoke = exports.bind = undefined;
-	
-	var _lang = __webpack_require__(2);
-	
-	function invoke(fn, args, context) {
-	    if (!fn || !(0, _lang.isFunction)(fn)) {
-	        return;
-	    }
-	
-	    var ret;
-	    var a1 = args[0];
-	    var a2 = args[1];
-	    var a3 = args[2];
-	
-	    switch (args.length) {
-	        case 0:
-	            ret = fn.call(context);
-	            break;
-	        case 1:
-	            ret = fn.call(context, a1);
-	            break;
-	        case 2:
-	            ret = fn.call(context, a1, a2);
-	            break;
-	        case 3:
-	            ret = fn.call(context, a1, a2, a3);
-	            break;
-	        default:
-	            ret = fn.apply(context, args);
-	            break;
-	    }
-	
-	    return ret;
-	}
-	
-	function bind(fn, context /* [,arg1[,arg2[,argN]]] */) {
-	    return (0, _lang.isFunction)(fn) ? Function.prototype.bind.apply(arguments) : fn;
-	}
-	
-	exports.bind = bind;
-	exports.invoke = invoke;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
-	
-	var _string = __webpack_require__(3);
-	
-	var _array = __webpack_require__(5);
-	
-	var _lang = __webpack_require__(2);
-	
-	// xml namespaces.
-	var ns = {
-	    xmlns: 'http://www.w3.org/2000/svg',
-	    xlink: 'http://www.w3.org/1999/xlink'
-	};
-	// svg version.
-	var svgVersion = '1.1';
-	
-	function isNode(elem, nodeName, attrName, attrValue) {
-	    var ret = elem && !isNaN(elem.nodeType);
-	
-	    if (ret) {
-	        ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
-	    }
-	
-	    if (ret) {
-	        ret = isNullOrUndefined(attrName) || elem.getAttribute(attrName) === attrValue;
-	    }
-	
-	    return ret;
-	}
-	
-	function getClassName(elem) {
-	    return elem.getAttribute && elem.getAttribute('class') || '';
-	}
-	
-	function getNodeName(elem) {
-	    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
-	}
-	
-	function parseXML(str, async) {
-	
-	    var xml;
-	
-	    try {
-	        var parser = new DOMParser();
-	
-	        if (!(0, _lang.isUndefined)(async)) {
-	            parser.async = async;
-	        }
-	
-	        xml = parser.parseFromString(str, 'text/xml');
-	    } catch (error) {
-	        xml = null;
-	    }
-	
-	    if (!xml || xml.getElementsByTagName('parsererror').length) {
-	        throw new Error('Invalid XML: ' + str);
-	    }
-	
-	    return xml;
-	}
-	
-	function createSvgDocument(content) {
-	    // Create an SVG document element.
-	    // If `content` is passed, it will be used as the SVG content of
-	    // the `<svg>` root element.
-	
-	    var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xmlns + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
-	    var xml = parseXML(svg, false);
-	    return xml.documentElement;
-	}
-	
-	function createSvgElement(tagName, doc) {
-	    return (doc || document).createElementNS(ns.xmlns, tagName);
-	}
-	
-	function setAttribute(elem, name, value) {
-	
-	    if (name === 'id') {
-	        elem.id = value;
-	    } else {
-	
-	        var combined = name.split(':');
-	
-	        combined.length > 1
-	        // Attribute names can be namespaced. E.g. `image` elements
-	        // have a `xlink:href` attribute to set the source of the image.
-	        ? elem.setAttributeNS(ns[combined[0]], combined[1], value) : elem.setAttribute(name, value);
-	    }
-	}
-	
-	// parse transform
-	// ---------------
-	
-	function parseTranslate(transform) {
-	
-	    var translate = { tx: 0, ty: 0 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/translate\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                translate.tx += parseFloat(arr[0]);
-	            }
-	
-	            if (arr[1]) {
-	                translate.ty += parseFloat(arr[1]);
-	            }
-	        }
-	    }
-	
-	    return translate;
-	}
-	
-	function parseScale(transform) {
-	
-	    var scale = { sx: 1, sy: 1 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/scale\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                scale.sx *= parseFloat(arr[0]);
-	            }
-	
-	            if (arr[1] || arr[0]) {
-	                scale.sy *= parseFloat(arr[1] || arr[0]);
-	            }
-	        }
-	    }
-	
-	    return scale;
-	}
-	
-	function parseRotate(transform) {
-	
-	    var rotate = { angle: 0 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/rotate\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                rotate.angle += parseFloat(arr[0]);
-	            }
-	
-	            if (arr[1] && arr[2]) {
-	                rotate.cx = parseFloat(arr[1]);
-	                rotate.cy = parseFloat(arr[2]);
-	            }
-	        }
-	    }
-	
-	    return rotate;
-	}
-	
-	function parseTransform(transform) {
-	    return {
-	        translate: parseTranslate(transform),
-	        rotate: parseRotate(transform),
-	        scale: parseScale(transform)
-	    };
-	}
-	
-	// clear transform
-	// ---------------
-	
-	function clearTranslate(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
-	}
-	
-	function clearScale(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
-	}
-	
-	function clearRotate(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
-	}
-	
-	// path data
-	// ---------
-	
-	function lineToPathData(line) {
-	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
-	}
-	
-	function polygonToPathData(polygon) {
-	
-	    var d = [];
-	
-	    (0, _array.forEach)(polygon.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
-	
-	    d.push('Z');
-	
-	    return d.join(' ');
-	}
-	
-	function polylineToPathData(polyline) {
-	
-	    var d = [];
-	
-	    (0, _array.forEach)(polyline.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
-	
-	    return d.join(' ');
-	}
-	
-	function rectToPathData(rect) {
-	
-	    var x = parseFloat(rect.getAttribute('x')) || 0;
-	    var y = parseFloat(rect.getAttribute('y')) || 0;
-	    var w = parseFloat(rect.getAttribute('width')) || 0;
-	    var h = parseFloat(rect.getAttribute('height')) || 0;
-	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
-	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
-	    var r = x + w;
-	    var b = y + h;
-	
-	    var d;
-	
-	    if (!rx && !ry) {
-	
-	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
-	    } else {
-	
-	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
-	    }
-	    return d.join(' ');
-	}
-	
-	var KAPPA = 0.5522847498307935;
-	
-	function circleToPathData(circle) {
-	
-	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
-	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
-	    var r = parseFloat(circle.getAttribute('r'));
-	    var cd = r * KAPPA; // Control distance.
-	
-	    return ['M', cx, cy - r, // Move to the first point.
-	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
-	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
-	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
-	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
-	    'Z'].join(' ');
-	}
-	
-	function ellipseToPathData(ellipse) {
-	
-	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
-	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
-	    var rx = parseFloat(ellipse.getAttribute('rx'));
-	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
-	    var cdx = rx * KAPPA; // Control distance x.
-	    var cdy = ry * KAPPA; // Control distance y.
-	
-	    return ['M', cx, cy - ry, // Move to the first point.
-	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
-	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
-	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
-	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
-	    'Z'].join(' ');
-	}
-	
-	exports.isNode = isNode;
-	exports.createSvgDocument = createSvgDocument;
-	exports.createSvgElement = createSvgElement;
-	exports.setAttribute = setAttribute;
-	exports.getClassName = getClassName;
-	exports.getNodeName = getNodeName;
-	exports.parseScale = parseScale;
-	exports.parseRotate = parseRotate;
-	exports.parseTransform = parseTransform;
-	exports.parseTranslate = parseTranslate;
-	exports.clearScale = clearScale;
-	exports.clearRotate = clearRotate;
-	exports.clearTranslate = clearTranslate;
-	exports.lineToPathData = lineToPathData;
-	exports.rectToPathData = rectToPathData;
-	exports.circleToPathData = circleToPathData;
-	exports.ellipseToPathData = ellipseToPathData;
-	exports.polygonToPathData = polygonToPathData;
-	exports.polylineToPathData = polylineToPathData;
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var math = Math;
-	var PI = math.PI;
-	var round = math.round;
-	
-	function toDeg(rad) {
-	    return 180 * rad / PI % 360;
-	}
-	
-	function toRad(deg, over360) {
-	    deg = over360 ? deg : deg % 360;
-	    return deg * PI / 180;
-	}
-	
-	function snapToGrid(val, gridSize) {
-	    return gridSize * round(val / gridSize);
-	}
-	
-	function normalizeAngle(angle) {
-	    return angle % 360 + (angle < 0 ? 360 : 0);
-	}
-	
-	exports.toDeg = toDeg;
-	exports.toRad = toRad;
-	exports.snapToGrid = snapToGrid;
-	exports.normalizeAngle = normalizeAngle;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -1202,7 +213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.VElement = undefined;
 	
-	var _utils = __webpack_require__(1);
+	var _utils = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -2128,6 +1139,1010 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = vector;
 
 /***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _lang = __webpack_require__(3);
+	
+	var _loop = function _loop(_key9) {
+	  if (_key9 === "default") return 'continue';
+	  Object.defineProperty(exports, _key9, {
+	    enumerable: true,
+	    get: function get() {
+	      return _lang[_key9];
+	    }
+	  });
+	};
+	
+	for (var _key9 in _lang) {
+	  var _ret = _loop(_key9);
+	
+	  if (_ret === 'continue') continue;
+	}
+	
+	var _string = __webpack_require__(4);
+	
+	var _loop2 = function _loop2(_key10) {
+	  if (_key10 === "default") return 'continue';
+	  Object.defineProperty(exports, _key10, {
+	    enumerable: true,
+	    get: function get() {
+	      return _string[_key10];
+	    }
+	  });
+	};
+	
+	for (var _key10 in _string) {
+	  var _ret2 = _loop2(_key10);
+	
+	  if (_ret2 === 'continue') continue;
+	}
+	
+	var _number = __webpack_require__(7);
+	
+	var _loop3 = function _loop3(_key11) {
+	  if (_key11 === "default") return 'continue';
+	  Object.defineProperty(exports, _key11, {
+	    enumerable: true,
+	    get: function get() {
+	      return _number[_key11];
+	    }
+	  });
+	};
+	
+	for (var _key11 in _number) {
+	  var _ret3 = _loop3(_key11);
+	
+	  if (_ret3 === 'continue') continue;
+	}
+	
+	var _array = __webpack_require__(6);
+	
+	var _loop4 = function _loop4(_key12) {
+	  if (_key12 === "default") return 'continue';
+	  Object.defineProperty(exports, _key12, {
+	    enumerable: true,
+	    get: function get() {
+	      return _array[_key12];
+	    }
+	  });
+	};
+	
+	for (var _key12 in _array) {
+	  var _ret4 = _loop4(_key12);
+	
+	  if (_ret4 === 'continue') continue;
+	}
+	
+	var _object = __webpack_require__(5);
+	
+	var _loop5 = function _loop5(_key13) {
+	  if (_key13 === "default") return 'continue';
+	  Object.defineProperty(exports, _key13, {
+	    enumerable: true,
+	    get: function get() {
+	      return _object[_key13];
+	    }
+	  });
+	};
+	
+	for (var _key13 in _object) {
+	  var _ret5 = _loop5(_key13);
+	
+	  if (_ret5 === 'continue') continue;
+	}
+	
+	var _function = __webpack_require__(8);
+	
+	var _loop6 = function _loop6(_key14) {
+	  if (_key14 === "default") return 'continue';
+	  Object.defineProperty(exports, _key14, {
+	    enumerable: true,
+	    get: function get() {
+	      return _function[_key14];
+	    }
+	  });
+	};
+	
+	for (var _key14 in _function) {
+	  var _ret6 = _loop6(_key14);
+	
+	  if (_ret6 === 'continue') continue;
+	}
+	
+	var _dom = __webpack_require__(9);
+	
+	var _loop7 = function _loop7(_key15) {
+	  if (_key15 === "default") return 'continue';
+	  Object.defineProperty(exports, _key15, {
+	    enumerable: true,
+	    get: function get() {
+	      return _dom[_key15];
+	    }
+	  });
+	};
+	
+	for (var _key15 in _dom) {
+	  var _ret7 = _loop7(_key15);
+	
+	  if (_ret7 === 'continue') continue;
+	}
+	
+	var _geom = __webpack_require__(10);
+	
+	var _loop8 = function _loop8(_key16) {
+	  if (_key16 === "default") return 'continue';
+	  Object.defineProperty(exports, _key16, {
+	    enumerable: true,
+	    get: function get() {
+	      return _geom[_key16];
+	    }
+	  });
+	};
+	
+	for (var _key16 in _geom) {
+	  var _ret8 = _loop8(_key16);
+	
+	  if (_ret8 === 'continue') continue;
+	}
+	
+	exports.default = {};
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	
+	var objProto = Object.prototype;
+	var toString = objProto.toString;
+	var hasOwn = objProto.hasOwnProperty;
+	
+	function isNull(obj) {
+	    return obj === null;
+	}
+	
+	function isUndefined(obj) {
+	    return typeof obj === 'undefined';
+	}
+	
+	function isString(obj) {
+	    return typeof obj === 'string';
+	}
+	
+	function isBoolean(obj) {
+	    return typeof obj === 'boolean';
+	}
+	
+	function isNullOrUndefined(obj) {
+	    return isUndefined(obj) || isNull(obj);
+	}
+	
+	function isType(obj, type) {
+	    return toString.call(obj) === '[object ' + type + ']';
+	}
+	
+	function isObject(obj) {
+	    if (!obj) {
+	        return false;
+	    }
+	
+	    var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
+	
+	    return type === 'function' || type === 'object';
+	}
+	
+	function isFunction(obj) {
+	    return isType(obj, 'Function');
+	}
+	
+	function isWindow(obj) {
+	    return obj && obj === obj.window;
+	}
+	
+	function isArray(obj) {
+	    return Array.isArray(obj);
+	}
+	
+	function isArrayLike(obj) {
+	    if (isArray(obj)) {
+	        return true;
+	    }
+	
+	    if (isFunction(obj) || isWindow(obj)) {
+	        return false;
+	    }
+	
+	    var length = !!obj && 'length' in obj && obj.length;
+	
+	    return length === 0 || typeof length === 'number' && length > 0 && length - 1 in obj;
+	}
+	
+	function isNumeric(obj) {
+	    return !isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
+	}
+	
+	function isPlainObject(obj) {
+	
+	    // Not plain objects:
+	    // - Any object or value whose internal [[Class]] property is not "[object Object]"
+	    // - DOM nodes
+	    // - window
+	    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
+	        return false;
+	    }
+	
+	    if (obj.constructor && !hasOwn.call(obj.constructor.prototype, 'isPrototypeOf')) {
+	        return false;
+	    }
+	
+	    // If the function hasn't returned already, we're confident that
+	    // |obj| is a plain object, created by {} or constructed with new Object
+	    return true;
+	}
+	
+	function isEmptyObject(obj) {
+	    var name;
+	    for (name in obj) {
+	        return false;
+	    }
+	    return true;
+	}
+	
+	exports.isNull = isNull;
+	exports.isType = isType;
+	exports.isArray = isArray;
+	exports.isObject = isObject;
+	exports.isString = isString;
+	exports.isWindow = isWindow;
+	exports.isBoolean = isBoolean;
+	exports.isNumeric = isNumeric;
+	exports.isFunction = isFunction;
+	exports.isArrayLike = isArrayLike;
+	exports.isUndefined = isUndefined;
+	exports.isPlainObject = isPlainObject;
+	exports.isEmptyObject = isEmptyObject;
+	exports.isNullOrUndefined = isNullOrUndefined;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.sanitizeText = exports.toString = exports.hashCode = exports.format = exports.uuid = exports.trim = exports.uc = exports.lc = undefined;
+	
+	var _object = __webpack_require__(5);
+	
+	var proto = String.prototype;
+	
+	function toString(str) {
+	    return '' + str;
+	}
+	
+	function uc(str) {
+	    return ('' + str).toUpperCase();
+	}
+	
+	function lc(str) {
+	    return ('' + str).toLowerCase();
+	}
+	
+	function trim(str) {
+	    return str ? proto.trim.call('' + str) : '';
+	}
+	
+	function uuid() {
+	
+	    // credit: http://stackoverflow.com/posts/2117523/revisions
+	
+	    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+	        var r = Math.random() * 16 | 0;
+	        var v = c == 'x' ? r : r & 0x3 | 0x8;
+	        return v.toString(16);
+	    });
+	}
+	
+	function hashCode(str) {
+	
+	    // Return a simple hash code from a string.
+	    // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
+	
+	    var hash = 0;
+	    var length = str.length;
+	
+	    if (length === 0) {
+	        return hash;
+	    }
+	
+	    for (var i = 0; i < length; i++) {
+	        var c = str.charCodeAt(i);
+	        hash = (hash << 5) - hash + c;
+	        hash = hash & hash; // Convert to 32bit integer
+	    }
+	
+	    return hash;
+	}
+	
+	function format(tpl, data) {
+	
+	    data = data || {};
+	
+	    return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
+	        var val = (0, _object.getByPath)(data, key);
+	        return val !== undefined ? val : input;
+	    });
+	}
+	
+	function sanitizeText(text) {
+	
+	    // Replace all spaces with the Unicode No-break space.
+	    // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
+	    // IE would otherwise collapse all spaces into one. This is useful
+	    // e.g. in tests when you want to compare the actual DOM text content
+	    // without having to add the unicode character in the place of all spaces.
+	
+	    return (text || '').replace(/ /g, ' ');
+	}
+	
+	exports.lc = lc;
+	exports.uc = uc;
+	exports.trim = trim;
+	exports.uuid = uuid;
+	exports.format = format;
+	exports.hashCode = hashCode;
+	exports.toString = toString;
+	exports.sanitizeText = sanitizeText;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getByPath = exports.destroy = exports.extend = exports.merge = exports.forIn = exports.keys = exports.hasKey = undefined;
+	
+	var _array = __webpack_require__(6);
+	
+	var _lang = __webpack_require__(3);
+	
+	function hasKey(obj, key) {
+	    return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
+	}
+	
+	function keys(obj) {
+	    return obj ? Object.keys(obj) : [];
+	}
+	
+	function forIn(obj, iterator, context) {
+	    (0, _array.forEach)(keys(obj), function (key) {
+	        iterator.call(context, obj[key], key);
+	    });
+	}
+	
+	function extend(target) {
+	
+	    if (!target) {
+	        target = {};
+	    }
+	
+	    for (var i = 1, l = arguments.length; i < l; i++) {
+	        var source = arguments[i];
+	
+	        if (source) {
+	            for (var key in source) {
+	                target[key] = source[key];
+	            }
+	        }
+	    }
+	
+	    return target;
+	}
+	
+	function merge(target) {
+	
+	    if (!target) {
+	        target = {};
+	    }
+	
+	    for (var i = 1, l = arguments.length; i < l; i++) {
+	
+	        var source = arguments[i];
+	        if (source) {
+	            for (var name in source) {
+	
+	                var src = target[name];
+	                var copy = source[name];
+	                var copyIsArray = (0, _lang.isArray)(copy);
+	
+	                if (copyIsArray || (0, _lang.isPlainObject)(copy)) {
+	
+	                    var clone;
+	                    if (copyIsArray) {
+	                        clone = src && (0, _lang.isArray)(src) ? src : [];
+	                    } else {
+	                        clone = src && (0, _lang.isPlainObject)(src) ? src : {};
+	                    }
+	
+	                    target[name] = merge(clone, copy);
+	                } else {
+	                    target[name] = copy;
+	                }
+	            }
+	        }
+	    }
+	
+	    return target;
+	}
+	
+	function getByPath(obj, path, delimiter) {
+	
+	    delimiter = delimiter || '.';
+	
+	    var keys = path.split(delimiter);
+	
+	    while (keys.length) {
+	
+	        var key = keys.shift();
+	
+	        if (Object(obj) === obj && key in obj) {
+	            obj = obj[key];
+	        } else {
+	            return undefined;
+	        }
+	    }
+	
+	    return obj;
+	}
+	
+	function destroy(obj) {
+	    if (obj) {
+	        for (var prop in obj) {
+	            if (obj.hasOwnProperty(prop)) {
+	                delete obj[prop];
+	            }
+	        }
+	        if (obj) {
+	            obj.prototype = obj['__proto__'] = null;
+	        }
+	        obj.destroyed = true;
+	    }
+	}
+	
+	exports.hasKey = hasKey;
+	exports.keys = keys;
+	exports.forIn = forIn;
+	exports.merge = merge;
+	exports.extend = extend;
+	exports.destroy = destroy;
+	exports.getByPath = getByPath;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.contains = exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
+	
+	var _lang = __webpack_require__(3);
+	
+	var proto = Array.prototype;
+	
+	function toArray(obj) {
+	    return (0, _lang.isArray)(obj) ? obj : (0, _lang.isArrayLike)(obj) ? proto.slice.call(obj) : [obj];
+	}
+	
+	function indexOf(arr, item) {
+	    return arr ? proto.indexOf.call(arr, item) : -1;
+	}
+	
+	function lastIndexOf(arr, item) {
+	    return arr ? proto.lastIndexOf.call(arr, item) : -1;
+	}
+	
+	function every(arr, iterator, context) {
+	    return arr ? proto.every.call(arr, iterator, context) : false;
+	}
+	
+	function some(arr, iterator, context) {
+	    return arr ? proto.some.call(arr, iterator, context) : false;
+	}
+	
+	function forEach(arr, iterator, context) {
+	    arr && proto.forEach.call(arr, iterator, context);
+	}
+	
+	function map(arr, iterator, context) {
+	    return arr ? proto.map.call(arr, iterator, context) : [];
+	}
+	
+	function filter(arr, iterator, context) {
+	    return arr ? proto.filter.call(arr, iterator, context) : [];
+	}
+	
+	function reduce(arr, iterator, initialValue) {
+	    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
+	}
+	
+	function reduceRight(arr, iterator, initialValue) {
+	    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
+	}
+	
+	function contains(arr, item) {
+	    return arr && indexOf(arr, item) >= 0;
+	}
+	
+	exports.toArray = toArray;
+	exports.indexOf = indexOf;
+	exports.lastIndexOf = lastIndexOf;
+	exports.every = every;
+	exports.some = some;
+	exports.forEach = forEach;
+	exports.map = map;
+	exports.filter = filter;
+	exports.reduce = reduce;
+	exports.reduceRight = reduceRight;
+	exports.contains = contains;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	
+	var _lang = __webpack_require__(3);
+	
+	function isFinite(value) {
+	    return window.isFinite(value) && !window.isNaN(parseFloat(value));
+	}
+	
+	function isPercentage(str) {
+	    return (0, _lang.isString)(str) && str.slice(-1) === '%';
+	}
+	
+	function toInt(value) {
+	    return parseInt(value, 10);
+	}
+	
+	function toFloat(value, isPercentage) {
+	    var v = parseFloat(value);
+	    return isPercentage ? v / 100 : v;
+	}
+	
+	function toFixed(value, precision) {
+	    var power = Math.pow(10, precision);
+	    return toFloat((Math.round(value * power) / power).toFixed(precision));
+	}
+	
+	exports.toInt = toInt;
+	exports.toFloat = toFloat;
+	exports.toFixed = toFixed;
+	exports.isFinite = isFinite;
+	exports.isPercentage = isPercentage;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.invoke = exports.bind = undefined;
+	
+	var _lang = __webpack_require__(3);
+	
+	function invoke(fn, args, context) {
+	    if (!fn || !(0, _lang.isFunction)(fn)) {
+	        return;
+	    }
+	
+	    var ret;
+	    var a1 = args[0];
+	    var a2 = args[1];
+	    var a3 = args[2];
+	
+	    switch (args.length) {
+	        case 0:
+	            ret = fn.call(context);
+	            break;
+	        case 1:
+	            ret = fn.call(context, a1);
+	            break;
+	        case 2:
+	            ret = fn.call(context, a1, a2);
+	            break;
+	        case 3:
+	            ret = fn.call(context, a1, a2, a3);
+	            break;
+	        default:
+	            ret = fn.apply(context, args);
+	            break;
+	    }
+	
+	    return ret;
+	}
+	
+	function bind(fn, context /* [,arg1[,arg2[,argN]]] */) {
+	    return (0, _lang.isFunction)(fn) ? Function.prototype.bind.apply(arguments) : fn;
+	}
+	
+	exports.bind = bind;
+	exports.invoke = invoke;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
+	
+	var _string = __webpack_require__(4);
+	
+	var _array = __webpack_require__(6);
+	
+	var _lang = __webpack_require__(3);
+	
+	// xml namespaces.
+	var ns = {
+	    xmlns: 'http://www.w3.org/2000/svg',
+	    xlink: 'http://www.w3.org/1999/xlink'
+	};
+	// svg version.
+	var svgVersion = '1.1';
+	
+	function isNode(elem, nodeName, attrName, attrValue) {
+	    var ret = elem && !isNaN(elem.nodeType);
+	
+	    if (ret) {
+	        ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+	    }
+	
+	    if (ret) {
+	        ret = isNullOrUndefined(attrName) || elem.getAttribute(attrName) === attrValue;
+	    }
+	
+	    return ret;
+	}
+	
+	function getClassName(elem) {
+	    return elem.getAttribute && elem.getAttribute('class') || '';
+	}
+	
+	function getNodeName(elem) {
+	    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
+	}
+	
+	function parseXML(str, async) {
+	
+	    var xml;
+	
+	    try {
+	        var parser = new DOMParser();
+	
+	        if (!(0, _lang.isUndefined)(async)) {
+	            parser.async = async;
+	        }
+	
+	        xml = parser.parseFromString(str, 'text/xml');
+	    } catch (error) {
+	        xml = null;
+	    }
+	
+	    if (!xml || xml.getElementsByTagName('parsererror').length) {
+	        throw new Error('Invalid XML: ' + str);
+	    }
+	
+	    return xml;
+	}
+	
+	function createSvgDocument(content) {
+	    // Create an SVG document element.
+	    // If `content` is passed, it will be used as the SVG content of
+	    // the `<svg>` root element.
+	
+	    var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xmlns + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
+	    var xml = parseXML(svg, false);
+	    return xml.documentElement;
+	}
+	
+	function createSvgElement(tagName, doc) {
+	    return (doc || document).createElementNS(ns.xmlns, tagName);
+	}
+	
+	function setAttribute(elem, name, value) {
+	
+	    if (name === 'id') {
+	        elem.id = value;
+	    } else {
+	
+	        var combined = name.split(':');
+	
+	        combined.length > 1
+	        // Attribute names can be namespaced. E.g. `image` elements
+	        // have a `xlink:href` attribute to set the source of the image.
+	        ? elem.setAttributeNS(ns[combined[0]], combined[1], value) : elem.setAttribute(name, value);
+	    }
+	}
+	
+	// parse transform
+	// ---------------
+	
+	function parseTranslate(transform) {
+	
+	    var translate = { tx: 0, ty: 0 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/translate\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                translate.tx += parseFloat(arr[0]);
+	            }
+	
+	            if (arr[1]) {
+	                translate.ty += parseFloat(arr[1]);
+	            }
+	        }
+	    }
+	
+	    return translate;
+	}
+	
+	function parseScale(transform) {
+	
+	    var scale = { sx: 1, sy: 1 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/scale\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                scale.sx *= parseFloat(arr[0]);
+	            }
+	
+	            if (arr[1] || arr[0]) {
+	                scale.sy *= parseFloat(arr[1] || arr[0]);
+	            }
+	        }
+	    }
+	
+	    return scale;
+	}
+	
+	function parseRotate(transform) {
+	
+	    var rotate = { angle: 0 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/rotate\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                rotate.angle += parseFloat(arr[0]);
+	            }
+	
+	            if (arr[1] && arr[2]) {
+	                rotate.cx = parseFloat(arr[1]);
+	                rotate.cy = parseFloat(arr[2]);
+	            }
+	        }
+	    }
+	
+	    return rotate;
+	}
+	
+	function parseTransform(transform) {
+	    return {
+	        translate: parseTranslate(transform),
+	        rotate: parseRotate(transform),
+	        scale: parseScale(transform)
+	    };
+	}
+	
+	// clear transform
+	// ---------------
+	
+	function clearTranslate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearScale(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearRotate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+	}
+	
+	// path data
+	// ---------
+	
+	function lineToPathData(line) {
+	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
+	}
+	
+	function polygonToPathData(polygon) {
+	
+	    var d = [];
+	
+	    (0, _array.forEach)(polygon.points, function (p, i) {
+	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	    });
+	
+	    d.push('Z');
+	
+	    return d.join(' ');
+	}
+	
+	function polylineToPathData(polyline) {
+	
+	    var d = [];
+	
+	    (0, _array.forEach)(polyline.points, function (p, i) {
+	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	    });
+	
+	    return d.join(' ');
+	}
+	
+	function rectToPathData(rect) {
+	
+	    var x = parseFloat(rect.getAttribute('x')) || 0;
+	    var y = parseFloat(rect.getAttribute('y')) || 0;
+	    var w = parseFloat(rect.getAttribute('width')) || 0;
+	    var h = parseFloat(rect.getAttribute('height')) || 0;
+	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
+	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
+	    var r = x + w;
+	    var b = y + h;
+	
+	    var d;
+	
+	    if (!rx && !ry) {
+	
+	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
+	    } else {
+	
+	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
+	    }
+	    return d.join(' ');
+	}
+	
+	var KAPPA = 0.5522847498307935;
+	
+	function circleToPathData(circle) {
+	
+	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
+	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
+	    var r = parseFloat(circle.getAttribute('r'));
+	    var cd = r * KAPPA; // Control distance.
+	
+	    return ['M', cx, cy - r, // Move to the first point.
+	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
+	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
+	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
+	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
+	    'Z'].join(' ');
+	}
+	
+	function ellipseToPathData(ellipse) {
+	
+	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
+	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
+	    var rx = parseFloat(ellipse.getAttribute('rx'));
+	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
+	    var cdx = rx * KAPPA; // Control distance x.
+	    var cdy = ry * KAPPA; // Control distance y.
+	
+	    return ['M', cx, cy - ry, // Move to the first point.
+	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
+	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
+	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
+	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
+	    'Z'].join(' ');
+	}
+	
+	exports.isNode = isNode;
+	exports.createSvgDocument = createSvgDocument;
+	exports.createSvgElement = createSvgElement;
+	exports.setAttribute = setAttribute;
+	exports.getClassName = getClassName;
+	exports.getNodeName = getNodeName;
+	exports.parseScale = parseScale;
+	exports.parseRotate = parseRotate;
+	exports.parseTransform = parseTransform;
+	exports.parseTranslate = parseTranslate;
+	exports.clearScale = clearScale;
+	exports.clearRotate = clearRotate;
+	exports.clearTranslate = clearTranslate;
+	exports.lineToPathData = lineToPathData;
+	exports.rectToPathData = rectToPathData;
+	exports.circleToPathData = circleToPathData;
+	exports.ellipseToPathData = ellipseToPathData;
+	exports.polygonToPathData = polygonToPathData;
+	exports.polylineToPathData = polylineToPathData;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var math = Math;
+	var PI = math.PI;
+	var round = math.round;
+	
+	function toDeg(rad) {
+	    return 180 * rad / PI % 360;
+	}
+	
+	function toRad(deg, over360) {
+	    deg = over360 ? deg : deg % 360;
+	    return deg * PI / 180;
+	}
+	
+	function snapToGrid(val, gridSize) {
+	    return gridSize * round(val / gridSize);
+	}
+	
+	function normalizeAngle(angle) {
+	    return angle % 360 + (angle < 0 ? 360 : 0);
+	}
+	
+	exports.toDeg = toDeg;
+	exports.toRad = toRad;
+	exports.snapToGrid = snapToGrid;
+	exports.normalizeAngle = normalizeAngle;
+
+/***/ },
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2139,7 +2154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
+	var _utils = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -2292,17 +2307,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
-	
-	var _Events = __webpack_require__(11);
-	
-	var _Events2 = _interopRequireDefault(_Events);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _utils = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Cell = (function () {
+	    _createClass(Cell, null, [{
+	        key: 'configure',
+	        value: function configure(attributes) {
+	
+	            var that = this;
+	
+	            attributes && (0, _utils.forIn)(attributes, function (val, key) {
+	                if (key === 'defaults') {
+	                    val = (0, _utils.merge)({}, that.defaults, val);
+	                }
+	                that[key] = val;
+	            });
+	        }
+	    }]);
+	
 	    function Cell(attributes) {
 	        _classCallCheck(this, Cell);
 	
@@ -2715,11 +2739,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        angle: 0,
 	        relative: false
 	    },
-	    x: 0,
-	    y: 0,
-	    width: 1,
-	    height: 1,
-	    angle: 0
+	    attrs: {}
 	};
 	
 	exports.default = Node;
@@ -2736,9 +2756,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
+	var _utils = __webpack_require__(2);
 	
-	var _filters = __webpack_require__(34);
+	var _filters = __webpack_require__(16);
 	
 	var _filters2 = _interopRequireDefault(_filters);
 	
@@ -2746,7 +2766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Events2 = _interopRequireDefault(_Events);
 	
-	var _vector = __webpack_require__(10);
+	var _vector = __webpack_require__(1);
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
@@ -2936,6 +2956,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'onContextMenu',
 	        value: function onContextMenu() {}
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            var that = this;
+	            var el = that.el;
+	
+	            if (el && el.parentNode) {
+	                el.parentNode.removeChild(el);
+	            }
+	        }
 	    }]);
 	
 	    return CellView;
@@ -2945,12 +2976,200 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(2);
+	
+	var filters = {
+	
+	    outline: function outline(args) {
+	
+	        // `color` ... outline color
+	        // `width`... outline width
+	        // `opacity` ... outline opacity
+	        // `margin` ... gap between outline and the element
+	
+	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" /><feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" /><feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/><feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/><feMerge><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	
+	        var margin = (0, _utils.isFinite)(args.margin) ? args.margin : 2;
+	        var width = (0, _utils.isFinite)(args.width) ? args.width : 1;
+	
+	        return (0, _utils.format)(tpl)({
+	            color: args.color || 'blue',
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
+	            outerRadius: margin + width,
+	            innerRadius: margin
+	        });
+	    },
+	
+	    highlight: function highlight(args) {
+	
+	        // `color` ... color
+	        // `width`... width
+	        // `blur` ... blur
+	        // `opacity` ... opacity
+	
+	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/><feComposite result="composed" in="colored" in2="morphed" operator="in"/><feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/><feBlend in="SourceGraphic" in2="blured" mode="normal"/></filter>';
+	
+	        return (0, _utils.format)(tpl)({
+	            color: args.color || 'red',
+	            width: (0, _utils.isFinite)(args.width) ? args.width : 1,
+	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 0,
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1
+	        });
+	    },
+	
+	    blur: function blur(args) {
+	
+	        // `x` ... horizontal blur
+	        // `y` ... vertical blur (optional)
+	
+	        var x = (0, _utils.isFinite)(args.x) ? args.x : 2;
+	
+	        return (0, _utils.format)('<filter><feGaussianBlur stdDeviation="${stdDeviation}"/></filter>')({
+	            stdDeviation: (0, _utils.isFinite)(args.y) ? [x, args.y] : x
+	        });
+	    },
+	
+	    dropShadow: function dropShadow(args) {
+	
+	        // `dx` ... horizontal shift
+	        // `dy` ... vertical shift
+	        // `blur` ... blur
+	        // `color` ... color
+	        // `opacity` ... opacity
+	
+	        var tpl = 'SVGFEDropShadowElement' in window ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>' : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	
+	        return (0, _utils.format)(tpl)({
+	            dx: args.dx || 0,
+	            dy: args.dy || 0,
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
+	            color: args.color || 'black',
+	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 4
+	        });
+	    },
+	
+	    grayscale: function grayscale(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely grayscale.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/></filter>')({
+	            a: 0.2126 + 0.7874 * (1 - amount),
+	            b: 0.7152 - 0.7152 * (1 - amount),
+	            c: 0.0722 - 0.0722 * (1 - amount),
+	            d: 0.2126 - 0.2126 * (1 - amount),
+	            e: 0.7152 + 0.2848 * (1 - amount),
+	            f: 0.0722 - 0.0722 * (1 - amount),
+	            g: 0.2126 - 0.2126 * (1 - amount),
+	            h: 0.0722 + 0.9278 * (1 - amount)
+	        });
+	    },
+	
+	    sepia: function sepia(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely sepia.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/></filter>')({
+	            a: 0.393 + 0.607 * (1 - amount),
+	            b: 0.769 - 0.769 * (1 - amount),
+	            c: 0.189 - 0.189 * (1 - amount),
+	            d: 0.349 - 0.349 * (1 - amount),
+	            e: 0.686 + 0.314 * (1 - amount),
+	            f: 0.168 - 0.168 * (1 - amount),
+	            g: 0.272 - 0.272 * (1 - amount),
+	            h: 0.534 - 0.534 * (1 - amount),
+	            i: 0.131 + 0.869 * (1 - amount)
+	        });
+	    },
+	
+	    saturate: function saturate(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 0 is completely un-saturated.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="saturate" values="${amount}"/></filter>')({
+	            amount: 1 - amount
+	        });
+	    },
+	
+	    hueRotate: function hueRotate(args) {
+	
+	        // `angle` ...  the number of degrees around the color
+	        // circle the input samples will be adjusted.
+	
+	        return (0, _utils.format)('<filter><feColorMatrix type="hueRotate" values="${angle}"/></filter>')({
+	            angle: args.angle || 0
+	        });
+	    },
+	
+	    invert: function invert(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely inverted.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="table" tableValues="${amount} ${amount2}"/><feFuncG type="table" tableValues="${amount} ${amount2}"/><feFuncB type="table" tableValues="${amount} ${amount2}"/></feComponentTransfer></filter>')({
+	            amount: amount,
+	            amount2: 1 - amount
+	        });
+	    },
+	
+	    brightness: function brightness(args) {
+	
+	        // `amount` ... proportion of the conversion.
+	        // A value of 0 will create an image that is completely black.
+	        // A value of 1 leaves the input unchanged.
+	
+	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}"/><feFuncG type="linear" slope="${amount}"/><feFuncB type="linear" slope="${amount}"/></feComponentTransfer></filter>')({
+	            amount: (0, _utils.isFinite)(args.amount) ? args.amount : 1
+	        });
+	    },
+	
+	    contrast: function contrast(args) {
+	
+	        // `amount` ... proportion of the conversion.
+	        // A value of 0 will create an image that is completely black.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}" intercept="${amount2}"/><feFuncG type="linear" slope="${amount}" intercept="${amount2}"/><feFuncB type="linear" slope="${amount}" intercept="${amount2}"/></feComponentTransfer></filter>')({
+	            amount: amount,
+	            amount2: .5 - amount / 2
+	        });
+	    }
+	};
+	
+	exports.default = filters;
+
+/***/ },
+/* 17 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2961,9 +3180,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
+	var _utils = __webpack_require__(2);
 	
-	var _vector = __webpack_require__(10);
+	var _vector = __webpack_require__(1);
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
@@ -3378,7 +3597,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = NodeView;
 
 /***/ },
-/* 18 */
+/* 19 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Change = (function () {
+	    function Change() {
+	        _classCallCheck(this, Change);
+	
+	        if (new.target === Change) {
+	            throw new Error('`Change` is an abstract class that cannot be instantiated.');
+	        }
+	    }
+	
+	    _createClass(Change, [{
+	        key: 'digest',
+	        value: function digest() {
+	            return this;
+	        }
+	    }]);
+	
+	    return Change;
+	})();
+	
+	exports.default = Change;
+
+/***/ },
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3389,7 +3643,178 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
+	var _Change2 = __webpack_require__(19);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var RootChange = (function (_Change) {
+	    _inherits(RootChange, _Change);
+	
+	    function RootChange(model, root) {
+	        _classCallCheck(this, RootChange);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
+	
+	        var that = _this;
+	
+	        that.model = model;
+	        that.root = root;
+	        that.previous = root;
+	        return _this;
+	    }
+	
+	    _createClass(RootChange, [{
+	        key: 'digest',
+	        value: function digest() {
+	
+	            var that = this;
+	            var model = that.model;
+	            var previous = that.previous;
+	
+	            that.root = previous;
+	            that.previous = model.rootChanged(previous);
+	
+	            return that;
+	        }
+	    }]);
+	
+	    return RootChange;
+	})(_Change3.default);
+	
+	exports.default = RootChange;
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Change2 = __webpack_require__(19);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ChildChange = (function (_Change) {
+	    _inherits(ChildChange, _Change);
+	
+	    function ChildChange(model, parent, child, index) {
+	        _classCallCheck(this, ChildChange);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
+	
+	        var that = _this;
+	
+	        that.model = model;
+	        that.child = child;
+	        that.parent = parent;
+	        that.index = index;
+	        that.previous = parent;
+	        that.previousIndex = index;
+	        return _this;
+	    }
+	
+	    _createClass(ChildChange, [{
+	        key: 'digest',
+	        value: function digest() {
+	
+	            var that = this;
+	            var model = that.model;
+	            var child = that.child;
+	            var newParent = that.previous;
+	            var newIndex = that.previousIndex;
+	            var oldParent = child.parent;
+	            var oldIndex = oldParent ? oldParent.getChildIndex(child) : 0;
+	
+	            // 移除连线时，需要移除连线和节点的关联关系
+	            if (!newParent) {
+	                that.connect(child, false);
+	            }
+	
+	            oldParent = model.childChanged(child, newParent, newIndex);
+	
+	            // 更新连线的父节点时，同时更新连线的关联节点
+	            if (newParent) {
+	                that.connect(child, true);
+	            }
+	
+	            that.parent = newParent;
+	            that.index = newIndex;
+	            that.previous = oldParent;
+	            that.previousIndex = oldIndex;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'connect',
+	        value: function connect(cell, connected) {
+	
+	            var that = this;
+	            var model = that.model;
+	
+	            if (cell.isLink()) {
+	
+	                var source = cell.getTerminal(true);
+	                var target = cell.getTerminal(false);
+	
+	                if (source) {
+	                    model.linkChanged(cell, connected ? source : null, true);
+	                }
+	
+	                if (target) {
+	                    model.linkChanged(cell, connected ? target : null, false);
+	                }
+	
+	                cell.setTerminal(source, true);
+	                cell.setTerminal(target, false);
+	            }
+	
+	            cell.eachChild(function (child) {
+	                that.connect(child, connected);
+	            });
+	
+	            return that;
+	        }
+	    }]);
+	
+	    return ChildChange;
+	})(_Change3.default);
+	
+	exports.default = ChildChange;
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(2);
 	
 	var _Events2 = __webpack_require__(11);
 	
@@ -3399,7 +3824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _RootChange = __webpack_require__(19);
+	var _RootChange = __webpack_require__(20);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
@@ -3407,7 +3832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _ChangeCollection = __webpack_require__(22);
+	var _ChangeCollection = __webpack_require__(23);
 	
 	var _ChangeCollection2 = _interopRequireDefault(_ChangeCollection);
 	
@@ -3982,213 +4407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Model;
 
 /***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Change2 = __webpack_require__(20);
-	
-	var _Change3 = _interopRequireDefault(_Change2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var RootChange = (function (_Change) {
-	    _inherits(RootChange, _Change);
-	
-	    function RootChange(model, root) {
-	        _classCallCheck(this, RootChange);
-	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
-	
-	        var that = _this;
-	
-	        that.model = model;
-	        that.root = root;
-	        that.previous = root;
-	        return _this;
-	    }
-	
-	    _createClass(RootChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            var that = this;
-	            var model = that.model;
-	            var previous = that.previous;
-	
-	            that.root = previous;
-	            that.previous = model.rootChanged(previous);
-	
-	            return that;
-	        }
-	    }]);
-	
-	    return RootChange;
-	})(_Change3.default);
-	
-	exports.default = RootChange;
-
-/***/ },
-/* 20 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Change = (function () {
-	    function Change() {
-	        _classCallCheck(this, Change);
-	
-	        if (new.target === Change) {
-	            throw new Error('`Change` is an abstract class that cannot be instantiated.');
-	        }
-	    }
-	
-	    _createClass(Change, [{
-	        key: 'digest',
-	        value: function digest() {
-	            return this;
-	        }
-	    }]);
-	
-	    return Change;
-	})();
-	
-	exports.default = Change;
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Change2 = __webpack_require__(20);
-	
-	var _Change3 = _interopRequireDefault(_Change2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ChildChange = (function (_Change) {
-	    _inherits(ChildChange, _Change);
-	
-	    function ChildChange(model, parent, child, index) {
-	        _classCallCheck(this, ChildChange);
-	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
-	
-	        var that = _this;
-	
-	        that.model = model;
-	        that.child = child;
-	        that.parent = parent;
-	        that.index = index;
-	        that.previous = parent;
-	        that.previousIndex = index;
-	        return _this;
-	    }
-	
-	    _createClass(ChildChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            var that = this;
-	            var model = that.model;
-	            var child = that.child;
-	            var newParent = that.previous;
-	            var newIndex = that.previousIndex;
-	            var oldParent = child.parent;
-	            var oldIndex = oldParent ? oldParent.getChildIndex(child) : 0;
-	
-	            // 移除连线时，需要移除连线和节点的关联关系
-	            if (!newParent) {
-	                that.connect(child, false);
-	            }
-	
-	            oldParent = model.childChanged(child, newParent, newIndex);
-	
-	            // 更新连线的父节点时，同时更新连线的关联节点
-	            if (newParent) {
-	                that.connect(child, true);
-	            }
-	
-	            that.parent = newParent;
-	            that.index = newIndex;
-	            that.previous = oldParent;
-	            that.previousIndex = oldIndex;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'connect',
-	        value: function connect(cell, connected) {
-	
-	            var that = this;
-	            var model = that.model;
-	
-	            if (cell.isLink()) {
-	
-	                var source = cell.getTerminal(true);
-	                var target = cell.getTerminal(false);
-	
-	                if (source) {
-	                    model.linkChanged(cell, connected ? source : null, true);
-	                }
-	
-	                if (target) {
-	                    model.linkChanged(cell, connected ? target : null, false);
-	                }
-	
-	                cell.setTerminal(source, true);
-	                cell.setTerminal(target, false);
-	            }
-	
-	            cell.eachChild(function (child) {
-	                that.connect(child, connected);
-	            });
-	
-	            return that;
-	        }
-	    }]);
-	
-	    return ChildChange;
-	})(_Change3.default);
-	
-	exports.default = ChildChange;
-
-/***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4256,7 +4475,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChangeCollection;
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4267,29 +4486,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
+	var _utils = __webpack_require__(2);
 	
 	var _Events2 = __webpack_require__(11);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _vector = __webpack_require__(10);
+	var _vector = __webpack_require__(1);
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _Model = __webpack_require__(18);
+	var _Model = __webpack_require__(22);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _LinkView = __webpack_require__(16);
+	var _LinkView = __webpack_require__(17);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _NodeView = __webpack_require__(17);
+	var _NodeView = __webpack_require__(18);
 	
 	var _NodeView2 = _interopRequireDefault(_NodeView);
 	
-	var _RootChange = __webpack_require__(19);
+	var _RootChange = __webpack_require__(20);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
@@ -4771,7 +4990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Paper;
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4779,8 +4998,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
-	var _utils = __webpack_require__(1);
 	
 	var _Node2 = __webpack_require__(14);
 	
@@ -4806,75 +5023,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Generic;
 	})(_Node3.default);
 	
-	Generic.defaults = (0, _utils.merge)({}, _Node3.default.defaults, {
-	    type: 'basic.Generic',
-	    attrs: {
-	        '.': { fill: '#ffffff', stroke: 'none' }
-	    }
-	});
-	
-	exports.default = Generic;
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Rect = (function (_Generic) {
-	    _inherits(Rect, _Generic);
-	
-	    function Rect() {
-	        _classCallCheck(this, Rect);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rect).apply(this, arguments));
-	    }
-	
-	    return Rect;
-	})(_Generic3.default);
-	
-	Rect.markup = '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>';
-	Rect.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Rect',
-	    attrs: {
-	        'rect': {
-	            fill: '#ffffff',
-	            stroke: '#000000',
-	            width: 100,
-	            height: 60
-	        },
-	        'text': {
-	            fill: '#000000',
-	            text: '',
-	            'font-size': 14,
-	            'ref-x': .5,
-	            'ref-y': .5,
-	            'text-anchor': 'middle',
-	            'y-alignment': 'middle',
-	            'font-family': 'Arial, helvetica, sans-serif'
+	Generic.configure({
+	    defaults: {
+	        attrs: {
+	            '.': { fill: '#ffffff', stroke: 'none' }
 	        }
 	    }
 	});
 	
-	exports.default = Rect;
+	exports.default = Generic;
 
 /***/ },
 /* 26 */
@@ -4886,422 +5043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Circle = (function (_Generic) {
-	    _inherits(Circle, _Generic);
-	
-	    function Circle() {
-	        _classCallCheck(this, Circle);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Circle).apply(this, arguments));
-	    }
-	
-	    return Circle;
-	})(_Generic3.default);
-	
-	Circle.markup = '<g class="pane-rotatable"><g class="pane-scalable"><circle/></g><text/></g>';
-	Circle.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Circle',
-	    size: { width: 60, height: 60 },
-	    attrs: {
-	        'circle': {
-	            fill: '#ffffff',
-	            stroke: '#000000',
-	            r: 30,
-	            cx: 30,
-	            cy: 30
-	        },
-	        'text': {
-	            'font-size': 14,
-	            text: '',
-	            'text-anchor': 'middle',
-	            'ref-x': .5,
-	            'ref-y': .5,
-	            'y-alignment': 'middle',
-	            fill: '#000000',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
-	    }
-	});
-	
-	exports.default = Circle;
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Ellipse = (function (_Generic) {
-	    _inherits(Ellipse, _Generic);
-	
-	    function Ellipse() {
-	        _classCallCheck(this, Ellipse);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Ellipse).apply(this, arguments));
-	    }
-	
-	    return Ellipse;
-	})(_Generic3.default);
-	
-	Ellipse.markup = '<g class="pane-rotatable"><g class="pane-scalable"><ellipse/></g><text/></g>';
-	Ellipse.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Ellipse',
-	    size: { width: 60, height: 40 },
-	    attrs: {
-	        'ellipse': {
-	            fill: '#ffffff',
-	            stroke: '#000000',
-	            rx: 30,
-	            ry: 20,
-	            cx: 30,
-	            cy: 20
-	        },
-	        'text': {
-	            'font-size': 14,
-	            text: '',
-	            'text-anchor': 'middle',
-	            'ref-x': .5,
-	            'ref-y': .5,
-	            'y-alignment': 'middle',
-	            fill: '#000000',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
-	    }
-	});
-	
-	exports.default = Ellipse;
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Image = (function (_Generic) {
-	    _inherits(Image, _Generic);
-	
-	    function Image() {
-	        _classCallCheck(this, Image);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Image).apply(this, arguments));
-	    }
-	
-	    return Image;
-	})(_Generic3.default);
-	
-	Image.markup = '<g class="pane-rotatable"><g class="pane-scalable"><image/></g><text/></g>';
-	Image.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Image',
-	    attrs: {
-	        'text': {
-	            'font-size': 14,
-	            text: '',
-	            'text-anchor': 'middle',
-	            'ref-x': .5,
-	            'ref-dy': 20,
-	            'y-alignment': 'middle',
-	            fill: '#000000',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
-	    }
-	});
-	
-	exports.default = Image;
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Path = (function (_Generic) {
-	    _inherits(Path, _Generic);
-	
-	    function Path() {
-	        _classCallCheck(this, Path);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Path).apply(this, arguments));
-	    }
-	
-	    return Path;
-	})(_Generic3.default);
-	
-	Path.markup = '<g class="pane-rotatable"><g class="pane-scalable"><path/></g><text/></g>';
-	Path.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Path',
-	    size: { width: 60, height: 60 },
-	    attrs: {
-	        'path': {
-	            fill: '#ffffff',
-	            stroke: '#000000'
-	        },
-	        'text': {
-	            'font-size': 14,
-	            text: '',
-	            'text-anchor': 'middle',
-	            'ref': 'path',
-	            'ref-x': .5,
-	            'ref-dy': 10,
-	            fill: '#000000',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
-	    }
-	});
-	
-	exports.default = Path;
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Polygon = (function (_Generic) {
-	    _inherits(Polygon, _Generic);
-	
-	    function Polygon() {
-	        _classCallCheck(this, Polygon);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Polygon).apply(this, arguments));
-	    }
-	
-	    return Polygon;
-	})(_Generic3.default);
-	
-	Polygon.markup = '<g class="pane-rotatable"><g class="pane-scalable"><polygon/></g><text/></g>';
-	Polygon.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Polygon',
-	    size: { width: 60, height: 40 },
-	    attrs: {
-	        'polygon': {
-	            fill: '#ffffff',
-	            stroke: '#000000'
-	        },
-	        'text': {
-	            'font-size': 14,
-	            text: '',
-	            'text-anchor': 'middle',
-	            'ref-x': .5,
-	            'ref-dy': 20,
-	            'y-alignment': 'middle',
-	            fill: '#000000',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
-	    }
-	});
-	
-	exports.default = Polygon;
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Polyline = (function (_Generic) {
-	    _inherits(Polyline, _Generic);
-	
-	    function Polyline() {
-	        _classCallCheck(this, Polyline);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Polyline).apply(this, arguments));
-	    }
-	
-	    return Polyline;
-	})(_Generic3.default);
-	
-	Polyline.markup = '<g class="pane-rotatable"><g class="pane-scalable"><polyline/></g><text/></g>';
-	Polyline.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Polyline',
-	    size: { width: 60, height: 40 },
-	    attrs: {
-	        'polyline': {
-	            fill: '#ffffff',
-	            stroke: '#000000'
-	        },
-	        'text': {
-	            'font-size': 14,
-	            text: '',
-	            'text-anchor': 'middle',
-	            'ref-x': .5,
-	            'ref-dy': 20,
-	            'y-alignment': 'middle',
-	            fill: '#000000',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
-	    }
-	});
-	
-	exports.default = Polyline;
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Path2 = __webpack_require__(29);
-	
-	var _Path3 = _interopRequireDefault(_Path2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Rhombus = (function (_Path) {
-	    _inherits(Rhombus, _Path);
-	
-	    function Rhombus() {
-	        _classCallCheck(this, Rhombus);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rhombus).apply(this, arguments));
-	    }
-	
-	    return Rhombus;
-	})(_Path3.default);
-	
-	Rhombus.defaults = (0, _utils.merge)({}, _Path3.default.defaults, {
-	    type: 'basic.Rhombus',
-	    attrs: {
-	        'path': {
-	            d: 'M 30 0 L 60 30 30 60 0 30 z'
-	        },
-	        'text': {
-	            'ref-y': 0.5,
-	            'y-alignment': 'middle'
-	        }
-	    }
-	});
-	
-	exports.default = Rhombus;
-
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _Generic2 = __webpack_require__(24);
+	var _Generic2 = __webpack_require__(25);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5325,18 +5067,436 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Text;
 	})(_Generic3.default);
 	
-	Text.markup = '<g class="pane-rotatable"><g class="pane-scalable"><text/></g></g>';
-	Text.defaults = (0, _utils.merge)({}, _Generic3.default.defaults, {
-	    type: 'basic.Text',
-	    attrs: {
-	        'text': {
-	            'font-size': 18,
-	            fill: '#000000'
+	Text.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><text/></g></g>',
+	    defaults: {
+	        attrs: {
+	            'text': {
+	                'font-size': 18,
+	                fill: '#000000'
+	            }
 	        }
 	    }
 	});
 	
 	exports.default = Text;
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Rect = (function (_Generic) {
+	    _inherits(Rect, _Generic);
+	
+	    function Rect() {
+	        _classCallCheck(this, Rect);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rect).apply(this, arguments));
+	    }
+	
+	    return Rect;
+	})(_Generic3.default);
+	
+	Rect.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',
+	    defaults: {
+	        attrs: {
+	            'rect': {
+	                fill: '#ffffff',
+	                stroke: '#000000',
+	                width: 100,
+	                height: 60
+	            },
+	            'text': {
+	                fill: '#000000',
+	                text: '',
+	                'font-size': 14,
+	                'ref-x': .5,
+	                'ref-y': .5,
+	                'text-anchor': 'middle',
+	                'y-alignment': 'middle',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Rect;
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Circle = (function (_Generic) {
+	    _inherits(Circle, _Generic);
+	
+	    function Circle() {
+	        _classCallCheck(this, Circle);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Circle).apply(this, arguments));
+	    }
+	
+	    return Circle;
+	})(_Generic3.default);
+	
+	Circle.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><circle/></g><text/></g>',
+	    defaults: {
+	        size: { width: 60, height: 60 },
+	        attrs: {
+	            'circle': {
+	                fill: '#ffffff',
+	                stroke: '#000000',
+	                r: 30,
+	                cx: 30,
+	                cy: 30
+	            },
+	            'text': {
+	                'font-size': 14,
+	                text: '',
+	                'text-anchor': 'middle',
+	                'ref-x': .5,
+	                'ref-y': .5,
+	                'y-alignment': 'middle',
+	                fill: '#000000',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	
+	});
+	
+	exports.default = Circle;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Ellipse = (function (_Generic) {
+	    _inherits(Ellipse, _Generic);
+	
+	    function Ellipse() {
+	        _classCallCheck(this, Ellipse);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Ellipse).apply(this, arguments));
+	    }
+	
+	    return Ellipse;
+	})(_Generic3.default);
+	
+	Ellipse.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><ellipse/></g><text/></g>',
+	    defaults: {
+	        size: { width: 60, height: 40 },
+	        attrs: {
+	            'ellipse': {
+	                fill: '#ffffff',
+	                stroke: '#000000',
+	                rx: 30,
+	                ry: 20,
+	                cx: 30,
+	                cy: 20
+	            },
+	            'text': {
+	                'font-size': 14,
+	                text: '',
+	                'text-anchor': 'middle',
+	                'ref-x': .5,
+	                'ref-y': .5,
+	                'y-alignment': 'middle',
+	                fill: '#000000',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Ellipse;
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Image = (function (_Generic) {
+	    _inherits(Image, _Generic);
+	
+	    function Image() {
+	        _classCallCheck(this, Image);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Image).apply(this, arguments));
+	    }
+	
+	    return Image;
+	})(_Generic3.default);
+	
+	Image.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><image/></g><text/></g>',
+	    defaults: {
+	        attrs: {
+	            'text': {
+	                'font-size': 14,
+	                text: '',
+	                'text-anchor': 'middle',
+	                'ref-x': .5,
+	                'ref-dy': 20,
+	                'y-alignment': 'middle',
+	                fill: '#000000',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Image;
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Path = (function (_Generic) {
+	    _inherits(Path, _Generic);
+	
+	    function Path() {
+	        _classCallCheck(this, Path);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Path).apply(this, arguments));
+	    }
+	
+	    return Path;
+	})(_Generic3.default);
+	
+	Path.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><path/></g><text/></g>',
+	    defaults: {
+	        size: { width: 60, height: 60 },
+	        attrs: {
+	            'path': {
+	                fill: '#ffffff',
+	                stroke: '#000000'
+	            },
+	            'text': {
+	                'font-size': 14,
+	                text: '',
+	                'text-anchor': 'middle',
+	                'ref': 'path',
+	                'ref-x': .5,
+	                'ref-dy': 10,
+	                fill: '#000000',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Path;
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Polygon = (function (_Generic) {
+	    _inherits(Polygon, _Generic);
+	
+	    function Polygon() {
+	        _classCallCheck(this, Polygon);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Polygon).apply(this, arguments));
+	    }
+	
+	    return Polygon;
+	})(_Generic3.default);
+	
+	Polygon.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><polygon/></g><text/></g>',
+	    defaults: {
+	        size: { width: 60, height: 40 },
+	        attrs: {
+	            'polygon': {
+	                fill: '#ffffff',
+	                stroke: '#000000'
+	            },
+	            'text': {
+	                'font-size': 14,
+	                text: '',
+	                'text-anchor': 'middle',
+	                'ref-x': .5,
+	                'ref-dy': 20,
+	                'y-alignment': 'middle',
+	                fill: '#000000',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Polygon;
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Generic2 = __webpack_require__(25);
+	
+	var _Generic3 = _interopRequireDefault(_Generic2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Polyline = (function (_Generic) {
+	    _inherits(Polyline, _Generic);
+	
+	    function Polyline() {
+	        _classCallCheck(this, Polyline);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Polyline).apply(this, arguments));
+	    }
+	
+	    return Polyline;
+	})(_Generic3.default);
+	
+	Polyline.configure({
+	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><polyline/></g><text/></g>',
+	    defaults: {
+	        size: { width: 60, height: 40 },
+	        attrs: {
+	            'polyline': {
+	                fill: '#ffffff',
+	                stroke: '#000000'
+	            },
+	            'text': {
+	                'font-size': 14,
+	                text: '',
+	                'text-anchor': 'middle',
+	                'ref-x': .5,
+	                'ref-dy': 20,
+	                'y-alignment': 'middle',
+	                fill: '#000000',
+	                'font-family': 'Arial, helvetica, sans-serif'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Polyline;
 
 /***/ },
 /* 34 */
@@ -5348,183 +5508,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
+	var _Path2 = __webpack_require__(31);
 	
-	var filters = {
+	var _Path3 = _interopRequireDefault(_Path2);
 	
-	    outline: function outline(args) {
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	        // `color` ... outline color
-	        // `width`... outline width
-	        // `opacity` ... outline opacity
-	        // `margin` ... gap between outline and the element
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" /><feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" /><feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/><feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/><feMerge><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	        var margin = (0, _utils.isFinite)(args.margin) ? args.margin : 2;
-	        var width = (0, _utils.isFinite)(args.width) ? args.width : 1;
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	        return (0, _utils.format)(tpl)({
-	            color: args.color || 'blue',
-	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
-	            outerRadius: margin + width,
-	            innerRadius: margin
-	        });
-	    },
+	var Rhombus = (function (_Path) {
+	    _inherits(Rhombus, _Path);
 	
-	    highlight: function highlight(args) {
+	    function Rhombus() {
+	        _classCallCheck(this, Rhombus);
 	
-	        // `color` ... color
-	        // `width`... width
-	        // `blur` ... blur
-	        // `opacity` ... opacity
-	
-	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/><feComposite result="composed" in="colored" in2="morphed" operator="in"/><feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/><feBlend in="SourceGraphic" in2="blured" mode="normal"/></filter>';
-	
-	        return (0, _utils.format)(tpl)({
-	            color: args.color || 'red',
-	            width: (0, _utils.isFinite)(args.width) ? args.width : 1,
-	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 0,
-	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1
-	        });
-	    },
-	
-	    blur: function blur(args) {
-	
-	        // `x` ... horizontal blur
-	        // `y` ... vertical blur (optional)
-	
-	        var x = (0, _utils.isFinite)(args.x) ? args.x : 2;
-	
-	        return (0, _utils.format)('<filter><feGaussianBlur stdDeviation="${stdDeviation}"/></filter>')({
-	            stdDeviation: (0, _utils.isFinite)(args.y) ? [x, args.y] : x
-	        });
-	    },
-	
-	    dropShadow: function dropShadow(args) {
-	
-	        // `dx` ... horizontal shift
-	        // `dy` ... vertical shift
-	        // `blur` ... blur
-	        // `color` ... color
-	        // `opacity` ... opacity
-	
-	        var tpl = 'SVGFEDropShadowElement' in window ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>' : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-	
-	        return (0, _utils.format)(tpl)({
-	            dx: args.dx || 0,
-	            dy: args.dy || 0,
-	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
-	            color: args.color || 'black',
-	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 4
-	        });
-	    },
-	
-	    grayscale: function grayscale(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 1 is completely grayscale.
-	        // A value of 0 leaves the input unchanged.
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/></filter>')({
-	            a: 0.2126 + 0.7874 * (1 - amount),
-	            b: 0.7152 - 0.7152 * (1 - amount),
-	            c: 0.0722 - 0.0722 * (1 - amount),
-	            d: 0.2126 - 0.2126 * (1 - amount),
-	            e: 0.7152 + 0.2848 * (1 - amount),
-	            f: 0.0722 - 0.0722 * (1 - amount),
-	            g: 0.2126 - 0.2126 * (1 - amount),
-	            h: 0.0722 + 0.9278 * (1 - amount)
-	        });
-	    },
-	
-	    sepia: function sepia(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 1 is completely sepia.
-	        // A value of 0 leaves the input unchanged.
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/></filter>')({
-	            a: 0.393 + 0.607 * (1 - amount),
-	            b: 0.769 - 0.769 * (1 - amount),
-	            c: 0.189 - 0.189 * (1 - amount),
-	            d: 0.349 - 0.349 * (1 - amount),
-	            e: 0.686 + 0.314 * (1 - amount),
-	            f: 0.168 - 0.168 * (1 - amount),
-	            g: 0.272 - 0.272 * (1 - amount),
-	            h: 0.534 - 0.534 * (1 - amount),
-	            i: 0.131 + 0.869 * (1 - amount)
-	        });
-	    },
-	
-	    saturate: function saturate(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 0 is completely un-saturated.
-	        // A value of 1 leaves the input unchanged.
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)('<filter><feColorMatrix type="saturate" values="${amount}"/></filter>')({
-	            amount: 1 - amount
-	        });
-	    },
-	
-	    hueRotate: function hueRotate(args) {
-	
-	        // `angle` ...  the number of degrees around the color
-	        // circle the input samples will be adjusted.
-	
-	        return (0, _utils.format)('<filter><feColorMatrix type="hueRotate" values="${angle}"/></filter>')({
-	            angle: args.angle || 0
-	        });
-	    },
-	
-	    invert: function invert(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 1 is completely inverted.
-	        // A value of 0 leaves the input unchanged.
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="table" tableValues="${amount} ${amount2}"/><feFuncG type="table" tableValues="${amount} ${amount2}"/><feFuncB type="table" tableValues="${amount} ${amount2}"/></feComponentTransfer></filter>')({
-	            amount: amount,
-	            amount2: 1 - amount
-	        });
-	    },
-	
-	    brightness: function brightness(args) {
-	
-	        // `amount` ... proportion of the conversion.
-	        // A value of 0 will create an image that is completely black.
-	        // A value of 1 leaves the input unchanged.
-	
-	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}"/><feFuncG type="linear" slope="${amount}"/><feFuncB type="linear" slope="${amount}"/></feComponentTransfer></filter>')({
-	            amount: (0, _utils.isFinite)(args.amount) ? args.amount : 1
-	        });
-	    },
-	
-	    contrast: function contrast(args) {
-	
-	        // `amount` ... proportion of the conversion.
-	        // A value of 0 will create an image that is completely black.
-	        // A value of 1 leaves the input unchanged.
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}" intercept="${amount2}"/><feFuncG type="linear" slope="${amount}" intercept="${amount2}"/><feFuncB type="linear" slope="${amount}" intercept="${amount2}"/></feComponentTransfer></filter>')({
-	            amount: amount,
-	            amount2: .5 - amount / 2
-	        });
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rhombus).apply(this, arguments));
 	    }
-	};
 	
-	exports.default = filters;
+	    return Rhombus;
+	})(_Path3.default);
+	
+	Rhombus.configure({
+	    defaults: {
+	        attrs: {
+	            'path': {
+	                d: 'M 30 0 L 60 30 30 60 0 30 z'
+	            },
+	            'text': {
+	                'ref-y': 0.5,
+	                'y-alignment': 'middle'
+	            }
+	        }
+	    }
+	});
+	
+	exports.default = Rhombus;
 
 /***/ }
 /******/ ])
