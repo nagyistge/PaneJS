@@ -1815,14 +1815,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lang = __webpack_require__(3);
 	
-	// xml namespaces.
-	var ns = {
-	    xmlns: 'http://www.w3.org/2000/svg',
-	    xlink: 'http://www.w3.org/1999/xlink'
-	};
-	// svg version.
-	var svgVersion = '1.1';
-	
 	function isNode(elem, nodeName, attrName, attrValue) {
 	    var ret = elem && !isNaN(elem.nodeType);
 	
@@ -1844,6 +1836,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getNodeName(elem) {
 	    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
 	}
+	
+	// xml namespaces.
+	var ns = {
+	    xmlns: 'http://www.w3.org/2000/svg',
+	    xlink: 'http://www.w3.org/1999/xlink'
+	};
+	// svg version.
+	var svgVersion = '1.1';
 	
 	function parseXML(str, async) {
 	
