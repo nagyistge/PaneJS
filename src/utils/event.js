@@ -164,11 +164,31 @@ function removeEventListener(element, type, handler) {
     }
 }
 
+function normalizeEvent(evt) {
+
+    var touchEvt = evt.originalEvent
+        && evt.originalEvent.changedTouches
+        && evt.originalEvent.changedTouches[0];
+
+    if (touchEvt) {
+        for (var property in evt) {
+            // copy all the properties from the input event that are not
+            // defined on the touch event (functions included).
+            if (touchEvt[property] === undefined) {
+                touchEvt[property] = evt[property];
+            }
+        }
+        return touchEvt;
+    }
+
+    return evt;
+}
 
 // exports
 // -------
 
 export {
+    normalizeEvent,
     addEventListener,
     removeEventListener
 }

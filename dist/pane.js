@@ -5635,7 +5635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.removeEventListener = exports.addEventListener = undefined;
+	exports.removeEventListener = exports.addEventListener = exports.normalizeEvent = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -5799,9 +5799,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
+	function normalizeEvent(evt) {
+	
+	    var touchEvt = evt.originalEvent && evt.originalEvent.changedTouches && evt.originalEvent.changedTouches[0];
+	
+	    if (touchEvt) {
+	        for (var property in evt) {
+	            // copy all the properties from the input event that are not
+	            // defined on the touch event (functions included).
+	            if (touchEvt[property] === undefined) {
+	                touchEvt[property] = evt[property];
+	            }
+	        }
+	        return touchEvt;
+	    }
+	
+	    return evt;
+	}
+	
 	// exports
 	// -------
 	
+	exports.normalizeEvent = normalizeEvent;
 	exports.addEventListener = addEventListener;
 	exports.removeEventListener = removeEventListener;
 
