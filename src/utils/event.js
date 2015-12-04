@@ -1,7 +1,5 @@
-import {
-    some,
-    isFunction
-} from './utils';
+import { isFunction } from './lang'
+import { some } from './array'
 
 
 var win = window;
@@ -50,6 +48,7 @@ function fixEvent(event) {
 fixEvent.preventDefault = function () {
     this.returnValue = false;
 };
+
 fixEvent.stopPropagation = function () {
     this.cancelBubble = true;
 };
@@ -121,7 +120,7 @@ function getDelegateTarget(element, target, selector) {
     return null;
 }
 
-function on(element, type, selector, handler, once) {
+function addEventListener(element, type, selector, handler, once) {
 
     if (isFunction(selector)) {
         return addEvent(element, type, selector);
@@ -134,7 +133,7 @@ function on(element, type, selector, handler, once) {
         // element) and fire the callback
         if (e.delegateTarget = getDelegateTarget(element, e.target, selector)) {
             if (once === true) {
-                off(element, type, wrapper);
+                removeEventListener(element, type, wrapper);
             }
             handler.call(element, e);
         }
@@ -146,24 +145,23 @@ function on(element, type, selector, handler, once) {
     return handler;
 }
 
-function off(element, type, handler) {
+function removeEventListener(element, type, handler) {
 
-    var delegateWrapper = handler._delegateWrapper;
+    var wrapper = handler._delegateWrapper;
 
     if (element.removeEventListener) {
         element.removeEventListener(type, handler, false);
-        element.removeEventListener(type, delegateWrapper, false);
+        wrapper && element.removeEventListener(type, wrapper, false);
     } else {
         // delete the event handler from the hash table
         if (element.events && element.events[type]) {
             delete element.events[type][handler.$$guid];
-            delete element.events[type][delegateWrapper.$$guid];
+
+            if (wrapper) {
+                delete element.events[type][wrapper.$$guid];
+            }
         }
     }
-}
-
-function once(element, type, selector, callback) {
-    on(element, type, selector, callback, true);
 }
 
 
@@ -171,7 +169,6 @@ function once(element, type, selector, callback) {
 // -------
 
 export {
-    on,
-    off,
-    once
+    addEventListener,
+    removeEventListener
 }

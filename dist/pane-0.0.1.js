@@ -1150,146 +1150,200 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lang = __webpack_require__(3);
 	
-	var _loop = function _loop(_key9) {
-	  if (_key9 === "default") return 'continue';
-	  Object.defineProperty(exports, _key9, {
-	    enumerable: true,
-	    get: function get() {
-	      return _lang[_key9];
-	    }
-	  });
-	};
-	
-	for (var _key9 in _lang) {
-	  var _ret = _loop(_key9);
-	
-	  if (_ret === 'continue') continue;
-	}
-	
-	var _string = __webpack_require__(4);
-	
-	var _loop2 = function _loop2(_key10) {
-	  if (_key10 === "default") return 'continue';
-	  Object.defineProperty(exports, _key10, {
-	    enumerable: true,
-	    get: function get() {
-	      return _string[_key10];
-	    }
-	  });
-	};
-	
-	for (var _key10 in _string) {
-	  var _ret2 = _loop2(_key10);
-	
-	  if (_ret2 === 'continue') continue;
-	}
-	
-	var _number = __webpack_require__(7);
-	
-	var _loop3 = function _loop3(_key11) {
-	  if (_key11 === "default") return 'continue';
-	  Object.defineProperty(exports, _key11, {
-	    enumerable: true,
-	    get: function get() {
-	      return _number[_key11];
-	    }
-	  });
-	};
-	
-	for (var _key11 in _number) {
-	  var _ret3 = _loop3(_key11);
-	
-	  if (_ret3 === 'continue') continue;
-	}
-	
-	var _array = __webpack_require__(6);
-	
-	var _loop4 = function _loop4(_key12) {
+	var _loop = function _loop(_key12) {
 	  if (_key12 === "default") return 'continue';
 	  Object.defineProperty(exports, _key12, {
 	    enumerable: true,
 	    get: function get() {
-	      return _array[_key12];
+	      return _lang[_key12];
 	    }
 	  });
 	};
 	
-	for (var _key12 in _array) {
-	  var _ret4 = _loop4(_key12);
+	for (var _key12 in _lang) {
+	  var _ret = _loop(_key12);
+	
+	  if (_ret === 'continue') continue;
+	}
+	
+	var _array = __webpack_require__(6);
+	
+	var _loop2 = function _loop2(_key13) {
+	  if (_key13 === "default") return 'continue';
+	  Object.defineProperty(exports, _key13, {
+	    enumerable: true,
+	    get: function get() {
+	      return _array[_key13];
+	    }
+	  });
+	};
+	
+	for (var _key13 in _array) {
+	  var _ret2 = _loop2(_key13);
+	
+	  if (_ret2 === 'continue') continue;
+	}
+	
+	var _string = __webpack_require__(4);
+	
+	var _loop3 = function _loop3(_key14) {
+	  if (_key14 === "default") return 'continue';
+	  Object.defineProperty(exports, _key14, {
+	    enumerable: true,
+	    get: function get() {
+	      return _string[_key14];
+	    }
+	  });
+	};
+	
+	for (var _key14 in _string) {
+	  var _ret3 = _loop3(_key14);
+	
+	  if (_ret3 === 'continue') continue;
+	}
+	
+	var _number = __webpack_require__(7);
+	
+	var _loop4 = function _loop4(_key15) {
+	  if (_key15 === "default") return 'continue';
+	  Object.defineProperty(exports, _key15, {
+	    enumerable: true,
+	    get: function get() {
+	      return _number[_key15];
+	    }
+	  });
+	};
+	
+	for (var _key15 in _number) {
+	  var _ret4 = _loop4(_key15);
 	
 	  if (_ret4 === 'continue') continue;
 	}
 	
 	var _object = __webpack_require__(5);
 	
-	var _loop5 = function _loop5(_key13) {
-	  if (_key13 === "default") return 'continue';
-	  Object.defineProperty(exports, _key13, {
+	var _loop5 = function _loop5(_key16) {
+	  if (_key16 === "default") return 'continue';
+	  Object.defineProperty(exports, _key16, {
 	    enumerable: true,
 	    get: function get() {
-	      return _object[_key13];
+	      return _object[_key16];
 	    }
 	  });
 	};
 	
-	for (var _key13 in _object) {
-	  var _ret5 = _loop5(_key13);
+	for (var _key16 in _object) {
+	  var _ret5 = _loop5(_key16);
 	
 	  if (_ret5 === 'continue') continue;
 	}
 	
 	var _function = __webpack_require__(8);
 	
-	var _loop6 = function _loop6(_key14) {
-	  if (_key14 === "default") return 'continue';
-	  Object.defineProperty(exports, _key14, {
+	var _loop6 = function _loop6(_key17) {
+	  if (_key17 === "default") return 'continue';
+	  Object.defineProperty(exports, _key17, {
 	    enumerable: true,
 	    get: function get() {
-	      return _function[_key14];
+	      return _function[_key17];
 	    }
 	  });
 	};
 	
-	for (var _key14 in _function) {
-	  var _ret6 = _loop6(_key14);
+	for (var _key17 in _function) {
+	  var _ret6 = _loop6(_key17);
 	
 	  if (_ret6 === 'continue') continue;
 	}
 	
 	var _dom = __webpack_require__(9);
 	
-	var _loop7 = function _loop7(_key15) {
-	  if (_key15 === "default") return 'continue';
-	  Object.defineProperty(exports, _key15, {
+	var _loop7 = function _loop7(_key18) {
+	  if (_key18 === "default") return 'continue';
+	  Object.defineProperty(exports, _key18, {
 	    enumerable: true,
 	    get: function get() {
-	      return _dom[_key15];
+	      return _dom[_key18];
 	    }
 	  });
 	};
 	
-	for (var _key15 in _dom) {
-	  var _ret7 = _loop7(_key15);
+	for (var _key18 in _dom) {
+	  var _ret7 = _loop7(_key18);
 	
 	  if (_ret7 === 'continue') continue;
 	}
 	
 	var _geom = __webpack_require__(10);
 	
-	var _loop8 = function _loop8(_key16) {
-	  if (_key16 === "default") return 'continue';
-	  Object.defineProperty(exports, _key16, {
+	var _loop8 = function _loop8(_key19) {
+	  if (_key19 === "default") return 'continue';
+	  Object.defineProperty(exports, _key19, {
 	    enumerable: true,
 	    get: function get() {
-	      return _geom[_key16];
+	      return _geom[_key19];
 	    }
 	  });
 	};
 	
-	for (var _key16 in _geom) {
-	  var _ret8 = _loop8(_key16);
+	for (var _key19 in _geom) {
+	  var _ret8 = _loop8(_key19);
 	
 	  if (_ret8 === 'continue') continue;
+	}
+	
+	var _event = __webpack_require__(38);
+	
+	var _loop9 = function _loop9(_key20) {
+	  if (_key20 === "default") return 'continue';
+	  Object.defineProperty(exports, _key20, {
+	    enumerable: true,
+	    get: function get() {
+	      return _event[_key20];
+	    }
+	  });
+	};
+	
+	for (var _key20 in _event) {
+	  var _ret9 = _loop9(_key20);
+	
+	  if (_ret9 === 'continue') continue;
+	}
+	
+	var _pathData = __webpack_require__(35);
+	
+	var _loop10 = function _loop10(_key21) {
+	  if (_key21 === "default") return 'continue';
+	  Object.defineProperty(exports, _key21, {
+	    enumerable: true,
+	    get: function get() {
+	      return _pathData[_key21];
+	    }
+	  });
+	};
+	
+	for (var _key21 in _pathData) {
+	  var _ret10 = _loop10(_key21);
+	
+	  if (_ret10 === 'continue') continue;
+	}
+	
+	var _transform = __webpack_require__(36);
+	
+	var _loop11 = function _loop11(_key22) {
+	  if (_key22 === "default") return 'continue';
+	  Object.defineProperty(exports, _key22, {
+	    enumerable: true,
+	    get: function get() {
+	      return _transform[_key22];
+	    }
+	  });
+	};
+	
+	for (var _key22 in _transform) {
+	  var _ret11 = _loop11(_key22);
+	
+	  if (_ret11 === 'continue') continue;
 	}
 	
 	exports.default = {};
@@ -1807,11 +1861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
-	
-	var _string = __webpack_require__(4);
-	
-	var _array = __webpack_require__(6);
+	exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -1897,215 +1947,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
-	// parse transform
-	// ---------------
-	
-	function parseTranslate(transform) {
-	
-	    var translate = { tx: 0, ty: 0 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/translate\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                translate.tx += parseFloat(arr[0]);
-	            }
-	
-	            if (arr[1]) {
-	                translate.ty += parseFloat(arr[1]);
-	            }
-	        }
-	    }
-	
-	    return translate;
-	}
-	
-	function parseScale(transform) {
-	
-	    var scale = { sx: 1, sy: 1 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/scale\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                scale.sx *= parseFloat(arr[0]);
-	            }
-	
-	            if (arr[1] || arr[0]) {
-	                scale.sy *= parseFloat(arr[1] || arr[0]);
-	            }
-	        }
-	    }
-	
-	    return scale;
-	}
-	
-	function parseRotate(transform) {
-	
-	    var rotate = { angle: 0 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/rotate\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                rotate.angle += parseFloat(arr[0]);
-	            }
-	
-	            if (arr[1] && arr[2]) {
-	                rotate.cx = parseFloat(arr[1]);
-	                rotate.cy = parseFloat(arr[2]);
-	            }
-	        }
-	    }
-	
-	    return rotate;
-	}
-	
-	function parseTransform(transform) {
-	    return {
-	        translate: parseTranslate(transform),
-	        rotate: parseRotate(transform),
-	        scale: parseScale(transform)
-	    };
-	}
-	
-	// clear transform
-	// ---------------
-	
-	function clearTranslate(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
-	}
-	
-	function clearScale(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
-	}
-	
-	function clearRotate(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
-	}
-	
-	// path data
-	// ---------
-	
-	function lineToPathData(line) {
-	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
-	}
-	
-	function polygonToPathData(polygon) {
-	
-	    var d = [];
-	
-	    (0, _array.forEach)(polygon.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
-	
-	    d.push('Z');
-	
-	    return d.join(' ');
-	}
-	
-	function polylineToPathData(polyline) {
-	
-	    var d = [];
-	
-	    (0, _array.forEach)(polyline.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
-	
-	    return d.join(' ');
-	}
-	
-	function rectToPathData(rect) {
-	
-	    var x = parseFloat(rect.getAttribute('x')) || 0;
-	    var y = parseFloat(rect.getAttribute('y')) || 0;
-	    var w = parseFloat(rect.getAttribute('width')) || 0;
-	    var h = parseFloat(rect.getAttribute('height')) || 0;
-	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
-	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
-	    var r = x + w;
-	    var b = y + h;
-	
-	    var d;
-	
-	    if (!rx && !ry) {
-	
-	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
-	    } else {
-	
-	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
-	    }
-	    return d.join(' ');
-	}
-	
-	var KAPPA = 0.5522847498307935;
-	
-	function circleToPathData(circle) {
-	
-	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
-	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
-	    var r = parseFloat(circle.getAttribute('r'));
-	    var cd = r * KAPPA; // Control distance.
-	
-	    return ['M', cx, cy - r, // Move to the first point.
-	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
-	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
-	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
-	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
-	    'Z'].join(' ');
-	}
-	
-	function ellipseToPathData(ellipse) {
-	
-	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
-	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
-	    var rx = parseFloat(ellipse.getAttribute('rx'));
-	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
-	    var cdx = rx * KAPPA; // Control distance x.
-	    var cdy = ry * KAPPA; // Control distance y.
-	
-	    return ['M', cx, cy - ry, // Move to the first point.
-	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
-	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
-	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
-	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
-	    'Z'].join(' ');
-	}
-	
 	exports.isNode = isNode;
 	exports.createSvgDocument = createSvgDocument;
 	exports.createSvgElement = createSvgElement;
 	exports.setAttribute = setAttribute;
 	exports.getClassName = getClassName;
 	exports.getNodeName = getNodeName;
-	exports.parseScale = parseScale;
-	exports.parseRotate = parseRotate;
-	exports.parseTransform = parseTransform;
-	exports.parseTranslate = parseTranslate;
-	exports.clearScale = clearScale;
-	exports.clearRotate = clearRotate;
-	exports.clearTranslate = clearTranslate;
-	exports.lineToPathData = lineToPathData;
-	exports.rectToPathData = rectToPathData;
-	exports.circleToPathData = circleToPathData;
-	exports.ellipseToPathData = ellipseToPathData;
-	exports.polygonToPathData = polygonToPathData;
-	exports.polylineToPathData = polylineToPathData;
 
 /***/ },
 /* 10 */
@@ -5547,6 +5394,416 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = Rhombus;
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = undefined;
+	
+	var _array = __webpack_require__(6);
+	
+	function lineToPathData(line) {
+	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
+	}
+	
+	function polygonToPathData(polygon) {
+	
+	    var d = [];
+	
+	    (0, _array.forEach)(polygon.points, function (p, i) {
+	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	    });
+	
+	    d.push('Z');
+	
+	    return d.join(' ');
+	}
+	
+	function polylineToPathData(polyline) {
+	
+	    var d = [];
+	
+	    (0, _array.forEach)(polyline.points, function (p, i) {
+	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	    });
+	
+	    return d.join(' ');
+	}
+	
+	function rectToPathData(rect) {
+	
+	    var x = parseFloat(rect.getAttribute('x')) || 0;
+	    var y = parseFloat(rect.getAttribute('y')) || 0;
+	    var w = parseFloat(rect.getAttribute('width')) || 0;
+	    var h = parseFloat(rect.getAttribute('height')) || 0;
+	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
+	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
+	    var r = x + w;
+	    var b = y + h;
+	
+	    var d;
+	
+	    if (!rx && !ry) {
+	
+	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
+	    } else {
+	
+	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
+	    }
+	    return d.join(' ');
+	}
+	
+	var KAPPA = 0.5522847498307935;
+	
+	function circleToPathData(circle) {
+	
+	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
+	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
+	    var r = parseFloat(circle.getAttribute('r'));
+	    var cd = r * KAPPA; // Control distance.
+	
+	    return ['M', cx, cy - r, // Move to the first point.
+	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
+	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
+	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
+	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
+	    'Z'].join(' ');
+	}
+	
+	function ellipseToPathData(ellipse) {
+	
+	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
+	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
+	    var rx = parseFloat(ellipse.getAttribute('rx'));
+	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
+	    var cdx = rx * KAPPA; // Control distance x.
+	    var cdy = ry * KAPPA; // Control distance y.
+	
+	    return ['M', cx, cy - ry, // Move to the first point.
+	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
+	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
+	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
+	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
+	    'Z'].join(' ');
+	}
+	
+	exports.lineToPathData = lineToPathData;
+	exports.rectToPathData = rectToPathData;
+	exports.circleToPathData = circleToPathData;
+	exports.ellipseToPathData = ellipseToPathData;
+	exports.polygonToPathData = polygonToPathData;
+	exports.polylineToPathData = polylineToPathData;
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = undefined;
+	
+	var _string = __webpack_require__(4);
+	
+	var _number = __webpack_require__(7);
+	
+	// parse transform
+	// ---------------
+	
+	function parseTranslate(transform) {
+	
+	    var translate = { tx: 0, ty: 0 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/translate\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                translate.tx += (0, _number.toFloat)(arr[0]);
+	            }
+	
+	            if (arr[1]) {
+	                translate.ty += (0, _number.toFloat)(arr[1]);
+	            }
+	        }
+	    }
+	
+	    return translate;
+	}
+	
+	function parseScale(transform) {
+	
+	    var scale = { sx: 1, sy: 1 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/scale\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                scale.sx *= (0, _number.toFloat)(arr[0]);
+	            }
+	
+	            if (arr[1] || arr[0]) {
+	                scale.sy *= (0, _number.toFloat)(arr[1] || arr[0]);
+	            }
+	        }
+	    }
+	
+	    return scale;
+	}
+	
+	function parseRotate(transform) {
+	
+	    var rotate = { angle: 0 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/rotate\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                rotate.angle += (0, _number.toFloat)(arr[0]);
+	            }
+	
+	            if (arr[1] && arr[2]) {
+	                rotate.cx = (0, _number.toFloat)(arr[1]);
+	                rotate.cy = (0, _number.toFloat)(arr[2]);
+	            }
+	        }
+	    }
+	
+	    return rotate;
+	}
+	
+	function parseTransform(transform) {
+	    return {
+	        translate: parseTranslate(transform),
+	        rotate: parseRotate(transform),
+	        scale: parseScale(transform)
+	    };
+	}
+	
+	// clear transform
+	// ---------------
+	
+	function clearTranslate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearScale(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearRotate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+	}
+	
+	exports.parseScale = parseScale;
+	exports.parseRotate = parseRotate;
+	exports.parseTransform = parseTransform;
+	exports.parseTranslate = parseTranslate;
+	exports.clearScale = clearScale;
+	exports.clearRotate = clearRotate;
+	exports.clearTranslate = clearTranslate;
+
+/***/ },
+/* 37 */,
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.removeEventListener = exports.addEventListener = undefined;
+	
+	var _lang = __webpack_require__(3);
+	
+	var _array = __webpack_require__(6);
+	
+	var win = window;
+	var doc = document;
+	var isMatchSelector = (function () {
+	
+	    var testDiv = doc.createElement('div');
+	    var matchesSelector = testDiv.matches || testDiv.webkitMatchesSelector || testDiv.mozMatchesSelector || testDiv.msMatchesSelector || testDiv.oMatchesSelector;
+	    var hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
+	
+	    return function (element, selector) {
+	
+	        if (hasMatchesSelector) {
+	            return matchesSelector.call(element, selector);
+	        }
+	
+	        var parentElem = element.parentNode;
+	
+	        // if the element is an orphan, and the browser doesn't support matching
+	        // orphans, append it to a documentFragment
+	        if (!parentElem && !hasMatchesSelector) {
+	            parentElem = doc.createDocumentFragment();
+	            parentElem.appendChild(element);
+	        }
+	
+	        // from the parent element's context, get all nodes that match the selector
+	        var nodes = parentElem.querySelectorAll(selector);
+	
+	        return (0, _array.some)(nodes, function (node) {
+	            return node === element;
+	        });
+	    };
+	})();
+	
+	function fixEvent(event) {
+	    // add W3C standard event methods
+	    event.preventDefault = fixEvent.preventDefault;
+	    event.stopPropagation = fixEvent.stopPropagation;
+	    return event;
+	}
+	
+	fixEvent.preventDefault = function () {
+	    this.returnValue = false;
+	};
+	
+	fixEvent.stopPropagation = function () {
+	    this.cancelBubble = true;
+	};
+	
+	function handleEvent(event) {
+	
+	    var returnValue = true;
+	    var element = this;
+	
+	    // grab the event object (IE uses a global event object)
+	    event = event || fixEvent((doc.parentWindow || win).event);
+	
+	    // get a reference to the hash table of event handlers
+	    var handlers = element.events[event.type];
+	
+	    // execute each event handler
+	    for (var i in handlers) {
+	        element.$$handleEvent = handlers[i];
+	        if (element.$$handleEvent(event) === false) {
+	            returnValue = false;
+	        }
+	    }
+	    return returnValue;
+	}
+	
+	function addEvent(element, type, handler) {
+	
+	    if (element.addEventListener) {
+	        element.addEventListener(type, handler, false);
+	    } else {
+	
+	        // assign each event handler a unique ID
+	        if (!handler.$$guid) {
+	            handler.$$guid = ++addEvent.guid;
+	        }
+	
+	        // create a hash table of event types for the element
+	        if (!element.events) {
+	            element.events = {};
+	        }
+	
+	        var fixedName = 'on' + type;
+	
+	        // create a hash table of event handlers for each element/event pair
+	        var handlers = element.events[type];
+	        if (!handlers) {
+	            handlers = element.events[type] = {};
+	            // store the existing event handler (if there is one)
+	            if (element[fixedName]) {
+	                handlers[0] = element[fixedName];
+	            }
+	        }
+	        // store the event handler in the hash table
+	        handlers[handler.$$guid] = handler;
+	        // assign a global event handler to do all the work
+	        element[fixedName] = handleEvent;
+	    }
+	}
+	
+	addEvent.guid = 0;
+	
+	function getDelegateTarget(element, target, selector) {
+	    while (target && target !== element) {
+	        if (isMatchSelector(target, selector)) {
+	            return target;
+	        }
+	        target = target.parentElement;
+	    }
+	    return null;
+	}
+	
+	function addEventListener(element, type, selector, handler, once) {
+	
+	    if ((0, _lang.isFunction)(selector)) {
+	        return addEvent(element, type, selector);
+	    }
+	
+	    function wrapper(e) {
+	
+	        // if this event has a delegateTarget, then we add it to the event
+	        // object (so that handlers may have a reference to the delegator
+	        // element) and fire the callback
+	        if (e.delegateTarget = getDelegateTarget(element, e.target, selector)) {
+	            if (once === true) {
+	                removeEventListener(element, type, wrapper);
+	            }
+	            handler.call(element, e);
+	        }
+	    }
+	
+	    handler._delegateWrapper = wrapper;
+	    addEvent(element, type, wrapper);
+	
+	    return handler;
+	}
+	
+	function removeEventListener(element, type, handler) {
+	
+	    var wrapper = handler._delegateWrapper;
+	
+	    if (element.removeEventListener) {
+	        element.removeEventListener(type, handler, false);
+	        wrapper && element.removeEventListener(type, wrapper, false);
+	    } else {
+	        // delete the event handler from the hash table
+	        if (element.events && element.events[type]) {
+	            delete element.events[type][handler.$$guid];
+	
+	            if (wrapper) {
+	                delete element.events[type][wrapper.$$guid];
+	            }
+	        }
+	    }
+	}
+	
+	// exports
+	// -------
+	
+	exports.addEventListener = addEventListener;
+	exports.removeEventListener = removeEventListener;
 
 /***/ }
 /******/ ])
