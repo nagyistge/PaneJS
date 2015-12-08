@@ -1501,7 +1501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.contains = exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
+	exports.contains = exports.lastIndexOf = exports.reduceRight = exports.indexOf = exports.toArray = exports.forEach = exports.reduce = exports.filter = exports.every = exports.some = exports.map = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -1551,16 +1551,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return arr && indexOf(arr, item) >= 0;
 	}
 	
-	exports.toArray = toArray;
-	exports.indexOf = indexOf;
-	exports.lastIndexOf = lastIndexOf;
-	exports.every = every;
-	exports.some = some;
-	exports.forEach = forEach;
 	exports.map = map;
+	exports.some = some;
+	exports.every = every;
 	exports.filter = filter;
 	exports.reduce = reduce;
+	exports.forEach = forEach;
+	exports.toArray = toArray;
+	exports.indexOf = indexOf;
 	exports.reduceRight = reduceRight;
+	exports.lastIndexOf = lastIndexOf;
 	exports.contains = contains;
 
 /***/ },
@@ -1883,7 +1883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isNode = undefined;
+	exports.containsElem = exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isNode = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -2032,6 +2032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.setAttribute = setAttribute;
 	exports.createSvgElement = createSvgElement;
 	exports.createSvgDocument = createSvgDocument;
+	exports.containsElem = contains;
 
 /***/ },
 /* 10 */
@@ -4952,7 +4953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // drawPane gets transformed (scaled/rotated).
 	
 	            var that = this;
-	            var gridSize = that.gridSize.gridSize || 1;
+	            var gridSize = that.options.gridSize || 1;
 	            var localPoint = (0, _vector2.default)(that.drawPane).toLocalPoint(point.x, point.y);
 	
 	            return {
@@ -4975,9 +4976,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
 	            // used below won't work.
 	            if (_detector2.default.IS_FF) {
-	                var fakeRect = V('rect', {
-	                    width: this.options.width,
-	                    height: this.options.height,
+	                var fakeRect = (0, _vector2.default)('rect', {
+	                    width: that.options.width,
+	                    height: that.options.height,
 	                    x: 0,
 	                    y: 0,
 	                    opacity: 0
@@ -4988,7 +4989,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var paperOffset = (0, _utils.getOffset)(svg);
 	
 	            if (_detector2.default.IS_FF) {
-	                // clean up the fake rectangle
 	                fakeRect.remove();
 	            }
 	
@@ -5052,6 +5052,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (0, _utils.addEventListener)(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
 	            (0, _utils.addEventListener)(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
 	            (0, _utils.addEventListener)(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
+	
+	            // Disables built-in pan and zoom in IE10 and later
+	            if (_detector2.default.IS_POINTER) {
+	                that.container.style.msTouchAction = 'none';
+	            }
 	
 	            that.model.on('change', that.processChanges, that);
 	
@@ -5459,7 +5464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var svg = that.svg;
 	                var target = e.target;
 	
-	                if (svg === target || contains(svg, target)) {
+	                if (svg === target || (0, _utils.containsElem)(svg, target)) {
 	                    return true;
 	                }
 	            }

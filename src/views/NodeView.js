@@ -3,10 +3,10 @@ import {
     merge,
     forIn,
     forEach,
+    toFloat,
     contains,
     isObject,
     isUndefined,
-    toFloat,
     isPercentage,
     clearTranslate,
 } from '../common/utils';

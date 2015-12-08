@@ -49,17 +49,16 @@ function contains(arr, item) {
     return arr && indexOf(arr, item) >= 0;
 }
 
-
 export {
-    toArray,
-    indexOf,
-    lastIndexOf,
-    every,
-    some,
-    forEach,
     map,
+    some,
+    every,
     filter,
     reduce,
+    forEach,
+    toArray,
+    indexOf,
     reduceRight,
-    contains
+    lastIndexOf,
+    contains,
 };

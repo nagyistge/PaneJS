@@ -157,4 +157,5 @@ export {
     setAttribute,
     createSvgElement,
     createSvgDocument,
+    contains as containsElem,
 }

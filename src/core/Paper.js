@@ -4,6 +4,7 @@ import {
     isString,
     getOffset,
     snapToGrid,
+    containsElem,
     normalizeEvent,
     addEventListener,
     removeEventListener
@@ -85,7 +86,7 @@ class Paper extends Events {
         // drawPane gets transformed (scaled/rotated).
 
         var that = this;
-        var gridSize = that.gridSize.gridSize || 1;
+        var gridSize = that.options.gridSize || 1;
         var localPoint = vector(that.drawPane).toLocalPoint(point.x, point.y);
 
         return {
@@ -107,9 +108,9 @@ class Paper extends Events {
         // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
         // used below won't work.
         if (detector.IS_FF) {
-            var fakeRect = V('rect', {
-                width: this.options.width,
-                height: this.options.height,
+            var fakeRect = vector('rect', {
+                width: that.options.width,
+                height: that.options.height,
                 x: 0,
                 y: 0,
                 opacity: 0
@@ -120,7 +121,6 @@ class Paper extends Events {
         var paperOffset = getOffset(svg);
 
         if (detector.IS_FF) {
-            // clean up the fake rectangle
             fakeRect.remove();
         }
 
@@ -181,6 +181,11 @@ class Paper extends Events {
         addEventListener(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
         addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
         addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
+
+        // Disables built-in pan and zoom in IE10 and later
+        if (detector.IS_POINTER) {
+            that.container.style.msTouchAction = 'none';
+        }
 
         that.model.on('change', that.processChanges, that);
 
@@ -563,7 +568,7 @@ class Paper extends Events {
             var svg = that.svg;
             var target = e.target;
 
-            if (svg === target || contains(svg, target)) {
+            if (svg === target || containsElem(svg, target)) {
                 return true;
             }
         }
