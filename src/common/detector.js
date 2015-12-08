@@ -1,7 +1,7 @@
 var ua = navigator.userAgent;
 var av = navigator.appVersion;
 
-module.exports = {
+export default {
     // IE
     IS_IE: ua.indexOf('MSIE') >= 0,
 

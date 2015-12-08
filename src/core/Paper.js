@@ -2,14 +2,16 @@ import {
     merge,
     forEach,
     isString,
+    getOffset,
     snapToGrid,
     normalizeEvent,
     addEventListener,
     removeEventListener
 } from '../common/utils';
 
-import Events from '../common/Events';
-import vector from '../common/vector';
+import Events   from '../common/Events';
+import vector   from '../common/vector';
+import detector from '../common/detector';
 
 import Model    from './Model';
 import Cell     from '../cells/Cell';
@@ -96,38 +98,43 @@ class Paper extends Events {
 
         var that = this;
         var svg = that.svg;
-
         var svgPoint = svg.createSVGPoint();
-        svgPoint.x = p.x;
-        svgPoint.y = p.y;
 
-        // This is a hack for Firefox! If there wasn't a fake (non-visible) rectangle covering the
-        // whole SVG area, `$(paper.svg).offset()` used below won't work.
-        var fakeRect = V('rect', {
-            width: this.options.width,
-            height: this.options.height,
-            x: 0,
-            y: 0,
-            opacity: 0
-        });
+        svgPoint.x = point.x;
+        svgPoint.y = point.y;
 
-        svg.appendChild(fakeRect);
+        // This is a hack for Firefox! If there wasn't a fake (non-visible)
+        // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
+        // used below won't work.
+        if (detector.IS_FF) {
+            var fakeRect = V('rect', {
+                width: this.options.width,
+                height: this.options.height,
+                x: 0,
+                y: 0,
+                opacity: 0
+            });
+            svg.appendChild(fakeRect.node);
+        }
 
-        var paperOffset = $(this.svg).offset();
+        var paperOffset = getOffset(svg);
 
-        // Clean up the fake rectangle once we have the offset of the SVG document.
-        fakeRect.remove();
+        if (detector.IS_FF) {
+            // clean up the fake rectangle
+            fakeRect.remove();
+        }
 
-        var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
-        var scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
+        var doc = document;
+        var body = doc.body;
+        var docElem = doc.documentElement;
+        var scrollTop = body.scrollTop || docElem.scrollTop;
+        var scrollLeft = body.scrollLeft || docElem.scrollLeft;
 
         svgPoint.x += scrollLeft - paperOffset.left;
         svgPoint.y += scrollTop - paperOffset.top;
 
         // Transform point into the viewport coordinate system.
-        var pointTransformed = svgPoint.matrixTransform(this.viewport.getCTM().inverse());
-
-        return pointTransformed;
+        return svgPoint.matrixTransform(that.drawPane.getCTM().inverse());
     }
 
     // lift cycle
@@ -461,7 +468,11 @@ class Paper extends Events {
         return null;
     }
 
-    findViewByCell(cell) {}
+    findViewByCell(cell) {
+
+        var id = isString(cell) ? cell : cell.id;
+        return this.views[id];
+    }
 
     findViewByPoint(point) {}
 
@@ -563,7 +574,7 @@ class Paper extends Events {
         e = normalizeEvent(e);
 
         var that = this;
-        var view = this.findViewByElem(e.target);
+        var view = that.findViewByElem(e.target);
 
         if (!that.isValidEvent(e, view)) {
             return;
@@ -577,10 +588,28 @@ class Paper extends Events {
         } else {
             that.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
         }
-
     }
 
-    onMouseDblClick(e) {}
+    onMouseDblClick(e) {
+
+        e.preventDefault();
+        e = normalizeEvent(e);
+
+        var that = this;
+        var view = that.findViewByElem(e.target);
+
+        if (!that.isValidEvent(e, view)) {
+            return;
+        }
+
+        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+
+        if (view) {
+            view.pointerdblclick(e, localPoint.x, localPoint.y);
+        } else {
+            that.trigger('blank:pointerdblclick', e, localPoint.x, localPoint.y);
+        }
+    }
 
     onMouseClick(e) {}
 

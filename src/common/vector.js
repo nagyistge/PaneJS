@@ -645,9 +645,7 @@ export class VElement {
         point.y = y;
 
         try {
-
             // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
-
             var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
             var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
             return globalPoint.matrixTransform(globalToLocalMatrix);

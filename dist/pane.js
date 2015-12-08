@@ -846,9 +846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            point.y = y;
 	
 	            try {
-	
 	                // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
-	
 	                var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 	                var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
 	                return globalPoint.matrixTransform(globalToLocalMatrix);
@@ -4853,6 +4851,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
+	var _detector = __webpack_require__(38);
+	
+	var _detector2 = _interopRequireDefault(_detector);
+	
 	var _Model = __webpack_require__(25);
 	
 	var _Model2 = _interopRequireDefault(_Model);
@@ -4964,38 +4966,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	            var svg = that.svg;
-	
 	            var svgPoint = svg.createSVGPoint();
-	            svgPoint.x = p.x;
-	            svgPoint.y = p.y;
 	
-	            // This is a hack for Firefox! If there wasn't a fake (non-visible) rectangle covering the
-	            // whole SVG area, `$(paper.svg).offset()` used below won't work.
-	            var fakeRect = V('rect', {
-	                width: this.options.width,
-	                height: this.options.height,
-	                x: 0,
-	                y: 0,
-	                opacity: 0
-	            });
+	            svgPoint.x = point.x;
+	            svgPoint.y = point.y;
 	
-	            svg.appendChild(fakeRect);
+	            // This is a hack for Firefox! If there wasn't a fake (non-visible)
+	            // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
+	            // used below won't work.
+	            if (_detector2.default.IS_FF) {
+	                var fakeRect = V('rect', {
+	                    width: this.options.width,
+	                    height: this.options.height,
+	                    x: 0,
+	                    y: 0,
+	                    opacity: 0
+	                });
+	                svg.appendChild(fakeRect.node);
+	            }
 	
-	            var paperOffset = $(this.svg).offset();
+	            var paperOffset = (0, _utils.getOffset)(svg);
 	
-	            // Clean up the fake rectangle once we have the offset of the SVG document.
-	            fakeRect.remove();
+	            if (_detector2.default.IS_FF) {
+	                // clean up the fake rectangle
+	                fakeRect.remove();
+	            }
 	
-	            var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
-	            var scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
+	            var doc = document;
+	            var body = doc.body;
+	            var docElem = doc.documentElement;
+	            var scrollTop = body.scrollTop || docElem.scrollTop;
+	            var scrollLeft = body.scrollLeft || docElem.scrollLeft;
 	
 	            svgPoint.x += scrollLeft - paperOffset.left;
 	            svgPoint.y += scrollTop - paperOffset.top;
 	
 	            // Transform point into the viewport coordinate system.
-	            var pointTransformed = svgPoint.matrixTransform(this.viewport.getCTM().inverse());
-	
-	            return pointTransformed;
+	            return svgPoint.matrixTransform(that.drawPane.getCTM().inverse());
 	        }
 	
 	        // lift cycle
@@ -5353,7 +5360,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'findViewByCell',
-	        value: function findViewByCell(cell) {}
+	        value: function findViewByCell(cell) {
+	
+	            var id = (0, _utils.isString)(cell) ? cell : cell.id;
+	            return this.views[id];
+	        }
 	    }, {
 	        key: 'findViewByPoint',
 	        value: function findViewByPoint(point) {}
@@ -5460,7 +5471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            e = (0, _utils.normalizeEvent)(e);
 	
 	            var that = this;
-	            var view = this.findViewByElem(e.target);
+	            var view = that.findViewByElem(e.target);
 	
 	            if (!that.isValidEvent(e, view)) {
 	                return;
@@ -5477,7 +5488,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'onMouseDblClick',
-	        value: function onMouseDblClick(e) {}
+	        value: function onMouseDblClick(e) {
+	
+	            e.preventDefault();
+	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
+	            var view = that.findViewByElem(e.target);
+	
+	            if (!that.isValidEvent(e, view)) {
+	                return;
+	            }
+	
+	            var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+	
+	            if (view) {
+	                view.pointerdblclick(e, localPoint.x, localPoint.y);
+	            } else {
+	                that.trigger('blank:pointerdblclick', e, localPoint.x, localPoint.y);
+	            }
+	        }
 	    }, {
 	        key: 'onMouseClick',
 	        value: function onMouseClick(e) {}
@@ -6058,6 +6088,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = Rhombus;
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var ua = navigator.userAgent;
+	var av = navigator.appVersion;
+	
+	exports.default = {
+	    // IE
+	    IS_IE: ua.indexOf('MSIE') >= 0,
+	
+	    IS_IE11: !!ua.match(/Trident\/7\./),
+	
+	    // Netscape
+	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
+	
+	    // Firefox
+	    IS_FF: ua.indexOf('Firefox/') >= 0,
+	
+	    // Chrome
+	    IS_GC: ua.indexOf('Chrome/') >= 0,
+	
+	    // Safari
+	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
+	
+	    // Opera
+	    IS_OP: ua.indexOf('Opera/') >= 0,
+	
+	    // True if -o-transform is available as a CSS style. This is the case
+	    // for Opera browsers that use Presto/2.5 and later.
+	    IS_OT: ua.indexOf('Presto/2.4.') < 0 && ua.indexOf('Presto/2.3.') < 0 && ua.indexOf('Presto/2.2.') < 0 && ua.indexOf('Presto/2.1.') < 0 && ua.indexOf('Presto/2.0.') < 0 && ua.indexOf('Presto/1.') < 0,
+	
+	    // True if -moz-transform is available as a CSS style. This is the case
+	    // for all Firefox-based browsers newer than or equal 3, such as Camino,
+	    // Iceweasel, Seamonkey and Iceape.
+	    IS_MT: ua.indexOf('Firefox/') >= 0 && ua.indexOf('Firefox/1.') < 0 && ua.indexOf('Firefox/2.') < 0 || ua.indexOf('Iceweasel/') >= 0 && ua.indexOf('Iceweasel/1.') < 0 && ua.indexOf('Iceweasel/2.') < 0 || ua.indexOf('SeaMonkey/') >= 0 && ua.indexOf('SeaMonkey/1.') < 0 || ua.indexOf('Iceape/') >= 0 && ua.indexOf('Iceape/1.') < 0,
+	
+	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
+	
+	    IS_WIN: av.indexOf('Win') > 0,
+	
+	    IS_MAC: av.indexOf('Mac') > 0,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement,
+	
+	    IS_POINTER: window.navigator.msPointerEnabled || false
+	};
 
 /***/ }
 /******/ ])
