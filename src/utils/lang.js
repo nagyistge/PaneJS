@@ -63,6 +63,10 @@ function isNumeric(obj) {
     return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
 }
 
+function isWindow(obj) {
+    return obj && obj === obj.window;
+}
+
 function isPlainObject(obj) {
 
     // Not plain objects:
@@ -98,6 +102,7 @@ export {
     isNull,
     isType,
     isArray,
+    isWindow,
     isObject,
     isString,
     isBoolean,

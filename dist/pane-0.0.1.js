@@ -1445,6 +1445,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return !isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
 	}
 	
+	function isWindow(obj) {
+	    return obj && obj === obj.window;
+	}
+	
 	function isPlainObject(obj) {
 	
 	    // Not plain objects:
@@ -1478,6 +1482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isNull = isNull;
 	exports.isType = isType;
 	exports.isArray = isArray;
+	exports.isWindow = isWindow;
 	exports.isObject = isObject;
 	exports.isString = isString;
 	exports.isBoolean = isBoolean;
@@ -1880,7 +1885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isWindow = exports.isNode = undefined;
+	exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isNode = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -1896,10 +1901,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return ret;
-	}
-	
-	function isWindow(obj) {
-	    return obj && obj === obj.window;
 	}
 	
 	var docElem = document.documentElement;
@@ -1921,7 +1922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	function getWindow(elem) {
-	    return isWindow(elem) ? elem : elem.nodeType === 9 ? elem.defaultView || elem.parentWindow : false;
+	    return (0, _lang.isWindow)(elem) ? elem : elem.nodeType === 9 ? elem.defaultView || elem.parentWindow : false;
 	}
 	
 	function getOffset(elem) {
@@ -2026,7 +2027,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.isNode = isNode;
-	exports.isWindow = isWindow;
 	exports.getWindow = getWindow;
 	exports.getOffset = getOffset;
 	exports.getNodeName = getNodeName;
@@ -5457,8 +5457,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onContextMenu',
 	        value: function onContextMenu(e) {
 	
-	            var that = this;
 	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
 	            var view = this.findViewByElem(e.target);
 	
 	            if (!that.isValidEvent(e, view)) {

@@ -1,4 +1,4 @@
-import { isUndefined } from './lang';
+import { isUndefined, isWindow } from './lang';
 
 function isNode(elem, nodeName, attrName, attrValue) {
     var ret = elem && !isNaN(elem.nodeType);
@@ -12,10 +12,6 @@ function isNode(elem, nodeName, attrName, attrValue) {
     }
 
     return ret;
-}
-
-function isWindow(obj) {
-    return obj && obj === obj.window;
 }
 
 var docElem = document.documentElement;
@@ -154,7 +150,6 @@ function setAttribute(elem, name, value) {
 
 export {
     isNode,
-    isWindow,
     getWindow,
     getOffset,
     getNodeName,

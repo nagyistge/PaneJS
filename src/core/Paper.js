@@ -560,8 +560,9 @@ class Paper extends Events {
 
     onContextMenu(e) {
 
-        var that = this;
         e = normalizeEvent(e);
+
+        var that = this;
         var view = this.findViewByElem(e.target);
 
         if (!that.isValidEvent(e, view)) {
