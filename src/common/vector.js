@@ -634,9 +634,30 @@ export class VElement {
     }
 
     toLocalPoint(x, y) {
+
         // Convert global point into the coordinate space of this element.
 
+        var that = this;
+        var svg = that.getSVG().node;
+        var point = svg.createSVGPoint();
 
+        point.x = x;
+        point.y = y;
+
+        try {
+
+            // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
+
+            var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+            var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+            return globalPoint.matrixTransform(globalToLocalMatrix);
+
+        } catch (e) {
+            // IE9 throws an exception in odd cases.
+            // (`Unexpected call to method or property access`)
+            // We have to make do with the original coordianates.
+            return point;
+        }
     }
 
     translateCenterToPoint() {}

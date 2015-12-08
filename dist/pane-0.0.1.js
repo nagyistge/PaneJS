@@ -76,91 +76,91 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector3 = _interopRequireDefault(_vector2);
 	
-	var _Events2 = __webpack_require__(11);
+	var _Events2 = __webpack_require__(14);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _Cell2 = __webpack_require__(12);
+	var _Cell2 = __webpack_require__(15);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
-	var _Link2 = __webpack_require__(13);
+	var _Link2 = __webpack_require__(16);
 	
 	var _Link3 = _interopRequireDefault(_Link2);
 	
-	var _Node2 = __webpack_require__(14);
+	var _Node2 = __webpack_require__(17);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
-	var _CellView2 = __webpack_require__(15);
+	var _CellView2 = __webpack_require__(18);
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
-	var _LinkView2 = __webpack_require__(17);
+	var _LinkView2 = __webpack_require__(20);
 	
 	var _LinkView3 = _interopRequireDefault(_LinkView2);
 	
-	var _NodeView2 = __webpack_require__(18);
+	var _NodeView2 = __webpack_require__(21);
 	
 	var _NodeView3 = _interopRequireDefault(_NodeView2);
 	
-	var _Change2 = __webpack_require__(19);
+	var _Change2 = __webpack_require__(22);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
-	var _RootChange2 = __webpack_require__(20);
+	var _RootChange2 = __webpack_require__(23);
 	
 	var _RootChange3 = _interopRequireDefault(_RootChange2);
 	
-	var _ChildChange2 = __webpack_require__(21);
+	var _ChildChange2 = __webpack_require__(24);
 	
 	var _ChildChange3 = _interopRequireDefault(_ChildChange2);
 	
-	var _Model2 = __webpack_require__(22);
+	var _Model2 = __webpack_require__(25);
 	
 	var _Model3 = _interopRequireDefault(_Model2);
 	
-	var _Paper2 = __webpack_require__(24);
+	var _Paper2 = __webpack_require__(27);
 	
 	var _Paper3 = _interopRequireDefault(_Paper2);
 	
-	var _Generic = __webpack_require__(25);
+	var _Generic = __webpack_require__(28);
 	
 	var _Generic2 = _interopRequireDefault(_Generic);
 	
-	var _Text = __webpack_require__(26);
+	var _Text = __webpack_require__(29);
 	
 	var _Text2 = _interopRequireDefault(_Text);
 	
-	var _Rect = __webpack_require__(27);
+	var _Rect = __webpack_require__(30);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Circle = __webpack_require__(28);
+	var _Circle = __webpack_require__(31);
 	
 	var _Circle2 = _interopRequireDefault(_Circle);
 	
-	var _Ellipse = __webpack_require__(29);
+	var _Ellipse = __webpack_require__(32);
 	
 	var _Ellipse2 = _interopRequireDefault(_Ellipse);
 	
-	var _Image = __webpack_require__(30);
+	var _Image = __webpack_require__(33);
 	
 	var _Image2 = _interopRequireDefault(_Image);
 	
-	var _Path = __webpack_require__(31);
+	var _Path = __webpack_require__(34);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Polygon = __webpack_require__(32);
+	var _Polygon = __webpack_require__(35);
 	
 	var _Polygon2 = _interopRequireDefault(_Polygon);
 	
-	var _Polyline = __webpack_require__(33);
+	var _Polyline = __webpack_require__(36);
 	
 	var _Polyline2 = _interopRequireDefault(_Polyline);
 	
-	var _Rhombus = __webpack_require__(34);
+	var _Rhombus = __webpack_require__(37);
 	
 	var _Rhombus2 = _interopRequireDefault(_Rhombus);
 	
@@ -835,8 +835,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'toLocalPoint',
 	        value: function toLocalPoint(x, y) {
+	
 	            // Convert global point into the coordinate space of this element.
 	
+	            var that = this;
+	            var svg = that.getSVG().node;
+	            var point = svg.createSVGPoint();
+	
+	            point.x = x;
+	            point.y = y;
+	
+	            try {
+	
+	                // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
+	
+	                var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+	                var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+	                return globalPoint.matrixTransform(globalToLocalMatrix);
+	            } catch (e) {
+	                // IE9 throws an exception in odd cases.
+	                // (`Unexpected call to method or property access`)
+	                // We have to make do with the original coordianates.
+	                return point;
+	            }
 	        }
 	    }, {
 	        key: 'translateCenterToPoint',
@@ -1166,7 +1187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret === 'continue') continue;
 	}
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(4);
 	
 	var _loop2 = function _loop2(_key13) {
 	  if (_key13 === "default") return 'continue';
@@ -1184,7 +1205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret2 === 'continue') continue;
 	}
 	
-	var _string = __webpack_require__(4);
+	var _string = __webpack_require__(5);
 	
 	var _loop3 = function _loop3(_key14) {
 	  if (_key14 === "default") return 'continue';
@@ -1220,7 +1241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret4 === 'continue') continue;
 	}
 	
-	var _object = __webpack_require__(5);
+	var _object = __webpack_require__(6);
 	
 	var _loop5 = function _loop5(_key16) {
 	  if (_key16 === "default") return 'continue';
@@ -1292,7 +1313,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret8 === 'continue') continue;
 	}
 	
-	var _event = __webpack_require__(38);
+	var _event = __webpack_require__(11);
 	
 	var _loop9 = function _loop9(_key20) {
 	  if (_key20 === "default") return 'continue';
@@ -1310,7 +1331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret9 === 'continue') continue;
 	}
 	
-	var _pathData = __webpack_require__(35);
+	var _pathData = __webpack_require__(12);
 	
 	var _loop10 = function _loop10(_key21) {
 	  if (_key21 === "default") return 'continue';
@@ -1328,7 +1349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (_ret10 === 'continue') continue;
 	}
 	
-	var _transform = __webpack_require__(36);
+	var _transform = __webpack_require__(13);
 	
 	var _loop11 = function _loop11(_key22) {
 	  if (_key22 === "default") return 'continue';
@@ -1402,10 +1423,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return isType(obj, 'Function');
 	}
 	
-	function isWindow(obj) {
-	    return obj && obj === obj.window;
-	}
-	
 	function isArray(obj) {
 	    return Array.isArray(obj);
 	}
@@ -1455,12 +1472,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return true;
 	}
 	
+	// exports
+	// -------
+	
 	exports.isNull = isNull;
 	exports.isType = isType;
 	exports.isArray = isArray;
 	exports.isObject = isObject;
 	exports.isString = isString;
-	exports.isWindow = isWindow;
 	exports.isBoolean = isBoolean;
 	exports.isNumeric = isNumeric;
 	exports.isFunction = isFunction;
@@ -1479,9 +1498,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.contains = exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
+	
+	var _lang = __webpack_require__(3);
+	
+	var proto = Array.prototype;
+	
+	function toArray(obj) {
+	    return (0, _lang.isArray)(obj) ? obj : (0, _lang.isArrayLike)(obj) ? proto.slice.call(obj) : [obj];
+	}
+	
+	function indexOf(arr, item) {
+	    return arr ? proto.indexOf.call(arr, item) : -1;
+	}
+	
+	function lastIndexOf(arr, item) {
+	    return arr ? proto.lastIndexOf.call(arr, item) : -1;
+	}
+	
+	function every(arr, iterator, context) {
+	    return arr ? proto.every.call(arr, iterator, context) : false;
+	}
+	
+	function some(arr, iterator, context) {
+	    return arr ? proto.some.call(arr, iterator, context) : false;
+	}
+	
+	function forEach(arr, iterator, context) {
+	    arr && proto.forEach.call(arr, iterator, context);
+	}
+	
+	function map(arr, iterator, context) {
+	    return arr ? proto.map.call(arr, iterator, context) : [];
+	}
+	
+	function filter(arr, iterator, context) {
+	    return arr ? proto.filter.call(arr, iterator, context) : [];
+	}
+	
+	function reduce(arr, iterator, initialValue) {
+	    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
+	}
+	
+	function reduceRight(arr, iterator, initialValue) {
+	    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
+	}
+	
+	function contains(arr, item) {
+	    return arr && indexOf(arr, item) >= 0;
+	}
+	
+	exports.toArray = toArray;
+	exports.indexOf = indexOf;
+	exports.lastIndexOf = lastIndexOf;
+	exports.every = every;
+	exports.some = some;
+	exports.forEach = forEach;
+	exports.map = map;
+	exports.filter = filter;
+	exports.reduce = reduce;
+	exports.reduceRight = reduceRight;
+	exports.contains = contains;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 	exports.sanitizeText = exports.toString = exports.hashCode = exports.format = exports.uuid = exports.trim = exports.uc = exports.lc = undefined;
 	
-	var _object = __webpack_require__(5);
+	var _object = __webpack_require__(6);
 	
 	var proto = String.prototype;
 	
@@ -1564,7 +1654,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.sanitizeText = sanitizeText;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1574,7 +1664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.getByPath = exports.destroy = exports.extend = exports.merge = exports.forIn = exports.keys = exports.hasKey = undefined;
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(4);
 	
 	var _lang = __webpack_require__(3);
 	
@@ -1690,77 +1780,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getByPath = getByPath;
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.contains = exports.reduceRight = exports.reduce = exports.filter = exports.map = exports.forEach = exports.some = exports.every = exports.lastIndexOf = exports.indexOf = exports.toArray = undefined;
-	
-	var _lang = __webpack_require__(3);
-	
-	var proto = Array.prototype;
-	
-	function toArray(obj) {
-	    return (0, _lang.isArray)(obj) ? obj : (0, _lang.isArrayLike)(obj) ? proto.slice.call(obj) : [obj];
-	}
-	
-	function indexOf(arr, item) {
-	    return arr ? proto.indexOf.call(arr, item) : -1;
-	}
-	
-	function lastIndexOf(arr, item) {
-	    return arr ? proto.lastIndexOf.call(arr, item) : -1;
-	}
-	
-	function every(arr, iterator, context) {
-	    return arr ? proto.every.call(arr, iterator, context) : false;
-	}
-	
-	function some(arr, iterator, context) {
-	    return arr ? proto.some.call(arr, iterator, context) : false;
-	}
-	
-	function forEach(arr, iterator, context) {
-	    arr && proto.forEach.call(arr, iterator, context);
-	}
-	
-	function map(arr, iterator, context) {
-	    return arr ? proto.map.call(arr, iterator, context) : [];
-	}
-	
-	function filter(arr, iterator, context) {
-	    return arr ? proto.filter.call(arr, iterator, context) : [];
-	}
-	
-	function reduce(arr, iterator, initialValue) {
-	    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
-	}
-	
-	function reduceRight(arr, iterator, initialValue) {
-	    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
-	}
-	
-	function contains(arr, item) {
-	    return arr && indexOf(arr, item) >= 0;
-	}
-	
-	exports.toArray = toArray;
-	exports.indexOf = indexOf;
-	exports.lastIndexOf = lastIndexOf;
-	exports.every = every;
-	exports.some = some;
-	exports.forEach = forEach;
-	exports.map = map;
-	exports.filter = filter;
-	exports.reduce = reduce;
-	exports.reduceRight = reduceRight;
-	exports.contains = contains;
-
-/***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1861,7 +1880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.getNodeName = exports.getClassName = exports.setAttribute = exports.createSvgElement = exports.createSvgDocument = exports.isNode = undefined;
+	exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isWindow = exports.isNode = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -1879,12 +1898,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	}
 	
-	function getClassName(elem) {
-	    return elem.getAttribute && elem.getAttribute('class') || '';
+	function isWindow(obj) {
+	    return obj && obj === obj.window;
+	}
+	
+	var docElem = document.documentElement;
+	var contains = docElem.compareDocumentPosition || docElem.contains ? function (context, elem) {
+	
+	    var aDown = context.nodeType === 9 ? context.documentElement : context;
+	    var bUp = elem && elem.parentNode;
+	
+	    return context === bUp || !!(bUp && bUp.nodeType === 1 && (aDown.contains ? aDown.contains(bUp) : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16));
+	} : function (context, elem) {
+	    if (elem) {
+	        while (elem = elem.parentNode) {
+	            if (elem === context) {
+	                return true;
+	            }
+	        }
+	    }
+	    return false;
+	};
+	
+	function getWindow(elem) {
+	    return isWindow(elem) ? elem : elem.nodeType === 9 ? elem.defaultView || elem.parentWindow : false;
+	}
+	
+	function getOffset(elem) {
+	
+	    var box = { top: 0, left: 0 };
+	    var doc = elem && elem.ownerDocument;
+	
+	    if (!doc) {
+	        return box;
+	    }
+	
+	    var docElem = doc.documentElement;
+	
+	    // Make sure it's not a disconnected DOM node
+	    if (!contains(docElem, elem)) {
+	        return box;
+	    }
+	
+	    // If we don't have gBCR, just use 0,0 rather than error
+	    // BlackBerry 5, iOS 3 (original iPhone)
+	    if (!(0, _lang.isUndefined)(elem.getBoundingClientRect)) {
+	        box = elem.getBoundingClientRect();
+	    }
+	
+	    var win = getWindow(doc);
+	
+	    return {
+	        top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0),
+	        left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0)
+	    };
 	}
 	
 	function getNodeName(elem) {
 	    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
+	}
+	
+	function getClassName(elem) {
+	    return elem.getAttribute && elem.getAttribute('class') || '';
 	}
 	
 	// xml namespaces.
@@ -1947,12 +2022,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
+	// exports
+	// -------
+	
 	exports.isNode = isNode;
-	exports.createSvgDocument = createSvgDocument;
-	exports.createSvgElement = createSvgElement;
-	exports.setAttribute = setAttribute;
-	exports.getClassName = getClassName;
+	exports.isWindow = isWindow;
+	exports.getWindow = getWindow;
+	exports.getOffset = getOffset;
 	exports.getNodeName = getNodeName;
+	exports.getClassName = getClassName;
+	exports.setAttribute = setAttribute;
+	exports.createSvgElement = createSvgElement;
+	exports.createSvgDocument = createSvgDocument;
 
 /***/ },
 /* 10 */
@@ -1991,6 +2072,434 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.removeEventListener = exports.addEventListener = exports.normalizeEvent = undefined;
+	
+	var _lang = __webpack_require__(3);
+	
+	var _array = __webpack_require__(4);
+	
+	var win = window;
+	var doc = document;
+	var isMatchSelector = (function () {
+	
+	    var testDiv = doc.createElement('div');
+	    var matchesSelector = testDiv.matches || testDiv.webkitMatchesSelector || testDiv.mozMatchesSelector || testDiv.msMatchesSelector || testDiv.oMatchesSelector;
+	    var hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
+	
+	    return function (elem, selector) {
+	
+	        if (hasMatchesSelector) {
+	            return matchesSelector.call(elem, selector);
+	        }
+	
+	        var parent = elem.parentNode;
+	
+	        // if the element is an orphan, and the browser doesn't support matching
+	        // orphans, append it to a documentFragment
+	        if (!parent && !hasMatchesSelector) {
+	            parent = doc.createDocumentFragment();
+	            parent.appendChild(elem);
+	        }
+	
+	        // from the parent element's context, get all nodes that match the selector
+	        var nodes = parent.querySelectorAll(selector);
+	
+	        return (0, _array.some)(nodes, function (node) {
+	            return node === elem;
+	        });
+	    };
+	})();
+	
+	function fixEvent(event) {
+	    // add W3C standard event methods
+	    event.preventDefault = fixEvent.preventDefault;
+	    event.stopPropagation = fixEvent.stopPropagation;
+	    return event;
+	}
+	
+	fixEvent.preventDefault = function () {
+	    this.returnValue = false;
+	};
+	
+	fixEvent.stopPropagation = function () {
+	    this.cancelBubble = true;
+	};
+	
+	function handleEvent(event) {
+	
+	    var returnValue = true;
+	    var element = this;
+	
+	    // grab the event object (IE uses a global event object)
+	    event = event || fixEvent((doc.parentWindow || win).event);
+	
+	    // get a reference to the hash table of event handlers
+	    var handlers = element.events[event.type];
+	
+	    // execute each event handler
+	    for (var i in handlers) {
+	        element.$$handleEvent = handlers[i];
+	        if (element.$$handleEvent(event) === false) {
+	            returnValue = false;
+	        }
+	    }
+	    return returnValue;
+	}
+	
+	function addEvent(elem, type, handler) {
+	
+	    if (elem.addEventListener) {
+	        elem.addEventListener(type, handler, false);
+	    } else {
+	
+	        // assign each event handler a unique ID
+	        if (!handler.$$guid) {
+	            handler.$$guid = ++addEvent.guid;
+	        }
+	
+	        // create a hash table of event types for the element
+	        if (!elem.events) {
+	            elem.events = {};
+	        }
+	
+	        var fixedName = 'on' + type;
+	
+	        // create a hash table of event handlers for each element/event pair
+	        var handlers = elem.events[type];
+	        if (!handlers) {
+	            handlers = elem.events[type] = {};
+	            // store the existing event handler (if there is one)
+	            if (elem[fixedName]) {
+	                handlers[0] = elem[fixedName];
+	            }
+	        }
+	        // store the event handler in the hash table
+	        handlers[handler.$$guid] = handler;
+	        // assign a global event handler to do all the work
+	        elem[fixedName] = handleEvent;
+	    }
+	}
+	
+	addEvent.guid = 0;
+	
+	function getDelegateTarget(elem, target, selector) {
+	    while (target && target !== elem) {
+	        if (isMatchSelector(target, selector)) {
+	            return target;
+	        }
+	        target = target.parentElement;
+	    }
+	    return null;
+	}
+	
+	function addEventListener(elem, type, selector, handler, once) {
+	
+	    if ((0, _lang.isFunction)(selector)) {
+	        return addEvent(elem, type, selector);
+	    }
+	
+	    function wrapper(e) {
+	
+	        // if this event has a delegateTarget, then we add it to the event
+	        // object (so that handlers may have a reference to the delegator
+	        // element) and fire the callback
+	        if (e.delegateTarget = getDelegateTarget(elem, e.target, selector)) {
+	            if (once === true) {
+	                removeEventListener(elem, type, wrapper);
+	            }
+	            handler.call(elem, e);
+	        }
+	    }
+	
+	    handler._delegateWrapper = wrapper;
+	    addEvent(elem, type, wrapper);
+	
+	    return handler;
+	}
+	
+	function removeEventListener(elem, type, handler) {
+	
+	    var wrapper = handler._delegateWrapper;
+	
+	    if (elem.removeEventListener) {
+	        elem.removeEventListener(type, handler, false);
+	        wrapper && elem.removeEventListener(type, wrapper, false);
+	    } else {
+	        // delete the event handler from the hash table
+	        if (elem.events && elem.events[type]) {
+	            delete elem.events[type][handler.$$guid];
+	
+	            if (wrapper) {
+	                delete elem.events[type][wrapper.$$guid];
+	            }
+	        }
+	    }
+	}
+	
+	function normalizeEvent(evt) {
+	
+	    var touchEvt = evt.originalEvent && evt.originalEvent.changedTouches && evt.originalEvent.changedTouches[0];
+	
+	    if (touchEvt) {
+	        for (var property in evt) {
+	            // copy all the properties from the input event that are not
+	            // defined on the touch event (functions included).
+	            if (touchEvt[property] === undefined) {
+	                touchEvt[property] = evt[property];
+	            }
+	        }
+	        return touchEvt;
+	    }
+	
+	    return evt;
+	}
+	
+	// exports
+	// -------
+	
+	exports.normalizeEvent = normalizeEvent;
+	exports.addEventListener = addEventListener;
+	exports.removeEventListener = removeEventListener;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = undefined;
+	
+	var _array = __webpack_require__(4);
+	
+	function lineToPathData(line) {
+	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
+	}
+	
+	function polygonToPathData(polygon) {
+	
+	    var d = [];
+	
+	    (0, _array.forEach)(polygon.points, function (p, i) {
+	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	    });
+	
+	    d.push('Z');
+	
+	    return d.join(' ');
+	}
+	
+	function polylineToPathData(polyline) {
+	
+	    var d = [];
+	
+	    (0, _array.forEach)(polyline.points, function (p, i) {
+	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	    });
+	
+	    return d.join(' ');
+	}
+	
+	function rectToPathData(rect) {
+	
+	    var x = parseFloat(rect.getAttribute('x')) || 0;
+	    var y = parseFloat(rect.getAttribute('y')) || 0;
+	    var w = parseFloat(rect.getAttribute('width')) || 0;
+	    var h = parseFloat(rect.getAttribute('height')) || 0;
+	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
+	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
+	    var r = x + w;
+	    var b = y + h;
+	
+	    var d;
+	
+	    if (!rx && !ry) {
+	
+	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
+	    } else {
+	
+	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
+	    }
+	    return d.join(' ');
+	}
+	
+	var KAPPA = 0.5522847498307935;
+	
+	function circleToPathData(circle) {
+	
+	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
+	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
+	    var r = parseFloat(circle.getAttribute('r'));
+	    var cd = r * KAPPA; // Control distance.
+	
+	    return ['M', cx, cy - r, // Move to the first point.
+	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
+	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
+	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
+	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
+	    'Z'].join(' ');
+	}
+	
+	function ellipseToPathData(ellipse) {
+	
+	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
+	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
+	    var rx = parseFloat(ellipse.getAttribute('rx'));
+	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
+	    var cdx = rx * KAPPA; // Control distance x.
+	    var cdy = ry * KAPPA; // Control distance y.
+	
+	    return ['M', cx, cy - ry, // Move to the first point.
+	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
+	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
+	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
+	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
+	    'Z'].join(' ');
+	}
+	
+	exports.lineToPathData = lineToPathData;
+	exports.rectToPathData = rectToPathData;
+	exports.circleToPathData = circleToPathData;
+	exports.ellipseToPathData = ellipseToPathData;
+	exports.polygonToPathData = polygonToPathData;
+	exports.polylineToPathData = polylineToPathData;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = undefined;
+	
+	var _string = __webpack_require__(5);
+	
+	var _number = __webpack_require__(7);
+	
+	// parse transform
+	// ---------------
+	
+	function parseTranslate(transform) {
+	
+	    var translate = { tx: 0, ty: 0 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/translate\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                translate.tx += (0, _number.toFloat)(arr[0]);
+	            }
+	
+	            if (arr[1]) {
+	                translate.ty += (0, _number.toFloat)(arr[1]);
+	            }
+	        }
+	    }
+	
+	    return translate;
+	}
+	
+	function parseScale(transform) {
+	
+	    var scale = { sx: 1, sy: 1 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/scale\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                scale.sx *= (0, _number.toFloat)(arr[0]);
+	            }
+	
+	            if (arr[1] || arr[0]) {
+	                scale.sy *= (0, _number.toFloat)(arr[1] || arr[0]);
+	            }
+	        }
+	    }
+	
+	    return scale;
+	}
+	
+	function parseRotate(transform) {
+	
+	    var rotate = { angle: 0 };
+	
+	    if (transform) {
+	
+	        var separator = /[ ,]+/;
+	
+	        var match = transform.match(/rotate\((.*)\)/);
+	        if (match) {
+	            var arr = match[1].split(separator);
+	
+	            if (arr[0]) {
+	                rotate.angle += (0, _number.toFloat)(arr[0]);
+	            }
+	
+	            if (arr[1] && arr[2]) {
+	                rotate.cx = (0, _number.toFloat)(arr[1]);
+	                rotate.cy = (0, _number.toFloat)(arr[2]);
+	            }
+	        }
+	    }
+	
+	    return rotate;
+	}
+	
+	function parseTransform(transform) {
+	    return {
+	        translate: parseTranslate(transform),
+	        rotate: parseRotate(transform),
+	        scale: parseScale(transform)
+	    };
+	}
+	
+	// clear transform
+	// ---------------
+	
+	function clearTranslate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearScale(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
+	}
+	
+	function clearRotate(transform) {
+	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+	}
+	
+	exports.parseScale = parseScale;
+	exports.parseRotate = parseRotate;
+	exports.parseTransform = parseTransform;
+	exports.parseTranslate = parseTranslate;
+	exports.clearScale = clearScale;
+	exports.clearRotate = clearRotate;
+	exports.clearTranslate = clearTranslate;
+
+/***/ },
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2143,7 +2652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Events;
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2464,7 +2973,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Cell;
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2475,7 +2984,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Cell2 = __webpack_require__(12);
+	var _Cell2 = __webpack_require__(15);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
@@ -2509,7 +3018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Link;
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2520,7 +3029,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Cell2 = __webpack_require__(12);
+	var _Cell2 = __webpack_require__(15);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
@@ -2592,7 +3101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Node;
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2605,17 +3114,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var _filters = __webpack_require__(16);
-	
-	var _filters2 = _interopRequireDefault(_filters);
-	
-	var _Events = __webpack_require__(11);
+	var _Events = __webpack_require__(14);
 	
 	var _Events2 = _interopRequireDefault(_Events);
 	
 	var _vector = __webpack_require__(1);
 	
 	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _filters = __webpack_require__(19);
+	
+	var _filters2 = _interopRequireDefault(_filters);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2632,6 +3141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.invalid = true;
 	
 	        that.ensureElement();
+	
+	        // attach cell's id to elem
+	        that.elem.cellId = cell.id;
 	    }
 	
 	    _createClass(CellView, [{
@@ -2639,13 +3151,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function ensureElement() {
 	
 	            var that = this;
+	            var vElem = (0, _vector2.default)('g');
 	
-	            var vel = (0, _vector2.default)('g');
-	
-	            that.el = vel.node;
-	            that.vel = vel;
-	
-	            that.paper.drawPane.appendChild(that.el);
+	            that.elem = vElem.node;
+	            that.vElem = vElem;
+	            that.paper.drawPane.appendChild(that.elem);
 	
 	            return that;
 	        }
@@ -2662,7 +3172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'find',
 	        value: function find(selector) {
-	            return selector === '.' ? [this.vel] : this.vel.find(selector);
+	            return selector === '.' ? [this.vElem] : this.vElem.find(selector);
 	        }
 	    }, {
 	        key: 'applyFilter',
@@ -2718,8 +3228,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (0, _vector2.default)(svg).getDefs().append(vFilter);
 	            }
 	
-	            (0, _utils.forEach)(vElements, function (vel) {
-	                vel.attr(filter, 'url(#' + filterId + ')');
+	            (0, _utils.forEach)(vElements, function (vElem) {
+	                vElem.attr(filter, 'url(#' + filterId + ')');
 	            });
 	
 	            return that;
@@ -2773,8 +3283,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (0, _vector2.default)(svg).getDefs().append(vGradient);
 	            }
 	
-	            (0, _utils.forEach)(vElements, function (vel) {
-	                vel.attr(attrName, 'url(#' + gradientId + ')');
+	            (0, _utils.forEach)(vElements, function (vElem) {
+	                vElem.attr(attrName, 'url(#' + gradientId + ')');
 	            });
 	
 	            return that;
@@ -2808,10 +3318,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function destroy() {
 	
 	            var that = this;
-	            var el = that.el;
+	            var elem = that.elem;
 	
-	            if (el && el.parentNode) {
-	                el.parentNode.removeChild(el);
+	            if (elem && elem.parentNode) {
+	                elem.parentNode.removeChild(elem);
 	            }
 	        }
 	    }]);
@@ -2822,7 +3332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CellView;
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3010,13 +3520,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = filters;
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3033,7 +3543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _CellView2 = __webpack_require__(15);
+	var _CellView2 = __webpack_require__(18);
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
@@ -3073,35 +3583,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
 	
-	                var vElements = that.find(selector);
+	                var vElems = that.find(selector);
 	
-	                if (!vElements.length) {
+	                if (!vElems.length) {
 	                    return;
 	                }
 	
-	                nodesBySelector[selector] = vElements;
+	                nodesBySelector[selector] = vElems;
 	
 	                var specialAttributes = NodeView.specialAttributes.slice();
 	
 	                if ((0, _utils.isObject)(attrs.filter)) {
 	                    specialAttributes.push('filter');
-	                    that.applyFilter(vElements, attrs.filter);
+	                    that.applyFilter(vElems, attrs.filter);
 	                }
 	
 	                if ((0, _utils.isObject)(attrs.fill)) {
 	                    specialAttributes.push('fill');
-	                    that.applyGradient(vElements, 'fill', attrs.fill);
+	                    that.applyGradient(vElems, 'fill', attrs.fill);
 	                }
 	
 	                if ((0, _utils.isObject)(attrs.stroke)) {
 	                    specialAttributes.push('stroke');
-	                    that.applyGradient(vElements, 'stroke', attrs.stroke);
+	                    that.applyGradient(vElems, 'stroke', attrs.stroke);
 	                }
 	
 	                if (!(0, _utils.isUndefined)(attrs.text)) {
 	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
-	                    (0, _utils.forEach)(vElements, function (vel) {
-	                        vel.text(attrs.text + '', {
+	                    (0, _utils.forEach)(vElems, function (vElem) {
+	                        vElem.text(attrs.text + '', {
 	                            lineHeight: attrs.lineHeight,
 	                            textPath: attrs.textPath,
 	                            annotations: attrs.annotations
@@ -3118,24 +3628,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	
 	                // set regular attributes
-	                (0, _utils.forEach)(vElements, function (vel) {
-	                    vel.attr(finalAttributes);
+	                (0, _utils.forEach)(vElems, function (vElem) {
+	                    vElem.attr(finalAttributes);
 	                });
 	
 	                if (attrs.port) {
-	                    (0, _utils.forEach)(vElements, function (vel) {
-	                        vel.attr('port', (0, _utils.isUndefined)(attrs.port.id) ? attrs.port : attrs.port.id);
+	                    (0, _utils.forEach)(vElems, function (vElem) {
+	                        vElem.attr('port', (0, _utils.isUndefined)(attrs.port.id) ? attrs.port : attrs.port.id);
 	                    });
 	                }
 	
 	                if (attrs.style) {
-	                    (0, _utils.forEach)(vElements, function (vel) {
-	                        vel.css(attrs.style);
+	                    (0, _utils.forEach)(vElems, function (vElem) {
+	                        vElem.css(attrs.style);
 	                    });
 	                }
 	
 	                if (!(0, _utils.isUndefined)(attrs.html)) {
-	                    (0, _utils.forEach)(vElements, function (vel) {});
+	                    (0, _utils.forEach)(vElems, function (vElem) {});
 	                }
 	
 	                // Special `ref-x` and `ref-y` attributes make it possible to
@@ -3158,8 +3668,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var all = allAttrs[selector];
 	                var attrs = specified ? (0, _utils.merge)({}, all, specified) : all;
 	
-	                (0, _utils.forEach)(nodesBySelector[selector], function (vel) {
-	                    that.positionRelative(vel, bbox, attrs, nodesBySelector);
+	                (0, _utils.forEach)(nodesBySelector[selector], function (vElem) {
+	                    that.positionRelative(vElem, bbox, attrs, nodesBySelector);
 	                });
 	            });
 	
@@ -3171,7 +3681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'positionRelative',
-	        value: function positionRelative(vel, bbox, attributes, nodesBySelector) {
+	        value: function positionRelative(vElem, bbox, attributes, nodesBySelector) {
 	
 	            var that = this;
 	            var ref = attributes['ref'];
@@ -3197,7 +3707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            refHeight = (0, _utils.toFloat)(refHeight, refHeightPercentage);
 	
 	            // Check if the node is a descendant of the scalable group.
-	            var scalableNode = vel.findParent('pane-scalable', that.el);
+	            var scalableNode = vElem.findParent('pane-scalable', that.elem);
 	
 	            // `ref` is the selector of the reference element.
 	            // If no `ref` specified, reference element is the root element.
@@ -3208,7 +3718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (nodesBySelector && nodesBySelector[ref]) {
 	                    vref = nodesBySelector[ref][0];
 	                } else {
-	                    vref = ref === '.' ? that.vel : that.vel.findOne(ref);
+	                    vref = ref === '.' ? that.vElem : that.vElem.findOne(ref);
 	                }
 	
 	                if (!vref) {
@@ -3217,31 +3727,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                // Get the bounding box of the reference element
 	                // relative to the root `<g>` element.
-	                bbox = vref.bbox(false, that.el);
+	                bbox = vref.bbox(false, that.elem);
 	            }
 	
 	            // Remove the previous translate() from the transform attribute
 	            // and translate the element relative to the root bounding box
 	            // following the `ref-x` and `ref-y` attributes.
-	            var transformAttr = vel.attr('transform');
+	            var transformAttr = vElem.attr('transform');
 	            if (transformAttr) {
-	                vel.attr('transform', (0, _utils.clearTranslate)(transformAttr));
+	                vElem.attr('transform', (0, _utils.clearTranslate)(transformAttr));
 	            }
 	
 	            // `ref-width` and `ref-height` defines the width and height of the
 	            // subElement relatively to the reference element size.
 	            if (isFinite(refWidth)) {
 	                if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
-	                    vel.attr('width', refWidth * bbox.width);
+	                    vElem.attr('width', refWidth * bbox.width);
 	                } else {
-	                    vel.attr('width', Math.max(refWidth + bbox.width, 0));
+	                    vElem.attr('width', Math.max(refWidth + bbox.width, 0));
 	                }
 	            }
 	            if (isFinite(refHeight)) {
 	                if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
-	                    vel.attr('height', refHeight * bbox.height);
+	                    vElem.attr('height', refHeight * bbox.height);
 	                } else {
-	                    vel.attr('height', Math.max(refHeight + bbox.height, 0));
+	                    vElem.attr('height', Math.max(refHeight + bbox.height, 0));
 	                }
 	            }
 	
@@ -3292,7 +3802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (!(0, _utils.isUndefined)(yAlignment) || !(0, _utils.isUndefined)(xAlignment)) {
 	
-	                var velBBox = vel.bbox(false, that.paper.drawPane);
+	                var velBBox = vElem.bbox(false, that.paper.drawPane);
 	
 	                if (yAlignment === 'middle') {
 	                    ty -= velBBox.height / 2;
@@ -3307,7 +3817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            vel.translate(tx, ty);
+	            vElem.translate(tx, ty);
 	
 	            return that;
 	        }
@@ -3316,14 +3826,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function render() {
 	
 	            var that = this;
-	            var vel = that.vel;
+	            var vElem = that.vElem;
 	
-	            vel.empty();
+	            vElem.empty();
 	
 	            that.renderMarkup();
 	
-	            that.scalableNode = vel.findOne('.pane-scalable');
-	            that.rotatableNode = vel.findOne('.pane-rotatable');
+	            that.scalableNode = vElem.findOne('.pane-scalable');
+	            that.rotatableNode = vElem.findOne('.pane-rotatable');
 	
 	            return that.update().resize().rotate().translate();
 	        }
@@ -3336,7 +3846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var markup = cell.markup;
 	
 	            if (markup) {
-	                that.vel.append((0, _vector2.default)(markup));
+	                that.vElem.append((0, _vector2.default)(markup));
 	            } else {
 	                throw new Error('invalid markup');
 	            }
@@ -3399,7 +3909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var position = that.cell.position || { x: 0, y: 0 };
 	
-	            that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+	            that.vElem.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
 	            return that;
 	        }
 	    }, {
@@ -3428,7 +3938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'scale',
 	        value: function scale(sx, sy) {
 	            var that = this;
-	            that.vel.scale(sx, sy);
+	            that.vElem.scale(sx, sy);
 	            return that;
 	        }
 	    }, {
@@ -3444,7 +3954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = NodeView;
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3479,7 +3989,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Change;
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3490,7 +4000,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Change2 = __webpack_require__(19);
+	var _Change2 = __webpack_require__(22);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
@@ -3539,7 +4049,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = RootChange;
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3550,7 +4060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Change2 = __webpack_require__(19);
+	var _Change2 = __webpack_require__(22);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
@@ -3650,7 +4160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChildChange;
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3663,23 +4173,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var _Events2 = __webpack_require__(11);
+	var _Events2 = __webpack_require__(14);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _Cell = __webpack_require__(12);
+	var _Cell = __webpack_require__(15);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _RootChange = __webpack_require__(20);
+	var _RootChange = __webpack_require__(23);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(21);
+	var _ChildChange = __webpack_require__(24);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _ChangeCollection = __webpack_require__(23);
+	var _ChangeCollection = __webpack_require__(26);
 	
 	var _ChangeCollection2 = _interopRequireDefault(_ChangeCollection);
 	
@@ -4254,7 +4764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Model;
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4322,7 +4832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChangeCollection;
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4335,7 +4845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var _Events2 = __webpack_require__(11);
+	var _Events2 = __webpack_require__(14);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
@@ -4343,23 +4853,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _Model = __webpack_require__(22);
+	var _Model = __webpack_require__(25);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _LinkView = __webpack_require__(17);
+	var _Cell = __webpack_require__(15);
+	
+	var _Cell2 = _interopRequireDefault(_Cell);
+	
+	var _LinkView = __webpack_require__(20);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _NodeView = __webpack_require__(18);
+	var _NodeView = __webpack_require__(21);
 	
 	var _NodeView2 = _interopRequireDefault(_NodeView);
 	
-	var _RootChange = __webpack_require__(20);
+	var _RootChange = __webpack_require__(23);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(21);
+	var _ChildChange = __webpack_require__(24);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
@@ -4427,6 +4941,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return that;
 	        }
+	    }, {
+	        key: 'snapToGrid',
+	        value: function snapToGrid(point) {
+	
+	            // Convert global coordinates to the local ones of the `drawPane`.
+	            // Otherwise, improper transformation would be applied when the
+	            // drawPane gets transformed (scaled/rotated).
+	
+	            var that = this;
+	            var gridSize = that.gridSize.gridSize || 1;
+	            var localPoint = (0, _vector2.default)(that.drawPane).toLocalPoint(point.x, point.y);
+	
+	            return {
+	                x: (0, _utils.snapToGrid)(localPoint.x, gridSize),
+	                y: (0, _utils.snapToGrid)(localPoint.y, gridSize)
+	            };
+	        }
+	    }, {
+	        key: 'toLocalPoint',
+	        value: function toLocalPoint(point) {
+	
+	            var that = this;
+	            var svg = that.svg;
+	
+	            var svgPoint = svg.createSVGPoint();
+	            svgPoint.x = p.x;
+	            svgPoint.y = p.y;
+	
+	            // This is a hack for Firefox! If there wasn't a fake (non-visible) rectangle covering the
+	            // whole SVG area, `$(paper.svg).offset()` used below won't work.
+	            var fakeRect = V('rect', {
+	                width: this.options.width,
+	                height: this.options.height,
+	                x: 0,
+	                y: 0,
+	                opacity: 0
+	            });
+	
+	            svg.appendChild(fakeRect);
+	
+	            var paperOffset = $(this.svg).offset();
+	
+	            // Clean up the fake rectangle once we have the offset of the SVG document.
+	            fakeRect.remove();
+	
+	            var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+	            var scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
+	
+	            svgPoint.x += scrollLeft - paperOffset.left;
+	            svgPoint.y += scrollTop - paperOffset.top;
+	
+	            // Transform point into the viewport coordinate system.
+	            var pointTransformed = svgPoint.matrixTransform(this.viewport.getCTM().inverse());
+	
+	            return pointTransformed;
+	        }
 	
 	        // lift cycle
 	        // ----------
@@ -4434,8 +5004,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'init',
 	        value: function init(container) {
-	
-	            // create svg
 	
 	            var that = this;
 	
@@ -4463,9 +5031,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setup',
 	        value: function setup() {
 	
-	            // install event listeners.
-	
 	            var that = this;
+	            var svg = that.svg;
+	
+	            (0, _utils.addEventListener)(svg, 'contextmenu', that.onContextMenu.bind(that));
+	            (0, _utils.addEventListener)(svg, 'dblclick', that.onMouseDblClick.bind(that));
+	            (0, _utils.addEventListener)(svg, 'click', that.onMouseClick.bind(that));
+	            (0, _utils.addEventListener)(svg, 'mousedown', that.onPointerDown.bind(that));
+	            (0, _utils.addEventListener)(svg, 'touchstart', that.onPointerDown.bind(that));
+	            (0, _utils.addEventListener)(svg, 'mousemove', that.onPointerMove.bind(that));
+	            (0, _utils.addEventListener)(svg, 'touchmove', that.onPointerMove.bind(that));
+	            (0, _utils.addEventListener)(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
+	            (0, _utils.addEventListener)(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
+	            (0, _utils.addEventListener)(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
+	            (0, _utils.addEventListener)(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
 	
 	            that.model.on('change', that.processChanges, that);
 	
@@ -4485,6 +5064,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return that;
 	        }
+	
+	        // validate
+	        // --------
+	
 	    }, {
 	        key: 'revalidate',
 	        value: function revalidate() {
@@ -4747,6 +5330,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	                view.render();
 	            }
 	        }
+	    }, {
+	        key: 'findViewByElem',
+	        value: function findViewByElem(elem) {
+	
+	            var that = this;
+	            var svg = that.svg;
+	
+	            elem = (0, _utils.isString)(elem) ? svg.querySelector(elem) : elem;
+	
+	            while (elem && elem !== svg && elem !== document) {
+	
+	                var cellId = elem.cellId;
+	                if (cellId) {
+	                    return that.views[cellId];
+	                }
+	
+	                elem = elem.parentNode;
+	            }
+	
+	            return null;
+	        }
+	    }, {
+	        key: 'findViewByCell',
+	        value: function findViewByCell(cell) {}
+	    }, {
+	        key: 'findViewByPoint',
+	        value: function findViewByPoint(point) {}
+	    }, {
+	        key: 'findViewsInArea',
+	        value: function findViewsInArea(rect) {}
 	
 	        // changes
 	        // -------
@@ -4821,14 +5434,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // --------------
 	
 	    }, {
+	        key: 'isValidEvent',
+	        value: function isValidEvent(e, view) {
+	
+	            // If the event is interesting, guard returns `true`.
+	            // Otherwise, it return `false`.
+	
+	            if (view && view.cell && view.cell instanceof _Cell2.default) {
+	                return true;
+	            } else {
+	
+	                var that = this;
+	                var svg = that.svg;
+	                var target = e.target;
+	
+	                if (svg === target || contains(svg, target)) {
+	                    return true;
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'onContextMenu',
+	        value: function onContextMenu(e) {
+	
+	            var that = this;
+	            e = (0, _utils.normalizeEvent)(e);
+	            var view = this.findViewByElem(e.target);
+	
+	            if (!that.isValidEvent(e, view)) {
+	                return;
+	            }
+	
+	            var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+	
+	            if (view) {
+	                that.sourceView = view;
+	                view.onContextMenu(e, localPoint.x, localPoint.y);
+	            } else {
+	                that.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
+	            }
+	        }
+	    }, {
+	        key: 'onMouseDblClick',
+	        value: function onMouseDblClick(e) {}
+	    }, {
+	        key: 'onMouseClick',
+	        value: function onMouseClick(e) {}
+	    }, {
 	        key: 'onPointerDown',
 	        value: function onPointerDown(e) {}
 	    }, {
 	        key: 'onPointerMove',
 	        value: function onPointerMove(e) {}
 	    }, {
-	        key: 'onPointerUp',
-	        value: function onPointerUp(e) {}
+	        key: 'onCellMouseOver',
+	        value: function onCellMouseOver(e) {}
+	    }, {
+	        key: 'onCellMouseOut',
+	        value: function onCellMouseOut(e) {}
 	    }]);
 	
 	    return Paper;
@@ -4837,7 +5500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Paper;
 
 /***/ },
-/* 25 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4846,7 +5509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(14);
+	var _Node2 = __webpack_require__(17);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -4881,7 +5544,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Generic;
 
 /***/ },
-/* 26 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4890,7 +5553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -4929,7 +5592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Text;
 
 /***/ },
-/* 27 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4938,7 +5601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -4989,7 +5652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 28 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4998,7 +5661,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5052,7 +5715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Circle;
 
 /***/ },
-/* 29 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5061,7 +5724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5115,7 +5778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Ellipse;
 
 /***/ },
-/* 30 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5124,7 +5787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5169,7 +5832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Image;
 
 /***/ },
-/* 31 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5178,7 +5841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5228,7 +5891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Path;
 
 /***/ },
-/* 32 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5237,7 +5900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5287,7 +5950,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polygon;
 
 /***/ },
-/* 33 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5296,7 +5959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(25);
+	var _Generic2 = __webpack_require__(28);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5346,7 +6009,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polyline;
 
 /***/ },
-/* 34 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5355,7 +6018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Path2 = __webpack_require__(31);
+	var _Path2 = __webpack_require__(34);
 	
 	var _Path3 = _interopRequireDefault(_Path2);
 	
@@ -5394,435 +6057,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = Rhombus;
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = undefined;
-	
-	var _array = __webpack_require__(6);
-	
-	function lineToPathData(line) {
-	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
-	}
-	
-	function polygonToPathData(polygon) {
-	
-	    var d = [];
-	
-	    (0, _array.forEach)(polygon.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
-	
-	    d.push('Z');
-	
-	    return d.join(' ');
-	}
-	
-	function polylineToPathData(polyline) {
-	
-	    var d = [];
-	
-	    (0, _array.forEach)(polyline.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
-	
-	    return d.join(' ');
-	}
-	
-	function rectToPathData(rect) {
-	
-	    var x = parseFloat(rect.getAttribute('x')) || 0;
-	    var y = parseFloat(rect.getAttribute('y')) || 0;
-	    var w = parseFloat(rect.getAttribute('width')) || 0;
-	    var h = parseFloat(rect.getAttribute('height')) || 0;
-	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
-	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
-	    var r = x + w;
-	    var b = y + h;
-	
-	    var d;
-	
-	    if (!rx && !ry) {
-	
-	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
-	    } else {
-	
-	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
-	    }
-	    return d.join(' ');
-	}
-	
-	var KAPPA = 0.5522847498307935;
-	
-	function circleToPathData(circle) {
-	
-	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
-	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
-	    var r = parseFloat(circle.getAttribute('r'));
-	    var cd = r * KAPPA; // Control distance.
-	
-	    return ['M', cx, cy - r, // Move to the first point.
-	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
-	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
-	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
-	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
-	    'Z'].join(' ');
-	}
-	
-	function ellipseToPathData(ellipse) {
-	
-	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
-	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
-	    var rx = parseFloat(ellipse.getAttribute('rx'));
-	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
-	    var cdx = rx * KAPPA; // Control distance x.
-	    var cdy = ry * KAPPA; // Control distance y.
-	
-	    return ['M', cx, cy - ry, // Move to the first point.
-	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
-	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
-	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
-	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
-	    'Z'].join(' ');
-	}
-	
-	exports.lineToPathData = lineToPathData;
-	exports.rectToPathData = rectToPathData;
-	exports.circleToPathData = circleToPathData;
-	exports.ellipseToPathData = ellipseToPathData;
-	exports.polygonToPathData = polygonToPathData;
-	exports.polylineToPathData = polylineToPathData;
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = undefined;
-	
-	var _string = __webpack_require__(4);
-	
-	var _number = __webpack_require__(7);
-	
-	// parse transform
-	// ---------------
-	
-	function parseTranslate(transform) {
-	
-	    var translate = { tx: 0, ty: 0 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/translate\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                translate.tx += (0, _number.toFloat)(arr[0]);
-	            }
-	
-	            if (arr[1]) {
-	                translate.ty += (0, _number.toFloat)(arr[1]);
-	            }
-	        }
-	    }
-	
-	    return translate;
-	}
-	
-	function parseScale(transform) {
-	
-	    var scale = { sx: 1, sy: 1 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/scale\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                scale.sx *= (0, _number.toFloat)(arr[0]);
-	            }
-	
-	            if (arr[1] || arr[0]) {
-	                scale.sy *= (0, _number.toFloat)(arr[1] || arr[0]);
-	            }
-	        }
-	    }
-	
-	    return scale;
-	}
-	
-	function parseRotate(transform) {
-	
-	    var rotate = { angle: 0 };
-	
-	    if (transform) {
-	
-	        var separator = /[ ,]+/;
-	
-	        var match = transform.match(/rotate\((.*)\)/);
-	        if (match) {
-	            var arr = match[1].split(separator);
-	
-	            if (arr[0]) {
-	                rotate.angle += (0, _number.toFloat)(arr[0]);
-	            }
-	
-	            if (arr[1] && arr[2]) {
-	                rotate.cx = (0, _number.toFloat)(arr[1]);
-	                rotate.cy = (0, _number.toFloat)(arr[2]);
-	            }
-	        }
-	    }
-	
-	    return rotate;
-	}
-	
-	function parseTransform(transform) {
-	    return {
-	        translate: parseTranslate(transform),
-	        rotate: parseRotate(transform),
-	        scale: parseScale(transform)
-	    };
-	}
-	
-	// clear transform
-	// ---------------
-	
-	function clearTranslate(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
-	}
-	
-	function clearScale(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
-	}
-	
-	function clearRotate(transform) {
-	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
-	}
-	
-	exports.parseScale = parseScale;
-	exports.parseRotate = parseRotate;
-	exports.parseTransform = parseTransform;
-	exports.parseTranslate = parseTranslate;
-	exports.clearScale = clearScale;
-	exports.clearRotate = clearRotate;
-	exports.clearTranslate = clearTranslate;
-
-/***/ },
-/* 37 */,
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.removeEventListener = exports.addEventListener = exports.normalizeEvent = undefined;
-	
-	var _lang = __webpack_require__(3);
-	
-	var _array = __webpack_require__(6);
-	
-	var win = window;
-	var doc = document;
-	var isMatchSelector = (function () {
-	
-	    var testDiv = doc.createElement('div');
-	    var matchesSelector = testDiv.matches || testDiv.webkitMatchesSelector || testDiv.mozMatchesSelector || testDiv.msMatchesSelector || testDiv.oMatchesSelector;
-	    var hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
-	
-	    return function (element, selector) {
-	
-	        if (hasMatchesSelector) {
-	            return matchesSelector.call(element, selector);
-	        }
-	
-	        var parentElem = element.parentNode;
-	
-	        // if the element is an orphan, and the browser doesn't support matching
-	        // orphans, append it to a documentFragment
-	        if (!parentElem && !hasMatchesSelector) {
-	            parentElem = doc.createDocumentFragment();
-	            parentElem.appendChild(element);
-	        }
-	
-	        // from the parent element's context, get all nodes that match the selector
-	        var nodes = parentElem.querySelectorAll(selector);
-	
-	        return (0, _array.some)(nodes, function (node) {
-	            return node === element;
-	        });
-	    };
-	})();
-	
-	function fixEvent(event) {
-	    // add W3C standard event methods
-	    event.preventDefault = fixEvent.preventDefault;
-	    event.stopPropagation = fixEvent.stopPropagation;
-	    return event;
-	}
-	
-	fixEvent.preventDefault = function () {
-	    this.returnValue = false;
-	};
-	
-	fixEvent.stopPropagation = function () {
-	    this.cancelBubble = true;
-	};
-	
-	function handleEvent(event) {
-	
-	    var returnValue = true;
-	    var element = this;
-	
-	    // grab the event object (IE uses a global event object)
-	    event = event || fixEvent((doc.parentWindow || win).event);
-	
-	    // get a reference to the hash table of event handlers
-	    var handlers = element.events[event.type];
-	
-	    // execute each event handler
-	    for (var i in handlers) {
-	        element.$$handleEvent = handlers[i];
-	        if (element.$$handleEvent(event) === false) {
-	            returnValue = false;
-	        }
-	    }
-	    return returnValue;
-	}
-	
-	function addEvent(element, type, handler) {
-	
-	    if (element.addEventListener) {
-	        element.addEventListener(type, handler, false);
-	    } else {
-	
-	        // assign each event handler a unique ID
-	        if (!handler.$$guid) {
-	            handler.$$guid = ++addEvent.guid;
-	        }
-	
-	        // create a hash table of event types for the element
-	        if (!element.events) {
-	            element.events = {};
-	        }
-	
-	        var fixedName = 'on' + type;
-	
-	        // create a hash table of event handlers for each element/event pair
-	        var handlers = element.events[type];
-	        if (!handlers) {
-	            handlers = element.events[type] = {};
-	            // store the existing event handler (if there is one)
-	            if (element[fixedName]) {
-	                handlers[0] = element[fixedName];
-	            }
-	        }
-	        // store the event handler in the hash table
-	        handlers[handler.$$guid] = handler;
-	        // assign a global event handler to do all the work
-	        element[fixedName] = handleEvent;
-	    }
-	}
-	
-	addEvent.guid = 0;
-	
-	function getDelegateTarget(element, target, selector) {
-	    while (target && target !== element) {
-	        if (isMatchSelector(target, selector)) {
-	            return target;
-	        }
-	        target = target.parentElement;
-	    }
-	    return null;
-	}
-	
-	function addEventListener(element, type, selector, handler, once) {
-	
-	    if ((0, _lang.isFunction)(selector)) {
-	        return addEvent(element, type, selector);
-	    }
-	
-	    function wrapper(e) {
-	
-	        // if this event has a delegateTarget, then we add it to the event
-	        // object (so that handlers may have a reference to the delegator
-	        // element) and fire the callback
-	        if (e.delegateTarget = getDelegateTarget(element, e.target, selector)) {
-	            if (once === true) {
-	                removeEventListener(element, type, wrapper);
-	            }
-	            handler.call(element, e);
-	        }
-	    }
-	
-	    handler._delegateWrapper = wrapper;
-	    addEvent(element, type, wrapper);
-	
-	    return handler;
-	}
-	
-	function removeEventListener(element, type, handler) {
-	
-	    var wrapper = handler._delegateWrapper;
-	
-	    if (element.removeEventListener) {
-	        element.removeEventListener(type, handler, false);
-	        wrapper && element.removeEventListener(type, wrapper, false);
-	    } else {
-	        // delete the event handler from the hash table
-	        if (element.events && element.events[type]) {
-	            delete element.events[type][handler.$$guid];
-	
-	            if (wrapper) {
-	                delete element.events[type][wrapper.$$guid];
-	            }
-	        }
-	    }
-	}
-	
-	function normalizeEvent(evt) {
-	
-	    var touchEvt = evt.originalEvent && evt.originalEvent.changedTouches && evt.originalEvent.changedTouches[0];
-	
-	    if (touchEvt) {
-	        for (var property in evt) {
-	            // copy all the properties from the input event that are not
-	            // defined on the touch event (functions included).
-	            if (touchEvt[property] === undefined) {
-	                touchEvt[property] = evt[property];
-	            }
-	        }
-	        return touchEvt;
-	    }
-	
-	    return evt;
-	}
-	
-	// exports
-	// -------
-	
-	exports.normalizeEvent = normalizeEvent;
-	exports.addEventListener = addEventListener;
-	exports.removeEventListener = removeEventListener;
 
 /***/ }
 /******/ ])

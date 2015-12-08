@@ -14,26 +14,26 @@ var isMatchSelector = function () {
         testDiv.oMatchesSelector;
     var hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
 
-    return function (element, selector) {
+    return function (elem, selector) {
 
         if (hasMatchesSelector) {
-            return matchesSelector.call(element, selector);
+            return matchesSelector.call(elem, selector);
         }
 
-        var parentElem = element.parentNode;
+        var parent = elem.parentNode;
 
         // if the element is an orphan, and the browser doesn't support matching
         // orphans, append it to a documentFragment
-        if (!parentElem && !hasMatchesSelector) {
-            parentElem = doc.createDocumentFragment();
-            parentElem.appendChild(element);
+        if (!parent && !hasMatchesSelector) {
+            parent = doc.createDocumentFragment();
+            parent.appendChild(elem);
         }
 
         // from the parent element's context, get all nodes that match the selector
-        var nodes = parentElem.querySelectorAll(selector);
+        var nodes = parent.querySelectorAll(selector);
 
         return some(nodes, function (node) {
-            return node === element;
+            return node === elem;
         });
     }
 }();
@@ -74,10 +74,10 @@ function handleEvent(event) {
     return returnValue;
 }
 
-function addEvent(element, type, handler) {
+function addEvent(elem, type, handler) {
 
-    if (element.addEventListener) {
-        element.addEventListener(type, handler, false);
+    if (elem.addEventListener) {
+        elem.addEventListener(type, handler, false);
     } else {
 
         // assign each event handler a unique ID
@@ -86,32 +86,32 @@ function addEvent(element, type, handler) {
         }
 
         // create a hash table of event types for the element
-        if (!element.events) {
-            element.events = {};
+        if (!elem.events) {
+            elem.events = {};
         }
 
         var fixedName = 'on' + type;
 
         // create a hash table of event handlers for each element/event pair
-        var handlers = element.events[type];
+        var handlers = elem.events[type];
         if (!handlers) {
-            handlers = element.events[type] = {};
+            handlers = elem.events[type] = {};
             // store the existing event handler (if there is one)
-            if (element[fixedName]) {
-                handlers[0] = element[fixedName];
+            if (elem[fixedName]) {
+                handlers[0] = elem[fixedName];
             }
         }
         // store the event handler in the hash table
         handlers[handler.$$guid] = handler;
         // assign a global event handler to do all the work
-        element[fixedName] = handleEvent;
+        elem[fixedName] = handleEvent;
     }
 }
 
 addEvent.guid = 0;
 
-function getDelegateTarget(element, target, selector) {
-    while (target && target !== element) {
+function getDelegateTarget(elem, target, selector) {
+    while (target && target !== elem) {
         if (isMatchSelector(target, selector)) {
             return target;
         }
@@ -120,10 +120,10 @@ function getDelegateTarget(element, target, selector) {
     return null;
 }
 
-function addEventListener(element, type, selector, handler, once) {
+function addEventListener(elem, type, selector, handler, once) {
 
     if (isFunction(selector)) {
-        return addEvent(element, type, selector);
+        return addEvent(elem, type, selector);
     }
 
     function wrapper(e) {
@@ -131,34 +131,34 @@ function addEventListener(element, type, selector, handler, once) {
         // if this event has a delegateTarget, then we add it to the event
         // object (so that handlers may have a reference to the delegator
         // element) and fire the callback
-        if (e.delegateTarget = getDelegateTarget(element, e.target, selector)) {
+        if (e.delegateTarget = getDelegateTarget(elem, e.target, selector)) {
             if (once === true) {
-                removeEventListener(element, type, wrapper);
+                removeEventListener(elem, type, wrapper);
             }
-            handler.call(element, e);
+            handler.call(elem, e);
         }
     }
 
     handler._delegateWrapper = wrapper;
-    addEvent(element, type, wrapper);
+    addEvent(elem, type, wrapper);
 
     return handler;
 }
 
-function removeEventListener(element, type, handler) {
+function removeEventListener(elem, type, handler) {
 
     var wrapper = handler._delegateWrapper;
 
-    if (element.removeEventListener) {
-        element.removeEventListener(type, handler, false);
-        wrapper && element.removeEventListener(type, wrapper, false);
+    if (elem.removeEventListener) {
+        elem.removeEventListener(type, handler, false);
+        wrapper && elem.removeEventListener(type, wrapper, false);
     } else {
         // delete the event handler from the hash table
-        if (element.events && element.events[type]) {
-            delete element.events[type][handler.$$guid];
+        if (elem.events && elem.events[type]) {
+            delete elem.events[type][handler.$$guid];
 
             if (wrapper) {
-                delete element.events[type][wrapper.$$guid];
+                delete elem.events[type][wrapper.$$guid];
             }
         }
     }

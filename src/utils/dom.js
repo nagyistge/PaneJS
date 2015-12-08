@@ -14,12 +14,77 @@ function isNode(elem, nodeName, attrName, attrValue) {
     return ret;
 }
 
-function getClassName(elem) {
-    return elem.getAttribute && elem.getAttribute('class') || '';
+function isWindow(obj) {
+    return obj && obj === obj.window;
+}
+
+var docElem = document.documentElement;
+var contains = docElem.compareDocumentPosition || docElem.contains ?
+    function (context, elem) {
+
+        var aDown = context.nodeType === 9 ? context.documentElement : context;
+        var bUp = elem && elem.parentNode;
+
+        return context === bUp || !!( bUp && bUp.nodeType === 1 && (
+                aDown.contains
+                    ? aDown.contains(bUp)
+                    : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16
+            ));
+    } :
+    function (context, elem) {
+        if (elem) {
+            while ((elem = elem.parentNode)) {
+                if (elem === context) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+function getWindow(elem) {
+    return isWindow(elem)
+        ? elem : elem.nodeType === 9
+        ? elem.defaultView || elem.parentWindow
+        : false;
+}
+
+function getOffset(elem) {
+
+    var box = {top: 0, left: 0};
+    var doc = elem && elem.ownerDocument;
+
+    if (!doc) {
+        return box;
+    }
+
+    var docElem = doc.documentElement;
+
+    // Make sure it's not a disconnected DOM node
+    if (!contains(docElem, elem)) {
+        return box;
+    }
+
+    // If we don't have gBCR, just use 0,0 rather than error
+    // BlackBerry 5, iOS 3 (original iPhone)
+    if (!isUndefined(elem.getBoundingClientRect)) {
+        box = elem.getBoundingClientRect();
+    }
+
+    var win = getWindow(doc);
+
+    return {
+        top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0),
+        left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0)
+    };
 }
 
 function getNodeName(elem) {
     return elem.nodeName ? elem.nodeName.toLowerCase() : '';
+}
+
+function getClassName(elem) {
+    return elem.getAttribute && elem.getAttribute('class') || '';
 }
 
 // xml namespaces.
@@ -84,11 +149,17 @@ function setAttribute(elem, name, value) {
 }
 
 
+// exports
+// -------
+
 export {
     isNode,
-    createSvgDocument,
-    createSvgElement,
-    setAttribute,
+    isWindow,
+    getWindow,
+    getOffset,
+    getNodeName,
     getClassName,
-    getNodeName
+    setAttribute,
+    createSvgElement,
+    createSvgDocument,
 }

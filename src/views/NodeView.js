@@ -33,35 +33,35 @@ class NodeView extends CellView {
 
         forIn(specifiedAttrs || allAttrs, function (attrs, selector) {
 
-            var vElements = that.find(selector);
+            var vElems = that.find(selector);
 
-            if (!vElements.length) {
+            if (!vElems.length) {
                 return;
             }
 
-            nodesBySelector[selector] = vElements;
+            nodesBySelector[selector] = vElems;
 
             var specialAttributes = NodeView.specialAttributes.slice();
 
             if (isObject(attrs.filter)) {
                 specialAttributes.push('filter');
-                that.applyFilter(vElements, attrs.filter);
+                that.applyFilter(vElems, attrs.filter);
             }
 
             if (isObject(attrs.fill)) {
                 specialAttributes.push('fill');
-                that.applyGradient(vElements, 'fill', attrs.fill);
+                that.applyGradient(vElems, 'fill', attrs.fill);
             }
 
             if (isObject(attrs.stroke)) {
                 specialAttributes.push('stroke');
-                that.applyGradient(vElements, 'stroke', attrs.stroke);
+                that.applyGradient(vElems, 'stroke', attrs.stroke);
             }
 
             if (!isUndefined(attrs.text)) {
                 specialAttributes.push('lineHeight', 'textPath', 'annotations');
-                forEach(vElements, function (vel) {
-                    vel.text(attrs.text + '', {
+                forEach(vElems, function (vElem) {
+                    vElem.text(attrs.text + '', {
                         lineHeight: attrs.lineHeight,
                         textPath: attrs.textPath,
                         annotations: attrs.annotations
@@ -78,24 +78,24 @@ class NodeView extends CellView {
             });
 
             // set regular attributes
-            forEach(vElements, function (vel) {
-                vel.attr(finalAttributes);
+            forEach(vElems, function (vElem) {
+                vElem.attr(finalAttributes);
             });
 
             if (attrs.port) {
-                forEach(vElements, function (vel) {
-                    vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
+                forEach(vElems, function (vElem) {
+                    vElem.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
                 });
             }
 
             if (attrs.style) {
-                forEach(vElements, function (vel) {
-                    vel.css(attrs.style);
+                forEach(vElems, function (vElem) {
+                    vElem.css(attrs.style);
                 });
             }
 
             if (!isUndefined(attrs.html)) {
-                forEach(vElements, function (vel) {
+                forEach(vElems, function (vElem) {
 
                 });
             }
@@ -131,8 +131,8 @@ class NodeView extends CellView {
             var all = allAttrs[selector];
             var attrs = specified ? merge({}, all, specified) : all;
 
-            forEach(nodesBySelector[selector], function (vel) {
-                that.positionRelative(vel, bbox, attrs, nodesBySelector);
+            forEach(nodesBySelector[selector], function (vElem) {
+                that.positionRelative(vElem, bbox, attrs, nodesBySelector);
             });
         });
 
@@ -143,7 +143,7 @@ class NodeView extends CellView {
         return that;
     }
 
-    positionRelative(vel, bbox, attributes, nodesBySelector) {
+    positionRelative(vElem, bbox, attributes, nodesBySelector) {
 
         var that = this;
         var ref = attributes['ref'];
@@ -170,7 +170,7 @@ class NodeView extends CellView {
 
 
         // Check if the node is a descendant of the scalable group.
-        var scalableNode = vel.findParent('pane-scalable', that.el);
+        var scalableNode = vElem.findParent('pane-scalable', that.elem);
 
         // `ref` is the selector of the reference element.
         // If no `ref` specified, reference element is the root element.
@@ -181,7 +181,7 @@ class NodeView extends CellView {
             if (nodesBySelector && nodesBySelector[ref]) {
                 vref = nodesBySelector[ref][0];
             } else {
-                vref = ref === '.' ? that.vel : that.vel.findOne(ref);
+                vref = ref === '.' ? that.vElem : that.vElem.findOne(ref);
             }
 
             if (!vref) {
@@ -190,31 +190,31 @@ class NodeView extends CellView {
 
             // Get the bounding box of the reference element
             // relative to the root `<g>` element.
-            bbox = vref.bbox(false, that.el);
+            bbox = vref.bbox(false, that.elem);
         }
 
         // Remove the previous translate() from the transform attribute
         // and translate the element relative to the root bounding box
         // following the `ref-x` and `ref-y` attributes.
-        var transformAttr = vel.attr('transform');
+        var transformAttr = vElem.attr('transform');
         if (transformAttr) {
-            vel.attr('transform', clearTranslate(transformAttr));
+            vElem.attr('transform', clearTranslate(transformAttr));
         }
 
         // `ref-width` and `ref-height` defines the width and height of the
         // subElement relatively to the reference element size.
         if (isFinite(refWidth)) {
             if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
-                vel.attr('width', refWidth * bbox.width);
+                vElem.attr('width', refWidth * bbox.width);
             } else {
-                vel.attr('width', Math.max(refWidth + bbox.width, 0));
+                vElem.attr('width', Math.max(refWidth + bbox.width, 0));
             }
         }
         if (isFinite(refHeight)) {
             if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
-                vel.attr('height', refHeight * bbox.height);
+                vElem.attr('height', refHeight * bbox.height);
             } else {
-                vel.attr('height', Math.max(refHeight + bbox.height, 0));
+                vElem.attr('height', Math.max(refHeight + bbox.height, 0));
             }
         }
 
@@ -265,7 +265,7 @@ class NodeView extends CellView {
 
         if (!isUndefined(yAlignment) || !isUndefined(xAlignment)) {
 
-            var velBBox = vel.bbox(false, that.paper.drawPane);
+            var velBBox = vElem.bbox(false, that.paper.drawPane);
 
             if (yAlignment === 'middle') {
                 ty -= velBBox.height / 2;
@@ -280,7 +280,7 @@ class NodeView extends CellView {
             }
         }
 
-        vel.translate(tx, ty);
+        vElem.translate(tx, ty);
 
         return that;
     }
@@ -288,14 +288,14 @@ class NodeView extends CellView {
     render() {
 
         var that = this;
-        var vel = that.vel;
+        var vElem = that.vElem;
 
-        vel.empty();
+        vElem.empty();
 
         that.renderMarkup();
 
-        that.scalableNode = vel.findOne('.pane-scalable');
-        that.rotatableNode = vel.findOne('.pane-rotatable');
+        that.scalableNode = vElem.findOne('.pane-scalable');
+        that.rotatableNode = vElem.findOne('.pane-rotatable');
 
         return that.update()
             .resize()
@@ -310,7 +310,7 @@ class NodeView extends CellView {
         var markup = cell.markup;
 
         if (markup) {
-            that.vel.append(vector(markup));
+            that.vElem.append(vector(markup));
         } else {
             throw new Error('invalid markup');
         }
@@ -372,7 +372,7 @@ class NodeView extends CellView {
         var that = this;
         var position = that.cell.position || {x: 0, y: 0};
 
-        that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+        that.vElem.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
         return that;
     }
 
@@ -400,7 +400,7 @@ class NodeView extends CellView {
 
     scale(sx, sy) {
         var that = this;
-        that.vel.scale(sx, sy);
+        that.vElem.scale(sx, sy);
         return that;
     }
 

@@ -6,9 +6,9 @@ import {
     isFinite
 } from '../common/utils';
 
-import filters from  '../common/filters';
 import Events  from '../common/Events';
 import vector  from '../common/vector';
+import filters from '../common/filters';
 
 
 class CellView {
@@ -22,18 +22,19 @@ class CellView {
         that.invalid = true;
 
         that.ensureElement();
+
+        // attach cell's id to elem
+        that.elem.cellId = cell.id;
     }
 
     ensureElement() {
 
         var that = this;
+        var vElem = vector('g');
 
-        var vel = vector('g');
-
-        that.el = vel.node;
-        that.vel = vel;
-
-        that.paper.drawPane.appendChild(that.el);
+        that.elem = vElem.node;
+        that.vElem = vElem;
+        that.paper.drawPane.appendChild(that.elem);
 
         return that;
     }
@@ -43,7 +44,7 @@ class CellView {
     update() { return this; }
 
     find(selector) {
-        return selector === '.' ? [this.vel] : this.vel.find(selector);
+        return selector === '.' ? [this.vElem] : this.vElem.find(selector);
     }
 
     applyFilter(selector, filter) {
@@ -99,8 +100,8 @@ class CellView {
             vector(svg).getDefs().append(vFilter);
         }
 
-        forEach(vElements, function (vel) {
-            vel.attr(filter, 'url(#' + filterId + ')');
+        forEach(vElements, function (vElem) {
+            vElem.attr(filter, 'url(#' + filterId + ')');
         });
 
         return that;
@@ -157,8 +158,8 @@ class CellView {
             vector(svg).getDefs().append(vGradient);
         }
 
-        forEach(vElements, function (vel) {
-            vel.attr(attrName, 'url(#' + gradientId + ')');
+        forEach(vElements, function (vElem) {
+            vElem.attr(attrName, 'url(#' + gradientId + ')');
         });
 
         return that;
@@ -183,10 +184,10 @@ class CellView {
     destroy() {
 
         var that = this;
-        var el = that.el;
+        var elem = that.elem;
 
-        if (el && el.parentNode) {
-            el.parentNode.removeChild(el);
+        if (elem && elem.parentNode) {
+            elem.parentNode.removeChild(elem);
         }
 
     }

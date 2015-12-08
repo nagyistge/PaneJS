@@ -40,10 +40,6 @@ function isFunction(obj) {
     return isType(obj, 'Function');
 }
 
-function isWindow(obj) {
-    return obj && obj === obj.window;
-}
-
 function isArray(obj) {
     return Array.isArray(obj);
 }
@@ -95,13 +91,15 @@ function isEmptyObject(obj) {
 }
 
 
+// exports
+// -------
+
 export {
     isNull,
     isType,
     isArray,
     isObject,
     isString,
-    isWindow,
     isBoolean,
     isNumeric,
     isFunction,

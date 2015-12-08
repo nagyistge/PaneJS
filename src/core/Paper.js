@@ -1,12 +1,18 @@
 import {
     merge,
     forEach,
+    isString,
+    snapToGrid,
+    normalizeEvent,
+    addEventListener,
+    removeEventListener
 } from '../common/utils';
 
 import Events from '../common/Events';
 import vector from '../common/vector';
 
 import Model    from './Model';
+import Cell     from '../cells/Cell';
 import LinkView from '../views/LinkView';
 import NodeView from '../views/NodeView';
 
@@ -70,13 +76,64 @@ class Paper extends Events {
         return that;
     }
 
+    snapToGrid(point) {
+
+        // Convert global coordinates to the local ones of the `drawPane`.
+        // Otherwise, improper transformation would be applied when the
+        // drawPane gets transformed (scaled/rotated).
+
+        var that = this;
+        var gridSize = that.gridSize.gridSize || 1;
+        var localPoint = vector(that.drawPane).toLocalPoint(point.x, point.y);
+
+        return {
+            x: snapToGrid(localPoint.x, gridSize),
+            y: snapToGrid(localPoint.y, gridSize)
+        };
+    }
+
+    toLocalPoint(point) {
+
+        var that = this;
+        var svg = that.svg;
+
+        var svgPoint = svg.createSVGPoint();
+        svgPoint.x = p.x;
+        svgPoint.y = p.y;
+
+        // This is a hack for Firefox! If there wasn't a fake (non-visible) rectangle covering the
+        // whole SVG area, `$(paper.svg).offset()` used below won't work.
+        var fakeRect = V('rect', {
+            width: this.options.width,
+            height: this.options.height,
+            x: 0,
+            y: 0,
+            opacity: 0
+        });
+
+        svg.appendChild(fakeRect);
+
+        var paperOffset = $(this.svg).offset();
+
+        // Clean up the fake rectangle once we have the offset of the SVG document.
+        fakeRect.remove();
+
+        var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+        var scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
+
+        svgPoint.x += scrollLeft - paperOffset.left;
+        svgPoint.y += scrollTop - paperOffset.top;
+
+        // Transform point into the viewport coordinate system.
+        var pointTransformed = svgPoint.matrixTransform(this.viewport.getCTM().inverse());
+
+        return pointTransformed;
+    }
 
     // lift cycle
     // ----------
 
     init(container) {
-
-        // create svg
 
         var that = this;
 
@@ -103,9 +160,20 @@ class Paper extends Events {
 
     setup() {
 
-        // install event listeners.
-
         var that = this;
+        var svg = that.svg;
+
+        addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
+        addEventListener(svg, 'dblclick', that.onMouseDblClick.bind(that));
+        addEventListener(svg, 'click', that.onMouseClick.bind(that));
+        addEventListener(svg, 'mousedown', that.onPointerDown.bind(that));
+        addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
+        addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
+        addEventListener(svg, 'touchmove', that.onPointerMove.bind(that));
+        addEventListener(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
+        addEventListener(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
+        addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
+        addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
 
         that.model.on('change', that.processChanges, that);
 
@@ -125,6 +193,10 @@ class Paper extends Events {
 
         return that;
     }
+
+
+    // validate
+    // --------
 
     revalidate() {
         return this.invalidate().validate();
@@ -369,6 +441,32 @@ class Paper extends Events {
         }
     }
 
+    findViewByElem(elem) {
+
+        var that = this;
+        var svg = that.svg;
+
+        elem = isString(elem) ? svg.querySelector(elem) : elem;
+
+        while (elem && elem !== svg && elem !== document) {
+
+            var cellId = elem.cellId;
+            if (cellId) {
+                return that.views[cellId];
+            }
+
+            elem = elem.parentNode;
+        }
+
+        return null;
+    }
+
+    findViewByCell(cell) {}
+
+    findViewByPoint(point) {}
+
+    findViewsInArea(rect) {}
+
 
     // changes
     // -------
@@ -441,11 +539,57 @@ class Paper extends Events {
     // event handlers
     // --------------
 
+    isValidEvent(e, view) {
+
+        // If the event is interesting, guard returns `true`.
+        // Otherwise, it return `false`.
+
+        if (view && view.cell && view.cell instanceof Cell) {
+            return true;
+        } else {
+
+            var that = this;
+            var svg = that.svg;
+            var target = e.target;
+
+            if (svg === target || contains(svg, target)) {
+                return true;
+            }
+        }
+    }
+
+    onContextMenu(e) {
+
+        var that = this;
+        e = normalizeEvent(e);
+        var view = this.findViewByElem(e.target);
+
+        if (!that.isValidEvent(e, view)) {
+            return;
+        }
+
+        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+
+        if (view) {
+            that.sourceView = view;
+            view.onContextMenu(e, localPoint.x, localPoint.y);
+        } else {
+            that.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
+        }
+
+    }
+
+    onMouseDblClick(e) {}
+
+    onMouseClick(e) {}
+
     onPointerDown(e) {}
 
     onPointerMove(e) {}
 
-    onPointerUp(e) {}
+    onCellMouseOver(e) {}
+
+    onCellMouseOut(e) {}
 }
 
 export default Paper;
