@@ -7,7 +7,9 @@ import {
     containsElem,
     normalizeEvent,
     addEventListener,
-    removeEventListener
+    removeEventListener,
+    createSvgElement,
+    createSvgDocument
 } from '../common/utils';
 
 import Events   from '../common/Events';
@@ -146,18 +148,18 @@ class Paper extends Events {
 
         if (container) {
 
-            var svg = vector('svg');
-            var root = vector('g');
-            var drawPane = vector('g');
+            var svg = createSvgDocument();
+            var root = createSvgElement('g');
+            var drawPane = createSvgElement('g');
 
-            root.append(drawPane);
-            svg.append(root);
-            container.appendChild(svg.node);
+            root.appendChild(drawPane);
+            svg.appendChild(root);
+            container.appendChild(svg);
 
+            that.svg = svg;
+            that.root = root;
+            that.drawPane = drawPane;
             that.container = container;
-            that.svg = svg.node;
-            that.root = root.node;
-            that.drawPane = drawPane.node;
 
             that.trigger('paper:init', container);
         }
