@@ -2666,6 +2666,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Cell = (function () {
@@ -2682,13 +2686,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (options) {
 	
-	                (0, _utils.forIn)(options, function (val, key) {
+	                utils.forIn(options, function (val, key) {
 	
-	                    if (key === 'defaults') {
-	                        val = (0, _utils.merge)({}, that.defaults, val);
-	                    }
-	
-	                    that[key] = val;
+	                    that[key] = key === 'defaults' ? utils.merge({}, that.defaults, val) : val;
 	                });
 	            }
 	        }
@@ -2698,7 +2698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _classCallCheck(this, Cell);
 	
 	        var that = this;
-	        var raw = (0, _utils.merge)({}, that.constructor.defaults, options);
+	        var raw = utils.merge({}, that.constructor.defaults, options);
 	
 	        that.raw = raw;
 	        that.data = raw.data;
@@ -2766,39 +2766,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getChildCount',
 	        value: function getChildCount() {
 	
-	            var children = this.children;
-	            return children ? children.length : 0;
+	            return this.children ? this.children.length : 0;
 	        }
 	    }, {
 	        key: 'indexOfChild',
 	        value: function indexOfChild(child) {
 	
-	            return (0, _utils.indexOf)(this.children || [], child);
+	            return utils.indexOf(this.children, child);
 	        }
 	    }, {
 	        key: 'getChildAt',
 	        value: function getChildAt(index) {
 	
-	            var children = this.children;
-	            return children ? children[index] : null;
+	            return this.children ? this.children[index] : null;
 	        }
 	    }, {
 	        key: 'eachChild',
 	        value: function eachChild(iterator, context) {
 	
-	            var that = this;
-	            var children = that.children;
-	
-	            children && (0, _utils.forEach)(children, iterator, context);
-	
-	            return that;
+	            return utils.forEach(this.children, iterator, context);
 	        }
 	    }, {
 	        key: 'filterChild',
 	        value: function filterChild(iterator, context) {
 	
-	            var children = this.children;
-	            return children ? (0, _utils.filter)(children, iterator, context) : [];
+	            return utils.filter(this.children, iterator, context);
 	        }
 	    }, {
 	        key: 'insertChild',
@@ -2809,7 +2801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (child) {
 	
 	                // fix index
-	                if ((0, _utils.isNullOrUndefined)(index)) {
+	                if (utils.isNullOrUndefined(index)) {
 	                    index = that.getChildCount();
 	
 	                    if (child.parent === that) {
@@ -2866,39 +2858,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getLinkCount',
 	        value: function getLinkCount() {
 	
-	            var links = this.links;
-	            return links ? links.length : 0;
+	            return this.links ? this.links.length : 0;
 	        }
 	    }, {
 	        key: 'indexOfLink',
 	        value: function indexOfLink(link) {
 	
-	            return (0, _utils.indexOf)(this.links || [], link);
+	            return utils.indexOf(this.links, link);
 	        }
 	    }, {
 	        key: 'getLinkAt',
 	        value: function getLinkAt(index) {
 	
-	            var links = this.links;
-	            return links ? links[index] : null;
+	            return this.links ? this.links[index] : null;
 	        }
 	    }, {
 	        key: 'eachLink',
 	        value: function eachLink(iterator, context) {
 	
-	            var that = this;
-	            var links = that.links;
-	
-	            links && (0, _utils.forEach)(links, iterator, context);
-	
-	            return that;
+	            return utils.forEach(this.links, iterator, context);
 	        }
 	    }, {
 	        key: 'filterLink',
 	        value: function filterLink(iterator, context) {
 	
-	            var links = this.links;
-	            return links ? (0, _utils.filter)(links, iterator, context) : [];
+	            return utils.filter(this.links, iterator, context);
 	        }
 	    }, {
 	        key: 'addLink',
@@ -2985,21 +2969,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'cloneData',
 	        value: function cloneData() {
 	
-	            var that = this;
-	            var data = that.data;
+	            var data = this.data;
 	
 	            if (data) {
 	
-	                if (data.clone && (0, _utils.isFunction)(data.clone)) {
+	                if (data.clone && utils.isFunction(data.clone)) {
 	                    return data.clone();
 	                }
 	
-	                if ((0, _utils.isNode)(data)) {
+	                if (utils.isNode(data)) {
 	                    return data.cloneNode(true);
 	                }
 	
-	                if ((0, _utils.isObject)(data)) {
-	                    return (0, _utils.merge)({}, data);
+	                if (utils.isObject(data)) {
+	                    return utils.merge({}, data);
 	                }
 	            }
 	
@@ -3010,7 +2993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function clone(cloneData) {
 	
 	            var that = this;
-	            var raw = (0, _utils.merge)({}, that.raw);
+	            var raw = utils.merge({}, that.raw);
 	
 	            raw.data = cloneData === true ? that.cloneData() : that.data;
 	            raw.visible = that.visible;
@@ -3072,6 +3055,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Link;
 	})(_Cell3.default);
+	
+	// exports
+	// -------
 	
 	exports.default = Link;
 
@@ -3155,6 +3141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    attrs: {}
 	};
+	
+	// exports
+	// -------
 	
 	exports.default = Node;
 

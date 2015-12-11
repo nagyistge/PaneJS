@@ -42,10 +42,11 @@ Node.defaults = {
         angle: 0,
         relative: false
     },
-    attrs: {
-
-    }
+    attrs: {}
 };
 
+
+// exports
+// -------
 
 export default Node;

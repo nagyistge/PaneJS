@@ -5,7 +5,7 @@ import {
     clone,
     isNode,
     isFunction,
-    isNullOrUndefined
+    isNullOrUndefined,
 } from '../common/utils';
 
 import Base from '../lib/Base';

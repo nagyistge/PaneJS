@@ -1,31 +1,18 @@
-import {
-    merge,
-    filter,
-    forIn,
-    forEach,
-    indexOf,
-    isNode,
-    isObject,
-    isFunction,
-    isNullOrUndefined
-} from '../common/utils';
-
+import * as utils from '../common/utils';
 
 class Cell {
 
     static configure(options) {
 
-        var that = this;
+        let that = this;
 
         if (options) {
 
-            forIn(options, function (val, key) {
+            utils.forIn(options, (val, key)=> {
 
-                if (key === 'defaults') {
-                    val = merge({}, that.defaults, val);
-                }
-
-                that[key] = val;
+                that[key] = key === 'defaults'
+                    ? utils.merge({}, that.defaults, val)
+                    : val;
             });
         }
     }
@@ -36,14 +23,14 @@ class Cell {
 
     constructor(options) {
 
-        var that = this;
-        var raw  = merge({}, that.constructor.defaults, options);
+        let that = this;
+        let raw = utils.merge({}, that.constructor.defaults, options);
 
-        that.raw      = raw;
-        that.data     = raw.data;
-        that.attrs    = raw.attrs;
-        that.visible  = raw.visible !== false;
-        that.size     = raw.size;
+        that.raw = raw;
+        that.data = raw.data;
+        that.attrs = raw.attrs;
+        that.visible = raw.visible !== false;
+        that.size = raw.size;
         that.position = raw.position;
         that.rotation = raw.rotation;
     }
@@ -67,7 +54,7 @@ class Cell {
 
     setTerminal(node, isSource) {
 
-        var that = this;
+        let that = this;
 
         if (isSource) {
             that.source = node;
@@ -82,8 +69,8 @@ class Cell {
 
         // remove link from node
 
-        var that = this;
-        var node = that.getTerminal(isSource);
+        let that = this;
+        let node = that.getTerminal(isSource);
 
         if (node) {
             node.removeLink(that, isSource);
@@ -98,45 +85,37 @@ class Cell {
 
     getChildCount() {
 
-        var children = this.children;
-        return children ? children.length : 0;
+        return this.children ? this.children.length : 0;
     }
 
     indexOfChild(child) {
 
-        return indexOf(this.children || [], child);
+        return utils.indexOf(this.children, child);
     }
 
     getChildAt(index) {
 
-        var children = this.children;
-        return children ? children[index] : null;
+        return this.children ? this.children[index] : null;
     }
 
     eachChild(iterator, context) {
 
-        var that     = this;
-        var children = that.children;
-
-        children && forEach(children, iterator, context);
-
-        return that;
+        return utils.forEach(this.children, iterator, context);
     }
 
     filterChild(iterator, context) {
 
-        var children = this.children;
-        return children ? filter(children, iterator, context) : [];
+        return utils.filter(this.children, iterator, context);
     }
 
     insertChild(child, index) {
 
-        var that = this;
+        let that = this;
 
         if (child) {
 
             // fix index
-            if (isNullOrUndefined(index)) {
+            if (utils.isNullOrUndefined(index)) {
                 index = that.getChildCount();
 
                 if (child.parent === that) {
@@ -149,7 +128,7 @@ class Cell {
             child.parent = that;
 
 
-            var children = that.children;
+            let children = that.children;
 
             if (children) {
                 children.splice(index, 0, child);
@@ -169,9 +148,9 @@ class Cell {
 
     removeChildAt(index) {
 
-        var that     = this;
-        var child    = null;
-        var children = that.children;
+        let that = this;
+        let child = null;
+        let children = that.children;
 
         if (children && index >= 0) {
 
@@ -192,41 +171,33 @@ class Cell {
 
     getLinkCount() {
 
-        var links = this.links;
-        return links ? links.length : 0;
+        return this.links ? this.links.length : 0;
     }
 
     indexOfLink(link) {
 
-        return indexOf(this.links || [], link);
+        return utils.indexOf(this.links, link);
     }
 
     getLinkAt(index) {
 
-        var links = this.links;
-        return links ? links[index] : null;
+        return this.links ? this.links[index] : null;
     }
 
     eachLink(iterator, context) {
 
-        var that  = this;
-        var links = that.links;
-
-        links && forEach(links, iterator, context);
-
-        return that;
+        return utils.forEach(this.links, iterator, context);
     }
 
     filterLink(iterator, context) {
 
-        var links = this.links;
-        return links ? filter(links, iterator, context) : [];
+        return utils.filter(this.links, iterator, context);
     }
 
     addLink(link, outgoing) {
 
-        var that  = this;
-        var links = that.links;
+        let that = this;
+        let links = that.links;
 
         if (link) {
 
@@ -250,14 +221,14 @@ class Cell {
 
     removeLink(link, outgoing) {
 
-        var that  = this;
-        var links = that.links;
+        let that = this;
+        let links = that.links;
 
         if (link) {
 
             // 连线的起点和终点是同一个节点时不需要移除
             if (links && link.getTerminal(!outgoing) !== that) {
-                var index = that.indexOfLink(link);
+                let index = that.indexOfLink(link);
 
                 if (index >= 0) {
                     links.splice(index, 1);
@@ -281,8 +252,8 @@ class Cell {
 
     removeFromParent() {
 
-        var that   = this;
-        var parent = that.parent;
+        let that = this;
+        let parent = that.parent;
 
         if (parent) {
             parent.removeChild(that);
@@ -301,21 +272,20 @@ class Cell {
 
     cloneData() {
 
-        var that = this;
-        var data = that.data;
+        let data = this.data;
 
         if (data) {
 
-            if (data.clone && isFunction(data.clone)) {
+            if (data.clone && utils.isFunction(data.clone)) {
                 return data.clone();
             }
 
-            if (isNode(data)) {
+            if (utils.isNode(data)) {
                 return data.cloneNode(true);
             }
 
-            if (isObject(data)) {
-                return merge({}, data);
+            if (utils.isObject(data)) {
+                return utils.merge({}, data);
             }
         }
 
@@ -324,10 +294,10 @@ class Cell {
 
     clone(cloneData) {
 
-        var that = this;
-        var raw  = merge({}, that.raw);
+        let that = this;
+        let raw = utils.merge({}, that.raw);
 
-        raw.data    = cloneData === true ? that.cloneData() : that.data;
+        raw.data = cloneData === true ? that.cloneData() : that.data;
         raw.visible = that.visible;
 
         return new Cell(raw);
