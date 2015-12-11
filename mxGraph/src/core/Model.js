@@ -442,7 +442,7 @@ export default Class.create({
         var oldParent = cell.parent;
 
         if (newParent) {
-            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+            if (newParent !== oldParent || oldParent.indexOfChild(cell) !== newIndex) {
                 newParent.insertChild(cell, newIndex);
             }
         } else if (oldParent) {
@@ -464,7 +464,7 @@ export default Class.create({
         var oldNode = link.getNode(isSource);
 
         if (newNode) {
-            newNode.insertLink(link, isSource);
+            newNode.addLink(link, isSource);
         } else if (oldNode) {
             oldNode.removeLink(link, isSource);
         }
@@ -511,7 +511,7 @@ export default Class.create({
         var previous = link.getTerminal(isSource);
 
         if (node) {
-            node.insertLink(link, isSource);
+            node.addLink(link, isSource);
         } else if (previous) {
             previous.removeLink(link, isSource);
         }
@@ -847,7 +847,7 @@ export default Class.create({
         if (source) {
             temp = mapping[objectIdentity.get(source)];
             if (temp) {
-                temp.insertLink(cloned, true);
+                temp.addLink(cloned, true);
             }
         }
 
@@ -855,7 +855,7 @@ export default Class.create({
         if (target) {
             temp = mapping[objectIdentity.get(target)];
             if (temp) {
-                temp.insertLink(cloned, false);
+                temp.addLink(cloned, false);
             }
         }
 

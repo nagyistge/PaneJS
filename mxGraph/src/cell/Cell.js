@@ -196,7 +196,7 @@ export default Base.extend({
             var links = that.links;
 
             // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
-            if (!links || that.getLinkIndex(link) < 0 ||
+            if (!links || that.indexOfLink(link) < 0 ||
                 link.getNode(!outgoing) !== that) {
 
                 if (!links) {
@@ -219,7 +219,7 @@ export default Base.extend({
 
             // 连线的起点和终点是同一个节点时不需要移除
             if (links && link.getTerminal(!outgoing) !== that) {
-                var index = that.getLinkIndex(link);
+                var index = that.indexOfLink(link);
 
                 if (index >= 0) {
                     links.splice(index, 1);

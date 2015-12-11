@@ -10,7 +10,7 @@ var cellRoute = {
             var parent = cell.parent;
 
             while (parent) {
-                var index = parent.getChildIndex(cell);
+                var index = parent.indexOfChild(cell);
                 result = index + cellRoute.separator + result;
 
                 cell = parent;

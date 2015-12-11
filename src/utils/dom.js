@@ -1,4 +1,4 @@
-import { isUndefined, isWindow } from './lang';
+import { isUndefined,isNullOrUndefined, isWindow } from './lang';
 
 function isNode(elem, nodeName, attrName, attrValue) {
     var ret = elem && !isNaN(elem.nodeType);
@@ -14,12 +14,12 @@ function isNode(elem, nodeName, attrName, attrValue) {
     return ret;
 }
 
-var docElem = document.documentElement;
+var docElem  = document.documentElement;
 var contains = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         var aDown = context.nodeType === 9 ? context.documentElement : context;
-        var bUp = elem && elem.parentNode;
+        var bUp   = elem && elem.parentNode;
 
         return context === bUp || !!( bUp && bUp.nodeType === 1 && (
                 aDown.contains
@@ -28,6 +28,7 @@ var contains = docElem.compareDocumentPosition || docElem.contains ?
             ));
     } :
     function (context, elem) {
+
         if (elem) {
             while ((elem = elem.parentNode)) {
                 if (elem === context) {
@@ -39,6 +40,7 @@ var contains = docElem.compareDocumentPosition || docElem.contains ?
     };
 
 function getWindow(elem) {
+
     return isWindow(elem)
         ? elem : elem.nodeType === 9
         ? elem.defaultView || elem.parentWindow

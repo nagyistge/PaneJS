@@ -228,7 +228,7 @@ class Model extends Events {
         var oldParent = cell.parent;
 
         if (newParent) {
-            if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+            if (newParent !== oldParent || oldParent.indexOfChild(cell) !== newIndex) {
                 newParent.insertChild(cell, newIndex);
             }
         } else if (oldParent) {
@@ -250,7 +250,7 @@ class Model extends Events {
         var oldNode = link.getNode(isSource);
 
         if (newNode) {
-            newNode.insertLink(link, isSource);
+            newNode.addLink(link, isSource);
         } else if (oldNode) {
             oldNode.removeLink(link, isSource);
         }

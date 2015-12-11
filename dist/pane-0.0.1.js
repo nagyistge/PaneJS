@@ -1891,11 +1891,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var ret = elem && !isNaN(elem.nodeType);
 	
 	    if (ret) {
-	        ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+	        ret = (0, _lang.isNullOrUndefined)(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
 	    }
 	
 	    if (ret) {
-	        ret = isNullOrUndefined(attrName) || elem.getAttribute(attrName) === attrValue;
+	        ret = (0, _lang.isNullOrUndefined)(attrName) || elem.getAttribute(attrName) === attrValue;
 	    }
 	
 	    return ret;
@@ -1909,6 +1909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return context === bUp || !!(bUp && bUp.nodeType === 1 && (aDown.contains ? aDown.contains(bUp) : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16));
 	} : function (context, elem) {
+	
 	    if (elem) {
 	        while (elem = elem.parentNode) {
 	            if (elem === context) {
@@ -1920,6 +1921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	function getWindow(elem) {
+	
 	    return (0, _lang.isWindow)(elem) ? elem : elem.nodeType === 9 ? elem.defaultView || elem.parentWindow : false;
 	}
 	
@@ -2667,34 +2669,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Cell = (function () {
-	    _createClass(Cell, null, [{
+	    _createClass(Cell, [{
+	        key: 'markup',
+	        get: function get() {
+	            return this.constructor.markup;
+	        }
+	    }], [{
 	        key: 'configure',
-	        value: function configure(attributes) {
+	        value: function configure(options) {
 	
 	            var that = this;
 	
-	            attributes && (0, _utils.forIn)(attributes, function (val, key) {
-	                if (key === 'defaults') {
-	                    val = (0, _utils.merge)({}, that.defaults, val);
-	                }
-	                that[key] = val;
-	            });
+	            if (options) {
+	
+	                (0, _utils.forIn)(options, function (val, key) {
+	
+	                    if (key === 'defaults') {
+	                        val = (0, _utils.merge)({}, that.defaults, val);
+	                    }
+	
+	                    that[key] = val;
+	                });
+	            }
 	        }
 	    }]);
 	
-	    function Cell(attributes) {
+	    function Cell(options) {
 	        _classCallCheck(this, Cell);
 	
 	        var that = this;
-	        var raw = (0, _utils.merge)({}, that.constructor.defaults, attributes);
+	        var raw = (0, _utils.merge)({}, that.constructor.defaults, options);
 	
 	        that.raw = raw;
 	        that.data = raw.data;
+	        that.attrs = raw.attrs;
+	        that.visible = raw.visible !== false;
 	        that.size = raw.size;
 	        that.position = raw.position;
 	        that.rotation = raw.rotation;
-	        that.visible = raw.visible !== false;
-	        that.attrs = raw.attrs;
 	    }
 	
 	    _createClass(Cell, [{
@@ -2714,18 +2726,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getTerminal',
 	        value: function getTerminal(isSource) {
+	
 	            return isSource ? this.source : this.target;
 	        }
 	    }, {
 	        key: 'setTerminal',
 	        value: function setTerminal(node, isSource) {
+	
+	            var that = this;
+	
 	            if (isSource) {
-	                this.source = node;
+	                that.source = node;
 	            } else {
-	                this.target = node;
+	                that.target = node;
 	            }
 	
-	            return node;
+	            return that;
 	        }
 	    }, {
 	        key: 'removeFromTerminal',
@@ -2734,7 +2750,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // remove link from node
 	
 	            var that = this;
-	
 	            var node = that.getTerminal(isSource);
 	
 	            if (node) {
@@ -2750,17 +2765,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getChildCount',
 	        value: function getChildCount() {
+	
 	            var children = this.children;
 	            return children ? children.length : 0;
 	        }
 	    }, {
-	        key: 'getChildIndex',
-	        value: function getChildIndex(child) {
+	        key: 'indexOfChild',
+	        value: function indexOfChild(child) {
+	
 	            return (0, _utils.indexOf)(this.children || [], child);
 	        }
 	    }, {
 	        key: 'getChildAt',
 	        value: function getChildAt(index) {
+	
 	            var children = this.children;
 	            return children ? children[index] : null;
 	        }
@@ -2778,12 +2796,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'filterChild',
 	        value: function filterChild(iterator, context) {
+	
 	            var children = this.children;
 	            return children ? (0, _utils.filter)(children, iterator, context) : [];
 	        }
 	    }, {
 	        key: 'insertChild',
 	        value: function insertChild(child, index) {
+	
 	            var that = this;
 	
 	            if (child) {
@@ -2815,16 +2835,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'removeChild',
 	        value: function removeChild(child) {
-	            return this.removeChildAt(this.getChildIndex(child));
+	
+	            return this.removeChildAt(this.indexOfChild(child));
 	        }
 	    }, {
 	        key: 'removeChildAt',
 	        value: function removeChildAt(index) {
+	
 	            var that = this;
 	            var child = null;
 	            var children = that.children;
 	
 	            if (children && index >= 0) {
+	
 	                child = that.getChildAt(index);
 	
 	                if (child) {
@@ -2842,17 +2865,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getLinkCount',
 	        value: function getLinkCount() {
+	
 	            var links = this.links;
 	            return links ? links.length : 0;
 	        }
 	    }, {
-	        key: 'getLinkIndex',
-	        value: function getLinkIndex(link) {
+	        key: 'indexOfLink',
+	        value: function indexOfLink(link) {
+	
 	            return (0, _utils.indexOf)(this.links || [], link);
 	        }
 	    }, {
 	        key: 'getLinkAt',
 	        value: function getLinkAt(index) {
+	
 	            var links = this.links;
 	            return links ? links[index] : null;
 	        }
@@ -2870,23 +2896,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'filterLink',
 	        value: function filterLink(iterator, context) {
+	
 	            var links = this.links;
 	            return links ? (0, _utils.filter)(links, iterator, context) : [];
 	        }
 	    }, {
-	        key: 'insertLink',
-	        value: function insertLink(link, outgoing) {
+	        key: 'addLink',
+	        value: function addLink(link, outgoing) {
 	
 	            var that = this;
+	            var links = that.links;
 	
 	            if (link) {
+	
 	                link.removeFromTerminal(outgoing);
 	                link.setTerminal(that, outgoing);
 	
-	                var links = that.links;
-	
 	                // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
-	                if (!links || that.getLinkIndex(link) < 0 || link.getTerminal(!outgoing) !== that) {
+	                if (!links || that.indexOfLink(link) < 0 || link.getTerminal(!outgoing) !== that) {
 	
 	                    if (!links) {
 	                        links = that.links = [];
@@ -2896,7 +2923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            return link;
+	            return that;
 	        }
 	    }, {
 	        key: 'removeLink',
@@ -2909,7 +2936,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                // 连线的起点和终点是同一个节点时不需要移除
 	                if (links && link.getTerminal(!outgoing) !== that) {
-	                    var index = that.getLinkIndex(link);
+	                    var index = that.indexOfLink(link);
 	
 	                    if (index >= 0) {
 	                        links.splice(index, 1);
@@ -2928,6 +2955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getParent',
 	        value: function getParent() {
+	
 	            return this.parent;
 	        }
 	    }, {
@@ -2954,20 +2982,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'toString',
 	        value: function toString() {}
 	    }, {
+	        key: 'cloneData',
+	        value: function cloneData() {
+	
+	            var that = this;
+	            var data = that.data;
+	
+	            if (data) {
+	
+	                if (data.clone && (0, _utils.isFunction)(data.clone)) {
+	                    return data.clone();
+	                }
+	
+	                if ((0, _utils.isNode)(data)) {
+	                    return data.cloneNode(true);
+	                }
+	
+	                if ((0, _utils.isObject)(data)) {
+	                    return (0, _utils.merge)({}, data);
+	                }
+	            }
+	
+	            return data;
+	        }
+	    }, {
 	        key: 'clone',
-	        value: function clone() {}
+	        value: function clone(cloneData) {
+	
+	            var that = this;
+	            var raw = (0, _utils.merge)({}, that.raw);
+	
+	            raw.data = cloneData === true ? that.cloneData() : that.data;
+	            raw.visible = that.visible;
+	
+	            return new Cell(raw);
+	        }
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {}
-	    }, {
-	        key: 'markup',
-	        get: function get() {
-	            return this.constructor.markup;
-	        }
 	    }]);
 	
 	    return Cell;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = Cell;
 
@@ -4100,7 +4159,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var newParent = that.previous;
 	            var newIndex = that.previousIndex;
 	            var oldParent = child.parent;
-	            var oldIndex = oldParent ? oldParent.getChildIndex(child) : 0;
+	            var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
 	
 	            // 移除连线时，需要移除连线和节点的关联关系
 	            if (!newParent) {
@@ -4440,7 +4499,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var oldParent = cell.parent;
 	
 	            if (newParent) {
-	                if (newParent !== oldParent || oldParent.getChildIndex(cell) !== newIndex) {
+	                if (newParent !== oldParent || oldParent.indexOfChild(cell) !== newIndex) {
 	                    newParent.insertChild(cell, newIndex);
 	                }
 	            } else if (oldParent) {
@@ -4463,7 +4522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var oldNode = link.getNode(isSource);
 	
 	            if (newNode) {
-	                newNode.insertLink(link, isSource);
+	                newNode.addLink(link, isSource);
 	            } else if (oldNode) {
 	                oldNode.removeLink(link, isSource);
 	            }

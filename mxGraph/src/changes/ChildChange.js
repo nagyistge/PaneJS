@@ -22,7 +22,7 @@ export default Change.extend({
         var newParent = that.previous;
         var newIndex = that.previousIndex;
         var oldParent = child.parent;
-        var oldIndex = oldParent ? oldParent.getChildIndex(child) : 0;
+        var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
 
         // 移除连线时，需要移除连线和节点的关联关系
         if (!newParent) {
