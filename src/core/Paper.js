@@ -481,9 +481,13 @@ class Paper extends Events {
         return this.views[id];
     }
 
-    findViewByPoint(point) {}
+    findViewByPoint(point) {
 
-    findViewsInArea(rect) {}
+    }
+
+    findViewsInArea(rect) {
+
+    }
 
 
     // changes
@@ -612,7 +616,7 @@ class Paper extends Events {
         var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
 
         if (view) {
-            view.pointerdblclick(e, localPoint.x, localPoint.y);
+            view.onMouseDblClick(e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:pointerdblclick', e, localPoint.x, localPoint.y);
         }
@@ -620,13 +624,93 @@ class Paper extends Events {
 
     onMouseClick(e) {}
 
-    onPointerDown(e) {}
+    onPointerDown(e) {
 
-    onPointerMove(e) {}
+        e = normalizeEvent(e);
 
-    onCellMouseOver(e) {}
+        var that = this;
+        var view = that.findViewByElem(e.target);
 
-    onCellMouseOut(e) {}
+        if (!that.isValidEvent(e, view)) {
+            return;
+        }
+
+        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+
+        if (view) {
+            view.onPointerDown(e, localPoint.x, localPoint.y);
+        } else {
+            that.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
+        }
+    }
+
+    onPointerMove(e) {
+
+        e.preventDefault();
+        e = normalizeEvent(e);
+
+        var that = this;
+        var sourceView = that.sourceView;
+
+        if (sourceView) {
+
+            var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+
+            that._mouseMoved++;
+
+            sourceView.onPointerMove(e, localPoint.x, localPoint.y);
+        }
+    }
+
+    onPointerUp(e) {
+
+        e = normalizeEvent(e);
+
+        var that = this;
+        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        var sourceView = that.sourceView;
+
+        if (sourceView) {
+            sourceView.onPointerUp(e, localPoint.x, localPoint.y);
+            that.sourceView = null;
+        } else {
+            that.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
+        }
+    }
+
+    onCellMouseOver(e) {
+
+        e = normalizeEvent(e);
+
+        var that = this;
+        var view = that.findViewByElem(e.target);
+
+        if (view) {
+
+            if (!that.isValidEvent(e, view)) {
+                return;
+            }
+
+            view.mouseover(e);
+        }
+    }
+
+    onCellMouseOut(e) {
+
+        e = normalizeEvent(e);
+
+        var that = this;
+        var view = that.findViewByElem(e.target);
+
+        if (view) {
+
+            if (!that.isValidEvent(e, view)) {
+                return;
+            }
+
+            view.mouseout(e);
+        }
+    }
 }
 
 export default Paper;

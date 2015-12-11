@@ -5508,7 +5508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 	
 	            if (view) {
-	                view.pointerdblclick(e, localPoint.x, localPoint.y);
+	                view.onMouseDblClick(e, localPoint.x, localPoint.y);
 	            } else {
 	                that.trigger('blank:pointerdblclick', e, localPoint.x, localPoint.y);
 	            }
@@ -5518,16 +5518,97 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function onMouseClick(e) {}
 	    }, {
 	        key: 'onPointerDown',
-	        value: function onPointerDown(e) {}
+	        value: function onPointerDown(e) {
+	
+	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
+	            var view = that.findViewByElem(e.target);
+	
+	            if (!that.isValidEvent(e, view)) {
+	                return;
+	            }
+	
+	            var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+	
+	            if (view) {
+	                view.onPointerDown(e, localPoint.x, localPoint.y);
+	            } else {
+	                that.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
+	            }
+	        }
 	    }, {
 	        key: 'onPointerMove',
-	        value: function onPointerMove(e) {}
+	        value: function onPointerMove(e) {
+	
+	            e.preventDefault();
+	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
+	            var sourceView = that.sourceView;
+	
+	            if (sourceView) {
+	
+	                var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+	
+	                that._mouseMoved++;
+	
+	                sourceView.onPointerMove(e, localPoint.x, localPoint.y);
+	            }
+	        }
+	    }, {
+	        key: 'onPointerUp',
+	        value: function onPointerUp(e) {
+	
+	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
+	            var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+	            var sourceView = that.sourceView;
+	
+	            if (sourceView) {
+	                sourceView.onPointerUp(e, localPoint.x, localPoint.y);
+	                that.sourceView = null;
+	            } else {
+	                that.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
+	            }
+	        }
 	    }, {
 	        key: 'onCellMouseOver',
-	        value: function onCellMouseOver(e) {}
+	        value: function onCellMouseOver(e) {
+	
+	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
+	            var view = that.findViewByElem(e.target);
+	
+	            if (view) {
+	
+	                if (!that.isValidEvent(e, view)) {
+	                    return;
+	                }
+	
+	                view.mouseover(e);
+	            }
+	        }
 	    }, {
 	        key: 'onCellMouseOut',
-	        value: function onCellMouseOut(e) {}
+	        value: function onCellMouseOut(e) {
+	
+	            e = (0, _utils.normalizeEvent)(e);
+	
+	            var that = this;
+	            var view = that.findViewByElem(e.target);
+	
+	            if (view) {
+	
+	                if (!that.isValidEvent(e, view)) {
+	                    return;
+	                }
+	
+	                view.mouseout(e);
+	            }
+	        }
 	    }]);
 	
 	    return Paper;
