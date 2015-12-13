@@ -13,7 +13,7 @@ rules:
   indent:
     - 2
     - 4
-  no-var:      1
+  no-var: 1
   vars-on-top: 0
   func-names: 2
   prefer-const: 0

@@ -21,6 +21,14 @@ class Cell {
         return this.constructor.markup;
     }
 
+    get size() {
+        return this.raw.zise;
+    }
+
+    get attrs(){
+        return this.raw.attrs;
+    }
+
     constructor(options) {
 
         let that = this;

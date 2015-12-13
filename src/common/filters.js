@@ -1,7 +1,4 @@
-import {
-    format,
-    isFinite
-} from '../common/utils'
+import { format, isFinite } from '../common/utils'
 
 var filters = {
 

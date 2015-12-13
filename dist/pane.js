@@ -2678,6 +2678,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        get: function get() {
 	            return this.constructor.markup;
 	        }
+	    }, {
+	        key: 'size',
+	        get: function get() {
+	            return this.raw.zise;
+	        }
+	    }, {
+	        key: 'attrs',
+	        get: function get() {
+	            return this.raw.attrs;
+	        }
 	    }], [{
 	        key: 'configure',
 	        value: function configure(options) {
