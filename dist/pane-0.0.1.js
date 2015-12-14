@@ -682,9 +682,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            node = node.parentNode;
 	
 	            while (node && node !== stop) {
-	                var vElem = vectorize(node);
-	                if (vElem.hasClass(className)) {
-	                    return vElem;
+	                var vel = vectorize(node);
+	                if (vel.hasClass(className)) {
+	                    return vel;
 	                }
 	
 	                node = node.parentNode;
@@ -2675,49 +2675,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Cell = (function () {
-	    _createClass(Cell, [{
-	        key: 'markup',
-	        get: function get() {
-	            return this.constructor.markup;
-	        }
-	
-	        //get size() {
-	        //    return this.raw.zise;
-	        //}
-	        //
-	        //get attrs(){
-	        //    return this.raw.attrs;
-	        //}
-	
-	    }], [{
-	        key: 'configure',
-	        value: function configure(options) {
-	
-	            var that = this;
-	
-	            if (options) {
-	
-	                utils.forIn(options, function (val, key) {
-	
-	                    that[key] = key === 'defaults' ? utils.merge({}, that.defaults, val) : val;
-	                });
-	            }
-	        }
-	    }]);
-	
-	    function Cell(options) {
+	    function Cell() {
 	        _classCallCheck(this, Cell);
-	
-	        var that = this;
-	        var raw = utils.merge({}, that.constructor.defaults, options);
-	
-	        that.raw = raw;
-	        that.data = raw.data;
-	        that.attrs = raw.attrs;
-	        that.visible = raw.visible !== false;
-	        that.size = raw.size;
-	        that.position = raw.position;
-	        that.rotation = raw.rotation;
 	    }
 	
 	    _createClass(Cell, [{
@@ -3014,6 +2973,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {}
+	    }], [{
+	        key: 'configure',
+	        value: function configure(options) {
+	
+	            var that = this;
+	
+	            if (options) {
+	
+	                utils.forIn(options, function (val, key) {
+	
+	                    that[key] = key === 'defaults' ? utils.merge({}, that.defaults, val) : val;
+	                });
+	            }
+	        }
 	    }]);
 	
 	    return Cell;
@@ -3084,11 +3057,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(2);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Cell2 = __webpack_require__(15);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -3099,13 +3078,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Node = (function (_Cell) {
 	    _inherits(Node, _Cell);
 	
-	    function Node() {
+	    _createClass(Node, [{
+	        key: 'markup',
+	        get: function get() {
+	            return this.constructor.markup;
+	        }
+	    }, {
+	        key: 'className',
+	        get: function get() {
+	
+	            var classNames = this.raw.classNames;
+	
+	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
+	        }
+	    }]);
+	
+	    function Node(options) {
 	        _classCallCheck(this, Node);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Node).call(this));
+	
+	        var that = _this;
+	        var raw = utils.merge({}, that.constructor.defaults, options);
+	
+	        that.raw = raw;
+	        that.data = raw.data;
+	        that.attrs = raw.attrs;
+	        that.visible = raw.visible !== false;
+	        that.size = raw.size;
+	        that.position = raw.position;
+	        that.rotation = raw.rotation;
+	        return _this;
 	    }
 	
 	    _createClass(Node, [{
+	        key: 'isNode',
+	        value: function isNode() {
+	            return true;
+	        }
+	    }, {
 	        key: 'getPosition',
 	        value: function getPosition(relative) {}
 	    }, {
@@ -3121,11 +3132,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'rotate',
 	        value: function rotate() {}
 	    }, {
-	        key: 'isNode',
-	        value: function isNode() {
-	            return true;
-	        }
-	    }, {
 	        key: 'getBBox',
 	        value: function getBBox() {
 	            return false;
@@ -3136,8 +3142,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(_Cell3.default);
 	
 	Node.defaults = {
-	    // set `null` to use the default view
-	    view: null,
+	    classNames: ['pane-node'],
+	    view: null, // set `null` to use the default view
 	    size: {
 	        width: 1,
 	        height: 1,
@@ -3150,7 +3156,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    rotation: {
 	        angle: 0,
-	        relative: false
+	        relative: false,
+	        inherited: true // inherit the parent's rotation
 	    },
 	    attrs: {}
 	};
@@ -3174,6 +3181,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Events = __webpack_require__(14);
 	
 	var _Events2 = _interopRequireDefault(_Events);
@@ -3188,6 +3197,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var CellView = (function () {
@@ -3201,9 +3212,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.invalid = true;
 	
 	        that.ensureElement();
-	
-	        // attach cell's id to elem
-	        that.elem.cellId = cell.id;
 	    }
 	
 	    _createClass(CellView, [{
@@ -3211,10 +3219,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function ensureElement() {
 	
 	            var that = this;
-	            var vElem = (0, _vector2.default)('g');
+	            var cell = that.cell;
+	            var vel = (0, _vector2.default)('g', { 'class': cell.className });
 	
-	            that.elem = vElem.node;
-	            that.vElem = vElem;
+	            that.vel = vel;
+	            that.elem = vel.node;
+	            that.elem.cellId = cell.id; // attach cell's id to elem
+	
 	            that.paper.drawPane.appendChild(that.elem);
 	
 	            return that;
@@ -3232,7 +3243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'find',
 	        value: function find(selector) {
-	            return selector === '.' ? [this.vElem] : this.vElem.find(selector);
+	            return selector === '.' ? [this.vel] : this.vel.find(selector);
 	        }
 	    }, {
 	        key: 'applyFilter',
@@ -3256,9 +3267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                throw new Error('Non-existing filter: ' + name);
 	            }
 	
-	            var vElements = (0, _utils.isString)(selector) ? that.find(selector) : selector;
+	            var vels = (0, _utils.isString)(selector) ? that.find(selector) : selector;
 	
-	            if (!vElements.length) {
+	            if (!vels.length) {
 	                return that;
 	            }
 	
@@ -3288,8 +3299,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (0, _vector2.default)(svg).getDefs().append(vFilter);
 	            }
 	
-	            (0, _utils.forEach)(vElements, function (vElem) {
-	                vElem.attr(filter, 'url(#' + filterId + ')');
+	            (0, _utils.forEach)(vels, function (vel) {
+	                vel.attr(filter, 'url(#' + filterId + ')');
 	            });
 	
 	            return that;
@@ -3316,9 +3327,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return that;
 	            }
 	
-	            var vElements = (0, _utils.isString)(selector) ? that.find(selector) : selector;
+	            var vels = (0, _utils.isString)(selector) ? that.find(selector) : selector;
 	
-	            if (!vElements.length) {
+	            if (!vels.length) {
 	                return that;
 	            }
 	
@@ -3343,8 +3354,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (0, _vector2.default)(svg).getDefs().append(vGradient);
 	            }
 	
-	            (0, _utils.forEach)(vElements, function (vElem) {
-	                vElem.attr(attrName, 'url(#' + gradientId + ')');
+	            (0, _utils.forEach)(vels, function (vel) {
+	                vel.attr(attrName, 'url(#' + gradientId + ')');
 	            });
 	
 	            return that;
@@ -3388,6 +3399,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return CellView;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = CellView;
 
@@ -3643,35 +3657,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
 	
-	                var vElems = that.find(selector);
+	                var vels = that.find(selector);
 	
-	                if (!vElems.length) {
+	                if (!vels.length) {
 	                    return;
 	                }
 	
-	                nodesBySelector[selector] = vElems;
+	                nodesBySelector[selector] = vels;
 	
 	                var specialAttributes = NodeView.specialAttributes.slice();
 	
 	                if ((0, _utils.isObject)(attrs.filter)) {
 	                    specialAttributes.push('filter');
-	                    that.applyFilter(vElems, attrs.filter);
+	                    that.applyFilter(vels, attrs.filter);
 	                }
 	
 	                if ((0, _utils.isObject)(attrs.fill)) {
 	                    specialAttributes.push('fill');
-	                    that.applyGradient(vElems, 'fill', attrs.fill);
+	                    that.applyGradient(vels, 'fill', attrs.fill);
 	                }
 	
 	                if ((0, _utils.isObject)(attrs.stroke)) {
 	                    specialAttributes.push('stroke');
-	                    that.applyGradient(vElems, 'stroke', attrs.stroke);
+	                    that.applyGradient(vels, 'stroke', attrs.stroke);
 	                }
 	
 	                if (!(0, _utils.isUndefined)(attrs.text)) {
 	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
-	                    (0, _utils.forEach)(vElems, function (vElem) {
-	                        vElem.text(attrs.text + '', {
+	                    (0, _utils.forEach)(vels, function (vel) {
+	                        vel.text(attrs.text + '', {
 	                            lineHeight: attrs.lineHeight,
 	                            textPath: attrs.textPath,
 	                            annotations: attrs.annotations
@@ -3688,24 +3702,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	
 	                // set regular attributes
-	                (0, _utils.forEach)(vElems, function (vElem) {
-	                    vElem.attr(finalAttributes);
+	                (0, _utils.forEach)(vels, function (vel) {
+	                    vel.attr(finalAttributes);
 	                });
 	
 	                if (attrs.port) {
-	                    (0, _utils.forEach)(vElems, function (vElem) {
-	                        vElem.attr('port', (0, _utils.isUndefined)(attrs.port.id) ? attrs.port : attrs.port.id);
+	                    (0, _utils.forEach)(vels, function (vel) {
+	                        vel.attr('port', (0, _utils.isUndefined)(attrs.port.id) ? attrs.port : attrs.port.id);
 	                    });
 	                }
 	
 	                if (attrs.style) {
-	                    (0, _utils.forEach)(vElems, function (vElem) {
-	                        vElem.css(attrs.style);
+	                    (0, _utils.forEach)(vels, function (vel) {
+	                        vel.css(attrs.style);
 	                    });
 	                }
 	
 	                if (!(0, _utils.isUndefined)(attrs.html)) {
-	                    (0, _utils.forEach)(vElems, function (vElem) {});
+	                    (0, _utils.forEach)(vels, function (vel) {});
 	                }
 	
 	                // Special `ref-x` and `ref-y` attributes make it possible to
@@ -3728,8 +3742,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var all = allAttrs[selector];
 	                var attrs = specified ? (0, _utils.merge)({}, all, specified) : all;
 	
-	                (0, _utils.forEach)(nodesBySelector[selector], function (vElem) {
-	                    that.positionRelative(vElem, bbox, attrs, nodesBySelector);
+	                (0, _utils.forEach)(nodesBySelector[selector], function (vel) {
+	                    that.positionRelative(vel, bbox, attrs, nodesBySelector);
 	                });
 	            });
 	
@@ -3741,7 +3755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'positionRelative',
-	        value: function positionRelative(vElem, bbox, attributes, nodesBySelector) {
+	        value: function positionRelative(vel, bbox, attributes, nodesBySelector) {
 	
 	            var that = this;
 	            var ref = attributes['ref'];
@@ -3767,7 +3781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            refHeight = (0, _utils.toFloat)(refHeight, refHeightPercentage);
 	
 	            // Check if the node is a descendant of the scalable group.
-	            var scalableNode = vElem.findParent('pane-scalable', that.elem);
+	            var scalableNode = vel.findParent('pane-scalable', that.elem);
 	
 	            // `ref` is the selector of the reference element.
 	            // If no `ref` specified, reference element is the root element.
@@ -3778,7 +3792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (nodesBySelector && nodesBySelector[ref]) {
 	                    vref = nodesBySelector[ref][0];
 	                } else {
-	                    vref = ref === '.' ? that.vElem : that.vElem.findOne(ref);
+	                    vref = ref === '.' ? that.vel : that.vel.findOne(ref);
 	                }
 	
 	                if (!vref) {
@@ -3793,25 +3807,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // Remove the previous translate() from the transform attribute
 	            // and translate the element relative to the root bounding box
 	            // following the `ref-x` and `ref-y` attributes.
-	            var transformAttr = vElem.attr('transform');
+	            var transformAttr = vel.attr('transform');
 	            if (transformAttr) {
-	                vElem.attr('transform', (0, _utils.clearTranslate)(transformAttr));
+	                vel.attr('transform', (0, _utils.clearTranslate)(transformAttr));
 	            }
 	
 	            // `ref-width` and `ref-height` defines the width and height of the
 	            // subElement relatively to the reference element size.
 	            if (isFinite(refWidth)) {
 	                if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
-	                    vElem.attr('width', refWidth * bbox.width);
+	                    vel.attr('width', refWidth * bbox.width);
 	                } else {
-	                    vElem.attr('width', Math.max(refWidth + bbox.width, 0));
+	                    vel.attr('width', Math.max(refWidth + bbox.width, 0));
 	                }
 	            }
 	            if (isFinite(refHeight)) {
 	                if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
-	                    vElem.attr('height', refHeight * bbox.height);
+	                    vel.attr('height', refHeight * bbox.height);
 	                } else {
-	                    vElem.attr('height', Math.max(refHeight + bbox.height, 0));
+	                    vel.attr('height', Math.max(refHeight + bbox.height, 0));
 	                }
 	            }
 	
@@ -3862,7 +3876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (!(0, _utils.isUndefined)(yAlignment) || !(0, _utils.isUndefined)(xAlignment)) {
 	
-	                var velBBox = vElem.bbox(false, that.paper.drawPane);
+	                var velBBox = vel.bbox(false, that.paper.drawPane);
 	
 	                if (yAlignment === 'middle') {
 	                    ty -= velBBox.height / 2;
@@ -3877,7 +3891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            vElem.translate(tx, ty);
+	            vel.translate(tx, ty);
 	
 	            return that;
 	        }
@@ -3886,14 +3900,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function render() {
 	
 	            var that = this;
-	            var vElem = that.vElem;
+	            var vel = that.vel;
 	
-	            vElem.empty();
+	            vel.empty();
 	
 	            that.renderMarkup();
 	
-	            that.scalableNode = vElem.findOne('.pane-scalable');
-	            that.rotatableNode = vElem.findOne('.pane-rotatable');
+	            that.scalableNode = vel.findOne('.pane-scalable');
+	            that.rotatableNode = vel.findOne('.pane-rotatable');
 	
 	            return that.update().resize().rotate().translate();
 	        }
@@ -3906,7 +3920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var markup = cell.markup;
 	
 	            if (markup) {
-	                that.vElem.append((0, _vector2.default)(markup));
+	                that.vel.append((0, _vector2.default)(markup));
 	            } else {
 	                throw new Error('invalid markup');
 	            }
@@ -3969,7 +3983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var position = that.cell.position || { x: 0, y: 0 };
 	
-	            that.vElem.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+	            that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
 	            return that;
 	        }
 	    }, {
@@ -3998,7 +4012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'scale',
 	        value: function scale(sx, sy) {
 	            var that = this;
-	            that.vElem.scale(sx, sy);
+	            that.vel.scale(sx, sy);
 	            return that;
 	        }
 	    }, {

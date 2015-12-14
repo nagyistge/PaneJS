@@ -483,9 +483,9 @@ export class VElement {
         node = node.parentNode;
 
         while (node && node !== stop) {
-            var vElem = vectorize(node);
-            if (vElem.hasClass(className)) {
-                return vElem;
+            var vel = vectorize(node);
+            if (vel.hasClass(className)) {
+                return vel;
             }
 
             node = node.parentNode;

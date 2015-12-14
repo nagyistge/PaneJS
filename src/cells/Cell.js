@@ -17,32 +17,6 @@ class Cell {
         }
     }
 
-    get markup() {
-        return this.constructor.markup;
-    }
-
-    //get size() {
-    //    return this.raw.zise;
-    //}
-    //
-    //get attrs(){
-    //    return this.raw.attrs;
-    //}
-
-    constructor(options) {
-
-        let that = this;
-        let raw = utils.merge({}, that.constructor.defaults, options);
-
-        that.raw = raw;
-        that.data = raw.data;
-        that.attrs = raw.attrs;
-        that.visible = raw.visible !== false;
-        that.size = raw.size;
-        that.position = raw.position;
-        that.rotation = raw.rotation;
-    }
-
     isNode() {
         return false;
     }

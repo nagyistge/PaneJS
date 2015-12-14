@@ -6,34 +6,35 @@ import {
     isFinite
 } from '../common/utils';
 
-import Events  from '../common/Events';
-import vector  from '../common/vector';
-import filters from '../common/filters';
+import * as utils from '../common/utils';
+import Events     from '../common/Events';
+import vector     from '../common/vector';
+import filters    from '../common/filters';
 
 
 class CellView {
 
     constructor(paper, cell) {
 
-        var that = this;
+        let that = this;
 
         that.cell = cell;
         that.paper = paper;
         that.invalid = true;
 
         that.ensureElement();
-
-        // attach cell's id to elem
-        that.elem.cellId = cell.id;
     }
 
     ensureElement() {
 
-        var that = this;
-        var vElem = vector('g');
+        let that = this;
+        let cell = that.cell;
+        let vel = vector('g', {'class': cell.className});
 
-        that.elem = vElem.node;
-        that.vElem = vElem;
+        that.vel = vel;
+        that.elem = vel.node;
+        that.elem.cellId = cell.id; // attach cell's id to elem
+
         that.paper.drawPane.appendChild(that.elem);
 
         return that;
@@ -44,7 +45,7 @@ class CellView {
     update() { return this; }
 
     find(selector) {
-        return selector === '.' ? [this.vElem] : this.vElem.find(selector);
+        return selector === '.' ? [this.vel] : this.vel.find(selector);
     }
 
     applyFilter(selector, filter) {
@@ -54,33 +55,33 @@ class CellView {
         // `{ name: <name of the filter>, args: { <arguments>, ... }`.
         // An example is: `{ filter: { name: 'blur', args: { radius: 5 } } }`.
 
-        var that = this;
+        let that = this;
 
         filter = filter || {};
 
-        var name = filter.name || '';
-        var args = filter.args || {};
-        var attrs = filter.attrs;
-        var filterFn = filters[name];
+        let name = filter.name || '';
+        let args = filter.args || {};
+        let attrs = filter.attrs;
+        let filterFn = filters[name];
 
         if (!name || !filterFn) {
             throw new Error('Non-existing filter: ' + name);
         }
 
-        var vElements = isString(selector) ? that.find(selector) : selector;
+        let vels = isString(selector) ? that.find(selector) : selector;
 
-        if (!vElements.length) {
+        if (!vels.length) {
             return that;
         }
 
-        var paper = that.paper;
-        var svg = paper.svg;
-        var filterId = name + '-' + paper.id + '-' + hashCode(JSON.stringify(filter));
+        let paper = that.paper;
+        let svg = paper.svg;
+        let filterId = name + '-' + paper.id + '-' + hashCode(JSON.stringify(filter));
 
 
         if (!svg.getElementById(filterId)) {
 
-            var vFilter = vector(filterFn(args));
+            let vFilter = vector(filterFn(args));
             // Set the filter area to be 3x the bounding box of the cell
             // and center the filter around the cell.
             vFilter.attr({
@@ -100,8 +101,8 @@ class CellView {
             vector(svg).getDefs().append(vFilter);
         }
 
-        forEach(vElements, function (vElem) {
-            vElem.attr(filter, 'url(#' + filterId + ')');
+        forEach(vels, function (vel) {
+            vel.attr(filter, 'url(#' + filterId + ')');
         });
 
         return that;
@@ -115,31 +116,31 @@ class CellView {
         // `{ type: <linearGradient|radialGradient>, stops: [ { offset: <offset>, color: <color> }, ... ]`.
         // An example is: `{ fill: { type: 'linearGradient', stops: [ { offset: '10%', color: 'green' }, { offset: '50%', color: 'blue' } ] } }`.
 
-        var that = this;
+        let that = this;
 
         gradient = gradient || {};
 
-        var type = gradient.type;
-        var stops = gradient.stops;
-        var attrs = gradient.attrs;
+        let type = gradient.type;
+        let stops = gradient.stops;
+        let attrs = gradient.attrs;
 
         if (!attrName || !type || !stops || !stops.length) {
             return that;
         }
 
-        var vElements = isString(selector) ? that.find(selector) : selector;
+        let vels = isString(selector) ? that.find(selector) : selector;
 
-        if (!vElements.length) {
+        if (!vels.length) {
             return that;
         }
 
-        var paper = that.paper;
-        var svg = paper.svg;
-        var gradientId = type + '-' + paper.id + '-' + hashCode(JSON.stringify(gradient));
+        let paper = that.paper;
+        let svg = paper.svg;
+        let gradientId = type + '-' + paper.id + '-' + hashCode(JSON.stringify(gradient));
 
         if (!svg.getElementById(gradientId)) {
 
-            var gradientString = [
+            let gradientString = [
                 '<' + type + '>',
                 map(stops, function (stop) {
                     return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + (isFinite(stop.opacity) ? stop.opacity : 1) + '" />';
@@ -147,7 +148,7 @@ class CellView {
                 '</' + type + '>'
             ].join('');
 
-            var vGradient = vector(gradientString);
+            let vGradient = vector(gradientString);
 
             if (attrs) {
                 vGradient.attr(attrs);
@@ -158,8 +159,8 @@ class CellView {
             vector(svg).getDefs().append(vGradient);
         }
 
-        forEach(vElements, function (vElem) {
-            vElem.attr(attrName, 'url(#' + gradientId + ')');
+        forEach(vels, function (vel) {
+            vel.attr(attrName, 'url(#' + gradientId + ')');
         });
 
         return that;
@@ -183,8 +184,8 @@ class CellView {
 
     destroy() {
 
-        var that = this;
-        var elem = that.elem;
+        let that = this;
+        let elem = that.elem;
 
         if (elem && elem.parentNode) {
             elem.parentNode.removeChild(elem);
@@ -193,5 +194,8 @@ class CellView {
     }
 }
 
+
+// exports
+// -------
 
 export default CellView;
