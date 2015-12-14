@@ -2678,16 +2678,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        get: function get() {
 	            return this.constructor.markup;
 	        }
-	    }, {
-	        key: 'size',
-	        get: function get() {
-	            return this.raw.zise;
-	        }
-	    }, {
-	        key: 'attrs',
-	        get: function get() {
-	            return this.raw.attrs;
-	        }
+	
+	        //get size() {
+	        //    return this.raw.zise;
+	        //}
+	        //
+	        //get attrs(){
+	        //    return this.raw.attrs;
+	        //}
+	
 	    }], [{
 	        key: 'configure',
 	        value: function configure(options) {
@@ -3135,14 +3134,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(_Cell3.default);
 	
 	Node.defaults = {
-	    position: {
-	        x: 0,
-	        y: 0,
-	        relative: false
-	    },
+	    // set `null` to use the default view
+	    view: null,
 	    size: {
 	        width: 1,
 	        height: 1,
+	        relative: false
+	    },
+	    position: {
+	        x: 0,
+	        y: 0,
 	        relative: false
 	    },
 	    rotation: {
@@ -5805,10 +5806,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    defaults: {
 	        attrs: {
 	            'rect': {
-	                fill: '#ffffff',
-	                stroke: '#000000',
-	                width: 100,
-	                height: 60
+	                'fill': '#ffffff',
+	                'stroke': '#000000',
+	                'stroke-width': '1',
+	                'width': 50,
+	                'height': 30
 	            },
 	            'text': {
 	                fill: '#000000',

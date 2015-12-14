@@ -16,13 +16,23 @@
     var model = new pane.Model();
     var paper = new pane.Paper(container, model);
 
-    var rb = new pane.shapes.basic.Rect({
+    var rectParent = new pane.shapes.basic.Rect({
         position: {x: 50, y: 50},
         size: {width: 100, height: 40},
         attrs: {text: {text: 'basic.Rect'}}
     });
 
-    model.addCell(rb);
+    var rectChild = new pane.shapes.basic.Rect({
+        position: {x: 10, y: 10},
+        size: {width: 20, height: 20},
+        attrs: {text: {text: 'R'}}
+    });
+
+
+    console.log(rectParent);
+
+    model.addCell(rectParent);
+    model.addCell(rectChild, rectParent);
 
     var tb = new pane.shapes.basic.Text({
         position: {x: 170, y: 50},

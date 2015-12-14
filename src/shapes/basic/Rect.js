@@ -7,10 +7,11 @@ Rect.configure({
     defaults: {
         attrs: {
             'rect': {
-                fill: '#ffffff',
-                stroke: '#000000',
-                width: 100,
-                height: 60
+                'fill': '#ffffff',
+                'stroke': '#000000',
+                'stroke-width': '1',
+                'width': 50,
+                'height': 30
             },
             'text': {
                 fill: '#000000',

@@ -21,13 +21,13 @@ class Cell {
         return this.constructor.markup;
     }
 
-    get size() {
-        return this.raw.zise;
-    }
-
-    get attrs(){
-        return this.raw.attrs;
-    }
+    //get size() {
+    //    return this.raw.zise;
+    //}
+    //
+    //get attrs(){
+    //    return this.raw.attrs;
+    //}
 
     constructor(options) {
 

@@ -28,14 +28,16 @@ class Node extends Cell {
 }
 
 Node.defaults = {
-    position: {
-        x: 0,
-        y: 0,
-        relative: false
-    },
+    // set `null` to use the default view
+    view: null,
     size: {
         width: 1,
         height: 1,
+        relative: false
+    },
+    position: {
+        x: 0,
+        y: 0,
         relative: false
     },
     rotation: {
