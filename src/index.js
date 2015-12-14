@@ -1,3 +1,5 @@
+require('./style/index.less');
+
 export * as utils         from './common/utils';
 export vector, {VElement} from './common/vector';
 export Events             from './common/Events';

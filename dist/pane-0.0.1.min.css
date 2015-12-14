@@ -1,0 +1,11 @@
+.viewport {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none
+}
+
+.element * {
+  vector-effect: non-scaling-stroke;
+  -moz-user-select: none;
+  user-drag: none
+}

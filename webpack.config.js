@@ -1,6 +1,7 @@
 var webpack = require('webpack');
-var path = require('path');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var pkg = require('./package');
+var path = require('path');
 
 var paths = {
   src: path.resolve(__dirname, 'src'),
@@ -55,11 +56,18 @@ module.exports = {
             //'transform-simplify-comparison-operators'
           ]
         }
+      }, {
+        test: /\.less?$/,
+        loader: ExtractTextPlugin.extract(
+          'css?sourceMap&-minimize!' + 'less?sourceMap'
+        )
       }
     ]
   },
 
-  plugins: [],
+  plugins: [
+    new ExtractTextPlugin('[name].css')
+  ],
 
   devtool: 'source-map'
 };

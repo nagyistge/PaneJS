@@ -124,49 +124,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Paper3 = _interopRequireDefault(_Paper2);
 	
-	var _Generic = __webpack_require__(28);
+	var _Generic = __webpack_require__(29);
 	
 	var _Generic2 = _interopRequireDefault(_Generic);
 	
-	var _Text = __webpack_require__(29);
+	var _Text = __webpack_require__(30);
 	
 	var _Text2 = _interopRequireDefault(_Text);
 	
-	var _Rect = __webpack_require__(30);
+	var _Rect = __webpack_require__(31);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Circle = __webpack_require__(31);
+	var _Circle = __webpack_require__(32);
 	
 	var _Circle2 = _interopRequireDefault(_Circle);
 	
-	var _Ellipse = __webpack_require__(32);
+	var _Ellipse = __webpack_require__(33);
 	
 	var _Ellipse2 = _interopRequireDefault(_Ellipse);
 	
-	var _Image = __webpack_require__(33);
+	var _Image = __webpack_require__(34);
 	
 	var _Image2 = _interopRequireDefault(_Image);
 	
-	var _Path = __webpack_require__(34);
+	var _Path = __webpack_require__(35);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Polygon = __webpack_require__(35);
+	var _Polygon = __webpack_require__(36);
 	
 	var _Polygon2 = _interopRequireDefault(_Polygon);
 	
-	var _Polyline = __webpack_require__(36);
+	var _Polyline = __webpack_require__(37);
 	
 	var _Polyline2 = _interopRequireDefault(_Polyline);
 	
-	var _Rhombus = __webpack_require__(37);
+	var _Rhombus = __webpack_require__(38);
 	
 	var _Rhombus2 = _interopRequireDefault(_Rhombus);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	__webpack_require__(39);
 	
 	exports.utils = _utils;
 	exports.vector = _vector3.default;
@@ -4015,7 +4017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 22 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
@@ -4027,15 +4029,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var Change = (function () {
 	    function Change() {
-	        _classCallCheck(this, Change);
+	        //if (new.target === Change) {
+	        //    throw new Error('`Change` is an abstract class that cannot be instantiated.');
+	        //}
 	
-	        if (new.target === Change) {
-	            throw new Error('`Change` is an abstract class that cannot be instantiated.');
-	        }
+	        _classCallCheck(this, Change);
 	    }
 	
 	    _createClass(Change, [{
-	        key: 'digest',
+	        key: "digest",
 	        value: function digest() {
 	            return this;
 	        }
@@ -4911,7 +4913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _detector = __webpack_require__(38);
+	var _detector = __webpack_require__(28);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -5677,6 +5679,59 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 28 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var ua = navigator.userAgent;
+	var av = navigator.appVersion;
+	
+	exports.default = {
+	    // IE
+	    IS_IE: ua.indexOf('MSIE') >= 0,
+	
+	    IS_IE11: !!ua.match(/Trident\/7\./),
+	
+	    // Netscape
+	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
+	
+	    // Firefox
+	    IS_FF: ua.indexOf('Firefox/') >= 0,
+	
+	    // Chrome
+	    IS_GC: ua.indexOf('Chrome/') >= 0,
+	
+	    // Safari
+	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
+	
+	    // Opera
+	    IS_OP: ua.indexOf('Opera/') >= 0,
+	
+	    // True if -o-transform is available as a CSS style. This is the case
+	    // for Opera browsers that use Presto/2.5 and later.
+	    IS_OT: ua.indexOf('Presto/2.4.') < 0 && ua.indexOf('Presto/2.3.') < 0 && ua.indexOf('Presto/2.2.') < 0 && ua.indexOf('Presto/2.1.') < 0 && ua.indexOf('Presto/2.0.') < 0 && ua.indexOf('Presto/1.') < 0,
+	
+	    // True if -moz-transform is available as a CSS style. This is the case
+	    // for all Firefox-based browsers newer than or equal 3, such as Camino,
+	    // Iceweasel, Seamonkey and Iceape.
+	    IS_MT: ua.indexOf('Firefox/') >= 0 && ua.indexOf('Firefox/1.') < 0 && ua.indexOf('Firefox/2.') < 0 || ua.indexOf('Iceweasel/') >= 0 && ua.indexOf('Iceweasel/1.') < 0 && ua.indexOf('Iceweasel/2.') < 0 || ua.indexOf('SeaMonkey/') >= 0 && ua.indexOf('SeaMonkey/1.') < 0 || ua.indexOf('Iceape/') >= 0 && ua.indexOf('Iceape/1.') < 0,
+	
+	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
+	
+	    IS_WIN: av.indexOf('Win') > 0,
+	
+	    IS_MAC: av.indexOf('Mac') > 0,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement,
+	
+	    IS_POINTER: window.navigator.msPointerEnabled || false
+	};
+
+/***/ },
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5720,7 +5775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Generic;
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5729,7 +5784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5768,7 +5823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Text;
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5777,7 +5832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5829,7 +5884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5838,7 +5893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5892,7 +5947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Circle;
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5901,7 +5956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -5955,7 +6010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Ellipse;
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5964,7 +6019,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -6009,7 +6064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Image;
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6018,7 +6073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -6068,7 +6123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Path;
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6077,7 +6132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -6127,7 +6182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polygon;
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6136,7 +6191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(28);
+	var _Generic2 = __webpack_require__(29);
 	
 	var _Generic3 = _interopRequireDefault(_Generic2);
 	
@@ -6186,7 +6241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polyline;
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6195,7 +6250,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Path2 = __webpack_require__(34);
+	var _Path2 = __webpack_require__(35);
 	
 	var _Path3 = _interopRequireDefault(_Path2);
 	
@@ -6236,57 +6291,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rhombus;
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var ua = navigator.userAgent;
-	var av = navigator.appVersion;
-	
-	exports.default = {
-	    // IE
-	    IS_IE: ua.indexOf('MSIE') >= 0,
-	
-	    IS_IE11: !!ua.match(/Trident\/7\./),
-	
-	    // Netscape
-	    IS_NS: ua.indexOf('Mozilla/') >= 0 && ua.indexOf('MSIE') < 0,
-	
-	    // Firefox
-	    IS_FF: ua.indexOf('Firefox/') >= 0,
-	
-	    // Chrome
-	    IS_GC: ua.indexOf('Chrome/') >= 0,
-	
-	    // Safari
-	    IS_SF: ua.indexOf('AppleWebKit/') >= 0 && ua.indexOf('Chrome/') < 0,
-	
-	    // Opera
-	    IS_OP: ua.indexOf('Opera/') >= 0,
-	
-	    // True if -o-transform is available as a CSS style. This is the case
-	    // for Opera browsers that use Presto/2.5 and later.
-	    IS_OT: ua.indexOf('Presto/2.4.') < 0 && ua.indexOf('Presto/2.3.') < 0 && ua.indexOf('Presto/2.2.') < 0 && ua.indexOf('Presto/2.1.') < 0 && ua.indexOf('Presto/2.0.') < 0 && ua.indexOf('Presto/1.') < 0,
-	
-	    // True if -moz-transform is available as a CSS style. This is the case
-	    // for all Firefox-based browsers newer than or equal 3, such as Camino,
-	    // Iceweasel, Seamonkey and Iceape.
-	    IS_MT: ua.indexOf('Firefox/') >= 0 && ua.indexOf('Firefox/1.') < 0 && ua.indexOf('Firefox/2.') < 0 || ua.indexOf('Iceweasel/') >= 0 && ua.indexOf('Iceweasel/1.') < 0 && ua.indexOf('Iceweasel/2.') < 0 || ua.indexOf('SeaMonkey/') >= 0 && ua.indexOf('SeaMonkey/1.') < 0 || ua.indexOf('Iceape/') >= 0 && ua.indexOf('Iceape/1.') < 0,
-	
-	    IS_IOS: !!ua.match(/(iPad|iPhone|iPod)/g),
-	
-	    IS_WIN: av.indexOf('Win') > 0,
-	
-	    IS_MAC: av.indexOf('Mac') > 0,
-	
-	    IS_TOUCH: 'ontouchstart' in document.documentElement,
-	
-	    IS_POINTER: window.navigator.msPointerEnabled || false
-	};
+	// removed by extract-text-webpack-plugin
 
 /***/ }
 /******/ ])
