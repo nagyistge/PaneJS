@@ -173,8 +173,8 @@ class Paper extends Events {
         var svg = that.svg;
 
         addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
-        addEventListener(svg, 'dblclick', that.onMouseDblClick.bind(that));
-        addEventListener(svg, 'click', that.onMouseClick.bind(that));
+        addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
+        addEventListener(svg, 'click', that.onClick.bind(that));
         addEventListener(svg, 'mousedown', that.onPointerDown.bind(that));
         addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
         addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
@@ -601,7 +601,7 @@ class Paper extends Events {
         }
     }
 
-    onMouseDblClick(e) {
+    onDblClick(e) {
 
         e.preventDefault();
         e = normalizeEvent(e);
@@ -616,13 +616,13 @@ class Paper extends Events {
         var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
 
         if (view) {
-            view.onMouseDblClick(e, localPoint.x, localPoint.y);
+            view.onDblClick(e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:pointerdblclick', e, localPoint.x, localPoint.y);
         }
     }
 
-    onMouseClick(e) {}
+    onClick(e) {}
 
     onPointerDown(e) {
 

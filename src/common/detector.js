@@ -1,5 +1,5 @@
-var ua = navigator.userAgent;
-var av = navigator.appVersion;
+let ua = navigator.userAgent;
+let av = navigator.appVersion;
 
 export default {
     // IE

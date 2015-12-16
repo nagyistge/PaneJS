@@ -166,6 +166,9 @@ class CellView {
         return that;
     }
 
+
+    onContextMenu() {}
+
     onDblClick() {}
 
     onClick() {}
@@ -180,7 +183,7 @@ class CellView {
 
     onMouseOut() {}
 
-    onContextMenu() {}
+
 
     destroy() {
 

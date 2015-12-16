@@ -1,4 +1,5 @@
 import {
+    toRad,
     toDeg,
     toFloat,
     toFixed,
@@ -6,6 +7,7 @@ import {
     isObject,
     snapToGrid,
     isUndefined,
+    normalizeAngle,
 } from '../common/utils';
 
 var math = Math;
@@ -56,7 +58,7 @@ class Point {
         // @param {number} angle Angle in radians.
         // @param {point} [optional] o Origin.
 
-        o = (o && point(o)) || point(0, 0);
+        o = o || new Point(0, 0);
         var x = abs(r * cos(angle));
         var y = abs(r * sin(angle));
         var deg = normalizeAngle(toDeg(angle));
@@ -70,7 +72,7 @@ class Point {
             x = -x;
         }
 
-        return point(o.x + x, o.y + y);
+        return new Point(o.x + x, o.y + y);
     }
 
     static random(x1, x2, y1, y2) {
@@ -206,14 +208,14 @@ class Point {
         // An origin can be specified, otherwise it's `0 0`.
 
 
-        o = o && new Point(o) || new Point(0, 0);
+        o = o || new Point(0, 0);
 
         var that = this;
         var x = that.x;
         var y = that.y;
 
         that.x = sqrt((x - o.x) * (x - o.x) + (y - o.y) * (y - o.y)); // r
-        that.y = toRad(o.theta(point(x, y)));
+        that.y = toRad(o.theta(new Point(x, y)));
 
         return that;
     }

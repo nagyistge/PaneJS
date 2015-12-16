@@ -6,61 +6,73 @@ import {
     toFloat,
     contains,
     isObject,
+    isFinite,
     isUndefined,
     isPercentage,
     clearTranslate,
 } from '../common/utils';
 
 import vector   from '../common/vector';
+import Point    from '../geometry/Point';
 import CellView from './CellView';
+
 
 class NodeView extends CellView {
 
     update(specifiedAttrs) {
 
-        var that = this;
-        var cell = that.cell;
-        var allAttrs = cell.attrs;
-        var rotatableNode = that.rotatableNode;
+        // process the `attrs` object and set attributes
+        // on sub elements based on the selectors.
+
+        let that = this;
+        let cell = that.cell;
+        let allAttrs = cell.attrs;
+        let rotatableNode = that.rotatableNode;
+        let rotationAttr;
 
         if (rotatableNode) {
-            var rotationAttr = rotatableNode.attr('transform');
+            rotationAttr = rotatableNode.attr('transform');
             rotatableNode.attr('transform', '');
         }
 
-        var relativelySelectors = [];
-        var nodesBySelector = {};
+        let relativelySelectors = [];
+        let nodesBySelector = {};
 
         forIn(specifiedAttrs || allAttrs, function (attrs, selector) {
 
-            var vels = that.find(selector);
+            let vElements = that.find(selector);
 
-            if (!vels.length) {
+            if (!vElements.length) {
                 return;
             }
 
-            nodesBySelector[selector] = vels;
+            nodesBySelector[selector] = vElements;
 
-            var specialAttributes = NodeView.specialAttributes.slice();
+            let specialAttributes = NodeView.specialAttributes.slice();
 
+
+            // TODO: test attrs.filter
             if (isObject(attrs.filter)) {
                 specialAttributes.push('filter');
-                that.applyFilter(vels, attrs.filter);
+                that.applyFilter(vElements, attrs.filter);
             }
 
+            // TODO: test attrs.fill
             if (isObject(attrs.fill)) {
                 specialAttributes.push('fill');
-                that.applyGradient(vels, 'fill', attrs.fill);
+                that.applyGradient(vElements, 'fill', attrs.fill);
             }
 
+            // TODO: test attrs.stroke
             if (isObject(attrs.stroke)) {
                 specialAttributes.push('stroke');
-                that.applyGradient(vels, 'stroke', attrs.stroke);
+                that.applyGradient(vElements, 'stroke', attrs.stroke);
             }
 
+            // TODO: test attrs.text
             if (!isUndefined(attrs.text)) {
                 specialAttributes.push('lineHeight', 'textPath', 'annotations');
-                forEach(vels, function (vel) {
+                forEach(vElements, function (vel) {
                     vel.text(attrs.text + '', {
                         lineHeight: attrs.lineHeight,
                         textPath: attrs.textPath,
@@ -69,7 +81,7 @@ class NodeView extends CellView {
                 });
             }
 
-            var finalAttributes = {};
+            let finalAttributes = {};
 
             forIn(attrs, function (value, key) {
                 if (!contains(specialAttributes, key)) {
@@ -78,30 +90,34 @@ class NodeView extends CellView {
             });
 
             // set regular attributes
-            forEach(vels, function (vel) {
+            forEach(vElements, function (vel) {
                 vel.attr(finalAttributes);
             });
 
-            if (attrs.port) {
-                forEach(vels, function (vel) {
-                    vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
-                });
-            }
+            //if (attrs.port) {
+            //    forEach(vels, function (vel) {
+            //        vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
+            //    });
+            //}
 
-            if (attrs.style) {
-                forEach(vels, function (vel) {
-                    vel.css(attrs.style);
-                });
-            }
+            // TODO: vel.css()
+
+            //if (attrs.style) {
+            //    forEach(vels, function (vel) {
+            //        vel.css(attrs.style);
+            //    });
+            //}
+
+            // TODO: attrs.html
 
             if (!isUndefined(attrs.html)) {
-                forEach(vels, function (vel) {
+                forEach(vElements, function (vel) {
 
                 });
             }
 
             // Special `ref-x` and `ref-y` attributes make it possible to
-            // set both absolute or relative positioning of subElements.
+            // set both absolute or relative positioning of sub elements.
             some([
                 'ref-x',
                 'ref-y',
@@ -113,23 +129,20 @@ class NodeView extends CellView {
                 'ref-height'
             ], function (key) {
                 return !isUndefined(attrs[key]);
-            })
-            && relativelySelectors.push(selector);
+            }) && relativelySelectors.push(selector);
         });
 
 
         // Note that we're using the bounding box without transformation
         // because we are already inside a transformed coordinate system.
-        var size = cell.size;
-        var bbox = {x: 0, y: 0, width: size.width, height: size.height};
-
-        specifiedAttrs = specifiedAttrs || {};
+        let size = cell.size;
+        let bbox = {x: 0, y: 0, width: size.width, height: size.height};
 
         forEach(relativelySelectors, function (selector) {
 
-            var specified = specifiedAttrs[selector];
-            var all = allAttrs[selector];
-            var attrs = specified ? merge({}, all, specified) : all;
+            let specified = specifiedAttrs && specifiedAttrs[selector];
+            let all = allAttrs[selector];
+            let attrs = specified ? merge({}, all, specified) : all;
 
             forEach(nodesBySelector[selector], function (vel) {
                 that.positionRelative(vel, bbox, attrs, nodesBySelector);
@@ -145,41 +158,41 @@ class NodeView extends CellView {
 
     positionRelative(vel, bbox, attributes, nodesBySelector) {
 
-        var that = this;
-        var ref = attributes['ref'];
-        var refDx = toFloat(attributes['ref-dx']);
-        var refDy = toFloat(attributes['ref-dy']);
-        var yAlignment = attributes['y-alignment'];
-        var xAlignment = attributes['x-alignment'];
+        let that = this;
+        let ref = attributes['ref'];
+        let refDx = toFloat(attributes['ref-dx']);
+        let refDy = toFloat(attributes['ref-dy']);
+        let yAlignment = attributes['y-alignment'];
+        let xAlignment = attributes['x-alignment'];
 
-        var refX = attributes['ref-x'];
-        var refXPercentage = isPercentage(refX);
+        let refX = attributes['ref-x'];
+        let refXPercentage = isPercentage(refX);
         refX = toFloat(refX, refXPercentage);
 
-        var refY = attributes['ref-y'];
-        var refYPercentage = isPercentage(refY);
+        let refY = attributes['ref-y'];
+        let refYPercentage = isPercentage(refY);
         refY = toFloat(refY, refYPercentage);
 
-        var refWidth = attributes['ref-width'];
-        var refWidthPercentage = isPercentage(refWidth);
+        let refWidth = attributes['ref-width'];
+        let refWidthPercentage = isPercentage(refWidth);
         refWidth = toFloat(refWidth, refWidthPercentage);
 
-        var refHeight = attributes['ref-height'];
-        var refHeightPercentage = isPercentage(refHeight);
+        let refHeight = attributes['ref-height'];
+        let refHeightPercentage = isPercentage(refHeight);
         refHeight = toFloat(refHeight, refHeightPercentage);
 
 
         // Check if the node is a descendant of the scalable group.
-        var scalableNode = vel.findParent('pane-scalable', that.elem);
+        let scalableNode = vel.findParent('pane-scalable', that.elem);
 
         // `ref` is the selector of the reference element.
         // If no `ref` specified, reference element is the root element.
         if (ref) {
 
-            var vref;
+            let vref = nodesBySelector && nodesBySelector[ref];
 
-            if (nodesBySelector && nodesBySelector[ref]) {
-                vref = nodesBySelector[ref][0];
+            if (vref) {
+                vref = vref[0];
             } else {
                 vref = ref === '.' ? that.vel : that.vel.findOne(ref);
             }
@@ -196,13 +209,13 @@ class NodeView extends CellView {
         // Remove the previous translate() from the transform attribute
         // and translate the element relative to the root bounding box
         // following the `ref-x` and `ref-y` attributes.
-        var transformAttr = vel.attr('transform');
+        let transformAttr = vel.attr('transform');
         if (transformAttr) {
             vel.attr('transform', clearTranslate(transformAttr));
         }
 
         // `ref-width` and `ref-height` defines the width and height of the
-        // subElement relatively to the reference element size.
+        // sub element relatively to the reference element size.
         if (isFinite(refWidth)) {
             if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
                 vel.attr('width', refWidth * bbox.width);
@@ -210,6 +223,7 @@ class NodeView extends CellView {
                 vel.attr('width', Math.max(refWidth + bbox.width, 0));
             }
         }
+
         if (isFinite(refHeight)) {
             if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
                 vel.attr('height', refHeight * bbox.height);
@@ -218,12 +232,12 @@ class NodeView extends CellView {
             }
         }
 
-        // The final translation of the subElement.
-        var tx = 0;
-        var ty = 0;
-        var scale;
+        // The final translation of the sub element.
+        let tx = 0;
+        let ty = 0;
+        let scale;
 
-        // `ref-dx` and `ref-dy` define the offset of the subElement relative
+        // `ref-dx` and `ref-dy` define the offset of the sub element relative
         // to the right and/or bottom coordinate of the reference element.
         if (isFinite(refDx)) {
             if (scalableNode) {
@@ -233,6 +247,7 @@ class NodeView extends CellView {
                 tx = bbox.x + bbox.width + refDx;
             }
         }
+
         if (isFinite(refDy)) {
             if (scalableNode) {
                 scale = scale || scalableNode.scale();
@@ -252,6 +267,7 @@ class NodeView extends CellView {
                 tx = bbox.x + refX;
             }
         }
+
         if (isFinite(refY)) {
             if (refXPercentage || refY > 0 && refY < 1) {
                 ty = bbox.y + bbox.height * refY;
@@ -265,7 +281,7 @@ class NodeView extends CellView {
 
         if (!isUndefined(yAlignment) || !isUndefined(xAlignment)) {
 
-            var velBBox = vel.bbox(false, that.paper.drawPane);
+            let velBBox = vel.bbox(false, that.paper.drawPane);
 
             if (yAlignment === 'middle') {
                 ty -= velBBox.height / 2;
@@ -287,8 +303,8 @@ class NodeView extends CellView {
 
     render() {
 
-        var that = this;
-        var vel = that.vel;
+        let that = this;
+        let vel = that.vel;
 
         vel.empty();
 
@@ -305,52 +321,60 @@ class NodeView extends CellView {
 
     renderMarkup() {
 
-        var that = this;
-        var cell = that.cell;
-        var markup = cell.markup;
+        // `markup` is rendered by default. Set the `markup` attribute
+        // on the model if the default markup is not desirable.
+
+        let that = this;
+        let markup = that.cell.markup;
 
         if (markup) {
             that.vel.append(vector(markup));
         } else {
-            throw new Error('invalid markup');
+            throw new Error('`markup` is missing while the default render() implementation is used.');
         }
 
         return that;
     }
 
+    scale(sx, sy) {
+        this.vel.scale(sx, sy);
+        return this;
+    }
+
     resize() {
 
-        var that = this;
-        var size = that.cell.size || {width: 1, height: 1};
+        let that = this;
+        let size = that.cell.size || {width: 1, height: 1};
 
-        var scalableNode = that.scalableNode;
+        let scalableNode = that.scalableNode;
         if (!scalableNode) {
             return;
         }
 
-        var scalableBBox = scalableNode.bbox(true);
+        // get bbox without transform
+        let nativeBBox = scalableNode.bbox(true);
 
         // Make sure `scalableBBox.width` and `scalableBBox.height` are not
         // zero which can happen if the element does not have any content.
         // By making the width(height) 1, we prevent HTML errors of the type
         // `scale(Infinity, Infinity)`.
-        var sx = size.width / (scalableBBox.width || 1);
-        var sy = size.height / (scalableBBox.height || 1);
+        let sx = size.width / (nativeBBox.width || 1);
+        let sy = size.height / (nativeBBox.height || 1);
         scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
 
 
-        var rotation = that.cell.rotation || {angle: 0};
-        var angle = rotation.angle;
+        let rotation = that.cell.rotation || {angle: 0};
+        let angle = rotation.angle;
 
         // Cancel the rotation but now around a different origin,
         // which is the center of the scaled object.
-        var rotatableNode = that.rotatableNode;
-        var rotateAttr = rotatableNode && rotatableNode.attr('transform');
+        let rotatableNode = that.rotatableNode;
+        let rotateAttr = rotatableNode && rotatableNode.attr('transform');
 
         if (rotateAttr && rotateAttr !== 'null') {
 
             rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
-            var rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
+            let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
 
             // Store new x, y and perform rotate() again against the new rotation origin.
             that.position = {
@@ -369,38 +393,79 @@ class NodeView extends CellView {
 
     translate() {
 
-        var that = this;
-        var position = that.cell.position || {x: 0, y: 0};
+        let that = this;
+        let cell = that.cell;
+        let position = cell.position || {x: 0, y: 0};
+        let x = position.x;
+        let y = position.y;
 
-        that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+        while (position && position.relative) {
+            let parent = cell.parent;
+            position = parent.position;
+            x += position.x;
+            y += position.y;
+        }
+
+
+        that.vel.attr('transform', 'translate(' + x + ',' + y + ')');
         return that;
     }
 
     rotate() {
 
-        var that = this;
-        var node = that.rotatableNode;
+        let that = this;
+        let node = that.rotatableNode;
 
         if (node) {
 
-            var cell = that.cell;
-            var rotation = cell.rotation;
-            var angle = rotation && rotation.angle || 0;
+            let cell = that.cell;
+            let parent = cell.parent;
+            let rotation = cell.rotation;
+            let angle = rotation && rotation.angle || 0;
+            let size = cell.size || {width: 1, height: 1};
+
+            let point;
+
+            if (parent) {
+                rotation = parent.rotation;
+
+                let parentAngle = rotation && rotation.angle || 0;
+
+                if (parentAngle !== 0) {
+
+                    let position = cell.position;
+                    let parentSize = parent.size;
 
 
-            var size = cell.size || {width: 1, height: 1};
-            var ox = size.width / 2;
-            var oy = size.height / 2;
+                    // 计算子元素安父元素中心旋转后的左上角坐标
+
+                    // 获取旋转前 子元素的中心点
+                    point = new Point(position.x + size.width / 2, position.y + size.height / 2);
+                    // 按父元素的中心点旋转
+                    point = point.rotate(new Point(50 + parentSize.width / 2, 100 + parentSize.height / 2), -parentAngle);
+                    // 得到左上角坐标
+                    point.x -= size.width / 2;
+                    point.y -= size.height / 2;
+
+
+                    console.log(point);
+
+                    // 更新子元素的位置
+
+                    position.x = point.x;
+                    position.y = point.y;
+
+                    angle += parentAngle;
+
+                }
+            }
+
+            let ox = size.width / 2;
+            let oy = size.height / 2;
 
             node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
         }
 
-        return that;
-    }
-
-    scale(sx, sy) {
-        var that = this;
-        that.vel.scale(sx, sy);
         return that;
     }
 
@@ -409,19 +474,20 @@ class NodeView extends CellView {
 
 
 NodeView.specialAttributes = [
-    'style',
     'text',
     'html',
+    'style',
+    'ref',
     'ref-x',
     'ref-y',
     'ref-dx',
     'ref-dy',
     'ref-width',
     'ref-height',
-    'ref',
     'x-alignment',
     'y-alignment',
     'port'
 ];
+
 
 export default NodeView;

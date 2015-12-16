@@ -35,6 +35,9 @@ import Polygon  from './shapes/basic/Polygon';
 import Polyline from './shapes/basic/Polyline';
 import Rhombus  from './shapes/basic/Rhombus';
 
+import PortRect  from './shapes/port/Rect';
+
+
 var shapes = {
     basic: {
         Generic: Generic,
@@ -47,6 +50,10 @@ var shapes = {
         Polygon: Polygon,
         Polyline: Polyline,
         Rhombus: Rhombus,
+    },
+
+    port: {
+        Rect: PortRect
     }
 };
 
