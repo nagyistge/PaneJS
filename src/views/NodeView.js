@@ -423,7 +423,8 @@ class NodeView extends CellView {
             let rotation = cell.rotation;
             let angle = rotation && rotation.angle || 0;
             let size = cell.size || {width: 1, height: 1};
-
+            let ox = size.width / 2;
+            let oy = size.height / 2;
             let point;
 
             if (parent) {
@@ -460,8 +461,7 @@ class NodeView extends CellView {
                 }
             }
 
-            let ox = size.width / 2;
-            let oy = size.height / 2;
+
 
             node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
         }

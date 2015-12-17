@@ -4044,7 +4044,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var rotation = cell.rotation;
 	                var angle = rotation && rotation.angle || 0;
 	                var size = cell.size || { width: 1, height: 1 };
-	
+	                var ox = size.width / 2;
+	                var oy = size.height / 2;
 	                var point = undefined;
 	
 	                if (parent) {
@@ -4077,9 +4078,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        angle += parentAngle;
 	                    }
 	                }
-	
-	                var ox = size.width / 2;
-	                var oy = size.height / 2;
 	
 	                node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
 	            }
