@@ -17,24 +17,43 @@ class Node extends Cell {
 
     }
 
+
     constructor(options) {
 
         super();
 
         let that = this;
-        let raw = utils.merge({}, that.constructor.defaults, options);
+        let metadata = utils.merge({}, that.constructor.defaults, options);
 
-        that.raw = raw;
-        that.data = raw.data;
-        that.attrs = raw.attrs;
-        that.visible = raw.visible !== false;
-        that.size = raw.size;
-        that.position = raw.position;
-        that.rotation = raw.rotation;
+        that.raw = metadata;
+        that.data = metadata.data;
+        that.attrs = metadata.attrs;
+        that.visible = metadata.visible !== false;
+
+        that.size = metadata.size;
+        that.position = metadata.position;
+        that.rotation = metadata.rotation;
     }
 
     isNode() {
         return true;
+    }
+
+    isRelativeSize() {}
+
+    isRelativePosition() {}
+
+    getClassName() {
+
+        let classNames = this.raw.classNames;
+
+        return utils.isArray(classNames)
+            ? classNames.join(' ')
+            : classNames || '';
+    }
+
+    getMarkup() {
+        return this.constructor.markup;
     }
 
     getPosition(relative) {
@@ -60,8 +79,9 @@ class Node extends Cell {
 }
 
 Node.defaults = {
-    classNames: ['pane-node'],
-    view: null, // set `null` to use the default view
+
+    classNames: ['pane-node'], // `String` or `Array`
+    view: null,  // set `null` to use the default view
     size: {
         width: 1,
         height: 1,
@@ -74,8 +94,7 @@ Node.defaults = {
     },
     rotation: {
         angle: 0,
-        relative: false,
-        inherited: true   // inherit the parent's rotation
+        inherited: true // inherit the parent's rotation
     },
     attrs: {}
 };

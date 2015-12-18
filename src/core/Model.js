@@ -15,6 +15,7 @@ import ChildChange      from '../changes/ChildChange';
 import ChangeCollection from '../changes/ChangeCollection'
 
 class Model extends Events {
+
     constructor(root) {
 
         super();

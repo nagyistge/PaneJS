@@ -12,14 +12,15 @@ import {
     createSvgDocument
 } from '../common/utils';
 
-import Events   from '../common/Events';
-import vector   from '../common/vector';
-import detector from '../common/detector';
+import Events      from '../common/Events';
+import vector      from '../common/vector';
+import detector    from '../common/detector';
+import * as utils  from '../common/utils';
 
-import Model    from './Model';
-import Cell     from '../cells/Cell';
-import LinkView from '../views/LinkView';
-import NodeView from '../views/NodeView';
+import Model       from './Model';
+import Cell        from '../cells/Cell';
+import LinkView    from '../views/LinkView';
+import NodeView    from '../views/NodeView';
 
 import RootChange  from '../changes/RootChange';
 import ChildChange from '../changes/ChildChange';
@@ -139,6 +140,7 @@ class Paper extends Events {
         return svgPoint.matrixTransform(that.drawPane.getCTM().inverse());
     }
 
+
     // lift cycle
     // ----------
 
@@ -150,14 +152,17 @@ class Paper extends Events {
 
             var svg = createSvgDocument();
             var root = createSvgElement('g');
+            var backgroundPane = createSvgElement('g');
             var drawPane = createSvgElement('g');
 
+            root.appendChild(backgroundPane);
             root.appendChild(drawPane);
             svg.appendChild(root);
             container.appendChild(svg);
 
             that.svg = svg;
             that.root = root;
+            that.backgroundPane = backgroundPane;
             that.drawPane = drawPane;
             that.container = container;
 
@@ -212,7 +217,7 @@ class Paper extends Events {
     // validate
     // --------
 
-    revalidate() {
+    reValidate() {
         return this.invalidate().validate();
     }
 
@@ -319,10 +324,10 @@ class Paper extends Events {
                 if (view.invalid) {
                     view.invalid = false;
 
-                    that.validateView(cell.getParent(), recurse);
-
-                    // render
-                    that.renderView(cell);
+                    that
+                        .validateView(cell.getParent(), recurse)
+                        .updateNodeGeometry(cell)
+                        .renderView(cell);
                 }
             }
 
@@ -336,23 +341,124 @@ class Paper extends Events {
         return that;
     }
 
+    updateNodeGeometry(node) {
+
+        // update the geometry
+
+        return this
+            .updateNodeSize(node)
+            .updateNodePosition(node)
+            .updateNodeRotation(node);
+    }
+
+    updateNodeSize(node) {
+
+        var that = this;
+
+        if (node && node.isNode()) {
+
+            var parent = node.parent;
+            var raw = node.metadata.size;
+            var width = raw.width;
+            var height = raw.height;
+
+            if (raw && raw.relative && parent && parent.isNode()) {
+
+                var parentSize = parent.size;
+                var isPercentage = utils.isPercentage(width);
+
+                width = utils.fixNumber(width, isPercentage, 0);
+
+                if (isPercentage || width >= 0 && width <= 1) {
+                    width *= parentSize.width;
+                } else {
+                    width += parentSize.width;
+                }
+
+                isPercentage = utils.isPercentage(height);
+                height = utils.fixNumber(height, isPercentage, 0);
+
+                if (isPercentage || height >= 0 && height <= 1) {
+                    height *= parentSize.height;
+                } else {
+                    height += parentSize.height;
+                }
+
+            } else {
+                width = utils.fixNumber(width, false, 1);
+                height = utils.fixNumber(height, false, 1);
+            }
+
+            node.size = {
+                width: Math.max(width, 1),
+                height: Math.max(height, 1)
+            };
+        }
+
+        return that;
+    }
+
+    updateNodePosition(cell) {
+
+        var that = this;
+        var parent = cell.parent;
+        var raw = cell.metadata.position;
+        var x = utils.isUndefined(raw.x) ? 0 : raw.x;
+        var y = utils.isUndefined(raw.y) ? 0 : raw.y;
+
+
+        if (raw && raw.relative) {
+
+        } else {
+
+        }
+
+        cell.position = {
+            x: x,
+            y: y
+        };
+
+        return that;
+    }
+
+    updateNodeRotation(cell) {
+
+        var that = this;
+        var raw = cell.metadata.rotation;
+
+        return that;
+    }
+
 
     // transform
     // ---------
 
-    resize(width, height) {
+    resize(width, height, relative) {
 
         var that = this;
         var options = that.options;
 
-        width = options.width = width || options.width;
-        height = options.height = height || options.height;
+        if (relative === true) {
+            width += options.width;
+            height += options.height;
+        }
+
+        options.width = width;
+        options.height = height;
 
         vector(that.svg).attr({width: width, height: height});
 
         that.trigger('paper:resize', width, height);
 
         return that;
+    }
+
+    resizeTo(width, height) {
+        return this.resize(width, height, false);
+    }
+
+    resizeBy(width, height) {
+        return this.resize(width, height, true);
     }
 
     translate(x, y, absolute) {
@@ -374,11 +480,11 @@ class Paper extends Events {
         return this.translate(x, y, true);
     }
 
-    scale(sx, sy, ox = 0, oy = 0) {
+    translateBy(x, y) {
 
     }
 
-    rotate(deg, ox = 0, oy = 0) {
+    scale(sx, sy, ox = 0, oy = 0) {
 
     }
 
@@ -408,18 +514,19 @@ class Paper extends Events {
         var options = that.options;
 
         // get view's constructor from options.
-        var ViewClass = options.getView.call(that, cell);
+        // TODO: getCellView
+        var ViewConstructor = options.getView.call(that, cell);
 
-        if (!ViewClass) {
-            ViewClass = cell.isLink()
+        if (!ViewConstructor) {
+            ViewConstructor = cell.isLink()
                 ? LinkView : cell.isNode()
                 ? NodeView
                 : null;
         }
 
-        if (ViewClass) {
+        if (ViewConstructor) {
 
-            var view = new ViewClass(that, cell);
+            var view = new ViewConstructor(that, cell);
             var views = that.views;
 
             if (!views) {
@@ -453,6 +560,8 @@ class Paper extends Events {
         if (view) {
             view.render();
         }
+
+        return that;
     }
 
     findViewByElem(elem) {

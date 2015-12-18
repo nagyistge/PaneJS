@@ -22,10 +22,17 @@ function toFixed(value, precision) {
     return toFloat((Math.round(value * power) / power).toFixed(precision));
 }
 
+function fixNumber(num, isPercentage, defaultValue) {
+    var ret = toFloat(num, isPercentage);
+
+    return isNaN(ret) ? defaultValue : ret;
+}
+
 export {
     toInt,
     toFloat,
     toFixed,
     isFinite,
-    isPercentage
+    isPercentage,
+    fixNumber
 };

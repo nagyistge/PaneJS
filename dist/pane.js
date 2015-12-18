@@ -1801,7 +1801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	exports.fixNumber = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
 	
 	var _lang = __webpack_require__(3);
 	
@@ -1827,11 +1827,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return toFloat((Math.round(value * power) / power).toFixed(precision));
 	}
 	
+	function fixNumber(num, isPercentage, defaultValue) {
+	    var ret = toFloat(num, isPercentage);
+	
+	    return isNaN(ret) ? defaultValue : ret;
+	}
+	
 	exports.toInt = toInt;
 	exports.toFloat = toFloat;
 	exports.toFixed = toFixed;
 	exports.isFinite = isFinite;
 	exports.isPercentage = isPercentage;
+	exports.fixNumber = fixNumber;
 
 /***/ },
 /* 8 */
@@ -3107,15 +3114,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Node).call(this));
 	
 	        var that = _this;
-	        var raw = utils.merge({}, that.constructor.defaults, options);
+	        var metadata = utils.merge({}, that.constructor.defaults, options);
 	
-	        that.raw = raw;
-	        that.data = raw.data;
-	        that.attrs = raw.attrs;
-	        that.visible = raw.visible !== false;
-	        that.size = raw.size;
-	        that.position = raw.position;
-	        that.rotation = raw.rotation;
+	        that.raw = metadata;
+	        that.data = metadata.data;
+	        that.attrs = metadata.attrs;
+	        that.visible = metadata.visible !== false;
+	
+	        that.size = metadata.size;
+	        that.position = metadata.position;
+	        that.rotation = metadata.rotation;
 	        return _this;
 	    }
 	
@@ -3123,6 +3131,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'isNode',
 	        value: function isNode() {
 	            return true;
+	        }
+	    }, {
+	        key: 'isRelativeSize',
+	        value: function isRelativeSize() {}
+	    }, {
+	        key: 'isRelativePosition',
+	        value: function isRelativePosition() {}
+	    }, {
+	        key: 'getClassName',
+	        value: function getClassName() {
+	
+	            var classNames = this.raw.classNames;
+	
+	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
+	        }
+	    }, {
+	        key: 'getMarkup',
+	        value: function getMarkup() {
+	            return this.constructor.markup;
 	        }
 	    }, {
 	        key: 'getPosition',
@@ -3150,7 +3177,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(_Cell3.default);
 	
 	Node.defaults = {
-	    classNames: ['pane-node'],
+	
+	    classNames: ['pane-node'], // `String` or `Array`
 	    view: null, // set `null` to use the default view
 	    size: {
 	        width: 1,
@@ -3164,7 +3192,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    rotation: {
 	        angle: 0,
-	        relative: false,
 	        inherited: true // inherit the parent's rotation
 	    },
 	    attrs: {}
@@ -4028,6 +4055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            that.vel.attr('transform', 'translate(' + x + ',' + y + ')');
+	
 	            return that;
 	        }
 	    }, {
@@ -4988,6 +5016,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Events2 = __webpack_require__(14);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
@@ -5025,6 +5055,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -5162,14 +5194,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var svg = (0, _utils.createSvgDocument)();
 	                var root = (0, _utils.createSvgElement)('g');
+	                var backgroundPane = (0, _utils.createSvgElement)('g');
 	                var drawPane = (0, _utils.createSvgElement)('g');
 	
+	                root.appendChild(backgroundPane);
 	                root.appendChild(drawPane);
 	                svg.appendChild(root);
 	                container.appendChild(svg);
 	
 	                that.svg = svg;
 	                that.root = root;
+	                that.backgroundPane = backgroundPane;
 	                that.drawPane = drawPane;
 	                that.container = container;
 	
@@ -5225,8 +5260,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // --------
 	
 	    }, {
-	        key: 'revalidate',
-	        value: function revalidate() {
+	        key: 'reValidate',
+	        value: function reValidate() {
 	            return this.invalidate().validate();
 	        }
 	    }, {
@@ -5343,10 +5378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (view.invalid) {
 	                        view.invalid = false;
 	
-	                        that.validateView(cell.getParent(), recurse);
-	
-	                        // render
-	                        that.renderView(cell);
+	                        that.validateView(cell.getParent(), recurse).updateNodeGeometry(cell).renderView(cell);
 	                    }
 	                }
 	
@@ -5359,25 +5391,123 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return that;
 	        }
+	    }, {
+	        key: 'updateNodeGeometry',
+	        value: function updateNodeGeometry(node) {
+	
+	            // update the geometry
+	
+	            return this.updateNodeSize(node).updateNodePosition(node).updateNodeRotation(node);
+	        }
+	    }, {
+	        key: 'updateNodeSize',
+	        value: function updateNodeSize(node) {
+	
+	            var that = this;
+	
+	            if (node && node.isNode()) {
+	
+	                var parent = node.parent;
+	                var raw = node.metadata.size;
+	                var width = raw.width;
+	                var height = raw.height;
+	
+	                if (raw && raw.relative && parent && parent.isNode()) {
+	
+	                    var parentSize = parent.size;
+	                    var isPercentage = utils.isPercentage(width);
+	
+	                    width = utils.fixNumber(width, isPercentage, 0);
+	
+	                    if (isPercentage || width >= 0 && width <= 1) {
+	                        width *= parentSize.width;
+	                    } else {
+	                        width += parentSize.width;
+	                    }
+	
+	                    isPercentage = utils.isPercentage(height);
+	                    height = utils.fixNumber(height, isPercentage, 0);
+	
+	                    if (isPercentage || height >= 0 && height <= 1) {
+	                        height *= parentSize.height;
+	                    } else {
+	                        height += parentSize.height;
+	                    }
+	                } else {
+	                    width = utils.fixNumber(width, false, 1);
+	                    height = utils.fixNumber(height, false, 1);
+	                }
+	
+	                node.size = {
+	                    width: Math.max(width, 1),
+	                    height: Math.max(height, 1)
+	                };
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'updateNodePosition',
+	        value: function updateNodePosition(cell) {
+	
+	            var that = this;
+	            var parent = cell.parent;
+	            var raw = cell.metadata.position;
+	            var x = utils.isUndefined(raw.x) ? 0 : raw.x;
+	            var y = utils.isUndefined(raw.y) ? 0 : raw.y;
+	
+	            if (raw && raw.relative) {} else {}
+	
+	            cell.position = {
+	                x: x,
+	                y: y
+	            };
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'updateNodeRotation',
+	        value: function updateNodeRotation(cell) {
+	
+	            var that = this;
+	            var raw = cell.metadata.rotation;
+	
+	            return that;
+	        }
 	
 	        // transform
 	        // ---------
 	
 	    }, {
 	        key: 'resize',
-	        value: function resize(width, height) {
+	        value: function resize(width, height, relative) {
 	
 	            var that = this;
 	            var options = that.options;
 	
-	            width = options.width = width || options.width;
-	            height = options.height = height || options.height;
+	            if (relative === true) {
+	                width += options.width;
+	                height += options.height;
+	            }
+	
+	            options.width = width;
+	            options.height = height;
 	
 	            (0, _vector2.default)(that.svg).attr({ width: width, height: height });
 	
 	            that.trigger('paper:resize', width, height);
 	
 	            return that;
+	        }
+	    }, {
+	        key: 'resizeTo',
+	        value: function resizeTo(width, height) {
+	            return this.resize(width, height, false);
+	        }
+	    }, {
+	        key: 'resizeBy',
+	        value: function resizeBy(width, height) {
+	            return this.resize(width, height, true);
 	        }
 	    }, {
 	        key: 'translate',
@@ -5401,16 +5531,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.translate(x, y, true);
 	        }
 	    }, {
+	        key: 'translateBy',
+	        value: function translateBy(x, y) {}
+	    }, {
 	        key: 'scale',
 	        value: function scale(sx, sy) {
 	            var ox = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 	            var oy = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
-	        }
-	    }, {
-	        key: 'rotate',
-	        value: function rotate(deg) {
-	            var ox = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	            var oy = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 	        }
 	
 	        // view
@@ -5441,15 +5568,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var options = that.options;
 	
 	            // get view's constructor from options.
-	            var ViewClass = options.getView.call(that, cell);
+	            // TODO: getCellView
+	            var ViewConstructor = options.getView.call(that, cell);
 	
-	            if (!ViewClass) {
-	                ViewClass = cell.isLink() ? _LinkView2.default : cell.isNode() ? _NodeView2.default : null;
+	            if (!ViewConstructor) {
+	                ViewConstructor = cell.isLink() ? _LinkView2.default : cell.isNode() ? _NodeView2.default : null;
 	            }
 	
-	            if (ViewClass) {
+	            if (ViewConstructor) {
 	
-	                var view = new ViewClass(that, cell);
+	                var view = new ViewConstructor(that, cell);
 	                var views = that.views;
 	
 	                if (!views) {
@@ -5485,6 +5613,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (view) {
 	                view.render();
 	            }
+	
+	            return that;
 	        }
 	    }, {
 	        key: 'findViewByElem',

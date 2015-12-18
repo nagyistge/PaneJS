@@ -408,6 +408,7 @@ class NodeView extends CellView {
 
 
         that.vel.attr('transform', 'translate(' + x + ',' + y + ')');
+
         return that;
     }
 
