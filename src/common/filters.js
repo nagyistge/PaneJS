@@ -1,6 +1,10 @@
 import { format, isFinite } from '../common/utils'
 
-var filters = {
+
+// exports
+// -------
+
+export default {
 
     outline: function (args) {
 
@@ -9,11 +13,21 @@ var filters = {
         // `opacity` ... outline opacity
         // `margin` ... gap between outline and the element
 
+        let tpl = '' +
+            '<filter>' +
+            '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' +
+            '  <feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" />' +
+            '  <feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" />' +
+            '  <feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/>' +
+            '  <feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/>' +
+            '  <feMerge>' +
+            '    <feMergeNode in="outline"/>' +
+            '    <feMergeNode in="SourceGraphic"/>' +
+            '  </feMerge>' +
+            '</filter>';
 
-        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" /><feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" /><feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/><feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/><feMerge><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-
-        var margin = isFinite(args.margin) ? args.margin : 2;
-        var width = isFinite(args.width) ? args.width : 1;
+        let margin = isFinite(args.margin) ? args.margin : 2;
+        let width = isFinite(args.width) ? args.width : 1;
 
         return format(tpl)({
             color: args.color || 'blue',
@@ -30,7 +44,14 @@ var filters = {
         // `blur` ... blur
         // `opacity` ... opacity
 
-        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/><feComposite result="composed" in="colored" in2="morphed" operator="in"/><feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/><feBlend in="SourceGraphic" in2="blured" mode="normal"/></filter>';
+        let tpl = '' +
+            '<filter>' +
+            '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' +
+            '  <feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/>' +
+            '  <feComposite result="composed" in="colored" in2="morphed" operator="in"/>' +
+            '  <feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/> ' +
+            '  <feBlend in="SourceGraphic" in2="blured" mode="normal"/>' +
+            '</filter>';
 
         return format(tpl)({
             color: args.color || 'red',
@@ -45,9 +66,14 @@ var filters = {
         // `x` ... horizontal blur
         // `y` ... vertical blur (optional)
 
-        var x = isFinite(args.x) ? args.x : 2;
+        let tpl = '' +
+            '<filter>' +
+            '  <feGaussianBlur stdDeviation="${stdDeviation}"/>' +
+            '</filter>';
 
-        return format('<filter><feGaussianBlur stdDeviation="${stdDeviation}"/></filter>')({
+        let x = isFinite(args.x) ? args.x : 2;
+
+        return format(tpl)({
             stdDeviation: isFinite(args.y) ? [x, args.y] : x
         });
     },
@@ -60,7 +86,7 @@ var filters = {
         // `color` ... color
         // `opacity` ... opacity
 
-        var tpl = 'SVGFEDropShadowElement' in window
+        let tpl = 'SVGFEDropShadowElement' in window
             ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>'
             : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
 
@@ -73,15 +99,20 @@ var filters = {
         });
     },
 
-    grayscale: function (args) {
+    grayScale: function (args) {
 
         // `amount` ... the proportion of the conversion.
         // A value of 1 is completely grayscale.
         // A value of 0 leaves the input unchanged.
 
-        var amount = isFinite(args.amount) ? args.amount : 1;
+        let tpl = '' +
+            '<filter>' +
+            '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/>' +
+            '</filter>';
 
-        return format('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/></filter>')({
+        let amount = isFinite(args.amount) ? args.amount : 1;
+
+        return format(tpl)({
             a: 0.2126 + 0.7874 * (1 - amount),
             b: 0.7152 - 0.7152 * (1 - amount),
             c: 0.0722 - 0.0722 * (1 - amount),
@@ -99,9 +130,14 @@ var filters = {
         // A value of 1 is completely sepia.
         // A value of 0 leaves the input unchanged.
 
-        var amount = isFinite(args.amount) ? args.amount : 1;
+        let template = '' +
+            '<filter>' +
+            '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/>' +
+            '</filter>';
 
-        return format('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/></filter>')({
+        let amount = isFinite(args.amount) ? args.amount : 1;
+
+        return format(template)({
             a: 0.393 + 0.607 * (1 - amount),
             b: 0.769 - 0.769 * (1 - amount),
             c: 0.189 - 0.189 * (1 - amount),
@@ -120,9 +156,14 @@ var filters = {
         // A value of 0 is completely un-saturated.
         // A value of 1 leaves the input unchanged.
 
-        var amount = isFinite(args.amount) ? args.amount : 1;
+        let template = '' +
+            '<filter>' +
+            '  <feColorMatrix type="saturate" values="${amount}"/>' +
+            '</filter>';
 
-        return format('<filter><feColorMatrix type="saturate" values="${amount}"/></filter>')({
+        let amount = isFinite(args.amount) ? args.amount : 1;
+
+        return format(template)({
             amount: 1 - amount
         });
     },
@@ -132,7 +173,12 @@ var filters = {
         // `angle` ...  the number of degrees around the color
         // circle the input samples will be adjusted.
 
-        return format('<filter><feColorMatrix type="hueRotate" values="${angle}"/></filter>')({
+        let template = '' +
+            '<filter>' +
+            '  <feColorMatrix type="hueRotate" values="${angle}"/>' +
+            '</filter>';
+
+        return format(template)({
             angle: args.angle || 0
         });
     },
@@ -143,9 +189,18 @@ var filters = {
         // A value of 1 is completely inverted.
         // A value of 0 leaves the input unchanged.
 
-        var amount = isFinite(args.amount) ? args.amount : 1;
+        let template = '' +
+            '<filter>' +
+            '  <feComponentTransfer>' +
+            '    <feFuncR type="table" tableValues="${amount} ${amount2}"/>' +
+            '    <feFuncG type="table" tableValues="${amount} ${amount2}"/>' +
+            '    <feFuncB type="table" tableValues="${amount} ${amount2}"/>' +
+            '  </feComponentTransfer>' +
+            '</filter>';
 
-        return format('<filter><feComponentTransfer><feFuncR type="table" tableValues="${amount} ${amount2}"/><feFuncG type="table" tableValues="${amount} ${amount2}"/><feFuncB type="table" tableValues="${amount} ${amount2}"/></feComponentTransfer></filter>')({
+        let amount = isFinite(args.amount) ? args.amount : 1;
+
+        return format(template)({
             amount: amount,
             amount2: 1 - amount
         });
@@ -157,7 +212,16 @@ var filters = {
         // A value of 0 will create an image that is completely black.
         // A value of 1 leaves the input unchanged.
 
-        return format('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}"/><feFuncG type="linear" slope="${amount}"/><feFuncB type="linear" slope="${amount}"/></feComponentTransfer></filter>')({
+        let template = '' +
+            '<filter>' +
+            '  <feComponentTransfer>' +
+            '    <feFuncR type="linear" slope="${amount}"/>' +
+            '    <feFuncG type="linear" slope="${amount}"/>' +
+            '    <feFuncB type="linear" slope="${amount}"/>' +
+            '  </feComponentTransfer>' +
+            '</filter>';
+
+        return format(template)({
             amount: isFinite(args.amount) ? args.amount : 1
         });
     },
@@ -168,14 +232,20 @@ var filters = {
         // A value of 0 will create an image that is completely black.
         // A value of 1 leaves the input unchanged.
 
-        var amount = isFinite(args.amount) ? args.amount : 1;
+        let template = '' +
+            '<filter>' +
+            '  <feComponentTransfer>' +
+            '    <feFuncR type="linear" slope="${amount}" intercept="${amount2}"/>' +
+            '    <feFuncG type="linear" slope="${amount}" intercept="${amount2}"/>' +
+            '    <feFuncB type="linear" slope="${amount}" intercept="${amount2}"/>' +
+            '  </feComponentTransfer>' +
+            '</filter>';
 
-        return format('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}" intercept="${amount2}"/><feFuncG type="linear" slope="${amount}" intercept="${amount2}"/><feFuncB type="linear" slope="${amount}" intercept="${amount2}"/></feComponentTransfer></filter>')({
+        let amount = isFinite(args.amount) ? args.amount : 1;
+
+        return format(template)({
             amount: amount,
             amount2: .5 - amount / 2
         });
     }
 };
-
-
-export default filters;

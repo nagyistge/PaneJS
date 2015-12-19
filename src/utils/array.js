@@ -1,6 +1,7 @@
 import { isArray, isArrayLike } from './lang';
 
-var proto = Array.prototype;
+let proto = Array.prototype;
+
 
 function toArray(obj) {
     return isArray(obj)
@@ -48,6 +49,7 @@ function reduceRight(arr, iterator, initialValue) {
 function contains(arr, item) {
     return arr && indexOf(arr, item) >= 0;
 }
+
 
 export {
     map,

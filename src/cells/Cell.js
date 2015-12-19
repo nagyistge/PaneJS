@@ -1,5 +1,6 @@
 import * as utils from '../common/utils';
 
+
 class Cell {
 
     static configure(options) {
@@ -16,15 +17,6 @@ class Cell {
             });
         }
     }
-
-    isNode() {
-        return false;
-    }
-
-    isLink() {
-        return false;
-    }
-
 
     // link
     // ----

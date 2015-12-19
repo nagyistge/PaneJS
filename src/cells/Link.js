@@ -3,7 +3,7 @@ import Cell from './Cell';
 
 class Link extends Cell {
 
-    isLink() {
+    get isLink() {
         return true;
     }
 }

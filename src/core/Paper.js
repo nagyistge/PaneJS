@@ -360,14 +360,14 @@ class Paper extends Events {
     updateNodeSize(node) {
 
         // only update the node's size
-        if (node && node.isNode()) {
+        if (node && node.isNode) {
 
             let parent = node.parent;
             let raw = node.metadata.size || {};
             let width = !isUndefined(raw.width) ? raw.width : 1;
             let height = !isUndefined(raw.height) ? raw.height : 1;
 
-            if (raw.relative && parent && parent.isNode()) {
+            if (raw.relative && parent && parent.isNode) {
 
                 let parentSize = parent.size;
                 let isPercent = isPercentage(width);
@@ -405,14 +405,14 @@ class Paper extends Events {
 
     updateNodePosition(node) {
 
-        if (node && node.isNode()) {
+        if (node && node.isNode) {
 
             let parent = node.parent;
             let raw = node.metadata.position || {};
             let x = !isUndefined(raw.x) ? raw.x : 0;
             let y = !isUndefined(raw.y) ? raw.y : 0;
 
-            if (raw.relative && parent && parent.isNode()) {
+            if (raw.relative && parent && parent.isNode) {
 
                 let parentSize = parent.size;
                 let parentPosition = parent.position;
@@ -453,13 +453,13 @@ class Paper extends Events {
 
     updateNodeRotation(node) {
 
-        if (node && node.isNode()) {
+        if (node && node.isNode) {
 
             let parent = node.parent;
             let raw = node.metadata.rotation || {};
             let angle = fixNumber(raw.angle, false, 0);
 
-            if (raw.inherited && parent && parent.isNode() && parent.rotation !== 0) {
+            if (raw.inherited && parent && parent.isNode && parent.rotation !== 0) {
 
                 // update node's position
                 let size = node.size;
@@ -494,8 +494,8 @@ class Paper extends Events {
 
         let that = this;
         let options = that.options;
-        var nativeWidth = options.width;
-        var nativeHeight = options.height;
+        let nativeWidth = options.width;
+        let nativeHeight = options.height;
 
         width = isUndefined(width) ? nativeWidth : width;
         height = isUndefined(height) ? nativeHeight : height;
@@ -503,8 +503,8 @@ class Paper extends Events {
         if (relative === true) {
 
             let svg = that.svg;
-            var isPercent = isPercentage(width);
-            var isNativePercent = isPercentage(nativeWidth);
+            let isPercent = isPercentage(width);
+            let isNativePercent = isPercentage(nativeWidth);
 
             if (isPercent) {
                 if (isNativePercent) {
@@ -606,8 +606,8 @@ class Paper extends Events {
         let ViewConstructor = options.getView.call(that, cell);
 
         if (!ViewConstructor) {
-            ViewConstructor = cell.isLink()
-                ? LinkView : cell.isNode()
+            ViewConstructor = cell.isLink
+                ? LinkView : cell.isNode
                 ? NodeView
                 : null;
         }

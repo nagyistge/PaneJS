@@ -2530,6 +2530,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var splitter = /\s+/;
@@ -2539,7 +2543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var result = true;
 	
 	    for (var i = 0, l = callbacks.length; i < l; i += 2) {
-	        result = (0, _utils.invoke)(callbacks[i], args, callbacks[i + 1] || context) && result;
+	        result = utils.invoke(callbacks[i], args, callbacks[i + 1] || context) && result;
 	    }
 	
 	    return result;
@@ -2564,7 +2568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            events = events.split(splitter);
 	
-	            (0, _utils.forEach)(events, function (event) {
+	            utils.forEach(events, function (event) {
 	                var list = listeners[event] || (listeners[event] = []);
 	                list.push(callback, context);
 	            });
@@ -2601,9 +2605,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return that;
 	            }
 	
-	            events = events ? events.split(splitter) : (0, _utils.keys)(listeners);
+	            events = events ? events.split(splitter) : utils.keys(listeners);
 	
-	            (0, _utils.forEach)(events, function (event) {
+	            utils.forEach(events, function (event) {
 	
 	                var list = listeners[event];
 	
@@ -2644,9 +2648,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var result = true;
 	            var commonCallbacks = listeners['*'];
 	
-	            (0, _utils.forEach)(eventName.split(splitter), function (event) {
+	            utils.forEach(eventName.split(splitter), function (event) {
 	
-	                var callbacks;
+	                var callbacks = undefined;
 	
 	                if (event !== '*') {
 	                    callbacks = listeners[event];
@@ -2666,6 +2670,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Events;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = Events;
 
@@ -2695,21 +2702,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    _createClass(Cell, [{
-	        key: 'isNode',
-	        value: function isNode() {
-	            return false;
-	        }
-	    }, {
-	        key: 'isLink',
-	        value: function isLink() {
-	            return false;
-	        }
+	        key: 'getTerminal',
 	
 	        // link
 	        // ----
 	
-	    }, {
-	        key: 'getTerminal',
 	        value: function getTerminal(isSource) {
 	
 	            return isSource ? this.source : this.target;
@@ -3047,7 +3044,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _createClass(Link, [{
 	        key: 'isLink',
-	        value: function isLink() {
+	        get: function get() {
 	            return true;
 	        }
 	    }]);
@@ -3074,15 +3071,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var utils = _interopRequireWildcard(_utils);
-	
 	var _Cell2 = __webpack_require__(15);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -3094,6 +3087,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _inherits(Node, _Cell);
 	
 	    _createClass(Node, [{
+	        key: 'isNode',
+	        get: function get() {
+	            return true;
+	        }
+	    }, {
 	        key: 'markup',
 	        get: function get() {
 	            return this.constructor.markup;
@@ -3104,7 +3102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var classNames = this.metadata.classNames;
 	
-	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
+	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
 	        }
 	    }]);
 	
@@ -3114,7 +3112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Node).call(this));
 	
 	        var that = _this;
-	        var metadata = utils.merge({}, that.constructor.defaults, options);
+	        var metadata = (0, _utils.merge)({}, that.constructor.defaults, options);
 	
 	        that.data = metadata.data;
 	        that.attrs = metadata.attrs;
@@ -3140,7 +3138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var classNames = this.raw.classNames;
 	
-	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
+	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
 	        }
 	    }, {
 	        key: 'getMarkup',
@@ -3448,7 +3446,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var filters = {
+	// exports
+	// -------
+	
+	exports.default = {
 	
 	    outline: function outline(args) {
 	
@@ -3457,7 +3458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // `opacity` ... outline opacity
 	        // `margin` ... gap between outline and the element
 	
-	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" /><feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" /><feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/><feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/><feMerge><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	        var tpl = '' + '<filter>' + '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' + '  <feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" />' + '  <feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" />' + '  <feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/>' + '  <feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/>' + '  <feMerge>' + '    <feMergeNode in="outline"/>' + '    <feMergeNode in="SourceGraphic"/>' + '  </feMerge>' + '</filter>';
 	
 	        var margin = (0, _utils.isFinite)(args.margin) ? args.margin : 2;
 	        var width = (0, _utils.isFinite)(args.width) ? args.width : 1;
@@ -3477,7 +3478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // `blur` ... blur
 	        // `opacity` ... opacity
 	
-	        var tpl = '<filter><feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/><feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/><feComposite result="composed" in="colored" in2="morphed" operator="in"/><feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/><feBlend in="SourceGraphic" in2="blured" mode="normal"/></filter>';
+	        var tpl = '' + '<filter>' + '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' + '  <feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/>' + '  <feComposite result="composed" in="colored" in2="morphed" operator="in"/>' + '  <feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/> ' + '  <feBlend in="SourceGraphic" in2="blured" mode="normal"/>' + '</filter>';
 	
 	        return (0, _utils.format)(tpl)({
 	            color: args.color || 'red',
@@ -3492,9 +3493,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // `x` ... horizontal blur
 	        // `y` ... vertical blur (optional)
 	
+	        var tpl = '' + '<filter>' + '  <feGaussianBlur stdDeviation="${stdDeviation}"/>' + '</filter>';
+	
 	        var x = (0, _utils.isFinite)(args.x) ? args.x : 2;
 	
-	        return (0, _utils.format)('<filter><feGaussianBlur stdDeviation="${stdDeviation}"/></filter>')({
+	        return (0, _utils.format)(tpl)({
 	            stdDeviation: (0, _utils.isFinite)(args.y) ? [x, args.y] : x
 	        });
 	    },
@@ -3518,15 +3521,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    },
 	
-	    grayscale: function grayscale(args) {
+	    grayScale: function grayScale(args) {
 	
 	        // `amount` ... the proportion of the conversion.
 	        // A value of 1 is completely grayscale.
 	        // A value of 0 leaves the input unchanged.
 	
+	        var tpl = '' + '<filter>' + '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/>' + '</filter>';
+	
 	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
 	
-	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/></filter>')({
+	        return (0, _utils.format)(tpl)({
 	            a: 0.2126 + 0.7874 * (1 - amount),
 	            b: 0.7152 - 0.7152 * (1 - amount),
 	            c: 0.0722 - 0.0722 * (1 - amount),
@@ -3544,9 +3549,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // A value of 1 is completely sepia.
 	        // A value of 0 leaves the input unchanged.
 	
+	        var template = '' + '<filter>' + '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/>' + '</filter>';
+	
 	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
 	
-	        return (0, _utils.format)('<filter><feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/></filter>')({
+	        return (0, _utils.format)(template)({
 	            a: 0.393 + 0.607 * (1 - amount),
 	            b: 0.769 - 0.769 * (1 - amount),
 	            c: 0.189 - 0.189 * (1 - amount),
@@ -3565,9 +3572,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // A value of 0 is completely un-saturated.
 	        // A value of 1 leaves the input unchanged.
 	
+	        var template = '' + '<filter>' + '  <feColorMatrix type="saturate" values="${amount}"/>' + '</filter>';
+	
 	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
 	
-	        return (0, _utils.format)('<filter><feColorMatrix type="saturate" values="${amount}"/></filter>')({
+	        return (0, _utils.format)(template)({
 	            amount: 1 - amount
 	        });
 	    },
@@ -3577,7 +3586,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // `angle` ...  the number of degrees around the color
 	        // circle the input samples will be adjusted.
 	
-	        return (0, _utils.format)('<filter><feColorMatrix type="hueRotate" values="${angle}"/></filter>')({
+	        var template = '' + '<filter>' + '  <feColorMatrix type="hueRotate" values="${angle}"/>' + '</filter>';
+	
+	        return (0, _utils.format)(template)({
 	            angle: args.angle || 0
 	        });
 	    },
@@ -3588,9 +3599,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // A value of 1 is completely inverted.
 	        // A value of 0 leaves the input unchanged.
 	
+	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="table" tableValues="${amount} ${amount2}"/>' + '    <feFuncG type="table" tableValues="${amount} ${amount2}"/>' + '    <feFuncB type="table" tableValues="${amount} ${amount2}"/>' + '  </feComponentTransfer>' + '</filter>';
+	
 	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
 	
-	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="table" tableValues="${amount} ${amount2}"/><feFuncG type="table" tableValues="${amount} ${amount2}"/><feFuncB type="table" tableValues="${amount} ${amount2}"/></feComponentTransfer></filter>')({
+	        return (0, _utils.format)(template)({
 	            amount: amount,
 	            amount2: 1 - amount
 	        });
@@ -3602,7 +3615,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // A value of 0 will create an image that is completely black.
 	        // A value of 1 leaves the input unchanged.
 	
-	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}"/><feFuncG type="linear" slope="${amount}"/><feFuncB type="linear" slope="${amount}"/></feComponentTransfer></filter>')({
+	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="linear" slope="${amount}"/>' + '    <feFuncG type="linear" slope="${amount}"/>' + '    <feFuncB type="linear" slope="${amount}"/>' + '  </feComponentTransfer>' + '</filter>';
+	
+	        return (0, _utils.format)(template)({
 	            amount: (0, _utils.isFinite)(args.amount) ? args.amount : 1
 	        });
 	    },
@@ -3613,16 +3628,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // A value of 0 will create an image that is completely black.
 	        // A value of 1 leaves the input unchanged.
 	
+	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="linear" slope="${amount}" intercept="${amount2}"/>' + '    <feFuncG type="linear" slope="${amount}" intercept="${amount2}"/>' + '    <feFuncB type="linear" slope="${amount}" intercept="${amount2}"/>' + '  </feComponentTransfer>' + '</filter>';
+	
 	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
 	
-	        return (0, _utils.format)('<filter><feComponentTransfer><feFuncR type="linear" slope="${amount}" intercept="${amount2}"/><feFuncG type="linear" slope="${amount}" intercept="${amount2}"/><feFuncB type="linear" slope="${amount}" intercept="${amount2}"/></feComponentTransfer></filter>')({
+	        return (0, _utils.format)(template)({
 	            amount: amount,
 	            amount2: .5 - amount / 2
 	        });
 	    }
 	};
-	
-	exports.default = filters;
 
 /***/ },
 /* 20 */
@@ -3988,7 +4003,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function resize() {
 	
 	            var that = this;
-	            var size = that.cell.size;
 	            var scalableNode = that.scalableNode;
 	
 	            if (!scalableNode) {
@@ -4002,6 +4016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // zero which can happen if the element does not have any content.
 	            // By making the width(height) 1, we prevent HTML errors of the type
 	            // `scale(Infinity, Infinity)`.
+	            var size = that.cell.size;
 	            var sx = size.width / (nativeBBox.width || 1);
 	            var sy = size.height / (nativeBBox.height || 1);
 	            scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
@@ -4092,15 +4107,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var Change = (function () {
 	    function Change() {
-	        //if (new.target === Change) {
-	        //    throw new Error('`Change` is an abstract class that cannot be instantiated.');
-	        //}
-	
 	        _classCallCheck(this, Change);
 	    }
 	
 	    _createClass(Change, [{
 	        key: "digest",
+	
+	        //constructor() {
+	        //    if (new.target === Change) {
+	        //        throw new Error('`Change` is an abstract class that cannot be instantiated.');
+	        //    }
+	        //}
+	
 	        value: function digest() {
 	            return this;
 	        }
@@ -4108,6 +4126,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Change;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = Change;
 
@@ -4168,6 +4189,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return RootChange;
 	})(_Change3.default);
+	
+	// exports
+	// -------
 	
 	exports.default = RootChange;
 
@@ -4252,7 +4276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var model = that.model;
 	
-	            if (cell.isLink()) {
+	            if (cell.isLink) {
 	
 	                var source = cell.getTerminal(true);
 	                var target = cell.getTerminal(false);
@@ -4279,6 +4303,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return ChildChange;
 	})(_Change3.default);
+	
+	// exports
+	// -------
 	
 	exports.default = ChildChange;
 
@@ -4952,6 +4979,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ChangeCollection;
 	})();
 	
+	// exports
+	// -------
+	
 	exports.default = ChangeCollection;
 
 /***/ },
@@ -5360,14 +5390,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function updateNodeSize(node) {
 	
 	            // only update the node's size
-	            if (node && node.isNode()) {
+	            if (node && node.isNode) {
 	
 	                var parent = node.parent;
 	                var raw = node.metadata.size || {};
 	                var width = !(0, _utils.isUndefined)(raw.width) ? raw.width : 1;
 	                var height = !(0, _utils.isUndefined)(raw.height) ? raw.height : 1;
 	
-	                if (raw.relative && parent && parent.isNode()) {
+	                if (raw.relative && parent && parent.isNode) {
 	
 	                    var parentSize = parent.size;
 	                    var isPercent = (0, _utils.isPercentage)(width);
@@ -5405,14 +5435,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'updateNodePosition',
 	        value: function updateNodePosition(node) {
 	
-	            if (node && node.isNode()) {
+	            if (node && node.isNode) {
 	
 	                var parent = node.parent;
 	                var raw = node.metadata.position || {};
 	                var x = !(0, _utils.isUndefined)(raw.x) ? raw.x : 0;
 	                var y = !(0, _utils.isUndefined)(raw.y) ? raw.y : 0;
 	
-	                if (raw.relative && parent && parent.isNode()) {
+	                if (raw.relative && parent && parent.isNode) {
 	
 	                    var parentSize = parent.size;
 	                    var parentPosition = parent.position;
@@ -5452,13 +5482,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'updateNodeRotation',
 	        value: function updateNodeRotation(node) {
 	
-	            if (node && node.isNode()) {
+	            if (node && node.isNode) {
 	
 	                var parent = node.parent;
 	                var raw = node.metadata.rotation || {};
 	                var angle = (0, _utils.fixNumber)(raw.angle, false, 0);
 	
-	                if (raw.inherited && parent && parent.isNode() && parent.rotation !== 0) {
+	                if (raw.inherited && parent && parent.isNode && parent.rotation !== 0) {
 	
 	                    // update node's position
 	                    var size = node.size;
@@ -5612,7 +5642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var ViewConstructor = options.getView.call(that, cell);
 	
 	            if (!ViewConstructor) {
-	                ViewConstructor = cell.isLink() ? _LinkView2.default : cell.isNode() ? _NodeView2.default : null;
+	                ViewConstructor = cell.isLink ? _LinkView2.default : cell.isNode ? _NodeView2.default : null;
 	            }
 	
 	            if (ViewConstructor) {
@@ -5941,6 +5971,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	var ua = navigator.userAgent;
 	var av = navigator.appVersion;
+	
+	// exports
+	// -------
 	
 	exports.default = {
 	    // IE

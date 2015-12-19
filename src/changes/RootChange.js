@@ -1,5 +1,6 @@
 import Change from './Change';
 
+
 class RootChange extends Change {
 
     constructor(model, root) {
@@ -26,5 +27,8 @@ class RootChange extends Change {
     }
 }
 
+
+// exports
+// -------
 
 export default RootChange;

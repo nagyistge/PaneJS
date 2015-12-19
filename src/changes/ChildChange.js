@@ -1,5 +1,6 @@
 import Change from './Change';
 
+
 class ChildChange extends Change {
 
     constructor(model, parent, child, index) {
@@ -51,7 +52,7 @@ class ChildChange extends Change {
         var that = this;
         var model = that.model;
 
-        if (cell.isLink()) {
+        if (cell.isLink) {
 
             var source = cell.getTerminal(true);
             var target = cell.getTerminal(false);
@@ -76,5 +77,8 @@ class ChildChange extends Change {
     }
 }
 
+
+// exports
+// -------
 
 export default ChildChange;

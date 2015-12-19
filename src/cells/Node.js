@@ -1,7 +1,16 @@
-import * as utils from '../common/utils';
-import Cell       from './Cell';
+import {
+    merge,
+    isArray
+} from '../common/utils';
+
+import Cell from './Cell';
+
 
 class Node extends Cell {
+
+    get isNode() {
+        return true;
+    }
 
     get markup() {
         return this.constructor.markup;
@@ -11,7 +20,7 @@ class Node extends Cell {
 
         let classNames = this.metadata.classNames;
 
-        return utils.isArray(classNames)
+        return isArray(classNames)
             ? classNames.join(' ')
             : classNames || '';
 
@@ -23,7 +32,7 @@ class Node extends Cell {
         super();
 
         let that = this;
-        let metadata = utils.merge({}, that.constructor.defaults, options);
+        let metadata = merge({}, that.constructor.defaults, options);
 
         that.data = metadata.data;
         that.attrs = metadata.attrs;
@@ -43,7 +52,7 @@ class Node extends Cell {
 
         let classNames = this.raw.classNames;
 
-        return utils.isArray(classNames)
+        return isArray(classNames)
             ? classNames.join(' ')
             : classNames || '';
     }

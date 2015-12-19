@@ -1,21 +1,19 @@
-import {
-    keys,
-    invoke,
-    forEach,
-} from '../common/utils';
+import * as utils from '../common/utils';
 
 const splitter = /\s+/;
+
 
 function triggerEvents(callbacks, args, context) {
 
     var result = true;
 
     for (let i = 0, l = callbacks.length; i < l; i += 2) {
-        result = invoke(callbacks[i], args, callbacks[i + 1] || context) && result;
+        result = utils.invoke(callbacks[i], args, callbacks[i + 1] || context) && result;
     }
 
     return result;
 }
+
 
 class Events {
 
@@ -31,8 +29,8 @@ class Events {
 
         events = events.split(splitter);
 
-        forEach(events, function (event) {
-            var list = listeners[event] || (listeners[event] = []);
+        utils.forEach(events, function (event) {
+            let list = listeners[event] || (listeners[event] = []);
             list.push(callback, context);
         });
 
@@ -41,8 +39,8 @@ class Events {
 
     once(events, callback, context) {
 
-        var that = this;
-        var cb = function () {
+        let that = this;
+        let cb = function () {
             that.off(events, cb);
             callback.apply(context || that, arguments);
         };
@@ -52,8 +50,8 @@ class Events {
 
     off(events, callback, context) {
 
-        var that = this;
-        var listeners = that.__events;
+        let that = this;
+        let listeners = that.__events;
 
         // No events.
         if (!listeners) {
@@ -66,11 +64,11 @@ class Events {
             return that;
         }
 
-        events = events ? events.split(splitter) : keys(listeners);
+        events = events ? events.split(splitter) : utils.keys(listeners);
 
-        forEach(events, function (event) {
+        utils.forEach(events, function (event) {
 
-            var list = listeners[event];
+            let list = listeners[event];
 
             if (!list) {
                 return;
@@ -95,20 +93,20 @@ class Events {
 
     trigger(eventName, ...args) {
 
-        var that = this;
-        var listeners = that.__events;
+        let that = this;
+        let listeners = that.__events;
 
         // No events.
         if (!listeners || !eventName) {
             return null;
         }
 
-        var result = true;
-        var commonCallbacks = listeners['*'];
+        let result = true;
+        let commonCallbacks = listeners['*'];
 
-        forEach(eventName.split(splitter), function (event) {
+        utils.forEach(eventName.split(splitter), function (event) {
 
-            var callbacks;
+            let callbacks;
 
             if (event !== '*') {
                 callbacks = listeners[event];
@@ -125,5 +123,9 @@ class Events {
         return result;
     }
 }
+
+
+// exports
+// -------
 
 export default Events;

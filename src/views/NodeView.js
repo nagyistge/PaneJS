@@ -344,7 +344,6 @@ class NodeView extends CellView {
     resize() {
 
         let that = this;
-        let size = that.cell.size;
         let scalableNode = that.scalableNode;
 
         if (!scalableNode) {
@@ -358,6 +357,7 @@ class NodeView extends CellView {
         // zero which can happen if the element does not have any content.
         // By making the width(height) 1, we prevent HTML errors of the type
         // `scale(Infinity, Infinity)`.
+        let size = that.cell.size;
         let sx = size.width / (nativeBBox.width || 1);
         let sy = size.height / (nativeBBox.height || 1);
         scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
