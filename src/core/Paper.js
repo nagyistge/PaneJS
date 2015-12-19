@@ -1,9 +1,13 @@
 import {
     merge,
+    toFloat,
+    fixNumber,
     forEach,
     isString,
     getOffset,
     snapToGrid,
+    isUndefined,
+    isPercentage,
     containsElem,
     normalizeEvent,
     addEventListener,
@@ -360,34 +364,34 @@ class Paper extends Events {
 
             let parent = node.parent;
             let raw = node.metadata.size || {};
-            let width = !utils.isUndefined(raw.width) ? raw.width : 1;
-            let height = !utils.isUndefined(raw.height) ? raw.height : 1;
+            let width = !isUndefined(raw.width) ? raw.width : 1;
+            let height = !isUndefined(raw.height) ? raw.height : 1;
 
             if (raw.relative && parent && parent.isNode()) {
 
                 let parentSize = parent.size;
-                let isPercentage = utils.isPercentage(width);
+                let isPercent = isPercentage(width);
 
-                width = utils.fixNumber(width, isPercentage, 0);
+                width = fixNumber(width, isPercent, 0);
 
-                if (isPercentage || width >= 0 && width <= 1) {
+                if (isPercent || width > 0 && width < 1) {
                     width *= parentSize.width;
                 } else {
                     width += parentSize.width;
                 }
 
-                isPercentage = utils.isPercentage(height);
-                height = utils.fixNumber(height, isPercentage, 0);
+                isPercent = isPercentage(height);
+                height = fixNumber(height, isPercent, 0);
 
-                if (isPercentage || height >= 0 && height <= 1) {
+                if (isPercent || height > 0 && height < 1) {
                     height *= parentSize.height;
                 } else {
                     height += parentSize.height;
                 }
 
             } else {
-                width = utils.fixNumber(width, false, 1);
-                height = utils.fixNumber(height, false, 1);
+                width = fixNumber(width, false, 1);
+                height = fixNumber(height, false, 1);
             }
 
             node.size = {
@@ -405,36 +409,36 @@ class Paper extends Events {
 
             let parent = node.parent;
             let raw = node.metadata.position || {};
-            let x = !utils.isUndefined(raw.x) ? raw.x : 0;
-            let y = !utils.isUndefined(raw.y) ? raw.y : 0;
+            let x = !isUndefined(raw.x) ? raw.x : 0;
+            let y = !isUndefined(raw.y) ? raw.y : 0;
 
             if (raw.relative && parent && parent.isNode()) {
 
                 let parentSize = parent.size;
                 let parentPosition = parent.position;
-                let isPercentage = utils.isPercentage(x);
+                let isPercent = isPercentage(x);
 
-                x = utils.fixNumber(x, isPercentage, 0);
+                x = fixNumber(x, isPercent, 0);
 
-                if (isPercentage || x >= -1 && x <= 1) {
+                if (isPercent || x > -1 && x < 1) {
                     x = parentPosition.x + parentSize.width * x;
                 } else {
                     x += parentPosition.x;
                 }
 
-                isPercentage = utils.isPercentage(y);
+                isPercent = isPercentage(y);
 
-                y = utils.fixNumber(y, isPercentage, 0);
+                y = fixNumber(y, isPercent, 0);
 
-                if (isPercentage || y >= -1 && y <= 1) {
+                if (isPercent || y > -1 && y < 1) {
                     y = parentPosition.y + parentSize.height * y;
                 } else {
                     y += parentPosition.y;
                 }
 
             } else {
-                x = utils.fixNumber(x, false, 0);
-                y = utils.fixNumber(y, false, 0);
+                x = fixNumber(x, false, 0);
+                y = fixNumber(y, false, 0);
             }
 
             node.position = {
@@ -453,9 +457,9 @@ class Paper extends Events {
 
             let parent = node.parent;
             let raw = node.metadata.rotation || {};
-            let angle = utils.fixNumber(angle, false, 0);
+            let angle = fixNumber(raw.angle, false, 0);
 
-            if (raw.inherited && parent && parent.isNode() && parent.angle !== 0) {
+            if (raw.inherited && parent && parent.isNode() && parent.rotation !== 0) {
 
                 // update node's position
                 let size = node.size;
@@ -467,7 +471,7 @@ class Paper extends Events {
                 let parentCenter = new Point(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
 
                 // angle is according to the clockwise
-                nodeCenter.rotate(parentCenter, -parent.angle);
+                nodeCenter.rotate(parentCenter, -parent.rotation);
 
                 // move the node to the new position
                 position.x = nodeCenter.x - size.width / 2;
@@ -490,10 +494,41 @@ class Paper extends Events {
 
         let that = this;
         let options = that.options;
+        var nativeWidth = options.width;
+        var nativeHeight = options.height;
+
+        width = isUndefined(width) ? nativeWidth : width;
+        height = isUndefined(height) ? nativeHeight : height;
 
         if (relative === true) {
-            width += options.width;
-            height += options.height;
+
+            let svg = that.svg;
+            var isPercent = isPercentage(width);
+            var isNativePercent = isPercentage(nativeWidth);
+
+            if (isPercent) {
+                if (isNativePercent) {
+                    width = toFloat(width, false, 0) + toFloat(nativeWidth, false, 0) + '%';
+                } else {
+                    width = toFloat(width, true, 1) * nativeWidth;
+                }
+            } else {
+                width += isNativePercent ? svg.offsetWidth : nativeWidth;
+            }
+
+
+            isPercent = isPercentage(height);
+            isNativePercent = isPercentage(nativeHeight);
+
+            if (isPercent) {
+                if (isNativePercent) {
+                    height = toFloat(height, false, 0) + toFloat(nativeHeight, false, 0) + '%';
+                } else {
+                    height = toFloat(height, true, 1) * nativeHeight;
+                }
+            } else {
+                height += isNativePercent ? svg.offsetHeight : nativeHeight;
+            }
         }
 
         options.width = width;

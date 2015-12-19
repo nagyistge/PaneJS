@@ -9,7 +9,7 @@ class Node extends Cell {
 
     get className() {
 
-        let classNames = this.raw.classNames;
+        let classNames = this.metadata.classNames;
 
         return utils.isArray(classNames)
             ? classNames.join(' ')
@@ -25,14 +25,10 @@ class Node extends Cell {
         let that = this;
         let metadata = utils.merge({}, that.constructor.defaults, options);
 
-        that.raw = metadata;
         that.data = metadata.data;
         that.attrs = metadata.attrs;
         that.visible = metadata.visible !== false;
-
-        that.size = metadata.size;
-        that.position = metadata.position;
-        that.rotation = metadata.rotation;
+        that.metadata = metadata;
     }
 
     isNode() {

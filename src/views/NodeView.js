@@ -344,9 +344,9 @@ class NodeView extends CellView {
     resize() {
 
         let that = this;
-        let size = that.cell.size || {width: 1, height: 1};
-
+        let size = that.cell.size;
         let scalableNode = that.scalableNode;
+
         if (!scalableNode) {
             return;
         }
@@ -363,26 +363,26 @@ class NodeView extends CellView {
         scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
 
 
-        let rotation = that.cell.rotation || {angle: 0};
-        let angle = rotation.angle;
-
-        // Cancel the rotation but now around a different origin,
-        // which is the center of the scaled object.
-        let rotatableNode = that.rotatableNode;
-        let rotateAttr = rotatableNode && rotatableNode.attr('transform');
-
-        if (rotateAttr && rotateAttr !== 'null') {
-
-            rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
-            let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
-
-            // Store new x, y and perform rotate() again against the new rotation origin.
-            that.position = {
-                x: rotatableBBox.x,
-                y: rotatableBBox.y
-            };
-            that.rotate();
-        }
+        //let rotation = that.cell.rotation;
+        //let angle = rotation.angle;
+        //
+        //// Cancel the rotation but now around a different origin,
+        //// which is the center of the scaled object.
+        //let rotatableNode = that.rotatableNode;
+        //let rotateAttr = rotatableNode && rotatableNode.attr('transform');
+        //
+        //if (rotateAttr && rotateAttr !== 'null') {
+        //
+        //    rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
+        //    let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
+        //
+        //    // Store new x, y and perform rotate() again against the new rotation origin.
+        //    that.position = {
+        //        x: rotatableBBox.x,
+        //        y: rotatableBBox.y
+        //    };
+        //    that.rotate();
+        //}
 
         // Update must always be called on non-rotated element. Otherwise,
         // relative positioning would work with wrong (rotated) bounding boxes.
@@ -394,20 +394,9 @@ class NodeView extends CellView {
     translate() {
 
         let that = this;
-        let cell = that.cell;
-        let position = cell.position || {x: 0, y: 0};
-        let x = position.x;
-        let y = position.y;
+        let position = that.cell.position;
 
-        while (position && position.relative) {
-            let parent = cell.parent;
-            position = parent.position;
-            x += position.x;
-            y += position.y;
-        }
-
-
-        that.vel.attr('transform', 'translate(' + x + ',' + y + ')');
+        that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
 
         return that;
     }
@@ -420,51 +409,12 @@ class NodeView extends CellView {
         if (node) {
 
             let cell = that.cell;
-            let parent = cell.parent;
             let rotation = cell.rotation;
-            let angle = rotation && rotation.angle || 0;
-            let size = cell.size || {width: 1, height: 1};
+            let size = cell.size;
             let ox = size.width / 2;
             let oy = size.height / 2;
-            let point;
 
-            if (parent) {
-                rotation = parent.rotation;
-
-                let parentAngle = rotation && rotation.angle || 0;
-
-                if (parentAngle !== 0) {
-
-                    let position = cell.position;
-                    let parentSize = parent.size;
-
-
-                    // 计算子元素安父元素中心旋转后的左上角坐标
-
-                    // 获取旋转前 子元素的中心点
-                    point = new Point(position.x + size.width / 2, position.y + size.height / 2);
-                    // 按父元素的中心点旋转
-                    point = point.rotate(new Point(50 + parentSize.width / 2, 100 + parentSize.height / 2), -parentAngle);
-                    // 得到左上角坐标
-                    point.x -= size.width / 2;
-                    point.y -= size.height / 2;
-
-
-                    console.log(point);
-
-                    // 更新子元素的位置
-
-                    position.x = point.x;
-                    position.y = point.y;
-
-                    angle += parentAngle;
-
-                }
-            }
-
-
-
-            node.attr('transform', 'rotate(' + angle + ',' + ox + ',' + oy + ')');
+            node.attr('transform', 'rotate(' + rotation + ',' + ox + ',' + oy + ')');
         }
 
         return that;
