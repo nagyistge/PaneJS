@@ -17,6 +17,8 @@ import vector      from '../common/vector';
 import detector    from '../common/detector';
 import * as utils  from '../common/utils';
 
+import Point       from '../geometry/Point';
+
 import Model       from './Model';
 import Cell        from '../cells/Cell';
 import LinkView    from '../views/LinkView';
@@ -25,10 +27,10 @@ import NodeView    from '../views/NodeView';
 import RootChange  from '../changes/RootChange';
 import ChildChange from '../changes/ChildChange';
 
-var counter = 0;
+let counter = 0;
 
 // the default options for paper
-var defaultOptions = {
+let defaultOptions = {
     x: 0,
     y: 0,
     width: '100%',
@@ -47,7 +49,7 @@ class Paper extends Events {
 
         super();
 
-        var that = this;
+        let that = this;
 
         that.id = 'paper' + counter++;
         that.model = model || new Model();
@@ -74,7 +76,7 @@ class Paper extends Events {
 
     configure(options) {
 
-        var that = this;
+        let that = this;
 
         that.options = merge({}, defaultOptions, options);
         that.trigger('paper:configure', that.options);
@@ -88,9 +90,9 @@ class Paper extends Events {
         // Otherwise, improper transformation would be applied when the
         // drawPane gets transformed (scaled/rotated).
 
-        var that = this;
-        var gridSize = that.options.gridSize || 1;
-        var localPoint = vector(that.drawPane).toLocalPoint(point.x, point.y);
+        let that = this;
+        let gridSize = that.options.gridSize || 1;
+        let localPoint = vector(that.drawPane).toLocalPoint(point.x, point.y);
 
         return {
             x: snapToGrid(localPoint.x, gridSize),
@@ -100,9 +102,9 @@ class Paper extends Events {
 
     toLocalPoint(point) {
 
-        var that = this;
-        var svg = that.svg;
-        var svgPoint = svg.createSVGPoint();
+        let that = this;
+        let svg = that.svg;
+        let svgPoint = svg.createSVGPoint();
 
         svgPoint.x = point.x;
         svgPoint.y = point.y;
@@ -111,7 +113,7 @@ class Paper extends Events {
         // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
         // used below won't work.
         if (detector.IS_FF) {
-            var fakeRect = vector('rect', {
+            let fakeRect = vector('rect', {
                 width: that.options.width,
                 height: that.options.height,
                 x: 0,
@@ -121,17 +123,17 @@ class Paper extends Events {
             svg.appendChild(fakeRect.node);
         }
 
-        var paperOffset = getOffset(svg);
+        let paperOffset = getOffset(svg);
 
         if (detector.IS_FF) {
             fakeRect.remove();
         }
 
-        var doc = document;
-        var body = doc.body;
-        var docElem = doc.documentElement;
-        var scrollTop = body.scrollTop || docElem.scrollTop;
-        var scrollLeft = body.scrollLeft || docElem.scrollLeft;
+        let doc = document;
+        let body = doc.body;
+        let docElem = doc.documentElement;
+        let scrollTop = body.scrollTop || docElem.scrollTop;
+        let scrollLeft = body.scrollLeft || docElem.scrollLeft;
 
         svgPoint.x += scrollLeft - paperOffset.left;
         svgPoint.y += scrollTop - paperOffset.top;
@@ -146,14 +148,14 @@ class Paper extends Events {
 
     init(container) {
 
-        var that = this;
+        let that = this;
 
         if (container) {
 
-            var svg = createSvgDocument();
-            var root = createSvgElement('g');
-            var backgroundPane = createSvgElement('g');
-            var drawPane = createSvgElement('g');
+            let svg = createSvgDocument();
+            let root = createSvgElement('g');
+            let backgroundPane = createSvgElement('g');
+            let drawPane = createSvgElement('g');
 
             root.appendChild(backgroundPane);
             root.appendChild(drawPane);
@@ -174,8 +176,8 @@ class Paper extends Events {
 
     setup() {
 
-        var that = this;
-        var svg = that.svg;
+        let that = this;
+        let svg = that.svg;
 
         addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
         addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
@@ -206,7 +208,7 @@ class Paper extends Events {
     }
 
     destroy() {
-        var that = this;
+        let that = this;
 
         that.trigger('paper:destroy');
 
@@ -223,8 +225,8 @@ class Paper extends Events {
 
     clear(cell, force = false, recurse = true) {
 
-        var that = this;
-        var model = that.model;
+        let that = this;
+        let model = that.model;
 
         cell = cell || model.getRoot();
 
@@ -243,12 +245,12 @@ class Paper extends Events {
 
     invalidate(cell, recurse = true, includeLink = true) {
 
-        var that = this;
-        var model = that.model;
+        let that = this;
+        let model = that.model;
 
         cell = cell || model.getRoot();
 
-        var view = that.getView(cell);
+        let view = that.getView(cell);
 
         if (view) {
             view.invalid = true;
@@ -278,7 +280,7 @@ class Paper extends Events {
 
     validate(cell) {
 
-        var that = this;
+        let that = this;
 
         cell = cell || that.model.getRoot();
 
@@ -292,13 +294,13 @@ class Paper extends Events {
 
         // create or remove view for cell
 
-        var that = this;
+        let that = this;
 
         if (cell) {
 
             visible = visible && cell.visible;
 
-            var view = that.getView(cell, visible);
+            let view = that.getView(cell, visible);
 
             if (view && !visible) {
                 that.removeView(cell);
@@ -314,11 +316,11 @@ class Paper extends Events {
 
     validateView(cell, recurse = true) {
 
-        var that = this;
+        let that = this;
 
         if (cell) {
 
-            var view = that.getView(cell);
+            let view = that.getView(cell);
 
             if (view) {
                 if (view.invalid) {
@@ -353,19 +355,18 @@ class Paper extends Events {
 
     updateNodeSize(node) {
 
-        var that = this;
-
+        // only update the node's size
         if (node && node.isNode()) {
 
-            var parent = node.parent;
-            var raw = node.metadata.size;
-            var width = raw.width;
-            var height = raw.height;
+            let parent = node.parent;
+            let raw = node.metadata.size || {};
+            let width = !utils.isUndefined(raw.width) ? raw.width : 1;
+            let height = !utils.isUndefined(raw.height) ? raw.height : 1;
 
-            if (raw && raw.relative && parent && parent.isNode()) {
+            if (raw.relative && parent && parent.isNode()) {
 
-                var parentSize = parent.size;
-                var isPercentage = utils.isPercentage(width);
+                let parentSize = parent.size;
+                let isPercentage = utils.isPercentage(width);
 
                 width = utils.fixNumber(width, isPercentage, 0);
 
@@ -395,38 +396,90 @@ class Paper extends Events {
             };
         }
 
-        return that;
+        return this;
     }
 
-    updateNodePosition(cell) {
+    updateNodePosition(node) {
 
-        var that = this;
-        var parent = cell.parent;
-        var raw = cell.metadata.position;
-        var x = utils.isUndefined(raw.x) ? 0 : raw.x;
-        var y = utils.isUndefined(raw.y) ? 0 : raw.y;
+        if (node && node.isNode()) {
 
+            let parent = node.parent;
+            let raw = node.metadata.position || {};
+            let x = !utils.isUndefined(raw.x) ? raw.x : 0;
+            let y = !utils.isUndefined(raw.y) ? raw.y : 0;
 
-        if (raw && raw.relative) {
+            if (raw.relative && parent && parent.isNode()) {
 
-        } else {
+                let parentSize = parent.size;
+                let parentPosition = parent.position;
+                let isPercentage = utils.isPercentage(x);
 
+                x = utils.fixNumber(x, isPercentage, 0);
+
+                if (isPercentage || x >= -1 && x <= 1) {
+                    x = parentPosition.x + parentSize.width * x;
+                } else {
+                    x += parentPosition.x;
+                }
+
+                isPercentage = utils.isPercentage(y);
+
+                y = utils.fixNumber(y, isPercentage, 0);
+
+                if (isPercentage || y >= -1 && y <= 1) {
+                    y = parentPosition.y + parentSize.height * y;
+                } else {
+                    y += parentPosition.y;
+                }
+
+            } else {
+                x = utils.fixNumber(x, false, 0);
+                y = utils.fixNumber(y, false, 0);
+            }
+
+            node.position = {
+                x: x,
+                y: y
+            };
         }
 
-        cell.position = {
-            x: x,
-            y: y
-        };
 
-        return that;
+        return this;
     }
 
-    updateNodeRotation(cell) {
+    updateNodeRotation(node) {
 
-        var that = this;
-        var raw = cell.metadata.rotation;
+        if (node && node.isNode()) {
 
-        return that;
+            let parent = node.parent;
+            let raw = node.metadata.rotation || {};
+            let angle = utils.fixNumber(angle, false, 0);
+
+            if (raw.inherited && parent && parent.isNode() && parent.angle !== 0) {
+
+                // update node's position
+                let size = node.size;
+                let position = node.position;
+                let nodeCenter = new Point(position.x + size.width / 2, position.y + size.height / 2);
+
+                let parentSize = parent.size;
+                let parentPosition = parent.position;
+                let parentCenter = new Point(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
+
+                // angle is according to the clockwise
+                nodeCenter.rotate(parentCenter, -parent.angle);
+
+                // move the node to the new position
+                position.x = nodeCenter.x - size.width / 2;
+                position.y = nodeCenter.y - size.height / 2;
+
+                angle += parent.rotation;
+            }
+
+            node.rotation = angle;
+        }
+
+        return this;
     }
 
 
@@ -435,8 +488,8 @@ class Paper extends Events {
 
     resize(width, height, relative) {
 
-        var that = this;
-        var options = that.options;
+        let that = this;
+        let options = that.options;
 
         if (relative === true) {
             width += options.width;
@@ -463,8 +516,8 @@ class Paper extends Events {
 
     translate(x, y, absolute) {
 
-        var that = this;
-        var options = that.options;
+        let that = this;
+        let options = that.options;
 
         x = options.x = x || options.x;
         y = options.y = y || options.y;
@@ -494,11 +547,11 @@ class Paper extends Events {
 
     getView(cell, create) {
 
-        var that = this;
-        var views = that.views;
+        let that = this;
+        let views = that.views;
 
         if (cell) {
-            var view = views ? views[cell.id] : null;
+            let view = views ? views[cell.id] : null;
 
             if (!view && create && cell.visible) {
                 view = that.createView(cell);
@@ -510,12 +563,12 @@ class Paper extends Events {
 
     createView(cell) {
 
-        var that = this;
-        var options = that.options;
+        let that = this;
+        let options = that.options;
 
         // get view's constructor from options.
         // TODO: getCellView
-        var ViewConstructor = options.getView.call(that, cell);
+        let ViewConstructor = options.getView.call(that, cell);
 
         if (!ViewConstructor) {
             ViewConstructor = cell.isLink()
@@ -526,8 +579,8 @@ class Paper extends Events {
 
         if (ViewConstructor) {
 
-            var view = new ViewConstructor(that, cell);
-            var views = that.views;
+            let view = new ViewConstructor(that, cell);
+            let views = that.views;
 
             if (!views) {
                 views = that.views = {};
@@ -541,8 +594,8 @@ class Paper extends Events {
 
     removeView(cell) {
 
-        var that = this;
-        var view = that.getView(cell);
+        let that = this;
+        let view = that.getView(cell);
 
         if (view) {
             delete that.views[cell.id];
@@ -554,8 +607,8 @@ class Paper extends Events {
 
     renderView(cell) {
 
-        var that = this;
-        var view = that.getView(cell);
+        let that = this;
+        let view = that.getView(cell);
 
         if (view) {
             view.render();
@@ -566,14 +619,14 @@ class Paper extends Events {
 
     findViewByElem(elem) {
 
-        var that = this;
-        var svg = that.svg;
+        let that = this;
+        let svg = that.svg;
 
         elem = isString(elem) ? svg.querySelector(elem) : elem;
 
         while (elem && elem !== svg && elem !== document) {
 
-            var cellId = elem.cellId;
+            let cellId = elem.cellId;
             if (cellId) {
                 return that.views[cellId];
             }
@@ -586,7 +639,7 @@ class Paper extends Events {
 
     findViewByCell(cell) {
 
-        var id = isString(cell) ? cell : cell.id;
+        let id = isString(cell) ? cell : cell.id;
         return this.views[id];
     }
 
@@ -604,7 +657,7 @@ class Paper extends Events {
 
     processChanges(changes) {
 
-        var that = this;
+        let that = this;
 
         console.log(changes);
 
@@ -620,7 +673,7 @@ class Paper extends Events {
 
     distributeChange(change) {
 
-        var that = this;
+        let that = this;
 
         if (change instanceof RootChange) {
             that.onRootChanged(change);
@@ -637,10 +690,10 @@ class Paper extends Events {
 
     onChildChanged(change) {
 
-        var that = this;
+        let that = this;
 
-        var newParent = change.parent;
-        var oldParent = change.previous;
+        let newParent = change.parent;
+        let oldParent = change.previous;
 
         that.invalidate(change.child, true, true);
 
@@ -679,9 +732,9 @@ class Paper extends Events {
             return true;
         } else {
 
-            var that = this;
-            var svg = that.svg;
-            var target = e.target;
+            let that = this;
+            let svg = that.svg;
+            let target = e.target;
 
             if (svg === target || containsElem(svg, target)) {
                 return true;
@@ -693,14 +746,14 @@ class Paper extends Events {
 
         e = normalizeEvent(e);
 
-        var that = this;
-        var view = that.findViewByElem(e.target);
+        let that = this;
+        let view = that.findViewByElem(e.target);
 
         if (!that.isValidEvent(e, view)) {
             return;
         }
 
-        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
 
         if (view) {
             that.sourceView = view;
@@ -715,14 +768,14 @@ class Paper extends Events {
         e.preventDefault();
         e = normalizeEvent(e);
 
-        var that = this;
-        var view = that.findViewByElem(e.target);
+        let that = this;
+        let view = that.findViewByElem(e.target);
 
         if (!that.isValidEvent(e, view)) {
             return;
         }
 
-        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
 
         if (view) {
             view.onDblClick(e, localPoint.x, localPoint.y);
@@ -737,14 +790,14 @@ class Paper extends Events {
 
         e = normalizeEvent(e);
 
-        var that = this;
-        var view = that.findViewByElem(e.target);
+        let that = this;
+        let view = that.findViewByElem(e.target);
 
         if (!that.isValidEvent(e, view)) {
             return;
         }
 
-        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
 
         if (view) {
             view.onPointerDown(e, localPoint.x, localPoint.y);
@@ -758,12 +811,12 @@ class Paper extends Events {
         e.preventDefault();
         e = normalizeEvent(e);
 
-        var that = this;
-        var sourceView = that.sourceView;
+        let that = this;
+        let sourceView = that.sourceView;
 
         if (sourceView) {
 
-            var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+            let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
 
             that._mouseMoved++;
 
@@ -775,9 +828,9 @@ class Paper extends Events {
 
         e = normalizeEvent(e);
 
-        var that = this;
-        var localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
-        var sourceView = that.sourceView;
+        let that = this;
+        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let sourceView = that.sourceView;
 
         if (sourceView) {
             sourceView.onPointerUp(e, localPoint.x, localPoint.y);
@@ -791,8 +844,8 @@ class Paper extends Events {
 
         e = normalizeEvent(e);
 
-        var that = this;
-        var view = that.findViewByElem(e.target);
+        let that = this;
+        let view = that.findViewByElem(e.target);
 
         if (view) {
 
@@ -808,8 +861,8 @@ class Paper extends Events {
 
         e = normalizeEvent(e);
 
-        var that = this;
-        var view = that.findViewByElem(e.target);
+        let that = this;
+        let view = that.findViewByElem(e.target);
 
         if (view) {
 

@@ -5030,6 +5030,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
+	var _Point = __webpack_require__(41);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
 	var _Model = __webpack_require__(25);
 	
 	var _Model2 = _interopRequireDefault(_Model);
@@ -5152,14 +5156,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
 	            // used below won't work.
 	            if (_detector2.default.IS_FF) {
-	                var fakeRect = (0, _vector2.default)('rect', {
+	                var _fakeRect = (0, _vector2.default)('rect', {
 	                    width: that.options.width,
 	                    height: that.options.height,
 	                    x: 0,
 	                    y: 0,
 	                    opacity: 0
 	                });
-	                svg.appendChild(fakeRect.node);
+	                svg.appendChild(_fakeRect.node);
 	            }
 	
 	            var paperOffset = (0, _utils.getOffset)(svg);
@@ -5403,16 +5407,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'updateNodeSize',
 	        value: function updateNodeSize(node) {
 	
-	            var that = this;
-	
+	            // only update the node's size
 	            if (node && node.isNode()) {
 	
 	                var parent = node.parent;
-	                var raw = node.metadata.size;
-	                var width = raw.width;
-	                var height = raw.height;
+	                var raw = node.metadata.size || {};
+	                var width = !utils.isUndefined(raw.width) ? raw.width : 1;
+	                var height = !utils.isUndefined(raw.height) ? raw.height : 1;
 	
-	                if (raw && raw.relative && parent && parent.isNode()) {
+	                if (raw.relative && parent && parent.isNode()) {
 	
 	                    var parentSize = parent.size;
 	                    var isPercentage = utils.isPercentage(width);
@@ -5444,35 +5447,90 @@ return /******/ (function(modules) { // webpackBootstrap
 	                };
 	            }
 	
-	            return that;
+	            return this;
 	        }
 	    }, {
 	        key: 'updateNodePosition',
-	        value: function updateNodePosition(cell) {
+	        value: function updateNodePosition(node) {
 	
-	            var that = this;
-	            var parent = cell.parent;
-	            var raw = cell.metadata.position;
-	            var x = utils.isUndefined(raw.x) ? 0 : raw.x;
-	            var y = utils.isUndefined(raw.y) ? 0 : raw.y;
+	            if (node && node.isNode()) {
 	
-	            if (raw && raw.relative) {} else {}
+	                var parent = node.parent;
+	                var raw = node.metadata.position || {};
+	                var x = !utils.isUndefined(raw.x) ? raw.x : 0;
+	                var y = !utils.isUndefined(raw.y) ? raw.y : 0;
 	
-	            cell.position = {
-	                x: x,
-	                y: y
-	            };
+	                if (raw.relative && parent && parent.isNode()) {
 	
-	            return that;
+	                    var parentSize = parent.size;
+	                    var parentPosition = parent.position;
+	                    var isPercentage = utils.isPercentage(x);
+	
+	                    x = utils.fixNumber(x, isPercentage, 0);
+	
+	                    if (isPercentage || x >= -1 && x <= 1) {
+	                        x = parentPosition.x + parentSize.width * x;
+	                    } else {
+	                        x += parentPosition.x;
+	                    }
+	
+	                    isPercentage = utils.isPercentage(y);
+	
+	                    y = utils.fixNumber(y, isPercentage, 0);
+	
+	                    if (isPercentage || y >= -1 && y <= 1) {
+	                        y = parentPosition.y + parentSize.height * y;
+	                    } else {
+	                        y += parentPosition.y;
+	                    }
+	                } else {
+	                    x = utils.fixNumber(x, false, 0);
+	                    y = utils.fixNumber(y, false, 0);
+	                }
+	
+	                node.position = {
+	                    x: x,
+	                    y: y
+	                };
+	            }
+	
+	            return this;
 	        }
 	    }, {
 	        key: 'updateNodeRotation',
-	        value: function updateNodeRotation(cell) {
+	        value: function updateNodeRotation(node) {
 	
-	            var that = this;
-	            var raw = cell.metadata.rotation;
+	            if (node && node.isNode()) {
 	
-	            return that;
+	                var parent = node.parent;
+	                var raw = node.metadata.rotation || {};
+	                var angle = utils.fixNumber(angle, false, 0);
+	
+	                if (raw.inherited && parent && parent.isNode() && parent.angle !== 0) {
+	
+	                    // update node's position
+	                    var size = node.size;
+	                    var position = node.position;
+	                    var nodeCenter = new _Point2.default(position.x + size.width / 2, position.y + size.height / 2);
+	
+	                    var parentSize = parent.size;
+	                    var parentPosition = parent.position;
+	                    var parentCenter = new _Point2.default(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
+	
+	                    // angle is according to the clockwise
+	                    nodeCenter.rotate(parentCenter, -parent.angle);
+	
+	                    // move the node to the new position
+	                    position.x = nodeCenter.x - size.width / 2;
+	                    position.y = nodeCenter.y - size.height / 2;
+	
+	                    angle += parent.rotation;
+	                }
+	
+	                node.rotation = angle;
+	            }
+	
+	            return this;
 	        }
 	
 	        // transform
