@@ -2975,12 +2975,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function clone(cloneData) {
 	
 	            var that = this;
-	            var raw = utils.merge({}, that.raw);
+	            var metadata = utils.merge({}, that.metadata);
 	
-	            raw.data = cloneData === true ? that.cloneData() : that.data;
-	            raw.visible = that.visible;
+	            metadata.data = cloneData === true ? that.cloneData() : that.data;
+	            metadata.visible = that.visible;
 	
-	            return new Cell(raw);
+	            return new Cell(metadata);
 	        }
 	    }, {
 	        key: 'destroy',
@@ -3122,36 +3122,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    _createClass(Node, [{
-	        key: 'isNode',
-	        value: function isNode() {
-	            return true;
-	        }
-	    }, {
-	        key: 'isRelativeSize',
-	        value: function isRelativeSize() {}
-	    }, {
-	        key: 'isRelativePosition',
-	        value: function isRelativePosition() {}
-	    }, {
-	        key: 'getClassName',
-	        value: function getClassName() {
-	
-	            var classNames = this.raw.classNames;
-	
-	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
-	        }
-	    }, {
-	        key: 'getMarkup',
-	        value: function getMarkup() {
-	            return this.constructor.markup;
-	        }
-	    }, {
-	        key: 'getPosition',
-	        value: function getPosition(relative) {}
-	    }, {
-	        key: 'setPosition',
-	        value: function setPosition(x, y, relative) {}
-	    }, {
 	        key: 'translate',
 	        value: function translate() {}
 	    }, {
@@ -4019,6 +3989,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var size = that.cell.size;
 	            var sx = size.width / (nativeBBox.width || 1);
 	            var sy = size.height / (nativeBBox.height || 1);
+	
+	            sx = (0, _utils.toFixed)(sx, 2);
+	            sy = (0, _utils.toFixed)(sy, 2);
+	
 	            scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
 	
 	            //let rotation = that.cell.rotation;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf8"/>
+
+    <title>Hello, World!</title>
+    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <style>
+        #container {
+            width: 500px;
+            height: 300px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../dist/pane.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+
+    var model = new pane.Model();
+    var paper = new pane.Paper(container, model);
+
+
+    model.beginUpdate();
+
+    var node1 = new pane.shapes.basic.Rect({
+        position: {x: 50, y: 50},
+        size: {width: 100, height: 40},
+        attrs: {text: {text: 'Hello,'}}
+    });
+
+    var node2 = new pane.shapes.basic.Rect({
+        position: {x: 250, y: 190},
+        size: {width: 100, height: 40},
+        attrs: {text: {text: 'World!'}}
+    });
+
+    model.addCell(node1);
+    model.addCell(node2);
+
+    model.endUpdate();
+</script>
+</body>
+</html>

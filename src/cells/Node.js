@@ -40,35 +40,6 @@ class Node extends Cell {
         that.metadata = metadata;
     }
 
-    isNode() {
-        return true;
-    }
-
-    isRelativeSize() {}
-
-    isRelativePosition() {}
-
-    getClassName() {
-
-        let classNames = this.raw.classNames;
-
-        return isArray(classNames)
-            ? classNames.join(' ')
-            : classNames || '';
-    }
-
-    getMarkup() {
-        return this.constructor.markup;
-    }
-
-    getPosition(relative) {
-
-    }
-
-    setPosition(x, y, relative) {
-
-    }
-
     translate() {
 
     }
@@ -76,7 +47,6 @@ class Node extends Cell {
     resize(width, height) {}
 
     rotate() { }
-
 
     getBBox() {
         return false;

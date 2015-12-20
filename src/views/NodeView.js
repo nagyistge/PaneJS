@@ -4,6 +4,7 @@ import {
     forIn,
     forEach,
     toFloat,
+    toFixed,
     contains,
     isObject,
     isFinite,
@@ -360,6 +361,10 @@ class NodeView extends CellView {
         let size = that.cell.size;
         let sx = size.width / (nativeBBox.width || 1);
         let sy = size.height / (nativeBBox.height || 1);
+
+        sx = toFixed(sx, 2);
+        sy = toFixed(sy, 2);
+
         scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
 
 

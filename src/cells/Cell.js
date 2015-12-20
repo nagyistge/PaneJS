@@ -269,12 +269,12 @@ class Cell {
     clone(cloneData) {
 
         let that = this;
-        let raw = utils.merge({}, that.raw);
+        let metadata = utils.merge({}, that.metadata);
 
-        raw.data = cloneData === true ? that.cloneData() : that.data;
-        raw.visible = that.visible;
+        metadata.data = cloneData === true ? that.cloneData() : that.data;
+        metadata.visible = that.visible;
 
-        return new Cell(raw);
+        return new Cell(metadata);
     }
 
     destroy() {}

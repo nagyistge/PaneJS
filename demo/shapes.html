@@ -4,12 +4,17 @@
     <meta charset="utf-8">
     <title>Basic shapes</title>
     <link rel="stylesheet" type="text/css" href="../dist/pane.css">
-    <script src="../dist/pane.js"></script>
+    <style>
+        #container {
+            width: 800px;
+            height: 600px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-<div id="container"
-     style="position:relative; overflow:hidden; width:800px; height:600px; background:url('images/grid.gif'); cursor:default;">
-</div>
+<div id="container"></div>
+<script src="../dist/pane.js"></script>
 <script>
 
     var container = document.getElementById('container');
@@ -30,8 +35,6 @@
         size: {width: 15, height: 15}
     });
 
-
-    console.log(rectParent);
 
     model.addCell(rectParent);
     model.addCell(rectChild, rectParent);
