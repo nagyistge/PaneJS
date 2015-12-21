@@ -20,6 +20,25 @@ import CellView from './CellView';
 
 class NodeView extends CellView {
 
+    static get specialAttributes() {
+
+        return [
+            'text',
+            'html',
+            'style',
+            'ref',
+            'ref-x',
+            'ref-y',
+            'ref-dx',
+            'ref-dy',
+            'ref-width',
+            'ref-height',
+            'x-alignment',
+            'y-alignment',
+            'port'
+        ];
+    }
+
     update(specifiedAttrs) {
 
         // process the `attrs` object and set attributes
@@ -429,21 +448,7 @@ class NodeView extends CellView {
 }
 
 
-NodeView.specialAttributes = [
-    'text',
-    'html',
-    'style',
-    'ref',
-    'ref-x',
-    'ref-y',
-    'ref-dx',
-    'ref-dy',
-    'ref-width',
-    'ref-height',
-    'x-alignment',
-    'y-alignment',
-    'port'
-];
-
+// exports
+// -------
 
 export default NodeView;

@@ -8,9 +8,22 @@ import Cell from './Cell';
 
 class Node extends Cell {
 
-    get isNode() {
-        return true;
+    constructor(options) {
+
+        super();
+
+        let that = this;
+        let metadata = merge({}, that.constructor.defaults, options);
+
+        that.data = metadata.data;
+        that.attrs = metadata.attrs;
+        that.visible = metadata.visible !== false;
+        that.metadata = metadata;
     }
+
+
+    // readolny props
+    // --------------
 
     get markup() {
         return this.constructor.markup;
@@ -26,19 +39,10 @@ class Node extends Cell {
 
     }
 
-
-    constructor(options) {
-
-        super();
-
-        let that = this;
-        let metadata = merge({}, that.constructor.defaults, options);
-
-        that.data = metadata.data;
-        that.attrs = metadata.attrs;
-        that.visible = metadata.visible !== false;
-        that.metadata = metadata;
+    get isNode() {
+        return true;
     }
+
 
     translate() {
 
@@ -53,10 +57,14 @@ class Node extends Cell {
     }
 }
 
-Node.defaults = {
 
+// static props
+// ------------
+
+Node.defaults = {
     classNames: ['pane-node'], // `String` or `Array`
     view: null,  // set `null` to use the default view
+    attrs: {},
     size: {
         width: 1,
         height: 1,
@@ -70,8 +78,7 @@ Node.defaults = {
     rotation: {
         angle: 0,
         inherited: true // inherit the parent's rotation
-    },
-    attrs: {}
+    }
 };
 
 

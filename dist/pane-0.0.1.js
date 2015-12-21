@@ -3021,6 +3021,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(2);
+	
 	var _Cell2 = __webpack_require__(15);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
@@ -3036,13 +3038,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Link = (function (_Cell) {
 	    _inherits(Link, _Cell);
 	
-	    function Link() {
+	    function Link(options) {
 	        _classCallCheck(this, Link);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Link).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this));
+	
+	        var that = _this;
+	        var metadata = (0, _utils.merge)({}, that.constructor.defaults, options);
+	
+	        that.data = metadata.data;
+	        that.attrs = metadata.attrs;
+	        that.visible = metadata.visible !== false;
+	        that.metadata = metadata;
+	        return _this;
 	    }
 	
 	    _createClass(Link, [{
+	        key: 'className',
+	        get: function get() {
+	
+	            var classNames = this.metadata.classNames;
+	
+	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
+	        }
+	    }, {
 	        key: 'isLink',
 	        get: function get() {
 	            return true;
@@ -3051,6 +3070,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Link;
 	})(_Cell3.default);
+	
+	// static props
+	// ------------
+	
+	Link.defaults = {
+	    classNames: ['pane-link'], // `String` or `Array`
+	    view: null, // set `null` to use the default view
+	    attrs: {},
+	    source: null,
+	    target: null
+	};
 	
 	// exports
 	// -------
@@ -3086,26 +3116,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Node = (function (_Cell) {
 	    _inherits(Node, _Cell);
 	
-	    _createClass(Node, [{
-	        key: 'isNode',
-	        get: function get() {
-	            return true;
-	        }
-	    }, {
-	        key: 'markup',
-	        get: function get() {
-	            return this.constructor.markup;
-	        }
-	    }, {
-	        key: 'className',
-	        get: function get() {
-	
-	            var classNames = this.metadata.classNames;
-	
-	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
-	        }
-	    }]);
-	
 	    function Node(options) {
 	        _classCallCheck(this, Node);
 	
@@ -3121,6 +3131,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this;
 	    }
 	
+	    // readolny props
+	    // --------------
+	
 	    _createClass(Node, [{
 	        key: 'translate',
 	        value: function translate() {}
@@ -3135,15 +3148,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function getBBox() {
 	            return false;
 	        }
+	    }, {
+	        key: 'markup',
+	        get: function get() {
+	            return this.constructor.markup;
+	        }
+	    }, {
+	        key: 'className',
+	        get: function get() {
+	
+	            var classNames = this.metadata.classNames;
+	
+	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
+	        }
+	    }, {
+	        key: 'isNode',
+	        get: function get() {
+	            return true;
+	        }
 	    }]);
 	
 	    return Node;
 	})(_Cell3.default);
 	
-	Node.defaults = {
+	// static props
+	// ------------
 	
+	Node.defaults = {
 	    classNames: ['pane-node'], // `String` or `Array`
 	    view: null, // set `null` to use the default view
+	    attrs: {},
 	    size: {
 	        width: 1,
 	        height: 1,
@@ -3157,8 +3191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rotation: {
 	        angle: 0,
 	        inherited: true // inherit the parent's rotation
-	    },
-	    attrs: {}
+	    }
 	};
 	
 	// exports
@@ -3359,6 +3392,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return that;
 	        }
+	
+	        // events
+	        // ------
+	
 	    }, {
 	        key: 'onContextMenu',
 	        value: function onContextMenu() {}
@@ -3611,9 +3648,66 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 20 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	__webpack_require__(2);
+	
+	var _vector = __webpack_require__(1);
+	
+	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _Point = __webpack_require__(41);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var _CellView2 = __webpack_require__(18);
+	
+	var _CellView3 = _interopRequireDefault(_CellView2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var LinkView = (function (_CellView) {
+	    _inherits(LinkView, _CellView);
+	
+	    function LinkView() {
+	        _classCallCheck(this, LinkView);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LinkView).apply(this, arguments));
+	    }
+	
+	    _createClass(LinkView, [{
+	        key: 'render',
+	        value: function render() {
+	            return this;
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            return this;
+	        }
+	    }]);
+	
+	    return LinkView;
+	})(_CellView3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = LinkView;
 
 /***/ },
 /* 21 */
@@ -4056,12 +4150,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getBBox',
 	        value: function getBBox() {}
+	    }], [{
+	        key: 'specialAttributes',
+	        get: function get() {
+	
+	            return ['text', 'html', 'style', 'ref', 'ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'ref-width', 'ref-height', 'x-alignment', 'y-alignment', 'port'];
+	        }
 	    }]);
 	
 	    return NodeView;
 	})(_CellView3.default);
 	
-	NodeView.specialAttributes = ['text', 'html', 'style', 'ref', 'ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'ref-width', 'ref-height', 'x-alignment', 'y-alignment', 'port'];
+	// exports
+	// -------
 	
 	exports.default = NodeView;
 
