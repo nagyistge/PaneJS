@@ -10,7 +10,19 @@ import CellView from './CellView';
 class LinkView extends CellView {
 
     render() {
-        return this;
+
+        let that = this;
+        let vel = that.vel;
+
+        vel.empty();
+
+        that.renderMarkup();
+
+        return that.update();
+    }
+
+    renderMarkup() {
+
     }
 
     update() {

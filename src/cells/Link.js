@@ -22,6 +22,13 @@ class Link extends Cell {
         that.metadata = metadata;
     }
 
+    // readolny props
+    // --------------
+
+    get markup() {
+        return this.constructor.markup;
+    }
+
     get className() {
 
         let classNames = this.metadata.classNames;
@@ -38,16 +45,25 @@ class Link extends Cell {
 }
 
 
-// static props
-// ------------
+Link.configure({
+    markup: ''
+    + '<path class="connection"/>'
+    + '<path class="marker-source"/>'
+    + '<path class="marker-target"/>'
+    + '<path class="connection-wrap"/>'
+    + '<g class="labels"/>'
+    + '<g class="marker-vertices"/>'
+    + '<g class="marker-arrowheads"/>'
+    + '<g class="link-tools"/>',
 
-Link.defaults = {
-    classNames: ['pane-link'], // `String` or `Array`
-    view: null,  // set `null` to use the default view
-    attrs: {},
-    source: null,
-    target: null
-};
+    defaults: {
+        classNames: ['pane-link'], // `String` or `Array`
+        view: null,  // set `null` to use the default view
+        attrs: {},
+        source: null,
+        target: null
+    }
+});
 
 
 // exports

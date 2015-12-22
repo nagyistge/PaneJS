@@ -3,22 +3,6 @@ import * as utils from '../common/utils';
 
 class Cell {
 
-    static configure(options) {
-
-        let that = this;
-
-        if (options) {
-
-            utils.forIn(options, (val, key)=> {
-
-                that[key] = key === 'defaults'
-                    ? utils.merge({}, that.defaults, val)
-                    : val;
-            });
-        }
-    }
-
-
     // link
     // ----
 
@@ -89,13 +73,12 @@ class Cell {
 
         if (child) {
 
-            // fix index
-            if (utils.isNullOrUndefined(index)) {
-                index = that.getChildCount();
+            let childCount = that.getChildCount();
 
-                if (child.parent === that) {
-                    index--;
-                }
+            index = utils.fixIndex(index, childCount);
+
+            if (child.parent === that && index === childCount) {
+                index--;
             }
 
 

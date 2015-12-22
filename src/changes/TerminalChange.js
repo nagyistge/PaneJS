@@ -5,6 +5,8 @@ class TerminalChange extends Change {
 
     constructor(model, link, node, isSource) {
 
+        super();
+
         var that = this;
 
         that.model = model;

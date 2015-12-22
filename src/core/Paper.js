@@ -29,8 +29,9 @@ import Cell        from '../cells/Cell';
 import LinkView    from '../views/LinkView';
 import NodeView    from '../views/NodeView';
 
-import RootChange  from '../changes/RootChange';
-import ChildChange from '../changes/ChildChange';
+import RootChange     from '../changes/RootChange';
+import ChildChange    from '../changes/ChildChange';
+import TerminalChange from '../changes/TerminalChange';
 
 let counter = 0;
 
@@ -333,7 +334,7 @@ class Paper extends Events {
 
                     that
                         .validateView(cell.getParent(), recurse)
-                        .updateNodeGeometry(cell)
+                        .updateCellGeometry(cell)
                         .renderView(cell);
                 }
             }
@@ -346,6 +347,14 @@ class Paper extends Events {
         }
 
         return that;
+    }
+
+    updateCellGeometry(cell) {
+
+        return cell.isNode
+            ? this.updateNodeGeometry(cell) : cell.isLink
+            ? this.updateLinkGeometry(cell)
+            : this;
     }
 
     updateNodeGeometry(node) {
@@ -487,6 +496,9 @@ class Paper extends Events {
         return this;
     }
 
+    updateLinkGeometry(link) {
+
+    }
 
     // transform
     // ---------
@@ -715,6 +727,8 @@ class Paper extends Events {
             that.onRootChanged(change);
         } else if (change instanceof ChildChange) {
             that.onChildChanged(change);
+        } else if (change instanceof TerminalChange) {
+            that.onTerminalChange(change);
         }
 
         return that;
@@ -753,6 +767,10 @@ class Paper extends Events {
                 that.invalidate(oldParent, false, false);
             }
         }
+    }
+
+    onTerminalChange(change) {
+        this.invalidate(change.link);
     }
 
 

@@ -3,24 +3,10 @@ import {
     isArray
 } from '../common/utils';
 
-import Cell from './Cell';
+import Visual from './Visual';
 
 
-class Node extends Cell {
-
-    constructor(options) {
-
-        super();
-
-        let that = this;
-        let metadata = merge({}, that.constructor.defaults, options);
-
-        that.data = metadata.data;
-        that.attrs = metadata.attrs;
-        that.visible = metadata.visible !== false;
-        that.metadata = metadata;
-    }
-
+class Node extends Visual {
 
     // readolny props
     // --------------

@@ -1,4 +1,4 @@
-import { isString } from './lang';
+import { isString, isNullOrUndefined } from './lang';
 
 function isFinite(value) {
     return window.isFinite(value) && !window.isNaN(parseFloat(value));
@@ -28,10 +28,18 @@ function fixNumber(num, isPercentage, defaultValue) {
     return isNaN(ret) ? defaultValue : ret;
 }
 
+function fixIndex(index, max) {
+    if (isNullOrUndefined(index)) {
+        return max;
+    }
+    return Math.min(index, max);
+}
+
 export {
     toInt,
     toFloat,
     toFixed,
+    fixIndex,
     isFinite,
     isPercentage,
     fixNumber

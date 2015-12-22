@@ -1,6 +1,7 @@
 import {
     filter,
     forEach,
+    fixIndex,
     isNumeric,
     isUndefined,
     isNullOrUndefined,
@@ -12,6 +13,7 @@ import Cell from '../cells/Cell';
 
 import RootChange       from '../changes/RootChange';
 import ChildChange      from '../changes/ChildChange';
+import TerminalChange   from '../changes/TerminalChange';
 import ChangeCollection from '../changes/ChangeCollection'
 
 class Model extends Events {
@@ -20,7 +22,7 @@ class Model extends Events {
 
         super();
 
-        var that = this;
+        let that = this;
 
         that.nextId = 0;
         that.updateLevel = 0;
@@ -55,6 +57,10 @@ class Model extends Events {
         return child === parent;
     }
 
+    isOrphan(cell) {
+        return !!(cell && cell.parent);
+    }
+
     contains(cell) {
         return this.isAncestor(this.root, cell);
     }
@@ -64,8 +70,8 @@ class Model extends Events {
     }
 
     createCellId() {
-        var that = this;
-        var id = that.nextId;
+        let that = this;
+        let id = that.nextId;
 
         that.nextId += 1;
 
@@ -74,9 +80,9 @@ class Model extends Events {
 
     getAncestors(child) {
 
-        var that = this;
-        var result = [];
-        var parent = child ? child.parent : null;
+        let that = this;
+        let result = [];
+        let parent = child ? child.parent : null;
 
         if (parent) {
             result.push(parent);
@@ -88,8 +94,8 @@ class Model extends Events {
 
     getDescendants(parent) {
 
-        var that = this;
-        var result = [];
+        let that = this;
+        let result = [];
 
         parent = parent || that.getRoot();
         parent.eachChild(function (child) {
@@ -102,17 +108,17 @@ class Model extends Events {
 
     getParents(cells) {
 
-        var parents = [];
+        let parents = [];
 
         if (cells) {
 
-            var hash = {};
+            let hash = {};
 
             each(cells, function (cell) {
-                var parent = cell.parent;
+                let parent = cell.parent;
 
                 if (parent) {
-                    var id = cellRoute.create(parent);
+                    let id = cellRoute.create(parent);
 
                     if (!hash[id]) {
                         hash[id] = parent;
@@ -134,7 +140,7 @@ class Model extends Events {
     }
 
     createRoot() {
-        var root = new Cell();
+        let root = new Cell();
 
         root.insertChild(this.createLayer());
 
@@ -143,7 +149,7 @@ class Model extends Events {
 
     getRoot(cell) {
 
-        var root = cell || this.root;
+        let root = cell || this.root;
 
         if (cell) {
             while (cell) {
@@ -161,8 +167,8 @@ class Model extends Events {
 
     rootChanged(newRoot) {
 
-        var that = this;
-        var oldRoot = that.root;
+        let that = this;
+        let oldRoot = that.root;
 
         that.root = newRoot;
         that.cells = null;
@@ -196,59 +202,115 @@ class Model extends Events {
         return cell ? cell.parent : null;
     }
 
-    addCell(child, parent, index) {
+    addNode(child, parent, index) {
         return this.addCells([child], parent, index);
     }
 
-    addCells(cells, parent, index) {
+    addLink(child, source, target, parent, index) {
+        return this.addCells([child], parent, index, source, target);
+    }
 
-        var that = this;
+    addCell(cell, parent, index, source, target) {
+        return this.addCells([cell], parent, index, source, target);
+    }
+
+    addCells(cells, parent, index, source, target) {
+
+        let that = this;
 
         parent = parent || that.getDefaultParent();
-        index = isNullOrUndefined(index) ? parent.getChildCount() : index;
+        index = fixIndex(index, parent.getChildCount());
 
         that.beginUpdate();
 
-        forEach(cells, function (cell) {
-            if (cell && parent && cell !== parent) {
-                that.digest(new ChildChange(that, parent, cell, index));
-                index += 1;
-            } else {
-                index -= 1;
-            }
-        });
+        try {
 
-        that.endUpdate();
+            forEach(cells, function (cell) {
+
+                if (cell) {
+
+                    if (cell !== parent) {
+
+                        let parentChanged = cell.parent !== parent;
+
+                        that.digest(new ChildChange(that, parent, cell, index));
+
+                        if (parentChanged) {
+
+                        }
+
+                        index++;
+                    }
+
+                    if (source) {
+                        that.cellConnected(cell, source, true);
+                    }
+
+                    if (target) {
+                        that.cellConnected(cell, source, false);
+                    }
+                }
+
+            });
+
+        } finally {
+            that.endUpdate();
+        }
 
         return that;
     }
 
-    childChanged(cell, newParent, newIndex) {
+    cellConnected(link, terminal, isSource) {
+
+        // connect link with node
 
         var that = this;
-        var oldParent = cell.parent;
 
-        if (newParent) {
-            if (newParent !== oldParent || oldParent.indexOfChild(cell) !== newIndex) {
-                newParent.insertChild(cell, newIndex);
+        if (link) {
+
+            that.beginUpdate();
+
+            try {
+
+                that.setTerminal(link, terminal, isSource);
+
+            } finally {
+                that.endUpdate();
             }
-        } else if (oldParent) {
-            oldParent.removeChild(cell);
+        }
+
+        return that;
+    }
+
+
+    childChanged(cell, parent, index) {
+
+        let that = this;
+        let previous = cell.parent;
+
+        if (parent) {
+            if (parent !== previous ||
+                previous.indexOfChild(cell) !== index) {
+                parent.insertChild(cell, index);
+            }
+        } else if (previous) {
+            previous.removeChild(cell);
         }
 
         // check if the previous parent was already in the
         // model and avoids calling cellAdded if it was.
-        if (newParent && !that.contains(oldParent)) {
+        if (parent && !that.contains(previous)) {
             that.cellAdded(cell);
-        } else if (!newParent) {
+        } else if (!parent) {
             that.cellRemoved(cell);
         }
 
-        return oldParent;
+        return previous;
     }
 
     linkChanged(link, newNode, isSource) {
-        var oldNode = link.getNode(isSource);
+
+        let oldNode = link.getTerminal(isSource);
 
         if (newNode) {
             newNode.addLink(link, isSource);
@@ -261,16 +323,16 @@ class Model extends Events {
 
     cellAdded(cell) {
 
-        var that = this;
+        let that = this;
 
         if (cell) {
 
-            var id = cell.id || that.createCellId(cell);
+            let id = cell.id || that.createCellId(cell);
 
             if (id) {
 
                 // distinct
-                var collision = that.getCellById(id);
+                let collision = that.getCellById(id);
 
                 if (collision !== cell) {
                     while (collision) {
@@ -299,7 +361,9 @@ class Model extends Events {
 
     updateLinkParents(cell, root) {
 
-        var that = this;
+        // Updates the parent for all links that are connected to node
+
+        let that = this;
 
         root = root || that.getRoot(cell);
 
@@ -321,10 +385,10 @@ class Model extends Events {
 
     updateLinkParent(link, root) {
 
-        var that = this;
-        var cell = null;
-        var source = link.getTerminal(true);
-        var target = link.getTerminal(false);
+        let that = this;
+        let cell = null;
+        let source = link.getTerminal(true);
+        let target = link.getTerminal(false);
 
         // use the first non-relative descendants of the source terminal
         while (source && !source.isLink && source.geometry && source.geometry.relative) {
@@ -348,14 +412,14 @@ class Model extends Events {
                 (cell.parent !== that.root || that.isAncestor(cell, link)) &&
                 link.parent !== cell) {
 
-                var geo = link.geometry;
+                let geo = link.geometry;
 
                 if (geo) {
-                    var origin1 = that.getOrigin(link.parent);
-                    var origin2 = that.getOrigin(cell);
+                    let origin1 = that.getOrigin(link.parent);
+                    let origin2 = that.getOrigin(cell);
 
-                    var dx = origin2.x - origin1.x;
-                    var dy = origin2.y - origin1.y;
+                    let dx = origin2.x - origin1.x;
+                    let dy = origin2.y - origin1.y;
 
                     geo = geo.clone();
                     geo.translate(-dx, -dy);
@@ -371,14 +435,14 @@ class Model extends Events {
 
         if (cell1 && cell2) {
 
-            var route1 = cellRoute.create(cell1);
-            var route2 = cellRoute.create(cell2);
+            let route1 = cellRoute.create(cell1);
+            let route2 = cellRoute.create(cell2);
 
             if (route1 && route2) {
 
-                var cell = cell1;
-                var route = route2;
-                var current = route1;
+                let cell = cell1;
+                let route = route2;
+                let current = route1;
 
                 if (route1.length > route2.length) {
                     cell = cell2;
@@ -387,7 +451,7 @@ class Model extends Events {
                 }
 
                 while (cell) {
-                    var parent = cell.parent;
+                    let parent = cell.parent;
 
                     // check if the cell path is equal to the beginning of the given cell path
                     if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
@@ -403,34 +467,9 @@ class Model extends Events {
         return null;
     }
 
-    // get the absolute, accumulated origin for the children
-    // inside the given parent as an `Point`.
-    getOrigin(cell) {
-
-        var that = this;
-        var result = null;
-
-        if (cell) {
-            result = that.getOrigin(cell.parent);
-
-            if (!cell.isLink) {
-                var geo = cell.geometry;
-
-                if (geo) {
-                    result.x += geo.x;
-                    result.y += geo.y;
-                }
-            }
-        } else {
-            result = new Point();
-        }
-
-        return result;
-    }
-
     remove(cell) {
 
-        var that = this;
+        let that = this;
 
         if (cell) {
             if (cell === that.root) {
@@ -445,7 +484,7 @@ class Model extends Events {
 
     cellRemoved(cell) {
 
-        var that = this;
+        let that = this;
 
         if (cell) {
 
@@ -453,8 +492,8 @@ class Model extends Events {
                 that.cellRemoved(child);
             });
 
-            var id = cell.id;
-            var cells = that.cells;
+            let id = cell.id;
+            let cells = that.cells;
             if (cells && id) {
                 delete cells[id];
             }
@@ -475,13 +514,62 @@ class Model extends Events {
         }) : [];
     }
 
+    getTerminal(link, isSource) {
+        return link ? link.getTerminal(isSource) : null;
+    }
+
+    setTerminal(link, terminal, isSource) {
+
+        let that = this;
+        let terminalChanged = terminal != that.getTerminal(link, isSource);
+
+        that.digest(new TerminalChange(that, link, terminal, isSource));
+
+        //if (this.maintainEdgeParent && terminalChanged) {
+        //    this.updateEdgeParent(link, this.getRoot());
+        //}
+
+        return that;
+    }
+
+    setTerminals(link, source, target) {
+
+        let that = this;
+
+        that.beginUpdate();
+
+        try {
+            that.setTerminal(link, source, true);
+            that.setTerminal(link, target, false);
+        }
+        finally {
+            that.endUpdate();
+        }
+
+        return that;
+    }
+
+    terminalChanged(link, node, isSource) {
+
+        var that = this;
+        var previous = that.getTerminal(link, isSource);
+
+        if (node) {
+            node.addLink(link, isSource);
+        } else if (previous) {
+            previous.removeLink(link, isSource);
+        }
+
+        return previous
+    }
+
 
     // update
     // ------
 
     digest(change) {
 
-        var that = this;
+        let that = this;
 
         change.digest();
 
@@ -494,7 +582,7 @@ class Model extends Events {
 
     beginUpdate() {
 
-        var that = this;
+        let that = this;
 
         that.updateLevel += 1;
         that.trigger('beginUpdate');
@@ -506,7 +594,7 @@ class Model extends Events {
 
     endUpdate() {
 
-        var that = this;
+        let that = this;
 
         that.updateLevel -= 1;
 
@@ -516,7 +604,7 @@ class Model extends Events {
 
         if (!that.endingUpdate) {
 
-            var changeCollection = that.changes;
+            let changeCollection = that.changes;
 
             that.endingUpdate = that.updateLevel === 0;
             that.trigger('endUpdate', changeCollection.changes);

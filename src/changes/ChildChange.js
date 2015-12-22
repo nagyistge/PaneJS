@@ -27,14 +27,13 @@ class ChildChange extends Change {
         var oldParent = child.parent;
         var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
 
-        // 移除连线时，需要移除连线和节点的关联关系
+        // the new parent is null, then the child(link) will be removed
         if (!newParent) {
             that.connect(child, false);
         }
 
         oldParent = model.childChanged(child, newParent, newIndex);
 
-        // 更新连线的父节点时，同时更新连线的关联节点
         if (newParent) {
             that.connect(child, true);
         }

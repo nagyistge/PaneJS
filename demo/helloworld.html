@@ -38,14 +38,11 @@
         attrs: {text: {text: 'World!'}}
     });
 
-    var link1 = new pane.Link({
-        source: node1,
-        target: node2
-    });
+    var link1 = new pane.Link();
 
-    model.addCell(node1);
-    model.addCell(node2);
-    model.addCell(link1);
+    model.addNode(node1);
+    model.addNode(node2);
+    model.addLink(link1, node1, node2);
 
     model.endUpdate();
 </script>
