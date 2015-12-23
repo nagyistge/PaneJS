@@ -182,21 +182,21 @@ class Rect {
         return new Rect(x, y, w, h);
     }
 
-    intersectionWithLineFromCenterToPoint(p, angle) {
+    intersectionWithLineFromCenterToPoint(point, angle) {
 
-        // Find point on my boundary where line starting from my center
-        // ending in point p intersects me. If angle is specified, intersection
-        // with rotated rectangle is computed.
+        // Find point on my boundary where line starting from my center ending
+        // in point p intersects me. If angle is specified, intersection with
+        // rotated rectangle is computed.
 
         var that = this;
         var result;
         var center = that.getCenter();
 
         if (angle) {
-            p.rotate(center, angle);
+            point.rotate(center, angle);
         }
 
-        // (clockwise, starting from the top side)
+        // clockwise, starting from the top side
         var sides = [
             new Line(that.getOrigin(), that.getTopRight()),
             new Line(that.getTopRight(), that.getCorner()),
@@ -204,7 +204,7 @@ class Rect {
             new Line(that.getBottomLeft(), that.getOrigin())
         ];
 
-        var connector = new Line(center, p);
+        var connector = new Line(center, point);
 
         for (var i = sides.length - 1; i >= 0; --i) {
             var intersection = sides[i].intersection(connector);

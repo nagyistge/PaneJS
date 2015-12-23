@@ -339,22 +339,7 @@ class NodeView extends CellView {
             .translate();
     }
 
-    renderMarkup() {
 
-        // `markup` is rendered by default. Set the `markup` attribute
-        // on the model if the default markup is not desirable.
-
-        let that = this;
-        let markup = that.cell.markup;
-
-        if (markup) {
-            that.vel.append(vector(markup));
-        } else {
-            throw new Error('`markup` is missing while the default render() implementation is used.');
-        }
-
-        return that;
-    }
 
     scale(sx, sy) {
         this.vel.scale(sx, sy);

@@ -3,11 +3,10 @@ import {
     isArray
 } from '../common/utils';
 
+import Visual from './Visual';
 
-import Cell from './Cell';
 
-
-class Link extends Cell {
+class Link extends Visual {
 
     constructor(options) {
 
@@ -58,10 +57,15 @@ Link.configure({
 
     defaults: {
         classNames: ['pane-link'], // `String` or `Array`
-        view: null,  // set `null` to use the default view
-        attrs: {},
-        source: null,
-        target: null
+        view: null,      // set `null` to use the default view
+        connector: null, // set `null` to use the default connector
+        attrs: {
+            '.connection': {
+                'fill': 'none',
+                'stroke': '#000000',
+                'stroke-width': 1
+            }
+        }
     }
 });
 

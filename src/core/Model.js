@@ -247,7 +247,7 @@ class Model extends Events {
                     }
 
                     if (target) {
-                        that.cellConnected(cell, source, false);
+                        that.cellConnected(cell, target, false);
                     }
                 }
 

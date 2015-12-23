@@ -9,7 +9,7 @@ class Visual extends Cell {
         super();
 
         let that = this;
-        let metadata = merge({}, that.constructor.defaults, options);
+        let metadata = utils.merge({}, that.constructor.defaults, options);
 
         that.data = metadata.data;
         that.attrs = metadata.attrs;

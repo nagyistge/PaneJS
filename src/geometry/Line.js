@@ -75,10 +75,13 @@ class Line {
     }
 
     intersection(l) {
-        var pt1Dir = point(this.end.x - this.start.x, this.end.y - this.start.y);
-        var pt2Dir = point(l.end.x - l.start.x, l.end.y - l.start.y);
+
+        var that = this;
+
+        var pt1Dir = new Point(that.end.x - that.start.x, that.end.y - that.start.y);
+        var pt2Dir = new Point(l.end.x - l.start.x, l.end.y - l.start.y);
         var det = (pt1Dir.x * pt2Dir.y) - (pt1Dir.y * pt2Dir.x);
-        var deltaPt = point(l.start.x - this.start.x, l.start.y - this.start.y);
+        var deltaPt = new Point(l.start.x - this.start.x, l.start.y - that.start.y);
         var alpha = (deltaPt.x * pt2Dir.y) - (deltaPt.y * pt2Dir.x);
         var beta = (deltaPt.x * pt1Dir.y) - (deltaPt.y * pt1Dir.x);
 
@@ -99,8 +102,7 @@ class Line {
             }
         }
 
-        return point(this.start.x + (alpha * pt1Dir.x / det),
-            this.start.y + (alpha * pt1Dir.y / det));
+        return new Point(that.start.x + (alpha * pt1Dir.x / det), that.start.y + (alpha * pt1Dir.y / det));
     }
 
     // @return the bearing (cardinal direction) of the line. For example N, W, or SE.

@@ -17,17 +17,18 @@ import {
     createSvgDocument
 } from '../common/utils';
 
-import Events      from '../common/Events';
-import vector      from '../common/vector';
-import detector    from '../common/detector';
-import * as utils  from '../common/utils';
+import Events     from '../common/Events';
+import vector     from '../common/vector';
+import detector   from '../common/detector';
+import * as utils from '../common/utils';
 
-import Point       from '../geometry/Point';
+import Point from '../geometry/Point';
+import Rect  from '../geometry/Rect';
 
-import Model       from './Model';
-import Cell        from '../cells/Cell';
-import LinkView    from '../views/LinkView';
-import NodeView    from '../views/NodeView';
+import Model    from './Model';
+import Cell     from '../cells/Cell';
+import LinkView from '../views/LinkView';
+import NodeView from '../views/NodeView';
 
 import RootChange     from '../changes/RootChange';
 import ChildChange    from '../changes/ChildChange';
@@ -333,7 +334,7 @@ class Paper extends Events {
                     view.invalid = false;
 
                     that
-                        .validateView(cell.getParent(), recurse)
+                        .validateView(cell.getParent(), false)
                         .updateCellGeometry(cell)
                         .renderView(cell);
                 }
@@ -498,7 +499,21 @@ class Paper extends Events {
 
     updateLinkGeometry(link) {
 
+        let source = link.getTerminal(true);
+        let target = link.getTerminal(false);
+        let sourceBBox = new Rect(source.position.x, source.position.y, source.size.width, source.size.height);
+        let targetBBox = new Rect(target.position.x, target.position.y, target.size.width, target.size.height);
+        var sourcePoint = sourceBBox.intersectionWithLineFromCenterToPoint(targetBBox.getCenter());
+        var targetPoint = targetBBox.intersectionWithLineFromCenterToPoint(sourceBBox.getCenter());
+
+        link.points = [
+            sourcePoint,
+            targetPoint
+        ];
+
+        return this;
     }
+
 
     // transform
     // ---------

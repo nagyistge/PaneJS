@@ -44,8 +44,36 @@ class CellView {
 
     update() { return this; }
 
+    renderMarkup() {
+
+        // `markup` is rendered by default. Set the `markup` attribute
+        // on the model if the default markup is not desirable.
+
+        let that = this;
+        let markup = that.cell.markup;
+
+        if (markup) {
+            that.vel.append(vector(markup));
+        } else {
+            throw new Error('`markup` is missing while the default render() implementation is used.');
+        }
+
+        return that;
+    }
+
     find(selector) {
         return selector === '.' ? [this.vel] : this.vel.find(selector);
+    }
+
+    applyAttrs(selector, attrs) {
+
+        var that = this;
+
+        forEach(that.find(selector), function (vel) {
+            vel.attr(attrs);
+        });
+
+        return that;
     }
 
     applyFilter(selector, filter) {
