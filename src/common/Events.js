@@ -5,7 +5,7 @@ const splitter = /\s+/;
 
 function triggerEvents(callbacks, args, context) {
 
-    var result = true;
+    let result = true;
 
     for (let i = 0, l = callbacks.length; i < l; i += 2) {
         result = utils.invoke(callbacks[i], args, callbacks[i + 1] || context) && result;
@@ -19,13 +19,13 @@ class Events {
 
     on(events, callback, context) {
 
-        var that = this;
+        let that = this;
 
         if (!callback) {
             return that;
         }
 
-        var listeners = that.__events || (that.__events = {});
+        let listeners = that.__events || (that.__events = {});
 
         events = events.split(splitter);
 

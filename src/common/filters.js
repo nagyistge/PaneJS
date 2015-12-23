@@ -1,4 +1,4 @@
-import { format, isFinite } from '../common/utils'
+import { format, isFinite } from '../common/utils';
 
 
 // exports
@@ -245,7 +245,7 @@ export default {
 
         return format(template)({
             amount: amount,
-            amount2: .5 - amount / 2
+            amount2: 0.5 - amount / 2
         });
     }
 };

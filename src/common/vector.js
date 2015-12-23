@@ -1,43 +1,14 @@
-import {
-    map,
-    some,
-    trim,
-    toInt,
-    forIn,
-    reduce,
-    forEach,
-    isArray,
-    toArray,
-    isObject,
-    isString,
-    isBoolean,
-    isFunction,
-    isUndefined,
-    parseScale,
-    parseRotate,
-    parseTranslate,
-    lineToPathData,
-    rectToPathData,
-    circleToPathData,
-    ellipseToPathData,
-    polygonToPathData,
-    polylineToPathData,
-    createSvgDocument,
-    createSvgElement,
-    setAttribute,
-    getClassName,
-    isNode,
-    sanitizeText,
-} from '../common/utils'
+import * as utils from '../common/utils';
+import Rect  from '../geometry/Rect';
+import Point from '../geometry/Point';
 
+let rclass    = /[\t\r\n\f]/g;
+let rnotwhite = (/\S+/g);
 
-var rclass = /[\t\r\n\f]/g;
-var rnotwhite = (/\S+/g);
-
-var pathCount = 0;
+let pathCount = 0;
 function createPathId() {
 
-    var id;
+    let id;
 
     do {
         pathCount += 1;
@@ -50,6 +21,7 @@ function createPathId() {
 export class VElement {
 
     constructor(elem) {
+
         if (elem instanceof VElement) {
             elem = elem.node;
         }
@@ -59,29 +31,32 @@ export class VElement {
 
     attr(name, value) {
 
-        var that = this;
-        var node = that.node;
-        var length = arguments.length;
+        let that = this;
+        let node = that.node;
+        let len  = arguments.length;
 
         // return all attributes
-        if (!length) {
-            var attrs = {};
-            forEach(node.attributes, function (attr) {
+        if (!len) {
+
+            let attrs = {};
+
+            utils.forEach(node.attributes, function (attr) {
                 attrs[attr.nodeName] = attr.nodeValue;
             });
+
             return attrs;
         }
 
-        if (length === 1) {
-            if (isObject(name)) {
-                forIn(name, function (attrValue, attrName) {
-                    setAttribute(node, attrName, attrValue);
+        if (len === 1) {
+            if (utils.isObject(name)) {
+                utils.forIn(name, function (attrValue, attrName) {
+                    utils.setAttribute(node, attrName, attrValue);
                 });
             } else {
                 return node.getAttribute(name);
             }
         } else {
-            setAttribute(node, name, value);
+            utils.setAttribute(node, name, value);
         }
 
         return that;
@@ -89,8 +64,8 @@ export class VElement {
 
     removeAttr(name) {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
         if (node && name) {
             node.removeAttribute(name);
@@ -99,16 +74,16 @@ export class VElement {
         return that;
     }
 
-    css(style) {
+    css(/* style */) {
 
     }
 
     text(content, options) {
 
-        var that = this;
-        var textNode = that.node;
+        let that     = this;
+        let textNode = that.node;
 
-        content = sanitizeText(content);
+        content = utils.sanitizeText(content);
         options = options || {};
 
         // `alignment-baseline` does not work in Firefox.
@@ -117,7 +92,7 @@ export class VElement {
         // in the top left corner we translate the `<text>` element by `0.8em`.
         // See `http://www.w3.org/Graphics/SVG/WG/wiki/How_to_determine_dominant_baseline`.
         // See also `http://apike.ca/prog_svg_text_style.html`.
-        var y = that.attr('y');
+        let y = that.attr('y');
         if (!y) {
             that.attr('y', '0.8em');
         }
@@ -133,12 +108,12 @@ export class VElement {
         // clear all `<tspan>` children
         textNode.textContent = '';
 
-        var textPathOptions = options.textPath;
+        let textPathOptions = options.textPath;
         if (textPathOptions) {
 
             // Wrap the text in the SVG <textPath> element that points to a path
             // defined by `options.textPath` inside the internal `<defs>` element.
-            var defs = that.find('defs');
+            let defs = that.find('defs');
             if (!defs.length) {
                 defs = createElement('defs');
                 that.append(defs);
@@ -148,16 +123,23 @@ export class VElement {
             // the SVG path data for the text to go along (this is a shortcut).
             // Otherwise if it is an object and contains the `d` property,
             // then this is our path.
-            var isTextPathObject = isObject(textPathOptions);
-            var d = isTextPathObject ? textPathOptions.d : textPathOptions;
-            var vPath;
+            let isTextPathObject = utils.isObject(textPathOptions);
+            // d attr
+            let d = isTextPathObject ? textPathOptions.d : textPathOptions;
+
+            let vPath;
 
             if (d) {
-                vPath = createElement('path', {d: d, id: createPathId()});
+
+                vPath = createElement('path', {
+                    d: d,
+                    id: createPathId()
+                });
+
                 defs.append(vPath);
             }
 
-            var vTextPath = createElement('textPath');
+            let vTextPath = createElement('textPath');
 
             // Set attributes on the `<textPath>`. The most important one
             // is the `xlink:href` that points to our newly created `<path/>` element in `<defs/>`.
@@ -179,22 +161,23 @@ export class VElement {
         }
 
 
-        var offset = 0;
-        var lines = content.split('\n');
-        var lineHeight = options.lineHeight;
-        var annotations = options.annotations;
-        var includeAnnotationIndices = options.includeAnnotationIndices;
+        let offset      = 0;
+        let lines       = content.split('\n');
+        let lineHeight  = options.lineHeight;
+        let annotations = options.annotations;
+
+        let includeAnnotationIndices = options.includeAnnotationIndices;
 
         if (annotations) {
-            annotations = isArray(annotations) ? annotations : [annotations];
+            annotations = utils.isArray(annotations) ? annotations : [annotations];
         }
 
         lineHeight = lineHeight === 'auto' ? '1.5em' : lineHeight || '1em';
 
 
-        forEach(lines, function (line, i) {
+        utils.forEach(lines, function (line, i) {
 
-            var vLine = createElement('tspan', {
+            let vLine = createElement('tspan', {
                 dy: i ? lineHeight : '0',
                 x: that.attr('x') || 0
             });
@@ -206,24 +189,26 @@ export class VElement {
                 if (annotations) {
                     // Get the line height based on the biggest font size
                     // in the annotations for this line.
-                    var maxFontSize = 0;
+                    let maxFontSize = 0;
 
                     // Find the *compacted* annotations for this line.
-                    var lineAnnotations = vector.annotateString(line, annotations, {
+                    let lineAnnotations = vector.annotateString(line, annotations, {
                         offset: -offset,
                         includeAnnotationIndices: includeAnnotationIndices
                     });
 
-                    forEach(lineAnnotations, function (annotation) {
+                    utils.forEach(lineAnnotations, function (annotation) {
 
-                        if (isObject(annotation)) {
+                        let tspan;
 
-                            var fontSize = toInt(annotation.attrs['font-size']);
+                        if (utils.isObject(annotation)) {
+
+                            let fontSize = utils.toInt(annotation.attrs['font-size']);
                             if (fontSize && fontSize > maxFontSize) {
                                 maxFontSize = fontSize;
                             }
 
-                            var tspan = createElement('tspan', annotation.attrs);
+                            tspan = createElement('tspan', annotation.attrs);
                             if (includeAnnotationIndices) {
                                 // If `includeAnnotationIndices` is `true`,
                                 // set the list of indices of all the applied annotations
@@ -241,12 +226,14 @@ export class VElement {
                         } else {
                             tspan = document.createTextNode(annotation || ' ');
                         }
+
                         vLine.append(tspan);
                     });
 
                     if (options.lineHeight === 'auto' && maxFontSize && i !== 0) {
                         vLine.attr('dy', (maxFontSize * 1.2) + 'px');
                     }
+
                 } else {
                     vLine.node.textContent = line;
                 }
@@ -259,7 +246,7 @@ export class VElement {
                 // `dy=1em` won't work with empty lines otherwise.
                 vLine.addClass('pane-text-empty');
                 vLine.node.style.opacity = 0;
-                vLine.node.textContent = '-';
+                vLine.node.textContent   = '-';
             }
 
             textNode.appendChild(vLine.node);
@@ -272,38 +259,38 @@ export class VElement {
 
     hasClass(selector) {
 
-        var that = this;
-        var node = that.node;
-        var className = ' ' + selector + ' ';
+        let that = this;
+        let node = that.node;
 
-        if (node.nodeType === 1) {
-            return (' ' + getClassName(node) + ' ').replace(rclass, ' ').indexOf(className) > -1;
+        let className = ' ' + selector + ' ';
 
-        }
-        return false;
+        return node.nodeType === 1
+            ? (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ').indexOf(className) > -1
+            : false;
     }
 
     addClass(value) {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
-        if (isFunction(value)) {
-            return that.addClass(value.call(node, getClassName(node)));
+        if (utils.isFunction(value)) {
+            return that.addClass(value.call(node, utils.getClassName(node)));
         }
 
-        if (value && isString(value) && node.nodeType === 1) {
+        if (value && utils.isString(value) && node.nodeType === 1) {
 
-            var classes = value.match(rnotwhite) || [];
-            var oldValue = (' ' + getClassName(node) + ' ').replace(rclass, ' ');
-            var newValue = reduce(classes, function (ret, cls) {
+            let classes  = value.match(rnotwhite) || [];
+            let oldValue = (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ');
+            let newValue = utils.reduce(classes, function (ret, cls) {
                 if (ret.indexOf(' ' + cls + ' ') < 0) {
                     ret += cls + ' ';
                 }
                 return ret;
             }, oldValue);
 
-            newValue = trim(newValue);
+            newValue = utils.trim(newValue);
+
             if (oldValue !== newValue) {
                 node.setAttribute('class', newValue);
             }
@@ -314,25 +301,26 @@ export class VElement {
 
     removeClass(value) {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
-        if (isFunction(value)) {
-            return that.removeClass(value.call(node, getClassName(node)));
+        if (utils.isFunction(value)) {
+            return that.removeClass(value.call(node, utils.getClassName(node)));
         }
 
-        if ((!value || isString(value)) && node.nodeType === 1) {
+        if ((!value || utils.isString(value)) && node.nodeType === 1) {
 
-            var classes = (value || '').match(rnotwhite) || [];
-            var oldValue = (' ' + getClassName(node) + ' ').replace(rclass, ' ');
-            var newValue = reduce(classes, function (ret, cls) {
+            let classes  = (value || '').match(rnotwhite) || [];
+            let oldValue = (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ');
+            let newValue = utils.reduce(classes, function (ret, cls) {
                 if (ret.indexOf(' ' + cls + ' ') > -1) {
                     ret = ret.replace(' ' + cls + ' ', ' ');
                 }
                 return ret;
             }, oldValue);
 
-            newValue = value ? trim(newValue) : '';
+            newValue = value ? utils.trim(newValue) : '';
+
             if (oldValue !== newValue) {
                 node.setAttribute('class', newValue);
             }
@@ -343,20 +331,20 @@ export class VElement {
 
     toggleClass(value, stateVal) {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
-        if (isBoolean(stateVal) && isString(value)) {
+        if (utils.isBoolean(stateVal) && utils.isString(value)) {
             return stateVal ? that.addClass(value) : that.removeClass(value);
         }
 
-        if (isFunction(value)) {
-            return that.toggleClass(value.call(node, getClassName(node), stateVal), stateVal);
+        if (utils.isFunction(value)) {
+            return that.toggleClass(value.call(node, utils.getClassName(node), stateVal), stateVal);
         }
 
-        if (value && isString(value)) {
-            var classes = value.match(rnotwhite) || [];
-            forEach(classes, function (cls) {
+        if (value && utils.isString(value)) {
+            let classes = value.match(rnotwhite) || [];
+            utils.forEach(classes, function (cls) {
                 that.hasClass(cls) ? that.removeClass(cls) : that.addClass(cls);
             });
         }
@@ -366,8 +354,8 @@ export class VElement {
 
     remove() {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
         if (node && node.parentNode) {
             node.parentNode.removeChild(node);
@@ -378,8 +366,8 @@ export class VElement {
 
     empty() {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
         if (node) {
             while (node.lastChild) {
@@ -392,9 +380,9 @@ export class VElement {
 
     append(elem) {
 
-        var that = this;
+        let that = this;
 
-        elem && forEach(toArray(elem), function (item) {
+        elem && utils.forEach(utils.toArray(elem), function (item) {
             that.node.appendChild(normalize(item));
         });
 
@@ -403,45 +391,45 @@ export class VElement {
 
     prepend(elem) {
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
         elem && node.insertBefore(normalize(elem), node.firstChild);
 
         return that;
     }
 
-    appendTo(elem) {
-        //elem.appendChild(this.node);
-        //return this;
+    appendTo(/* elem */) {
+        // elem.appendChild(this.node);
+        // return this;
     }
 
-    prependTo(elem) {
-
-    }
-
-    before(elem) {
+    prependTo(/* elem */) {
 
     }
 
-    after(elem) {
+    before(/* elem */) {
+
+    }
+
+    after(/* elem */) {
 
     }
 
     getSVG() {
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
         return node instanceof window.SVGSVGElement ? that : vectorize(node.ownerSVGElement);
     }
 
     getDefs() {
 
-        var defs = null;
-        var svg = this.getSVG();
+        let defs = null;
+        let svg  = this.getSVG();
 
-        some(svg.node.childNodes, function (node) {
-            if (isNode(node, 'defs')) {
+        utils.some(svg.node.childNodes, function (node) {
+            if (utils.isNode(node, 'defs')) {
                 defs = vectorize(node);
                 return true;
             }
@@ -456,9 +444,9 @@ export class VElement {
     }
 
     clone() {
-        var node = this.node;
 
-        var cloned = vectorize(node.cloneNode(true));
+        let node   = this.node;
+        let cloned = vectorize(node.cloneNode(true));
 
         if (node.id) {
             cloned.node.removeAttribute('id');
@@ -467,23 +455,25 @@ export class VElement {
     }
 
     find(selector) {
-        return map(this.node.querySelectorAll(selector), vectorize);
+
+        return utils.map(this.node.querySelectorAll(selector), vectorize);
     }
 
     findOne(selector) {
-        var found = this.node.querySelector(selector);
+
+        let found = this.node.querySelector(selector);
         return found ? vectorize(found) : null;
     }
 
     findParent(className, terminator) {
 
-        var node = this.node;
-        var stop = terminator || node.ownerSVGElement;
+        let node = this.node;
+        let stop = terminator || node.ownerSVGElement;
 
         node = node.parentNode;
 
         while (node && node !== stop) {
-            var vel = vectorize(node);
+            let vel = vectorize(node);
             if (vel.hasClass(className)) {
                 return vel;
             }
@@ -496,88 +486,99 @@ export class VElement {
 
     index() {
 
-        var index = 0;
-        var node = this.node.previousSibling;
+        let idx  = 0;
+        let node = this.node.previousSibling;
 
         while (node) {
             // nodeType 1 for ELEMENT_NODE
             if (node.nodeType === 1) {
-                index++;
+                idx++;
             }
             node = node.previousSibling;
         }
 
-        return index;
+        return idx;
     }
 
     translate(tx, ty, relative) {
 
-        var that = this;
-        var transformAttr = that.attr('transform') || '';
-        var translate = parseTranslate(transformAttr);
+        let raw = this.attr('transform') || '';
+        let ts  = utils.parseTranslate(raw);
 
         if (!arguments.length) {
-            return translate;
+            return ts;
         }
 
-        transformAttr = trim(transformAttr.replace(/translate\([^\)]*\)/g, ''));
+        let mutant = utils.clearTranslate(raw);
 
-        var dx = relative ? translate.tx + tx : tx;
-        var dy = relative ? translate.ty + ty : ty;
-        var newTranslate = 'translate(' + dx + ',' + dy + ')' + ' ' + transformAttr;
+        let dx = relative ? ts.tx + tx : tx;
+        let dy = relative ? ts.ty + ty : ty;
 
-        that.attr('transform', newTranslate);
+        let final = 'translate(' + dx + ',' + dy + ')';
 
-        return that;
+        if (mutant) {
+            final = final + ' ' + mutant;
+        }
+
+        return this.attr('transform', final);
     }
 
     rotate(angle, cx, cy, relative) {
 
-        var transformAttr = that.attr('transform') || '';
-        var rotate = parseRotate(transformAttr);
+        let raw = this.attr('transform') || '';
+        let rt  = utils.parseRotate(raw);
 
         if (!arguments.length) {
-            return rotate;
+            return rt;
         }
 
-        transformAttr = trim(transformAttr.replace(/rotate\([^\)]*\)/g, ''));
+        let mutant = utils.clearRotate(raw);
 
         angle %= 360;
 
-        var newAngle = relative ? rotate.angle + angle : angle;
-        var newOrigin = isUndefined(cx) || isUndefined(cy) ? '' : ',' + cx + ',' + cy;
-        var newRotate = 'rotate(' + newAngle + newOrigin + ')';
+        let newAngle  = relative ? rt.angle + angle : angle;
+        let newOrigin = utils.isUndefined(cx) || utils.isUndefined(cy) ? '' : ',' + cx + ',' + cy;
 
-        return this.attr('transform', transformAttr + ' ' + newRotate);
+        let final = 'rotate(' + newAngle + newOrigin + ')';
+
+        if (mutant) {
+            final = mutant + ' ' + final;
+        }
+
+        return this.attr('transform', final);
     }
 
     scale(sx, sy, relative) {
 
-        var transformAttr = this.attr('transform') || '';
-        var scale = parseScale(transformAttr);
-        var length = arguments.length;
+        let raw = this.attr('transform') || '';
+        let sc  = utils.parseScale(raw);
+        let len = arguments.length;
 
-        if (!length) {
-            return scale;
+        if (!len) {
+            return sc;
         }
 
-        transformAttr = trim(transformAttr.replace(/scale\([^\)]*\)/g, ''));
+        let mutant = utils.clearScale(raw);
 
-        if (length === 1) {
+        if (len === 1) {
             sy = sx;
-        } else if (length === 2) {
-            if (isBoolean(sy)) {
+        } else if (len === 2) {
+            if (utils.isBoolean(sy)) {
                 relative = sy;
-                sy = sx;
+                sy       = sx;
             }
         }
 
-        sx = relative ? scale.sx * sx : sx;
-        sy = relative ? scale.sy * sy : sy;
+        sx = relative ? sc.sx * sx : sx;
+        sy = relative ? sc.sy * sy : sy;
 
-        var newScale = 'scale(' + sx + ',' + sy + ')';
+        let final = 'scale(' + sx + ',' + sy + ')';
 
-        return this.attr('transform', transformAttr + ' ' + newScale);
+        if (mutant) {
+            final = mutant + ' ' + final;
+        }
+
+        return this.attr('transform', final);
     }
 
     bbox(withoutTransformations, target) {
@@ -587,8 +588,8 @@ export class VElement {
         // If `target` is specified, bounding box will be computed
         // relatively to `target` element.
 
-        var that = this;
-        var node = that.node;
+        let that = this;
+        let node = that.node;
 
         // If the element is not in the live DOM, it does not have a bounding
         // box defined and so fall back to 'zero' dimension element.
@@ -602,7 +603,7 @@ export class VElement {
         }
 
 
-        var box;
+        let box;
         try {
             box = node.getBBox();
             // We are creating a new object as the standard says that
@@ -627,7 +628,7 @@ export class VElement {
             return box;
         }
 
-        var matrix = node.getTransformToElement(target || node.ownerSVGElement);
+        let matrix = node.getTransformToElement(target || node.ownerSVGElement);
 
         return vector.transformRect(box, matrix);
 
@@ -637,17 +638,17 @@ export class VElement {
 
         // Convert global point into the coordinate space of this element.
 
-        var that = this;
-        var svg = that.getSVG().node;
-        var point = svg.createSVGPoint();
+        let that  = this;
+        let svg   = that.getSVG().node;
+        let point = svg.createSVGPoint();
 
         point.x = x;
         point.y = y;
 
         try {
             // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
-            var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-            var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+            let globalPoint         = point.matrixTransform(svg.getScreenCTM().inverse());
+            let globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
             return globalPoint.matrixTransform(globalToLocalMatrix);
 
         } catch (e) {
@@ -686,15 +687,21 @@ export class VElement {
 
         interval = interval || 1;
 
-        var node = this.node;
-        var length = node.getTotalLength();
-        var distance = 0;
-        var samples = [];
-        var sample;
+        let node     = this.node;
+        let length   = node.getTotalLength();
+        let distance = 0;
+        let samples  = [];
 
         while (distance < length) {
-            sample = node.getPointAtLength(distance);
-            samples.push({x: sample.x, y: sample.y, distance: distance});
+
+            let sample = node.getPointAtLength(distance);
+
+            samples.push({
+                x: sample.x,
+                y: sample.y,
+                distance: distance
+            });
+
             distance += interval;
         }
 
@@ -703,9 +710,9 @@ export class VElement {
 
     toPath() {
 
-        var that = this;
-        var path = vectorize(createSvgElement('path'));
-        var d = that.toPathData();
+        let that = this;
+        let path = vectorize(utils.createSvgElement('path'));
+        let d    = that.toPathData();
 
         path.attr(that.attr());
 
@@ -716,25 +723,19 @@ export class VElement {
 
     toPathData() {
 
-        var that = this;
-        var node = that.node;
-        var tagName = node.tagName.toUpperCase();
+        let that = this;
+        let node = that.node;
 
-        switch (tagName) {
-            case 'PATH':
-                return that.attr('d');
-            case 'LINE':
-                return lineToPathData(node);
-            case 'POLYGON':
-                return polygonToPathData(node);
-            case 'POLYLINE':
-                return polylineToPathData(node);
-            case 'ELLIPSE':
-                return ellipseToPathData(node);
-            case 'CIRCLE':
-                return circleToPathData(node);
-            case 'RECT':
-                return rectToPathData(node);
+        let tagName = node.tagName.toLowerCase();
+
+        if (tagName === 'path') {
+            return that.attr('d');
+        }
+
+        let method = utils[tagName + 'ToPathData'];
+
+        if (utils.isFunction(method)) {
+            return method(node);
         }
 
         throw new Error(tagName + ' cannot be converted to PATH.');
@@ -750,42 +751,43 @@ export class VElement {
         // Returns a point in the `target` coordinate system (the same system as `ref` is in) if
         // an intersection is found. Returns `undefined` otherwise.
 
-        var that = this;
-        var svg = that.svg().node;
+        let that = this;
+        let svg  = that.svg().node;
 
         target = target || svg;
 
-        var bbox = g.rect(this.bbox(false, target));
-        var center = bbox.getCenter();
-        var spot = bbox.intersectionWithLineFromCenterToPoint(ref);
+        let bbox   = Rect.fromRect(that.bbox(false, target));
+        let center = bbox.getCenter();
+        let spot   = bbox.intersectionWithLineFromCenterToPoint(ref);
 
         if (!spot) {
             return undefined;
         }
 
-        var tagName = this.node.localName.toUpperCase();
+        let tagName = that.node.localName.toUpperCase();
 
         // Little speed up optimalization for `<rect>` element. We do not do conversion
         // to path element and sampling but directly calculate the intersection through
         // a transformed geometrical rectangle.
         if (tagName === 'RECT') {
 
-            var gRect = g.rect(
+            let gRect = new Rect(
                 parseFloat(this.attr('x') || 0),
                 parseFloat(this.attr('y') || 0),
                 parseFloat(this.attr('width')),
                 parseFloat(this.attr('height'))
             );
             // Get the rect transformation matrix with regards to the SVG document.
-            var rectMatrix = this.node.getTransformToElement(target);
+            let rectMatrix = that.node.getTransformToElement(target);
             // Decompose the matrix to find the rotation angle.
-            var rectMatrixComponents = V.decomposeMatrix(rectMatrix);
+            let rectMatrixComponents = vector.decomposeMatrix(rectMatrix);
             // Now we want to rotate the rectangle back so that we
             // can use `intersectionWithLineFromCenterToPoint()` passing the angle as the second argument.
-            var resetRotation = svg.createSVGTransform();
+            let resetRotation = svg.createSVGTransform();
             resetRotation.setRotate(-rectMatrixComponents.rotation, center.x, center.y);
-            var rect = V.transformRect(gRect, resetRotation.matrix.multiply(rectMatrix));
-            spot = g.rect(rect).intersectionWithLineFromCenterToPoint(ref, rectMatrixComponents.rotation);
+            let rect = vector.transformRect(gRect, resetRotation.matrix.multiply(rectMatrix));
+
+            spot = Rect.fromRect(rect).intersectionWithLineFromCenterToPoint(ref, rectMatrixComponents.rotation);
 
         } else if (tagName === 'PATH'
             || tagName === 'POLYGON'
@@ -793,26 +795,26 @@ export class VElement {
             || tagName === 'CIRCLE'
             || tagName === 'ELLIPSE') {
 
-            var pathNode = (tagName === 'PATH') ? that : that.toPath();
-            var samples = pathNode.sample();
-            var minDistance = Infinity;
-            var closestSamples = [];
+            let pathNode       = (tagName === 'PATH') ? that : that.toPath();
+            let samples        = pathNode.sample();
+            let minDistance    = Infinity;
+            let closestSamples = [];
 
-            for (var i = 0, len = samples.length; i < len; i++) {
+            for (let i = 0, len = samples.length; i < len; i++) {
 
-                var sample = samples[i];
+                let sample = samples[i];
                 // Convert the sample point in the local coordinate system to the global coordinate system.
-                var gp = V.createSVGPoint(sample.x, sample.y);
-                gp = gp.matrixTransform(this.node.getTransformToElement(target));
-                sample = g.point(gp);
-                var centerDistance = sample.distance(center);
+                let gp             = vector.createSVGPoint(sample.x, sample.y);
+                gp                 = gp.matrixTransform(this.node.getTransformToElement(target));
+                sample             = Point.fromPoint(gp);
+                let centerDistance = sample.distance(center);
                 // Penalize a higher distance to the reference point by 10%.
                 // This gives better results. This is due to
                 // inaccuracies introduced by rounding errors and getPointAtLength() returns.
-                var refDistance = sample.distance(ref) * 1.1;
-                var distance = centerDistance + refDistance;
+                let refDistance = sample.distance(ref) * 1.1;
+                let distance    = centerDistance + refDistance;
                 if (distance < minDistance) {
-                    minDistance = distance;
+                    minDistance    = distance;
                     closestSamples = [{
                         sample: sample,
                         refDistance: refDistance
@@ -850,16 +852,16 @@ function createElement(elem, attrs, children) {
         return null;
     }
 
-    if (isObject(elem)) {
+    if (utils.isObject(elem)) {
         return vectorize(elem);
     }
 
     if (elem.toLowerCase() === 'svg') {
-        return vectorize(createSvgDocument());
+        return vectorize(utils.createSvgDocument());
     } else if (elem[0] === '<') {
-        var svgDoc = createSvgDocument(elem);
+        let svgDoc = utils.createSvgDocument(elem);
         if (svgDoc.childNodes.length > 1) {
-            return map(svgDoc.childNodes, function (childNode) {
+            return utils.map(svgDoc.childNodes, function (childNode) {
                 return vectorize(document.importNode(childNode, true));
             });
         }
@@ -869,18 +871,18 @@ function createElement(elem, attrs, children) {
 
 
     // create svg node by tagName.
-    elem = createSvgElement(elem);
+    elem = utils.createSvgElement(elem);
 
     // set attributes.
-    attrs && forIn(attrs, function (value, attr) {
-        setAttribute(elem, attr, value);
+    attrs && utils.forIn(attrs, function (value, attr) {
+        utils.setAttribute(elem, attr, value);
     });
 
     // append children.
     if (children) {
-        children = isArray(children) ? children : [children];
+        children = utils.isArray(children) ? children : [children];
 
-        forEach(children, function (child) {
+        utils.forEach(children, function (child) {
             elem.appendChild(child instanceof VElement ? child.node : child);
         });
     }
@@ -892,16 +894,19 @@ function createElement(elem, attrs, children) {
 // vector
 // ------
 
-var vector = VElement.createElement = createElement;
-var svgDocument = createElement('svg').node;
+let vector = VElement.createElement = createElement;
+let svgDocument = createElement('svg').node;
 
 vector.isVElement = function (obj) {
     return obj instanceof VElement;
 };
 
 vector.createSVGMatrix = function (matrix) {
-    var svgMatrix = svgDocument.createSVGMatrix();
-    for (var key in matrix) {
+
+    let svgMatrix = svgDocument.createSVGMatrix();
+
+    /* eslint guard-for-in: 0 */
+    for (let key in matrix) {
         svgMatrix[key] = matrix[key];
     }
 
@@ -913,46 +918,67 @@ vector.createSVGTransform = function () {
 };
 
 vector.createSVGPoint = function (x, y) {
-    var point = svgDocument.createSVGPoint();
+
+    let point = svgDocument.createSVGPoint();
+
     point.x = x;
     point.y = y;
+
     return point;
 };
 
 vector.transformRect = function (rect, matrix) {
 
-    var point = svgDocument.createSVGPoint();
+    let point = svgDocument.createSVGPoint();
 
     point.x = rect.x;
     point.y = rect.y;
-    var corner1 = point.matrixTransform(matrix);
+
+    let corner1 = point.matrixTransform(matrix);
+
 
     point.x = rect.x + rect.width;
     point.y = rect.y;
-    var corner2 = point.matrixTransform(matrix);
+
+    let corner2 = point.matrixTransform(matrix);
+
 
     point.x = rect.x + rect.width;
     point.y = rect.y + rect.height;
-    var corner3 = point.matrixTransform(matrix);
+
+    let corner3 = point.matrixTransform(matrix);
+
 
     point.x = rect.x;
     point.y = rect.y + rect.height;
-    var corner4 = point.matrixTransform(matrix);
 
-    var minX = Math.min(corner1.x, corner2.x, corner3.x, corner4.x);
-    var maxX = Math.max(corner1.x, corner2.x, corner3.x, corner4.x);
-    var minY = Math.min(corner1.y, corner2.y, corner3.y, corner4.y);
-    var maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
+    let corner4 = point.matrixTransform(matrix);
 
-    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+
+    let minX = Math.min(corner1.x, corner2.x, corner3.x, corner4.x);
+    let maxX = Math.max(corner1.x, corner2.x, corner3.x, corner4.x);
+    let minY = Math.min(corner1.y, corner2.y, corner3.y, corner4.y);
+    let maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
+
+    return {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
+    };
 };
 
 vector.styleToObject = function (styleString) {
-    var ret = {};
-    forEach(styleString.split(';'), function (style) {
-        var pair = style.split('=');
-        ret[trim(pair[0])] = trim(pair[1]);
+
+    let ret = {};
+
+    utils.forEach(styleString.split(';'), function (style) {
+
+        let pair = style.split('=');
+
+        ret[utils.trim(pair[0])] = utils.trim(pair[1]);
     });
+
     return ret;
 };
 

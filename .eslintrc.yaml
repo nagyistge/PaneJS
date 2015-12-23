@@ -19,6 +19,8 @@ rules:
   prefer-const: 0
   comma-dangle: 0
   padded-blocks: 0
+  no-floating-decimal: 0
+  no-use-before-define: 0
   no-param-reassign: 0
   no-nested-ternary: 0 # Disallow Nested Ternaries
   func-names: 0 # Require Function Expressions to have a Name
