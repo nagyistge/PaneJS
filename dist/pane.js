@@ -7424,6 +7424,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Point = __webpack_require__(21);
 	
 	var _Point2 = _interopRequireDefault(_Point);
@@ -7434,15 +7436,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	var math = Math;
-	var abs = math.abs;
-	var cos = math.cos;
-	var sin = math.sin;
-	var mmin = math.min;
-	var mmax = math.max;
-	var _round = math.round;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Rect = (function () {
 	    function Rect() {
@@ -7461,34 +7457,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.height = height;
 	    }
 	
+	    // static methods
+	    // --------------
+	
 	    _createClass(Rect, [{
 	        key: 'getOrigin',
+	
+	        // methods
+	        // -------
+	
 	        value: function getOrigin() {
+	
 	            return new _Point2.default(this.x, this.y);
 	        }
 	    }, {
 	        key: 'getCenter',
 	        value: function getCenter() {
-	            var that = this;
-	            return new _Point2.default(that.x + that.width / 2, that.y + that.height / 2);
+	
+	            return new _Point2.default(this.x + this.width / 2, this.y + this.height / 2);
 	        }
 	    }, {
 	        key: 'getCorner',
 	        value: function getCorner() {
-	            var that = this;
-	            return new _Point2.default(that.x + that.width, that.y + that.height);
+	
+	            return new _Point2.default(this.x + this.width, this.y + this.height);
 	        }
 	    }, {
 	        key: 'getTopRight',
 	        value: function getTopRight() {
-	            var that = this;
-	            return new _Point2.default(that.x + that.width, that.y);
+	
+	            return new _Point2.default(this.x + this.width, this.y);
 	        }
 	    }, {
 	        key: 'getBottomLeft',
 	        value: function getBottomLeft() {
-	            var that = this;
-	            return new _Point2.default(that.x, that.y + that.height);
+	
+	            return new _Point2.default(this.x, this.y + this.height);
 	        }
 	    }, {
 	        key: 'getNearestSideToPoint',
@@ -7517,7 +7521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (distToBottom < closest) {
-	                //closest = distToBottom;
+	                // closest = distToBottom;
 	                side = 'bottom';
 	            }
 	
@@ -7532,16 +7536,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	
 	            if (that.containsPoint(point)) {
+	
 	                var side = that.getNearestSideToPoint(point);
-	                switch (side) {
-	                    case 'right':
-	                        return new _Point2.default(that.x + that.width, point.y);
-	                    case 'left':
-	                        return new _Point2.default(that.x, point.y);
-	                    case 'bottom':
-	                        return new _Point2.default(point.x, that.y + that.height);
-	                    case 'top':
-	                        return new _Point2.default(point.x, that.y);
+	
+	                if (side === 'right') {
+	
+	                    return new _Point2.default(that.x + that.width, point.y);
+	                } else if (side === 'left') {
+	
+	                    return new _Point2.default(that.x, point.y);
+	                } else if (side === 'bottom') {
+	
+	                    return new _Point2.default(point.x, that.y + that.height);
+	                } else if (side === 'top') {
+	
+	                    return new _Point2.default(point.x, that.y);
 	                }
 	            }
 	
@@ -7549,11 +7558,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'containsPoint',
-	        value: function containsPoint(p) {
+	        value: function containsPoint(point) {
 	
 	            var that = this;
 	
-	            return p.x >= that.x && p.x <= that.x + that.width && p.y >= that.y && p.y <= that.y + that.height;
+	            return point.x >= that.x && point.x <= that.x + that.width && point.y >= that.y && point.y <= that.y + that.height;
 	        }
 	    }, {
 	        key: 'containsRect',
@@ -7579,6 +7588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'intersect',
 	        value: function intersect(rect) {
+	
 	            var that = this;
 	            var origin1 = that.getOrigin();
 	            var corner1 = that.getCorner();
@@ -7590,10 +7600,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return null;
 	            }
 	
-	            var x = mmax(origin1.x, origin2.x);
-	            var y = mmax(origin1.y, origin2.y);
-	            var w = mmin(corner1.x, corner2.x) - x;
-	            var h = mmin(corner1.y, corner2.y) - y;
+	            var x = Math.max(origin1.x, origin2.x);
+	            var y = Math.max(origin1.y, origin2.y);
+	            var w = Math.min(corner1.x, corner2.x) - x;
+	            var h = Math.min(corner1.y, corner2.y) - y;
 	
 	            return new Rect(x, y, w, h);
 	        }
@@ -7606,7 +7616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // rotated rectangle is computed.
 	
 	            var that = this;
-	            var result;
+	            var result = undefined;
 	            var center = that.getCenter();
 	
 	            if (angle) {
@@ -7656,10 +7666,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var w = that.width;
 	            var h = that.height;
 	
-	            that.x = precision ? (0, _utils.toFixed)(x, precision) : _round(x);
-	            that.y = precision ? (0, _utils.toFixed)(y, precision) : _round(y);
-	            that.width = precision ? (0, _utils.toFixed)(w, precision) : _round(w);
-	            that.height = precision ? (0, _utils.toFixed)(h, precision) : _round(h);
+	            that.x = precision ? utils.toFixed(x, precision) : Math.round(x);
+	            that.y = precision ? utils.toFixed(y, precision) : Math.round(y);
+	            that.width = precision ? utils.toFixed(w, precision) : Math.round(w);
+	            that.height = precision ? utils.toFixed(h, precision) : Math.round(h);
 	
 	            return that;
 	        }
@@ -7701,16 +7711,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function getBBox(angle) {
 	
 	            var that = this;
-	            //var x = that.x;
-	            //var y = that.y;
-	            //var w = that.width;
-	            //var h = that.height;
 	
-	            var theta = (0, _utils.toRad)(angle || 0);
-	            var st = abs(sin(theta));
-	            var ct = abs(cos(theta));
+	            var theta = utils.toRad(angle || 0);
+	            var st = Math.abs(Math.sin(theta));
+	            var ct = Math.abs(Math.cos(theta));
 	            var w = that.width * ct + that.height * st;
 	            var h = that.width * st + that.height * ct;
+	
 	            return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
 	        }
 	    }, {
@@ -7731,34 +7738,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return that;
 	        }
+	
+	        // common
+	        // ------
+	
 	    }, {
 	        key: 'equals',
 	        value: function equals(rect) {
+	
 	            return Rect.equals(this, rect);
 	        }
 	    }, {
 	        key: 'valueOf',
 	        value: function valueOf() {
-	            var that = this;
-	            return [that.x, that.y, that.width, that.height];
+	
+	            return [this.x, this.y, this.width, this.height];
 	        }
 	    }, {
 	        key: 'toString',
 	        value: function toString() {
+	
 	            return this.valueOf().join(', ');
 	        }
 	    }, {
 	        key: 'clone',
 	        value: function clone() {
+	
 	            return Rect.fromRect(this);
 	        }
 	    }], [{
 	        key: 'equals',
 	        value: function equals(rect1, rect2) {
+	
 	            var result = rect1 && rect2 && rect1 instanceof Rect && rect2 instanceof Rect;
+	
 	            if (result) {
+	
 	                rect1.normalize();
 	                rect2.normalize();
+	
 	                result = rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
 	            }
 	
@@ -7767,12 +7785,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'fromRect',
 	        value: function fromRect(rect) {
+	
 	            return new Rect(rect.x, rect.y, rect.width, rect.height);
 	        }
 	    }]);
 	
 	    return Rect;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = Rect;
 
