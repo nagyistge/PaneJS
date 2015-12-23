@@ -4089,17 +4089,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return point1 && point2 && point1 instanceof Point && point2 instanceof Point && point1.x === point2.x && point1.y === point2.y;
 	        }
 	    }, {
+	        key: 'random',
+	        value: function random(x1, x2, y1, y2) {
+	
+	            // Create a point with random coordinates that fall
+	            // into the range `[x1, x2]` and `[y1, y2]`.
+	
+	            var x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
+	            var y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
+	
+	            return new Point(x, y);
+	        }
+	    }, {
 	        key: 'fromPoint',
 	        value: function fromPoint(point) {
 	
 	            return new Point(point.x, point.y);
-	        }
-	    }, {
-	        key: 'fromString',
-	        value: function fromString(str) {
-	
-	            var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
-	            return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
 	        }
 	    }, {
 	        key: 'fromPolar',
@@ -4127,16 +4132,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return new Point(origin.x + x, origin.y + y);
 	        }
 	    }, {
-	        key: 'random',
-	        value: function random(x1, x2, y1, y2) {
+	        key: 'fromString',
+	        value: function fromString(str) {
 	
-	            // Create a point with random coordinates that fall
-	            // into the range `[x1, x2]` and `[y1, y2]`.
-	
-	            var x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
-	            var y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
-	
-	            return new Point(x, y);
+	            var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+	            return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
 	        }
 	    }]);
 	

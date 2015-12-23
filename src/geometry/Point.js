@@ -23,15 +23,20 @@ class Point {
             && point1.y === point2.y;
     }
 
+    static random(x1, x2, y1, y2) {
+
+        // Create a point with random coordinates that fall
+        // into the range `[x1, x2]` and `[y1, y2]`.
+
+        let x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
+        let y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
+
+        return new Point(x, y);
+    }
+
     static fromPoint(point) {
 
         return new Point(point.x, point.y);
-    }
-
-    static fromString(str) {
-
-        let arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
-        return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
     }
 
     static fromPolar(r, angle, origin) {
@@ -58,15 +63,10 @@ class Point {
         return new Point(origin.x + x, origin.y + y);
     }
 
-    static random(x1, x2, y1, y2) {
+    static fromString(str) {
 
-        // Create a point with random coordinates that fall
-        // into the range `[x1, x2]` and `[y1, y2]`.
-
-        let x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
-        let y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
-
-        return new Point(x, y);
+        let arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+        return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
     }
 
 
