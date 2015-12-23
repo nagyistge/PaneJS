@@ -7790,19 +7790,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Point = __webpack_require__(21);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	var math = Math;
-	var cos = math.cos;
-	var sin = math.sin;
-	var sqrt = math.sqrt;
-	var atan2 = math.atan2;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Line = (function () {
 	    function Line(start, end) {
@@ -7810,14 +7808,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var that = this;
 	
+	        if (!start) {
+	            throw new Error('The start point of line must be specified.');
+	        }
+	
+	        if (!end) {
+	            throw new Error('The end point of line must be specified.');
+	        }
+	
 	        that.start = start;
 	        that.end = end;
 	    }
 	
+	    // static methods
+	    // --------------
+	
 	    _createClass(Line, [{
 	        key: 'getLength',
+	
+	        // methods
+	        // -------
+	
 	        value: function getLength() {
-	            return sqrt(this.getSquaredLength());
+	            return Math.sqrt(this.getSquaredLength());
 	        }
 	    }, {
 	        key: 'getSquaredLength',
@@ -7860,19 +7873,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'intersection',
-	        value: function intersection(l) {
+	        value: function intersection(line) {
 	
 	            var that = this;
 	
-	            var pt1Dir = new _Point2.default(that.end.x - that.start.x, that.end.y - that.start.y);
-	            var pt2Dir = new _Point2.default(l.end.x - l.start.x, l.end.y - l.start.y);
-	            var det = pt1Dir.x * pt2Dir.y - pt1Dir.y * pt2Dir.x;
-	            var deltaPt = new _Point2.default(l.start.x - this.start.x, l.start.y - that.start.y);
-	            var alpha = deltaPt.x * pt2Dir.y - deltaPt.y * pt2Dir.x;
-	            var beta = deltaPt.x * pt1Dir.y - deltaPt.y * pt1Dir.x;
+	            var start1 = that.start;
+	            var end1 = that.end;
 	
+	            var start2 = line.start;
+	            var end2 = line.end;
+	
+	            var point1 = new _Point2.default(end1.x - start1.x, end1.y - start1.y);
+	            var point2 = new _Point2.default(end2.x - start2.x, end2.y - start2.y);
+	
+	            var det = point1.x * point2.y - point1.y * point2.x;
+	            var deltaPt = new _Point2.default(start2.x - start1.x, start2.y - start1.y);
+	            var alpha = deltaPt.x * point2.y - deltaPt.y * point2.x;
+	            var beta = deltaPt.x * point1.y - deltaPt.y * point1.x;
+	
+	            // no intersection found
 	            if (det === 0 || alpha * det < 0 || beta * det < 0) {
-	                // No intersection found.
 	                return null;
 	            }
 	
@@ -7886,42 +7906,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            return new _Point2.default(that.start.x + alpha * pt1Dir.x / det, that.start.y + alpha * pt1Dir.y / det);
+	            return new _Point2.default(start1.x + alpha * point1.x / det, start1.y + alpha * point1.y / det);
 	        }
-	
-	        // @return the bearing (cardinal direction) of the line. For example N, W, or SE.
-	        // @returns {String} One of the following bearings : NE, E, SE, S, SW, W, NW, N.
-	
 	    }, {
 	        key: 'getDirection',
 	        value: function getDirection() {
 	
+	            // get cardinal direction of the line.
+	            // One of the following bearings : NE, E, SE, S, SW, W, NW, N.
+	
 	            var that = this;
-	            var lat1 = (0, _utils.toRad)(this.start.y);
-	            var lat2 = (0, _utils.toRad)(this.end.y);
-	            var lon1 = this.start.x;
-	            var lon2 = this.end.x;
-	            var dLon = (0, _utils.toRad)(lon2 - lon1);
-	            var y = sin(dLon) * cos(lat2);
-	            var x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
-	            var brng = toDeg(atan2(y, x));
+	            var start = that.start;
+	            var end = that.end;
+	
+	            var lat1 = utils.toRad(start.y);
+	            var lat2 = utils.toRad(end.y);
+	            var lon1 = start.x;
+	            var lon2 = end.x;
+	            var dLon = utils.toRad(lon2 - lon1);
+	            var y = Math.sin(dLon) * Math.cos(lat2);
+	            var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+	            var brng = utils.toDeg(Math.atan2(y, x));
 	
 	            var bearings = ['NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
 	
 	            var index = brng - 22.5;
+	
 	            if (index < 0) {
 	                index += 360;
 	            }
-	            index = parseInt(index / 45);
+	            index = utils.toInt(index / 45);
 	
 	            return bearings[index];
 	        }
 	    }, {
 	        key: 'pointOffset',
-	        value: function pointOffset(p) {
+	        value: function pointOffset(point) {
 	
-	            // get the offset of the point `p` from the line.
-	            // + if the point `p` is on the right side of the line,
+	            // get the offset of the `point` from the line.
+	            // + if the `point` is on the right side of the line,
 	            // - if on the left and `0` if on the line.
 	
 	            var that = this;
@@ -7929,8 +7952,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var end = that.end;
 	
 	            // Find the sign of the determinant of vectors (start,end), where p is the query point.
-	            return ((end.x - start.x) * (p.y - start.y) - (end.y - start.y) * (p.x - start.x)) / 2;
+	            return ((end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x)) / 2;
 	        }
+	
+	        // common
+	        // ------
+	
 	    }, {
 	        key: 'valueOf',
 	        value: function valueOf() {
@@ -7954,17 +7981,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }], [{
 	        key: 'equals',
 	        value: function equals(line1, line2) {
-	            return line1 && line2 && line1 instanceof Line && line2 instanceof Line && (line1.start && line1.start.equals(line2.start) || !line1.start && line1.start === line2.start) && (line1.end && line1.end.equals(line2.end) || !line1.end && line1.end === line2.end);
+	            return line1 && line2 && line1 instanceof Line && line2 instanceof Line && (line1.start && line1.start.equals(line2.start) || !line1.start && !line2.start) && (line1.end && line1.end.equals(line2.end) || !line1.end && !line2.end);
 	        }
 	    }, {
 	        key: 'fromLine',
 	        value: function fromLine(line) {
-	            return new Line(line.start, line.end);
+	            return new Line(line.start.clone(), line.end.clone());
 	        }
 	    }]);
 	
 	    return Line;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = Line;
 

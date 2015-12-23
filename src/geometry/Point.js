@@ -1,5 +1,6 @@
 import * as utils from '../common/utils';
 
+
 class Point {
 
     constructor(x = 0, y = 0) {
