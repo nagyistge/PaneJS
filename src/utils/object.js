@@ -1,15 +1,18 @@
-import { forEach } from './array'
+import { forEach } from './array';
 import { isArray, isPlainObject } from './lang';
 
 function hasKey(obj, key) {
+
     return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
 }
 
 function keys(obj) {
+
     return obj ? Object.keys(obj) : [];
 }
 
 function forIn(obj, iterator, context) {
+
     forEach(keys(obj), function (key) {
         iterator.call(context, obj[key], key);
     });
@@ -21,11 +24,13 @@ function extend(target) {
         target = {};
     }
 
-    for (var i = 1, l = arguments.length; i < l; i++) {
-        var source = arguments[i];
+    for (let i = 1, l = arguments.length; i < l; i++) {
+        let source = arguments[i];
 
         if (source) {
-            for (var key in source) {
+
+            /* eslint guard-for-in: 0 */
+            for (let key in source) {
                 target[key] = source[key];
             }
         }
@@ -40,19 +45,21 @@ function merge(target) {
         target = {};
     }
 
-    for (var i = 1, l = arguments.length; i < l; i++) {
+    for (let i = 1, l = arguments.length; i < l; i++) {
 
-        var source = arguments[i];
+        let source = arguments[i];
         if (source) {
-            for (var name in source) {
 
-                var src = target[name];
-                var copy = source[name];
-                var copyIsArray = isArray(copy);
+            /* eslint guard-for-in: 0 */
+            for (let name in source) {
+
+                let src         = target[name];
+                let copy        = source[name];
+                let copyIsArray = isArray(copy);
 
                 if (copyIsArray || isPlainObject(copy)) {
 
-                    var clone;
+                    let clone;
                     if (copyIsArray) {
                         clone = src && isArray(src) ? src : [];
                     } else {
@@ -75,11 +82,11 @@ function getByPath(obj, path, delimiter) {
 
     delimiter = delimiter || '.';
 
-    var keys = path.split(delimiter);
+    let paths = path.split(delimiter);
 
-    while (keys.length) {
+    while (paths.length) {
 
-        var key = keys.shift();
+        let key = paths.shift();
 
         if (Object(obj) === obj && key in obj) {
             obj = obj[key];
@@ -92,18 +99,25 @@ function getByPath(obj, path, delimiter) {
 }
 
 function destroy(obj) {
+
     if (obj) {
-        for (var prop in obj) {
+        for (let prop in obj) {
             if (obj.hasOwnProperty(prop)) {
                 delete obj[prop];
             }
         }
         if (obj) {
-            obj.prototype = obj['__proto__'] = null;
+
+            /* eslint no-proto: 0 */
+            obj.prototype = obj.__proto__ = null;
         }
         obj.destroyed = true;
     }
 }
+
+
+// exports
+// -------
 
 export {
     hasKey,

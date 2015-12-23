@@ -1,7 +1,19 @@
-import { isUndefined,isNullOrUndefined, isWindow } from './lang';
+import { isUndefined, isNullOrUndefined, isWindow } from './lang';
+
+
+function getNodeName(elem) {
+
+    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
+}
+
+function getClassName(elem) {
+
+    return elem.getAttribute && elem.getAttribute('class') || '';
+}
 
 function isNode(elem, nodeName, attrName, attrValue) {
-    var ret = elem && !isNaN(elem.nodeType);
+
+    let ret = elem && !isNaN(elem.nodeType);
 
     if (ret) {
         ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
@@ -14,14 +26,14 @@ function isNode(elem, nodeName, attrName, attrValue) {
     return ret;
 }
 
-var docElem  = document.documentElement;
-var contains = docElem.compareDocumentPosition || docElem.contains ?
+let docElem  = document.documentElement;
+let contains = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
-        var aDown = context.nodeType === 9 ? context.documentElement : context;
-        var bUp   = elem && elem.parentNode;
+        let aDown = context.nodeType === 9 ? context.documentElement : context;
+        let bUp   = elem && elem.parentNode;
 
-        return context === bUp || !!( bUp && bUp.nodeType === 1 && (
+        return context === bUp || !!(bUp && bUp.nodeType === 1 && (
                 aDown.contains
                     ? aDown.contains(bUp)
                     : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16
@@ -30,12 +42,16 @@ var contains = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         if (elem) {
+
+            /* eslint no-cond-assign: 0 */
+
             while ((elem = elem.parentNode)) {
                 if (elem === context) {
                     return true;
                 }
             }
         }
+
         return false;
     };
 
@@ -49,17 +65,21 @@ function getWindow(elem) {
 
 function getOffset(elem) {
 
-    var box = {top: 0, left: 0};
-    var doc = elem && elem.ownerDocument;
+    let box = {
+        top: 0,
+        left: 0
+    };
+
+    let doc = elem && elem.ownerDocument;
 
     if (!doc) {
         return box;
     }
 
-    var docElem = doc.documentElement;
+    let docElement = doc.documentElement;
 
     // Make sure it's not a disconnected DOM node
-    if (!contains(docElem, elem)) {
+    if (!contains(docElement, elem)) {
         return box;
     }
 
@@ -69,42 +89,37 @@ function getOffset(elem) {
         box = elem.getBoundingClientRect();
     }
 
-    var win = getWindow(doc);
+    let win = getWindow(doc);
 
     return {
-        top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0),
-        left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0)
+        top: box.top + (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0),
+        left: box.left + (win.pageXOffset || docElement.scrollLeft) - (docElement.clientLeft || 0)
     };
 }
 
-function getNodeName(elem) {
-    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
-}
-
-function getClassName(elem) {
-    return elem.getAttribute && elem.getAttribute('class') || '';
-}
 
 // xml namespaces.
-var ns = {
+let ns = {
     xmlns: 'http://www.w3.org/2000/svg',
     xlink: 'http://www.w3.org/1999/xlink'
 };
 // svg version.
-var svgVersion = '1.1';
+let svgVersion = '1.1';
 
 function parseXML(str, async) {
 
-    var xml;
+    let xml;
 
     try {
-        var parser = new DOMParser();
+
+        let parser = new DOMParser();
 
         if (!isUndefined(async)) {
             parser.async = async;
         }
 
         xml = parser.parseFromString(str, 'text/xml');
+
     } catch (error) {
         xml = null;
     }
@@ -117,16 +132,18 @@ function parseXML(str, async) {
 }
 
 function createSvgDocument(content) {
+
     // Create an SVG document element.
     // If `content` is passed, it will be used as the SVG content of
     // the `<svg>` root element.
 
-    var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xmlns + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
-    var xml = parseXML(svg, false);
+    let svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xmlns + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
+    let xml = parseXML(svg, false);
     return xml.documentElement;
 }
 
 function createSvgElement(tagName, doc) {
+
     return (doc || document).createElementNS(ns.xmlns, tagName);
 }
 
@@ -136,7 +153,7 @@ function setAttribute(elem, name, value) {
         elem.id = value;
     } else {
 
-        var combined = name.split(':');
+        let combined = name.split(':');
 
         combined.length > 1
             // Attribute names can be namespaced. E.g. `image` elements
@@ -160,4 +177,4 @@ export {
     createSvgElement,
     createSvgDocument,
     contains as containsElem,
-}
+};

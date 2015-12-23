@@ -1,50 +1,66 @@
-var objProto = Object.prototype;
-var toString = objProto.toString;
-var hasOwn = objProto.hasOwnProperty;
+let objProto = Object.prototype;
+let toString = objProto.toString;
+let hasOwn = objProto.hasOwnProperty;
+
 
 function isNull(obj) {
+
     return obj === null;
 }
 
 function isUndefined(obj) {
+
     return typeof obj === 'undefined';
 }
 
 function isString(obj) {
+
     return typeof obj === 'string';
 }
 
 function isBoolean(obj) {
+
     return typeof obj === 'boolean';
 }
 
 function isNullOrUndefined(obj) {
+
     return isUndefined(obj) || isNull(obj);
 }
 
 function isType(obj, type) {
+
     return toString.call(obj) === '[object ' + type + ']';
 }
 
 function isObject(obj) {
+
     if (!obj) {
         return false;
     }
 
-    var type = typeof obj;
+    let type = typeof obj;
 
     return type === 'function' || type === 'object';
 }
 
+function isWindow(obj) {
+
+    return obj && obj === obj.window;
+}
+
 function isFunction(obj) {
+
     return isType(obj, 'Function');
 }
 
 function isArray(obj) {
+
     return Array.isArray(obj);
 }
 
 function isArrayLike(obj) {
+
     if (isArray(obj)) {
         return true;
     }
@@ -53,18 +69,15 @@ function isArrayLike(obj) {
         return false;
     }
 
-    var length = !!obj && 'length' in obj && obj.length;
+    let length = !!obj && 'length' in obj && obj.length;
 
     return length === 0 ||
         typeof length === 'number' && length > 0 && (length - 1) in obj;
 }
 
 function isNumeric(obj) {
-    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-}
 
-function isWindow(obj) {
-    return obj && obj === obj.window;
+    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
 }
 
 function isPlainObject(obj) {
@@ -87,10 +100,14 @@ function isPlainObject(obj) {
 }
 
 function isEmptyObject(obj) {
-    var name;
-    for (name in obj) {
+
+    /* eslint guard-for-in: 0 */
+    /* eslint no-unused-vars: 0 */
+
+    for (let name in obj) {
         return false;
     }
+
     return true;
 }
 

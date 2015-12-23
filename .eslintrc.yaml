@@ -20,10 +20,17 @@ rules:
   comma-dangle: 0
   padded-blocks: 0
   no-param-reassign: 0
+  no-nested-ternary: 0 # Disallow Nested Ternaries
+  func-names: 0 # Require Function Expressions to have a Name
+  wrap-iife: 0
   no-multi-spaces:
     - 2
     - exceptions:
         ImportDeclaration : true
         VariableDeclarator: true
         AssignmentExpression: true
-
+  no-unused-expressions:
+    - 2
+    -
+      allowShortCircuit: true
+      allowTernary: true

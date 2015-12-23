@@ -15,9 +15,13 @@ function normalizeAngle(angle) {
     return (angle % 360) + (angle < 0 ? 360 : 0);
 }
 
+
+// exports
+// -------
+
 export {
     toDeg,
     toRad,
     snapToGrid,
     normalizeAngle,
-}
+};

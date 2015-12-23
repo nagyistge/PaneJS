@@ -1,20 +1,24 @@
-import { getByPath } from './object'
+import { getByPath } from './object';
 
-var proto = String.prototype;
+let proto = String.prototype;
 
 function toString(str) {
+
     return '' + str;
 }
 
 function uc(str) {
+
     return ('' + str).toUpperCase();
 }
 
 function lc(str) {
+
     return ('' + str).toLowerCase();
 }
 
 function trim(str) {
+
     return str ? proto.trim.call('' + str) : '';
 }
 
@@ -23,8 +27,8 @@ function uuid() {
     // credit: http://stackoverflow.com/posts/2117523/revisions
 
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0;
-        var v = c == 'x' ? r : (r & 0x3 | 0x8);
+        let r = Math.random() * 16 | 0;
+        let v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
@@ -34,17 +38,17 @@ function hashCode(str) {
     // Return a simple hash code from a string.
     // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
 
-    var hash = 0;
-    var length = str.length;
+    let hash   = 0;
+    let length = str.length;
 
     if (length === 0) {
         return hash;
     }
 
-    for (var i = 0; i < length; i++) {
-        var c = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + c;
-        hash = hash & hash; // Convert to 32bit integer
+    for (let i = 0; i < length; i++) {
+        let c = str.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + c;
+        hash  = hash & hash; // Convert to 32bit integer
     }
 
     return hash;
@@ -55,7 +59,7 @@ function format(tpl, data) {
     data = data || {};
 
     return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
-        var val = getByPath(data, key);
+        let val = getByPath(data, key);
         return val !== undefined ? val : input;
     });
 }
@@ -71,6 +75,10 @@ function sanitizeText(text) {
     return (text || '').replace(/ /g, '\u00A0');
 }
 
+
+// exports
+// -------
+
 export {
     lc,
     uc,
@@ -80,4 +88,4 @@ export {
     hashCode,
     toString,
     sanitizeText
-}
+};
