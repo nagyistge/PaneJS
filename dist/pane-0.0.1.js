@@ -3958,6 +3958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var dx = point.x - this.x;
 	            var dy = point.y - this.y;
+	
 	            return Math.sqrt(dx * dx + dy * dy);
 	        }
 	    }, {
@@ -3980,6 +3981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            origin = origin || new Point();
 	
 	            var that = this;
+	
 	            var x = that.x;
 	            var y = that.y;
 	
@@ -4118,6 +4120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var x = Math.abs(r * Math.cos(angle));
 	            var y = Math.abs(r * Math.sin(angle));
+	
 	            var deg = utils.normalizeAngle(utils.toDeg(angle));
 	
 	            if (deg < 90) {
@@ -4136,6 +4139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function fromString(str) {
 	
 	            var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+	
 	            return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
 	        }
 	    }]);
@@ -7372,6 +7376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(Visual, [{
 	        key: 'markup',
 	        get: function get() {
+	
 	            return this.constructor.markup;
 	        }
 	    }, {
@@ -7503,24 +7508,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	
 	            var distToLeft = point.x - that.x;
-	            var distToRight = that.x + that.width - point.x;
 	            var distToTop = point.y - that.y;
+	            var distToRight = that.x + that.width - point.x;
 	            var distToBottom = that.y + that.height - point.y;
 	
 	            var closest = distToLeft;
 	            var side = 'left';
 	
 	            if (distToRight < closest) {
+	
 	                closest = distToRight;
 	                side = 'right';
 	            }
 	
 	            if (distToTop < closest) {
+	
 	                closest = distToTop;
 	                side = 'top';
 	            }
 	
 	            if (distToBottom < closest) {
+	
 	                // closest = distToBottom;
 	                side = 'bottom';
 	            }
@@ -7852,6 +7860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // -------
 	
 	        value: function getLength() {
+	
 	            return Math.sqrt(this.getSquaredLength());
 	        }
 	    }, {
@@ -7946,8 +7955,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var lon1 = start.x;
 	            var lon2 = end.x;
 	            var dLon = utils.toRad(lon2 - lon1);
+	
 	            var y = Math.sin(dLon) * Math.cos(lat2);
 	            var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+	
 	            var brng = utils.toDeg(Math.atan2(y, x));
 	
 	            var bearings = ['NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
@@ -7957,6 +7968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (index < 0) {
 	                index += 360;
 	            }
+	
 	            index = utils.toInt(index / 45);
 	
 	            return bearings[index];
@@ -7970,6 +7982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // - if on the left and `0` if on the line.
 	
 	            var that = this;
+	
 	            var start = that.start;
 	            var end = that.end;
 	
@@ -7983,31 +7996,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'valueOf',
 	        value: function valueOf() {
+	
 	            return [this.satrt.valueOf(), this.end.valueOf()];
 	        }
 	    }, {
 	        key: 'toString',
 	        value: function toString() {
+	
 	            return this.start.toString() + ' ' + this.end.toString();
 	        }
 	    }, {
 	        key: 'equals',
 	        value: function equals(line) {
+	
 	            return Line.equals(this, line);
 	        }
 	    }, {
 	        key: 'clone',
 	        value: function clone() {
+	
 	            return Line.fromLine(this);
 	        }
 	    }], [{
 	        key: 'equals',
 	        value: function equals(line1, line2) {
+	
 	            return line1 && line2 && line1 instanceof Line && line2 instanceof Line && (line1.start && line1.start.equals(line2.start) || !line1.start && !line2.start) && (line1.end && line1.end.equals(line2.end) || !line1.end && !line2.end);
 	        }
 	    }, {
 	        key: 'fromLine',
 	        value: function fromLine(line) {
+	
 	            return new Line(line.start.clone(), line.end.clone());
 	        }
 	    }]);

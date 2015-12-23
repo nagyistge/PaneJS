@@ -1,11 +1,11 @@
-import Rect  from './Rect'
-import Point from './Point'
+import Rect  from './Rect';
+import Point from './Point';
 
 class Ellipse {
 
     constructor(x = 0, y = 0, a = 0, b = 0) {
 
-        var that = this;
+        let that = this;
 
         that.x = x;
         that.y = y;
@@ -14,7 +14,11 @@ class Ellipse {
     }
 
 
+    // static methods
+    // --------------
+
     static equals(e1, e2) {
+
         return e1 && e1
             && e1 instanceof Ellipse
             && e2 instanceof Ellipse
@@ -25,69 +29,99 @@ class Ellipse {
     }
 
     static fromEllipse(e) {
+
         return new Ellipse(e.x, e.y, e.a, e.b);
     }
 
 
+    // methods
+    // -------
+
     getCenter() {
+
         return new Point(this.x, this.y);
     }
 
     getBBox() {
-        var that = this;
-        return new Rect(that.x - that.a, that.y - that.b, 2 * that.a, 2 * that.b);
+
+        return new Rect(this.x - this.a, this.y - this.b, 2 * this.a, 2 * this.b);
     }
 
-    // Find point on me where line from my center to
-    // point p intersects my boundary.
-    // @param {number} angle If angle is specified, intersection with rotated ellipse is computed.
-    intersectionWithLineFromCenterToPoint(p, angle) {
-        p = point(p);
+    intersectionWithLineFromCenterToPoint(point, angle) {
+
+        // Find point on me where line from my center to `point` intersects with
+        // my boundary.
+        // If angle is specified, intersection with rotated ellipse is computed.
+
+        let that   = this;
+        let center = that.getCenter();
+
         if (angle) {
-            p.rotate(point(this.x, this.y), angle);
+            point.rotate(center, angle);
         }
-        var dx = p.x - this.x;
-        var dy = p.y - this.y;
-        var result;
+
+        let dx = point.x - that.x;
+        let dy = point.y - that.y;
+
+        let result;
+
         if (dx === 0) {
-            result = this.bbox().pointNearestToPoint(p);
+
+            result = that.getBBox().getNearestPointToPoint(point);
+
             if (angle) {
-                return result.rotate(point(this.x, this.y), -angle);
+                return result.rotate(center, -angle);
             }
+
             return result;
         }
-        var m = dy / dx;
-        var mSquared = m * m;
-        var aSquared = this.a * this.a;
-        var bSquared = this.b * this.b;
-        var x = sqrt(1 / ((1 / aSquared) + (mSquared / bSquared)));
+
+        let m  = dy / dx;
+        let mm = m * m;
+        let aa = that.a * that.a;
+        let bb = that.b * that.b;
+        let x  = Math.sqrt(1 / ((1 / aa) + (mm / bb)));
 
         x = dx < 0 ? -x : x;
-        var y = m * x;
-        result = point(this.x + x, this.y + y);
+
+        let y = m * x;
+
+        result = new Point(that.x + x, that.y + y);
+
         if (angle) {
-            return result.rotate(point(this.x, this.y), -angle);
+            return result.rotate(center, -angle);
         }
+
         return result;
     }
 
-    equals(e) {
 
-        return Ellipse.equals(this, e);
+    // common
+    // ------
+
+    equals(ellipse) {
+
+        return Ellipse.equals(this, ellipse);
     }
 
     valueOf() {
-        var that = this;
-        return [that.x, that.y, that.a, that.b];
+
+        return [this.x, this.y, this.a, this.b];
     }
 
     toString() {
+
         return this.valueOf().join(', ');
     }
 
     clone() {
+
         return Ellipse.fromEllipse(this);
     }
 }
+
+
+// exports
+// -------
 
 export default Ellipse;

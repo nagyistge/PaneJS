@@ -17,7 +17,7 @@ class Line {
         }
 
         that.start = start;
-        that.end = end;
+        that.end   = end;
     }
 
 
@@ -25,6 +25,7 @@ class Line {
     // --------------
 
     static equals(line1, line2) {
+
         return line1 && line2
             && line1 instanceof Line
             && line2 instanceof Line
@@ -33,6 +34,7 @@ class Line {
     }
 
     static fromLine(line) {
+
         return new Line(line.start.clone(), line.end.clone());
     }
 
@@ -41,6 +43,7 @@ class Line {
     // -------
 
     getLength() {
+
         return Math.sqrt(this.getSquaredLength());
     }
 
@@ -85,18 +88,18 @@ class Line {
         let that = this;
 
         let start1 = that.start;
-        let end1 = that.end;
+        let end1   = that.end;
 
         let start2 = line.start;
-        let end2 = line.end;
+        let end2   = line.end;
 
         let point1 = new Point(end1.x - start1.x, end1.y - start1.y);
         let point2 = new Point(end2.x - start2.x, end2.y - start2.y);
 
-        let det = point1.x * point2.y - point1.y * point2.x;
+        let det     = point1.x * point2.y - point1.y * point2.x;
         let deltaPt = new Point(start2.x - start1.x, start2.y - start1.y);
-        let alpha = deltaPt.x * point2.y - deltaPt.y * point2.x;
-        let beta = deltaPt.x * point1.y - deltaPt.y * point1.x;
+        let alpha   = deltaPt.x * point2.y - deltaPt.y * point2.x;
+        let beta    = deltaPt.x * point1.y - deltaPt.y * point1.x;
 
         // no intersection found
         if (det === 0 || alpha * det < 0 || beta * det < 0) {
@@ -121,17 +124,19 @@ class Line {
         // get cardinal direction of the line.
         // One of the following bearings : NE, E, SE, S, SW, W, NW, N.
 
-        let that = this;
+        let that  = this;
         let start = that.start;
-        let end = that.end;
+        let end   = that.end;
 
         let lat1 = utils.toRad(start.y);
         let lat2 = utils.toRad(end.y);
         let lon1 = start.x;
         let lon2 = end.x;
         let dLon = utils.toRad(lon2 - lon1);
+
         let y = Math.sin(dLon) * Math.cos(lat2);
         let x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+
         let brng = utils.toDeg(Math.atan2(y, x));
 
         let bearings = ['NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
@@ -141,6 +146,7 @@ class Line {
         if (index < 0) {
             index += 360;
         }
+
         index = utils.toInt(index / 45);
 
         return bearings[index];
@@ -153,8 +159,9 @@ class Line {
         // - if on the left and `0` if on the line.
 
         let that = this;
+
         let start = that.start;
-        let end = that.end;
+        let end   = that.end;
 
         // Find the sign of the determinant of vectors (start,end), where p is the query point.
         return ((end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x)) / 2;
@@ -165,18 +172,22 @@ class Line {
     // ------
 
     valueOf() {
+
         return [this.satrt.valueOf(), this.end.valueOf()];
     }
 
     toString() {
+
         return this.start.toString() + ' ' + this.end.toString();
     }
 
     equals(line) {
+
         return Line.equals(this, line);
     }
 
     clone() {
+
         return Line.fromLine(this);
     }
 }

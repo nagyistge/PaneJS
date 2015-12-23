@@ -50,6 +50,7 @@ class Point {
 
         let x = Math.abs(r * Math.cos(angle));
         let y = Math.abs(r * Math.sin(angle));
+
         let deg = utils.normalizeAngle(utils.toDeg(angle));
 
         if (deg < 90) {
@@ -67,6 +68,7 @@ class Point {
     static fromString(str) {
 
         let arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+
         return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
     }
 
@@ -113,7 +115,7 @@ class Point {
         // Move point on the line from `ref` to me by `distance`.
 
         let that = this;
-        let rad = utils.toRad(ref.theta(that));
+        let rad  = utils.toRad(ref.theta(that));
 
         return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
     }
@@ -175,6 +177,7 @@ class Point {
 
         let dx = point.x - this.x;
         let dy = point.y - this.y;
+
         return Math.sqrt(dx * dx + dy * dy);
     }
 
@@ -195,6 +198,7 @@ class Point {
         origin = origin || new Point();
 
         let that = this;
+
         let x = that.x;
         let y = that.y;
 

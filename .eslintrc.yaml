@@ -20,5 +20,10 @@ rules:
   comma-dangle: 0
   padded-blocks: 0
   no-param-reassign: 0
-
+  no-multi-spaces:
+    - 2
+    - exceptions:
+        ImportDeclaration : true
+        VariableDeclarator: true
+        AssignmentExpression: true
 

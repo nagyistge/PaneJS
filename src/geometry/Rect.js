@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
 import Point from './Point';
-import Line from './Line';
+import Line  from './Line';
 
 
 class Rect {
@@ -9,9 +9,9 @@ class Rect {
 
         let that = this;
 
-        that.x = x;
-        that.y = y;
-        that.width = width;
+        that.x      = x;
+        that.y      = y;
+        that.width  = width;
         that.height = height;
     }
 
@@ -77,25 +77,28 @@ class Rect {
 
         let that = this;
 
-        let distToLeft = point.x - that.x;
-        let distToRight = (that.x + that.width) - point.x;
-        let distToTop = point.y - that.y;
+        let distToLeft   = point.x - that.x;
+        let distToTop    = point.y - that.y;
+        let distToRight  = (that.x + that.width) - point.x;
         let distToBottom = (that.y + that.height) - point.y;
 
         let closest = distToLeft;
-        let side = 'left';
+        let side    = 'left';
 
         if (distToRight < closest) {
+
             closest = distToRight;
-            side = 'right';
+            side    = 'right';
         }
 
         if (distToTop < closest) {
+
             closest = distToTop;
-            side = 'top';
+            side    = 'top';
         }
 
         if (distToBottom < closest) {
+
             // closest = distToBottom;
             side = 'bottom';
         }
@@ -169,7 +172,7 @@ class Rect {
 
     intersect(rect) {
 
-        let that = this;
+        let that    = this;
         let origin1 = that.getOrigin();
         let corner1 = that.getCorner();
         let origin2 = rect.getOrigin();
@@ -197,7 +200,7 @@ class Rect {
         // in point p intersects me. If angle is specified, intersection with
         // rotated rectangle is computed.
 
-        let that = this;
+        let that   = this;
         let result;
         let center = that.getCenter();
 
@@ -251,9 +254,9 @@ class Rect {
         let w = that.width;
         let h = that.height;
 
-        that.x = precision ? utils.toFixed(x, precision) : Math.round(x);
-        that.y = precision ? utils.toFixed(y, precision) : Math.round(y);
-        that.width = precision ? utils.toFixed(w, precision) : Math.round(w);
+        that.x      = precision ? utils.toFixed(x, precision) : Math.round(x);
+        that.y      = precision ? utils.toFixed(y, precision) : Math.round(y);
+        that.width  = precision ? utils.toFixed(w, precision) : Math.round(w);
         that.height = precision ? utils.toFixed(h, precision) : Math.round(h);
 
         return that;
@@ -283,9 +286,9 @@ class Rect {
             h = -h;
         }
 
-        that.x = x;
-        that.y = y;
-        that.width = w;
+        that.x      = x;
+        that.y      = y;
+        that.width  = w;
         that.height = h;
 
         return that;
@@ -296,26 +299,26 @@ class Rect {
         let that = this;
 
         let theta = utils.toRad(angle || 0);
-        let st = Math.abs(Math.sin(theta));
-        let ct = Math.abs(Math.cos(theta));
-        let w = that.width * ct + that.height * st;
-        let h = that.width * st + that.height * ct;
+        let st    = Math.abs(Math.sin(theta));
+        let ct    = Math.abs(Math.cos(theta));
+        let w     = that.width * ct + that.height * st;
+        let h     = that.width * st + that.height * ct;
 
         return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
     }
 
     snapToGrid(gx, gy) {
 
-        let that = this;
+        let that   = this;
         let origin = that.getOrigin();
         let corner = that.getCorner();
 
         origin = origin.snapToGrid(gx, gy);
         corner = corner.snapToGrid(gx, gy);
 
-        that.x = origin.x;
-        that.y = origin.y;
-        that.width = corner.x - origin.x;
+        that.x      = origin.x;
+        that.y      = origin.y;
+        that.width  = corner.x - origin.x;
         that.height = corner.y - origin.y;
 
         return that;
