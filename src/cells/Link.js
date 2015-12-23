@@ -64,6 +64,12 @@ Link.configure({
                 'fill': 'none',
                 'stroke': '#000000',
                 'stroke-width': 1
+            },
+            '.marker-source': {
+                d: 'M 10 0 L 0 5 L 10 10 z'
+            },
+            '.marker-target': {
+                d: 'M 10 0 L 0 5 L 10 10 z'
             }
         }
     }

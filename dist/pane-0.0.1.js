@@ -2070,21 +2070,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var math = Math;
-	var PI = math.PI;
-	var round = math.round;
-	
 	function toDeg(rad) {
-	    return 180 * rad / PI % 360;
+	    return 180 * rad / Math.PI % 360;
 	}
 	
 	function toRad(deg, over360) {
 	    deg = over360 ? deg : deg % 360;
-	    return deg * PI / 180;
+	    return deg * Math.PI / 180;
 	}
 	
 	function snapToGrid(val, gridSize) {
-	    return gridSize * round(val / gridSize);
+	    return gridSize * Math.round(val / gridSize);
 	}
 	
 	function normalizeAngle(angle) {
@@ -3084,6 +3080,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                'fill': 'none',
 	                'stroke': '#000000',
 	                'stroke-width': 1
+	            },
+	            '.marker-source': {
+	                d: 'M 10 0 L 0 5 L 10 10 z'
+	            },
+	            '.marker-target': {
+	                d: 'M 10 0 L 0 5 L 10 10 z'
 	            }
 	        }
 	    }
@@ -3817,20 +3819,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var utils = _interopRequireWildcard(_utils);
 	
-	var math = Math;
-	var PI = math.PI;
-	var abs = math.abs;
-	var cos = math.cos;
-	var sin = math.sin;
-	var mmin = math.min;
-	var mmax = math.max;
-	var sqrt = math.sqrt;
-	var atan2 = math.atan2;
-	var _round = math.round;
-	var floor = math.floor;
-	var _random = math.random;
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Point = (function () {
 	    function Point() {
@@ -3845,8 +3838,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        that.y = y;
 	    }
 	
+	    // static methods
+	    // --------------
+	
 	    _createClass(Point, [{
 	        key: 'update',
+	
+	        // methods
+	        // -------
+	
 	        value: function update() {
 	            var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 	            var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
@@ -3857,6 +3857,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            that.y = y;
 	
 	            return that;
+	        }
+	    }, {
+	        key: 'rotate',
+	        value: function rotate(origin, angle) {
+	
+	            // Rotate point by angle around origin `origin`.
+	
+	            angle = (angle + 360) % 360;
+	
+	            var that = this;
+	
+	            that.toPolar(origin);
+	            that.y += utils.toRad(angle);
+	
+	            return Point.fromPolar(that.x, that.y, origin);
 	        }
 	    }, {
 	        key: 'translate',
@@ -3872,155 +3887,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
-	        key: 'round',
-	        value: function round(precision) {
-	
-	            var that = this;
-	
-	            that.x = precision ? (0, _utils.toFixed)(that.x, precision) : _round(that.x);
-	            that.y = precision ? (0, _utils.toFixed)(that.y, precision) : _round(that.y);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'diff',
-	        value: function diff(p) {
-	            return new Point(this.x - p.x, this.y - p.y);
-	        }
-	    }, {
-	        key: 'adhereToRect',
-	        value: function adhereToRect(rect) {
-	
-	            // If point lies outside rectangle `rect`, return the nearest point on
-	            // the boundary of rect `rect`, otherwise return point itself.
-	
-	            var that = this;
-	            if (rect.containsPoint(that)) {
-	                return that;
-	            }
-	
-	            that.x = mmin(mmax(that.x, rect.x), rect.x + rect.width);
-	            that.y = mmin(mmax(that.y, rect.y), rect.y + rect.height);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'theta',
-	        value: function theta(p) {
-	
-	            // Compute the angle between me and `p` and the x axis.
-	            // (cartesian-to-polar coordinates conversion)
-	            // Return theta angle in degrees.
-	
-	            // Invert the y-axis.
-	            var y = -(p.y - this.y);
-	            var x = p.x - this.x;
-	            // Makes sure that the comparison with zero takes rounding errors into account.
-	            var PRECISION = 10;
-	            // Note that `atan2` is not defined for `x`, `y` both equal zero.
-	            var rad = (0, _utils.toFixed)(y, PRECISION) === 0 && (0, _utils.toFixed)(x, PRECISION) === 0 ? 0 : atan2(y, x);
-	
-	            // Correction for III. and IV. quadrant.
-	            if (rad < 0) {
-	                rad = 2 * PI + rad;
-	            }
-	
-	            return (0, _utils.toDeg)(rad);
-	        }
-	    }, {
-	        key: 'distance',
-	        value: function distance(p) {
-	
-	            // Returns distance between me and point `p`.
-	
-	            var dx = p.x - this.x;
-	            var dy = p.y - this.y;
-	            return sqrt(dx * dx + dy * dy);
-	        }
-	    }, {
-	        key: 'manhattanDistance',
-	        value: function manhattanDistance(p) {
-	
-	            // Returns a manhattan (taxi-cab) distance between me and point `p`.
-	
-	            return abs(p.x - this.x) + abs(p.y - this.y);
-	        }
-	    }, {
-	        key: 'normalize',
-	        value: function normalize(len) {
-	
-	            // Scale the line segment between (0,0) and me to have a length of len.
-	
-	            var that = this;
-	            var x = that.x;
-	            var y = that.y;
-	
-	            if (x === 0 && y === 0) {
-	                return that;
-	            }
-	
-	            var l = len || 1;
-	            var s;
-	
-	            if (x === 0) {
-	                s = l / y;
-	            } else if (y === 0) {
-	                s = l / x;
-	            } else {
-	                s = l / that.distance(new Point());
-	            }
-	
-	            that.x = s * x;
-	            that.y = s * y;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'toPolar',
-	        value: function toPolar(o) {
-	
-	            // Converts rectangular to polar coordinates.
-	            // An origin can be specified, otherwise it's `0 0`.
-	
-	            o = o || new Point(0, 0);
-	
-	            var that = this;
-	            var x = that.x;
-	            var y = that.y;
-	
-	            that.x = sqrt((x - o.x) * (x - o.x) + (y - o.y) * (y - o.y)); // r
-	            that.y = (0, _utils.toRad)(o.theta(new Point(x, y)));
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'rotate',
-	        value: function rotate(o, angle) {
-	
-	            // Rotate point by angle around origin o.
-	
-	            angle = (angle + 360) % 360;
-	
-	            var that = this;
-	
-	            that.toPolar(o);
-	            that.y += (0, _utils.toRad)(angle);
-	
-	            var p = Point.fromPolar(that.x, that.y, o);
-	
-	            that.x = p.x;
-	            that.y = p.y;
-	            return that;
-	        }
-	    }, {
 	        key: 'move',
 	        value: function move(ref, distance) {
 	
-	            // Move point on line starting from ref
-	            // ending at me by distance distance.
+	            // Move point on the line from `ref` to me by `distance`.
+	
 	            var that = this;
-	            var rad = (0, _utils.toRad)(ref.theta(that));
-	            return that.translate(cos(rad) * distance, -sin(rad) * distance);
+	            var rad = utils.toRad(ref.theta(that));
+	
+	            return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
 	        }
 	    }, {
 	        key: 'reflect',
@@ -4032,8 +3907,122 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return ref.move(this, this.distance(ref));
 	        }
 	    }, {
+	        key: 'round',
+	        value: function round(precision) {
+	
+	            var that = this;
+	
+	            that.x = precision ? utils.toFixed(that.x, precision) : Math.round(that.x);
+	            that.y = precision ? utils.toFixed(that.y, precision) : Math.round(that.y);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'diff',
+	        value: function diff(point) {
+	
+	            return new Point(this.x - point.x, this.y - point.y);
+	        }
+	    }, {
+	        key: 'theta',
+	        value: function theta(point) {
+	
+	            // Compute the angle between me and `point` and the x axis.
+	            // (cartesian-to-polar coordinates conversion)
+	            // Return theta angle in degrees.
+	
+	            point = point || new Point();
+	
+	            // invert the y-axis.
+	            var y = -(point.y - this.y);
+	            var x = point.x - this.x;
+	
+	            var PRECISION = 10;
+	            // Note that `atan2` is not defined for `x`, `y` both equal zero.
+	            var rad = utils.toFixed(x, PRECISION) === 0 && utils.toFixed(y, PRECISION) === 0 ? 0 : Math.atan2(y, x);
+	
+	            // Correction for III. and IV. quadrant.
+	            if (rad < 0) {
+	                rad = 2 * Math.PI + rad;
+	            }
+	
+	            return utils.toDeg(rad);
+	        }
+	    }, {
+	        key: 'distance',
+	        value: function distance(point) {
+	
+	            // Returns distance between me and point `point`.
+	
+	            point = point || new Point();
+	
+	            var dx = point.x - this.x;
+	            var dy = point.y - this.y;
+	            return Math.sqrt(dx * dx + dy * dy);
+	        }
+	    }, {
+	        key: 'manhattanDistance',
+	        value: function manhattanDistance(point) {
+	
+	            // Returns a manhattan (taxi-cab) distance between me and point `p`.
+	
+	            point = point || new Point();
+	
+	            return Math.abs(point.x - this.x) + Math.abs(point.y - this.y);
+	        }
+	    }, {
+	        key: 'toPolar',
+	        value: function toPolar(origin) {
+	
+	            // Converts rectangular to polar coordinates.
+	            // An origin can be specified, otherwise it's `0 0`.
+	
+	            origin = origin || new Point();
+	
+	            var that = this;
+	            var x = that.x;
+	            var y = that.y;
+	
+	            that.x = Math.sqrt((x - origin.x) * (x - origin.x) + (y - origin.y) * (y - origin.y));
+	            that.y = utils.toRad(origin.theta(that));
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'normalize',
+	        value: function normalize() {
+	            var len = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+	
+	            // Scale the line segment between (0,0) and me to have a length of len.
+	
+	            var that = this;
+	
+	            var x = that.x;
+	            var y = that.y;
+	
+	            if (x === 0 && y === 0) {
+	                return that;
+	            }
+	
+	            var scale = undefined;
+	
+	            if (x === 0) {
+	                scale = len / y;
+	            } else if (y === 0) {
+	                scale = len / x;
+	            } else {
+	                scale = len / that.distance(new Point());
+	            }
+	
+	            that.x = scale * x;
+	            that.y = scale * y;
+	
+	            return that;
+	        }
+	    }, {
 	        key: 'changeInAngle',
 	        value: function changeInAngle(dx, dy, ref) {
+	
 	            // Returns change in angle from my previous position (-dx, -dy) to
 	            // my new position relative to ref point.
 	
@@ -4046,11 +4035,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	
-	            that.x = (0, _utils.snapToGrid)(that.x, gx);
-	            that.y = (0, _utils.snapToGrid)(that.y, gy || gx);
+	            that.x = utils.snapToGrid(that.x, gx);
+	            that.y = utils.snapToGrid(that.y, gy || gx);
 	
 	            return that;
 	        }
+	    }, {
+	        key: 'adhereToRect',
+	        value: function adhereToRect(rect) {
+	
+	            // If point lies outside rectangle `rect`, return the nearest point on
+	            // the boundary of rect `rect`, otherwise return point itself.
+	
+	            var that = this;
+	
+	            if (rect.containsPoint(that)) {
+	                return that;
+	            }
+	
+	            that.x = Math.min(Math.max(that.x, rect.x), rect.x + rect.width);
+	            that.y = Math.min(Math.max(that.y, rect.y), rect.y + rect.height);
+	
+	            return that;
+	        }
+	
+	        // common
+	        // ------
+	
 	    }, {
 	        key: 'valueOf',
 	        value: function valueOf() {
@@ -4073,33 +4084,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }], [{
 	        key: 'equals',
-	        value: function equals(p1, p2) {
-	            return p1 && p2 && p1 instanceof Point && p2 instanceof Point && p1.x === p2.x && p1.y === p2.y;
+	        value: function equals(point1, point2) {
+	
+	            return point1 && point2 && point1 instanceof Point && point2 instanceof Point && point1.x === point2.x && point1.y === point2.y;
 	        }
 	    }, {
 	        key: 'fromPoint',
-	        value: function fromPoint(p) {
-	            return new Point(p.x, p.y);
+	        value: function fromPoint(point) {
+	
+	            return new Point(point.x, point.y);
 	        }
 	    }, {
 	        key: 'fromString',
 	        value: function fromString(str) {
+	
 	            var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
-	            return new Point((0, _utils.toFloat)(arr[0]), (0, _utils.toFloat)(arr[1]));
+	            return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
 	        }
 	    }, {
 	        key: 'fromPolar',
-	        value: function fromPolar(r, angle, o) {
+	        value: function fromPolar(r, angle, origin) {
 	
-	            // Alternative constructor, from polar coordinates.
 	            // @param {number} r Distance.
 	            // @param {number} angle Angle in radians.
 	            // @param {point} [optional] o Origin.
 	
-	            o = o || new Point(0, 0);
-	            var x = abs(r * cos(angle));
-	            var y = abs(r * sin(angle));
-	            var deg = (0, _utils.normalizeAngle)((0, _utils.toDeg)(angle));
+	            origin = origin || new Point(0, 0);
+	
+	            var x = Math.abs(r * Math.cos(angle));
+	            var y = Math.abs(r * Math.sin(angle));
+	            var deg = utils.normalizeAngle(utils.toDeg(angle));
 	
 	            if (deg < 90) {
 	                y = -y;
@@ -4110,16 +4124,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                x = -x;
 	            }
 	
-	            return new Point(o.x + x, o.y + y);
+	            return new Point(origin.x + x, origin.y + y);
 	        }
 	    }, {
 	        key: 'random',
 	        value: function random(x1, x2, y1, y2) {
+	
 	            // Create a point with random coordinates that fall
 	            // into the range `[x1, x2]` and `[y1, y2]`.
 	
-	            var x = floor(_random() * (x2 - x1 + 1) + x1);
-	            var y = floor(_random() * (y2 - y1 + 1) + y1);
+	            var x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
+	            var y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
 	
 	            return new Point(x, y);
 	        }
@@ -4127,6 +4142,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Point;
 	})();
+	
+	// exports
+	// -------
 	
 	exports.default = Point;
 
