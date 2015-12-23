@@ -1,6 +1,7 @@
 import * as utils from '../common/utils';
 import Cell from './Cell';
 
+
 class Visual extends Cell {
 
     constructor(options) {
@@ -17,8 +18,8 @@ class Visual extends Cell {
     }
 
 
-    // readolny props
-    // --------------
+    // props
+    // -----
 
     get markup() {
         return this.constructor.markup;

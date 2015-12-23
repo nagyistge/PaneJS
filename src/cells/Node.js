@@ -8,8 +8,8 @@ import Visual from './Visual';
 
 class Node extends Visual {
 
-    // readolny props
-    // --------------
+    // props
+    // -----
 
     get markup() {
         return this.constructor.markup;

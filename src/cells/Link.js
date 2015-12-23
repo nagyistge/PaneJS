@@ -22,8 +22,8 @@ class Link extends Cell {
         that.metadata = metadata;
     }
 
-    // readolny props
-    // --------------
+    // props
+    // -----
 
     get markup() {
         return this.constructor.markup;

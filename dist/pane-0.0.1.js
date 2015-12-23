@@ -3046,8 +3046,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this;
 	    }
 	
-	    // readolny props
-	    // --------------
+	    // props
+	    // -----
 	
 	    _createClass(Link, [{
 	        key: 'markup',
@@ -3141,8 +3141,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'markup',
 	
-	        // readolny props
-	        // --------------
+	        // props
+	        // -----
 	
 	        get: function get() {
 	            return this.constructor.markup;
@@ -7261,8 +7261,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this;
 	    }
 	
-	    // readolny props
-	    // --------------
+	    // props
+	    // -----
 	
 	    _createClass(Visual, [{
 	        key: 'markup',
