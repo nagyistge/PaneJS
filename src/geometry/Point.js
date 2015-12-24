@@ -15,13 +15,13 @@ class Point {
     // static methods
     // --------------
 
-    static equals(point1, point2) {
+    static equals(p1, p2) {
 
-        return point1 && point2
-            && point1 instanceof Point
-            && point2 instanceof Point
-            && point1.x === point2.x
-            && point1.y === point2.y;
+        return p1 && p2
+            && p1 instanceof Point
+            && p2 instanceof Point
+            && p1.x === p2.x
+            && p1.y === p2.y;
     }
 
     static random(x1, x2, y1, y2) {
@@ -35,18 +35,14 @@ class Point {
         return new Point(x, y);
     }
 
-    static fromPoint(point) {
+    static fromPoint(p) {
 
-        return new Point(point.x, point.y);
+        return new Point(p.x, p.y);
     }
 
-    static fromPolar(r, angle, origin) {
+    static fromPolar(r, angle, o) {
 
-        // @param {number} r Distance.
-        // @param {number} angle Angle in radians.
-        // @param {point} [optional] o Origin.
-
-        origin = origin || new Point(0, 0);
+        o = o || new Point(0, 0);
 
         let x = Math.abs(r * Math.cos(angle));
         let y = Math.abs(r * Math.sin(angle));
@@ -62,7 +58,7 @@ class Point {
             x = -x;
         }
 
-        return new Point(origin.x + x, origin.y + y);
+        return new Point(o.x + x, o.y + y);
     }
 
     static fromString(str) {
@@ -86,7 +82,7 @@ class Point {
         return that;
     }
 
-    rotate(origin, angle) {
+    rotate(o, angle) {
 
         // Rotate point by angle around origin `origin`.
 
@@ -94,10 +90,15 @@ class Point {
 
         let that = this;
 
-        that.toPolar(origin);
+        that.toPolar(o);
         that.y += utils.toRad(angle);
 
-        return Point.fromPolar(that.x, that.y, origin);
+        let p = Point.fromPolar(that.x, that.y, o);
+
+        that.x = p.x;
+        that.y = p.y;
+
+        return that;
     }
 
     translate(dx = 0, dy = 0) {
@@ -138,22 +139,22 @@ class Point {
         return that;
     }
 
-    diff(point) {
+    diff(p) {
 
-        return new Point(this.x - point.x, this.y - point.y);
+        return new Point(this.x - p.x, this.y - p.y);
     }
 
-    theta(point) {
+    theta(p) {
 
         // Compute the angle between me and `point` and the x axis.
         // (cartesian-to-polar coordinates conversion)
         // Return theta angle in degrees.
 
-        point = point || new Point();
+        p = p || new Point();
 
         // invert the y-axis.
-        let y = -(point.y - this.y);
-        let x = point.x - this.x;
+        let y = -(p.y - this.y);
+        let x = p.x - this.x;
 
         let PRECISION = 10;
         // Note that `atan2` is not defined for `x`, `y` both equal zero.
@@ -169,41 +170,41 @@ class Point {
         return utils.toDeg(rad);
     }
 
-    distance(point) {
+    distance(p) {
 
         // Returns distance between me and point `point`.
 
-        point = point || new Point();
+        p = p || new Point();
 
-        let dx = point.x - this.x;
-        let dy = point.y - this.y;
+        let dx = p.x - this.x;
+        let dy = p.y - this.y;
 
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    manhattanDistance(point) {
+    manhattanDistance(p) {
 
         // Returns a manhattan (taxi-cab) distance between me and point `p`.
 
-        point = point || new Point();
+        p = p || new Point();
 
-        return Math.abs(point.x - this.x) + Math.abs(point.y - this.y);
+        return Math.abs(p.x - this.x) + Math.abs(p.y - this.y);
     }
 
-    toPolar(origin) {
+    toPolar(o) {
 
         // Converts rectangular to polar coordinates.
         // An origin can be specified, otherwise it's `0 0`.
 
-        origin = origin || new Point();
+        o = o || new Point(0, 0);
 
         let that = this;
 
         let x = that.x;
         let y = that.y;
 
-        that.x = Math.sqrt((x - origin.x) * (x - origin.x) + (y - origin.y) * (y - origin.y));
-        that.y = utils.toRad(origin.theta(that));
+        that.x = Math.sqrt((x - o.x) * (x - o.x) + (y - o.y) * (y - o.y));
+        that.y = utils.toRad(o.theta(new Point(x, y)));
 
         return that;
     }

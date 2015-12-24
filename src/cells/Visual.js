@@ -18,6 +18,14 @@ class Visual extends Cell {
     }
 
 
+    // static methods
+    // --------------
+
+    static setDefaults(options) {
+        this.defaults = utils.merge({}, this.defaults, options);
+    }
+
+
     // props
     // -----
 
@@ -35,16 +43,11 @@ class Visual extends Cell {
             : classNames || '';
 
     }
-
-
-    // static methods
-    // --------------
-
-    static setDefaults(options) {
-        this.defaults = utils.merge({}, this.defaults, options);
-    }
 }
 
+
+// static props
+// ------------
 
 Visual.defaults = {
     markup: '',
@@ -52,6 +55,7 @@ Visual.defaults = {
     view: null,  // set `null` to use the default view
     attrs: {}    // styles
 };
+
 
 // exports
 // -------

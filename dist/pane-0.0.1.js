@@ -76,91 +76,91 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector3 = _interopRequireDefault(_vector2);
 	
-	var _Events2 = __webpack_require__(14);
+	var _Events2 = __webpack_require__(17);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _Cell2 = __webpack_require__(15);
+	var _Cell2 = __webpack_require__(18);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
-	var _Link2 = __webpack_require__(16);
+	var _Link2 = __webpack_require__(19);
 	
 	var _Link3 = _interopRequireDefault(_Link2);
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
-	var _CellView2 = __webpack_require__(19);
+	var _CellView2 = __webpack_require__(22);
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
-	var _LinkView2 = __webpack_require__(21);
+	var _LinkView2 = __webpack_require__(24);
 	
 	var _LinkView3 = _interopRequireDefault(_LinkView2);
 	
-	var _NodeView2 = __webpack_require__(24);
+	var _NodeView2 = __webpack_require__(26);
 	
 	var _NodeView3 = _interopRequireDefault(_NodeView2);
 	
-	var _Change2 = __webpack_require__(25);
+	var _Change2 = __webpack_require__(27);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
-	var _RootChange2 = __webpack_require__(26);
+	var _RootChange2 = __webpack_require__(28);
 	
 	var _RootChange3 = _interopRequireDefault(_RootChange2);
 	
-	var _ChildChange2 = __webpack_require__(27);
+	var _ChildChange2 = __webpack_require__(29);
 	
 	var _ChildChange3 = _interopRequireDefault(_ChildChange2);
 	
-	var _Model2 = __webpack_require__(28);
+	var _Model2 = __webpack_require__(30);
 	
 	var _Model3 = _interopRequireDefault(_Model2);
 	
-	var _Paper2 = __webpack_require__(31);
+	var _Paper2 = __webpack_require__(33);
 	
 	var _Paper3 = _interopRequireDefault(_Paper2);
 	
-	var _Text = __webpack_require__(36);
+	var _Text = __webpack_require__(35);
 	
 	var _Text2 = _interopRequireDefault(_Text);
 	
-	var _Rect = __webpack_require__(37);
+	var _Rect = __webpack_require__(36);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Circle = __webpack_require__(38);
+	var _Circle = __webpack_require__(37);
 	
 	var _Circle2 = _interopRequireDefault(_Circle);
 	
-	var _Ellipse = __webpack_require__(39);
+	var _Ellipse = __webpack_require__(38);
 	
 	var _Ellipse2 = _interopRequireDefault(_Ellipse);
 	
-	var _Image = __webpack_require__(40);
+	var _Image = __webpack_require__(39);
 	
 	var _Image2 = _interopRequireDefault(_Image);
 	
-	var _Path = __webpack_require__(41);
+	var _Path = __webpack_require__(40);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Polygon = __webpack_require__(42);
+	var _Polygon = __webpack_require__(41);
 	
 	var _Polygon2 = _interopRequireDefault(_Polygon);
 	
-	var _Polyline = __webpack_require__(43);
+	var _Polyline = __webpack_require__(42);
 	
 	var _Polyline2 = _interopRequireDefault(_Polyline);
 	
-	var _Rhombus = __webpack_require__(44);
+	var _Rhombus = __webpack_require__(43);
 	
 	var _Rhombus2 = _interopRequireDefault(_Rhombus);
 	
-	var _Rect3 = __webpack_require__(45);
+	var _Rect3 = __webpack_require__(44);
 	
 	var _Rect4 = _interopRequireDefault(_Rect3);
 	
@@ -168,7 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(46);
+	__webpack_require__(45);
 	
 	exports.utils = _utils;
 	exports.vector = _vector3.default;
@@ -222,11 +222,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Rect = __webpack_require__(33);
+	var _Rect = __webpack_require__(14);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Point = __webpack_require__(22);
+	var _Point = __webpack_require__(15);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
@@ -2715,6 +2715,978 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var _Line = __webpack_require__(16);
+	
+	var _Line2 = _interopRequireDefault(_Line);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Rect = (function () {
+	    function Rect() {
+	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	        var width = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	        var height = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+	
+	        _classCallCheck(this, Rect);
+	
+	        var that = this;
+	
+	        that.x = x;
+	        that.y = y;
+	        that.width = width;
+	        that.height = height;
+	    }
+	
+	    // static methods
+	    // --------------
+	
+	    _createClass(Rect, [{
+	        key: 'getOrigin',
+	
+	        // methods
+	        // -------
+	
+	        value: function getOrigin() {
+	
+	            return new _Point2.default(this.x, this.y);
+	        }
+	    }, {
+	        key: 'getCenter',
+	        value: function getCenter() {
+	
+	            return new _Point2.default(this.x + this.width / 2, this.y + this.height / 2);
+	        }
+	    }, {
+	        key: 'getCorner',
+	        value: function getCorner() {
+	
+	            return new _Point2.default(this.x + this.width, this.y + this.height);
+	        }
+	    }, {
+	        key: 'getTopRight',
+	        value: function getTopRight() {
+	
+	            return new _Point2.default(this.x + this.width, this.y);
+	        }
+	    }, {
+	        key: 'getBottomLeft',
+	        value: function getBottomLeft() {
+	
+	            return new _Point2.default(this.x, this.y + this.height);
+	        }
+	    }, {
+	        key: 'getNearestSideToPoint',
+	        value: function getNearestSideToPoint(point) {
+	
+	            // get (left|right|top|bottom) side which is nearest to point
+	
+	            var that = this;
+	
+	            var distToLeft = point.x - that.x;
+	            var distToTop = point.y - that.y;
+	            var distToRight = that.x + that.width - point.x;
+	            var distToBottom = that.y + that.height - point.y;
+	
+	            var closest = distToLeft;
+	            var side = 'left';
+	
+	            if (distToRight < closest) {
+	
+	                closest = distToRight;
+	                side = 'right';
+	            }
+	
+	            if (distToTop < closest) {
+	
+	                closest = distToTop;
+	                side = 'top';
+	            }
+	
+	            if (distToBottom < closest) {
+	
+	                // closest = distToBottom;
+	                side = 'bottom';
+	            }
+	
+	            return side;
+	        }
+	    }, {
+	        key: 'getNearestPointToPoint',
+	        value: function getNearestPointToPoint(point) {
+	
+	            // get a point on my boundary nearest to `point`
+	
+	            var that = this;
+	
+	            if (that.containsPoint(point)) {
+	
+	                var side = that.getNearestSideToPoint(point);
+	
+	                if (side === 'right') {
+	
+	                    return new _Point2.default(that.x + that.width, point.y);
+	                } else if (side === 'left') {
+	
+	                    return new _Point2.default(that.x, point.y);
+	                } else if (side === 'bottom') {
+	
+	                    return new _Point2.default(point.x, that.y + that.height);
+	                } else if (side === 'top') {
+	
+	                    return new _Point2.default(point.x, that.y);
+	                }
+	            }
+	
+	            return point.adhereToRect(that);
+	        }
+	    }, {
+	        key: 'containsPoint',
+	        value: function containsPoint(point) {
+	
+	            var that = this;
+	
+	            return point.x >= that.x && point.x <= that.x + that.width && point.y >= that.y && point.y <= that.y + that.height;
+	        }
+	    }, {
+	        key: 'containsRect',
+	        value: function containsRect(rect) {
+	
+	            var that = this;
+	
+	            that.normalize();
+	            rect.normalize();
+	
+	            var x2 = rect.x;
+	            var y2 = rect.y;
+	            var w2 = rect.width;
+	            var h2 = rect.height;
+	
+	            var x1 = that.x;
+	            var y1 = that.y;
+	            var w1 = that.width;
+	            var h1 = that.height;
+	
+	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
+	        }
+	    }, {
+	        key: 'intersect',
+	        value: function intersect(rect) {
+	
+	            var that = this;
+	            var origin1 = that.getOrigin();
+	            var corner1 = that.getCorner();
+	            var origin2 = rect.getOrigin();
+	            var corner2 = rect.getCorner();
+	
+	            // No intersection found
+	            if (origin1.x >= corner2.x || origin1.y >= corner2.y || origin2.x >= corner1.x || origin2.y >= corner1.y) {
+	                return null;
+	            }
+	
+	            var x = Math.max(origin1.x, origin2.x);
+	            var y = Math.max(origin1.y, origin2.y);
+	            var w = Math.min(corner1.x, corner2.x) - x;
+	            var h = Math.min(corner1.y, corner2.y) - y;
+	
+	            return new Rect(x, y, w, h);
+	        }
+	    }, {
+	        key: 'intersectionWithLineFromCenterToPoint',
+	        value: function intersectionWithLineFromCenterToPoint(point, angle) {
+	
+	            // Find point on my boundary where line starting from my center ending
+	            // in point p intersects me. If angle is specified, intersection with
+	            // rotated rectangle is computed.
+	
+	            var that = this;
+	            var result = undefined;
+	            var center = that.getCenter();
+	
+	            if (angle) {
+	                point.rotate(center, angle);
+	            }
+	
+	            // clockwise, starting from the top side
+	            var sides = [new _Line2.default(that.getOrigin(), that.getTopRight()), new _Line2.default(that.getTopRight(), that.getCorner()), new _Line2.default(that.getCorner(), that.getBottomLeft()), new _Line2.default(that.getBottomLeft(), that.getOrigin())];
+	
+	            var connector = new _Line2.default(center, point);
+	
+	            for (var i = sides.length - 1; i >= 0; --i) {
+	                var intersection = sides[i].intersection(connector);
+	                if (intersection) {
+	                    result = intersection;
+	                    break;
+	                }
+	            }
+	
+	            if (result && angle) {
+	                result.rotate(center, -angle);
+	            }
+	
+	            return result;
+	        }
+	    }, {
+	        key: 'moveAndExpand',
+	        value: function moveAndExpand(rect) {
+	
+	            var that = this;
+	
+	            that.x += rect.x || 0;
+	            that.y += rect.y || 0;
+	            that.width += rect.width || 0;
+	            that.height += rect.height || 0;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'round',
+	        value: function round(precision) {
+	
+	            var that = this;
+	
+	            var x = that.x;
+	            var y = that.y;
+	            var w = that.width;
+	            var h = that.height;
+	
+	            that.x = precision ? utils.toFixed(x, precision) : Math.round(x);
+	            that.y = precision ? utils.toFixed(y, precision) : Math.round(y);
+	            that.width = precision ? utils.toFixed(w, precision) : Math.round(w);
+	            that.height = precision ? utils.toFixed(h, precision) : Math.round(h);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'normalize',
+	        value: function normalize() {
+	
+	            // Normalize the rectangle.
+	            // i.e., make it so that it has a non-negative width and height.
+	            // If width < 0 the function swaps the left and right corners,
+	            // and it swaps the top and bottom corners if height < 0
+	
+	            var that = this;
+	
+	            var x = that.x;
+	            var y = that.y;
+	            var w = that.width;
+	            var h = that.height;
+	
+	            if (w < 0) {
+	                x = x + w;
+	                w = -w;
+	            }
+	
+	            if (h < 0) {
+	                y = y + h;
+	                h = -h;
+	            }
+	
+	            that.x = x;
+	            that.y = y;
+	            that.width = w;
+	            that.height = h;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'getBBox',
+	        value: function getBBox(angle) {
+	
+	            var that = this;
+	
+	            var theta = utils.toRad(angle || 0);
+	            var st = Math.abs(Math.sin(theta));
+	            var ct = Math.abs(Math.cos(theta));
+	            var w = that.width * ct + that.height * st;
+	            var h = that.width * st + that.height * ct;
+	
+	            return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
+	        }
+	    }, {
+	        key: 'snapToGrid',
+	        value: function snapToGrid(gx, gy) {
+	
+	            var that = this;
+	            var origin = that.getOrigin();
+	            var corner = that.getCorner();
+	
+	            origin = origin.snapToGrid(gx, gy);
+	            corner = corner.snapToGrid(gx, gy);
+	
+	            that.x = origin.x;
+	            that.y = origin.y;
+	            that.width = corner.x - origin.x;
+	            that.height = corner.y - origin.y;
+	
+	            return that;
+	        }
+	
+	        // common
+	        // ------
+	
+	    }, {
+	        key: 'equals',
+	        value: function equals(rect) {
+	
+	            return Rect.equals(this, rect);
+	        }
+	    }, {
+	        key: 'valueOf',
+	        value: function valueOf() {
+	
+	            return [this.x, this.y, this.width, this.height];
+	        }
+	    }, {
+	        key: 'toString',
+	        value: function toString() {
+	
+	            return this.valueOf().join(', ');
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone() {
+	
+	            return Rect.fromRect(this);
+	        }
+	    }], [{
+	        key: 'equals',
+	        value: function equals(rect1, rect2) {
+	
+	            var result = rect1 && rect2 && rect1 instanceof Rect && rect2 instanceof Rect;
+	
+	            if (result) {
+	
+	                rect1.normalize();
+	                rect2.normalize();
+	
+	                result = rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
+	            }
+	
+	            return result;
+	        }
+	    }, {
+	        key: 'fromRect',
+	        value: function fromRect(rect) {
+	
+	            return new Rect(rect.x, rect.y, rect.width, rect.height);
+	        }
+	    }]);
+	
+	    return Rect;
+	})();
+	
+	// exports
+	// -------
+	
+	exports.default = Rect;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(2);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Point = (function () {
+	    function Point() {
+	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	
+	        _classCallCheck(this, Point);
+	
+	        var that = this;
+	
+	        that.x = x;
+	        that.y = y;
+	    }
+	
+	    // static methods
+	    // --------------
+	
+	    _createClass(Point, [{
+	        key: 'update',
+	
+	        // methods
+	        // -------
+	
+	        value: function update() {
+	            var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	            var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	
+	            var that = this;
+	
+	            that.x = x;
+	            that.y = y;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'rotate',
+	        value: function rotate(o, angle) {
+	
+	            // Rotate point by angle around origin `origin`.
+	
+	            angle = (angle + 360) % 360;
+	
+	            var that = this;
+	
+	            that.toPolar(o);
+	            that.y += utils.toRad(angle);
+	
+	            var p = Point.fromPolar(that.x, that.y, o);
+	
+	            that.x = p.x;
+	            that.y = p.y;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate() {
+	            var dx = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	            var dy = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	
+	            var that = this;
+	
+	            that.x += dx;
+	            that.y += dy;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'move',
+	        value: function move(ref, distance) {
+	
+	            // Move point on the line from `ref` to me by `distance`.
+	
+	            var that = this;
+	            var rad = utils.toRad(ref.theta(that));
+	
+	            return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
+	        }
+	    }, {
+	        key: 'reflect',
+	        value: function reflect(ref) {
+	
+	            // Returns a point that is the reflection of me with
+	            // the center of inversion in ref point.
+	
+	            return ref.move(this, this.distance(ref));
+	        }
+	    }, {
+	        key: 'round',
+	        value: function round(precision) {
+	
+	            var that = this;
+	
+	            that.x = precision ? utils.toFixed(that.x, precision) : Math.round(that.x);
+	            that.y = precision ? utils.toFixed(that.y, precision) : Math.round(that.y);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'diff',
+	        value: function diff(p) {
+	
+	            return new Point(this.x - p.x, this.y - p.y);
+	        }
+	    }, {
+	        key: 'theta',
+	        value: function theta(p) {
+	
+	            // Compute the angle between me and `point` and the x axis.
+	            // (cartesian-to-polar coordinates conversion)
+	            // Return theta angle in degrees.
+	
+	            p = p || new Point();
+	
+	            // invert the y-axis.
+	            var y = -(p.y - this.y);
+	            var x = p.x - this.x;
+	
+	            var PRECISION = 10;
+	            // Note that `atan2` is not defined for `x`, `y` both equal zero.
+	            var rad = utils.toFixed(x, PRECISION) === 0 && utils.toFixed(y, PRECISION) === 0 ? 0 : Math.atan2(y, x);
+	
+	            // Correction for III. and IV. quadrant.
+	            if (rad < 0) {
+	                rad = 2 * Math.PI + rad;
+	            }
+	
+	            return utils.toDeg(rad);
+	        }
+	    }, {
+	        key: 'distance',
+	        value: function distance(p) {
+	
+	            // Returns distance between me and point `point`.
+	
+	            p = p || new Point();
+	
+	            var dx = p.x - this.x;
+	            var dy = p.y - this.y;
+	
+	            return Math.sqrt(dx * dx + dy * dy);
+	        }
+	    }, {
+	        key: 'manhattanDistance',
+	        value: function manhattanDistance(p) {
+	
+	            // Returns a manhattan (taxi-cab) distance between me and point `p`.
+	
+	            p = p || new Point();
+	
+	            return Math.abs(p.x - this.x) + Math.abs(p.y - this.y);
+	        }
+	    }, {
+	        key: 'toPolar',
+	        value: function toPolar(o) {
+	
+	            // Converts rectangular to polar coordinates.
+	            // An origin can be specified, otherwise it's `0 0`.
+	
+	            o = o || new Point(0, 0);
+	
+	            var that = this;
+	
+	            var x = that.x;
+	            var y = that.y;
+	
+	            that.x = Math.sqrt((x - o.x) * (x - o.x) + (y - o.y) * (y - o.y));
+	            that.y = utils.toRad(o.theta(new Point(x, y)));
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'normalize',
+	        value: function normalize() {
+	            var len = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+	
+	            // Scale the line segment between (0,0) and me to have a length of len.
+	
+	            var that = this;
+	
+	            var x = that.x;
+	            var y = that.y;
+	
+	            if (x === 0 && y === 0) {
+	                return that;
+	            }
+	
+	            var scale = undefined;
+	
+	            if (x === 0) {
+	                scale = len / y;
+	            } else if (y === 0) {
+	                scale = len / x;
+	            } else {
+	                scale = len / that.distance(new Point());
+	            }
+	
+	            that.x = scale * x;
+	            that.y = scale * y;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'changeInAngle',
+	        value: function changeInAngle(dx, dy, ref) {
+	
+	            // Returns change in angle from my previous position (-dx, -dy) to
+	            // my new position relative to ref point.
+	
+	            // Revert the translation and measure the change in angle around x-axis.
+	            return this.translate(-dx, -dy).theta(ref) - this.theta(ref);
+	        }
+	    }, {
+	        key: 'snapToGrid',
+	        value: function snapToGrid(gx, gy) {
+	
+	            var that = this;
+	
+	            that.x = utils.snapToGrid(that.x, gx);
+	            that.y = utils.snapToGrid(that.y, gy || gx);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'adhereToRect',
+	        value: function adhereToRect(rect) {
+	
+	            // If point lies outside rectangle `rect`, return the nearest point on
+	            // the boundary of rect `rect`, otherwise return point itself.
+	
+	            var that = this;
+	
+	            if (rect.containsPoint(that)) {
+	                return that;
+	            }
+	
+	            that.x = Math.min(Math.max(that.x, rect.x), rect.x + rect.width);
+	            that.y = Math.min(Math.max(that.y, rect.y), rect.y + rect.height);
+	
+	            return that;
+	        }
+	
+	        // common
+	        // ------
+	
+	    }, {
+	        key: 'valueOf',
+	        value: function valueOf() {
+	            return [this.x, this.y];
+	        }
+	    }, {
+	        key: 'toString',
+	        value: function toString() {
+	            return this.valueOf().join(', ');
+	        }
+	    }, {
+	        key: 'equals',
+	        value: function equals(p) {
+	            return Point.equals(this, p);
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone() {
+	            return Point.fromPoint(this);
+	        }
+	    }], [{
+	        key: 'equals',
+	        value: function equals(p1, p2) {
+	
+	            return p1 && p2 && p1 instanceof Point && p2 instanceof Point && p1.x === p2.x && p1.y === p2.y;
+	        }
+	    }, {
+	        key: 'random',
+	        value: function random(x1, x2, y1, y2) {
+	
+	            // Create a point with random coordinates that fall
+	            // into the range `[x1, x2]` and `[y1, y2]`.
+	
+	            var x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
+	            var y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
+	
+	            return new Point(x, y);
+	        }
+	    }, {
+	        key: 'fromPoint',
+	        value: function fromPoint(p) {
+	
+	            return new Point(p.x, p.y);
+	        }
+	    }, {
+	        key: 'fromPolar',
+	        value: function fromPolar(r, angle, o) {
+	
+	            o = o || new Point(0, 0);
+	
+	            var x = Math.abs(r * Math.cos(angle));
+	            var y = Math.abs(r * Math.sin(angle));
+	
+	            var deg = utils.normalizeAngle(utils.toDeg(angle));
+	
+	            if (deg < 90) {
+	                y = -y;
+	            } else if (deg < 180) {
+	                x = -x;
+	                y = -y;
+	            } else if (deg < 270) {
+	                x = -x;
+	            }
+	
+	            return new Point(o.x + x, o.y + y);
+	        }
+	    }, {
+	        key: 'fromString',
+	        value: function fromString(str) {
+	
+	            var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
+	
+	            return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
+	        }
+	    }]);
+	
+	    return Point;
+	})();
+	
+	// exports
+	// -------
+	
+	exports.default = Point;
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(2);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Line = (function () {
+	    function Line(start, end) {
+	        _classCallCheck(this, Line);
+	
+	        var that = this;
+	
+	        if (!start) {
+	            throw new Error('The start point of line must be specified.');
+	        }
+	
+	        if (!end) {
+	            throw new Error('The end point of line must be specified.');
+	        }
+	
+	        that.start = start;
+	        that.end = end;
+	    }
+	
+	    // static methods
+	    // --------------
+	
+	    _createClass(Line, [{
+	        key: 'getLength',
+	
+	        // methods
+	        // -------
+	
+	        value: function getLength() {
+	
+	            return Math.sqrt(this.getSquaredLength());
+	        }
+	    }, {
+	        key: 'getSquaredLength',
+	        value: function getSquaredLength() {
+	
+	            // Return the line's length without sqrt.
+	            // Note that for applications where the exact length
+	            // is not necessary (e.g. compare only)
+	
+	            var that = this;
+	
+	            var dx = that.end.x - that.start.x;
+	            var dy = that.end.y - that.end.x;
+	
+	            return dx * dx + dy * dy;
+	        }
+	    }, {
+	        key: 'getMidpoint',
+	        value: function getMidpoint() {
+	
+	            var that = this;
+	
+	            var x = (that.start.x + that.end.x) / 2;
+	            var y = (that.start.y + that.end.y) / 2;
+	
+	            return new _Point2.default(x, y);
+	        }
+	    }, {
+	        key: 'getPointAt',
+	        value: function getPointAt(percent) {
+	
+	            // get point at `percent` (0~1).
+	
+	            var that = this;
+	
+	            var x = (1 - percent) * that.start.x + percent * that.end.x;
+	            var y = (1 - percent) * that.start.y + percent * that.end.y;
+	
+	            return new _Point2.default(x, y);
+	        }
+	    }, {
+	        key: 'intersection',
+	        value: function intersection(line) {
+	
+	            var that = this;
+	
+	            var start1 = that.start;
+	            var end1 = that.end;
+	
+	            var start2 = line.start;
+	            var end2 = line.end;
+	
+	            var point1 = new _Point2.default(end1.x - start1.x, end1.y - start1.y);
+	            var point2 = new _Point2.default(end2.x - start2.x, end2.y - start2.y);
+	
+	            var det = point1.x * point2.y - point1.y * point2.x;
+	            var deltaPt = new _Point2.default(start2.x - start1.x, start2.y - start1.y);
+	            var alpha = deltaPt.x * point2.y - deltaPt.y * point2.x;
+	            var beta = deltaPt.x * point1.y - deltaPt.y * point1.x;
+	
+	            // no intersection found
+	            if (det === 0 || alpha * det < 0 || beta * det < 0) {
+	                return null;
+	            }
+	
+	            if (det > 0) {
+	                if (alpha > det || beta > det) {
+	                    return null;
+	                }
+	            } else {
+	                if (alpha < det || beta < det) {
+	                    return null;
+	                }
+	            }
+	
+	            return new _Point2.default(start1.x + alpha * point1.x / det, start1.y + alpha * point1.y / det);
+	        }
+	    }, {
+	        key: 'getDirection',
+	        value: function getDirection() {
+	
+	            // get cardinal direction of the line.
+	            // One of the following bearings : NE, E, SE, S, SW, W, NW, N.
+	
+	            var that = this;
+	            var start = that.start;
+	            var end = that.end;
+	
+	            var lat1 = utils.toRad(start.y);
+	            var lat2 = utils.toRad(end.y);
+	            var lon1 = start.x;
+	            var lon2 = end.x;
+	            var dLon = utils.toRad(lon2 - lon1);
+	
+	            var y = Math.sin(dLon) * Math.cos(lat2);
+	            var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+	
+	            var brng = utils.toDeg(Math.atan2(y, x));
+	
+	            var bearings = ['NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+	
+	            var index = brng - 22.5;
+	
+	            if (index < 0) {
+	                index += 360;
+	            }
+	
+	            index = utils.toInt(index / 45);
+	
+	            return bearings[index];
+	        }
+	    }, {
+	        key: 'pointOffset',
+	        value: function pointOffset(point) {
+	
+	            // get the offset of the `point` from the line.
+	            // + if the `point` is on the right side of the line,
+	            // - if on the left and `0` if on the line.
+	
+	            var that = this;
+	
+	            var start = that.start;
+	            var end = that.end;
+	
+	            // Find the sign of the determinant of vectors (start,end), where p is the query point.
+	            return ((end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x)) / 2;
+	        }
+	
+	        // common
+	        // ------
+	
+	    }, {
+	        key: 'valueOf',
+	        value: function valueOf() {
+	
+	            return [this.satrt.valueOf(), this.end.valueOf()];
+	        }
+	    }, {
+	        key: 'toString',
+	        value: function toString() {
+	
+	            return this.start.toString() + ' ' + this.end.toString();
+	        }
+	    }, {
+	        key: 'equals',
+	        value: function equals(line) {
+	
+	            return Line.equals(this, line);
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone() {
+	
+	            return Line.fromLine(this);
+	        }
+	    }], [{
+	        key: 'equals',
+	        value: function equals(line1, line2) {
+	
+	            return line1 && line2 && line1 instanceof Line && line2 instanceof Line && (line1.start && line1.start.equals(line2.start) || !line1.start && !line2.start) && (line1.end && line1.end.equals(line2.end) || !line1.end && !line2.end);
+	        }
+	    }, {
+	        key: 'fromLine',
+	        value: function fromLine(line) {
+	
+	            return new Line(line.start.clone(), line.end.clone());
+	        }
+	    }]);
+	
+	    return Line;
+	})();
+	
+	// exports
+	// -------
+	
+	exports.default = Line;
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(2);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2860,7 +3832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Events;
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3178,7 +4150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Cell;
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3191,7 +4163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var _Visual2 = __webpack_require__(17);
+	var _Visual2 = __webpack_require__(20);
 	
 	var _Visual3 = _interopRequireDefault(_Visual2);
 	
@@ -3249,7 +4221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Link;
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3264,7 +4236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Cell2 = __webpack_require__(15);
+	var _Cell2 = __webpack_require__(18);
 	
 	var _Cell3 = _interopRequireDefault(_Cell2);
 	
@@ -3296,11 +4268,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this;
 	    }
 	
-	    // props
-	    // -----
+	    // static methods
+	    // --------------
 	
 	    _createClass(Visual, [{
 	        key: 'markup',
+	
+	        // props
+	        // -----
+	
 	        get: function get() {
 	
 	            return this.metadata.markup;
@@ -3313,10 +4289,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
 	        }
-	
-	        // static methods
-	        // --------------
-	
 	    }], [{
 	        key: 'setDefaults',
 	        value: function setDefaults(options) {
@@ -3326,6 +4298,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Visual;
 	})(_Cell3.default);
+	
+	// static props
+	// ------------
 	
 	Visual.defaults = {
 	    markup: '',
@@ -3340,7 +4315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Visual;
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3353,7 +4328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var _Visual2 = __webpack_require__(17);
+	var _Visual2 = __webpack_require__(20);
 	
 	var _Visual3 = _interopRequireDefault(_Visual2);
 	
@@ -3430,7 +4405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Node;
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3445,7 +4420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Events = __webpack_require__(14);
+	var _Events = __webpack_require__(17);
 	
 	var _Events2 = _interopRequireDefault(_Events);
 	
@@ -3453,7 +4428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _filters = __webpack_require__(20);
+	var _filters = __webpack_require__(23);
 	
 	var _filters2 = _interopRequireDefault(_filters);
 	
@@ -3702,7 +4677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CellView;
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3907,7 +4882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3926,15 +4901,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _Point = __webpack_require__(22);
+	var _Point = __webpack_require__(15);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
-	var _CellView2 = __webpack_require__(19);
+	var _CellView2 = __webpack_require__(22);
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
-	var _normal = __webpack_require__(23);
+	var _normal = __webpack_require__(25);
 	
 	var _normal2 = _interopRequireDefault(_normal);
 	
@@ -4042,354 +5017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = LinkView;
 
 /***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(2);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Point = (function () {
-	    function Point() {
-	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	
-	        _classCallCheck(this, Point);
-	
-	        var that = this;
-	
-	        that.x = x;
-	        that.y = y;
-	    }
-	
-	    // static methods
-	    // --------------
-	
-	    _createClass(Point, [{
-	        key: 'update',
-	
-	        // methods
-	        // -------
-	
-	        value: function update() {
-	            var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-	            var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	
-	            var that = this;
-	
-	            that.x = x;
-	            that.y = y;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'rotate',
-	        value: function rotate(origin, angle) {
-	
-	            // Rotate point by angle around origin `origin`.
-	
-	            angle = (angle + 360) % 360;
-	
-	            var that = this;
-	
-	            that.toPolar(origin);
-	            that.y += utils.toRad(angle);
-	
-	            return Point.fromPolar(that.x, that.y, origin);
-	        }
-	    }, {
-	        key: 'translate',
-	        value: function translate() {
-	            var dx = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-	            var dy = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	
-	            var that = this;
-	
-	            that.x += dx;
-	            that.y += dy;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'move',
-	        value: function move(ref, distance) {
-	
-	            // Move point on the line from `ref` to me by `distance`.
-	
-	            var that = this;
-	            var rad = utils.toRad(ref.theta(that));
-	
-	            return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
-	        }
-	    }, {
-	        key: 'reflect',
-	        value: function reflect(ref) {
-	
-	            // Returns a point that is the reflection of me with
-	            // the center of inversion in ref point.
-	
-	            return ref.move(this, this.distance(ref));
-	        }
-	    }, {
-	        key: 'round',
-	        value: function round(precision) {
-	
-	            var that = this;
-	
-	            that.x = precision ? utils.toFixed(that.x, precision) : Math.round(that.x);
-	            that.y = precision ? utils.toFixed(that.y, precision) : Math.round(that.y);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'diff',
-	        value: function diff(point) {
-	
-	            return new Point(this.x - point.x, this.y - point.y);
-	        }
-	    }, {
-	        key: 'theta',
-	        value: function theta(point) {
-	
-	            // Compute the angle between me and `point` and the x axis.
-	            // (cartesian-to-polar coordinates conversion)
-	            // Return theta angle in degrees.
-	
-	            point = point || new Point();
-	
-	            // invert the y-axis.
-	            var y = -(point.y - this.y);
-	            var x = point.x - this.x;
-	
-	            var PRECISION = 10;
-	            // Note that `atan2` is not defined for `x`, `y` both equal zero.
-	            var rad = utils.toFixed(x, PRECISION) === 0 && utils.toFixed(y, PRECISION) === 0 ? 0 : Math.atan2(y, x);
-	
-	            // Correction for III. and IV. quadrant.
-	            if (rad < 0) {
-	                rad = 2 * Math.PI + rad;
-	            }
-	
-	            return utils.toDeg(rad);
-	        }
-	    }, {
-	        key: 'distance',
-	        value: function distance(point) {
-	
-	            // Returns distance between me and point `point`.
-	
-	            point = point || new Point();
-	
-	            var dx = point.x - this.x;
-	            var dy = point.y - this.y;
-	
-	            return Math.sqrt(dx * dx + dy * dy);
-	        }
-	    }, {
-	        key: 'manhattanDistance',
-	        value: function manhattanDistance(point) {
-	
-	            // Returns a manhattan (taxi-cab) distance between me and point `p`.
-	
-	            point = point || new Point();
-	
-	            return Math.abs(point.x - this.x) + Math.abs(point.y - this.y);
-	        }
-	    }, {
-	        key: 'toPolar',
-	        value: function toPolar(origin) {
-	
-	            // Converts rectangular to polar coordinates.
-	            // An origin can be specified, otherwise it's `0 0`.
-	
-	            origin = origin || new Point();
-	
-	            var that = this;
-	
-	            var x = that.x;
-	            var y = that.y;
-	
-	            that.x = Math.sqrt((x - origin.x) * (x - origin.x) + (y - origin.y) * (y - origin.y));
-	            that.y = utils.toRad(origin.theta(that));
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'normalize',
-	        value: function normalize() {
-	            var len = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
-	
-	            // Scale the line segment between (0,0) and me to have a length of len.
-	
-	            var that = this;
-	
-	            var x = that.x;
-	            var y = that.y;
-	
-	            if (x === 0 && y === 0) {
-	                return that;
-	            }
-	
-	            var scale = undefined;
-	
-	            if (x === 0) {
-	                scale = len / y;
-	            } else if (y === 0) {
-	                scale = len / x;
-	            } else {
-	                scale = len / that.distance(new Point());
-	            }
-	
-	            that.x = scale * x;
-	            that.y = scale * y;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'changeInAngle',
-	        value: function changeInAngle(dx, dy, ref) {
-	
-	            // Returns change in angle from my previous position (-dx, -dy) to
-	            // my new position relative to ref point.
-	
-	            // Revert the translation and measure the change in angle around x-axis.
-	            return this.translate(-dx, -dy).theta(ref) - this.theta(ref);
-	        }
-	    }, {
-	        key: 'snapToGrid',
-	        value: function snapToGrid(gx, gy) {
-	
-	            var that = this;
-	
-	            that.x = utils.snapToGrid(that.x, gx);
-	            that.y = utils.snapToGrid(that.y, gy || gx);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'adhereToRect',
-	        value: function adhereToRect(rect) {
-	
-	            // If point lies outside rectangle `rect`, return the nearest point on
-	            // the boundary of rect `rect`, otherwise return point itself.
-	
-	            var that = this;
-	
-	            if (rect.containsPoint(that)) {
-	                return that;
-	            }
-	
-	            that.x = Math.min(Math.max(that.x, rect.x), rect.x + rect.width);
-	            that.y = Math.min(Math.max(that.y, rect.y), rect.y + rect.height);
-	
-	            return that;
-	        }
-	
-	        // common
-	        // ------
-	
-	    }, {
-	        key: 'valueOf',
-	        value: function valueOf() {
-	            return [this.x, this.y];
-	        }
-	    }, {
-	        key: 'toString',
-	        value: function toString() {
-	            return this.valueOf().join(', ');
-	        }
-	    }, {
-	        key: 'equals',
-	        value: function equals(p) {
-	            return Point.equals(this, p);
-	        }
-	    }, {
-	        key: 'clone',
-	        value: function clone() {
-	            return Point.fromPoint(this);
-	        }
-	    }], [{
-	        key: 'equals',
-	        value: function equals(point1, point2) {
-	
-	            return point1 && point2 && point1 instanceof Point && point2 instanceof Point && point1.x === point2.x && point1.y === point2.y;
-	        }
-	    }, {
-	        key: 'random',
-	        value: function random(x1, x2, y1, y2) {
-	
-	            // Create a point with random coordinates that fall
-	            // into the range `[x1, x2]` and `[y1, y2]`.
-	
-	            var x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
-	            var y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
-	
-	            return new Point(x, y);
-	        }
-	    }, {
-	        key: 'fromPoint',
-	        value: function fromPoint(point) {
-	
-	            return new Point(point.x, point.y);
-	        }
-	    }, {
-	        key: 'fromPolar',
-	        value: function fromPolar(r, angle, origin) {
-	
-	            // @param {number} r Distance.
-	            // @param {number} angle Angle in radians.
-	            // @param {point} [optional] o Origin.
-	
-	            origin = origin || new Point(0, 0);
-	
-	            var x = Math.abs(r * Math.cos(angle));
-	            var y = Math.abs(r * Math.sin(angle));
-	
-	            var deg = utils.normalizeAngle(utils.toDeg(angle));
-	
-	            if (deg < 90) {
-	                y = -y;
-	            } else if (deg < 180) {
-	                x = -x;
-	                y = -y;
-	            } else if (deg < 270) {
-	                x = -x;
-	            }
-	
-	            return new Point(origin.x + x, origin.y + y);
-	        }
-	    }, {
-	        key: 'fromString',
-	        value: function fromString(str) {
-	
-	            var arr = str.split(str.indexOf('@') === -1 ? ' ' : '@');
-	
-	            return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
-	        }
-	    }]);
-	
-	    return Point;
-	})();
-	
-	// exports
-	// -------
-	
-	exports.default = Point;
-
-/***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4420,7 +5048,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4437,11 +5065,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _Point = __webpack_require__(22);
+	var _Point = __webpack_require__(15);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
-	var _CellView2 = __webpack_require__(19);
+	var _CellView2 = __webpack_require__(22);
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
@@ -4859,7 +5487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = NodeView;
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4900,7 +5528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Change;
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4911,7 +5539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Change2 = __webpack_require__(25);
+	var _Change2 = __webpack_require__(27);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
@@ -4963,7 +5591,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = RootChange;
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4974,7 +5602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Change2 = __webpack_require__(25);
+	var _Change2 = __webpack_require__(27);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
@@ -5076,7 +5704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChildChange;
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5089,27 +5717,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
-	var _Events2 = __webpack_require__(14);
+	var _Events2 = __webpack_require__(17);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _Cell = __webpack_require__(15);
+	var _Cell = __webpack_require__(18);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _RootChange = __webpack_require__(26);
+	var _RootChange = __webpack_require__(28);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(27);
+	var _ChildChange = __webpack_require__(29);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _TerminalChange = __webpack_require__(29);
+	var _TerminalChange = __webpack_require__(31);
 	
 	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
 	
-	var _ChangeCollection = __webpack_require__(30);
+	var _ChangeCollection = __webpack_require__(32);
 	
 	var _ChangeCollection2 = _interopRequireDefault(_ChangeCollection);
 	
@@ -5769,7 +6397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Model;
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5780,7 +6408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Change2 = __webpack_require__(25);
+	var _Change2 = __webpack_require__(27);
 	
 	var _Change3 = _interopRequireDefault(_Change2);
 	
@@ -5832,7 +6460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = TerminalChange;
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5903,7 +6531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChangeCollection;
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5918,7 +6546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Events2 = __webpack_require__(14);
+	var _Events2 = __webpack_require__(17);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
@@ -5926,43 +6554,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _detector = __webpack_require__(32);
+	var _detector = __webpack_require__(34);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
-	var _Point = __webpack_require__(22);
+	var _Point = __webpack_require__(15);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
-	var _Rect = __webpack_require__(33);
+	var _Rect = __webpack_require__(14);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Model = __webpack_require__(28);
+	var _Model = __webpack_require__(30);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _Cell = __webpack_require__(15);
+	var _Cell = __webpack_require__(18);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _LinkView = __webpack_require__(21);
+	var _LinkView = __webpack_require__(24);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _NodeView = __webpack_require__(24);
+	var _NodeView = __webpack_require__(26);
 	
 	var _NodeView2 = _interopRequireDefault(_NodeView);
 	
-	var _RootChange = __webpack_require__(26);
+	var _RootChange = __webpack_require__(28);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(27);
+	var _ChildChange = __webpack_require__(29);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _TerminalChange = __webpack_require__(29);
+	var _TerminalChange = __webpack_require__(31);
 	
 	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
 	
@@ -6427,18 +7055,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // update node's position
 	                    var size = node.size;
 	                    var position = node.position;
-	                    var nodeCenter = new _Point2.default(position.x + size.width / 2, position.y + size.height / 2);
+	                    var center = new _Point2.default(position.x + size.width / 2, position.y + size.height / 2);
 	
 	                    var parentSize = parent.size;
 	                    var parentPosition = parent.position;
 	                    var parentCenter = new _Point2.default(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
 	
 	                    // angle is according to the clockwise
-	                    nodeCenter.rotate(parentCenter, -parent.rotation);
+	                    center.rotate(parentCenter, -parent.rotation);
 	
 	                    // move the node to the new position
-	                    position.x = nodeCenter.x - size.width / 2;
-	                    position.y = nodeCenter.y - size.height / 2;
+	                    position.x = center.x - size.width / 2;
+	                    position.y = center.y - size.height / 2;
 	
 	                    angle += parent.rotation;
 	                }
@@ -7009,7 +7637,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Paper;
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7065,632 +7693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(2);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _Point = __webpack_require__(22);
-	
-	var _Point2 = _interopRequireDefault(_Point);
-	
-	var _Line = __webpack_require__(34);
-	
-	var _Line2 = _interopRequireDefault(_Line);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Rect = (function () {
-	    function Rect() {
-	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	        var width = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	        var height = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
-	
-	        _classCallCheck(this, Rect);
-	
-	        var that = this;
-	
-	        that.x = x;
-	        that.y = y;
-	        that.width = width;
-	        that.height = height;
-	    }
-	
-	    // static methods
-	    // --------------
-	
-	    _createClass(Rect, [{
-	        key: 'getOrigin',
-	
-	        // methods
-	        // -------
-	
-	        value: function getOrigin() {
-	
-	            return new _Point2.default(this.x, this.y);
-	        }
-	    }, {
-	        key: 'getCenter',
-	        value: function getCenter() {
-	
-	            return new _Point2.default(this.x + this.width / 2, this.y + this.height / 2);
-	        }
-	    }, {
-	        key: 'getCorner',
-	        value: function getCorner() {
-	
-	            return new _Point2.default(this.x + this.width, this.y + this.height);
-	        }
-	    }, {
-	        key: 'getTopRight',
-	        value: function getTopRight() {
-	
-	            return new _Point2.default(this.x + this.width, this.y);
-	        }
-	    }, {
-	        key: 'getBottomLeft',
-	        value: function getBottomLeft() {
-	
-	            return new _Point2.default(this.x, this.y + this.height);
-	        }
-	    }, {
-	        key: 'getNearestSideToPoint',
-	        value: function getNearestSideToPoint(point) {
-	
-	            // get (left|right|top|bottom) side which is nearest to point
-	
-	            var that = this;
-	
-	            var distToLeft = point.x - that.x;
-	            var distToTop = point.y - that.y;
-	            var distToRight = that.x + that.width - point.x;
-	            var distToBottom = that.y + that.height - point.y;
-	
-	            var closest = distToLeft;
-	            var side = 'left';
-	
-	            if (distToRight < closest) {
-	
-	                closest = distToRight;
-	                side = 'right';
-	            }
-	
-	            if (distToTop < closest) {
-	
-	                closest = distToTop;
-	                side = 'top';
-	            }
-	
-	            if (distToBottom < closest) {
-	
-	                // closest = distToBottom;
-	                side = 'bottom';
-	            }
-	
-	            return side;
-	        }
-	    }, {
-	        key: 'getNearestPointToPoint',
-	        value: function getNearestPointToPoint(point) {
-	
-	            // get a point on my boundary nearest to `point`
-	
-	            var that = this;
-	
-	            if (that.containsPoint(point)) {
-	
-	                var side = that.getNearestSideToPoint(point);
-	
-	                if (side === 'right') {
-	
-	                    return new _Point2.default(that.x + that.width, point.y);
-	                } else if (side === 'left') {
-	
-	                    return new _Point2.default(that.x, point.y);
-	                } else if (side === 'bottom') {
-	
-	                    return new _Point2.default(point.x, that.y + that.height);
-	                } else if (side === 'top') {
-	
-	                    return new _Point2.default(point.x, that.y);
-	                }
-	            }
-	
-	            return point.adhereToRect(that);
-	        }
-	    }, {
-	        key: 'containsPoint',
-	        value: function containsPoint(point) {
-	
-	            var that = this;
-	
-	            return point.x >= that.x && point.x <= that.x + that.width && point.y >= that.y && point.y <= that.y + that.height;
-	        }
-	    }, {
-	        key: 'containsRect',
-	        value: function containsRect(rect) {
-	
-	            var that = this;
-	
-	            that.normalize();
-	            rect.normalize();
-	
-	            var x2 = rect.x;
-	            var y2 = rect.y;
-	            var w2 = rect.width;
-	            var h2 = rect.height;
-	
-	            var x1 = that.x;
-	            var y1 = that.y;
-	            var w1 = that.width;
-	            var h1 = that.height;
-	
-	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
-	        }
-	    }, {
-	        key: 'intersect',
-	        value: function intersect(rect) {
-	
-	            var that = this;
-	            var origin1 = that.getOrigin();
-	            var corner1 = that.getCorner();
-	            var origin2 = rect.getOrigin();
-	            var corner2 = rect.getCorner();
-	
-	            // No intersection found
-	            if (origin1.x >= corner2.x || origin1.y >= corner2.y || origin2.x >= corner1.x || origin2.y >= corner1.y) {
-	                return null;
-	            }
-	
-	            var x = Math.max(origin1.x, origin2.x);
-	            var y = Math.max(origin1.y, origin2.y);
-	            var w = Math.min(corner1.x, corner2.x) - x;
-	            var h = Math.min(corner1.y, corner2.y) - y;
-	
-	            return new Rect(x, y, w, h);
-	        }
-	    }, {
-	        key: 'intersectionWithLineFromCenterToPoint',
-	        value: function intersectionWithLineFromCenterToPoint(point, angle) {
-	
-	            // Find point on my boundary where line starting from my center ending
-	            // in point p intersects me. If angle is specified, intersection with
-	            // rotated rectangle is computed.
-	
-	            var that = this;
-	            var result = undefined;
-	            var center = that.getCenter();
-	
-	            if (angle) {
-	                point.rotate(center, angle);
-	            }
-	
-	            // clockwise, starting from the top side
-	            var sides = [new _Line2.default(that.getOrigin(), that.getTopRight()), new _Line2.default(that.getTopRight(), that.getCorner()), new _Line2.default(that.getCorner(), that.getBottomLeft()), new _Line2.default(that.getBottomLeft(), that.getOrigin())];
-	
-	            var connector = new _Line2.default(center, point);
-	
-	            for (var i = sides.length - 1; i >= 0; --i) {
-	                var intersection = sides[i].intersection(connector);
-	                if (intersection) {
-	                    result = intersection;
-	                    break;
-	                }
-	            }
-	
-	            if (result && angle) {
-	                result.rotate(center, -angle);
-	            }
-	
-	            return result;
-	        }
-	    }, {
-	        key: 'moveAndExpand',
-	        value: function moveAndExpand(rect) {
-	
-	            var that = this;
-	
-	            that.x += rect.x || 0;
-	            that.y += rect.y || 0;
-	            that.width += rect.width || 0;
-	            that.height += rect.height || 0;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'round',
-	        value: function round(precision) {
-	
-	            var that = this;
-	
-	            var x = that.x;
-	            var y = that.y;
-	            var w = that.width;
-	            var h = that.height;
-	
-	            that.x = precision ? utils.toFixed(x, precision) : Math.round(x);
-	            that.y = precision ? utils.toFixed(y, precision) : Math.round(y);
-	            that.width = precision ? utils.toFixed(w, precision) : Math.round(w);
-	            that.height = precision ? utils.toFixed(h, precision) : Math.round(h);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'normalize',
-	        value: function normalize() {
-	
-	            // Normalize the rectangle.
-	            // i.e., make it so that it has a non-negative width and height.
-	            // If width < 0 the function swaps the left and right corners,
-	            // and it swaps the top and bottom corners if height < 0
-	
-	            var that = this;
-	
-	            var x = that.x;
-	            var y = that.y;
-	            var w = that.width;
-	            var h = that.height;
-	
-	            if (w < 0) {
-	                x = x + w;
-	                w = -w;
-	            }
-	
-	            if (h < 0) {
-	                y = y + h;
-	                h = -h;
-	            }
-	
-	            that.x = x;
-	            that.y = y;
-	            that.width = w;
-	            that.height = h;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'getBBox',
-	        value: function getBBox(angle) {
-	
-	            var that = this;
-	
-	            var theta = utils.toRad(angle || 0);
-	            var st = Math.abs(Math.sin(theta));
-	            var ct = Math.abs(Math.cos(theta));
-	            var w = that.width * ct + that.height * st;
-	            var h = that.width * st + that.height * ct;
-	
-	            return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
-	        }
-	    }, {
-	        key: 'snapToGrid',
-	        value: function snapToGrid(gx, gy) {
-	
-	            var that = this;
-	            var origin = that.getOrigin();
-	            var corner = that.getCorner();
-	
-	            origin = origin.snapToGrid(gx, gy);
-	            corner = corner.snapToGrid(gx, gy);
-	
-	            that.x = origin.x;
-	            that.y = origin.y;
-	            that.width = corner.x - origin.x;
-	            that.height = corner.y - origin.y;
-	
-	            return that;
-	        }
-	
-	        // common
-	        // ------
-	
-	    }, {
-	        key: 'equals',
-	        value: function equals(rect) {
-	
-	            return Rect.equals(this, rect);
-	        }
-	    }, {
-	        key: 'valueOf',
-	        value: function valueOf() {
-	
-	            return [this.x, this.y, this.width, this.height];
-	        }
-	    }, {
-	        key: 'toString',
-	        value: function toString() {
-	
-	            return this.valueOf().join(', ');
-	        }
-	    }, {
-	        key: 'clone',
-	        value: function clone() {
-	
-	            return Rect.fromRect(this);
-	        }
-	    }], [{
-	        key: 'equals',
-	        value: function equals(rect1, rect2) {
-	
-	            var result = rect1 && rect2 && rect1 instanceof Rect && rect2 instanceof Rect;
-	
-	            if (result) {
-	
-	                rect1.normalize();
-	                rect2.normalize();
-	
-	                result = rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
-	            }
-	
-	            return result;
-	        }
-	    }, {
-	        key: 'fromRect',
-	        value: function fromRect(rect) {
-	
-	            return new Rect(rect.x, rect.y, rect.width, rect.height);
-	        }
-	    }]);
-	
-	    return Rect;
-	})();
-	
-	// exports
-	// -------
-	
-	exports.default = Rect;
-
-/***/ },
-/* 34 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(2);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _Point = __webpack_require__(22);
-	
-	var _Point2 = _interopRequireDefault(_Point);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Line = (function () {
-	    function Line(start, end) {
-	        _classCallCheck(this, Line);
-	
-	        var that = this;
-	
-	        if (!start) {
-	            throw new Error('The start point of line must be specified.');
-	        }
-	
-	        if (!end) {
-	            throw new Error('The end point of line must be specified.');
-	        }
-	
-	        that.start = start;
-	        that.end = end;
-	    }
-	
-	    // static methods
-	    // --------------
-	
-	    _createClass(Line, [{
-	        key: 'getLength',
-	
-	        // methods
-	        // -------
-	
-	        value: function getLength() {
-	
-	            return Math.sqrt(this.getSquaredLength());
-	        }
-	    }, {
-	        key: 'getSquaredLength',
-	        value: function getSquaredLength() {
-	
-	            // Return the line's length without sqrt.
-	            // Note that for applications where the exact length
-	            // is not necessary (e.g. compare only)
-	
-	            var that = this;
-	
-	            var dx = that.end.x - that.start.x;
-	            var dy = that.end.y - that.end.x;
-	
-	            return dx * dx + dy * dy;
-	        }
-	    }, {
-	        key: 'getMidpoint',
-	        value: function getMidpoint() {
-	
-	            var that = this;
-	
-	            var x = (that.start.x + that.end.x) / 2;
-	            var y = (that.start.y + that.end.y) / 2;
-	
-	            return new _Point2.default(x, y);
-	        }
-	    }, {
-	        key: 'getPointAt',
-	        value: function getPointAt(percent) {
-	
-	            // get point at `percent` (0~1).
-	
-	            var that = this;
-	
-	            var x = (1 - percent) * that.start.x + percent * that.end.x;
-	            var y = (1 - percent) * that.start.y + percent * that.end.y;
-	
-	            return new _Point2.default(x, y);
-	        }
-	    }, {
-	        key: 'intersection',
-	        value: function intersection(line) {
-	
-	            var that = this;
-	
-	            var start1 = that.start;
-	            var end1 = that.end;
-	
-	            var start2 = line.start;
-	            var end2 = line.end;
-	
-	            var point1 = new _Point2.default(end1.x - start1.x, end1.y - start1.y);
-	            var point2 = new _Point2.default(end2.x - start2.x, end2.y - start2.y);
-	
-	            var det = point1.x * point2.y - point1.y * point2.x;
-	            var deltaPt = new _Point2.default(start2.x - start1.x, start2.y - start1.y);
-	            var alpha = deltaPt.x * point2.y - deltaPt.y * point2.x;
-	            var beta = deltaPt.x * point1.y - deltaPt.y * point1.x;
-	
-	            // no intersection found
-	            if (det === 0 || alpha * det < 0 || beta * det < 0) {
-	                return null;
-	            }
-	
-	            if (det > 0) {
-	                if (alpha > det || beta > det) {
-	                    return null;
-	                }
-	            } else {
-	                if (alpha < det || beta < det) {
-	                    return null;
-	                }
-	            }
-	
-	            return new _Point2.default(start1.x + alpha * point1.x / det, start1.y + alpha * point1.y / det);
-	        }
-	    }, {
-	        key: 'getDirection',
-	        value: function getDirection() {
-	
-	            // get cardinal direction of the line.
-	            // One of the following bearings : NE, E, SE, S, SW, W, NW, N.
-	
-	            var that = this;
-	            var start = that.start;
-	            var end = that.end;
-	
-	            var lat1 = utils.toRad(start.y);
-	            var lat2 = utils.toRad(end.y);
-	            var lon1 = start.x;
-	            var lon2 = end.x;
-	            var dLon = utils.toRad(lon2 - lon1);
-	
-	            var y = Math.sin(dLon) * Math.cos(lat2);
-	            var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
-	
-	            var brng = utils.toDeg(Math.atan2(y, x));
-	
-	            var bearings = ['NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-	
-	            var index = brng - 22.5;
-	
-	            if (index < 0) {
-	                index += 360;
-	            }
-	
-	            index = utils.toInt(index / 45);
-	
-	            return bearings[index];
-	        }
-	    }, {
-	        key: 'pointOffset',
-	        value: function pointOffset(point) {
-	
-	            // get the offset of the `point` from the line.
-	            // + if the `point` is on the right side of the line,
-	            // - if on the left and `0` if on the line.
-	
-	            var that = this;
-	
-	            var start = that.start;
-	            var end = that.end;
-	
-	            // Find the sign of the determinant of vectors (start,end), where p is the query point.
-	            return ((end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x)) / 2;
-	        }
-	
-	        // common
-	        // ------
-	
-	    }, {
-	        key: 'valueOf',
-	        value: function valueOf() {
-	
-	            return [this.satrt.valueOf(), this.end.valueOf()];
-	        }
-	    }, {
-	        key: 'toString',
-	        value: function toString() {
-	
-	            return this.start.toString() + ' ' + this.end.toString();
-	        }
-	    }, {
-	        key: 'equals',
-	        value: function equals(line) {
-	
-	            return Line.equals(this, line);
-	        }
-	    }, {
-	        key: 'clone',
-	        value: function clone() {
-	
-	            return Line.fromLine(this);
-	        }
-	    }], [{
-	        key: 'equals',
-	        value: function equals(line1, line2) {
-	
-	            return line1 && line2 && line1 instanceof Line && line2 instanceof Line && (line1.start && line1.start.equals(line2.start) || !line1.start && !line2.start) && (line1.end && line1.end.equals(line2.end) || !line1.end && !line2.end);
-	        }
-	    }, {
-	        key: 'fromLine',
-	        value: function fromLine(line) {
-	
-	            return new Line(line.start.clone(), line.end.clone());
-	        }
-	    }]);
-	
-	    return Line;
-	})();
-	
-	// exports
-	// -------
-	
-	exports.default = Line;
-
-/***/ },
-/* 35 */,
-/* 36 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7699,7 +7702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7742,7 +7745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Text;
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7751,7 +7754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7805,7 +7808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7814,7 +7817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7875,7 +7878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Circle;
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7884,7 +7887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7946,7 +7949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Ellipse;
 
 /***/ },
-/* 40 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7955,7 +7958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8004,7 +8007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Image;
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8013,7 +8016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8071,7 +8074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Path;
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8080,7 +8083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8138,7 +8141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polygon;
 
 /***/ },
-/* 43 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8147,7 +8150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8205,7 +8208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polyline;
 
 /***/ },
-/* 44 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8214,7 +8217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Path2 = __webpack_require__(41);
+	var _Path2 = __webpack_require__(40);
 	
 	var _Path3 = _interopRequireDefault(_Path2);
 	
@@ -8254,7 +8257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rhombus;
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8263,7 +8266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(18);
+	var _Node2 = __webpack_require__(21);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8304,7 +8307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin

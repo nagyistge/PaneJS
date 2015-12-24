@@ -456,20 +456,20 @@ class Paper extends Events {
             if (raw.inherited && parent && parent.isNode && parent.rotation !== 0) {
 
                 // update node's position
-                let size       = node.size;
-                let position   = node.position;
-                let nodeCenter = new Point(position.x + size.width / 2, position.y + size.height / 2);
+                let size     = node.size;
+                let position = node.position;
+                let center   = new Point(position.x + size.width / 2, position.y + size.height / 2);
 
                 let parentSize     = parent.size;
                 let parentPosition = parent.position;
                 let parentCenter   = new Point(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
 
                 // angle is according to the clockwise
-                nodeCenter.rotate(parentCenter, -parent.rotation);
+                center.rotate(parentCenter, -parent.rotation);
 
                 // move the node to the new position
-                position.x = nodeCenter.x - size.width / 2;
-                position.y = nodeCenter.y - size.height / 2;
+                position.x = center.x - size.width / 2;
+                position.y = center.y - size.height / 2;
 
                 angle += parent.rotation;
             }
