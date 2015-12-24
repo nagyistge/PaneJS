@@ -124,10 +124,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Paper3 = _interopRequireDefault(_Paper2);
 	
-	var _Generic = __webpack_require__(35);
-	
-	var _Generic2 = _interopRequireDefault(_Generic);
-	
 	var _Text = __webpack_require__(36);
 	
 	var _Text2 = _interopRequireDefault(_Text);
@@ -191,7 +187,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var shapes = {
 	    basic: {
-	        Generic: _Generic2.default,
 	        Text: _Text2.default,
 	        Rect: _Rect2.default,
 	        Circle: _Circle2.default,
@@ -3211,38 +3206,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Link = (function (_Visual) {
 	    _inherits(Link, _Visual);
 	
-	    function Link(options) {
+	    function Link() {
 	        _classCallCheck(this, Link);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this));
-	
-	        var that = _this;
-	        var metadata = (0, _utils.merge)({}, that.constructor.defaults, options);
-	
-	        that.data = metadata.data;
-	        that.attrs = metadata.attrs;
-	        that.visible = metadata.visible !== false;
-	        that.metadata = metadata;
-	        return _this;
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Link).apply(this, arguments));
 	    }
 	
-	    // props
-	    // -----
-	
 	    _createClass(Link, [{
-	        key: 'markup',
-	        get: function get() {
-	            return this.constructor.markup;
-	        }
-	    }, {
-	        key: 'className',
-	        get: function get() {
-	
-	            var classNames = this.metadata.classNames;
-	
-	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
-	        }
-	    }, {
 	        key: 'isLink',
 	        get: function get() {
 	            return true;
@@ -3252,25 +3222,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Link;
 	})(_Visual3.default);
 	
-	Link.configure({
+	Link.setDefaults({
+	
 	    markup: '' + '<path class="connection"/>' + '<path class="marker-source"/>' + '<path class="marker-target"/>' + '<path class="connection-wrap"/>' + '<g class="labels"/>' + '<g class="marker-vertices"/>' + '<g class="marker-arrowheads"/>' + '<g class="link-tools"/>',
 	
-	    defaults: {
-	        classNames: ['pane-link'], // `String` or `Array`
-	        view: null, // set `null` to use the default view
-	        connector: null, // set `null` to use the default connector
-	        attrs: {
-	            '.connection': {
-	                'fill': 'none',
-	                'stroke': '#000000',
-	                'stroke-width': 1
-	            },
-	            '.marker-source': {
-	                d: 'M 10 0 L 0 5 L 10 10 z'
-	            },
-	            '.marker-target': {
-	                d: 'M 10 0 L 0 5 L 10 10 z'
-	            }
+	    classNames: ['pane-link'], // `String` or `Array`
+	    connector: null, // set `null` to use the default connector
+	    attrs: {
+	        '.connection': {
+	            'fill': 'none',
+	            'stroke': '#000000',
+	            'stroke-width': 1
+	        },
+	        '.marker-source': {
+	            d: 'M 10 0 L 0 5 L 10 10 z'
+	        },
+	        '.marker-target': {
+	            d: 'M 10 0 L 0 5 L 10 10 z'
 	        }
 	    }
 	});
@@ -3335,7 +3303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'markup',
 	        get: function get() {
 	
-	            return this.constructor.markup;
+	            return this.metadata.markup;
 	        }
 	    }, {
 	        key: 'className',
@@ -3343,30 +3311,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var classNames = this.metadata.classNames;
 	
-	            return isArray(classNames) ? classNames.join(' ') : classNames || '';
+	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
 	        }
 	
 	        // static methods
 	        // --------------
 	
 	    }], [{
-	        key: 'configure',
-	        value: function configure(options) {
-	
-	            var that = this;
-	
-	            if (options) {
-	
-	                utils.forIn(options, function (val, key) {
-	
-	                    that[key] = key === 'defaults' ? utils.merge({}, that.defaults, val) : val;
-	                });
-	            }
+	        key: 'setDefaults',
+	        value: function setDefaults(options) {
+	            this.defaults = utils.merge({}, this.defaults, options);
 	        }
 	    }]);
 	
 	    return Visual;
 	})(_Cell3.default);
+	
+	Visual.defaults = {
+	    markup: '',
+	    data: null, // attach data to the cell
+	    view: null, // set `null` to use the default view
+	    attrs: {} // styles
+	};
 	
 	// exports
 	// -------
@@ -3410,6 +3376,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _createClass(Node, [{
 	        key: 'translate',
+	
+	        // methods
+	        // -------
+	
 	        value: function translate() {}
 	    }, {
 	        key: 'resize',
@@ -3423,24 +3393,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return false;
 	        }
 	    }, {
-	        key: 'markup',
+	        key: 'isNode',
 	
 	        // props
 	        // -----
 	
-	        get: function get() {
-	            return this.constructor.markup;
-	        }
-	    }, {
-	        key: 'className',
-	        get: function get() {
-	
-	            var classNames = this.metadata.classNames;
-	
-	            return (0, _utils.isArray)(classNames) ? classNames.join(' ') : classNames || '';
-	        }
-	    }, {
-	        key: 'isNode',
 	        get: function get() {
 	            return true;
 	        }
@@ -3449,13 +3406,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Node;
 	})(_Visual3.default);
 	
-	// static props
-	// ------------
-	
-	Node.defaults = {
+	Node.setDefaults({
 	    classNames: ['pane-node'], // `String` or `Array`
-	    view: null, // set `null` to use the default view
-	    attrs: {},
 	    size: {
 	        width: 1,
 	        height: 1,
@@ -3470,7 +3422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        angle: 0,
 	        inherited: true // inherit the parent's rotation
 	    }
-	};
+	});
 	
 	// exports
 	// -------
@@ -3968,6 +3920,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(2);
 	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _vector = __webpack_require__(1);
 	
 	var _vector2 = _interopRequireDefault(_vector);
@@ -3985,6 +3939,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _normal2 = _interopRequireDefault(_normal);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -4025,23 +3981,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	
-	            (0, _utils.forIn)(that.cell.attrs, function (attrs, selector) {
+	            utils.forIn(that.cell.attrs, function (attrs, selector) {
 	
 	                var processed = [];
 	
-	                if ((0, _utils.isObject)(attrs.fill)) {
+	                if (utils.isObject(attrs.fill)) {
 	
 	                    that.applyGradient(selector, 'fill', attrs.fill);
 	                    processed.push('fill');
 	                }
 	
-	                if ((0, _utils.isObject)(attrs.stroke)) {
+	                if (utils.isObject(attrs.stroke)) {
 	
 	                    that.applyGradient(selector, 'stroke', attrs.stroke);
 	                    processed.push('stroke');
 	                }
 	
-	                if ((0, _utils.isObject)(attrs.filter)) {
+	                if (utils.isObject(attrs.filter)) {
 	
 	                    that.applyFilter(selector, attrs.filter);
 	                    processed.push('filter');
@@ -4050,8 +4006,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // remove processed special attributes from attrs
 	                var finalAttributes = {};
 	
-	                (0, _utils.forIn)(attrs, function (value, key) {
-	                    if (!(0, _utils.contains)(processed, key)) {
+	                utils.forIn(attrs, function (value, key) {
+	                    if (!utils.contains(processed, key)) {
 	                        finalAttributes[key] = value;
 	                    }
 	                });
@@ -4068,10 +4024,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var points = that.cell.points;
 	
-	            that.applyAttrs('.connection', { d: (0, _normal2.default)(points[0], points[1]) });
+	            //that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
 	
 	            return that;
 	        }
+	    }, {
+	        key: 'parseRoute',
+	        value: function parseRoute() {}
 	    }]);
 	
 	    return LinkView;
@@ -6068,7 +6027,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	
-	            that.options = (0, _utils.merge)({}, defaultOptions, options);
+	            that.options = utils.merge({}, defaultOptions, options);
 	            that.trigger('paper:configure', that.options);
 	
 	            return that;
@@ -6086,8 +6045,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var localPoint = (0, _vector2.default)(that.drawPane).toLocalPoint(point.x, point.y);
 	
 	            return {
-	                x: (0, _utils.snapToGrid)(localPoint.x, gridSize),
-	                y: (0, _utils.snapToGrid)(localPoint.y, gridSize)
+	                x: utils.snapToGrid(localPoint.x, gridSize),
+	                y: utils.snapToGrid(localPoint.y, gridSize)
 	            };
 	        }
 	    }, {
@@ -6115,7 +6074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                svg.appendChild(_fakeRect.node);
 	            }
 	
-	            var paperOffset = (0, _utils.getOffset)(svg);
+	            var paperOffset = utils.getOffset(svg);
 	
 	            if (_detector2.default.IS_FF) {
 	                fakeRect.remove();
@@ -6145,10 +6104,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (container) {
 	
-	                var svg = (0, _utils.createSvgDocument)();
-	                var root = (0, _utils.createSvgElement)('g');
-	                var backgroundPane = (0, _utils.createSvgElement)('g');
-	                var drawPane = (0, _utils.createSvgElement)('g');
+	                var svg = utils.createSvgDocument();
+	                var root = utils.createSvgElement('g');
+	                var backgroundPane = utils.createSvgElement('g');
+	                var drawPane = utils.createSvgElement('g');
 	
 	                root.appendChild(backgroundPane);
 	                root.appendChild(drawPane);
@@ -6173,17 +6132,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var svg = that.svg;
 	
-	            (0, _utils.addEventListener)(svg, 'contextmenu', that.onContextMenu.bind(that));
-	            (0, _utils.addEventListener)(svg, 'dblclick', that.onDblClick.bind(that));
-	            (0, _utils.addEventListener)(svg, 'click', that.onClick.bind(that));
-	            (0, _utils.addEventListener)(svg, 'mousedown', that.onPointerDown.bind(that));
-	            (0, _utils.addEventListener)(svg, 'touchstart', that.onPointerDown.bind(that));
-	            (0, _utils.addEventListener)(svg, 'mousemove', that.onPointerMove.bind(that));
-	            (0, _utils.addEventListener)(svg, 'touchmove', that.onPointerMove.bind(that));
-	            (0, _utils.addEventListener)(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
-	            (0, _utils.addEventListener)(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
-	            (0, _utils.addEventListener)(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
-	            (0, _utils.addEventListener)(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
+	            utils.addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
+	            utils.addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
+	            utils.addEventListener(svg, 'click', that.onClick.bind(that));
+	            utils.addEventListener(svg, 'mousedown', that.onPointerDown.bind(that));
+	            utils.addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
+	            utils.addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
+	            utils.addEventListener(svg, 'touchmove', that.onPointerMove.bind(that));
+	            utils.addEventListener(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
+	            utils.addEventListener(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
+	            utils.addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
+	            utils.addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
 	
 	            // Disables built-in pan and zoom in IE10 and later
 	            if (_detector2.default.IS_POINTER) {
@@ -6365,17 +6324,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // only update the node's size
 	            if (node && node.isNode) {
 	
-	                var parent = node.parent;
 	                var raw = node.metadata.size || {};
-	                var width = !(0, _utils.isUndefined)(raw.width) ? raw.width : 1;
-	                var height = !(0, _utils.isUndefined)(raw.height) ? raw.height : 1;
+	                var width = !utils.isUndefined(raw.width) ? raw.width : 1;
+	                var height = !utils.isUndefined(raw.height) ? raw.height : 1;
+	
+	                var parent = node.parent;
 	
 	                if (raw.relative && parent && parent.isNode) {
 	
 	                    var parentSize = parent.size;
-	                    var isPercent = (0, _utils.isPercentage)(width);
+	                    var isPercent = utils.isPercentage(width);
 	
-	                    width = (0, _utils.fixNumber)(width, isPercent, 0);
+	                    width = utils.fixNumber(width, isPercent, 0);
 	
 	                    if (isPercent || width > 0 && width < 1) {
 	                        width *= parentSize.width;
@@ -6383,8 +6343,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        width += parentSize.width;
 	                    }
 	
-	                    isPercent = (0, _utils.isPercentage)(height);
-	                    height = (0, _utils.fixNumber)(height, isPercent, 0);
+	                    isPercent = utils.isPercentage(height);
+	                    height = utils.fixNumber(height, isPercent, 0);
 	
 	                    if (isPercent || height > 0 && height < 1) {
 	                        height *= parentSize.height;
@@ -6392,8 +6352,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        height += parentSize.height;
 	                    }
 	                } else {
-	                    width = (0, _utils.fixNumber)(width, false, 1);
-	                    height = (0, _utils.fixNumber)(height, false, 1);
+	                    width = utils.fixNumber(width, false, 1);
+	                    height = utils.fixNumber(height, false, 1);
 	                }
 	
 	                node.size = {
@@ -6410,18 +6370,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (node && node.isNode) {
 	
-	                var parent = node.parent;
 	                var raw = node.metadata.position || {};
-	                var x = !(0, _utils.isUndefined)(raw.x) ? raw.x : 0;
-	                var y = !(0, _utils.isUndefined)(raw.y) ? raw.y : 0;
+	                var x = !utils.isUndefined(raw.x) ? raw.x : 0;
+	                var y = !utils.isUndefined(raw.y) ? raw.y : 0;
+	
+	                var parent = node.parent;
 	
 	                if (raw.relative && parent && parent.isNode) {
 	
 	                    var parentSize = parent.size;
 	                    var parentPosition = parent.position;
-	                    var isPercent = (0, _utils.isPercentage)(x);
+	                    var isPercent = utils.isPercentage(x);
 	
-	                    x = (0, _utils.fixNumber)(x, isPercent, 0);
+	                    x = utils.fixNumber(x, isPercent, 0);
 	
 	                    if (isPercent || x > -1 && x < 1) {
 	                        x = parentPosition.x + parentSize.width * x;
@@ -6429,9 +6390,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        x += parentPosition.x;
 	                    }
 	
-	                    isPercent = (0, _utils.isPercentage)(y);
+	                    isPercent = utils.isPercentage(y);
 	
-	                    y = (0, _utils.fixNumber)(y, isPercent, 0);
+	                    y = utils.fixNumber(y, isPercent, 0);
 	
 	                    if (isPercent || y > -1 && y < 1) {
 	                        y = parentPosition.y + parentSize.height * y;
@@ -6439,8 +6400,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        y += parentPosition.y;
 	                    }
 	                } else {
-	                    x = (0, _utils.fixNumber)(x, false, 0);
-	                    y = (0, _utils.fixNumber)(y, false, 0);
+	                    x = utils.fixNumber(x, false, 0);
+	                    y = utils.fixNumber(y, false, 0);
 	                }
 	
 	                node.position = {
@@ -6459,7 +6420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var parent = node.parent;
 	                var raw = node.metadata.rotation || {};
-	                var angle = (0, _utils.fixNumber)(raw.angle, false, 0);
+	                var angle = utils.fixNumber(raw.angle, false, 0);
 	
 	                if (raw.inherited && parent && parent.isNode && parent.rotation !== 0) {
 	
@@ -6491,16 +6452,97 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'updateLinkGeometry',
 	        value: function updateLinkGeometry(link) {
 	
-	            var source = link.getTerminal(true);
-	            var target = link.getTerminal(false);
-	            var sourceBBox = new _Rect2.default(source.position.x, source.position.y, source.size.width, source.size.height);
-	            var targetBBox = new _Rect2.default(target.position.x, target.position.y, target.size.width, target.size.height);
-	            var sourcePoint = sourceBBox.intersectionWithLineFromCenterToPoint(targetBBox.getCenter());
-	            var targetPoint = targetBBox.intersectionWithLineFromCenterToPoint(sourceBBox.getCenter());
+	            var that = this;
 	
-	            link.points = [sourcePoint, targetPoint];
+	            var vertices = that.parseRoute(link);
 	
-	            return this;
+	            link.sourcePoint = that.getConnectionPoint(link, true);
+	            link.targetPoint = that.getConnectionPoint(link, false);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'parseRoute',
+	        value: function parseRoute(link) {
+	
+	            var that = this;
+	            var router = link.router || that.options.defaultRouter;
+	            var vertices = link.vertices || [];
+	
+	            if (!router) {
+	                return vertices;
+	            }
+	
+	            var routerFn = undefined;
+	            var args = {};
+	
+	            if (utils.isFunction(router)) {
+	                routerFn = router;
+	            } else {
+	
+	                var name = undefined;
+	
+	                if (utils.isObject(router)) {
+	                    name = router.name;
+	                    args = router.args;
+	                } else {
+	                    name = '' + router;
+	                }
+	
+	                routerFn = that.getRouterByName(name);
+	
+	                if (!utils.isFunction(routerFn)) {
+	                    throw new Error('Unknown router: "' + name + '"');
+	                }
+	            }
+	
+	            return routerFn.call(this, vertices, args, link);
+	        }
+	    }, {
+	        key: 'getConnectionPoint',
+	        value: function getConnectionPoint(link, isSource) {
+	
+	            // find the connection point on the terminal
+	
+	            var model = this.model;
+	
+	            var spot = undefined;
+	            var terminal = model.getTerminal(link, isSource);
+	
+	            if (terminal) {
+	
+	                var spotBBox = new _Rect2.default(terminal.position.x, terminal.position.y, terminal.size.width, terminal.size.height);
+	
+	                var vertices = link.vertices || [];
+	                var reference = isSource ? vertices[0] : vertices[vertices.length - 1];
+	
+	                if (!reference) {
+	
+	                    var referenceTerminal = link.getTerminal(!isSource);
+	
+	                    if (referenceTerminal) {
+	
+	                        var referenceBBox = new _Rect2.default(referenceTerminal.position.x, referenceTerminal.position.y, referenceTerminal.size.width, referenceTerminal.size.height);
+	
+	                        reference = referenceBBox.intersectionWithLineFromCenterToPoint(spotBBox.getCenter());
+	                        reference = reference || referenceBBox.getCenter();
+	                    }
+	                }
+	
+	                if (!reference) {
+	                    reference = isSource ? link.targetPoint : link.sourcePoint;
+	                }
+	
+	                if (reference) {
+	                    spot = spotBBox.intersectionWithLineFromCenterToPoint(reference);
+	                }
+	
+	                spot = spot || spotBBox.getCenter();
+	            } else {
+	                spot = isSource ? link.sourcePoint : link.targetPoint;
+	            }
+	
+	            return spot;
 	        }
 	
 	        // transform
@@ -6515,33 +6557,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var nativeWidth = options.width;
 	            var nativeHeight = options.height;
 	
-	            width = (0, _utils.isUndefined)(width) ? nativeWidth : width;
-	            height = (0, _utils.isUndefined)(height) ? nativeHeight : height;
+	            width = utils.isUndefined(width) ? nativeWidth : width;
+	            height = utils.isUndefined(height) ? nativeHeight : height;
 	
 	            if (relative === true) {
 	
 	                var svg = that.svg;
-	                var isPercent = (0, _utils.isPercentage)(width);
-	                var isNativePercent = (0, _utils.isPercentage)(nativeWidth);
+	                var isPercent = utils.isPercentage(width);
+	                var isNativePercent = utils.isPercentage(nativeWidth);
 	
 	                if (isPercent) {
 	                    if (isNativePercent) {
-	                        width = (0, _utils.toFloat)(width, false, 0) + (0, _utils.toFloat)(nativeWidth, false, 0) + '%';
+	                        width = utils.toFloat(width, false, 0) + utils.toFloat(nativeWidth, false, 0) + '%';
 	                    } else {
-	                        width = (0, _utils.toFloat)(width, true, 1) * nativeWidth;
+	                        width = utils.toFloat(width, true, 1) * nativeWidth;
 	                    }
 	                } else {
 	                    width += isNativePercent ? svg.offsetWidth : nativeWidth;
 	                }
 	
-	                isPercent = (0, _utils.isPercentage)(height);
-	                isNativePercent = (0, _utils.isPercentage)(nativeHeight);
+	                isPercent = utils.isPercentage(height);
+	                isNativePercent = utils.isPercentage(nativeHeight);
 	
 	                if (isPercent) {
 	                    if (isNativePercent) {
-	                        height = (0, _utils.toFloat)(height, false, 0) + (0, _utils.toFloat)(nativeHeight, false, 0) + '%';
+	                        height = utils.toFloat(height, false, 0) + utils.toFloat(nativeHeight, false, 0) + '%';
 	                    } else {
-	                        height = (0, _utils.toFloat)(height, true, 1) * nativeHeight;
+	                        height = utils.toFloat(height, true, 1) * nativeHeight;
 	                    }
 	                } else {
 	                    height += isNativePercent ? svg.offsetHeight : nativeHeight;
@@ -6681,7 +6723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var svg = that.svg;
 	
-	            elem = (0, _utils.isString)(elem) ? svg.querySelector(elem) : elem;
+	            elem = utils.isString(elem) ? svg.querySelector(elem) : elem;
 	
 	            while (elem && elem !== svg && elem !== document) {
 	
@@ -6699,7 +6741,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'findViewByCell',
 	        value: function findViewByCell(cell) {
 	
-	            var id = (0, _utils.isString)(cell) ? cell : cell.id;
+	            var id = utils.isString(cell) ? cell : cell.id;
+	
 	            return this.views[id];
 	        }
 	    }, {
@@ -6720,7 +6763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            console.log(changes);
 	
-	            (0, _utils.forEach)(changes, function (change) {
+	            utils.forEach(changes, function (change) {
 	                that.distributeChange(change);
 	            });
 	
@@ -6785,6 +6828,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.invalidate(change.link);
 	        }
 	
+	        // router
+	        // ------
+	
+	    }, {
+	        key: 'registerRouter',
+	        value: function registerRouter(name, fn) {}
+	    }, {
+	        key: 'getRouterByName',
+	        value: function getRouterByName(name) {}
+	
 	        // event handlers
 	        // --------------
 	
@@ -6803,7 +6856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var svg = that.svg;
 	                var target = e.target;
 	
-	                if (svg === target || (0, _utils.containsElem)(svg, target)) {
+	                if (svg === target || utils.containsElem(svg, target)) {
 	                    return true;
 	                }
 	            }
@@ -6812,7 +6865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onContextMenu',
 	        value: function onContextMenu(e) {
 	
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var view = that.findViewByElem(e.target);
@@ -6835,7 +6888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function onDblClick(e) {
 	
 	            e.preventDefault();
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var view = that.findViewByElem(e.target);
@@ -6859,7 +6912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onPointerDown',
 	        value: function onPointerDown(e) {
 	
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var view = that.findViewByElem(e.target);
@@ -6881,7 +6934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function onPointerMove(e) {
 	
 	            e.preventDefault();
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var sourceView = that.sourceView;
@@ -6899,7 +6952,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onPointerUp',
 	        value: function onPointerUp(e) {
 	
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
@@ -6916,7 +6969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onCellMouseOver',
 	        value: function onCellMouseOver(e) {
 	
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var view = that.findViewByElem(e.target);
@@ -6934,7 +6987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onCellMouseOut',
 	        value: function onCellMouseOut(e) {
 	
-	            e = (0, _utils.normalizeEvent)(e);
+	            e = utils.normalizeEvent(e);
 	
 	            var that = this;
 	            var view = that.findViewByElem(e.target);
@@ -7636,7 +7689,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Line;
 
 /***/ },
-/* 35 */
+/* 35 */,
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7657,52 +7711,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Generic = (function (_Node) {
-	    _inherits(Generic, _Node);
-	
-	    function Generic() {
-	        _classCallCheck(this, Generic);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Generic).apply(this, arguments));
-	    }
-	
-	    return Generic;
-	})(_Node3.default);
-	
-	Generic.configure({
-	    defaults: {
-	        attrs: {
-	            '.': { fill: '#ffffff', stroke: 'none' }
-	        }
-	    }
-	});
-	
-	exports.default = Generic;
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Generic2 = __webpack_require__(35);
-	
-	var _Generic3 = _interopRequireDefault(_Generic2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Text = (function (_Generic) {
-	    _inherits(Text, _Generic);
+	var Text = (function (_Node) {
+	    _inherits(Text, _Node);
 	
 	    function Text() {
 	        _classCallCheck(this, Text);
@@ -7711,16 +7721,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Text;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Text.configure({
+	Text.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><text/></g></g>',
-	    defaults: {
-	        attrs: {
-	            'text': {
-	                'font-size': 18,
-	                fill: '#000000'
-	            }
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'text': {
+	            'font-size': 18,
+	            'fill': '#000000'
 	        }
 	    }
 	});
@@ -7737,9 +7751,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -7749,8 +7763,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Rect = (function (_Generic) {
-	    _inherits(Rect, _Generic);
+	var Rect = (function (_Node) {
+	    _inherits(Rect, _Node);
 	
 	    function Rect() {
 	        _classCallCheck(this, Rect);
@@ -7759,29 +7773,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Rect;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Rect.configure({
+	Rect.setDefaults({
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',
-	    defaults: {
-	        attrs: {
-	            'rect': {
-	                'fill': '#ffffff',
-	                'stroke': '#000000',
-	                'stroke-width': '1',
-	                'width': 100,
-	                'height': 40
-	            },
-	            'text': {
-	                fill: '#000000',
-	                text: '',
-	                'font-size': 14,
-	                'ref-x': .5,
-	                'ref-y': .5,
-	                'text-anchor': 'middle',
-	                'y-alignment': 'middle',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'rect': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000',
+	            'stroke-width': '1',
+	            'width': 100,
+	            'height': 40
+	        },
+	        'text': {
+	            fill: '#000000',
+	            text: '',
+	            'font-size': 14,
+	            'ref-x': .5,
+	            'ref-y': .5,
+	            'text-anchor': 'middle',
+	            'y-alignment': 'middle',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -7798,9 +7814,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -7810,8 +7826,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Circle = (function (_Generic) {
-	    _inherits(Circle, _Generic);
+	var Circle = (function (_Node) {
+	    _inherits(Circle, _Node);
 	
 	    function Circle() {
 	        _classCallCheck(this, Circle);
@@ -7820,33 +7836,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Circle;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Circle.configure({
+	Circle.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><circle/></g><text/></g>',
-	    defaults: {
-	        size: { width: 60, height: 60 },
-	        attrs: {
-	            'circle': {
-	                fill: '#ffffff',
-	                stroke: '#000000',
-	                r: 30,
-	                cx: 30,
-	                cy: 30
-	            },
-	            'text': {
-	                'font-size': 14,
-	                text: '',
-	                'text-anchor': 'middle',
-	                'ref-x': .5,
-	                'ref-y': .5,
-	                'y-alignment': 'middle',
-	                fill: '#000000',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	
+	    size: {
+	        width: 60,
+	        height: 60
+	    },
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'circle': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000',
+	            'r': 30,
+	            'cx': 30,
+	            'cy': 30
+	        },
+	        'text': {
+	            'font-size': 14,
+	            'text': '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-y': .5,
+	            'y-alignment': 'middle',
+	            'fill': '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
-	
 	});
 	
 	exports.default = Circle;
@@ -7861,9 +7884,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -7873,8 +7896,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Ellipse = (function (_Generic) {
-	    _inherits(Ellipse, _Generic);
+	var Ellipse = (function (_Node) {
+	    _inherits(Ellipse, _Node);
 	
 	    function Ellipse() {
 	        _classCallCheck(this, Ellipse);
@@ -7883,31 +7906,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Ellipse;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Ellipse.configure({
+	Ellipse.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><ellipse/></g><text/></g>',
-	    defaults: {
-	        size: { width: 60, height: 40 },
-	        attrs: {
-	            'ellipse': {
-	                fill: '#ffffff',
-	                stroke: '#000000',
-	                rx: 30,
-	                ry: 20,
-	                cx: 30,
-	                cy: 20
-	            },
-	            'text': {
-	                'font-size': 14,
-	                text: '',
-	                'text-anchor': 'middle',
-	                'ref-x': .5,
-	                'ref-y': .5,
-	                'y-alignment': 'middle',
-	                fill: '#000000',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	
+	    size: {
+	        width: 60,
+	        height: 40
+	    },
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'ellipse': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000',
+	            'rx': 30,
+	            'ry': 20,
+	            'cx': 30,
+	            'cy': 20
+	        },
+	        'text': {
+	            'font-size': 14,
+	            'text': '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-y': .5,
+	            'y-alignment': 'middle',
+	            'fill': '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -7924,9 +7955,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -7936,8 +7967,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Image = (function (_Generic) {
-	    _inherits(Image, _Generic);
+	var Image = (function (_Node) {
+	    _inherits(Image, _Node);
 	
 	    function Image() {
 	        _classCallCheck(this, Image);
@@ -7946,22 +7977,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Image;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Image.configure({
+	Image.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><image/></g><text/></g>',
-	    defaults: {
-	        attrs: {
-	            'text': {
-	                'font-size': 14,
-	                text: '',
-	                'text-anchor': 'middle',
-	                'ref-x': .5,
-	                'ref-dy': 20,
-	                'y-alignment': 'middle',
-	                fill: '#000000',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            'text': '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-dy': 20,
+	            'y-alignment': 'middle',
+	            'fill': '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -7978,9 +8013,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -7990,8 +8025,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Path = (function (_Generic) {
-	    _inherits(Path, _Generic);
+	var Path = (function (_Node) {
+	    _inherits(Path, _Node);
 	
 	    function Path() {
 	        _classCallCheck(this, Path);
@@ -8000,27 +8035,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Path;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Path.configure({
+	Path.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><path/></g><text/></g>',
-	    defaults: {
-	        size: { width: 60, height: 60 },
-	        attrs: {
-	            'path': {
-	                fill: '#ffffff',
-	                stroke: '#000000'
-	            },
-	            'text': {
-	                'font-size': 14,
-	                text: '',
-	                'text-anchor': 'middle',
-	                'ref': 'path',
-	                'ref-x': .5,
-	                'ref-dy': 10,
-	                fill: '#000000',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	
+	    size: {
+	        width: 60,
+	        height: 60
+	    },
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'path': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            'text': '',
+	            'text-anchor': 'middle',
+	            'ref': 'path',
+	            'ref-x': .5,
+	            'ref-dy': 10,
+	            'fill': '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -8037,9 +8080,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -8049,8 +8092,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Polygon = (function (_Generic) {
-	    _inherits(Polygon, _Generic);
+	var Polygon = (function (_Node) {
+	    _inherits(Polygon, _Node);
 	
 	    function Polygon() {
 	        _classCallCheck(this, Polygon);
@@ -8059,27 +8102,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Polygon;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Polygon.configure({
+	Polygon.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><polygon/></g><text/></g>',
-	    defaults: {
-	        size: { width: 60, height: 40 },
-	        attrs: {
-	            'polygon': {
-	                fill: '#ffffff',
-	                stroke: '#000000'
-	            },
-	            'text': {
-	                'font-size': 14,
-	                text: '',
-	                'text-anchor': 'middle',
-	                'ref-x': .5,
-	                'ref-dy': 20,
-	                'y-alignment': 'middle',
-	                fill: '#000000',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	
+	    size: {
+	        width: 60,
+	        height: 40
+	    },
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'polygon': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            'text': '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-dy': 20,
+	            'y-alignment': 'middle',
+	            'fill': '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -8096,9 +8147,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Generic2 = __webpack_require__(35);
+	var _Node2 = __webpack_require__(18);
 	
-	var _Generic3 = _interopRequireDefault(_Generic2);
+	var _Node3 = _interopRequireDefault(_Node2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -8108,8 +8159,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Polyline = (function (_Generic) {
-	    _inherits(Polyline, _Generic);
+	var Polyline = (function (_Node) {
+	    _inherits(Polyline, _Node);
 	
 	    function Polyline() {
 	        _classCallCheck(this, Polyline);
@@ -8118,27 +8169,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return Polyline;
-	})(_Generic3.default);
+	})(_Node3.default);
 	
-	Polyline.configure({
+	Polyline.setDefaults({
+	
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><polyline/></g><text/></g>',
-	    defaults: {
-	        size: { width: 60, height: 40 },
-	        attrs: {
-	            'polyline': {
-	                fill: '#ffffff',
-	                stroke: '#000000'
-	            },
-	            'text': {
-	                'font-size': 14,
-	                text: '',
-	                'text-anchor': 'middle',
-	                'ref-x': .5,
-	                'ref-dy': 20,
-	                'y-alignment': 'middle',
-	                fill: '#000000',
-	                'font-family': 'Arial, helvetica, sans-serif'
-	            }
+	
+	    size: {
+	        width: 60,
+	        height: 40
+	    },
+	
+	    attrs: {
+	        '.': {
+	            'fill': '#ffffff',
+	            'stroke': 'none'
+	        },
+	        'polyline': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000'
+	        },
+	        'text': {
+	            'font-size': 14,
+	            'text': '',
+	            'text-anchor': 'middle',
+	            'ref-x': .5,
+	            'ref-dy': 20,
+	            'y-alignment': 'middle',
+	            'fill': '#000000',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -8179,16 +8238,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Rhombus;
 	})(_Path3.default);
 	
-	Rhombus.configure({
-	    defaults: {
-	        attrs: {
-	            'path': {
-	                d: 'M 30 0 L 60 30 30 60 0 30 z'
-	            },
-	            'text': {
-	                'ref-y': 0.5,
-	                'y-alignment': 'middle'
-	            }
+	Rhombus.setDefaults({
+	
+	    attrs: {
+	        'path': {
+	            d: 'M 30 0 L 60 30 30 60 0 30 z'
+	        },
+	        'text': {
+	            'ref-y': 0.5,
+	            'y-alignment': 'middle'
 	        }
 	    }
 	});
@@ -8229,18 +8287,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Rect;
 	})(_Node3.default);
 	
-	Rect.configure({
+	Rect.setDefaults({
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g></g>',
-	    defaults: {
-	        attrs: {
-	            '.': { fill: '#ffffff', stroke: 'none' },
-	            'rect': {
-	                'fill': '#ffffff',
-	                'stroke': '#000000',
-	                'stroke-width': '1',
-	                'width': 15,
-	                'height': 15
-	            }
+	    attrs: {
+	        '.': { fill: '#ffffff', stroke: 'none' },
+	        'rect': {
+	            'fill': '#ffffff',
+	            'stroke': '#000000',
+	            'stroke-width': '1',
+	            'width': 15,
+	            'height': 15
 	        }
 	    }
 	});

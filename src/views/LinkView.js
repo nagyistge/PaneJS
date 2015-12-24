@@ -1,9 +1,4 @@
-import {
-    forIn,
-    isObject,
-    contains
-} from '../common/utils';
-
+import * as utils from '../common/utils';
 import vector   from '../common/vector';
 import Point    from '../geometry/Point';
 import CellView from './CellView';
@@ -14,7 +9,7 @@ class LinkView extends CellView {
     render() {
 
         let that = this;
-        let vel = that.vel;
+        let vel  = that.vel;
 
         vel.empty();
 
@@ -33,23 +28,23 @@ class LinkView extends CellView {
 
         var that = this;
 
-        forIn(that.cell.attrs, function (attrs, selector) {
+        utils.forIn(that.cell.attrs, function (attrs, selector) {
 
             var processed = [];
 
-            if (isObject(attrs.fill)) {
+            if (utils.isObject(attrs.fill)) {
 
                 that.applyGradient(selector, 'fill', attrs.fill);
                 processed.push('fill');
             }
 
-            if (isObject(attrs.stroke)) {
+            if (utils.isObject(attrs.stroke)) {
 
                 that.applyGradient(selector, 'stroke', attrs.stroke);
                 processed.push('stroke');
             }
 
-            if (isObject(attrs.filter)) {
+            if (utils.isObject(attrs.filter)) {
 
                 that.applyFilter(selector, attrs.filter);
                 processed.push('filter');
@@ -58,8 +53,8 @@ class LinkView extends CellView {
             // remove processed special attributes from attrs
             let finalAttributes = {};
 
-            forIn(attrs, function (value, key) {
-                if (!contains(processed, key)) {
+            utils.forIn(attrs, function (value, key) {
+                if (!utils.contains(processed, key)) {
                     finalAttributes[key] = value;
                 }
             });
@@ -72,12 +67,16 @@ class LinkView extends CellView {
 
     updateConnection() {
 
-        let that = this;
+        let that   = this;
         let points = that.cell.points;
 
-        that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
+        //that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
 
         return that;
+    }
+
+    parseRoute() {
+
     }
 }
 

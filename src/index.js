@@ -24,7 +24,6 @@ export Model from './core/Model';
 export Paper from './core/Paper';
 
 
-import Generic  from './shapes/basic/Generic';
 import Text     from './shapes/basic/Text';
 import Rect     from './shapes/basic/Rect';
 import Circle   from './shapes/basic/Circle';
@@ -40,7 +39,6 @@ import PortRect  from './shapes/port/Rect';
 
 var shapes = {
     basic: {
-        Generic: Generic,
         Text: Text,
         Rect: Rect,
         Circle: Circle,

@@ -1,26 +1,7 @@
-import {
-    merge,
-    forEach,
-    isString,
-    isUndefined,
-    isPercentage,
-    toFloat,
-    toFixed,
-    fixNumber,
-    getOffset,
-    snapToGrid,
-    containsElem,
-    normalizeEvent,
-    addEventListener,
-    removeEventListener,
-    createSvgElement,
-    createSvgDocument
-} from '../common/utils';
-
+import * as utils from '../common/utils';
 import Events     from '../common/Events';
 import vector     from '../common/vector';
 import detector   from '../common/detector';
-import * as utils from '../common/utils';
 
 import Point from '../geometry/Point';
 import Rect  from '../geometry/Rect';
@@ -58,7 +39,7 @@ class Paper extends Events {
 
         let that = this;
 
-        that.id = 'paper' + counter++;
+        that.id    = 'paper' + counter++;
         that.model = model || new Model();
 
         that.configure(options);
@@ -85,7 +66,7 @@ class Paper extends Events {
 
         let that = this;
 
-        that.options = merge({}, defaultOptions, options);
+        that.options = utils.merge({}, defaultOptions, options);
         that.trigger('paper:configure', that.options);
 
         return that;
@@ -97,20 +78,20 @@ class Paper extends Events {
         // Otherwise, improper transformation would be applied when the
         // drawPane gets transformed (scaled/rotated).
 
-        let that = this;
-        let gridSize = that.options.gridSize || 1;
+        let that       = this;
+        let gridSize   = that.options.gridSize || 1;
         let localPoint = vector(that.drawPane).toLocalPoint(point.x, point.y);
 
         return {
-            x: snapToGrid(localPoint.x, gridSize),
-            y: snapToGrid(localPoint.y, gridSize)
+            x: utils.snapToGrid(localPoint.x, gridSize),
+            y: utils.snapToGrid(localPoint.y, gridSize)
         };
     }
 
     toLocalPoint(point) {
 
-        let that = this;
-        let svg = that.svg;
+        let that     = this;
+        let svg      = that.svg;
         let svgPoint = svg.createSVGPoint();
 
         svgPoint.x = point.x;
@@ -130,16 +111,16 @@ class Paper extends Events {
             svg.appendChild(fakeRect.node);
         }
 
-        let paperOffset = getOffset(svg);
+        let paperOffset = utils.getOffset(svg);
 
         if (detector.IS_FF) {
             fakeRect.remove();
         }
 
-        let doc = document;
-        let body = doc.body;
-        let docElem = doc.documentElement;
-        let scrollTop = body.scrollTop || docElem.scrollTop;
+        let doc        = document;
+        let body       = doc.body;
+        let docElem    = doc.documentElement;
+        let scrollTop  = body.scrollTop || docElem.scrollTop;
         let scrollLeft = body.scrollLeft || docElem.scrollLeft;
 
         svgPoint.x += scrollLeft - paperOffset.left;
@@ -159,21 +140,21 @@ class Paper extends Events {
 
         if (container) {
 
-            let svg = createSvgDocument();
-            let root = createSvgElement('g');
-            let backgroundPane = createSvgElement('g');
-            let drawPane = createSvgElement('g');
+            let svg            = utils.createSvgDocument();
+            let root           = utils.createSvgElement('g');
+            let backgroundPane = utils.createSvgElement('g');
+            let drawPane       = utils.createSvgElement('g');
 
             root.appendChild(backgroundPane);
             root.appendChild(drawPane);
             svg.appendChild(root);
             container.appendChild(svg);
 
-            that.svg = svg;
-            that.root = root;
+            that.svg            = svg;
+            that.root           = root;
             that.backgroundPane = backgroundPane;
-            that.drawPane = drawPane;
-            that.container = container;
+            that.drawPane       = drawPane;
+            that.container      = container;
 
             that.trigger('paper:init', container);
         }
@@ -184,19 +165,19 @@ class Paper extends Events {
     setup() {
 
         let that = this;
-        let svg = that.svg;
+        let svg  = that.svg;
 
-        addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
-        addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
-        addEventListener(svg, 'click', that.onClick.bind(that));
-        addEventListener(svg, 'mousedown', that.onPointerDown.bind(that));
-        addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
-        addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
-        addEventListener(svg, 'touchmove', that.onPointerMove.bind(that));
-        addEventListener(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
-        addEventListener(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
-        addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
-        addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
+        utils.addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
+        utils.addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
+        utils.addEventListener(svg, 'click', that.onClick.bind(that));
+        utils.addEventListener(svg, 'mousedown', that.onPointerDown.bind(that));
+        utils.addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
+        utils.addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
+        utils.addEventListener(svg, 'touchmove', that.onPointerMove.bind(that));
+        utils.addEventListener(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
+        utils.addEventListener(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
+        utils.addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
+        utils.addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
 
         // Disables built-in pan and zoom in IE10 and later
         if (detector.IS_POINTER) {
@@ -232,7 +213,7 @@ class Paper extends Events {
 
     clear(cell, force = false, recurse = true) {
 
-        let that = this;
+        let that  = this;
         let model = that.model;
 
         cell = cell || model.getRoot();
@@ -252,7 +233,7 @@ class Paper extends Events {
 
     invalidate(cell, recurse = true, includeLink = true) {
 
-        let that = this;
+        let that  = this;
         let model = that.model;
 
         cell = cell || model.getRoot();
@@ -373,17 +354,18 @@ class Paper extends Events {
         // only update the node's size
         if (node && node.isNode) {
 
+            let raw    = node.metadata.size || {};
+            let width  = !utils.isUndefined(raw.width) ? raw.width : 1;
+            let height = !utils.isUndefined(raw.height) ? raw.height : 1;
+
             let parent = node.parent;
-            let raw = node.metadata.size || {};
-            let width = !isUndefined(raw.width) ? raw.width : 1;
-            let height = !isUndefined(raw.height) ? raw.height : 1;
 
             if (raw.relative && parent && parent.isNode) {
 
                 let parentSize = parent.size;
-                let isPercent = isPercentage(width);
+                let isPercent  = utils.isPercentage(width);
 
-                width = fixNumber(width, isPercent, 0);
+                width = utils.fixNumber(width, isPercent, 0);
 
                 if (isPercent || width > 0 && width < 1) {
                     width *= parentSize.width;
@@ -391,8 +373,8 @@ class Paper extends Events {
                     width += parentSize.width;
                 }
 
-                isPercent = isPercentage(height);
-                height = fixNumber(height, isPercent, 0);
+                isPercent = utils.isPercentage(height);
+                height    = utils.fixNumber(height, isPercent, 0);
 
                 if (isPercent || height > 0 && height < 1) {
                     height *= parentSize.height;
@@ -401,8 +383,8 @@ class Paper extends Events {
                 }
 
             } else {
-                width = fixNumber(width, false, 1);
-                height = fixNumber(height, false, 1);
+                width  = utils.fixNumber(width, false, 1);
+                height = utils.fixNumber(height, false, 1);
             }
 
             node.size = {
@@ -418,18 +400,19 @@ class Paper extends Events {
 
         if (node && node.isNode) {
 
-            let parent = node.parent;
             let raw = node.metadata.position || {};
-            let x = !isUndefined(raw.x) ? raw.x : 0;
-            let y = !isUndefined(raw.y) ? raw.y : 0;
+            let x   = !utils.isUndefined(raw.x) ? raw.x : 0;
+            let y   = !utils.isUndefined(raw.y) ? raw.y : 0;
+
+            let parent = node.parent;
 
             if (raw.relative && parent && parent.isNode) {
 
-                let parentSize = parent.size;
+                let parentSize     = parent.size;
                 let parentPosition = parent.position;
-                let isPercent = isPercentage(x);
+                let isPercent      = utils.isPercentage(x);
 
-                x = fixNumber(x, isPercent, 0);
+                x = utils.fixNumber(x, isPercent, 0);
 
                 if (isPercent || x > -1 && x < 1) {
                     x = parentPosition.x + parentSize.width * x;
@@ -437,9 +420,9 @@ class Paper extends Events {
                     x += parentPosition.x;
                 }
 
-                isPercent = isPercentage(y);
+                isPercent = utils.isPercentage(y);
 
-                y = fixNumber(y, isPercent, 0);
+                y = utils.fixNumber(y, isPercent, 0);
 
                 if (isPercent || y > -1 && y < 1) {
                     y = parentPosition.y + parentSize.height * y;
@@ -448,8 +431,8 @@ class Paper extends Events {
                 }
 
             } else {
-                x = fixNumber(x, false, 0);
-                y = fixNumber(y, false, 0);
+                x = utils.fixNumber(x, false, 0);
+                y = utils.fixNumber(y, false, 0);
             }
 
             node.position = {
@@ -467,19 +450,19 @@ class Paper extends Events {
         if (node && node.isNode) {
 
             let parent = node.parent;
-            let raw = node.metadata.rotation || {};
-            let angle = fixNumber(raw.angle, false, 0);
+            let raw    = node.metadata.rotation || {};
+            let angle  = utils.fixNumber(raw.angle, false, 0);
 
             if (raw.inherited && parent && parent.isNode && parent.rotation !== 0) {
 
                 // update node's position
-                let size = node.size;
-                let position = node.position;
+                let size       = node.size;
+                let position   = node.position;
                 let nodeCenter = new Point(position.x + size.width / 2, position.y + size.height / 2);
 
-                let parentSize = parent.size;
+                let parentSize     = parent.size;
                 let parentPosition = parent.position;
-                let parentCenter = new Point(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
+                let parentCenter   = new Point(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
 
                 // angle is according to the clockwise
                 nodeCenter.rotate(parentCenter, -parent.rotation);
@@ -499,19 +482,104 @@ class Paper extends Events {
 
     updateLinkGeometry(link) {
 
-        let source = link.getTerminal(true);
-        let target = link.getTerminal(false);
-        let sourceBBox = new Rect(source.position.x, source.position.y, source.size.width, source.size.height);
-        let targetBBox = new Rect(target.position.x, target.position.y, target.size.width, target.size.height);
-        var sourcePoint = sourceBBox.intersectionWithLineFromCenterToPoint(targetBBox.getCenter());
-        var targetPoint = targetBBox.intersectionWithLineFromCenterToPoint(sourceBBox.getCenter());
+        let that = this;
 
-        link.points = [
-            sourcePoint,
-            targetPoint
-        ];
+        let vertices = that.parseRoute(link);
 
-        return this;
+        link.sourcePoint = that.getConnectionPoint(link, true);
+        link.targetPoint = that.getConnectionPoint(link, false);
+
+        return that;
+    }
+
+    parseRoute(link) {
+
+        let that     = this;
+        let router   = link.router || that.options.defaultRouter;
+        let vertices = link.vertices || [];
+
+        if (!router) {
+            return vertices;
+        }
+
+        let routerFn;
+        let args = {};
+
+        if (utils.isFunction(router)) {
+            routerFn = router;
+        } else {
+
+            let name;
+
+            if (utils.isObject(router)) {
+                name = router.name;
+                args = router.args;
+            } else {
+                name = '' + router;
+            }
+
+            routerFn = that.getRouterByName(name);
+
+            if (!utils.isFunction(routerFn)) {
+                throw new Error('Unknown router: "' + name + '"');
+            }
+        }
+
+        return routerFn.call(this, vertices, args, link);
+    }
+
+    getConnectionPoint(link, isSource) {
+
+        // find the connection point on the terminal
+
+        let model = this.model;
+
+        let spot;
+        let terminal = model.getTerminal(link, isSource);
+
+        if (terminal) {
+
+            let spotBBox = new Rect(
+                terminal.position.x,
+                terminal.position.y,
+                terminal.size.width,
+                terminal.size.height);
+
+            let vertices  = link.vertices || [];
+            let reference = isSource ? vertices[0] : vertices[vertices.length - 1];
+
+            if (!reference) {
+
+                let referenceTerminal = link.getTerminal(!isSource);
+
+                if (referenceTerminal) {
+
+                    let referenceBBox = new Rect(
+                        referenceTerminal.position.x,
+                        referenceTerminal.position.y,
+                        referenceTerminal.size.width,
+                        referenceTerminal.size.height);
+
+                    reference = referenceBBox.intersectionWithLineFromCenterToPoint(spotBBox.getCenter());
+                    reference = reference || referenceBBox.getCenter();
+                }
+            }
+
+            if (!reference) {
+                reference = isSource ? link.targetPoint : link.sourcePoint;
+            }
+
+            if (reference) {
+                spot = spotBBox.intersectionWithLineFromCenterToPoint(reference);
+            }
+
+            spot = spot || spotBBox.getCenter();
+
+        } else {
+            spot = isSource ? link.sourcePoint : link.targetPoint;
+        }
+
+        return spot;
     }
 
 
@@ -520,46 +588,46 @@ class Paper extends Events {
 
     resize(width, height, relative) {
 
-        let that = this;
-        let options = that.options;
-        let nativeWidth = options.width;
+        let that         = this;
+        let options      = that.options;
+        let nativeWidth  = options.width;
         let nativeHeight = options.height;
 
-        width = isUndefined(width) ? nativeWidth : width;
-        height = isUndefined(height) ? nativeHeight : height;
+        width  = utils.isUndefined(width) ? nativeWidth : width;
+        height = utils.isUndefined(height) ? nativeHeight : height;
 
         if (relative === true) {
 
-            let svg = that.svg;
-            let isPercent = isPercentage(width);
-            let isNativePercent = isPercentage(nativeWidth);
+            let svg             = that.svg;
+            let isPercent       = utils.isPercentage(width);
+            let isNativePercent = utils.isPercentage(nativeWidth);
 
             if (isPercent) {
                 if (isNativePercent) {
-                    width = toFloat(width, false, 0) + toFloat(nativeWidth, false, 0) + '%';
+                    width = utils.toFloat(width, false, 0) + utils.toFloat(nativeWidth, false, 0) + '%';
                 } else {
-                    width = toFloat(width, true, 1) * nativeWidth;
+                    width = utils.toFloat(width, true, 1) * nativeWidth;
                 }
             } else {
                 width += isNativePercent ? svg.offsetWidth : nativeWidth;
             }
 
 
-            isPercent = isPercentage(height);
-            isNativePercent = isPercentage(nativeHeight);
+            isPercent       = utils.isPercentage(height);
+            isNativePercent = utils.isPercentage(nativeHeight);
 
             if (isPercent) {
                 if (isNativePercent) {
-                    height = toFloat(height, false, 0) + toFloat(nativeHeight, false, 0) + '%';
+                    height = utils.toFloat(height, false, 0) + utils.toFloat(nativeHeight, false, 0) + '%';
                 } else {
-                    height = toFloat(height, true, 1) * nativeHeight;
+                    height = utils.toFloat(height, true, 1) * nativeHeight;
                 }
             } else {
                 height += isNativePercent ? svg.offsetHeight : nativeHeight;
             }
         }
 
-        options.width = width;
+        options.width  = width;
         options.height = height;
 
         vector(that.svg).attr({width: width, height: height});
@@ -579,7 +647,7 @@ class Paper extends Events {
 
     translate(x, y, absolute) {
 
-        let that = this;
+        let that    = this;
         let options = that.options;
 
         x = options.x = x || options.x;
@@ -610,7 +678,7 @@ class Paper extends Events {
 
     getView(cell, create) {
 
-        let that = this;
+        let that  = this;
         let views = that.views;
 
         if (cell) {
@@ -626,7 +694,7 @@ class Paper extends Events {
 
     createView(cell) {
 
-        let that = this;
+        let that    = this;
         let options = that.options;
 
         // get view's constructor from options.
@@ -642,7 +710,7 @@ class Paper extends Events {
 
         if (ViewConstructor) {
 
-            let view = new ViewConstructor(that, cell);
+            let view  = new ViewConstructor(that, cell);
             let views = that.views;
 
             if (!views) {
@@ -683,9 +751,9 @@ class Paper extends Events {
     findViewByElem(elem) {
 
         let that = this;
-        let svg = that.svg;
+        let svg  = that.svg;
 
-        elem = isString(elem) ? svg.querySelector(elem) : elem;
+        elem = utils.isString(elem) ? svg.querySelector(elem) : elem;
 
         while (elem && elem !== svg && elem !== document) {
 
@@ -702,7 +770,8 @@ class Paper extends Events {
 
     findViewByCell(cell) {
 
-        let id = isString(cell) ? cell : cell.id;
+        let id = utils.isString(cell) ? cell : cell.id;
+
         return this.views[id];
     }
 
@@ -724,7 +793,7 @@ class Paper extends Events {
 
         console.log(changes);
 
-        forEach(changes, function (change) {
+        utils.forEach(changes, function (change) {
             that.distributeChange(change);
         });
 
@@ -789,6 +858,17 @@ class Paper extends Events {
     }
 
 
+    // router
+    // ------
+
+    registerRouter(name, fn) {
+
+    }
+
+    getRouterByName(name) {
+
+    }
+
     // event handlers
     // --------------
 
@@ -801,11 +881,11 @@ class Paper extends Events {
             return true;
         } else {
 
-            let that = this;
-            let svg = that.svg;
+            let that   = this;
+            let svg    = that.svg;
             let target = e.target;
 
-            if (svg === target || containsElem(svg, target)) {
+            if (svg === target || utils.containsElem(svg, target)) {
                 return true;
             }
         }
@@ -813,7 +893,7 @@ class Paper extends Events {
 
     onContextMenu(e) {
 
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
         let that = this;
         let view = that.findViewByElem(e.target);
@@ -835,7 +915,7 @@ class Paper extends Events {
     onDblClick(e) {
 
         e.preventDefault();
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
         let that = this;
         let view = that.findViewByElem(e.target);
@@ -857,7 +937,7 @@ class Paper extends Events {
 
     onPointerDown(e) {
 
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
         let that = this;
         let view = that.findViewByElem(e.target);
@@ -878,9 +958,9 @@ class Paper extends Events {
     onPointerMove(e) {
 
         e.preventDefault();
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
-        let that = this;
+        let that       = this;
         let sourceView = that.sourceView;
 
         if (sourceView) {
@@ -895,9 +975,9 @@ class Paper extends Events {
 
     onPointerUp(e) {
 
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
-        let that = this;
+        let that       = this;
         let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
         let sourceView = that.sourceView;
 
@@ -911,7 +991,7 @@ class Paper extends Events {
 
     onCellMouseOver(e) {
 
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
         let that = this;
         let view = that.findViewByElem(e.target);
@@ -928,7 +1008,7 @@ class Paper extends Events {
 
     onCellMouseOut(e) {
 
-        e = normalizeEvent(e);
+        e = utils.normalizeEvent(e);
 
         let that = this;
         let view = that.findViewByElem(e.target);

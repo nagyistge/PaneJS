@@ -1,15 +1,19 @@
-import Generic from './Generic';
+import Node from '../../cells/Node';
 
-class Text extends Generic {}
+class Text extends Node {}
 
-Text.configure({
+Text.setDefaults({
+
     markup: '<g class="pane-rotatable"><g class="pane-scalable"><text/></g></g>',
-    defaults: {
-        attrs: {
-            'text': {
-                'font-size': 18,
-                fill: '#000000'
-            }
+
+    attrs: {
+        '.': {
+            'fill': '#ffffff',
+            'stroke': 'none'
+        },
+        'text': {
+            'font-size': 18,
+            'fill': '#000000'
         }
     }
 });

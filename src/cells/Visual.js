@@ -23,14 +23,14 @@ class Visual extends Cell {
 
     get markup() {
 
-        return this.constructor.markup;
+        return this.metadata.markup;
     }
 
     get className() {
 
         let classNames = this.metadata.classNames;
 
-        return isArray(classNames)
+        return utils.isArray(classNames)
             ? classNames.join(' ')
             : classNames || '';
 
@@ -40,22 +40,18 @@ class Visual extends Cell {
     // static methods
     // --------------
 
-    static configure(options) {
-
-        let that = this;
-
-        if (options) {
-
-            utils.forIn(options, (val, key)=> {
-
-                that[key] = key === 'defaults'
-                    ? utils.merge({}, that.defaults, val)
-                    : val;
-            });
-        }
+    static setDefaults(options) {
+        this.defaults = utils.merge({}, this.defaults, options);
     }
 }
 
+
+Visual.defaults = {
+    markup: '',
+    data: null,  // attach data to the cell
+    view: null,  // set `null` to use the default view
+    attrs: {}    // styles
+};
 
 // exports
 // -------

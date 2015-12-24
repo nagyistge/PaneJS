@@ -11,24 +11,13 @@ class Node extends Visual {
     // props
     // -----
 
-    get markup() {
-        return this.constructor.markup;
-    }
-
-    get className() {
-
-        let classNames = this.metadata.classNames;
-
-        return isArray(classNames)
-            ? classNames.join(' ')
-            : classNames || '';
-
-    }
-
     get isNode() {
         return true;
     }
 
+
+    // methods
+    // -------
 
     translate() {
 
@@ -44,13 +33,8 @@ class Node extends Visual {
 }
 
 
-// static props
-// ------------
-
-Node.defaults = {
+Node.setDefaults({
     classNames: ['pane-node'], // `String` or `Array`
-    view: null,  // set `null` to use the default view
-    attrs: {},
     size: {
         width: 1,
         height: 1,
@@ -65,7 +49,7 @@ Node.defaults = {
         angle: 0,
         inherited: true // inherit the parent's rotation
     }
-};
+});
 
 
 // exports
