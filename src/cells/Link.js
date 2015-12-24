@@ -1,8 +1,3 @@
-import {
-    merge,
-    isArray
-} from '../common/utils';
-
 import Visual from './Visual';
 
 
@@ -26,12 +21,12 @@ Link.setDefaults({
     + '<g class="marker-arrowheads"/>'
     + '<g class="link-tools"/>',
 
-    classNames: ['pane-link'], // `String` or `Array`
+    classNames: 'pane-link',
     connector: null, // set `null` to use the default connector
     attrs: {
         '.connection': {
             'fill': 'none',
-            'stroke': '#000000',
+            'stroke': '#000',
             'stroke-width': 1
         },
         '.marker-source': {

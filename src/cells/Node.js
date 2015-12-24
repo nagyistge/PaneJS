@@ -1,8 +1,3 @@
-import {
-    merge,
-    isArray
-} from '../common/utils';
-
 import Visual from './Visual';
 
 
@@ -34,7 +29,7 @@ class Node extends Visual {
 
 
 Node.setDefaults({
-    classNames: ['pane-node'], // `String` or `Array`
+    classNames: 'pane-node',
     size: {
         width: 1,
         height: 1,
