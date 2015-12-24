@@ -13,6 +13,7 @@ entry[pkg.name] = './src/index.js';
 entry[pkg.name + '-' + pkg.version] = './src/index.js';
 
 module.exports = {
+
   entry: entry,
 
   resolve: {
@@ -21,6 +22,7 @@ module.exports = {
 
   output: {
     path: paths.dist,
+    publicPath: '/dist/',
     filename: '[name].js',
     library: pkg.name,
     libraryTarget: 'umd'
