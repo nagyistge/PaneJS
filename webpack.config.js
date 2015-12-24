@@ -42,11 +42,11 @@ module.exports = {
 
             // Syntax
             //'syntax-class-properties',
-            'syntax-export-extensions',
+            //'syntax-export-extensions',
 
             // Experimental
             //'transform-class-properties',
-            'transform-export-extensions',
+            //'transform-export-extensions',
 
             // Minification
             //'transform-member-expression-literals',

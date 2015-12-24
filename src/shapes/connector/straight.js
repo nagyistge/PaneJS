@@ -1,6 +1,6 @@
 import * as utils from '../../common/utils'
 
-export default function normalConnector(sourcePoint, targetPoint, vertices) {
+export default function straight(sourcePoint, targetPoint, vertices) {
 
     var d = ['M', sourcePoint.x, sourcePoint.y];
 
@@ -13,3 +13,4 @@ export default function normalConnector(sourcePoint, targetPoint, vertices) {
 
     return d.join(' ');
 };
+
