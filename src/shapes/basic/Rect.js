@@ -6,25 +6,23 @@ Rect.setDefaults({
     markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',
     attrs: {
         '.': {
-            'fill': '#ffffff',
+            'fill': '#fff',
             'stroke': 'none'
         },
         'rect': {
-            'fill': '#ffffff',
-            'stroke': '#000000',
+            'fill': '#fff',
+            'stroke': '#000',
             'stroke-width': '1',
             'width': 100,
             'height': 40
         },
         'text': {
-            fill: '#000000',
-            text: '',
+            'fill': '#000',
             'font-size': 14,
             'ref-x': .5,
             'ref-y': .5,
             'text-anchor': 'middle',
-            'y-alignment': 'middle',
-            'font-family': 'Arial, helvetica, sans-serif'
+            'y-alignment': 'middle'
         }
     }
 });

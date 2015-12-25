@@ -2,7 +2,6 @@ import * as utils from '../common/utils';
 import vector   from '../common/vector';
 import Point    from '../geometry/Point';
 import CellView from './CellView';
-import normalConnector from '../shapes/connectors/normal';
 
 class LinkView extends CellView {
 
@@ -51,15 +50,15 @@ class LinkView extends CellView {
             }
 
             // remove processed special attributes from attrs
-            let finalAttributes = {};
+            let surplus = {};
 
             utils.forIn(attrs, function (value, key) {
                 if (!utils.contains(processed, key)) {
-                    finalAttributes[key] = value;
+                    surplus[key] = value;
                 }
             });
 
-            that.applyAttrs(selector, finalAttributes);
+            that.applyAttrs(selector, surplus);
         });
 
         return that;

@@ -22,6 +22,8 @@ Link.setDefaults({
     + '<g class="link-tools"/>',
 
     classNames: 'pane-link',
+    router: null,
+    marker: null,
     connector: null, // set `null` to use the default connector
     attrs: {
         '.connection': {

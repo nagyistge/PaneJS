@@ -1,11 +1,3 @@
-import {
-    map,
-    forEach,
-    hashCode,
-    isString,
-    isFinite
-} from '../common/utils';
-
 import * as utils from '../common/utils';
 import Events     from '../common/Events';
 import vector     from '../common/vector';
@@ -69,7 +61,7 @@ class CellView {
 
         var that = this;
 
-        forEach(that.find(selector), function (vel) {
+        utils.forEach(that.find(selector), function (vel) {
             vel.attr(attrs);
         });
 
@@ -96,7 +88,7 @@ class CellView {
             throw new Error('Non-existing filter: ' + name);
         }
 
-        let vels = isString(selector) ? that.find(selector) : selector;
+        let vels = utils.isString(selector) ? that.find(selector) : selector;
 
         if (!vels.length) {
             return that;
@@ -104,7 +96,7 @@ class CellView {
 
         let paper = that.paper;
         let svg = paper.svg;
-        let filterId = name + '-' + paper.id + '-' + hashCode(JSON.stringify(filter));
+        let filterId = name + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(filter));
 
 
         if (!svg.getElementById(filterId)) {
@@ -129,7 +121,7 @@ class CellView {
             vector(svg).getDefs().append(vFilter);
         }
 
-        forEach(vels, function (vel) {
+        utils.forEach(vels, function (vel) {
             vel.attr(filter, 'url(#' + filterId + ')');
         });
 
@@ -156,7 +148,7 @@ class CellView {
             return that;
         }
 
-        let vels = isString(selector) ? that.find(selector) : selector;
+        let vels = utils.isString(selector) ? that.find(selector) : selector;
 
         if (!vels.length) {
             return that;
@@ -164,14 +156,14 @@ class CellView {
 
         let paper = that.paper;
         let svg = paper.svg;
-        let gradientId = type + '-' + paper.id + '-' + hashCode(JSON.stringify(gradient));
+        let gradientId = type + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
 
         if (!svg.getElementById(gradientId)) {
 
             let gradientString = [
                 '<' + type + '>',
-                map(stops, function (stop) {
-                    return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + (isFinite(stop.opacity) ? stop.opacity : 1) + '" />';
+                utils.map(stops, function (stop) {
+                    return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + (utils.isFinite(stop.opacity) ? stop.opacity : 1) + '" />';
                 }).join(''),
                 '</' + type + '>'
             ].join('');
@@ -187,7 +179,7 @@ class CellView {
             vector(svg).getDefs().append(vGradient);
         }
 
-        forEach(vels, function (vel) {
+        utils.forEach(vels, function (vel) {
             vel.attr(attrName, 'url(#' + gradientId + ')');
         });
 

@@ -1,27 +1,28 @@
 require('./style/index.less');
 
-export * as utils         from './common/utils';
-export vector, {VElement} from './common/vector';
-export Events             from './common/Events';
+import * as utils         from './common/utils';
+import vector, {VElement} from './common/vector';
+import Events             from './common/Events';
 
 
-export Cell from './cells/Cell';
-export Link from './cells/Link';
-export Node from './cells/Node';
+import Model from './core/Model';
+import Paper from './core/Paper';
 
 
-export CellView from './views/CellView';
-export LinkView from './views/LinkView';
-export NodeView from './views/NodeView';
+import Cell from './cells/Cell';
+import Link from './cells/Link';
+import Node from './cells/Node';
 
 
-export Change      from './changes/Change'
-export RootChange  from './changes/RootChange'
-export ChildChange from './changes/ChildChange'
+import CellView from './views/CellView';
+import LinkView from './views/LinkView';
+import NodeView from './views/NodeView';
 
 
-export Model from './core/Model';
-export Paper from './core/Paper';
+import Change         from './changes/Change'
+import RootChange     from './changes/RootChange'
+import ChildChange    from './changes/ChildChange'
+import TerminalChange from './changes/TerminalChange'
 
 
 import Text     from './shapes/basic/Text';
@@ -37,24 +38,58 @@ import Rhombus  from './shapes/basic/Rhombus';
 import PortRect  from './shapes/port/Rect';
 
 
-var shapes = {
+import sharp from './shapes/connector/sharp';
+import rounded  from './shapes/connector/rounded';
+
+
+// register default connectors and markers
+Paper
+    .registerConnector('sharp', sharp)
+    .registerConnector('rounded', rounded);
+
+
+let shapes = {
     basic: {
-        Text: Text,
-        Rect: Rect,
-        Circle: Circle,
-        Ellipse: Ellipse,
-        Image: Image,
-        Path: Path,
-        Polygon: Polygon,
-        Polyline: Polyline,
-        Rhombus: Rhombus,
+        Text,
+        Rect,
+        Circle,
+        Ellipse,
+        Image,
+        Path,
+        Polygon,
+        Polyline,
+        Rhombus
     },
 
     port: {
-        Rect: PortRect
+        Rect
     }
 };
 
+
+// exports
+// -------
+
 export {
+    utils,
+    vector,
+    VElement,
+
+    Cell,
+    Link,
+    Node,
+
+    CellView,
+    LinkView,
+    NodeView,
+
+    Change,
+    RootChange,
+    ChildChange,
+    TerminalChange,
+
+    Model,
+    Paper,
+
     shapes
 }

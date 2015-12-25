@@ -101,17 +101,17 @@ class NodeView extends CellView {
                 });
             }
 
-            let finalAttributes = {};
+            let surplus = {};
 
             forIn(attrs, function (value, key) {
                 if (!contains(specialAttributes, key)) {
-                    finalAttributes[key] = value;
+                    surplus[key] = value;
                 }
             });
 
             // set regular attributes
             forEach(vElements, function (vel) {
-                vel.attr(finalAttributes);
+                vel.attr(surplus);
             });
 
             //if (attrs.port) {

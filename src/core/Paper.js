@@ -484,8 +484,7 @@ class Paper extends Events {
 
         let that = this;
 
-        let vertices = that.parseRoute(link);
-
+        link.routerPoints = that.parseRoute(link);
         link.sourcePoint = that.getConnectionPoint(link, true);
         link.targetPoint = that.getConnectionPoint(link, false);
 
@@ -502,30 +501,30 @@ class Paper extends Events {
             return vertices;
         }
 
-        let routerFn;
-        let args = {};
+        let parser;
+        let options = {};
 
         if (utils.isFunction(router)) {
-            routerFn = router;
+            parser = router;
         } else {
 
             let name;
 
             if (utils.isObject(router)) {
                 name = router.name;
-                args = router.args;
+                options = router.options;
             } else {
                 name = '' + router;
             }
 
-            routerFn = that.getRouterByName(name);
+            parser = that.getRouter(name);
 
-            if (!utils.isFunction(routerFn)) {
+            if (!utils.isFunction(parser)) {
                 throw new Error('Unknown router: "' + name + '"');
             }
         }
 
-        return routerFn.call(this, vertices, args, link);
+        return parser.call(this, vertices, options);
     }
 
     getConnectionPoint(link, isSource) {
@@ -545,7 +544,7 @@ class Paper extends Events {
                 terminal.size.width,
                 terminal.size.height);
 
-            let vertices = link.vertices || [];
+            let vertices = link.routerPoints || [];
             let reference = isSource ? vertices[0] : vertices[vertices.length - 1];
 
             if (!reference) {
@@ -865,9 +864,51 @@ class Paper extends Events {
 
     }
 
-    getRouterByName(name) {
+    getRouter(name) {
 
     }
+
+    // connector
+    // ---------
+
+    static registerConnector(name, fn) {
+
+        let that = this;
+        let connectors = that.connectors;
+
+        if (!connectors) {
+            connectors = that.connectors = {};
+        }
+
+        return that;
+    }
+
+    static getConnector(name) {
+        let connectors = this.connectors;
+
+        return connectors ? connectors[name] : null;
+    }
+
+    getConnector(name) {
+
+        return this.constructor.getConnector(name);
+    }
+
+
+    // marker
+    // ------
+
+    static registerMarker(name) {}
+
+    static getMarker(name) {
+
+    }
+
+    getMarker(name) {
+
+        return this.constructor.getMarker(name);
+    }
+
 
     // event handlers
     // --------------

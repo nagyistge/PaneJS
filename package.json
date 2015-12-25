@@ -42,6 +42,7 @@
     "extract-text-webpack-plugin": "^0.9.1",
     "less": "^2.5.3",
     "less-loader": "^2.2.2",
+    "portscanner": "^1.0.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
