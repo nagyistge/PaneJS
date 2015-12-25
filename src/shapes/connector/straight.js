@@ -1,8 +1,8 @@
 import * as utils from '../../common/utils'
 
-export default function straight(sourcePoint, targetPoint, vertices) {
+function straight(sourcePoint, targetPoint, vertices) {
 
-    var d = ['M', sourcePoint.x, sourcePoint.y];
+    let d = ['M', sourcePoint.x, sourcePoint.y];
 
     utils.forEach(vertices, function (vertex) {
 
@@ -12,5 +12,7 @@ export default function straight(sourcePoint, targetPoint, vertices) {
     d.push(targetPoint.x, targetPoint.y);
 
     return d.join(' ');
-};
+}
 
+
+export default straight;
