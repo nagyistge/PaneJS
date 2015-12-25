@@ -116,7 +116,7 @@ class Point {
         // Move point on the line from `ref` to me by `distance`.
 
         let that = this;
-        let rad  = utils.toRad(ref.theta(that));
+        let rad = utils.toRad(ref.theta(that));
 
         return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
     }
@@ -137,6 +137,11 @@ class Point {
         that.y = precision ? utils.toFixed(that.y, precision) : Math.round(that.y);
 
         return that;
+    }
+
+    smooth() {
+
+        return thi.round(2);
     }
 
     diff(p) {
