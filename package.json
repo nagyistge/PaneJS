@@ -47,7 +47,7 @@
     "webpack-dev-server": "^1.14.0"
   },
   "scripts": {
-    "server": "node ./server.js",
+    "dev": "node ./server.js",
     "clean": "rm -rf dist",
     "lint": "eslint ./src --ext '.js'",
     "build": "npm run clean && webpack && webpack --config webpack.config.min.js",

@@ -41,11 +41,24 @@ var server = new WebpackDevServer(compiler, {
 });
 
 
-server.listen(port, 'localhost', function (err, result) {
+server.listen(port, host);
 
-    if (err) {
-        console.log(err);
-    }
+server.listeningApp
+    .on('listening', function () {
 
-    console.log('Listening at localhost:' + port);
-});
+        var target = 'http://' + host + ':' + port;
+
+        console.log('Dev server started on ' + target);
+
+    })
+    .on('error', function (err) {
+
+        if (err.code === 'EADDRINUSE') {
+            console.log('Port ' + port + ' is already in use by another process.');
+        } else {
+            console.log(err);
+        }
+
+        process.exit(err.code);
+
+    });
