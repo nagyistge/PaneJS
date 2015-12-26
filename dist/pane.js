@@ -73,101 +73,101 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Events2 = _interopRequireDefault(_Events);
 	
-	var _Cell = __webpack_require__(18);
-	
-	var _Cell2 = _interopRequireDefault(_Cell);
-	
-	var _Link = __webpack_require__(19);
-	
-	var _Link2 = _interopRequireDefault(_Link);
-	
-	var _Node = __webpack_require__(21);
-	
-	var _Node2 = _interopRequireDefault(_Node);
-	
-	var _CellView = __webpack_require__(22);
-	
-	var _CellView2 = _interopRequireDefault(_CellView);
-	
-	var _LinkView = __webpack_require__(24);
-	
-	var _LinkView2 = _interopRequireDefault(_LinkView);
-	
-	var _NodeView = __webpack_require__(25);
-	
-	var _NodeView2 = _interopRequireDefault(_NodeView);
-	
-	var _Change = __webpack_require__(26);
-	
-	var _Change2 = _interopRequireDefault(_Change);
-	
-	var _RootChange = __webpack_require__(27);
-	
-	var _RootChange2 = _interopRequireDefault(_RootChange);
-	
-	var _ChildChange = __webpack_require__(28);
-	
-	var _ChildChange2 = _interopRequireDefault(_ChildChange);
-	
-	var _TerminalChange = __webpack_require__(29);
-	
-	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
-	
-	var _Model = __webpack_require__(30);
+	var _Model = __webpack_require__(18);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _Paper = __webpack_require__(32);
+	var _Paper = __webpack_require__(25);
 	
 	var _Paper2 = _interopRequireDefault(_Paper);
 	
-	var _straight = __webpack_require__(34);
+	var _Cell = __webpack_require__(19);
 	
-	var _straight2 = _interopRequireDefault(_straight);
+	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _rounded = __webpack_require__(35);
+	var _Link = __webpack_require__(31);
 	
-	var _rounded2 = _interopRequireDefault(_rounded);
+	var _Link2 = _interopRequireDefault(_Link);
 	
-	var _Text = __webpack_require__(36);
+	var _Node = __webpack_require__(33);
+	
+	var _Node2 = _interopRequireDefault(_Node);
+	
+	var _CellView = __webpack_require__(28);
+	
+	var _CellView2 = _interopRequireDefault(_CellView);
+	
+	var _LinkView = __webpack_require__(27);
+	
+	var _LinkView2 = _interopRequireDefault(_LinkView);
+	
+	var _NodeView = __webpack_require__(30);
+	
+	var _NodeView2 = _interopRequireDefault(_NodeView);
+	
+	var _Change = __webpack_require__(21);
+	
+	var _Change2 = _interopRequireDefault(_Change);
+	
+	var _RootChange = __webpack_require__(20);
+	
+	var _RootChange2 = _interopRequireDefault(_RootChange);
+	
+	var _ChildChange = __webpack_require__(22);
+	
+	var _ChildChange2 = _interopRequireDefault(_ChildChange);
+	
+	var _TerminalChange = __webpack_require__(23);
+	
+	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
+	
+	var _Text = __webpack_require__(34);
 	
 	var _Text2 = _interopRequireDefault(_Text);
 	
-	var _Rect = __webpack_require__(37);
+	var _Rect = __webpack_require__(35);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Circle = __webpack_require__(38);
+	var _Circle = __webpack_require__(36);
 	
 	var _Circle2 = _interopRequireDefault(_Circle);
 	
-	var _Ellipse = __webpack_require__(39);
+	var _Ellipse = __webpack_require__(37);
 	
 	var _Ellipse2 = _interopRequireDefault(_Ellipse);
 	
-	var _Image = __webpack_require__(40);
+	var _Image = __webpack_require__(38);
 	
 	var _Image2 = _interopRequireDefault(_Image);
 	
-	var _Path = __webpack_require__(41);
+	var _Path = __webpack_require__(39);
 	
 	var _Path2 = _interopRequireDefault(_Path);
 	
-	var _Polygon = __webpack_require__(42);
+	var _Polygon = __webpack_require__(40);
 	
 	var _Polygon2 = _interopRequireDefault(_Polygon);
 	
-	var _Polyline = __webpack_require__(43);
+	var _Polyline = __webpack_require__(41);
 	
 	var _Polyline2 = _interopRequireDefault(_Polyline);
 	
-	var _Rhombus = __webpack_require__(44);
+	var _Rhombus = __webpack_require__(42);
 	
 	var _Rhombus2 = _interopRequireDefault(_Rhombus);
 	
-	var _Rect3 = __webpack_require__(45);
+	var _Rect3 = __webpack_require__(43);
 	
 	var _Rect4 = _interopRequireDefault(_Rect3);
+	
+	var _sharp = __webpack_require__(44);
+	
+	var _sharp2 = _interopRequireDefault(_sharp);
+	
+	var _rounded = __webpack_require__(45);
+	
+	var _rounded2 = _interopRequireDefault(_rounded);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -175,8 +175,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(46);
 	
-	_Paper2.default.registerConnector('straight', _straight2.default);
-	_Paper2.default.registerConnector('rounded', _rounded2.default);
+	// register default connectors and markers
+	_Paper2.default.registerConnector('sharp', _sharp2.default).registerConnector('rounded', _rounded2.default);
 	
 	var shapes = {
 	    basic: {
@@ -195,6 +195,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Rect: _Rect2.default
 	    }
 	};
+	
+	// exports
+	// -------
 	
 	exports.utils = utils;
 	exports.vector = _vector2.default;
@@ -3216,6 +3219,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
+	        key: 'smooth',
+	        value: function smooth() {
+	
+	            return thi.round(2);
+	        }
+	    }, {
 	        key: 'diff',
 	        value: function diff(p) {
 	
@@ -3853,1924 +3862,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(1);
 	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Cell = (function () {
-	    function Cell() {
-	        _classCallCheck(this, Cell);
-	    }
-	
-	    _createClass(Cell, [{
-	        key: 'getTerminal',
-	
-	        // link
-	        // ----
-	
-	        value: function getTerminal(isSource) {
-	
-	            return isSource ? this.source : this.target;
-	        }
-	    }, {
-	        key: 'setTerminal',
-	        value: function setTerminal(node, isSource) {
-	
-	            var that = this;
-	
-	            if (isSource) {
-	                that.source = node;
-	            } else {
-	                that.target = node;
-	            }
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'removeFromTerminal',
-	        value: function removeFromTerminal(isSource) {
-	
-	            // remove link from node
-	
-	            var that = this;
-	            var node = that.getTerminal(isSource);
-	
-	            if (node) {
-	                node.removeLink(that, isSource);
-	            }
-	
-	            return that;
-	        }
-	
-	        // children
-	        // --------
-	
-	    }, {
-	        key: 'getChildCount',
-	        value: function getChildCount() {
-	
-	            return this.children ? this.children.length : 0;
-	        }
-	    }, {
-	        key: 'indexOfChild',
-	        value: function indexOfChild(child) {
-	
-	            return utils.indexOf(this.children, child);
-	        }
-	    }, {
-	        key: 'getChildAt',
-	        value: function getChildAt(index) {
-	
-	            return this.children ? this.children[index] : null;
-	        }
-	    }, {
-	        key: 'eachChild',
-	        value: function eachChild(iterator, context) {
-	
-	            return utils.forEach(this.children, iterator, context);
-	        }
-	    }, {
-	        key: 'filterChild',
-	        value: function filterChild(iterator, context) {
-	
-	            return utils.filter(this.children, iterator, context);
-	        }
-	    }, {
-	        key: 'insertChild',
-	        value: function insertChild(child, index) {
-	
-	            var that = this;
-	
-	            if (child) {
-	
-	                var childCount = that.getChildCount();
-	
-	                index = utils.fixIndex(index, childCount);
-	
-	                if (child.parent === that && index === childCount) {
-	                    index--;
-	                }
-	
-	                child.removeFromParent();
-	                child.parent = that;
-	
-	                var children = that.children;
-	
-	                if (children) {
-	                    children.splice(index, 0, child);
-	                } else {
-	                    children = that.children = [];
-	                    children.push(child);
-	                }
-	            }
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'removeChild',
-	        value: function removeChild(child) {
-	
-	            return this.removeChildAt(this.indexOfChild(child));
-	        }
-	    }, {
-	        key: 'removeChildAt',
-	        value: function removeChildAt(index) {
-	
-	            var that = this;
-	            var child = null;
-	            var children = that.children;
-	
-	            if (children && index >= 0) {
-	
-	                child = that.getChildAt(index);
-	
-	                if (child) {
-	                    children.splice(index, 1);
-	                    child.parent = null;
-	                }
-	            }
-	
-	            return child;
-	        }
-	
-	        // node
-	        // -----
-	
-	    }, {
-	        key: 'getLinkCount',
-	        value: function getLinkCount() {
-	
-	            return this.links ? this.links.length : 0;
-	        }
-	    }, {
-	        key: 'indexOfLink',
-	        value: function indexOfLink(link) {
-	
-	            return utils.indexOf(this.links, link);
-	        }
-	    }, {
-	        key: 'getLinkAt',
-	        value: function getLinkAt(index) {
-	
-	            return this.links ? this.links[index] : null;
-	        }
-	    }, {
-	        key: 'eachLink',
-	        value: function eachLink(iterator, context) {
-	
-	            return utils.forEach(this.links, iterator, context);
-	        }
-	    }, {
-	        key: 'filterLink',
-	        value: function filterLink(iterator, context) {
-	
-	            return utils.filter(this.links, iterator, context);
-	        }
-	    }, {
-	        key: 'addLink',
-	        value: function addLink(link, outgoing) {
-	
-	            var that = this;
-	            var links = that.links;
-	
-	            if (link) {
-	
-	                link.removeFromTerminal(outgoing);
-	                link.setTerminal(that, outgoing);
-	
-	                // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
-	                if (!links || that.indexOfLink(link) < 0 || link.getTerminal(!outgoing) !== that) {
-	
-	                    if (!links) {
-	                        links = that.links = [];
-	                    }
-	
-	                    links.push(link);
-	                }
-	            }
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'removeLink',
-	        value: function removeLink(link, outgoing) {
-	
-	            var that = this;
-	            var links = that.links;
-	
-	            if (link) {
-	
-	                // 连线的起点和终点是同一个节点时不需要移除
-	                if (links && link.getTerminal(!outgoing) !== that) {
-	                    var index = that.indexOfLink(link);
-	
-	                    if (index >= 0) {
-	                        links.splice(index, 1);
-	                    }
-	                }
-	
-	                link.setTerminal(null, outgoing);
-	            }
-	
-	            return link;
-	        }
-	
-	        // parent
-	        // ------
-	
-	    }, {
-	        key: 'getParent',
-	        value: function getParent() {
-	
-	            return this.parent;
-	        }
-	    }, {
-	        key: 'removeFromParent',
-	        value: function removeFromParent() {
-	
-	            var that = this;
-	            var parent = that.parent;
-	
-	            if (parent) {
-	                parent.removeChild(that);
-	            }
-	
-	            return that;
-	        }
-	
-	        // common
-	        // ------
-	
-	    }, {
-	        key: 'valueOf',
-	        value: function valueOf() {}
-	    }, {
-	        key: 'toString',
-	        value: function toString() {}
-	    }, {
-	        key: 'cloneData',
-	        value: function cloneData() {
-	
-	            var data = this.data;
-	
-	            if (data) {
-	
-	                if (data.clone && utils.isFunction(data.clone)) {
-	                    return data.clone();
-	                }
-	
-	                if (utils.isNode(data)) {
-	                    return data.cloneNode(true);
-	                }
-	
-	                if (utils.isObject(data)) {
-	                    return utils.merge({}, data);
-	                }
-	            }
-	
-	            return data;
-	        }
-	    }, {
-	        key: 'clone',
-	        value: function clone(cloneData) {
-	
-	            var that = this;
-	            var metadata = utils.merge({}, that.metadata);
-	
-	            metadata.data = cloneData === true ? that.cloneData() : that.data;
-	            metadata.visible = that.visible;
-	
-	            return new Cell(metadata);
-	        }
-	    }, {
-	        key: 'destroy',
-	        value: function destroy() {}
-	    }]);
-	
-	    return Cell;
-	})();
-	
-	// exports
-	// -------
-	
-	exports.default = Cell;
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Visual2 = __webpack_require__(20);
-	
-	var _Visual3 = _interopRequireDefault(_Visual2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Link = (function (_Visual) {
-	    _inherits(Link, _Visual);
-	
-	    function Link() {
-	        _classCallCheck(this, Link);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Link).apply(this, arguments));
-	    }
-	
-	    _createClass(Link, [{
-	        key: 'isLink',
-	        get: function get() {
-	            return true;
-	        }
-	    }]);
-	
-	    return Link;
-	})(_Visual3.default);
-	
-	Link.setDefaults({
-	
-	    markup: '' + '<path class="connection"/>' + '<path class="marker-source"/>' + '<path class="marker-target"/>' + '<path class="connection-wrap"/>' + '<g class="labels"/>' + '<g class="marker-vertices"/>' + '<g class="marker-arrowheads"/>' + '<g class="link-tools"/>',
-	
-	    classNames: 'pane-link',
-	    connector: null, // set `null` to use the default connector
-	    attrs: {
-	        '.connection': {
-	            'fill': 'none',
-	            'stroke': '#000',
-	            'stroke-width': 1
-	        },
-	        '.marker-source': {
-	            d: 'M 10 0 L 0 5 L 10 10 z'
-	        },
-	        '.marker-target': {
-	            d: 'M 10 0 L 0 5 L 10 10 z'
-	        }
-	    }
-	});
-	
-	// exports
-	// -------
-	
-	exports.default = Link;
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _Cell2 = __webpack_require__(18);
-	
-	var _Cell3 = _interopRequireDefault(_Cell2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Visual = (function (_Cell) {
-	    _inherits(Visual, _Cell);
-	
-	    function Visual(options) {
-	        _classCallCheck(this, Visual);
-	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Visual).call(this));
-	
-	        var that = _this;
-	        var metadata = utils.merge({}, that.constructor.defaults, options);
-	
-	        that.data = metadata.data;
-	        that.attrs = metadata.attrs;
-	        that.visible = metadata.visible !== false;
-	        that.metadata = metadata;
-	        return _this;
-	    }
-	
-	    // static methods
-	    // --------------
-	
-	    _createClass(Visual, [{
-	        key: 'markup',
-	
-	        // props
-	        // -----
-	
-	        get: function get() {
-	
-	            return this.metadata.markup;
-	        }
-	    }, {
-	        key: 'className',
-	        get: function get() {
-	
-	            var classNames = this.metadata.classNames;
-	
-	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
-	        }
-	    }], [{
-	        key: 'setDefaults',
-	        value: function setDefaults(options) {
-	
-	            this.defaults = utils.merge({}, this.defaults, options);
-	        }
-	    }]);
-	
-	    return Visual;
-	})(_Cell3.default);
-	
-	// static props
-	// ------------
-	
-	Visual.defaults = {
-	    markup: '',
-	    attrs: {}, // styles
-	    data: null, // attach data to the cell
-	    view: null };
-	
-	// exports
-	// -------
-	
-	// set `null` to use the default view
-	exports.default = Visual;
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Visual2 = __webpack_require__(20);
-	
-	var _Visual3 = _interopRequireDefault(_Visual2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Node = (function (_Visual) {
-	    _inherits(Node, _Visual);
-	
-	    function Node() {
-	        _classCallCheck(this, Node);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
-	    }
-	
-	    _createClass(Node, [{
-	        key: 'translate',
-	
-	        // methods
-	        // -------
-	
-	        value: function translate() {}
-	    }, {
-	        key: 'resize',
-	        value: function resize(width, height) {}
-	    }, {
-	        key: 'rotate',
-	        value: function rotate() {}
-	    }, {
-	        key: 'getBBox',
-	        value: function getBBox() {
-	            return false;
-	        }
-	    }, {
-	        key: 'isNode',
-	
-	        // props
-	        // -----
-	
-	        get: function get() {
-	            return true;
-	        }
-	    }]);
-	
-	    return Node;
-	})(_Visual3.default);
-	
-	Node.setDefaults({
-	    classNames: 'pane-node',
-	    size: {
-	        width: 1,
-	        height: 1,
-	        relative: false
-	    },
-	    position: {
-	        x: 0,
-	        y: 0,
-	        relative: false
-	    },
-	    rotation: {
-	        angle: 0,
-	        inherited: true // inherit the parent's rotation
-	    }
-	});
-	
-	// exports
-	// -------
-	
-	exports.default = Node;
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _Events = __webpack_require__(17);
-	
-	var _Events2 = _interopRequireDefault(_Events);
-	
-	var _vector = __webpack_require__(13);
-	
-	var _vector2 = _interopRequireDefault(_vector);
-	
-	var _filters = __webpack_require__(23);
-	
-	var _filters2 = _interopRequireDefault(_filters);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var CellView = (function () {
-	    function CellView(paper, cell) {
-	        _classCallCheck(this, CellView);
-	
-	        var that = this;
-	
-	        that.cell = cell;
-	        that.paper = paper;
-	        that.invalid = true;
-	
-	        that.ensureElement();
-	    }
-	
-	    _createClass(CellView, [{
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            var that = this;
-	            var cell = that.cell;
-	            var vel = (0, _vector2.default)('g', { 'class': cell.className });
-	
-	            that.vel = vel;
-	            that.elem = vel.node;
-	            that.elem.cellId = cell.id; // attach cell's id to elem
-	
-	            that.paper.drawPane.appendChild(that.elem);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            return this;
-	        }
-	    }, {
-	        key: 'update',
-	        value: function update() {
-	            return this;
-	        }
-	    }, {
-	        key: 'renderMarkup',
-	        value: function renderMarkup() {
-	
-	            // `markup` is rendered by default. Set the `markup` attribute
-	            // on the model if the default markup is not desirable.
-	
-	            var that = this;
-	            var markup = that.cell.markup;
-	
-	            if (markup) {
-	                that.vel.append((0, _vector2.default)(markup));
-	            } else {
-	                throw new Error('`markup` is missing while the default render() implementation is used.');
-	            }
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'find',
-	        value: function find(selector) {
-	            return selector === '.' ? [this.vel] : this.vel.find(selector);
-	        }
-	    }, {
-	        key: 'applyAttrs',
-	        value: function applyAttrs(selector, attrs) {
-	
-	            var that = this;
-	
-	            (0, _utils.forEach)(that.find(selector), function (vel) {
-	                vel.attr(attrs);
-	            });
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'applyFilter',
-	        value: function applyFilter(selector, filter) {
-	
-	            // `selector` is a CSS selector or `'.'`.
-	            // `filter` must be in the special filter format:
-	            // `{ name: <name of the filter>, args: { <arguments>, ... }`.
-	            // An example is: `{ filter: { name: 'blur', args: { radius: 5 } } }`.
-	
-	            var that = this;
-	
-	            filter = filter || {};
-	
-	            var name = filter.name || '';
-	            var args = filter.args || {};
-	            var attrs = filter.attrs;
-	            var filterFn = _filters2.default[name];
-	
-	            if (!name || !filterFn) {
-	                throw new Error('Non-existing filter: ' + name);
-	            }
-	
-	            var vels = (0, _utils.isString)(selector) ? that.find(selector) : selector;
-	
-	            if (!vels.length) {
-	                return that;
-	            }
-	
-	            var paper = that.paper;
-	            var svg = paper.svg;
-	            var filterId = name + '-' + paper.id + '-' + (0, _utils.hashCode)(JSON.stringify(filter));
-	
-	            if (!svg.getElementById(filterId)) {
-	
-	                var vFilter = (0, _vector2.default)(filterFn(args));
-	                // Set the filter area to be 3x the bounding box of the cell
-	                // and center the filter around the cell.
-	                vFilter.attr({
-	                    filterUnits: 'objectBoundingBox',
-	                    x: -1,
-	                    y: -1,
-	                    width: 3,
-	                    height: 3
-	                });
-	
-	                if (attrs) {
-	                    vFilter.attr(attrs);
-	                }
-	
-	                vFilter.node.id = filterId;
-	
-	                (0, _vector2.default)(svg).getDefs().append(vFilter);
-	            }
-	
-	            (0, _utils.forEach)(vels, function (vel) {
-	                vel.attr(filter, 'url(#' + filterId + ')');
-	            });
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'applyGradient',
-	        value: function applyGradient(selector, attrName, gradient) {
-	
-	            // `selector` is a CSS selector or `'.'`.
-	            // `attrName` is either a `'fill'` or `'stroke'`.
-	            // `gradient` must be in the special gradient format:
-	            // `{ type: <linearGradient|radialGradient>, stops: [ { offset: <offset>, color: <color> }, ... ]`.
-	            // An example is: `{ fill: { type: 'linearGradient', stops: [ { offset: '10%', color: 'green' }, { offset: '50%', color: 'blue' } ] } }`.
-	
-	            var that = this;
-	
-	            gradient = gradient || {};
-	
-	            var type = gradient.type;
-	            var stops = gradient.stops;
-	            var attrs = gradient.attrs;
-	
-	            if (!attrName || !type || !stops || !stops.length) {
-	                return that;
-	            }
-	
-	            var vels = (0, _utils.isString)(selector) ? that.find(selector) : selector;
-	
-	            if (!vels.length) {
-	                return that;
-	            }
-	
-	            var paper = that.paper;
-	            var svg = paper.svg;
-	            var gradientId = type + '-' + paper.id + '-' + (0, _utils.hashCode)(JSON.stringify(gradient));
-	
-	            if (!svg.getElementById(gradientId)) {
-	
-	                var gradientString = ['<' + type + '>', (0, _utils.map)(stops, function (stop) {
-	                    return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + ((0, _utils.isFinite)(stop.opacity) ? stop.opacity : 1) + '" />';
-	                }).join(''), '</' + type + '>'].join('');
-	
-	                var vGradient = (0, _vector2.default)(gradientString);
-	
-	                if (attrs) {
-	                    vGradient.attr(attrs);
-	                }
-	
-	                vGradient.node.id = gradientId;
-	
-	                (0, _vector2.default)(svg).getDefs().append(vGradient);
-	            }
-	
-	            (0, _utils.forEach)(vels, function (vel) {
-	                vel.attr(attrName, 'url(#' + gradientId + ')');
-	            });
-	
-	            return that;
-	        }
-	
-	        // events
-	        // ------
-	
-	    }, {
-	        key: 'onContextMenu',
-	        value: function onContextMenu() {}
-	    }, {
-	        key: 'onDblClick',
-	        value: function onDblClick() {}
-	    }, {
-	        key: 'onClick',
-	        value: function onClick() {}
-	    }, {
-	        key: 'onPointerDown',
-	        value: function onPointerDown() {}
-	    }, {
-	        key: 'onPointerMove',
-	        value: function onPointerMove() {}
-	    }, {
-	        key: 'onPointerUp',
-	        value: function onPointerUp() {}
-	    }, {
-	        key: 'onMouseOver',
-	        value: function onMouseOver() {}
-	    }, {
-	        key: 'onMouseOut',
-	        value: function onMouseOut() {}
-	    }, {
-	        key: 'destroy',
-	        value: function destroy() {
-	
-	            var that = this;
-	            var elem = that.elem;
-	
-	            if (elem && elem.parentNode) {
-	                elem.parentNode.removeChild(elem);
-	            }
-	        }
-	    }]);
-	
-	    return CellView;
-	})();
-	
-	// exports
-	// -------
-	
-	exports.default = CellView;
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	// exports
-	// -------
-	
-	exports.default = {
-	
-	    outline: function outline(args) {
-	
-	        // `color` ... outline color
-	        // `width`... outline width
-	        // `opacity` ... outline opacity
-	        // `margin` ... gap between outline and the element
-	
-	        var tpl = '' + '<filter>' + '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' + '  <feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" />' + '  <feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" />' + '  <feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/>' + '  <feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/>' + '  <feMerge>' + '    <feMergeNode in="outline"/>' + '    <feMergeNode in="SourceGraphic"/>' + '  </feMerge>' + '</filter>';
-	
-	        var margin = (0, _utils.isFinite)(args.margin) ? args.margin : 2;
-	        var width = (0, _utils.isFinite)(args.width) ? args.width : 1;
-	
-	        return (0, _utils.format)(tpl)({
-	            color: args.color || 'blue',
-	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
-	            outerRadius: margin + width,
-	            innerRadius: margin
-	        });
-	    },
-	
-	    highlight: function highlight(args) {
-	
-	        // `color` ... color
-	        // `width`... width
-	        // `blur` ... blur
-	        // `opacity` ... opacity
-	
-	        var tpl = '' + '<filter>' + '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' + '  <feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/>' + '  <feComposite result="composed" in="colored" in2="morphed" operator="in"/>' + '  <feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/> ' + '  <feBlend in="SourceGraphic" in2="blured" mode="normal"/>' + '</filter>';
-	
-	        return (0, _utils.format)(tpl)({
-	            color: args.color || 'red',
-	            width: (0, _utils.isFinite)(args.width) ? args.width : 1,
-	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 0,
-	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1
-	        });
-	    },
-	
-	    blur: function blur(args) {
-	
-	        // `x` ... horizontal blur
-	        // `y` ... vertical blur (optional)
-	
-	        var tpl = '' + '<filter>' + '  <feGaussianBlur stdDeviation="${stdDeviation}"/>' + '</filter>';
-	
-	        var x = (0, _utils.isFinite)(args.x) ? args.x : 2;
-	
-	        return (0, _utils.format)(tpl)({
-	            stdDeviation: (0, _utils.isFinite)(args.y) ? [x, args.y] : x
-	        });
-	    },
-	
-	    dropShadow: function dropShadow(args) {
-	
-	        // `dx` ... horizontal shift
-	        // `dy` ... vertical shift
-	        // `blur` ... blur
-	        // `color` ... color
-	        // `opacity` ... opacity
-	
-	        var tpl = 'SVGFEDropShadowElement' in window ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>' : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-	
-	        return (0, _utils.format)(tpl)({
-	            dx: args.dx || 0,
-	            dy: args.dy || 0,
-	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
-	            color: args.color || 'black',
-	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 4
-	        });
-	    },
-	
-	    grayScale: function grayScale(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 1 is completely grayscale.
-	        // A value of 0 leaves the input unchanged.
-	
-	        var tpl = '' + '<filter>' + '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/>' + '</filter>';
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)(tpl)({
-	            a: 0.2126 + 0.7874 * (1 - amount),
-	            b: 0.7152 - 0.7152 * (1 - amount),
-	            c: 0.0722 - 0.0722 * (1 - amount),
-	            d: 0.2126 - 0.2126 * (1 - amount),
-	            e: 0.7152 + 0.2848 * (1 - amount),
-	            f: 0.0722 - 0.0722 * (1 - amount),
-	            g: 0.2126 - 0.2126 * (1 - amount),
-	            h: 0.0722 + 0.9278 * (1 - amount)
-	        });
-	    },
-	
-	    sepia: function sepia(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 1 is completely sepia.
-	        // A value of 0 leaves the input unchanged.
-	
-	        var template = '' + '<filter>' + '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/>' + '</filter>';
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)(template)({
-	            a: 0.393 + 0.607 * (1 - amount),
-	            b: 0.769 - 0.769 * (1 - amount),
-	            c: 0.189 - 0.189 * (1 - amount),
-	            d: 0.349 - 0.349 * (1 - amount),
-	            e: 0.686 + 0.314 * (1 - amount),
-	            f: 0.168 - 0.168 * (1 - amount),
-	            g: 0.272 - 0.272 * (1 - amount),
-	            h: 0.534 - 0.534 * (1 - amount),
-	            i: 0.131 + 0.869 * (1 - amount)
-	        });
-	    },
-	
-	    saturate: function saturate(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 0 is completely un-saturated.
-	        // A value of 1 leaves the input unchanged.
-	
-	        var template = '' + '<filter>' + '  <feColorMatrix type="saturate" values="${amount}"/>' + '</filter>';
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)(template)({
-	            amount: 1 - amount
-	        });
-	    },
-	
-	    hueRotate: function hueRotate(args) {
-	
-	        // `angle` ...  the number of degrees around the color
-	        // circle the input samples will be adjusted.
-	
-	        var template = '' + '<filter>' + '  <feColorMatrix type="hueRotate" values="${angle}"/>' + '</filter>';
-	
-	        return (0, _utils.format)(template)({
-	            angle: args.angle || 0
-	        });
-	    },
-	
-	    invert: function invert(args) {
-	
-	        // `amount` ... the proportion of the conversion.
-	        // A value of 1 is completely inverted.
-	        // A value of 0 leaves the input unchanged.
-	
-	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="table" tableValues="${amount} ${amount2}"/>' + '    <feFuncG type="table" tableValues="${amount} ${amount2}"/>' + '    <feFuncB type="table" tableValues="${amount} ${amount2}"/>' + '  </feComponentTransfer>' + '</filter>';
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)(template)({
-	            amount: amount,
-	            amount2: 1 - amount
-	        });
-	    },
-	
-	    brightness: function brightness(args) {
-	
-	        // `amount` ... proportion of the conversion.
-	        // A value of 0 will create an image that is completely black.
-	        // A value of 1 leaves the input unchanged.
-	
-	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="linear" slope="${amount}"/>' + '    <feFuncG type="linear" slope="${amount}"/>' + '    <feFuncB type="linear" slope="${amount}"/>' + '  </feComponentTransfer>' + '</filter>';
-	
-	        return (0, _utils.format)(template)({
-	            amount: (0, _utils.isFinite)(args.amount) ? args.amount : 1
-	        });
-	    },
-	
-	    contrast: function contrast(args) {
-	
-	        // `amount` ... proportion of the conversion.
-	        // A value of 0 will create an image that is completely black.
-	        // A value of 1 leaves the input unchanged.
-	
-	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="linear" slope="${amount}" intercept="${amount2}"/>' + '    <feFuncG type="linear" slope="${amount}" intercept="${amount2}"/>' + '    <feFuncB type="linear" slope="${amount}" intercept="${amount2}"/>' + '  </feComponentTransfer>' + '</filter>';
-	
-	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
-	
-	        return (0, _utils.format)(template)({
-	            amount: amount,
-	            amount2: 0.5 - amount / 2
-	        });
-	    }
-	};
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _vector = __webpack_require__(13);
-	
-	var _vector2 = _interopRequireDefault(_vector);
-	
-	var _Point = __webpack_require__(15);
-	
-	var _Point2 = _interopRequireDefault(_Point);
-	
-	var _CellView2 = __webpack_require__(22);
-	
-	var _CellView3 = _interopRequireDefault(_CellView2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var LinkView = (function (_CellView) {
-	    _inherits(LinkView, _CellView);
-	
-	    function LinkView() {
-	        _classCallCheck(this, LinkView);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LinkView).apply(this, arguments));
-	    }
-	
-	    _createClass(LinkView, [{
-	        key: 'render',
-	        value: function render() {
-	
-	            var that = this;
-	            var vel = that.vel;
-	
-	            vel.empty();
-	
-	            that.renderMarkup();
-	
-	            return that.update();
-	        }
-	    }, {
-	        key: 'update',
-	        value: function update() {
-	            return this.updateAttributes().updateConnection();
-	        }
-	    }, {
-	        key: 'updateAttributes',
-	        value: function updateAttributes() {
-	
-	            var that = this;
-	
-	            utils.forIn(that.cell.attrs, function (attrs, selector) {
-	
-	                var processed = [];
-	
-	                if (utils.isObject(attrs.fill)) {
-	
-	                    that.applyGradient(selector, 'fill', attrs.fill);
-	                    processed.push('fill');
-	                }
-	
-	                if (utils.isObject(attrs.stroke)) {
-	
-	                    that.applyGradient(selector, 'stroke', attrs.stroke);
-	                    processed.push('stroke');
-	                }
-	
-	                if (utils.isObject(attrs.filter)) {
-	
-	                    that.applyFilter(selector, attrs.filter);
-	                    processed.push('filter');
-	                }
-	
-	                // remove processed special attributes from attrs
-	                var finalAttributes = {};
-	
-	                utils.forIn(attrs, function (value, key) {
-	                    if (!utils.contains(processed, key)) {
-	                        finalAttributes[key] = value;
-	                    }
-	                });
-	
-	                that.applyAttrs(selector, finalAttributes);
-	            });
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'updateConnection',
-	        value: function updateConnection() {
-	
-	            var that = this;
-	            var points = that.cell.points;
-	
-	            //that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'parseRoute',
-	        value: function parseRoute() {}
-	    }]);
-	
-	    return LinkView;
-	})(_CellView3.default);
-	
-	// exports
-	// -------
-	
-	exports.default = LinkView;
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var _vector = __webpack_require__(13);
-	
-	var _vector2 = _interopRequireDefault(_vector);
-	
-	var _Point = __webpack_require__(15);
-	
-	var _Point2 = _interopRequireDefault(_Point);
-	
-	var _CellView2 = __webpack_require__(22);
-	
-	var _CellView3 = _interopRequireDefault(_CellView2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var NodeView = (function (_CellView) {
-	    _inherits(NodeView, _CellView);
-	
-	    function NodeView() {
-	        _classCallCheck(this, NodeView);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(NodeView).apply(this, arguments));
-	    }
-	
-	    _createClass(NodeView, [{
-	        key: 'update',
-	        value: function update(specifiedAttrs) {
-	
-	            // process the `attrs` object and set attributes
-	            // on sub elements based on the selectors.
-	
-	            var that = this;
-	            var cell = that.cell;
-	            var allAttrs = cell.attrs;
-	            var rotatableNode = that.rotatableNode;
-	            var rotationAttr = undefined;
-	
-	            if (rotatableNode) {
-	                rotationAttr = rotatableNode.attr('transform');
-	                rotatableNode.attr('transform', '');
-	            }
-	
-	            var relativelySelectors = [];
-	            var nodesBySelector = {};
-	
-	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
-	
-	                var vElements = that.find(selector);
-	
-	                if (!vElements.length) {
-	                    return;
-	                }
-	
-	                nodesBySelector[selector] = vElements;
-	
-	                var specialAttributes = NodeView.specialAttributes.slice();
-	
-	                // TODO: test attrs.filter
-	                if ((0, _utils.isObject)(attrs.filter)) {
-	                    specialAttributes.push('filter');
-	                    that.applyFilter(vElements, attrs.filter);
-	                }
-	
-	                // TODO: test attrs.fill
-	                if ((0, _utils.isObject)(attrs.fill)) {
-	                    specialAttributes.push('fill');
-	                    that.applyGradient(vElements, 'fill', attrs.fill);
-	                }
-	
-	                // TODO: test attrs.stroke
-	                if ((0, _utils.isObject)(attrs.stroke)) {
-	                    specialAttributes.push('stroke');
-	                    that.applyGradient(vElements, 'stroke', attrs.stroke);
-	                }
-	
-	                // TODO: test attrs.text
-	                if (!(0, _utils.isUndefined)(attrs.text)) {
-	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
-	                    (0, _utils.forEach)(vElements, function (vel) {
-	                        vel.text(attrs.text + '', {
-	                            lineHeight: attrs.lineHeight,
-	                            textPath: attrs.textPath,
-	                            annotations: attrs.annotations
-	                        });
-	                    });
-	                }
-	
-	                var finalAttributes = {};
-	
-	                (0, _utils.forIn)(attrs, function (value, key) {
-	                    if (!(0, _utils.contains)(specialAttributes, key)) {
-	                        finalAttributes[key] = value;
-	                    }
-	                });
-	
-	                // set regular attributes
-	                (0, _utils.forEach)(vElements, function (vel) {
-	                    vel.attr(finalAttributes);
-	                });
-	
-	                //if (attrs.port) {
-	                //    forEach(vels, function (vel) {
-	                //        vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
-	                //    });
-	                //}
-	
-	                // TODO: vel.css()
-	
-	                //if (attrs.style) {
-	                //    forEach(vels, function (vel) {
-	                //        vel.css(attrs.style);
-	                //    });
-	                //}
-	
-	                // TODO: attrs.html
-	
-	                if (!(0, _utils.isUndefined)(attrs.html)) {
-	                    (0, _utils.forEach)(vElements, function (vel) {});
-	                }
-	
-	                // Special `ref-x` and `ref-y` attributes make it possible to
-	                // set both absolute or relative positioning of sub elements.
-	                (0, _utils.some)(['ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'x-alignment', 'y-alignment', 'ref-width', 'ref-height'], function (key) {
-	                    return !(0, _utils.isUndefined)(attrs[key]);
-	                }) && relativelySelectors.push(selector);
-	            });
-	
-	            // Note that we're using the bounding box without transformation
-	            // because we are already inside a transformed coordinate system.
-	            var size = cell.size;
-	            var bbox = { x: 0, y: 0, width: size.width, height: size.height };
-	
-	            (0, _utils.forEach)(relativelySelectors, function (selector) {
-	
-	                var specified = specifiedAttrs && specifiedAttrs[selector];
-	                var all = allAttrs[selector];
-	                var attrs = specified ? (0, _utils.merge)({}, all, specified) : all;
-	
-	                (0, _utils.forEach)(nodesBySelector[selector], function (vel) {
-	                    that.positionRelative(vel, bbox, attrs, nodesBySelector);
-	                });
-	            });
-	
-	            if (rotatableNode) {
-	                rotatableNode.attr('transform', rotationAttr || '');
-	            }
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'positionRelative',
-	        value: function positionRelative(vel, bbox, attributes, nodesBySelector) {
-	
-	            var that = this;
-	            var ref = attributes['ref'];
-	            var refDx = (0, _utils.toFloat)(attributes['ref-dx']);
-	            var refDy = (0, _utils.toFloat)(attributes['ref-dy']);
-	            var yAlignment = attributes['y-alignment'];
-	            var xAlignment = attributes['x-alignment'];
-	
-	            var refX = attributes['ref-x'];
-	            var refXPercentage = (0, _utils.isPercentage)(refX);
-	            refX = (0, _utils.toFloat)(refX, refXPercentage);
-	
-	            var refY = attributes['ref-y'];
-	            var refYPercentage = (0, _utils.isPercentage)(refY);
-	            refY = (0, _utils.toFloat)(refY, refYPercentage);
-	
-	            var refWidth = attributes['ref-width'];
-	            var refWidthPercentage = (0, _utils.isPercentage)(refWidth);
-	            refWidth = (0, _utils.toFloat)(refWidth, refWidthPercentage);
-	
-	            var refHeight = attributes['ref-height'];
-	            var refHeightPercentage = (0, _utils.isPercentage)(refHeight);
-	            refHeight = (0, _utils.toFloat)(refHeight, refHeightPercentage);
-	
-	            // Check if the node is a descendant of the scalable group.
-	            var scalableNode = vel.findParent('pane-scalable', that.elem);
-	
-	            // `ref` is the selector of the reference element.
-	            // If no `ref` specified, reference element is the root element.
-	            if (ref) {
-	
-	                var vref = nodesBySelector && nodesBySelector[ref];
-	
-	                if (vref) {
-	                    vref = vref[0];
-	                } else {
-	                    vref = ref === '.' ? that.vel : that.vel.findOne(ref);
-	                }
-	
-	                if (!vref) {
-	                    throw new Error('NodeView: reference does not exists.');
-	                }
-	
-	                // Get the bounding box of the reference element
-	                // relative to the root `<g>` element.
-	                bbox = vref.bbox(false, that.elem);
-	            }
-	
-	            // Remove the previous translate() from the transform attribute
-	            // and translate the element relative to the root bounding box
-	            // following the `ref-x` and `ref-y` attributes.
-	            var transformAttr = vel.attr('transform');
-	            if (transformAttr) {
-	                vel.attr('transform', (0, _utils.clearTranslate)(transformAttr));
-	            }
-	
-	            // `ref-width` and `ref-height` defines the width and height of the
-	            // sub element relatively to the reference element size.
-	            if ((0, _utils.isFinite)(refWidth)) {
-	                if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
-	                    vel.attr('width', refWidth * bbox.width);
-	                } else {
-	                    vel.attr('width', Math.max(refWidth + bbox.width, 0));
-	                }
-	            }
-	
-	            if ((0, _utils.isFinite)(refHeight)) {
-	                if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
-	                    vel.attr('height', refHeight * bbox.height);
-	                } else {
-	                    vel.attr('height', Math.max(refHeight + bbox.height, 0));
-	                }
-	            }
-	
-	            // The final translation of the sub element.
-	            var tx = 0;
-	            var ty = 0;
-	            var scale = undefined;
-	
-	            // `ref-dx` and `ref-dy` define the offset of the sub element relative
-	            // to the right and/or bottom coordinate of the reference element.
-	            if ((0, _utils.isFinite)(refDx)) {
-	                if (scalableNode) {
-	                    scale = scalableNode.scale();
-	                    tx = bbox.x + bbox.width + refDx / scale.sx;
-	                } else {
-	                    tx = bbox.x + bbox.width + refDx;
-	                }
-	            }
-	
-	            if ((0, _utils.isFinite)(refDy)) {
-	                if (scalableNode) {
-	                    scale = scale || scalableNode.scale();
-	                    ty = bbox.y + bbox.height + refDy / scale.sy;
-	                } else {
-	                    ty = bbox.y + bbox.height + refDy;
-	                }
-	            }
-	
-	            if ((0, _utils.isFinite)(refX)) {
-	                if (refXPercentage || refX > 0 && refX < 1) {
-	                    tx = bbox.x + bbox.width * refX;
-	                } else if (scalableNode) {
-	                    scale = scale || scalableNode.scale();
-	                    tx = bbox.x + refX / scale.sx;
-	                } else {
-	                    tx = bbox.x + refX;
-	                }
-	            }
-	
-	            if ((0, _utils.isFinite)(refY)) {
-	                if (refXPercentage || refY > 0 && refY < 1) {
-	                    ty = bbox.y + bbox.height * refY;
-	                } else if (scalableNode) {
-	                    scale = scale || scalableNode.scale();
-	                    ty = bbox.y + refY / scale.sy;
-	                } else {
-	                    ty = bbox.y + refY;
-	                }
-	            }
-	
-	            if (!(0, _utils.isUndefined)(yAlignment) || !(0, _utils.isUndefined)(xAlignment)) {
-	
-	                var velBBox = vel.bbox(false, that.paper.drawPane);
-	
-	                if (yAlignment === 'middle') {
-	                    ty -= velBBox.height / 2;
-	                } else if ((0, _utils.isFinite)(yAlignment)) {
-	                    ty += yAlignment > -1 && yAlignment < 1 ? velBBox.height * yAlignment : yAlignment;
-	                }
-	
-	                if (xAlignment === 'middle') {
-	                    tx -= velBBox.width / 2;
-	                } else if ((0, _utils.isFinite)(xAlignment)) {
-	                    tx += xAlignment > -1 && xAlignment < 1 ? velBBox.width * xAlignment : xAlignment;
-	                }
-	            }
-	
-	            vel.translate(tx, ty);
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	
-	            var that = this;
-	            var vel = that.vel;
-	
-	            vel.empty();
-	
-	            that.renderMarkup();
-	
-	            that.scalableNode = vel.findOne('.pane-scalable');
-	            that.rotatableNode = vel.findOne('.pane-rotatable');
-	
-	            return that.update().resize().rotate().translate();
-	        }
-	    }, {
-	        key: 'scale',
-	        value: function scale(sx, sy) {
-	            this.vel.scale(sx, sy);
-	            return this;
-	        }
-	    }, {
-	        key: 'resize',
-	        value: function resize() {
-	
-	            var that = this;
-	            var scalableNode = that.scalableNode;
-	
-	            if (!scalableNode) {
-	                return;
-	            }
-	
-	            // get bbox without transform
-	            var nativeBBox = scalableNode.bbox(true);
-	
-	            // Make sure `scalableBBox.width` and `scalableBBox.height` are not
-	            // zero which can happen if the element does not have any content.
-	            // By making the width(height) 1, we prevent HTML errors of the type
-	            // `scale(Infinity, Infinity)`.
-	            var size = that.cell.size;
-	            var sx = size.width / (nativeBBox.width || 1);
-	            var sy = size.height / (nativeBBox.height || 1);
-	
-	            sx = (0, _utils.toFixed)(sx, 2);
-	            sy = (0, _utils.toFixed)(sy, 2);
-	
-	            scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
-	
-	            //let rotation = that.cell.rotation;
-	            //let angle = rotation.angle;
-	            //
-	            //// Cancel the rotation but now around a different origin,
-	            //// which is the center of the scaled object.
-	            //let rotatableNode = that.rotatableNode;
-	            //let rotateAttr = rotatableNode && rotatableNode.attr('transform');
-	            //
-	            //if (rotateAttr && rotateAttr !== 'null') {
-	            //
-	            //    rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
-	            //    let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
-	            //
-	            //    // Store new x, y and perform rotate() again against the new rotation origin.
-	            //    that.position = {
-	            //        x: rotatableBBox.x,
-	            //        y: rotatableBBox.y
-	            //    };
-	            //    that.rotate();
-	            //}
-	
-	            // Update must always be called on non-rotated element. Otherwise,
-	            // relative positioning would work with wrong (rotated) bounding boxes.
-	            that.update();
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'translate',
-	        value: function translate() {
-	
-	            var that = this;
-	            var position = that.cell.position;
-	
-	            that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'rotate',
-	        value: function rotate() {
-	
-	            var that = this;
-	            var node = that.rotatableNode;
-	
-	            if (node) {
-	
-	                var cell = that.cell;
-	                var rotation = cell.rotation;
-	                var size = cell.size;
-	                var ox = size.width / 2;
-	                var oy = size.height / 2;
-	
-	                node.attr('transform', 'rotate(' + rotation + ',' + ox + ',' + oy + ')');
-	            }
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'getBBox',
-	        value: function getBBox() {}
-	    }], [{
-	        key: 'specialAttributes',
-	        get: function get() {
-	
-	            return ['text', 'html', 'style', 'ref', 'ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'ref-width', 'ref-height', 'x-alignment', 'y-alignment', 'port'];
-	        }
-	    }]);
-	
-	    return NodeView;
-	})(_CellView3.default);
-	
-	// exports
-	// -------
-	
-	exports.default = NodeView;
-
-/***/ },
-/* 26 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Change = (function () {
-	    function Change() {
-	        _classCallCheck(this, Change);
-	    }
-	
-	    _createClass(Change, [{
-	        key: "digest",
-	
-	        //constructor() {
-	        //    if (new.target === Change) {
-	        //        throw new Error('`Change` is an abstract class that cannot be instantiated.');
-	        //    }
-	        //}
-	
-	        value: function digest() {
-	            return this;
-	        }
-	    }]);
-	
-	    return Change;
-	})();
-	
-	// exports
-	// -------
-	
-	exports.default = Change;
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Change2 = __webpack_require__(26);
-	
-	var _Change3 = _interopRequireDefault(_Change2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var RootChange = (function (_Change) {
-	    _inherits(RootChange, _Change);
-	
-	    function RootChange(model, root) {
-	        _classCallCheck(this, RootChange);
-	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
-	
-	        var that = _this;
-	
-	        that.model = model;
-	        that.root = root;
-	        that.previous = root;
-	        return _this;
-	    }
-	
-	    _createClass(RootChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            var that = this;
-	            var model = that.model;
-	            var previous = that.previous;
-	
-	            that.root = previous;
-	            that.previous = model.rootChanged(previous);
-	
-	            return that;
-	        }
-	    }]);
-	
-	    return RootChange;
-	})(_Change3.default);
-	
-	// exports
-	// -------
-	
-	exports.default = RootChange;
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Change2 = __webpack_require__(26);
-	
-	var _Change3 = _interopRequireDefault(_Change2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ChildChange = (function (_Change) {
-	    _inherits(ChildChange, _Change);
-	
-	    function ChildChange(model, parent, child, index) {
-	        _classCallCheck(this, ChildChange);
-	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
-	
-	        var that = _this;
-	
-	        that.model = model;
-	        that.child = child;
-	        that.parent = parent;
-	        that.index = index;
-	        that.previous = parent;
-	        that.previousIndex = index;
-	        return _this;
-	    }
-	
-	    _createClass(ChildChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            var that = this;
-	            var model = that.model;
-	            var child = that.child;
-	            var newParent = that.previous;
-	            var newIndex = that.previousIndex;
-	            var oldParent = child.parent;
-	            var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
-	
-	            // the new parent is null, then the child(link) will be removed
-	            if (!newParent) {
-	                that.connect(child, false);
-	            }
-	
-	            oldParent = model.childChanged(child, newParent, newIndex);
-	
-	            if (newParent) {
-	                that.connect(child, true);
-	            }
-	
-	            that.parent = newParent;
-	            that.index = newIndex;
-	            that.previous = oldParent;
-	            that.previousIndex = oldIndex;
-	
-	            return that;
-	        }
-	    }, {
-	        key: 'connect',
-	        value: function connect(cell, connected) {
-	
-	            var that = this;
-	            var model = that.model;
-	
-	            if (cell.isLink) {
-	
-	                var source = cell.getTerminal(true);
-	                var target = cell.getTerminal(false);
-	
-	                if (source) {
-	                    model.linkChanged(cell, connected ? source : null, true);
-	                }
-	
-	                if (target) {
-	                    model.linkChanged(cell, connected ? target : null, false);
-	                }
-	
-	                cell.setTerminal(source, true);
-	                cell.setTerminal(target, false);
-	            }
-	
-	            cell.eachChild(function (child) {
-	                that.connect(child, connected);
-	            });
-	
-	            return that;
-	        }
-	    }]);
-	
-	    return ChildChange;
-	})(_Change3.default);
-	
-	// exports
-	// -------
-	
-	exports.default = ChildChange;
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Change2 = __webpack_require__(26);
-	
-	var _Change3 = _interopRequireDefault(_Change2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var TerminalChange = (function (_Change) {
-	    _inherits(TerminalChange, _Change);
-	
-	    function TerminalChange(model, link, node, isSource) {
-	        _classCallCheck(this, TerminalChange);
-	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TerminalChange).call(this));
-	
-	        var that = _this;
-	
-	        that.model = model;
-	        that.link = link;
-	        that.terminal = node;
-	        that.previous = node;
-	        that.isSource = isSource;
-	        return _this;
-	    }
-	
-	    _createClass(TerminalChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            var that = this;
-	
-	            that.terminal = that.previous;
-	            that.previous = that.model.terminalChanged(that.link, that.previous, that.isSource);
-	
-	            return that;
-	        }
-	    }]);
-	
-	    return TerminalChange;
-	})(_Change3.default);
-	
-	// exports
-	// -------
-	
-	exports.default = TerminalChange;
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
 	var _Events2 = __webpack_require__(17);
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _Cell = __webpack_require__(18);
+	var _Cell = __webpack_require__(19);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _RootChange = __webpack_require__(27);
+	var _RootChange = __webpack_require__(20);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(28);
+	var _ChildChange = __webpack_require__(22);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _TerminalChange = __webpack_require__(29);
+	var _TerminalChange = __webpack_require__(23);
 	
 	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
 	
-	var _ChangeCollection = __webpack_require__(31);
+	var _ChangeCollection = __webpack_require__(24);
 	
 	var _ChangeCollection2 = _interopRequireDefault(_ChangeCollection);
 	
@@ -6430,7 +4542,605 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Model;
 
 /***/ },
-/* 31 */
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Cell = (function () {
+	    function Cell() {
+	        _classCallCheck(this, Cell);
+	    }
+	
+	    _createClass(Cell, [{
+	        key: 'getTerminal',
+	
+	        // link
+	        // ----
+	
+	        value: function getTerminal(isSource) {
+	
+	            return isSource ? this.source : this.target;
+	        }
+	    }, {
+	        key: 'setTerminal',
+	        value: function setTerminal(node, isSource) {
+	
+	            var that = this;
+	
+	            if (isSource) {
+	                that.source = node;
+	            } else {
+	                that.target = node;
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'removeFromTerminal',
+	        value: function removeFromTerminal(isSource) {
+	
+	            // remove link from node
+	
+	            var that = this;
+	            var node = that.getTerminal(isSource);
+	
+	            if (node) {
+	                node.removeLink(that, isSource);
+	            }
+	
+	            return that;
+	        }
+	
+	        // children
+	        // --------
+	
+	    }, {
+	        key: 'getChildCount',
+	        value: function getChildCount() {
+	
+	            return this.children ? this.children.length : 0;
+	        }
+	    }, {
+	        key: 'indexOfChild',
+	        value: function indexOfChild(child) {
+	
+	            return utils.indexOf(this.children, child);
+	        }
+	    }, {
+	        key: 'getChildAt',
+	        value: function getChildAt(index) {
+	
+	            return this.children ? this.children[index] : null;
+	        }
+	    }, {
+	        key: 'eachChild',
+	        value: function eachChild(iterator, context) {
+	
+	            return utils.forEach(this.children, iterator, context);
+	        }
+	    }, {
+	        key: 'filterChild',
+	        value: function filterChild(iterator, context) {
+	
+	            return utils.filter(this.children, iterator, context);
+	        }
+	    }, {
+	        key: 'insertChild',
+	        value: function insertChild(child, index) {
+	
+	            var that = this;
+	
+	            if (child) {
+	
+	                var childCount = that.getChildCount();
+	
+	                index = utils.fixIndex(index, childCount);
+	
+	                if (child.parent === that && index === childCount) {
+	                    index--;
+	                }
+	
+	                child.removeFromParent();
+	                child.parent = that;
+	
+	                var children = that.children;
+	
+	                if (children) {
+	                    children.splice(index, 0, child);
+	                } else {
+	                    children = that.children = [];
+	                    children.push(child);
+	                }
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'removeChild',
+	        value: function removeChild(child) {
+	
+	            return this.removeChildAt(this.indexOfChild(child));
+	        }
+	    }, {
+	        key: 'removeChildAt',
+	        value: function removeChildAt(index) {
+	
+	            var that = this;
+	            var child = null;
+	            var children = that.children;
+	
+	            if (children && index >= 0) {
+	
+	                child = that.getChildAt(index);
+	
+	                if (child) {
+	                    children.splice(index, 1);
+	                    child.parent = null;
+	                }
+	            }
+	
+	            return child;
+	        }
+	
+	        // node
+	        // -----
+	
+	    }, {
+	        key: 'getLinkCount',
+	        value: function getLinkCount() {
+	
+	            return this.links ? this.links.length : 0;
+	        }
+	    }, {
+	        key: 'indexOfLink',
+	        value: function indexOfLink(link) {
+	
+	            return utils.indexOf(this.links, link);
+	        }
+	    }, {
+	        key: 'getLinkAt',
+	        value: function getLinkAt(index) {
+	
+	            return this.links ? this.links[index] : null;
+	        }
+	    }, {
+	        key: 'eachLink',
+	        value: function eachLink(iterator, context) {
+	
+	            return utils.forEach(this.links, iterator, context);
+	        }
+	    }, {
+	        key: 'filterLink',
+	        value: function filterLink(iterator, context) {
+	
+	            return utils.filter(this.links, iterator, context);
+	        }
+	    }, {
+	        key: 'addLink',
+	        value: function addLink(link, outgoing) {
+	
+	            var that = this;
+	            var links = that.links;
+	
+	            if (link) {
+	
+	                link.removeFromTerminal(outgoing);
+	                link.setTerminal(that, outgoing);
+	
+	                // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
+	                if (!links || that.indexOfLink(link) < 0 || link.getTerminal(!outgoing) !== that) {
+	
+	                    if (!links) {
+	                        links = that.links = [];
+	                    }
+	
+	                    links.push(link);
+	                }
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'removeLink',
+	        value: function removeLink(link, outgoing) {
+	
+	            var that = this;
+	            var links = that.links;
+	
+	            if (link) {
+	
+	                // 连线的起点和终点是同一个节点时不需要移除
+	                if (links && link.getTerminal(!outgoing) !== that) {
+	                    var index = that.indexOfLink(link);
+	
+	                    if (index >= 0) {
+	                        links.splice(index, 1);
+	                    }
+	                }
+	
+	                link.setTerminal(null, outgoing);
+	            }
+	
+	            return link;
+	        }
+	
+	        // parent
+	        // ------
+	
+	    }, {
+	        key: 'getParent',
+	        value: function getParent() {
+	
+	            return this.parent;
+	        }
+	    }, {
+	        key: 'removeFromParent',
+	        value: function removeFromParent() {
+	
+	            var that = this;
+	            var parent = that.parent;
+	
+	            if (parent) {
+	                parent.removeChild(that);
+	            }
+	
+	            return that;
+	        }
+	
+	        // common
+	        // ------
+	
+	    }, {
+	        key: 'valueOf',
+	        value: function valueOf() {}
+	    }, {
+	        key: 'toString',
+	        value: function toString() {}
+	    }, {
+	        key: 'cloneData',
+	        value: function cloneData() {
+	
+	            var data = this.data;
+	
+	            if (data) {
+	
+	                if (data.clone && utils.isFunction(data.clone)) {
+	                    return data.clone();
+	                }
+	
+	                if (utils.isNode(data)) {
+	                    return data.cloneNode(true);
+	                }
+	
+	                if (utils.isObject(data)) {
+	                    return utils.merge({}, data);
+	                }
+	            }
+	
+	            return data;
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone(cloneData) {
+	
+	            var that = this;
+	            var metadata = utils.merge({}, that.metadata);
+	
+	            metadata.data = cloneData === true ? that.cloneData() : that.data;
+	            metadata.visible = that.visible;
+	
+	            return new Cell(metadata);
+	        }
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {}
+	    }]);
+	
+	    return Cell;
+	})();
+	
+	// exports
+	// -------
+	
+	exports.default = Cell;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Change2 = __webpack_require__(21);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var RootChange = (function (_Change) {
+	    _inherits(RootChange, _Change);
+	
+	    function RootChange(model, root) {
+	        _classCallCheck(this, RootChange);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
+	
+	        var that = _this;
+	
+	        that.model = model;
+	        that.root = root;
+	        that.previous = root;
+	        return _this;
+	    }
+	
+	    _createClass(RootChange, [{
+	        key: 'digest',
+	        value: function digest() {
+	
+	            var that = this;
+	            var model = that.model;
+	            var previous = that.previous;
+	
+	            that.root = previous;
+	            that.previous = model.rootChanged(previous);
+	
+	            return that;
+	        }
+	    }]);
+	
+	    return RootChange;
+	})(_Change3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = RootChange;
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Change = (function () {
+	    function Change() {
+	        _classCallCheck(this, Change);
+	    }
+	
+	    _createClass(Change, [{
+	        key: "digest",
+	
+	        //constructor() {
+	        //    if (new.target === Change) {
+	        //        throw new Error('`Change` is an abstract class that cannot be instantiated.');
+	        //    }
+	        //}
+	
+	        value: function digest() {
+	            return this;
+	        }
+	    }]);
+	
+	    return Change;
+	})();
+	
+	// exports
+	// -------
+	
+	exports.default = Change;
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Change2 = __webpack_require__(21);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ChildChange = (function (_Change) {
+	    _inherits(ChildChange, _Change);
+	
+	    function ChildChange(model, parent, child, index) {
+	        _classCallCheck(this, ChildChange);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
+	
+	        var that = _this;
+	
+	        that.model = model;
+	        that.child = child;
+	        that.parent = parent;
+	        that.index = index;
+	        that.previous = parent;
+	        that.previousIndex = index;
+	        return _this;
+	    }
+	
+	    _createClass(ChildChange, [{
+	        key: 'digest',
+	        value: function digest() {
+	
+	            var that = this;
+	            var model = that.model;
+	            var child = that.child;
+	            var newParent = that.previous;
+	            var newIndex = that.previousIndex;
+	            var oldParent = child.parent;
+	            var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
+	
+	            // the new parent is null, then the child(link) will be removed
+	            if (!newParent) {
+	                that.connect(child, false);
+	            }
+	
+	            oldParent = model.childChanged(child, newParent, newIndex);
+	
+	            if (newParent) {
+	                that.connect(child, true);
+	            }
+	
+	            that.parent = newParent;
+	            that.index = newIndex;
+	            that.previous = oldParent;
+	            that.previousIndex = oldIndex;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'connect',
+	        value: function connect(cell, connected) {
+	
+	            var that = this;
+	            var model = that.model;
+	
+	            if (cell.isLink) {
+	
+	                var source = cell.getTerminal(true);
+	                var target = cell.getTerminal(false);
+	
+	                if (source) {
+	                    model.linkChanged(cell, connected ? source : null, true);
+	                }
+	
+	                if (target) {
+	                    model.linkChanged(cell, connected ? target : null, false);
+	                }
+	
+	                cell.setTerminal(source, true);
+	                cell.setTerminal(target, false);
+	            }
+	
+	            cell.eachChild(function (child) {
+	                that.connect(child, connected);
+	            });
+	
+	            return that;
+	        }
+	    }]);
+	
+	    return ChildChange;
+	})(_Change3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = ChildChange;
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Change2 = __webpack_require__(21);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var TerminalChange = (function (_Change) {
+	    _inherits(TerminalChange, _Change);
+	
+	    function TerminalChange(model, link, node, isSource) {
+	        _classCallCheck(this, TerminalChange);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TerminalChange).call(this));
+	
+	        var that = _this;
+	
+	        that.model = model;
+	        that.link = link;
+	        that.terminal = node;
+	        that.previous = node;
+	        that.isSource = isSource;
+	        return _this;
+	    }
+	
+	    _createClass(TerminalChange, [{
+	        key: 'digest',
+	        value: function digest() {
+	
+	            var that = this;
+	
+	            that.terminal = that.previous;
+	            that.previous = that.model.terminalChanged(that.link, that.previous, that.isSource);
+	
+	            return that;
+	        }
+	    }]);
+	
+	    return TerminalChange;
+	})(_Change3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = TerminalChange;
+
+/***/ },
+/* 24 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6501,7 +5211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ChangeCollection;
 
 /***/ },
-/* 32 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6524,7 +5234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _detector = __webpack_require__(33);
+	var _detector = __webpack_require__(26);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -6536,31 +5246,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _Model = __webpack_require__(30);
+	var _Model = __webpack_require__(18);
 	
 	var _Model2 = _interopRequireDefault(_Model);
 	
-	var _Cell = __webpack_require__(18);
+	var _Cell = __webpack_require__(19);
 	
 	var _Cell2 = _interopRequireDefault(_Cell);
 	
-	var _LinkView = __webpack_require__(24);
+	var _LinkView = __webpack_require__(27);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _NodeView = __webpack_require__(25);
+	var _NodeView = __webpack_require__(30);
 	
 	var _NodeView2 = _interopRequireDefault(_NodeView);
 	
-	var _RootChange = __webpack_require__(27);
+	var _RootChange = __webpack_require__(20);
 	
 	var _RootChange2 = _interopRequireDefault(_RootChange);
 	
-	var _ChildChange = __webpack_require__(28);
+	var _ChildChange = __webpack_require__(22);
 	
 	var _ChildChange2 = _interopRequireDefault(_ChildChange);
 	
-	var _TerminalChange = __webpack_require__(29);
+	var _TerminalChange = __webpack_require__(23);
 	
 	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
 	
@@ -7052,8 +5762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	
-	            var vertices = that.parseRoute(link);
-	
+	            link.routerPoints = that.parseRoute(link);
 	            link.sourcePoint = that.getConnectionPoint(link, true);
 	            link.targetPoint = that.getConnectionPoint(link, false);
 	
@@ -7071,30 +5780,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return vertices;
 	            }
 	
-	            var routerFn = undefined;
-	            var args = {};
+	            var parser = undefined;
+	            var options = {};
 	
 	            if (utils.isFunction(router)) {
-	                routerFn = router;
+	                parser = router;
 	            } else {
 	
 	                var name = undefined;
 	
 	                if (utils.isObject(router)) {
 	                    name = router.name;
-	                    args = router.args;
+	                    options = router.options;
 	                } else {
 	                    name = '' + router;
 	                }
 	
-	                routerFn = that.getRouter(name);
+	                parser = that.getRouter(name);
 	
-	                if (!utils.isFunction(routerFn)) {
+	                if (!utils.isFunction(parser)) {
 	                    throw new Error('Unknown router: "' + name + '"');
 	                }
 	            }
 	
-	            return routerFn.call(this, vertices, args, link);
+	            return parser.call(this, vertices, options);
 	        }
 	    }, {
 	        key: 'getConnectionPoint',
@@ -7111,7 +5820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var spotBBox = new _Rect2.default(terminal.position.x, terminal.position.y, terminal.size.width, terminal.size.height);
 	
-	                var vertices = link.vertices || [];
+	                var vertices = link.routerPoints || [];
 	                var reference = isSource ? vertices[0] : vertices[vertices.length - 1];
 	
 	                if (!reference) {
@@ -7446,6 +6155,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.constructor.getConnector(name);
 	        }
 	
+	        // marker
+	        // ------
+	
+	    }, {
+	        key: 'getMarker',
+	        value: function getMarker(name) {
+	
+	            return this.constructor.getMarker(name);
+	        }
+	
 	        // event handlers
 	        // --------------
 	
@@ -7629,6 +6348,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return connectors ? connectors[name] : null;
 	        }
+	    }, {
+	        key: 'registerMarker',
+	        value: function registerMarker(name) {}
+	    }, {
+	        key: 'getMarker',
+	        value: function getMarker(name) {}
 	    }]);
 	
 	    return Paper;
@@ -7637,7 +6362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Paper;
 
 /***/ },
-/* 33 */
+/* 26 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7693,6 +6418,1307 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _vector = __webpack_require__(13);
+	
+	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var _CellView2 = __webpack_require__(28);
+	
+	var _CellView3 = _interopRequireDefault(_CellView2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var LinkView = (function (_CellView) {
+	    _inherits(LinkView, _CellView);
+	
+	    function LinkView() {
+	        _classCallCheck(this, LinkView);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LinkView).apply(this, arguments));
+	    }
+	
+	    _createClass(LinkView, [{
+	        key: 'render',
+	        value: function render() {
+	
+	            var that = this;
+	            var vel = that.vel;
+	
+	            vel.empty();
+	
+	            that.renderMarkup();
+	
+	            return that.update();
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            return this.updateAttributes().updateConnection();
+	        }
+	    }, {
+	        key: 'updateAttributes',
+	        value: function updateAttributes() {
+	
+	            var that = this;
+	
+	            utils.forIn(that.cell.attrs, function (attrs, selector) {
+	
+	                var processed = [];
+	
+	                if (utils.isObject(attrs.fill)) {
+	
+	                    that.applyGradient(selector, 'fill', attrs.fill);
+	                    processed.push('fill');
+	                }
+	
+	                if (utils.isObject(attrs.stroke)) {
+	
+	                    that.applyGradient(selector, 'stroke', attrs.stroke);
+	                    processed.push('stroke');
+	                }
+	
+	                if (utils.isObject(attrs.filter)) {
+	
+	                    that.applyFilter(selector, attrs.filter);
+	                    processed.push('filter');
+	                }
+	
+	                // remove processed special attributes from attrs
+	                var surplus = {};
+	
+	                utils.forIn(attrs, function (value, key) {
+	                    if (!utils.contains(processed, key)) {
+	                        surplus[key] = value;
+	                    }
+	                });
+	
+	                that.applyAttrs(selector, surplus);
+	            });
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'updateConnection',
+	        value: function updateConnection() {
+	
+	            var that = this;
+	            var points = that.cell.points;
+	
+	            //that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'parseRoute',
+	        value: function parseRoute() {}
+	    }]);
+	
+	    return LinkView;
+	})(_CellView3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = LinkView;
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Events = __webpack_require__(17);
+	
+	var _Events2 = _interopRequireDefault(_Events);
+	
+	var _vector = __webpack_require__(13);
+	
+	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _filters = __webpack_require__(29);
+	
+	var _filters2 = _interopRequireDefault(_filters);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var CellView = (function () {
+	    function CellView(paper, cell) {
+	        _classCallCheck(this, CellView);
+	
+	        var that = this;
+	
+	        that.cell = cell;
+	        that.paper = paper;
+	        that.invalid = true;
+	
+	        that.ensureElement();
+	    }
+	
+	    _createClass(CellView, [{
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            var that = this;
+	            var cell = that.cell;
+	            var vel = (0, _vector2.default)('g', { 'class': cell.className });
+	
+	            that.vel = vel;
+	            that.elem = vel.node;
+	            that.elem.cellId = cell.id; // attach cell's id to elem
+	
+	            that.paper.drawPane.appendChild(that.elem);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return this;
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            return this;
+	        }
+	    }, {
+	        key: 'renderMarkup',
+	        value: function renderMarkup() {
+	
+	            // `markup` is rendered by default. Set the `markup` attribute
+	            // on the model if the default markup is not desirable.
+	
+	            var that = this;
+	            var markup = that.cell.markup;
+	
+	            if (markup) {
+	                that.vel.append((0, _vector2.default)(markup));
+	            } else {
+	                throw new Error('`markup` is missing while the default render() implementation is used.');
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'find',
+	        value: function find(selector) {
+	            return selector === '.' ? [this.vel] : this.vel.find(selector);
+	        }
+	    }, {
+	        key: 'applyAttrs',
+	        value: function applyAttrs(selector, attrs) {
+	
+	            var that = this;
+	
+	            utils.forEach(that.find(selector), function (vel) {
+	                vel.attr(attrs);
+	            });
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'applyFilter',
+	        value: function applyFilter(selector, filter) {
+	
+	            // `selector` is a CSS selector or `'.'`.
+	            // `filter` must be in the special filter format:
+	            // `{ name: <name of the filter>, args: { <arguments>, ... }`.
+	            // An example is: `{ filter: { name: 'blur', args: { radius: 5 } } }`.
+	
+	            var that = this;
+	
+	            filter = filter || {};
+	
+	            var name = filter.name || '';
+	            var args = filter.args || {};
+	            var attrs = filter.attrs;
+	            var filterFn = _filters2.default[name];
+	
+	            if (!name || !filterFn) {
+	                throw new Error('Non-existing filter: ' + name);
+	            }
+	
+	            var vels = utils.isString(selector) ? that.find(selector) : selector;
+	
+	            if (!vels.length) {
+	                return that;
+	            }
+	
+	            var paper = that.paper;
+	            var svg = paper.svg;
+	            var filterId = name + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(filter));
+	
+	            if (!svg.getElementById(filterId)) {
+	
+	                var vFilter = (0, _vector2.default)(filterFn(args));
+	                // Set the filter area to be 3x the bounding box of the cell
+	                // and center the filter around the cell.
+	                vFilter.attr({
+	                    filterUnits: 'objectBoundingBox',
+	                    x: -1,
+	                    y: -1,
+	                    width: 3,
+	                    height: 3
+	                });
+	
+	                if (attrs) {
+	                    vFilter.attr(attrs);
+	                }
+	
+	                vFilter.node.id = filterId;
+	
+	                (0, _vector2.default)(svg).getDefs().append(vFilter);
+	            }
+	
+	            utils.forEach(vels, function (vel) {
+	                vel.attr(filter, 'url(#' + filterId + ')');
+	            });
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'applyGradient',
+	        value: function applyGradient(selector, attrName, gradient) {
+	
+	            // `selector` is a CSS selector or `'.'`.
+	            // `attrName` is either a `'fill'` or `'stroke'`.
+	            // `gradient` must be in the special gradient format:
+	            // `{ type: <linearGradient|radialGradient>, stops: [ { offset: <offset>, color: <color> }, ... ]`.
+	            // An example is: `{ fill: { type: 'linearGradient', stops: [ { offset: '10%', color: 'green' }, { offset: '50%', color: 'blue' } ] } }`.
+	
+	            var that = this;
+	
+	            gradient = gradient || {};
+	
+	            var type = gradient.type;
+	            var stops = gradient.stops;
+	            var attrs = gradient.attrs;
+	
+	            if (!attrName || !type || !stops || !stops.length) {
+	                return that;
+	            }
+	
+	            var vels = utils.isString(selector) ? that.find(selector) : selector;
+	
+	            if (!vels.length) {
+	                return that;
+	            }
+	
+	            var paper = that.paper;
+	            var svg = paper.svg;
+	            var gradientId = type + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
+	
+	            if (!svg.getElementById(gradientId)) {
+	
+	                var gradientString = ['<' + type + '>', utils.map(stops, function (stop) {
+	                    return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + (utils.isFinite(stop.opacity) ? stop.opacity : 1) + '" />';
+	                }).join(''), '</' + type + '>'].join('');
+	
+	                var vGradient = (0, _vector2.default)(gradientString);
+	
+	                if (attrs) {
+	                    vGradient.attr(attrs);
+	                }
+	
+	                vGradient.node.id = gradientId;
+	
+	                (0, _vector2.default)(svg).getDefs().append(vGradient);
+	            }
+	
+	            utils.forEach(vels, function (vel) {
+	                vel.attr(attrName, 'url(#' + gradientId + ')');
+	            });
+	
+	            return that;
+	        }
+	
+	        // events
+	        // ------
+	
+	    }, {
+	        key: 'onContextMenu',
+	        value: function onContextMenu() {}
+	    }, {
+	        key: 'onDblClick',
+	        value: function onDblClick() {}
+	    }, {
+	        key: 'onClick',
+	        value: function onClick() {}
+	    }, {
+	        key: 'onPointerDown',
+	        value: function onPointerDown() {}
+	    }, {
+	        key: 'onPointerMove',
+	        value: function onPointerMove() {}
+	    }, {
+	        key: 'onPointerUp',
+	        value: function onPointerUp() {}
+	    }, {
+	        key: 'onMouseOver',
+	        value: function onMouseOver() {}
+	    }, {
+	        key: 'onMouseOut',
+	        value: function onMouseOut() {}
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            var that = this;
+	            var elem = that.elem;
+	
+	            if (elem && elem.parentNode) {
+	                elem.parentNode.removeChild(elem);
+	            }
+	        }
+	    }]);
+	
+	    return CellView;
+	})();
+	
+	// exports
+	// -------
+	
+	exports.default = CellView;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	// exports
+	// -------
+	
+	exports.default = {
+	
+	    outline: function outline(args) {
+	
+	        // `color` ... outline color
+	        // `width`... outline width
+	        // `opacity` ... outline opacity
+	        // `margin` ... gap between outline and the element
+	
+	        var tpl = '' + '<filter>' + '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' + '  <feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" />' + '  <feMorphology in="SourceAlpha" result="morphedInner" operator="dilate" radius="${innerRadius}" />' + '  <feComposite result="morphedOuterColored" in="colored" in2="morphedOuter" operator="in"/>' + '  <feComposite operator="xor" in="morphedOuterColored" in2="morphedInner" result="outline"/>' + '  <feMerge>' + '    <feMergeNode in="outline"/>' + '    <feMergeNode in="SourceGraphic"/>' + '  </feMerge>' + '</filter>';
+	
+	        var margin = (0, _utils.isFinite)(args.margin) ? args.margin : 2;
+	        var width = (0, _utils.isFinite)(args.width) ? args.width : 1;
+	
+	        return (0, _utils.format)(tpl)({
+	            color: args.color || 'blue',
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
+	            outerRadius: margin + width,
+	            innerRadius: margin
+	        });
+	    },
+	
+	    highlight: function highlight(args) {
+	
+	        // `color` ... color
+	        // `width`... width
+	        // `blur` ... blur
+	        // `opacity` ... opacity
+	
+	        var tpl = '' + '<filter>' + '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' + '  <feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/>' + '  <feComposite result="composed" in="colored" in2="morphed" operator="in"/>' + '  <feGaussianBlur result="blured" in="composed" stdDeviation="${blur}"/> ' + '  <feBlend in="SourceGraphic" in2="blured" mode="normal"/>' + '</filter>';
+	
+	        return (0, _utils.format)(tpl)({
+	            color: args.color || 'red',
+	            width: (0, _utils.isFinite)(args.width) ? args.width : 1,
+	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 0,
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1
+	        });
+	    },
+	
+	    blur: function blur(args) {
+	
+	        // `x` ... horizontal blur
+	        // `y` ... vertical blur (optional)
+	
+	        var tpl = '' + '<filter>' + '  <feGaussianBlur stdDeviation="${stdDeviation}"/>' + '</filter>';
+	
+	        var x = (0, _utils.isFinite)(args.x) ? args.x : 2;
+	
+	        return (0, _utils.format)(tpl)({
+	            stdDeviation: (0, _utils.isFinite)(args.y) ? [x, args.y] : x
+	        });
+	    },
+	
+	    dropShadow: function dropShadow(args) {
+	
+	        // `dx` ... horizontal shift
+	        // `dy` ... vertical shift
+	        // `blur` ... blur
+	        // `color` ... color
+	        // `opacity` ... opacity
+	
+	        var tpl = 'SVGFEDropShadowElement' in window ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>' : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+	
+	        return (0, _utils.format)(tpl)({
+	            dx: args.dx || 0,
+	            dy: args.dy || 0,
+	            opacity: (0, _utils.isFinite)(args.opacity) ? args.opacity : 1,
+	            color: args.color || 'black',
+	            blur: (0, _utils.isFinite)(args.blur) ? args.blur : 4
+	        });
+	    },
+	
+	    grayScale: function grayScale(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely grayscale.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var tpl = '' + '<filter>' + '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/>' + '</filter>';
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)(tpl)({
+	            a: 0.2126 + 0.7874 * (1 - amount),
+	            b: 0.7152 - 0.7152 * (1 - amount),
+	            c: 0.0722 - 0.0722 * (1 - amount),
+	            d: 0.2126 - 0.2126 * (1 - amount),
+	            e: 0.7152 + 0.2848 * (1 - amount),
+	            f: 0.0722 - 0.0722 * (1 - amount),
+	            g: 0.2126 - 0.2126 * (1 - amount),
+	            h: 0.0722 + 0.9278 * (1 - amount)
+	        });
+	    },
+	
+	    sepia: function sepia(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely sepia.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var template = '' + '<filter>' + '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${h} ${i} 0 0 0 0 0 1 0"/>' + '</filter>';
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)(template)({
+	            a: 0.393 + 0.607 * (1 - amount),
+	            b: 0.769 - 0.769 * (1 - amount),
+	            c: 0.189 - 0.189 * (1 - amount),
+	            d: 0.349 - 0.349 * (1 - amount),
+	            e: 0.686 + 0.314 * (1 - amount),
+	            f: 0.168 - 0.168 * (1 - amount),
+	            g: 0.272 - 0.272 * (1 - amount),
+	            h: 0.534 - 0.534 * (1 - amount),
+	            i: 0.131 + 0.869 * (1 - amount)
+	        });
+	    },
+	
+	    saturate: function saturate(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 0 is completely un-saturated.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var template = '' + '<filter>' + '  <feColorMatrix type="saturate" values="${amount}"/>' + '</filter>';
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)(template)({
+	            amount: 1 - amount
+	        });
+	    },
+	
+	    hueRotate: function hueRotate(args) {
+	
+	        // `angle` ...  the number of degrees around the color
+	        // circle the input samples will be adjusted.
+	
+	        var template = '' + '<filter>' + '  <feColorMatrix type="hueRotate" values="${angle}"/>' + '</filter>';
+	
+	        return (0, _utils.format)(template)({
+	            angle: args.angle || 0
+	        });
+	    },
+	
+	    invert: function invert(args) {
+	
+	        // `amount` ... the proportion of the conversion.
+	        // A value of 1 is completely inverted.
+	        // A value of 0 leaves the input unchanged.
+	
+	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="table" tableValues="${amount} ${amount2}"/>' + '    <feFuncG type="table" tableValues="${amount} ${amount2}"/>' + '    <feFuncB type="table" tableValues="${amount} ${amount2}"/>' + '  </feComponentTransfer>' + '</filter>';
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)(template)({
+	            amount: amount,
+	            amount2: 1 - amount
+	        });
+	    },
+	
+	    brightness: function brightness(args) {
+	
+	        // `amount` ... proportion of the conversion.
+	        // A value of 0 will create an image that is completely black.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="linear" slope="${amount}"/>' + '    <feFuncG type="linear" slope="${amount}"/>' + '    <feFuncB type="linear" slope="${amount}"/>' + '  </feComponentTransfer>' + '</filter>';
+	
+	        return (0, _utils.format)(template)({
+	            amount: (0, _utils.isFinite)(args.amount) ? args.amount : 1
+	        });
+	    },
+	
+	    contrast: function contrast(args) {
+	
+	        // `amount` ... proportion of the conversion.
+	        // A value of 0 will create an image that is completely black.
+	        // A value of 1 leaves the input unchanged.
+	
+	        var template = '' + '<filter>' + '  <feComponentTransfer>' + '    <feFuncR type="linear" slope="${amount}" intercept="${amount2}"/>' + '    <feFuncG type="linear" slope="${amount}" intercept="${amount2}"/>' + '    <feFuncB type="linear" slope="${amount}" intercept="${amount2}"/>' + '  </feComponentTransfer>' + '</filter>';
+	
+	        var amount = (0, _utils.isFinite)(args.amount) ? args.amount : 1;
+	
+	        return (0, _utils.format)(template)({
+	            amount: amount,
+	            amount2: 0.5 - amount / 2
+	        });
+	    }
+	};
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var _vector = __webpack_require__(13);
+	
+	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var _CellView2 = __webpack_require__(28);
+	
+	var _CellView3 = _interopRequireDefault(_CellView2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var NodeView = (function (_CellView) {
+	    _inherits(NodeView, _CellView);
+	
+	    function NodeView() {
+	        _classCallCheck(this, NodeView);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(NodeView).apply(this, arguments));
+	    }
+	
+	    _createClass(NodeView, [{
+	        key: 'update',
+	        value: function update(specifiedAttrs) {
+	
+	            // process the `attrs` object and set attributes
+	            // on sub elements based on the selectors.
+	
+	            var that = this;
+	            var cell = that.cell;
+	            var allAttrs = cell.attrs;
+	            var rotatableNode = that.rotatableNode;
+	            var rotationAttr = undefined;
+	
+	            if (rotatableNode) {
+	                rotationAttr = rotatableNode.attr('transform');
+	                rotatableNode.attr('transform', '');
+	            }
+	
+	            var relativelySelectors = [];
+	            var nodesBySelector = {};
+	
+	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
+	
+	                var vElements = that.find(selector);
+	
+	                if (!vElements.length) {
+	                    return;
+	                }
+	
+	                nodesBySelector[selector] = vElements;
+	
+	                var specialAttributes = NodeView.specialAttributes.slice();
+	
+	                // TODO: test attrs.filter
+	                if ((0, _utils.isObject)(attrs.filter)) {
+	                    specialAttributes.push('filter');
+	                    that.applyFilter(vElements, attrs.filter);
+	                }
+	
+	                // TODO: test attrs.fill
+	                if ((0, _utils.isObject)(attrs.fill)) {
+	                    specialAttributes.push('fill');
+	                    that.applyGradient(vElements, 'fill', attrs.fill);
+	                }
+	
+	                // TODO: test attrs.stroke
+	                if ((0, _utils.isObject)(attrs.stroke)) {
+	                    specialAttributes.push('stroke');
+	                    that.applyGradient(vElements, 'stroke', attrs.stroke);
+	                }
+	
+	                // TODO: test attrs.text
+	                if (!(0, _utils.isUndefined)(attrs.text)) {
+	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
+	                    (0, _utils.forEach)(vElements, function (vel) {
+	                        vel.text(attrs.text + '', {
+	                            lineHeight: attrs.lineHeight,
+	                            textPath: attrs.textPath,
+	                            annotations: attrs.annotations
+	                        });
+	                    });
+	                }
+	
+	                var surplus = {};
+	
+	                (0, _utils.forIn)(attrs, function (value, key) {
+	                    if (!(0, _utils.contains)(specialAttributes, key)) {
+	                        surplus[key] = value;
+	                    }
+	                });
+	
+	                // set regular attributes
+	                (0, _utils.forEach)(vElements, function (vel) {
+	                    vel.attr(surplus);
+	                });
+	
+	                //if (attrs.port) {
+	                //    forEach(vels, function (vel) {
+	                //        vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
+	                //    });
+	                //}
+	
+	                // TODO: vel.css()
+	
+	                //if (attrs.style) {
+	                //    forEach(vels, function (vel) {
+	                //        vel.css(attrs.style);
+	                //    });
+	                //}
+	
+	                // TODO: attrs.html
+	
+	                if (!(0, _utils.isUndefined)(attrs.html)) {
+	                    (0, _utils.forEach)(vElements, function (vel) {});
+	                }
+	
+	                // Special `ref-x` and `ref-y` attributes make it possible to
+	                // set both absolute or relative positioning of sub elements.
+	                (0, _utils.some)(['ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'x-alignment', 'y-alignment', 'ref-width', 'ref-height'], function (key) {
+	                    return !(0, _utils.isUndefined)(attrs[key]);
+	                }) && relativelySelectors.push(selector);
+	            });
+	
+	            // Note that we're using the bounding box without transformation
+	            // because we are already inside a transformed coordinate system.
+	            var size = cell.size;
+	            var bbox = { x: 0, y: 0, width: size.width, height: size.height };
+	
+	            (0, _utils.forEach)(relativelySelectors, function (selector) {
+	
+	                var specified = specifiedAttrs && specifiedAttrs[selector];
+	                var all = allAttrs[selector];
+	                var attrs = specified ? (0, _utils.merge)({}, all, specified) : all;
+	
+	                (0, _utils.forEach)(nodesBySelector[selector], function (vel) {
+	                    that.positionRelative(vel, bbox, attrs, nodesBySelector);
+	                });
+	            });
+	
+	            if (rotatableNode) {
+	                rotatableNode.attr('transform', rotationAttr || '');
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'positionRelative',
+	        value: function positionRelative(vel, bbox, attributes, nodesBySelector) {
+	
+	            var that = this;
+	            var ref = attributes['ref'];
+	            var refDx = (0, _utils.toFloat)(attributes['ref-dx']);
+	            var refDy = (0, _utils.toFloat)(attributes['ref-dy']);
+	            var yAlignment = attributes['y-alignment'];
+	            var xAlignment = attributes['x-alignment'];
+	
+	            var refX = attributes['ref-x'];
+	            var refXPercentage = (0, _utils.isPercentage)(refX);
+	            refX = (0, _utils.toFloat)(refX, refXPercentage);
+	
+	            var refY = attributes['ref-y'];
+	            var refYPercentage = (0, _utils.isPercentage)(refY);
+	            refY = (0, _utils.toFloat)(refY, refYPercentage);
+	
+	            var refWidth = attributes['ref-width'];
+	            var refWidthPercentage = (0, _utils.isPercentage)(refWidth);
+	            refWidth = (0, _utils.toFloat)(refWidth, refWidthPercentage);
+	
+	            var refHeight = attributes['ref-height'];
+	            var refHeightPercentage = (0, _utils.isPercentage)(refHeight);
+	            refHeight = (0, _utils.toFloat)(refHeight, refHeightPercentage);
+	
+	            // Check if the node is a descendant of the scalable group.
+	            var scalableNode = vel.findParent('pane-scalable', that.elem);
+	
+	            // `ref` is the selector of the reference element.
+	            // If no `ref` specified, reference element is the root element.
+	            if (ref) {
+	
+	                var vref = nodesBySelector && nodesBySelector[ref];
+	
+	                if (vref) {
+	                    vref = vref[0];
+	                } else {
+	                    vref = ref === '.' ? that.vel : that.vel.findOne(ref);
+	                }
+	
+	                if (!vref) {
+	                    throw new Error('NodeView: reference does not exists.');
+	                }
+	
+	                // Get the bounding box of the reference element
+	                // relative to the root `<g>` element.
+	                bbox = vref.bbox(false, that.elem);
+	            }
+	
+	            // Remove the previous translate() from the transform attribute
+	            // and translate the element relative to the root bounding box
+	            // following the `ref-x` and `ref-y` attributes.
+	            var transformAttr = vel.attr('transform');
+	            if (transformAttr) {
+	                vel.attr('transform', (0, _utils.clearTranslate)(transformAttr));
+	            }
+	
+	            // `ref-width` and `ref-height` defines the width and height of the
+	            // sub element relatively to the reference element size.
+	            if ((0, _utils.isFinite)(refWidth)) {
+	                if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
+	                    vel.attr('width', refWidth * bbox.width);
+	                } else {
+	                    vel.attr('width', Math.max(refWidth + bbox.width, 0));
+	                }
+	            }
+	
+	            if ((0, _utils.isFinite)(refHeight)) {
+	                if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
+	                    vel.attr('height', refHeight * bbox.height);
+	                } else {
+	                    vel.attr('height', Math.max(refHeight + bbox.height, 0));
+	                }
+	            }
+	
+	            // The final translation of the sub element.
+	            var tx = 0;
+	            var ty = 0;
+	            var scale = undefined;
+	
+	            // `ref-dx` and `ref-dy` define the offset of the sub element relative
+	            // to the right and/or bottom coordinate of the reference element.
+	            if ((0, _utils.isFinite)(refDx)) {
+	                if (scalableNode) {
+	                    scale = scalableNode.scale();
+	                    tx = bbox.x + bbox.width + refDx / scale.sx;
+	                } else {
+	                    tx = bbox.x + bbox.width + refDx;
+	                }
+	            }
+	
+	            if ((0, _utils.isFinite)(refDy)) {
+	                if (scalableNode) {
+	                    scale = scale || scalableNode.scale();
+	                    ty = bbox.y + bbox.height + refDy / scale.sy;
+	                } else {
+	                    ty = bbox.y + bbox.height + refDy;
+	                }
+	            }
+	
+	            if ((0, _utils.isFinite)(refX)) {
+	                if (refXPercentage || refX > 0 && refX < 1) {
+	                    tx = bbox.x + bbox.width * refX;
+	                } else if (scalableNode) {
+	                    scale = scale || scalableNode.scale();
+	                    tx = bbox.x + refX / scale.sx;
+	                } else {
+	                    tx = bbox.x + refX;
+	                }
+	            }
+	
+	            if ((0, _utils.isFinite)(refY)) {
+	                if (refXPercentage || refY > 0 && refY < 1) {
+	                    ty = bbox.y + bbox.height * refY;
+	                } else if (scalableNode) {
+	                    scale = scale || scalableNode.scale();
+	                    ty = bbox.y + refY / scale.sy;
+	                } else {
+	                    ty = bbox.y + refY;
+	                }
+	            }
+	
+	            if (!(0, _utils.isUndefined)(yAlignment) || !(0, _utils.isUndefined)(xAlignment)) {
+	
+	                var velBBox = vel.bbox(false, that.paper.drawPane);
+	
+	                if (yAlignment === 'middle') {
+	                    ty -= velBBox.height / 2;
+	                } else if ((0, _utils.isFinite)(yAlignment)) {
+	                    ty += yAlignment > -1 && yAlignment < 1 ? velBBox.height * yAlignment : yAlignment;
+	                }
+	
+	                if (xAlignment === 'middle') {
+	                    tx -= velBBox.width / 2;
+	                } else if ((0, _utils.isFinite)(xAlignment)) {
+	                    tx += xAlignment > -1 && xAlignment < 1 ? velBBox.width * xAlignment : xAlignment;
+	                }
+	            }
+	
+	            vel.translate(tx, ty);
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	
+	            var that = this;
+	            var vel = that.vel;
+	
+	            vel.empty();
+	
+	            that.renderMarkup();
+	
+	            that.scalableNode = vel.findOne('.pane-scalable');
+	            that.rotatableNode = vel.findOne('.pane-rotatable');
+	
+	            return that.update().resize().rotate().translate();
+	        }
+	    }, {
+	        key: 'scale',
+	        value: function scale(sx, sy) {
+	            this.vel.scale(sx, sy);
+	            return this;
+	        }
+	    }, {
+	        key: 'resize',
+	        value: function resize() {
+	
+	            var that = this;
+	            var scalableNode = that.scalableNode;
+	
+	            if (!scalableNode) {
+	                return;
+	            }
+	
+	            // get bbox without transform
+	            var nativeBBox = scalableNode.bbox(true);
+	
+	            // Make sure `scalableBBox.width` and `scalableBBox.height` are not
+	            // zero which can happen if the element does not have any content.
+	            // By making the width(height) 1, we prevent HTML errors of the type
+	            // `scale(Infinity, Infinity)`.
+	            var size = that.cell.size;
+	            var sx = size.width / (nativeBBox.width || 1);
+	            var sy = size.height / (nativeBBox.height || 1);
+	
+	            sx = (0, _utils.toFixed)(sx, 2);
+	            sy = (0, _utils.toFixed)(sy, 2);
+	
+	            scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
+	
+	            //let rotation = that.cell.rotation;
+	            //let angle = rotation.angle;
+	            //
+	            //// Cancel the rotation but now around a different origin,
+	            //// which is the center of the scaled object.
+	            //let rotatableNode = that.rotatableNode;
+	            //let rotateAttr = rotatableNode && rotatableNode.attr('transform');
+	            //
+	            //if (rotateAttr && rotateAttr !== 'null') {
+	            //
+	            //    rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
+	            //    let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
+	            //
+	            //    // Store new x, y and perform rotate() again against the new rotation origin.
+	            //    that.position = {
+	            //        x: rotatableBBox.x,
+	            //        y: rotatableBBox.y
+	            //    };
+	            //    that.rotate();
+	            //}
+	
+	            // Update must always be called on non-rotated element. Otherwise,
+	            // relative positioning would work with wrong (rotated) bounding boxes.
+	            that.update();
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate() {
+	
+	            var that = this;
+	            var position = that.cell.position;
+	
+	            that.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'rotate',
+	        value: function rotate() {
+	
+	            var that = this;
+	            var node = that.rotatableNode;
+	
+	            if (node) {
+	
+	                var cell = that.cell;
+	                var rotation = cell.rotation;
+	                var size = cell.size;
+	                var ox = size.width / 2;
+	                var oy = size.height / 2;
+	
+	                node.attr('transform', 'rotate(' + rotation + ',' + ox + ',' + oy + ')');
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'getBBox',
+	        value: function getBBox() {}
+	    }], [{
+	        key: 'specialAttributes',
+	        get: function get() {
+	
+	            return ['text', 'html', 'style', 'ref', 'ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'ref-width', 'ref-height', 'x-alignment', 'y-alignment', 'port'];
+	        }
+	    }]);
+	
+	    return NodeView;
+	})(_CellView3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = NodeView;
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Visual2 = __webpack_require__(32);
+	
+	var _Visual3 = _interopRequireDefault(_Visual2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Link = (function (_Visual) {
+	    _inherits(Link, _Visual);
+	
+	    function Link() {
+	        _classCallCheck(this, Link);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Link).apply(this, arguments));
+	    }
+	
+	    _createClass(Link, [{
+	        key: 'isLink',
+	        get: function get() {
+	            return true;
+	        }
+	    }]);
+	
+	    return Link;
+	})(_Visual3.default);
+	
+	Link.setDefaults({
+	
+	    markup: '' + '<path class="connection"/>' + '<path class="marker-source"/>' + '<path class="marker-target"/>' + '<path class="connection-wrap"/>' + '<g class="labels"/>' + '<g class="marker-vertices"/>' + '<g class="marker-arrowheads"/>' + '<g class="link-tools"/>',
+	
+	    classNames: 'pane-link',
+	    router: null,
+	    marker: null,
+	    connector: null, // set `null` to use the default connector
+	    attrs: {
+	        '.connection': {
+	            'fill': 'none',
+	            'stroke': '#000',
+	            'stroke-width': 1
+	        },
+	        '.marker-source': {
+	            d: 'M 10 0 L 0 5 L 10 10 z'
+	        },
+	        '.marker-target': {
+	            d: 'M 10 0 L 0 5 L 10 10 z'
+	        }
+	    }
+	});
+	
+	// exports
+	// -------
+	
+	exports.default = Link;
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Cell2 = __webpack_require__(19);
+	
+	var _Cell3 = _interopRequireDefault(_Cell2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Visual = (function (_Cell) {
+	    _inherits(Visual, _Cell);
+	
+	    function Visual(options) {
+	        _classCallCheck(this, Visual);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Visual).call(this));
+	
+	        var that = _this;
+	        var metadata = utils.merge({}, that.constructor.defaults, options);
+	
+	        that.data = metadata.data;
+	        that.attrs = metadata.attrs;
+	        that.visible = metadata.visible !== false;
+	        that.metadata = metadata;
+	        return _this;
+	    }
+	
+	    // static methods
+	    // --------------
+	
+	    _createClass(Visual, [{
+	        key: 'markup',
+	
+	        // props
+	        // -----
+	
+	        get: function get() {
+	
+	            return this.metadata.markup;
+	        }
+	    }, {
+	        key: 'className',
+	        get: function get() {
+	
+	            var classNames = this.metadata.classNames;
+	
+	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
+	        }
+	    }], [{
+	        key: 'setDefaults',
+	        value: function setDefaults(options) {
+	
+	            this.defaults = utils.merge({}, this.defaults, options);
+	        }
+	    }]);
+	
+	    return Visual;
+	})(_Cell3.default);
+	
+	// static props
+	// ------------
+	
+	Visual.defaults = {
+	    markup: '',
+	    attrs: {}, // styles
+	    data: null, // attach data to the cell
+	    view: null };
+	
+	// exports
+	// -------
+	
+	// set `null` to use the default view
+	exports.default = Visual;
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Visual2 = __webpack_require__(32);
+	
+	var _Visual3 = _interopRequireDefault(_Visual2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Node = (function (_Visual) {
+	    _inherits(Node, _Visual);
+	
+	    function Node() {
+	        _classCallCheck(this, Node);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
+	    }
+	
+	    _createClass(Node, [{
+	        key: 'translate',
+	
+	        // methods
+	        // -------
+	
+	        value: function translate() {}
+	    }, {
+	        key: 'resize',
+	        value: function resize(width, height) {}
+	    }, {
+	        key: 'rotate',
+	        value: function rotate() {}
+	    }, {
+	        key: 'getBBox',
+	        value: function getBBox() {
+	            return false;
+	        }
+	    }, {
+	        key: 'isNode',
+	
+	        // props
+	        // -----
+	
+	        get: function get() {
+	            return true;
+	        }
+	    }]);
+	
+	    return Node;
+	})(_Visual3.default);
+	
+	Node.setDefaults({
+	    classNames: 'pane-node',
+	    size: {
+	        width: 1,
+	        height: 1,
+	        relative: false
+	    },
+	    position: {
+	        x: 0,
+	        y: 0,
+	        relative: false
+	    },
+	    rotation: {
+	        angle: 0,
+	        inherited: true // inherit the parent's rotation
+	    }
+	});
+	
+	// exports
+	// -------
+	
+	exports.default = Node;
+
+/***/ },
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -7702,88 +7728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function straight(sourcePoint, targetPoint, vertices) {
-	
-	    var d = ['M', sourcePoint.x, sourcePoint.y];
-	
-	    utils.forEach(vertices, function (vertex) {
-	
-	        d.push(vertex.x, vertex.y);
-	    });
-	
-	    d.push(targetPoint.x, targetPoint.y);
-	
-	    return d.join(' ');
-	}
-	
-	exports.default = straight;
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function rounded(sourcePoint, targetPoint, vertices) {
-	    var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
-	
-	    var offset = options.radius || 10;
-	
-	    var c1, c2, d1, d2, prev, next;
-	
-	    var d = ['M', sourcePoint.x, sourcePoint.y];
-	
-	    utils.forEach(vertices, function (vertex, index) {
-	
-	        // the closest vertices
-	        prev = vertices[index - 1] || sourcePoint;
-	        next = vertices[index + 1] || targetPoint;
-	
-	        // a half distance to the closest vertex
-	        d1 = d2 || g.point(vertex).distance(prev) / 2;
-	        d2 = g.point(vertex).distance(next) / 2;
-	
-	        // control points
-	        c1 = g.point(vertex).move(prev, -Math.min(offset, d1)).round();
-	        c2 = g.point(vertex).move(next, -Math.min(offset, d2)).round();
-	
-	        d.push(c1.x, c1.y, 'S', vertex.x, vertex.y, c2.x, c2.y, 'L');
-	    });
-	
-	    d.push(targetPoint.x, targetPoint.y);
-	
-	    return d.join(' ');
-	}
-	
-	exports.default = rounded;
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7826,7 +7771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Text;
 
 /***/ },
-/* 37 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7835,7 +7780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7863,25 +7808,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',
 	    attrs: {
 	        '.': {
-	            'fill': '#ffffff',
+	            'fill': '#fff',
 	            'stroke': 'none'
 	        },
 	        'rect': {
-	            'fill': '#ffffff',
-	            'stroke': '#000000',
+	            'fill': '#fff',
+	            'stroke': '#000',
 	            'stroke-width': '1',
 	            'width': 100,
 	            'height': 40
 	        },
 	        'text': {
-	            fill: '#000000',
-	            text: '',
+	            'fill': '#000',
 	            'font-size': 14,
 	            'ref-x': .5,
 	            'ref-y': .5,
 	            'text-anchor': 'middle',
-	            'y-alignment': 'middle',
-	            'font-family': 'Arial, helvetica, sans-serif'
+	            'y-alignment': 'middle'
 	        }
 	    }
 	});
@@ -7889,7 +7832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7898,7 +7841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -7959,7 +7902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Circle;
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7968,7 +7911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8030,7 +7973,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Ellipse;
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8039,7 +7982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8088,7 +8031,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Image;
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8097,7 +8040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8155,7 +8098,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Path;
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8164,7 +8107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8222,7 +8165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polygon;
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8231,7 +8174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8289,7 +8232,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polyline;
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8298,7 +8241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Path2 = __webpack_require__(41);
+	var _Path2 = __webpack_require__(39);
 	
 	var _Path3 = _interopRequireDefault(_Path2);
 	
@@ -8338,7 +8281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rhombus;
 
 /***/ },
-/* 45 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8347,7 +8290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Node2 = __webpack_require__(21);
+	var _Node2 = __webpack_require__(33);
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
@@ -8386,6 +8329,95 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = Rect;
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function straight(sourcePoint, targetPoint, vertices) {
+	
+	    var d = ['M', sourcePoint.x, sourcePoint.y];
+	
+	    utils.forEach(vertices, function (vertex) {
+	
+	        d.push(vertex.x, vertex.y);
+	    });
+	
+	    d.push(targetPoint.x, targetPoint.y);
+	
+	    return d.join(' ');
+	}
+	
+	exports.default = straight;
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function rounded(sourcePoint, targetPoint, vertices) {
+	    var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+	
+	    var offset = options.radius || 10;
+	
+	    var d1 = undefined,
+	        d2 = undefined;
+	
+	    var d = ['M', sourcePoint.x, sourcePoint.y];
+	
+	    utils.forEach(vertices, function (vertex, index) {
+	
+	        // the closest vertices
+	        var prev = vertices[index - 1] || sourcePoint;
+	        var next = vertices[index + 1] || targetPoint;
+	        var cur = _Point2.default.fromPoint(vertex);
+	
+	        // a half distance to the closest vertex
+	        d1 = d2 || cur.distance(prev) / 2;
+	        d2 = cur.distance(next) / 2;
+	
+	        // control points
+	        var c1 = _Point2.default.fromPoint(vertex).move(prev, -Math.min(offset, d1)).smooth();
+	        var c2 = _Point2.default.fromPoint(vertex).move(next, -Math.min(offset, d2)).smooth();
+	
+	        d.push(c1.x, c1.y, 'S', vertex.x, vertex.y, c2.x, c2.y, 'L');
+	    });
+	
+	    d.push(targetPoint.x, targetPoint.y);
+	
+	    return d.join(' ');
+	}
+	
+	exports.default = rounded;
 
 /***/ },
 /* 46 */
