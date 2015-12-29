@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-
+var path = require('path');
 var pkg = require('../package');
 var config = require('../webpack.config');
 var webpack = require('webpack');
@@ -10,6 +10,7 @@ var WebpackDevServer = require('webpack-dev-server');
 // server
 var port = 9090;
 var host = '127.0.0.1';
+var wwwRoot = path.resolve(__dirname, '../');
 
 // the dev entry
 var entry = config.entry[pkg.name];
@@ -19,7 +20,7 @@ delete config.entry[pkg.name + '-' + pkg.version];
 
 // config the dev server
 config.entry[pkg.name] = [
-  'webpack-dev-server/client?http://localhost:' + port,
+  'webpack-dev-server/client?http://' + host + ':' + port,
   'webpack/hot/dev-server',
   entry
 ];
@@ -32,7 +33,7 @@ config.plugins.push(
 
 var compiler = webpack(config);
 var server = new WebpackDevServer(compiler, {
-  contentBase: __dirname,
+  contentBase: wwwRoot,
   publicPath: config.output.publicPath,
   hot: true,
   noInfo: false,
@@ -62,4 +63,5 @@ server.listeningApp
     }
 
     process.exit(err.code);
+
   });
