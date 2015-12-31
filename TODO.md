@@ -1,10 +1,7 @@
-- 连线
+- 连线渲染
+- DOM 事件和交互
 - 固定的 port
-- 连线的渲染引擎
-- 数据驱动
-- 渲染引擎
-- DOM 事件绑定
-- 配置 eslint
-- 配置 travis.ci
 - foreignObject 的兼容方案
-- 单元测试
+- eslint
+- unit test, coverage
+- travis-ci
