@@ -37,6 +37,7 @@ module.exports = {
         include: paths.src,
         loader: 'babel',
         query: {
+          babelrc: false,
           presets: ['es2015'],
           plugins: [
 
