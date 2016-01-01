@@ -484,14 +484,14 @@ class Paper extends Events {
 
         let that = this;
 
-        link.routerPoints = that.parseRoute(link);
+        link.routerPoints = that.parseRouter(link);
         link.sourcePoint = that.getConnectionPoint(link, true);
         link.targetPoint = that.getConnectionPoint(link, false);
 
         return that;
     }
 
-    parseRoute(link) {
+    parseRouter(link) {
 
         let that = this;
         let router = link.router || that.options.defaultRouter;
@@ -1064,5 +1064,9 @@ class Paper extends Events {
         }
     }
 }
+
+
+// exports
+// -------
 
 export default Paper;

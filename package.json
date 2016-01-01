@@ -55,6 +55,6 @@
     "lint": "eslint ./src --ext '.js'",
     "build": "npm run clean && webpack && webpack --config webpack.config.min.js",
     "release": "npm run clean && webpack --config webpack.config.production.js && webpack --config webpack.config.min.js && zip dist/${npm_package_name}-${npm_package_version}.zip -j dist dist/*",
-    "test": "browserify spec/index.spec.js > spec/index.js "
+    "test": "mocha"
   }
 }
