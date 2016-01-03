@@ -50,16 +50,8 @@
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
-  "paths": {
-    "dist": "./dist"
-  },
   "scripts": {
-    "dev": "node ./scripts/server.js",
-    "clean": "rm -rf ${npm_package_paths_dist}",
-    "lint": "eslint ./src --ext '.js'",
-    "build": "npm run clean && webpack && webpack --config webpack.config.min.js",
-    "release": "npm run clean && webpack --config webpack.config.production.js && webpack --config webpack.config.min.js && zip dist/${npm_package_name}-${npm_package_version}.zip -j dist dist/*",
-    "test": "make test",
-    "coverage": "rm -rf ./test/coverage && ./node_modules/.bin/babel-node ./node_modules/.bin/isparta cover ./node_modules/.bin/_mocha --dir ./test/coverage  -- -R spec"
+    "lint": "make lint",
+    "test": "make test"
   }
 }
