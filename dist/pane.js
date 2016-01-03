@@ -1730,6 +1730,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return id;
 	}
 	
+	// chrome 48 removed svg getTransformToElement api
+	function getTransformToElementPolyfill(source, target) {
+	    var matrix = undefined;
+	    try {
+	        matrix = target.getScreenCTM().inverse();
+	    } catch (e) {
+	        throw new Error('Can not inverse source element\' ctm.');
+	    }
+	    return matrix.multiply(source.getScreenCTM());
+	}
+	function wrapGetTransformToElement(source, target) {
+	    var ctm = source.getTransformToElement !== undefined ? // api not found
+	    source.getTransformToElement(target) : getTransformToElementPolyfill(source, target);
+	    return ctm;
+	}
+	
 	var VElement = exports.VElement = (function () {
 	    function VElement(elem) {
 	        _classCallCheck(this, VElement);
@@ -2360,7 +2376,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return box;
 	            }
 	
-	            var matrix = node.getTransformToElement(target || node.ownerSVGElement);
+	            //let matrix = node.getTransformToElement(target || node.ownerSVGElement);
+	            var matrix = wrapGetTransformToElement(node, target || node.ownerSVGElement);
 	
 	            return vector.transformRect(box, matrix);
 	        }
@@ -2380,7 +2397,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            try {
 	                // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
 	                var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-	                var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+	                //let globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+	                var globalToLocalMatrix = wrapGetTransformToElement(that.node, svg).inverse();
 	                return globalPoint.matrixTransform(globalToLocalMatrix);
 	            } catch (e) {
 	                // IE9 throws an exception in odd cases.
@@ -2510,7 +2528,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var gRect = new _Rect2.default(parseFloat(this.attr('x') || 0), parseFloat(this.attr('y') || 0), parseFloat(this.attr('width')), parseFloat(this.attr('height')));
 	                // Get the rect transformation matrix with regards to the SVG document.
-	                var rectMatrix = that.node.getTransformToElement(target);
+	                //let rectMatrix = that.node.getTransformToElement(target);
+	                var rectMatrix = wrapGetTransformToElement(that.node, target);
 	                // Decompose the matrix to find the rotation angle.
 	                var rectMatrixComponents = vector.decomposeMatrix(rectMatrix);
 	                // Now we want to rotate the rectangle back so that we
@@ -2532,7 +2551,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var sample = samples[i];
 	                    // Convert the sample point in the local coordinate system to the global coordinate system.
 	                    var gp = vector.createSVGPoint(sample.x, sample.y);
-	                    gp = gp.matrixTransform(this.node.getTransformToElement(target));
+	                    //gp                 = gp.matrixTransform(this.node.getTransformToElement(target));
+	                    gp = gp.matrixTransform(wrapGetTransformToElement(this.node, target));
 	                    sample = _Point2.default.fromPoint(gp);
 	                    var centerDistance = sample.distance(center);
 	                    // Penalize a higher distance to the reference point by 10%.
