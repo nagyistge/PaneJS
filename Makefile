@@ -21,6 +21,8 @@ COVERALLS_CMD = $(DIR_BIN)/coveralls
 .PHONY: test
 
 
+default: dev-server
+
 dev-server: build
 	node ./scripts/server.js
 
