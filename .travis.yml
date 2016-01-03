@@ -1,12 +1,18 @@
+sudo: false
 language: node_js
-
 node_js:
   - 0.12
 
-script:
-  - npm run-script lint
-  - npm test
+cache:
+  directories:
+    - node_modules
 
 install: npm install
 
-after_script: NODE_ENV=test istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage
+script:
+  - make lint
+  - make test
+
+after_script:
+  - make test-cov
+  - make test-rpt
