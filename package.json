@@ -47,6 +47,7 @@
     "less": "^2.5.3",
     "less-loader": "^2.2.2",
     "mocha": "^2.3.4",
+    "semver": "^5.1.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
