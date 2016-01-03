@@ -18,6 +18,23 @@ function createPathId() {
     return id;
 }
 
+// chrome 48 removed svg getTransformToElement api
+function getTransformToElementPolyfill(source, target) {
+    let matrix;
+    try {
+        matrix = target.getScreenCTM().inverse();
+    } catch(e) {
+        throw new Error('Can not inverse source element\' ctm.');
+    }
+    return matrix.multiply(source.getScreenCTM());
+}
+function wrapGetTransformToElement(source, target) {
+    let ctm = source.getTransformToElement !== undefined ? // api not found
+      source.getTransformToElement(target) :
+      getTransformToElementPolyfill(source, target);
+    return ctm;
+}
+
 export class VElement {
 
     constructor(elem) {
@@ -628,7 +645,8 @@ export class VElement {
             return box;
         }
 
-        let matrix = node.getTransformToElement(target || node.ownerSVGElement);
+        //let matrix = node.getTransformToElement(target || node.ownerSVGElement);
+        let matrix = wrapGetTransformToElement(node, target || node.ownerSVGElement);
 
         return vector.transformRect(box, matrix);
 
@@ -648,7 +666,8 @@ export class VElement {
         try {
             // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
             let globalPoint         = point.matrixTransform(svg.getScreenCTM().inverse());
-            let globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+            //let globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+            let globalToLocalMatrix = wrapGetTransformToElement(that.node, svg).inverse();
             return globalPoint.matrixTransform(globalToLocalMatrix);
 
         } catch (e) {
@@ -778,7 +797,8 @@ export class VElement {
                 parseFloat(this.attr('height'))
             );
             // Get the rect transformation matrix with regards to the SVG document.
-            let rectMatrix = that.node.getTransformToElement(target);
+            //let rectMatrix = that.node.getTransformToElement(target);
+            let rectMatrix = wrapGetTransformToElement(that.node, target);
             // Decompose the matrix to find the rotation angle.
             let rectMatrixComponents = vector.decomposeMatrix(rectMatrix);
             // Now we want to rotate the rectangle back so that we
@@ -805,7 +825,8 @@ export class VElement {
                 let sample = samples[i];
                 // Convert the sample point in the local coordinate system to the global coordinate system.
                 let gp             = vector.createSVGPoint(sample.x, sample.y);
-                gp                 = gp.matrixTransform(this.node.getTransformToElement(target));
+                //gp                 = gp.matrixTransform(this.node.getTransformToElement(target));
+                gp                 = gp.matrixTransform(wrapGetTransformToElement(this.node, target));
                 sample             = Point.fromPoint(gp);
                 let centerDistance = sample.distance(center);
                 // Penalize a higher distance to the reference point by 10%.

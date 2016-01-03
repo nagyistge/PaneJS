@@ -5762,15 +5762,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	
-	            link.routerPoints = that.parseRoute(link);
+	            link.routerPoints = that.parseRouter(link);
 	            link.sourcePoint = that.getConnectionPoint(link, true);
 	            link.targetPoint = that.getConnectionPoint(link, false);
 	
 	            return that;
 	        }
 	    }, {
-	        key: 'parseRoute',
-	        value: function parseRoute(link) {
+	        key: 'parseRouter',
+	        value: function parseRouter(link) {
 	
 	            var that = this;
 	            var router = link.router || that.options.defaultRouter;
@@ -6358,6 +6358,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Paper;
 	})(_Events3.default);
+	
+	// exports
+	// -------
 	
 	exports.default = Paper;
 
