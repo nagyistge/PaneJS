@@ -726,6 +726,22 @@ export class VElement {
 
     translateAndAutoOrient(position, reference, target) {
 
+        // Efficiently auto-orient an element.
+        // This basically implements the orient=auto attribute of markers.
+        // The easiest way of understanding on what this does is to imagine
+        // the element is an arrowhead. Calling this method on the arrowhead
+        // makes it point to the `position` point while being auto-oriented
+        // (properly rotated) towards the `reference` point. `target` is the
+        // element relative to which the transformations are applied. Usually
+        // a viewport.
+
+
+        // Clean-up previously set transformations except the scale. If we
+        // didn't clean up the previous transformations then they'd add up
+        // with the old ones. Scale is an exception as it doesn't add up,
+        // consider: `this.scale(2).scale(2).scale(2)`. The result is that the
+        // element is scaled by the factor 2, not 8.
+
         let that = this;
         let s = that.scale();
         that.attr('transform', '');
