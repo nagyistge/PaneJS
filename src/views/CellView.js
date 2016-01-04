@@ -57,6 +57,10 @@ class CellView {
         return selector === '.' ? [this.vel] : this.vel.find(selector);
     }
 
+    findOne(selector) {
+        return selector === '.' ? this.vel : this.vel.findOne(selector);
+    }
+
     applyAttrs(selector, attrs) {
 
         var that = this;
