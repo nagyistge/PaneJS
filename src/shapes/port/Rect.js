@@ -5,7 +5,7 @@ class Rect extends Node {}
 Rect.setDefaults({
     markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g></g>',
     attrs: {
-        '.': {fill: '#ffffff', stroke: 'none'},
+        '.': { fill: '#ffffff', stroke: 'none' },
         'rect': {
             'fill': '#ffffff',
             'stroke': '#000000',

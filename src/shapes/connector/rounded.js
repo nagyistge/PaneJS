@@ -1,11 +1,12 @@
-import * as utils from '../../common/utils'
+import * as utils from '../../common/utils';
 import Point from '../../geometry/Point';
 
 function rounded(sourcePoint, targetPoint, vertices, options = {}) {
 
     let offset = options.radius || 10;
 
-    let d1, d2;
+    let d1;
+    let d2;
 
     let d = ['M', sourcePoint.x, sourcePoint.y];
 

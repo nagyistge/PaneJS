@@ -21,7 +21,7 @@ class CellView {
 
         let that = this;
         let cell = that.cell;
-        let vel = vector('g', {'class': cell.className});
+        let vel = vector('g', { 'class': cell.className });
 
         that.vel = vel;
         that.elem = vel.node;
@@ -63,7 +63,7 @@ class CellView {
 
     applyAttrs(selector, attrs) {
 
-        var that = this;
+        let that = this;
 
         utils.forEach(that.find(selector), function (vel) {
             vel.attr(attrs);

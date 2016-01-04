@@ -25,6 +25,7 @@ rules:
   no-nested-ternary: 0 # Disallow Nested Ternaries
   func-names: 0 # Require Function Expressions to have a Name
   wrap-iife: 0
+  dot-notation: 1
   no-multi-spaces:
     - 2
     - exceptions:

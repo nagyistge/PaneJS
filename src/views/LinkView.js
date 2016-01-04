@@ -1,6 +1,4 @@
 import * as utils from '../common/utils';
-import vector     from '../common/vector';
-import Point      from '../geometry/Point';
 import CellView   from './CellView';
 
 class LinkView extends CellView {
@@ -92,7 +90,7 @@ class LinkView extends CellView {
 
             let pathData = connectorFn(sourcePoint, targetPoint, routerPoints, connectorOptions || {});
 
-            that.applyAttrs('.connection', {d: pathData});
+            that.applyAttrs('.connection', { d: pathData });
 
         } else {
             throw new Error('Unknown connector: "' + connectorName + '"');
