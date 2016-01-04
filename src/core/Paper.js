@@ -880,12 +880,14 @@ class Paper extends Events {
             connectors = that.connectors = {};
         }
 
+        connectors[name] = fn;
+
         return that;
     }
 
     static getConnector(name) {
-        let connectors = this.connectors;
 
+        let connectors = this.connectors;
         return connectors ? connectors[name] : null;
     }
 
@@ -898,10 +900,24 @@ class Paper extends Events {
     // marker
     // ------
 
-    static registerMarker(name) {}
+    static registerMarker(name, fn) {
+
+        let that = this;
+        let markers = that.markers;
+
+        if (!markers) {
+            markers = that.connectors = {};
+        }
+
+        markers[name] = fn;
+
+        return that;
+    }
 
     static getMarker(name) {
 
+        let markers = this.markers;
+        return markers ? markers[name] : null;
     }
 
     getMarker(name) {

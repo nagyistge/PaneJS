@@ -13,16 +13,17 @@ Rect.setDefaults({
             'fill': '#fff',
             'stroke': '#000',
             'stroke-width': '1',
-            'width': 100,
-            'height': 40
+            'width': 80,
+            'height': 30
         },
         'text': {
             'fill': '#000',
-            'font-size': 14,
+            'font-size': 12,
             'ref-x': .5,
             'ref-y': .5,
             'text-anchor': 'middle',
-            'y-alignment': 'middle'
+            'y-alignment': 'middle',
+            'font-family': 'Arial, helvetica, sans-serif'
         }
     }
 });

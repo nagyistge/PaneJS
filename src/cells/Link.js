@@ -4,7 +4,23 @@ import Visual from './Visual';
 class Link extends Visual {
 
     get isLink() {
+
         return true;
+    }
+
+    get connector() {
+
+        return this.metadata.connector;
+    }
+
+    get sourceMarker() {
+
+        return this.metadata.sourceMarker;
+    }
+
+    get targetMarker() {
+
+        return this.metadata.targetMarker;
     }
 }
 
@@ -13,9 +29,9 @@ Link.setDefaults({
 
     markup: ''
     + '<path class="connection"/>'
-    + '<path class="marker-source"/>'
-    + '<path class="marker-target"/>'
     + '<path class="connection-wrap"/>'
+    + '<path class="source-marker"/>'
+    + '<path class="target-marker"/>'
     + '<g class="labels"/>'
     + '<g class="marker-vertices"/>'
     + '<g class="marker-arrowheads"/>'
@@ -23,19 +39,20 @@ Link.setDefaults({
 
     classNames: 'pane-link',
     router: null,
-    marker: null,
-    connector: null, // set `null` to use the default connector
+    sourceMarker: 'classic',
+    targetMarker: null,
+    connector: 'sharp',
     attrs: {
         '.connection': {
             'fill': 'none',
             'stroke': '#000',
             'stroke-width': 1
         },
-        '.marker-source': {
-            d: 'M 10 0 L 0 5 L 10 10 z'
+        '.source-marker': {
+            d: 'M 0 3.50 L 7 0 L 5.25 3.50 L 7 7 z'
         },
-        '.marker-target': {
-            d: 'M 10 0 L 0 5 L 10 10 z'
+        '.target-marker': {
+            d: 'M 0 3.50 L 7 0 L 5.25 3.50 L 7 7 z'
         }
     }
 });

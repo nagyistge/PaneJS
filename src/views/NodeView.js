@@ -223,7 +223,7 @@ class NodeView extends CellView {
 
             // Get the bounding box of the reference element
             // relative to the root `<g>` element.
-            bbox = vref.bbox(false, that.elem);
+            bbox = vref.getBBox(false, that.elem);
         }
 
         // Remove the previous translate() from the transform attribute
@@ -301,7 +301,7 @@ class NodeView extends CellView {
 
         if (!isUndefined(yAlignment) || !isUndefined(xAlignment)) {
 
-            let velBBox = vel.bbox(false, that.paper.drawPane);
+            let velBBox = vel.getBBox(false, that.paper.drawPane);
 
             if (yAlignment === 'middle') {
                 ty -= velBBox.height / 2;
@@ -356,7 +356,7 @@ class NodeView extends CellView {
         }
 
         // get bbox without transform
-        let nativeBBox = scalableNode.bbox(true);
+        let nativeBBox = scalableNode.getBBox(true);
 
         // Make sure `scalableBBox.width` and `scalableBBox.height` are not
         // zero which can happen if the element does not have any content.

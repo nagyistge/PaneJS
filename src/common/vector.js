@@ -869,13 +869,13 @@ export class VElement {
 
     findIntersection(ref, target) {
 
-        // Find the intersection of a line starting in the center
-        // of the SVG `node` ending in the point `ref`.
-        // `target` is an SVG element to which `node`s transformations are relative to.
-        // In JointJS, `target` is the `paper.viewport` SVG group element.
-        // Note that `ref` point must be in the coordinate system of the `target` for this function to work properly.
-        // Returns a point in the `target` coordinate system (the same system as `ref` is in) if
-        // an intersection is found. Returns `undefined` otherwise.
+        // Find the intersection of a line starting in the center of the `node`
+        // ending in the point `ref`. `target` is an SVG element to which
+        // node's transformations are relative to. Note that `ref` point must
+        // be in  the coordinate system of the `target` for this function to
+        // work  properly. Returns a point in the `target` coordinate system
+        // (the same system as `ref` is in) if an intersection is found.
+        // Returns `undefined` otherwise.
 
         let that = this;
         let svg = that.svg().node;

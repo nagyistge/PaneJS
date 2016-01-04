@@ -2,7 +2,7 @@ function smooth(sourcePoint, targetPoint, vertices) {
 
     var d;
 
-    if (vertices.length) {
+    if (vertices && vertices.length) {
 
         d = g.bezier.curveThroughPoints([sourcePoint].concat(vertices).concat([targetPoint]));
 
@@ -12,9 +12,9 @@ function smooth(sourcePoint, targetPoint, vertices) {
         // between the source and target points. SourceControlPoint Y is equal to sourcePoint Y
         // and targetControlPointY being equal to targetPointY. Handle situation were
         // sourcePointX is greater or less then targetPointX.
-        var controlPointX = (sourcePoint.x < targetPoint.x)
-            ? targetPoint.x - ((targetPoint.x - sourcePoint.x) / 2)
-            : sourcePoint.x - ((sourcePoint.x - targetPoint.x) / 2);
+        var controlPointX = sourcePoint.x < targetPoint.x
+            ? targetPoint.x - (targetPoint.x - sourcePoint.x) / 2
+            : sourcePoint.x - (sourcePoint.x - targetPoint.x) / 2;
 
         d = [
             'M', sourcePoint.x, sourcePoint.y,

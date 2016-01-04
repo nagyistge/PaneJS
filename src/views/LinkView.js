@@ -1,14 +1,14 @@
 import * as utils from '../common/utils';
-import vector   from '../common/vector';
-import Point    from '../geometry/Point';
-import CellView from './CellView';
+import vector     from '../common/vector';
+import Point      from '../geometry/Point';
+import CellView   from './CellView';
 
 class LinkView extends CellView {
 
     render() {
 
         let that = this;
-        let vel  = that.vel;
+        let vel = that.vel;
 
         vel.empty();
 
@@ -20,16 +20,18 @@ class LinkView extends CellView {
     update() {
         return this
             .updateAttributes()
+            .updateMarker(true)
+            .updateMarker(false)
             .updateConnection();
     }
 
     updateAttributes() {
 
-        var that = this;
+        let that = this;
 
         utils.forIn(that.cell.attrs, function (attrs, selector) {
 
-            var processed = [];
+            let processed = [];
 
             if (utils.isObject(attrs.fill)) {
 
@@ -66,16 +68,60 @@ class LinkView extends CellView {
 
     updateConnection() {
 
-        let that   = this;
-        let points = that.cell.points;
+        let that = this;
+        let link = that.cell;
+        let connector = link.connector;
+        let connectorName;
+        let connectorOptions;
 
-        //that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
+        if (utils.isObject(connector)) {
+            connectorName = connector.name;
+            connectorOptions = connector.options;
+        } else {
+            connectorName = connector;
+        }
+
+
+        let connectorFn = that.paper.getConnector(connectorName);
+
+        if (connectorFn && utils.isFunction(connectorFn)) {
+
+            let routerPoints = link.routerPoints;
+            let sourcePoint = link.sourcePoint;
+            let targetPoint = link.targetPoint;
+
+            let pathData = connectorFn(sourcePoint, targetPoint, routerPoints, connectorOptions || {});
+
+            that.applyAttrs('.connection', {d: pathData});
+
+        } else {
+            throw new Error('Unknown connector: "' + connectorName + '"');
+        }
 
         return that;
     }
 
-    parseRoute() {
+    updateMarker(isSource) {
 
+        let that = this;
+        let link = that.cell;
+        let vMarker = that.findOne(isSource ? '.source-marker' : '.target-marker');
+
+        if (vMarker) {
+
+            let routerPoints = link.routerPoints;
+            let sourcePoint = link.sourcePoint;
+            let targetPoint = link.targetPoint;
+
+            let position = isSource ? sourcePoint : targetPoint;
+            let reference = isSource
+                ? (routerPoints[0] || targetPoint)
+                : (routerPoints[routerPoints.length - 1] || sourcePoint);
+
+            vMarker.translateAndAutoOrient(position, reference, that.paper.drawPane);
+        }
+
+        return that;
     }
 }
 
