@@ -52,7 +52,6 @@ test-rpt:
 	cat $(DIR_COV)/lcov.info | $(CMD_COVERALLS)
 
 
-
 build: clean-dist
 	webpack
 	webpack --config webpack.config.min.js
