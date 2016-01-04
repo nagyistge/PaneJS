@@ -33,6 +33,38 @@ function getTransformToElement(source, target) {
     return matrix.multiply(source.getScreenCTM());
 }
 
+function deltaTransformPoint(matrix, point) {
+
+    return {
+        x: point.x * matrix.a + point.y * matrix.c,
+        y: point.x * matrix.b + point.y * matrix.d
+    };
+}
+
+function decomposeMatrix(matrix) {
+
+    // @see https://gist.github.com/2052247
+
+    // calculate delta transform point
+    let px = deltaTransformPoint(matrix, {x: 0, y: 1});
+    let py = deltaTransformPoint(matrix, {x: 1, y: 0});
+
+    // calculate skew
+    let skewX = ((180 / Math.PI) * Math.atan2(px.y, px.x) - 90);
+    let skewY = ((180 / Math.PI) * Math.atan2(py.y, py.x));
+
+    return {
+
+        translateX: matrix.e,
+        translateY: matrix.f,
+        scaleX: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b),
+        scaleY: Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d),
+        skewX: skewX,
+        skewY: skewY,
+        rotation: skewX // rotation is the same as skew x
+    };
+}
+
 
 export class VElement {
 
@@ -597,7 +629,7 @@ export class VElement {
         return this.attr('transform', final);
     }
 
-    bbox(withoutTransformations, target) {
+    getBBox(withoutTransformations, target) {
 
         // Get SVGRect that contains coordinates and dimension of the real
         // bounding box, i.e. after transformations are applied.
@@ -692,7 +724,54 @@ export class VElement {
 
     translateCenterToPoint() {}
 
-    translateAndAutoOrient() {}
+    translateAndAutoOrient(position, reference, target) {
+
+        let that = this;
+        let s = that.scale();
+        that.attr('transform', '');
+        that.scale(s.sx, s.sy);
+
+        let svg = that.getSVG().node;
+        let bbox = that.getBBox(false, target);
+
+        // 1. Translate to origin.
+        let translateToOrigin = svg.createSVGTransform();
+        translateToOrigin.setTranslate(-bbox.x - bbox.width / 2, -bbox.y - bbox.height / 2);
+
+        // 2. Rotate around origin.
+        let rotateAroundOrigin = svg.createSVGTransform();
+        let angle = Point.fromPoint(position).changeInAngle(position.x - reference.x, position.y - reference.y, reference);
+        rotateAroundOrigin.setRotate(angle, 0, 0);
+
+        // 3. Translate to the `position` + the offset (half my width) towards the `reference` point.
+        let translateFinal = svg.createSVGTransform();
+        let finalPosition = Point.fromPoint(position).move(reference, bbox.width / 2);
+        translateFinal.setTranslate(position.x + (position.x - finalPosition.x), position.y + (position.y - finalPosition.y));
+
+        // 4. Apply transformations.
+        let ctm = that.getTransformToElement(target);
+        let transform = svg.createSVGTransform();
+        transform.setMatrix(
+            translateFinal.matrix.multiply(
+                rotateAroundOrigin.matrix.multiply(
+                    translateToOrigin.matrix.multiply(ctm)))
+        );
+
+
+        // Instead of directly setting the `matrix()` transform on the element,
+        // first, decompose the matrix into separate transforms. This allows us
+        // to use normal vector's methods as they don't work on matrices.
+        // An example of this is to retrieve a scale of an element.
+
+        let decomposition = decomposeMatrix(transform.matrix);
+
+        that.translate(decomposition.translateX, decomposition.translateY);
+        that.rotate(decomposition.rotation);
+        // Note that scale has been already applied
+        //this.scale(decomposition.scaleX, decomposition.scaleY);
+
+        return that;
+    }
 
     animateAlongPath() {}
 
