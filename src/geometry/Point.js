@@ -249,7 +249,7 @@ class Point {
         // my new position relative to ref point.
 
         // Revert the translation and measure the change in angle around x-axis.
-        return this.translate(-dx, -dy).theta(ref) - this.theta(ref);
+        return Point.fromPoint(this).translate(-dx, -dy).theta(ref) - this.theta(ref);
     }
 
     snapToGrid(gx, gy) {
