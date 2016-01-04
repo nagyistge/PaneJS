@@ -65,7 +65,9 @@ release-major: NEXT_VERSION = $(shell node -pe 'require("semver").inc("$(VERSION
 
 
 release-patch release-minor release-major: lint test build
-	@printf "Current version is $(VERSION). This will publish version $(NEXT_VERSION). Press [enter] to continue." >&2
+
+	@printf "Current version is $(VERSION). This will publish version $(NEXT_VERSION)."
+	@printf "Press [enter] to continue." >&2
 	@read nothing
 
 	node -e "\
@@ -77,4 +79,4 @@ release-patch release-minor release-major: lint test build
 	git commit package.json -m 'Version $(NEXT_VERSION)'
 	git tag -a "v$(NEXT_VERSION)" -m "Version $(NEXT_VERSION)"
 	git push --tags origin HEAD:master
-    npm publish
+	npm publish
