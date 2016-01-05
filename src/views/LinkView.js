@@ -125,8 +125,8 @@ class LinkView extends CellView {
             vMarker.translateAndAutoOrient(position, reference, drawPane);
 
             // update the connection point on the marker
-
             if (connectionPoint !== true) {
+
                 let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
                 p = p.matrixTransform(vMarker.node.getTransformToElement(drawPane));
 

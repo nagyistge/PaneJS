@@ -531,33 +531,23 @@ class Paper extends Events {
 
         // find the connection point on the terminal
 
-        let model = this.model;
-
+        let that = this;
         let spot;
-        let terminal = model.getTerminal(link, isSource);
+        let terminalView = that.getTerminalView(link, isSource);
 
-        if (terminal) {
+        if (terminalView) {
 
-            let spotBBox = new Rect(
-                terminal.position.x,
-                terminal.position.y,
-                terminal.size.width,
-                terminal.size.height);
-
+            let spotBBox = terminalView.getStrokeBBox();
             let vertices = link.routerPoints || [];
             let reference = isSource ? vertices[0] : vertices[vertices.length - 1];
 
             if (!reference) {
 
-                let referenceTerminal = link.getTerminal(!isSource);
+                let referenceView = that.getTerminalView(link, !isSource);
 
-                if (referenceTerminal) {
+                if (referenceView) {
 
-                    let referenceBBox = new Rect(
-                        referenceTerminal.position.x,
-                        referenceTerminal.position.y,
-                        referenceTerminal.size.width,
-                        referenceTerminal.size.height);
+                    let referenceBBox = referenceView.getStrokeBBox();
 
                     reference = referenceBBox.intersectionWithLineFromCenterToPoint(spotBBox.getCenter());
                     reference = reference || referenceBBox.getCenter();
@@ -575,6 +565,7 @@ class Paper extends Events {
             spot = spot || spotBBox.getCenter();
 
         } else {
+
             spot = isSource ? link.sourcePoint : link.targetPoint;
         }
 
@@ -629,7 +620,7 @@ class Paper extends Events {
         options.width = width;
         options.height = height;
 
-        vector(that.svg).attr({width: width, height: height});
+        vector(that.svg).attr({ width: width, height: height });
 
         that.trigger('paper:resize', width, height);
 
@@ -689,6 +680,13 @@ class Paper extends Events {
 
             return view;
         }
+    }
+
+    getTerminalView(link, isSource) {
+
+        let terminal = this.model.getTerminal(link, isSource);
+
+        return terminal ? this.getView(terminal) : null;
     }
 
     createView(cell) {
@@ -959,7 +957,7 @@ class Paper extends Events {
             return;
         }
 
-        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
         if (view) {
             that.sourceView = view;
@@ -981,7 +979,7 @@ class Paper extends Events {
             return;
         }
 
-        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
         if (view) {
             view.onDblClick(e, localPoint.x, localPoint.y);
@@ -1003,7 +1001,7 @@ class Paper extends Events {
             return;
         }
 
-        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
         if (view) {
             view.onPointerDown(e, localPoint.x, localPoint.y);
@@ -1022,7 +1020,7 @@ class Paper extends Events {
 
         if (sourceView) {
 
-            let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+            let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
             that._mouseMoved++;
 
@@ -1035,7 +1033,7 @@ class Paper extends Events {
         e = utils.normalizeEvent(e);
 
         let that = this;
-        let localPoint = that.snapToGrid({x: e.clientX, y: e.clientY});
+        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
         let sourceView = that.sourceView;
 
         if (sourceView) {

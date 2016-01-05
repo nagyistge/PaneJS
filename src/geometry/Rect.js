@@ -245,6 +245,18 @@ class Rect {
         return that;
     }
 
+    grow(amount) {
+
+        var that = this;
+
+        that.x -= amount;
+        that.y -= amount;
+        that.width += 2 * amount;
+        that.height += 2 * amount;
+
+        return that;
+    }
+
     round(precision) {
 
         let that = this;

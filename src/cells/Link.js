@@ -39,8 +39,8 @@ Link.setDefaults({
 
     classNames: 'pane-link',
     router: null,
-    sourceMarker: 'classic',
-    targetMarker: 'cloven',
+    sourceMarker: null,
+    targetMarker: null,
     connector: 'sharp',
     attrs: {
         '.connection': {

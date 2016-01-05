@@ -1,3 +1,4 @@
+import * as utils from '../common/utils';
 import Visual from './Visual';
 
 
@@ -24,6 +25,19 @@ class Node extends Visual {
 
     getBBox() {
         return false;
+    }
+
+    getStrokeWidth() {
+
+        let attr = this.getStrokeAttr();
+        let strokeWidth = attr['stroke-width'] || 0;
+
+        return utils.toFloat(strokeWidth) || 0;
+    }
+
+    getStrokeAttr() {
+
+        return null;
     }
 }
 

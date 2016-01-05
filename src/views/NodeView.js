@@ -1,4 +1,5 @@
 import * as utils from '../common/utils';
+import Rect     from '../geometry/Rect';
 import CellView from './CellView';
 
 
@@ -415,7 +416,23 @@ class NodeView extends CellView {
         return that;
     }
 
-    getBBox() {}
+    getBBox() {
+        return this.vel.getBBox();
+    }
+
+    getStrokeBBox() {
+
+        let cell = this.cell;
+        let strokeWidth = this.cell.getStrokeWidth();
+
+        let bbox = new Rect(
+            cell.position.x,
+            cell.position.y,
+            cell.size.width,
+            cell.size.height);
+
+        return bbox.grow(strokeWidth / 2);
+    }
 }
 
 
