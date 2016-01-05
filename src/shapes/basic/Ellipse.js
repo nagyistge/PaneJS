@@ -1,7 +1,13 @@
 import Node from '../../cells/Node';
 
 
-class Ellipse extends Node {}
+class Ellipse extends Node {
+
+    getStrokeAttr() {
+
+        return this.attrs.ellipse;
+    }
+}
 
 
 Ellipse.setDefaults({

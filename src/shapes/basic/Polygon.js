@@ -1,6 +1,12 @@
 import Node from '../../cells/Node';
 
-class Polygon extends Node {}
+class Polygon extends Node {
+
+    getStrokeAttr() {
+
+        return this.attrs.polygon;
+    }
+}
 
 Polygon.setDefaults({
 
