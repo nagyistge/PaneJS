@@ -27,12 +27,15 @@
     model.beginUpdate();
 
     var node1 = new pane.shapes.basic.Rect({
-        position: { x: 70, y: 40 },
-        size: { width: 80, height: 30 },
+        position: {
+            x: 70,
+            y: 40
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
         attrs: {
-            rect: {
-                'stroke-width': 1
-            },
             text: {
                 text: 'Hello,'
             }
@@ -40,25 +43,23 @@
     });
 
     var node2 = new pane.shapes.basic.Rect({
-        position: { x: 200, y: 200 },
-        size: { width: 80, height: 30 },
+        position: {
+            x: 200,
+            y: 200
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
         attrs: {
-            rect: {
-                'stroke-width': 1
-            },
-            text: { text: 'World!' }
+            text: {
+                text: 'World!'
+            }
         }
     });
 
     var link1 = new pane.Link({
-        sourceMarker: null,
-        targetMarker: 'diamond',
-        attrs: {
-            '.target-marker': {
-                stroke: '#000',
-                fill: 'none'
-            }
-        }
+        targetMarker: 'classic'
     });
 
     model.addNode(node1);
