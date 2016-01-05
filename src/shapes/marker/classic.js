@@ -16,6 +16,7 @@ function classicMarker(vMarker, options) {
 
         vMarker.attr('d', pathArr.join(' '));
 
+        // return the connection point on the marker
         return new Point(size * 0.75, size / 2);
     }
 }

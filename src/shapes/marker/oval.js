@@ -4,6 +4,7 @@ import Point  from '../../geometry/Point';
 
 function ovalMarker(vMarker, options) {
 
+    // Note: vMarker should be a `g` element
 
     if (vMarker) {
 
@@ -21,6 +22,7 @@ function ovalMarker(vMarker, options) {
 
         vMarker.append(vEllipse);
 
+        // return the connection point on the marker
         return new Point(rx * 2, ry);
     }
 }

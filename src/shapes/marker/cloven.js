@@ -14,6 +14,8 @@ function clovenMarker(vMarker, options) {
             fill: 'none'
         });
 
+
+        // return true will use the connection point on the cell
         return true;
     }
 }
