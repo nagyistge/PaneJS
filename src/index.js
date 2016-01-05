@@ -39,11 +39,15 @@ Paper
 // -------
 
 import classicMarker from './shapes/marker/classic';
+import diamondMarker from './shapes/marker/diamond';
 import clovenMarker from './shapes/marker/cloven';
+import ovalMarker from './shapes/marker/oval';
 
 Paper
     .registerMarker('classic', classicMarker)
-    .registerMarker('cloven', clovenMarker);
+    .registerMarker('diamond', diamondMarker)
+    .registerMarker('cloven', clovenMarker)
+    .registerMarker('oval', ovalMarker);
 
 
 // shapes
