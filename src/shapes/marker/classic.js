@@ -1,12 +1,23 @@
-import * as utils from '../../common/utils';
-import vector     from '../../common/vector';
+import Point from '../../geometry/Point';
 
 
-function classic(sourcePoint, targetPoint, vertices, options) {
+function classicMarker(vMarker, options) {
 
+    if (vMarker) {
 
+        let size = options.size || 7;
+        let pathArr = [];
 
-    return 'M 0 3.50 L 7 0 L 5.25 3.50 L 7 7 z';
+        pathArr.push('M', 0, size / 2);
+        pathArr.push('L', size, 0);
+        pathArr.push('L', size * 0.75, size / 2);
+        pathArr.push('L', size, size);
+        pathArr.push('Z');
+
+        vMarker.attr('d', pathArr.join(' '));
+
+        return new Point(size * 0.75, size / 2);
+    }
 }
 
-export default classic;
+export default classicMarker;

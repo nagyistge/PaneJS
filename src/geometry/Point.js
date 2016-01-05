@@ -141,7 +141,7 @@ class Point {
 
     smooth() {
 
-        return thi.round(2);
+        return this.round(2);
     }
 
     diff(p) {

@@ -1,4 +1,6 @@
 import * as utils from '../common/utils';
+import vector     from '../common/vector';
+import Point      from '../geometry/Point';
 import CellView   from './CellView';
 
 class LinkView extends CellView {
@@ -103,23 +105,65 @@ class LinkView extends CellView {
 
         let that = this;
         let link = that.cell;
+        let marker = isSource ? link.sourceMarker : link.targetMarker;
         let vMarker = that.findOne(isSource ? '.source-marker' : '.target-marker');
+        let connectionPoint = that.applyMarker(vMarker, marker);
 
-        if (vMarker) {
+        if (connectionPoint) {
 
-            let routerPoints = link.routerPoints;
+            let drawPane = that.paper.drawPane;
             let sourcePoint = link.sourcePoint;
             let targetPoint = link.targetPoint;
+            let routerPoints = link.routerPoints;
 
             let position = isSource ? sourcePoint : targetPoint;
             let reference = isSource
                 ? (routerPoints[0] || targetPoint)
                 : (routerPoints[routerPoints.length - 1] || sourcePoint);
 
-            vMarker.translateAndAutoOrient(position, reference, that.paper.drawPane);
+            // make the marker at the right position
+            vMarker.translateAndAutoOrient(position, reference, drawPane);
+
+            // update the connection point on the marker
+
+            if (connectionPoint !== true) {
+                let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
+                p = p.matrixTransform(vMarker.node.getTransformToElement(drawPane));
+
+                let newPoint = Point.fromPoint(p);
+
+                if (isSource) {
+                    link.sourcePoint = newPoint;
+                } else {
+                    link.targetPoint = newPoint;
+                }
+            }
         }
 
         return that;
+    }
+
+    applyMarker(vMarker, marker) {
+
+        if (marker && vMarker) {
+
+            let that = this;
+            let markerName;
+            let markerOption;
+
+            if (utils.isObject(marker)) {
+                markerName = marker.name || '';
+                markerOption = marker.options;
+            } else {
+                markerName = '' + marker;
+            }
+
+            let markerFn = that.paper.getMarker(markerName);
+
+            if (markerFn && utils.isFunction(markerFn)) {
+                return markerFn(vMarker, markerOption || {});
+            }
+        }
     }
 }
 

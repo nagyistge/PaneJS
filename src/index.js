@@ -25,6 +25,30 @@ import ChildChange    from './changes/ChildChange'
 import TerminalChange from './changes/TerminalChange'
 
 
+// connectors
+// ----------
+import sharpConnector   from './shapes/connector/sharp';
+import roundedConnector from './shapes/connector/rounded';
+
+Paper
+    .registerConnector('sharp', sharpConnector)
+    .registerConnector('rounded', roundedConnector);
+
+
+// markers
+// -------
+
+import classicMarker from './shapes/marker/classic';
+import clovenMarker from './shapes/marker/cloven';
+
+Paper
+    .registerMarker('classic', classicMarker)
+    .registerMarker('cloven', clovenMarker);
+
+
+// shapes
+// ------
+
 import Text     from './shapes/basic/Text';
 import Rect     from './shapes/basic/Rect';
 import Circle   from './shapes/basic/Circle';
@@ -36,17 +60,6 @@ import Polyline from './shapes/basic/Polyline';
 import Rhombus  from './shapes/basic/Rhombus';
 
 import PortRect  from './shapes/port/Rect';
-
-
-import sharp from './shapes/connector/sharp';
-import rounded  from './shapes/connector/rounded';
-
-
-// register default connectors and markers
-Paper
-    .registerConnector('sharp', sharp)
-    .registerConnector('rounded', rounded);
-
 
 let shapes = {
     basic: {

@@ -906,7 +906,7 @@ class Paper extends Events {
         let markers = that.markers;
 
         if (!markers) {
-            markers = that.connectors = {};
+            markers = that.markers = {};
         }
 
         markers[name] = fn;

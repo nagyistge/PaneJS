@@ -40,19 +40,13 @@ Link.setDefaults({
     classNames: 'pane-link',
     router: null,
     sourceMarker: 'classic',
-    targetMarker: null,
+    targetMarker: 'cloven',
     connector: 'sharp',
     attrs: {
         '.connection': {
             'fill': 'none',
             'stroke': '#000',
             'stroke-width': 1
-        },
-        '.source-marker': {
-            d: 'M 0 3.50 L 7 0 L 5.25 3.50 L 7 7 z'
-        },
-        '.target-marker': {
-            d: 'M 0 3.50 L 7 0 L 5.25 3.50 L 7 7 z'
         }
     }
 });

@@ -1,7 +1,7 @@
 import * as utils from '../../common/utils';
 import Point from '../../geometry/Point';
 
-function rounded(sourcePoint, targetPoint, vertices, options = {}) {
+function roundedConnector(sourcePoint, targetPoint, vertices, options = {}) {
 
     let offset = options.radius || 10;
 
@@ -34,4 +34,4 @@ function rounded(sourcePoint, targetPoint, vertices, options = {}) {
 }
 
 
-export default rounded;
+export default roundedConnector;

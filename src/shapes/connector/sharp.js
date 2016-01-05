@@ -1,6 +1,6 @@
 import * as utils from '../../common/utils';
 
-function straight(sourcePoint, targetPoint, vertices) {
+function sharpConnector(sourcePoint, targetPoint, vertices) {
 
     let d = ['M', sourcePoint.x, sourcePoint.y];
 
@@ -15,4 +15,4 @@ function straight(sourcePoint, targetPoint, vertices) {
 }
 
 
-export default straight;
+export default sharpConnector;

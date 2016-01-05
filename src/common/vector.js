@@ -878,11 +878,11 @@ export class VElement {
         // Returns `undefined` otherwise.
 
         let that = this;
-        let svg = that.svg().node;
+        let svg = that.getSVG().node;
 
         target = target || svg;
 
-        let bbox = Rect.fromRect(that.bbox(false, target));
+        let bbox = Rect.fromRect(that.getBBox(false, target));
         let center = bbox.getCenter();
         let spot = bbox.intersectionWithLineFromCenterToPoint(ref);
 
@@ -931,7 +931,7 @@ export class VElement {
                 let sample = samples[i];
                 // Convert the sample point in the local coordinate system to the global coordinate system.
                 let gp = vector.createSVGPoint(sample.x, sample.y);
-                gp = gp.matrixTransform(this.node.getTransformToElement(target));
+                gp = gp.matrixTransform(that.node.getTransformToElement(target));
                 sample = Point.fromPoint(gp);
                 let centerDistance = sample.distance(center);
                 // Penalize a higher distance to the reference point by 10%.
