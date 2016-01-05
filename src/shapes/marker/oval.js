@@ -1,20 +1,27 @@
+import vector from '../../common/vector';
+import Point  from '../../geometry/Point';
+
+
 function ovalMarker(vMarker, options) {
+
 
     if (vMarker) {
 
-        let size = options.size || 7;
-        let pathArr = [];
+        let rx = options.rx || 5;
+        let ry = options.ry || rx;
 
-        pathArr.push('M', size, 0);
-        pathArr.push('L', 0, size / 2);
-        pathArr.push('L', size, size);
+        let vEllipse = vector('ellipse');
 
-        vMarker.attr({
-            d: pathArr.join(' '),
-            fill: 'none'
+        vEllipse.attr({
+            cx: rx,
+            cy: ry,
+            rx: rx,
+            ry: ry
         });
 
-        return true;
+        vMarker.append(vEllipse);
+
+        return new Point(rx * 2, ry);
     }
 }
 
