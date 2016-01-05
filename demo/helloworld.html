@@ -31,7 +31,7 @@
         size: { width: 80, height: 30 },
         attrs: {
             rect: {
-                'stroke-width': 10
+                'stroke-width': 1
             },
             text: {
                 text: 'Hello,'
@@ -44,7 +44,7 @@
         size: { width: 80, height: 30 },
         attrs: {
             rect: {
-                'stroke-width': 10
+                'stroke-width': 1
             },
             text: { text: 'World!' }
         }
@@ -52,7 +52,12 @@
 
     var link1 = new pane.Link({
         sourceMarker: null,
-        targetMarker: 'classic'
+        targetMarker: 'cloven',
+        attrs: {
+            '.target-marker': {
+                stroke: '#000'
+            }
+        }
     });
 
     model.addNode(node1);

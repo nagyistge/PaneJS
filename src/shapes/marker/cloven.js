@@ -9,7 +9,10 @@ function clovenMarker(vMarker, options) {
         pathArr.push('L', 0, size / 2);
         pathArr.push('L', size, size);
 
-        vMarker.attr('d', pathArr.join(' '));
+        vMarker.attr({
+            d: pathArr.join(' '),
+            fill: 'none'
+        });
 
         return true;
     }
