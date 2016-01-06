@@ -450,6 +450,8 @@ class NodeView extends CellView {
             cell.size.width,
             cell.size.height);
 
+        strokeWidth -= 1;
+
         return strokeWidth ? bbox.grow(strokeWidth / 2) : bbox;
     }
 }

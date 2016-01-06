@@ -46,8 +46,8 @@ function decomposeMatrix(matrix) {
     // @see https://gist.github.com/2052247
 
     // calculate delta transform point
-    let px = deltaTransformPoint(matrix, {x: 0, y: 1});
-    let py = deltaTransformPoint(matrix, {x: 1, y: 0});
+    let px = deltaTransformPoint(matrix, { x: 0, y: 1 });
+    let py = deltaTransformPoint(matrix, { x: 1, y: 0 });
 
     // calculate skew
     let skewX = ((180 / Math.PI) * Math.atan2(px.y, px.x) - 90);
@@ -672,14 +672,13 @@ export class VElement {
             };
         }
 
-        if (withoutTransformations) {
-            return box;
+        if (!withoutTransformations) {
+
+            let matrix = node.getTransformToElement(target || node.ownerSVGElement);
+            box = vector.transformRect(box, matrix);
         }
 
-        let matrix = node.getTransformToElement(target || node.ownerSVGElement);
-
-        return vector.transformRect(box, matrix);
-
+        return Rect.fromRect(box);
     }
 
     toLocalPoint(x, y) {
