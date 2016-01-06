@@ -112,22 +112,12 @@ class LinkView extends CellView {
 
     updateMarker() {
 
-        let that = this;
-        let sourceMarkerMeta = that.renderMarker(true);
-        let targetMarkerMeta = that.renderMarker(false);
-
-        that.updateConnectionPoint(true, sourceMarkerMeta && sourceMarkerMeta.rad || 0);
-        that.updateConnectionPoint(false, targetMarkerMeta && targetMarkerMeta.rad || 0);
-
-        if (sourceMarkerMeta) {
-            that.transformMarker(true, sourceMarkerMeta.point)
-        }
-
-        if (targetMarkerMeta) {
-            that.transformMarker(false, targetMarkerMeta.point);
-        }
-
-        return that;
+        return this.renderMarker(true)
+            .renderMarker(false)
+            .updateConnectionPoint(true)
+            .updateConnectionPoint(false)
+            .transformMarker(true)
+            .transformMarker(false);
     }
 
     updateConnector() {
@@ -169,7 +159,7 @@ class LinkView extends CellView {
         return 0;
     }
 
-    getTerminalOuterBox(isSource, rad) {
+    getTerminalOuterBox(isSource) {
 
         let that = this;
         let terminalView = that.paper.getTerminalView(that.cell, isSource);
@@ -180,10 +170,13 @@ class LinkView extends CellView {
             let markerStrokeWidth = isSource
                 ? that.sourceMarkerStrokeWidth
                 : that.targetMarkerStrokeWidth;
+            let renderedMarker = isSource
+                ? that.renderedSourceMarker
+                : that.renderedTargetMarker;
 
-            if (markerStrokeWidth) {
+            if (renderedMarker && markerStrokeWidth) {
 
-                rad = rad || 0;
+                let rad = renderedMarker.rad || 0;
 
                 if (rad >= Math.PI / 4) {
                     bbox.grow(markerStrokeWidth / 2);
@@ -262,40 +255,58 @@ class LinkView extends CellView {
             let renderer = that.paper.getMarker(marker.name);
 
             if (renderer && utils.isFunction(renderer)) {
-                return renderer(vMarker, marker.options);
+                let result = renderer(vMarker, marker.options);
+
+                if (isSource) {
+                    that.renderedSourceMarker = result;
+                } else {
+                    that.renderedTargetMarker = result;
+                }
             }
         }
+
+        return that;
     }
 
-    transformMarker(isSource, connectionPoint) {
+    transformMarker(isSource) {
 
         let that = this;
-        let link = that.cell;
-        let drawPane = that.paper.drawPane;
-        let sourcePoint = link.sourcePoint;
-        let targetPoint = link.targetPoint;
-        let routerPoints = link.routerPoints;
+        let renderedMarker = isSource
+            ? that.renderedSourceMarker
+            : that.renderedTargetMarker;
 
-        let startPoint = isSource ? sourcePoint : targetPoint;
-        let endPoint = isSource
-            ? (routerPoints[0] || targetPoint)
-            : (routerPoints[routerPoints.length - 1] || sourcePoint);
+        if (renderedMarker) {
 
-        // make the marker at the right position
-        let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
-        vMarker.translateAndAutoOrient(startPoint, endPoint, drawPane);
+            let link = that.cell;
+            let drawPane = that.paper.drawPane;
+            let sourcePoint = link.sourcePoint;
+            let targetPoint = link.targetPoint;
+            let routerPoints = link.routerPoints;
 
-        // update the connection point on the marker
-        let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
-        p = p.matrixTransform(vMarker.node.getTransformToElement(drawPane));
+            let startPoint = isSource ? sourcePoint : targetPoint;
+            let endPoint = isSource
+                ? (routerPoints[0] || targetPoint)
+                : (routerPoints[routerPoints.length - 1] || sourcePoint);
 
-        let newPoint = Point.fromPoint(p);
+            // make the marker at the right position
+            let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
+            vMarker.translateAndAutoOrient(startPoint, endPoint, drawPane);
 
-        if (isSource) {
-            link.sourcePoint = newPoint;
-        } else {
-            link.targetPoint = newPoint;
+            // update the connection point on the marker
+            let connectionPoint = renderedMarker.point;
+            let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
+            p = p.matrixTransform(vMarker.node.getTransformToElement(drawPane));
+
+            let newPoint = Point.fromPoint(p);
+
+            if (isSource) {
+                link.sourcePoint = newPoint;
+            } else {
+                link.targetPoint = newPoint;
+            }
         }
+
+        return that;
     }
 }
 
