@@ -86,6 +86,8 @@ let shapes = {
 };
 
 
+import * as geometry from './geometry/index';
+
 // exports
 // -------
 
@@ -93,6 +95,7 @@ export {
     utils,
     vector,
     VElement,
+    geometry,
 
     Cell,
     Link,

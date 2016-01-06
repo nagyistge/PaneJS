@@ -23,7 +23,58 @@
     var model = new pane.Model();
     var paper = new pane.Paper(container, model);
 
+    var link1 = new pane.Link({
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
 
+    link1.sourcePoint = new pane.geometry.Point(40, 30);
+    link1.targetPoint = new pane.geometry.Point(240, 30);
+    link1.vertices = [
+        new pane.geometry.Point(40, 80),
+        new pane.geometry.Point(140, 110),
+        new pane.geometry.Point(240, 80)
+    ];
+
+    model.addLink(link1);
+
+
+    var link2 = link1.clone();
+    link2.sourcePoint = new pane.geometry.Point(40, 160);
+    link2.targetPoint = new pane.geometry.Point(240, 160);
+    link2.vertices = [
+        new pane.geometry.Point(40, 250),
+        new pane.geometry.Point(140, 200),
+        new pane.geometry.Point(240, 250)
+    ];
+    model.addLink(link2);
+
+
+    var link3 = new pane.Link({
+        connector: 'rounded',
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
+
+    link3.sourcePoint = new pane.geometry.Point(300, 30);
+    link3.targetPoint = new pane.geometry.Point(500, 30);
+    link3.vertices = [
+        new pane.geometry.Point(300, 80),
+        new pane.geometry.Point(400, 110),
+        new pane.geometry.Point(500, 80)
+    ];
+
+    model.addLink(link3);
+
+    var link4 = link3.clone();
+    link4.sourcePoint = new pane.geometry.Point(300, 160);
+    link4.targetPoint = new pane.geometry.Point(500, 160);
+    link4.vertices = [
+        new pane.geometry.Point(300, 250),
+        new pane.geometry.Point(400, 200),
+        new pane.geometry.Point(500, 250)
+    ];
+    model.addLink(link4);
 
 </script>
 
