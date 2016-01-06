@@ -174,8 +174,8 @@ class Paper extends Events {
         utils.addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
         utils.addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
         utils.addEventListener(svg, 'touchmove', that.onPointerMove.bind(that));
-        utils.addEventListener(svg, 'mouseover', '.pane-element', that.onCellMouseOver.bind(that));
-        utils.addEventListener(svg, 'mouseout', '.pane-element', that.onCellMouseOut.bind(that));
+        utils.addEventListener(svg, 'mouseover', '.pane-node', that.onCellMouseOver.bind(that));
+        utils.addEventListener(svg, 'mouseout', '.pane-node', that.onCellMouseOut.bind(that));
         utils.addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
         utils.addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
 
@@ -974,7 +974,7 @@ class Paper extends Events {
                 return;
             }
 
-            view.mouseover(e);
+            view.onMouseOver(e);
         }
     }
 
@@ -991,7 +991,7 @@ class Paper extends Events {
                 return;
             }
 
-            view.mouseout(e);
+            view.onMouseOut(e);
         }
     }
 }

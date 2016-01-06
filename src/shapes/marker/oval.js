@@ -8,7 +8,7 @@ function ovalMarker(vMarker, options) {
 
     if (vMarker) {
 
-        let rx = options.rx || 5;
+        let rx = options.rx || 2.5;
         let ry = options.ry || rx;
 
         let vEllipse = vector('ellipse');
