@@ -6,8 +6,7 @@ function clovenMarker(vMarker, options) {
     if (vMarker) {
 
         let rx = options.rx || 7;
-        let ry = options.ry || 3.5;
-        let size = options.size || 7;
+        let ry = options.ry || rx / 2;
         let pathArr = [];
 
         pathArr.push('M', rx, 0);
@@ -15,9 +14,6 @@ function clovenMarker(vMarker, options) {
         pathArr.push('L', rx, ry * 2);
 
         vMarker.attr('d', pathArr.join(' '));
-
-
-        // return true will use the connection point on the cell
 
         return {
             rad: Math.atan2(ry, rx),

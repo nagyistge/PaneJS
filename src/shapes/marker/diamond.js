@@ -6,7 +6,7 @@ function diamondMarker(vMarker, options) {
     if (vMarker) {
 
         let rx = options.rx || 5;
-        let ry = options.ry || 2.5;
+        let ry = options.ry || rx / 2;
         let pathArr = [];
 
         pathArr.push('M', rx, 0);

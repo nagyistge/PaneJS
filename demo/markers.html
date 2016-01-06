@@ -63,22 +63,22 @@
         targetMarker: {
             name: 'classic',
             options: {
-                size: 30
+                size: 12
             }
         },
         attrs: {
             '.source-marker': {
                 'fill': 'none',
                 'stroke': '#000',
-                'stroke-width': 2
+                'stroke-width': 1
             },
             '.target-marker': {
-                'fill': 'none',
+                'fill': '#FF0000',
                 'stroke': '#000',
-                'stroke-width': 6
+                'stroke-width': 2
             },
             '.connector': {
-                'stroke-width': 3
+                'stroke-width': 1
             }
         }
     });
@@ -99,19 +99,20 @@
         targetMarker: {
             name: 'block',
             options: {
-                size: 11
+                rx: 10,
+                ry: 3
             }
         },
         attrs: {
             '.source-marker': {
-                'fill': '#ff0000',
+                'fill': '#FF0000',
                 'stroke': '#000',
                 'stroke-width': 1
             },
             '.target-marker': {
                 'fill': 'none',
                 'stroke': '#000',
-                'stroke-width': 2
+                'stroke-width': 1
             },
             '.connector': {
                 'stroke-width': 1
@@ -135,20 +136,20 @@
         targetMarker: {
             name: 'cloven',
             options: {
-                rx: 10,
-                ry: 30
+                rx: 5,
+                ry: 10
             }
         },
         attrs: {
             '.source-marker': {
                 'fill': 'none',
                 'stroke': '#000',
-                'stroke-width': 4
+                'stroke-width': 1
             },
             '.target-marker': {
                 'fill': 'none',
-                'stroke': '#000',
-                'stroke-width': 5
+                'stroke': '#FF0000',
+                'stroke-width': 2
             },
             '.connector': {
                 'stroke-width': 1
@@ -178,7 +179,7 @@
         },
         attrs: {
             '.source-marker': {
-                'fill': 'none',
+                'fill': '#FF0000',
                 'stroke': '#000',
                 'stroke-width': 1
             },
@@ -188,7 +189,7 @@
                 'stroke-width': 1
             },
             '.connector': {
-                'stroke-width': 4
+                'stroke-width': 1
             }
         }
     });
