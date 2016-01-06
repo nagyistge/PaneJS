@@ -1,10 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf8"/>
+
+    <title>Markers</title>
+    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <style>
+        #container {
+            width: 700px;
+            height: 500px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
+<div id="container"></div>
+<script src="../dist/pane.js"></script>
+<script>
 
+    var container = document.getElementById('container');
+
+    var model = new pane.Model();
+    var paper = new pane.Paper(container, model);
+
+    var node1 = new pane.shapes.basic.Rect({
+        position: {
+            x: 100,
+            y: 40
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+            text: {
+                text: 'Node'
+            }
+        }
+    });
+
+    var node2 = new pane.shapes.basic.Rect({
+        position: {
+            x: 400,
+            y: 40
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+            text: {
+                text: 'Node'
+            }
+        }
+    });
+
+    model.addNode(node1);
+    model.addNode(node2);
+
+    var link1 = new pane.Link({
+        sourceMarker: 'classic',
+        targetMarker: {
+            name: 'classic',
+            options: {
+                size: 30
+            }
+        },
+        attrs: {
+            '.source-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 2
+            },
+            '.target-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 6
+            },
+            '.connector': {
+                'stroke-width': 3
+            }
+        }
+    });
+
+    model.addNode(node1);
+    model.addNode(node2);
+    model.addLink(link1, node1, node2);
+
+
+    var node3 = node1.clone();
+    var node4 = node2.clone();
+
+    node3.translate(100, 110);
+    node4.translate(400, 110);
+
+    var link2 = new pane.Link({
+        sourceMarker: 'block',
+        targetMarker: {
+            name: 'block',
+            options: {
+                size: 11
+            }
+        },
+        attrs: {
+            '.source-marker': {
+                'fill': '#ff0000',
+                'stroke': '#000',
+                'stroke-width': 1
+            },
+            '.target-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 2
+            },
+            '.connector': {
+                'stroke-width': 1
+            }
+        }
+    });
+
+    model.addNode(node3);
+    model.addNode(node4);
+    model.addLink(link2, node3, node4);
+
+
+    var node5 = node1.clone();
+    var node6 = node2.clone();
+
+    node5.translate(100, 180);
+    node6.translate(400, 180);
+
+    var link3 = new pane.Link({
+        sourceMarker: 'cloven',
+        targetMarker: {
+            name: 'cloven',
+            options: {
+                rx: 10,
+                ry: 30
+            }
+        },
+        attrs: {
+            '.source-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 4
+            },
+            '.target-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 5
+            },
+            '.connector': {
+                'stroke-width': 1
+            }
+        }
+    });
+
+    model.addNode(node5);
+    model.addNode(node6);
+    model.addLink(link3, node5, node6);
+
+
+    var node7 = node1.clone();
+    var node8 = node2.clone();
+
+    node7.translate(100, 250);
+    node8.translate(400, 250);
+
+    var link4 = new pane.Link({
+        sourceMarker: 'diamond',
+        targetMarker: {
+            name: 'diamond',
+            options: {
+                rx: 8,
+                ry: 8
+            }
+        },
+        attrs: {
+            '.source-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 1
+            },
+            '.target-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 1
+            },
+            '.connector': {
+                'stroke-width': 4
+            }
+        }
+    });
+
+    model.addNode(node7);
+    model.addNode(node8);
+    model.addLink(link4, node7, node8);
+
+
+    var node9 = node1.clone();
+    var node10 = node2.clone();
+
+    node9.translate(100, 320);
+    node10.translate(400, 320);
+
+    var link5 = new pane.Link({
+        markup: ''
+        + '<path class="connector"/>'
+        + '<g class="source-marker"/>'
+        + '<g class="target-marker"/>',
+
+        sourceMarker: 'oval',
+        targetMarker: {
+            name: 'oval',
+            options: {
+                rx: 8,
+                ry: 6
+            }
+        },
+        attrs: {
+            '.source-marker': {
+                'stroke': '#000',
+                'stroke-width': 4
+            },
+            '.target-marker': {
+                'stroke': '#000',
+                'stroke-width': 4
+            },
+            '.connector': {
+                'stroke-width': 1
+            }
+        }
+    });
+
+    model.addNode(node9);
+    model.addNode(node10);
+    model.addLink(link5, node9, node10);
+
+</script>
 </body>
 </html>

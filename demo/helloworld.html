@@ -52,6 +52,7 @@
             height: 30
         },
         attrs: {
+
             text: {
                 text: 'World!'
             }
@@ -59,7 +60,22 @@
     });
 
     var link1 = new pane.Link({
-        targetMarker: 'classic'
+        targetMarker: 'classic',
+        attrs: {
+            '.source-marker': {
+                'fill': '#ff0000',
+                'stroke': '#000',
+                'stroke-width': 1
+            },
+            '.target-marker': {
+                'fill': 'none',
+                'stroke': '#000',
+                'stroke-width': 2
+            },
+            '.connector': {
+                'stroke-width': 1
+            }
+        }
     });
 
     model.addNode(node1);

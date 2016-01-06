@@ -15,8 +15,17 @@ class Node extends Visual {
     // methods
     // -------
 
-    translate() {
+    translate(dx, dy, options = {}) {
 
+        let position = this.metadata.position;
+
+        if (options.relative) {
+            position.x += dx;
+            position.y += dy;
+        } else {
+            position.x = dx;
+            position.y = dy;
+        }
     }
 
     resize(width, height) {}
@@ -29,15 +38,16 @@ class Node extends Visual {
 
     getStrokeWidth() {
 
-        let attr = this.getStrokeAttr();
+        let attrs = this.attrs;
+        let attr = attrs.rect ||
+            attrs.path ||
+            attrs.circle ||
+            attrs.ellipse ||
+            attrs.polyline ||
+            attrs.polygon;
         let strokeWidth = attr['stroke-width'] || 0;
 
         return utils.toFloat(strokeWidth) || 0;
-    }
-
-    getStrokeAttr() {
-
-        return null;
     }
 }
 

@@ -329,7 +329,6 @@ class NodeView extends CellView {
             .translate();
     }
 
-
     scale(sx, sy) {
         this.vel.scale(sx, sy);
         return this;
@@ -420,10 +419,30 @@ class NodeView extends CellView {
         return this.vel.getBBox();
     }
 
+    getStrokeWidth() {
+
+        let vel = this.vel;
+        let vTarget = vel.findOne('rect')
+            || vel.findOne('path')
+            || vel.findOne('circle')
+            || vel.findOne('ellipse')
+            || vel.findOne('polyline')
+            || vel.findOne('polygon');
+
+        if (vTarget && vTarget.node) {
+
+            let sw = utils.getComputedStyle(vTarget.node, 'stroke-width');
+
+            return sw && utils.toFloat(sw) || 0;
+        }
+
+        return 0;
+    }
+
     getStrokeBBox() {
 
         let cell = this.cell;
-        let strokeWidth = this.cell.getStrokeWidth();
+        let strokeWidth = this.getStrokeWidth();
 
         let bbox = new Rect(
             cell.position.x,
@@ -431,7 +450,7 @@ class NodeView extends CellView {
             cell.size.width,
             cell.size.height);
 
-        return bbox.grow(strokeWidth / 2);
+        return strokeWidth ? bbox.grow(strokeWidth / 2) : bbox;
     }
 }
 

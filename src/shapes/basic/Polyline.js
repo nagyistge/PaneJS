@@ -1,12 +1,6 @@
 import Node from '../../cells/Node';
 
-class Polyline extends Node {
-
-    getStrokeAttr() {
-
-        return this.attrs.polyline;
-    }
-}
+class Polyline extends Node {}
 
 Polyline.setDefaults({
 

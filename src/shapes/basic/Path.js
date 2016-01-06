@@ -1,13 +1,7 @@
 import Node from '../../cells/Node';
 
 
-class Path extends Node {
-
-    getStrokeAttr() {
-
-        return this.attrs.path;
-    }
-}
+class Path extends Node {}
 
 Path.setDefaults({
 

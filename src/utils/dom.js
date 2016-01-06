@@ -26,12 +26,12 @@ function isNode(elem, nodeName, attrName, attrValue) {
     return ret;
 }
 
-let docElem  = document.documentElement;
+let docElem = document.documentElement;
 let contains = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         let aDown = context.nodeType === 9 ? context.documentElement : context;
-        let bUp   = elem && elem.parentNode;
+        let bUp = elem && elem.parentNode;
 
         return context === bUp || !!(bUp && bUp.nodeType === 1 && (
                 aDown.contains
@@ -163,6 +163,23 @@ function setAttribute(elem, name, value) {
     }
 }
 
+function getComputedStyle(elem, name) {
+
+    let computed;
+
+    if (elem.ownerDocument.defaultView.opener) {
+        computed = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+    }
+
+    computed = window.getComputedStyle(elem, null);
+
+    if (computed && name) {
+        return computed.getPropertyValue(name) || computed[name];
+    }
+
+    return computed;
+}
+
 
 // exports
 // -------
@@ -177,4 +194,5 @@ export {
     createSvgElement,
     createSvgDocument,
     contains as containsElem,
+    getComputedStyle
 };

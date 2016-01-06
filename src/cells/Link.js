@@ -1,3 +1,4 @@
+import * as utils from '../common/utils';
 import Visual from './Visual';
 
 
@@ -8,19 +9,63 @@ class Link extends Visual {
         return true;
     }
 
-    get connector() {
+    getRouter() {
 
-        return this.metadata.connector;
+        let router = this.metadata.router || {};
+
+        if (!utils.isObject(router)) {
+
+            router = { name: router };
+        }
+
+        return router;
     }
 
-    get sourceMarker() {
+    getConnector() {
 
-        return this.metadata.sourceMarker;
+        let connector = this.metadata.connector || {};
+        let selector = '.connector';
+
+        if (!utils.isObject(connector)) {
+
+            connector = { name: connector };
+        }
+
+        connector.selector = selector;
+
+        return connector;
     }
 
-    get targetMarker() {
+    getMarker(isSource) {
 
-        return this.metadata.targetMarker;
+        let that = this;
+        let metadata = that.metadata;
+        let marker = isSource ? metadata.sourceMarker : metadata.targetMarker;
+        let selector = isSource ? '.source-marker' : '.target-marker';
+
+        if (!utils.isObject(marker)) {
+
+            marker = { name: marker };
+        }
+
+        marker.selector = selector;
+
+        if (!utils.isObject(marker.options)) {
+            marker.options = {};
+        }
+
+        marker.options.markerStrokeWidth = that.getStrokeWidth(selector);
+        marker.options.connectorStrokeWidth = that.getStrokeWidth('.connector');
+
+
+        return marker;
+    }
+
+    getStrokeWidth(selector) {
+
+        let attr = this.attrs[selector];
+
+        return attr && utils.toFloat(attr['stroke-width']) || 0;
     }
 }
 
@@ -28,14 +73,9 @@ class Link extends Visual {
 Link.setDefaults({
 
     markup: ''
-    + '<path class="connection"/>'
-    + '<path class="connection-wrap"/>'
+    + '<path class="connector"/>'
     + '<path class="source-marker"/>'
-    + '<path class="target-marker"/>'
-    + '<g class="labels"/>'
-    + '<g class="marker-vertices"/>'
-    + '<g class="marker-arrowheads"/>'
-    + '<g class="link-tools"/>',
+    + '<path class="target-marker"/>',
 
     classNames: 'pane-link',
     router: null,
@@ -43,7 +83,17 @@ Link.setDefaults({
     targetMarker: null,
     connector: 'sharp',
     attrs: {
-        '.connection': {
+        '.source-marker': {
+            'fill': '#000',
+            'stroke': '#000',
+            'stroke-width': 1
+        },
+        '.target-marker': {
+            'fill': '#000',
+            'stroke': '#000',
+            'stroke-width': 1
+        },
+        '.connector': {
             'fill': 'none',
             'stroke': '#000',
             'stroke-width': 1

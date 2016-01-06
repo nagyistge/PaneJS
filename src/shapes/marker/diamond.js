@@ -18,7 +18,10 @@ function diamondMarker(vMarker, options) {
         vMarker.attr('d', pathArr.join(' '));
 
         // return the connection point on the marker
-        return new Point(rx * 2, ry);
+        return {
+            rad: Math.atan2(ry, rx),
+            point: new Point(rx * 2 - 1, ry)
+        };
     }
 }
 

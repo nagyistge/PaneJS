@@ -1,22 +1,28 @@
+import * as utils from '../../common/utils';
+import Point from '../../geometry/Point';
+
 function clovenMarker(vMarker, options) {
 
     if (vMarker) {
 
+        let rx = options.rx || 7;
+        let ry = options.ry || 3.5;
         let size = options.size || 7;
         let pathArr = [];
 
-        pathArr.push('M', size, 0);
-        pathArr.push('L', 0, size / 2);
-        pathArr.push('L', size, size);
+        pathArr.push('M', rx, 0);
+        pathArr.push('L', 0, ry);
+        pathArr.push('L', rx, ry * 2);
 
-        vMarker.attr({
-            d: pathArr.join(' '),
-            fill: 'none'
-        });
+        vMarker.attr('d', pathArr.join(' '));
 
 
         // return true will use the connection point on the cell
-        return true;
+
+        return {
+            rad: Math.atan2(ry, rx),
+            point: new Point(0, ry)
+        };
     }
 }
 

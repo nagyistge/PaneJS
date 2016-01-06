@@ -258,7 +258,7 @@ class Cell {
         metadata.data = cloneData === true ? that.cloneData() : that.data;
         metadata.visible = that.visible;
 
-        return new Cell(metadata);
+        return new that.constructor(metadata);
     }
 
     destroy() {}

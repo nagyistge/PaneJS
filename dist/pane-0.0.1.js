@@ -121,62 +121,92 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TerminalChange2 = _interopRequireDefault(_TerminalChange);
 	
-	var _Text = __webpack_require__(34);
-	
-	var _Text2 = _interopRequireDefault(_Text);
-	
-	var _Rect = __webpack_require__(35);
-	
-	var _Rect2 = _interopRequireDefault(_Rect);
-	
-	var _Circle = __webpack_require__(36);
-	
-	var _Circle2 = _interopRequireDefault(_Circle);
-	
-	var _Ellipse = __webpack_require__(37);
-	
-	var _Ellipse2 = _interopRequireDefault(_Ellipse);
-	
-	var _Image = __webpack_require__(38);
-	
-	var _Image2 = _interopRequireDefault(_Image);
-	
-	var _Path = __webpack_require__(39);
-	
-	var _Path2 = _interopRequireDefault(_Path);
-	
-	var _Polygon = __webpack_require__(40);
-	
-	var _Polygon2 = _interopRequireDefault(_Polygon);
-	
-	var _Polyline = __webpack_require__(41);
-	
-	var _Polyline2 = _interopRequireDefault(_Polyline);
-	
-	var _Rhombus = __webpack_require__(42);
-	
-	var _Rhombus2 = _interopRequireDefault(_Rhombus);
-	
-	var _Rect3 = __webpack_require__(43);
-	
-	var _Rect4 = _interopRequireDefault(_Rect3);
-	
-	var _sharp = __webpack_require__(44);
+	var _sharp = __webpack_require__(34);
 	
 	var _sharp2 = _interopRequireDefault(_sharp);
 	
-	var _rounded = __webpack_require__(45);
+	var _rounded = __webpack_require__(35);
 	
 	var _rounded2 = _interopRequireDefault(_rounded);
+	
+	var _classic = __webpack_require__(36);
+	
+	var _classic2 = _interopRequireDefault(_classic);
+	
+	var _diamond = __webpack_require__(37);
+	
+	var _diamond2 = _interopRequireDefault(_diamond);
+	
+	var _block = __webpack_require__(38);
+	
+	var _block2 = _interopRequireDefault(_block);
+	
+	var _cloven = __webpack_require__(39);
+	
+	var _cloven2 = _interopRequireDefault(_cloven);
+	
+	var _oval = __webpack_require__(40);
+	
+	var _oval2 = _interopRequireDefault(_oval);
+	
+	var _Text = __webpack_require__(41);
+	
+	var _Text2 = _interopRequireDefault(_Text);
+	
+	var _Rect = __webpack_require__(42);
+	
+	var _Rect2 = _interopRequireDefault(_Rect);
+	
+	var _Circle = __webpack_require__(43);
+	
+	var _Circle2 = _interopRequireDefault(_Circle);
+	
+	var _Ellipse = __webpack_require__(44);
+	
+	var _Ellipse2 = _interopRequireDefault(_Ellipse);
+	
+	var _Image = __webpack_require__(45);
+	
+	var _Image2 = _interopRequireDefault(_Image);
+	
+	var _Path = __webpack_require__(46);
+	
+	var _Path2 = _interopRequireDefault(_Path);
+	
+	var _Polygon = __webpack_require__(47);
+	
+	var _Polygon2 = _interopRequireDefault(_Polygon);
+	
+	var _Polyline = __webpack_require__(48);
+	
+	var _Polyline2 = _interopRequireDefault(_Polyline);
+	
+	var _Rhombus = __webpack_require__(49);
+	
+	var _Rhombus2 = _interopRequireDefault(_Rhombus);
+	
+	var _Rect3 = __webpack_require__(50);
+	
+	var _Rect4 = _interopRequireDefault(_Rect3);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(46);
+	__webpack_require__(51);
 	
-	// register default connectors and markers
+	// connectors
+	// ----------
+	
 	_Paper2.default.registerConnector('sharp', _sharp2.default).registerConnector('rounded', _rounded2.default);
+	
+	// markers
+	// -------
+	
+	_Paper2.default.registerMarker('classic', _classic2.default).registerMarker('diamond', _diamond2.default).registerMarker('cloven', _cloven2.default).registerMarker('block', _block2.default).registerMarker('oval', _oval2.default);
+	
+	// shapes
+	// ------
 	
 	var shapes = {
 	    basic: {
@@ -1019,7 +1049,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.containsElem = exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isNode = undefined;
+	exports.getComputedStyle = exports.containsElem = exports.createSvgDocument = exports.createSvgElement = exports.setAttribute = exports.getClassName = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isNode = undefined;
 	
 	var _lang = __webpack_require__(2);
 	
@@ -1173,6 +1203,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
+	function getComputedStyle(elem, name) {
+	
+	    var computed = undefined;
+	
+	    if (elem.ownerDocument.defaultView.opener) {
+	        computed = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+	    }
+	
+	    computed = window.getComputedStyle(elem, null);
+	
+	    if (computed && name) {
+	        return computed.getPropertyValue(name) || computed[name];
+	    }
+	
+	    return computed;
+	}
+	
 	// exports
 	// -------
 	
@@ -1185,6 +1232,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.createSvgElement = createSvgElement;
 	exports.createSvgDocument = createSvgDocument;
 	exports.containsElem = contains;
+	exports.getComputedStyle = getComputedStyle;
 
 /***/ },
 /* 9 */
@@ -1718,6 +1766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var rnotwhite = /\S+/g;
 	
 	var pathCount = 0;
+	
 	function createPathId() {
 	
 	    var id = undefined;
@@ -1730,20 +1779,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return id;
 	}
 	
-	// chrome 48 removed svg getTransformToElement api
-	function getTransformToElementPolyfill(source, target) {
+	function _getTransformToElement(source, target) {
+	
+	    // chrome 48 removed svg getTransformToElement api
+	
 	    var matrix = undefined;
 	    try {
 	        matrix = target.getScreenCTM().inverse();
 	    } catch (e) {
-	        throw new Error('Can not inverse source element\' ctm.');
+	        throw new Error('Can not inverse source element\'s ctm.');
 	    }
+	
 	    return matrix.multiply(source.getScreenCTM());
 	}
-	function wrapGetTransformToElement(source, target) {
-	    var ctm = source.getTransformToElement !== undefined ? // api not found
-	    source.getTransformToElement(target) : getTransformToElementPolyfill(source, target);
-	    return ctm;
+	
+	function deltaTransformPoint(matrix, point) {
+	
+	    return {
+	        x: point.x * matrix.a + point.y * matrix.c,
+	        y: point.x * matrix.b + point.y * matrix.d
+	    };
+	}
+	
+	function decomposeMatrix(matrix) {
+	
+	    // @see https://gist.github.com/2052247
+	
+	    // calculate delta transform point
+	    var px = deltaTransformPoint(matrix, { x: 0, y: 1 });
+	    var py = deltaTransformPoint(matrix, { x: 1, y: 0 });
+	
+	    // calculate skew
+	    var skewX = 180 / Math.PI * Math.atan2(px.y, px.x) - 90;
+	    var skewY = 180 / Math.PI * Math.atan2(py.y, py.x);
+	
+	    return {
+	
+	        translateX: matrix.e,
+	        translateY: matrix.f,
+	        scaleX: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b),
+	        scaleY: Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d),
+	        skewX: skewX,
+	        skewY: skewY,
+	        rotation: skewX // rotation is the same as skew x
+	    };
 	}
 	
 	var VElement = exports.VElement = (function () {
@@ -2329,8 +2408,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.attr('transform', final);
 	        }
 	    }, {
-	        key: 'bbox',
-	        value: function bbox(withoutTransformations, target) {
+	        key: 'getBBox',
+	        value: function getBBox(withoutTransformations, target) {
 	
 	            // Get SVGRect that contains coordinates and dimension of the real
 	            // bounding box, i.e. after transformations are applied.
@@ -2376,8 +2455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return box;
 	            }
 	
-	            //let matrix = node.getTransformToElement(target || node.ownerSVGElement);
-	            var matrix = wrapGetTransformToElement(node, target || node.ownerSVGElement);
+	            var matrix = node.getTransformToElement(target || node.ownerSVGElement);
 	
 	            return vector.transformRect(box, matrix);
 	        }
@@ -2397,8 +2475,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            try {
 	                // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
 	                var globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-	                //let globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
-	                var globalToLocalMatrix = wrapGetTransformToElement(that.node, svg).inverse();
+	                var globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
 	                return globalPoint.matrixTransform(globalToLocalMatrix);
 	            } catch (e) {
 	                // IE9 throws an exception in odd cases.
@@ -2408,11 +2485,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
+	        key: 'getTransformToElement',
+	        value: function getTransformToElement(toElem) {
+	
+	            var node = this.node;
+	
+	            if (!node) {
+	
+	                return null;
+	            } else {
+	
+	                return node.getTransformToElement ? node.getTransformToElement(toElem) : _getTransformToElement(node, toElem);
+	            }
+	        }
+	    }, {
 	        key: 'translateCenterToPoint',
 	        value: function translateCenterToPoint() {}
 	    }, {
 	        key: 'translateAndAutoOrient',
-	        value: function translateAndAutoOrient() {}
+	        value: function translateAndAutoOrient(position, reference, target) {
+	
+	            // Efficiently auto-orient an element.
+	            // This basically implements the orient=auto attribute of markers.
+	            // The easiest way of understanding on what this does is to imagine
+	            // the element is an arrowhead. Calling this method on the arrowhead
+	            // makes it point to the `position` point while being auto-oriented
+	            // (properly rotated) towards the `reference` point. `target` is the
+	            // element relative to which the transformations are applied. Usually
+	            // a viewport.
+	
+	            // Clean-up previously set transformations except the scale. If we
+	            // didn't clean up the previous transformations then they'd add up
+	            // with the old ones. Scale is an exception as it doesn't add up,
+	            // consider: `this.scale(2).scale(2).scale(2)`. The result is that the
+	            // element is scaled by the factor 2, not 8.
+	
+	            var that = this;
+	            var s = that.scale();
+	            that.attr('transform', '');
+	            that.scale(s.sx, s.sy);
+	
+	            var svg = that.getSVG().node;
+	            var bbox = that.getBBox(false, target);
+	
+	            // 1. Translate to origin.
+	            var translateToOrigin = svg.createSVGTransform();
+	            translateToOrigin.setTranslate(-bbox.x - bbox.width / 2, -bbox.y - bbox.height / 2);
+	
+	            // 2. Rotate around origin.
+	            var rotateAroundOrigin = svg.createSVGTransform();
+	            var angle = _Point2.default.fromPoint(position).changeInAngle(position.x - reference.x, position.y - reference.y, reference);
+	            rotateAroundOrigin.setRotate(angle, 0, 0);
+	
+	            // 3. Translate to the `position` + the offset (half my width) towards the `reference` point.
+	            var translateFinal = svg.createSVGTransform();
+	            var finalPosition = _Point2.default.fromPoint(position).move(reference, bbox.width / 2);
+	            translateFinal.setTranslate(position.x + (position.x - finalPosition.x), position.y + (position.y - finalPosition.y));
+	
+	            // 4. Apply transformations.
+	            var ctm = that.getTransformToElement(target);
+	            var transform = svg.createSVGTransform();
+	            transform.setMatrix(translateFinal.matrix.multiply(rotateAroundOrigin.matrix.multiply(translateToOrigin.matrix.multiply(ctm))));
+	
+	            // Instead of directly setting the `matrix()` transform on the element,
+	            // first, decompose the matrix into separate transforms. This allows us
+	            // to use normal vector's methods as they don't work on matrices.
+	            // An example of this is to retrieve a scale of an element.
+	
+	            var decomposition = decomposeMatrix(transform.matrix);
+	
+	            that.translate(decomposition.translateX, decomposition.translateY);
+	            that.rotate(decomposition.rotation);
+	            // Note that scale has been already applied
+	            //this.scale(decomposition.scaleX, decomposition.scaleY);
+	
+	            return that;
+	        }
 	    }, {
 	        key: 'animateAlongPath',
 	        value: function animateAlongPath() {}
@@ -2498,20 +2646,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'findIntersection',
 	        value: function findIntersection(ref, target) {
 	
-	            // Find the intersection of a line starting in the center
-	            // of the SVG `node` ending in the point `ref`.
-	            // `target` is an SVG element to which `node`s transformations are relative to.
-	            // In JointJS, `target` is the `paper.viewport` SVG group element.
-	            // Note that `ref` point must be in the coordinate system of the `target` for this function to work properly.
-	            // Returns a point in the `target` coordinate system (the same system as `ref` is in) if
-	            // an intersection is found. Returns `undefined` otherwise.
+	            // Find the intersection of a line starting in the center of the `node`
+	            // ending in the point `ref`. `target` is an SVG element to which
+	            // node's transformations are relative to. Note that `ref` point must
+	            // be in  the coordinate system of the `target` for this function to
+	            // work  properly. Returns a point in the `target` coordinate system
+	            // (the same system as `ref` is in) if an intersection is found.
+	            // Returns `undefined` otherwise.
 	
 	            var that = this;
-	            var svg = that.svg().node;
+	            var svg = that.getSVG().node;
 	
 	            target = target || svg;
 	
-	            var bbox = _Rect2.default.fromRect(that.bbox(false, target));
+	            var bbox = _Rect2.default.fromRect(that.getBBox(false, target));
 	            var center = bbox.getCenter();
 	            var spot = bbox.intersectionWithLineFromCenterToPoint(ref);
 	
@@ -2528,8 +2676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var gRect = new _Rect2.default(parseFloat(this.attr('x') || 0), parseFloat(this.attr('y') || 0), parseFloat(this.attr('width')), parseFloat(this.attr('height')));
 	                // Get the rect transformation matrix with regards to the SVG document.
-	                //let rectMatrix = that.node.getTransformToElement(target);
-	                var rectMatrix = wrapGetTransformToElement(that.node, target);
+	                var rectMatrix = that.node.getTransformToElement(target);
 	                // Decompose the matrix to find the rotation angle.
 	                var rectMatrixComponents = vector.decomposeMatrix(rectMatrix);
 	                // Now we want to rotate the rectangle back so that we
@@ -2551,8 +2698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var sample = samples[i];
 	                    // Convert the sample point in the local coordinate system to the global coordinate system.
 	                    var gp = vector.createSVGPoint(sample.x, sample.y);
-	                    //gp                 = gp.matrixTransform(this.node.getTransformToElement(target));
-	                    gp = gp.matrixTransform(wrapGetTransformToElement(this.node, target));
+	                    gp = gp.matrixTransform(that.node.getTransformToElement(target));
 	                    sample = _Point2.default.fromPoint(gp);
 	                    var centerDistance = sample.distance(center);
 	                    // Penalize a higher distance to the reference point by 10%.
@@ -2979,6 +3125,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
+	        key: 'grow',
+	        value: function grow(amount) {
+	
+	            var that = this;
+	
+	            that.x -= amount;
+	            that.y -= amount;
+	            that.width += 2 * amount;
+	            that.height += 2 * amount;
+	
+	            return that;
+	        }
+	    }, {
 	        key: 'round',
 	        value: function round(precision) {
 	
@@ -3242,7 +3401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'smooth',
 	        value: function smooth() {
 	
-	            return thi.round(2);
+	            return this.round(2);
 	        }
 	    }, {
 	        key: 'diff',
@@ -3356,7 +3515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // my new position relative to ref point.
 	
 	            // Revert the translation and measure the change in angle around x-axis.
-	            return this.translate(-dx, -dy).theta(ref) - this.theta(ref);
+	            return Point.fromPoint(this).translate(-dx, -dy).theta(ref) - this.theta(ref);
 	        }
 	    }, {
 	        key: 'snapToGrid',
@@ -4864,7 +5023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            metadata.data = cloneData === true ? that.cloneData() : that.data;
 	            metadata.visible = that.visible;
 	
-	            return new Cell(metadata);
+	            return new that.constructor(metadata);
 	        }
 	    }, {
 	        key: 'destroy',
@@ -5831,25 +5990,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // find the connection point on the terminal
 	
-	            var model = this.model;
-	
+	            var that = this;
 	            var spot = undefined;
-	            var terminal = model.getTerminal(link, isSource);
+	            var terminalView = that.getTerminalView(link, isSource);
 	
-	            if (terminal) {
+	            if (terminalView) {
 	
-	                var spotBBox = new _Rect2.default(terminal.position.x, terminal.position.y, terminal.size.width, terminal.size.height);
-	
+	                var spotBBox = terminalView.getStrokeBBox();
 	                var vertices = link.routerPoints || [];
 	                var reference = isSource ? vertices[0] : vertices[vertices.length - 1];
 	
 	                if (!reference) {
 	
-	                    var referenceTerminal = link.getTerminal(!isSource);
+	                    var referenceView = that.getTerminalView(link, !isSource);
 	
-	                    if (referenceTerminal) {
+	                    if (referenceView) {
 	
-	                        var referenceBBox = new _Rect2.default(referenceTerminal.position.x, referenceTerminal.position.y, referenceTerminal.size.width, referenceTerminal.size.height);
+	                        var referenceBBox = referenceView.getStrokeBBox();
 	
 	                        reference = referenceBBox.intersectionWithLineFromCenterToPoint(spotBBox.getCenter());
 	                        reference = reference || referenceBBox.getCenter();
@@ -5866,6 +6023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                spot = spot || spotBBox.getCenter();
 	            } else {
+	
 	                spot = isSource ? link.sourcePoint : link.targetPoint;
 	            }
 	
@@ -5986,6 +6144,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                return view;
 	            }
+	        }
+	    }, {
+	        key: 'getTerminalView',
+	        value: function getTerminalView(link, isSource) {
+	
+	            var terminal = this.model.getTerminal(link, isSource);
+	
+	            return terminal ? this.getView(terminal) : null;
 	        }
 	    }, {
 	        key: 'createView',
@@ -6159,11 +6325,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // ------
 	
 	    }, {
-	        key: 'registerRouter',
-	        value: function registerRouter(name, fn) {}
-	    }, {
 	        key: 'getRouter',
-	        value: function getRouter(name) {}
+	        value: function getRouter(name) {
+	
+	            return this.constructor.getRouter(name);
+	        }
 	
 	        // connector
 	        // ---------
@@ -6349,6 +6515,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }], [{
+	        key: 'registerRouter',
+	        value: function registerRouter(name, fn) {
+	
+	            var that = this;
+	            var router = that.router;
+	
+	            if (!router) {
+	                router = that.router = {};
+	            }
+	
+	            router[name] = fn;
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'getRouter',
+	        value: function getRouter(name) {
+	
+	            var router = this.router;
+	            return router ? router[name] : null;
+	        }
+	    }, {
 	        key: 'registerConnector',
 	        value: function registerConnector(name, fn) {
 	
@@ -6359,21 +6547,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	                connectors = that.connectors = {};
 	            }
 	
+	            connectors[name] = fn;
+	
 	            return that;
 	        }
 	    }, {
 	        key: 'getConnector',
 	        value: function getConnector(name) {
-	            var connectors = this.connectors;
 	
+	            var connectors = this.connectors;
 	            return connectors ? connectors[name] : null;
 	        }
 	    }, {
 	        key: 'registerMarker',
-	        value: function registerMarker(name) {}
+	        value: function registerMarker(name, fn) {
+	
+	            var that = this;
+	            var markers = that.markers;
+	
+	            if (!markers) {
+	                markers = that.markers = {};
+	            }
+	
+	            markers[name] = fn;
+	
+	            return that;
+	        }
 	    }, {
 	        key: 'getMarker',
-	        value: function getMarker(name) {}
+	        value: function getMarker(name) {
+	
+	            var markers = this.markers;
+	            return markers ? markers[name] : null;
+	        }
 	    }]);
 	
 	    return Paper;
@@ -6460,6 +6666,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
+	var _Line = __webpack_require__(16);
+	
+	var _Line2 = _interopRequireDefault(_Line);
+	
 	var _Point = __webpack_require__(15);
 	
 	var _Point2 = _interopRequireDefault(_Point);
@@ -6503,7 +6713,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'update',
 	        value: function update() {
-	            return this.updateAttributes().updateConnection();
+	            return this.updateAttributes().parseRouter().updateCache()
+	            //.updateConnectionPoint(true)
+	            //.updateConnectionPoint(false)
+	            .updateMarker(true).updateMarker(false).updateConnection();
+	        }
+	    }, {
+	        key: 'parseRouter',
+	        value: function parseRouter() {
+	
+	            var that = this;
+	            var link = that.cell;
+	            var router = link.getRouter();
+	            var vertices = link.vertices || [];
+	
+	            var parser = that.paper.getRouter(router.name);
+	
+	            link.routerPoints = parser && utils.isFunction(parser) ? parser.call(that, vertices, router.options || {}) : vertices;
+	
+	            return that;
 	        }
 	    }, {
 	        key: 'updateAttributes',
@@ -6548,19 +6776,192 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return that;
 	        }
 	    }, {
-	        key: 'updateConnection',
-	        value: function updateConnection() {
+	        key: 'updateCache',
+	        value: function updateCache() {
 	
 	            var that = this;
-	            var points = that.cell.points;
+	            var link = that.cell;
 	
-	            //that.applyAttrs('.connection', {d: normalConnector(points[0], points[1])});
+	            that.connector = link.getConnector();
+	            that.sourceMarker = link.getMarker(true);
+	            that.targetMarker = link.getMarker(false);
+	
+	            that.connectorStrokeWidth = that.getStrokeWidth(that.connector.selector);
+	            that.sourceMarkerStrokeWidth = that.getStrokeWidth(that.sourceMarker.selector);
+	            that.targetMarkerStrokeWidth = that.getStrokeWidth(that.targetMarker.selector);
+	
+	            var options = that.sourceMarker.options;
+	
+	            options.connectorStrokeWidth = that.connectorStrokeWidth;
+	            options.markerStrokeWidth = that.sourceMarkerStrokeWidth;
+	
+	            options = that.targetMarker.options;
+	            options.connectorStrokeWidth = that.connectorStrokeWidth;
+	            options.markerStrokeWidth = that.targetMarkerStrokeWidth;
+	
+	            console.log(that.sourceMarker);
+	            console.log(that.targetMarker);
 	
 	            return that;
 	        }
 	    }, {
-	        key: 'parseRoute',
-	        value: function parseRoute() {}
+	        key: 'getStrokeWidth',
+	        value: function getStrokeWidth(selector) {
+	
+	            var vel = this.findOne(selector);
+	
+	            if (vel && vel.node) {
+	
+	                var sw = utils.getComputedStyle(vel.node, 'stroke-width');
+	
+	                return sw && utils.toFloat(sw) || 0;
+	            }
+	
+	            return 0;
+	        }
+	    }, {
+	        key: 'getTerminalOuterBox',
+	        value: function getTerminalOuterBox(isSource, rad) {
+	
+	            var that = this;
+	            var terminalView = that.paper.getTerminalView(that.cell, isSource);
+	
+	            if (terminalView) {
+	
+	                var bbox = terminalView.getStrokeBBox();
+	                var markerStrokeWidth = isSource ? that.sourceMarkerStrokeWidth : that.targetMarkerStrokeWidth;
+	
+	                if (markerStrokeWidth) {
+	                    bbox.grow(markerStrokeWidth / Math.cos(rad || 0));
+	                }
+	
+	                return bbox;
+	            }
+	        }
+	    }, {
+	        key: 'updateConnectionPoint',
+	        value: function updateConnectionPoint(isSource, rad) {
+	
+	            // find the connection point on the terminal
+	
+	            var that = this;
+	            var link = that.cell;
+	            var terminalOuterBox = that.getTerminalOuterBox(isSource, rad);
+	            var connectionPoint = undefined;
+	
+	            if (terminalOuterBox) {
+	
+	                var vertices = link.routerPoints || [];
+	                var reference = isSource ? vertices[0] : vertices[vertices.length - 1];
+	
+	                if (!reference) {
+	
+	                    var referenceOuterBox = that.getTerminalOuterBox(!isSource);
+	
+	                    if (referenceOuterBox) {
+	
+	                        reference = referenceOuterBox.intersectionWithLineFromCenterToPoint(terminalOuterBox.getCenter());
+	                        reference = reference || terminalOuterBox.getCenter();
+	                    }
+	                }
+	
+	                if (!reference) {
+	                    reference = isSource ? link.targetPoint : link.sourcePoint;
+	                }
+	
+	                if (reference) {
+	                    connectionPoint = terminalOuterBox.intersectionWithLineFromCenterToPoint(reference);
+	                }
+	
+	                connectionPoint = connectionPoint || terminalOuterBox.getCenter();
+	
+	                if (isSource) {
+	                    link.sourcePoint = connectionPoint;
+	                } else {
+	                    link.targetPoint = connectionPoint;
+	                }
+	
+	                link[isSource ? 'sourcePoint' : 'targetPoint'] = connectionPoint;
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'updateConnection',
+	        value: function updateConnection() {
+	
+	            var that = this;
+	            var link = that.cell;
+	            var connector = link.getConnector();
+	            var connectorFn = that.paper.getConnector(connector.name);
+	
+	            if (connectorFn && utils.isFunction(connectorFn)) {
+	
+	                var sourcePoint = link.sourcePoint;
+	                var targetPoint = link.targetPoint;
+	                var vertices = link.routerPoints;
+	                var options = connector.options || {};
+	
+	                var pathData = connectorFn(sourcePoint, targetPoint, vertices, options);
+	
+	                that.applyAttrs(connector.selector, { d: pathData });
+	            } else {
+	                throw new Error('Unknown connector: "' + connectorName + '"');
+	            }
+	
+	            return that;
+	        }
+	    }, {
+	        key: 'updateMarker',
+	        value: function updateMarker(isSource) {
+	
+	            var that = this;
+	            var link = that.cell;
+	            var marker = link.getMarker(isSource);
+	            var vMarker = that.findOne(marker.selector);
+	            var options = marker.options;
+	            var markerResult = undefined;
+	
+	            if (marker && vMarker) {
+	
+	                var markerFn = that.paper.getMarker(marker.name);
+	
+	                if (markerFn && utils.isFunction(markerFn)) {
+	                    markerResult = markerFn(vMarker, options);
+	                }
+	            }
+	
+	            if (markerResult) {
+	
+	                that.updateConnectionPoint(isSource, markerResult.rad);
+	
+	                var drawPane = that.paper.drawPane;
+	                var sourcePoint = link.sourcePoint;
+	                var targetPoint = link.targetPoint;
+	                var routerPoints = link.routerPoints;
+	
+	                var startPoint = isSource ? sourcePoint : targetPoint;
+	                var endPoint = isSource ? routerPoints[0] || targetPoint : routerPoints[routerPoints.length - 1] || sourcePoint;
+	
+	                // make the marker at the right position
+	                vMarker.translateAndAutoOrient(startPoint, endPoint, drawPane);
+	
+	                // update the connection point on the marker
+	                var markerPoint = markerResult.point;
+	                var p = _vector2.default.createSVGPoint(markerPoint.x, markerPoint.y);
+	                p = p.matrixTransform(vMarker.node.getTransformToElement(drawPane));
+	
+	                var newPoint = _Point2.default.fromPoint(p);
+	
+	                if (isSource) {
+	                    link.sourcePoint = newPoint;
+	                } else {
+	                    link.targetPoint = newPoint;
+	                }
+	            }
+	
+	            return that;
+	        }
 	    }]);
 	
 	    return LinkView;
@@ -6666,6 +7067,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'find',
 	        value: function find(selector) {
 	            return selector === '.' ? [this.vel] : this.vel.find(selector);
+	        }
+	    }, {
+	        key: 'findOne',
+	        value: function findOne(selector) {
+	            return selector === '.' ? this.vel : this.vel.findOne(selector);
 	        }
 	    }, {
 	        key: 'applyAttrs',
@@ -7062,19 +7468,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(1);
 	
-	var _vector = __webpack_require__(13);
+	var utils = _interopRequireWildcard(_utils);
 	
-	var _vector2 = _interopRequireDefault(_vector);
+	var _Rect = __webpack_require__(14);
 	
-	var _Point = __webpack_require__(15);
-	
-	var _Point2 = _interopRequireDefault(_Point);
+	var _Rect2 = _interopRequireDefault(_Rect);
 	
 	var _CellView2 = __webpack_require__(28);
 	
 	var _CellView3 = _interopRequireDefault(_CellView2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -7112,7 +7518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var relativelySelectors = [];
 	            var nodesBySelector = {};
 	
-	            (0, _utils.forIn)(specifiedAttrs || allAttrs, function (attrs, selector) {
+	            utils.forIn(specifiedAttrs || allAttrs, function (attrs, selector) {
 	
 	                var vElements = that.find(selector);
 	
@@ -7125,27 +7531,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var specialAttributes = NodeView.specialAttributes.slice();
 	
 	                // TODO: test attrs.filter
-	                if ((0, _utils.isObject)(attrs.filter)) {
+	                if (utils.isObject(attrs.filter)) {
 	                    specialAttributes.push('filter');
 	                    that.applyFilter(vElements, attrs.filter);
 	                }
 	
 	                // TODO: test attrs.fill
-	                if ((0, _utils.isObject)(attrs.fill)) {
+	                if (utils.isObject(attrs.fill)) {
 	                    specialAttributes.push('fill');
 	                    that.applyGradient(vElements, 'fill', attrs.fill);
 	                }
 	
 	                // TODO: test attrs.stroke
-	                if ((0, _utils.isObject)(attrs.stroke)) {
+	                if (utils.isObject(attrs.stroke)) {
 	                    specialAttributes.push('stroke');
 	                    that.applyGradient(vElements, 'stroke', attrs.stroke);
 	                }
 	
 	                // TODO: test attrs.text
-	                if (!(0, _utils.isUndefined)(attrs.text)) {
+	                if (!utils.isUndefined(attrs.text)) {
 	                    specialAttributes.push('lineHeight', 'textPath', 'annotations');
-	                    (0, _utils.forEach)(vElements, function (vel) {
+	                    utils.forEach(vElements, function (vel) {
 	                        vel.text(attrs.text + '', {
 	                            lineHeight: attrs.lineHeight,
 	                            textPath: attrs.textPath,
@@ -7156,56 +7562,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var surplus = {};
 	
-	                (0, _utils.forIn)(attrs, function (value, key) {
-	                    if (!(0, _utils.contains)(specialAttributes, key)) {
+	                utils.forIn(attrs, function (value, key) {
+	                    if (!utils.contains(specialAttributes, key)) {
 	                        surplus[key] = value;
 	                    }
 	                });
 	
 	                // set regular attributes
-	                (0, _utils.forEach)(vElements, function (vel) {
+	                utils.forEach(vElements, function (vel) {
 	                    vel.attr(surplus);
 	                });
 	
-	                //if (attrs.port) {
+	                // if (attrs.port) {
 	                //    forEach(vels, function (vel) {
 	                //        vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
 	                //    });
-	                //}
+	                // }
 	
 	                // TODO: vel.css()
 	
-	                //if (attrs.style) {
+	                // if (attrs.style) {
 	                //    forEach(vels, function (vel) {
 	                //        vel.css(attrs.style);
 	                //    });
-	                //}
+	                // }
 	
 	                // TODO: attrs.html
 	
-	                if (!(0, _utils.isUndefined)(attrs.html)) {
-	                    (0, _utils.forEach)(vElements, function (vel) {});
-	                }
+	                // if (!utils.isUndefined(attrs.html)) {
+	                //    utils.forEach(vElements, function (vel) {
+	                //
+	                //    });
+	                // }
 	
 	                // Special `ref-x` and `ref-y` attributes make it possible to
 	                // set both absolute or relative positioning of sub elements.
-	                (0, _utils.some)(['ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'x-alignment', 'y-alignment', 'ref-width', 'ref-height'], function (key) {
-	                    return !(0, _utils.isUndefined)(attrs[key]);
+	                utils.some(['ref-x', 'ref-y', 'ref-dx', 'ref-dy', 'x-alignment', 'y-alignment', 'ref-width', 'ref-height'], function (key) {
+	                    return !utils.isUndefined(attrs[key]);
 	                }) && relativelySelectors.push(selector);
 	            });
 	
 	            // Note that we're using the bounding box without transformation
 	            // because we are already inside a transformed coordinate system.
 	            var size = cell.size;
-	            var bbox = { x: 0, y: 0, width: size.width, height: size.height };
+	            var bbox = {
+	                x: 0,
+	                y: 0,
+	                width: size.width,
+	                height: size.height
+	            };
 	
-	            (0, _utils.forEach)(relativelySelectors, function (selector) {
+	            utils.forEach(relativelySelectors, function (selector) {
 	
 	                var specified = specifiedAttrs && specifiedAttrs[selector];
 	                var all = allAttrs[selector];
-	                var attrs = specified ? (0, _utils.merge)({}, all, specified) : all;
+	                var attrs = specified ? utils.merge({}, all, specified) : all;
 	
-	                (0, _utils.forEach)(nodesBySelector[selector], function (vel) {
+	                utils.forEach(nodesBySelector[selector], function (vel) {
 	                    that.positionRelative(vel, bbox, attrs, nodesBySelector);
 	                });
 	            });
@@ -7222,26 +7635,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var that = this;
 	            var ref = attributes['ref'];
-	            var refDx = (0, _utils.toFloat)(attributes['ref-dx']);
-	            var refDy = (0, _utils.toFloat)(attributes['ref-dy']);
+	            var refDx = utils.toFloat(attributes['ref-dx']);
+	            var refDy = utils.toFloat(attributes['ref-dy']);
 	            var yAlignment = attributes['y-alignment'];
 	            var xAlignment = attributes['x-alignment'];
 	
 	            var refX = attributes['ref-x'];
-	            var refXPercentage = (0, _utils.isPercentage)(refX);
-	            refX = (0, _utils.toFloat)(refX, refXPercentage);
+	            var refXPercentage = utils.isPercentage(refX);
+	            refX = utils.toFloat(refX, refXPercentage);
 	
 	            var refY = attributes['ref-y'];
-	            var refYPercentage = (0, _utils.isPercentage)(refY);
-	            refY = (0, _utils.toFloat)(refY, refYPercentage);
+	            var refYPercentage = utils.isPercentage(refY);
+	            refY = utils.toFloat(refY, refYPercentage);
 	
 	            var refWidth = attributes['ref-width'];
-	            var refWidthPercentage = (0, _utils.isPercentage)(refWidth);
-	            refWidth = (0, _utils.toFloat)(refWidth, refWidthPercentage);
+	            var refWidthPercentage = utils.isPercentage(refWidth);
+	            refWidth = utils.toFloat(refWidth, refWidthPercentage);
 	
 	            var refHeight = attributes['ref-height'];
-	            var refHeightPercentage = (0, _utils.isPercentage)(refHeight);
-	            refHeight = (0, _utils.toFloat)(refHeight, refHeightPercentage);
+	            var refHeightPercentage = utils.isPercentage(refHeight);
+	            refHeight = utils.toFloat(refHeight, refHeightPercentage);
 	
 	            // Check if the node is a descendant of the scalable group.
 	            var scalableNode = vel.findParent('pane-scalable', that.elem);
@@ -7264,7 +7677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                // Get the bounding box of the reference element
 	                // relative to the root `<g>` element.
-	                bbox = vref.bbox(false, that.elem);
+	                bbox = vref.getBBox(false, that.elem);
 	            }
 	
 	            // Remove the previous translate() from the transform attribute
@@ -7272,12 +7685,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // following the `ref-x` and `ref-y` attributes.
 	            var transformAttr = vel.attr('transform');
 	            if (transformAttr) {
-	                vel.attr('transform', (0, _utils.clearTranslate)(transformAttr));
+	                vel.attr('transform', utils.clearTranslate(transformAttr));
 	            }
 	
 	            // `ref-width` and `ref-height` defines the width and height of the
 	            // sub element relatively to the reference element size.
-	            if ((0, _utils.isFinite)(refWidth)) {
+	            if (utils.isFinite(refWidth)) {
 	                if (refWidthPercentage || refWidth >= 0 && refWidth <= 1) {
 	                    vel.attr('width', refWidth * bbox.width);
 	                } else {
@@ -7285,7 +7698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            if ((0, _utils.isFinite)(refHeight)) {
+	            if (utils.isFinite(refHeight)) {
 	                if (refHeightPercentage || refHeight >= 0 && refHeight <= 1) {
 	                    vel.attr('height', refHeight * bbox.height);
 	                } else {
@@ -7300,7 +7713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // `ref-dx` and `ref-dy` define the offset of the sub element relative
 	            // to the right and/or bottom coordinate of the reference element.
-	            if ((0, _utils.isFinite)(refDx)) {
+	            if (utils.isFinite(refDx)) {
 	                if (scalableNode) {
 	                    scale = scalableNode.scale();
 	                    tx = bbox.x + bbox.width + refDx / scale.sx;
@@ -7309,7 +7722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            if ((0, _utils.isFinite)(refDy)) {
+	            if (utils.isFinite(refDy)) {
 	                if (scalableNode) {
 	                    scale = scale || scalableNode.scale();
 	                    ty = bbox.y + bbox.height + refDy / scale.sy;
@@ -7318,7 +7731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            if ((0, _utils.isFinite)(refX)) {
+	            if (utils.isFinite(refX)) {
 	                if (refXPercentage || refX > 0 && refX < 1) {
 	                    tx = bbox.x + bbox.width * refX;
 	                } else if (scalableNode) {
@@ -7329,7 +7742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            if ((0, _utils.isFinite)(refY)) {
+	            if (utils.isFinite(refY)) {
 	                if (refXPercentage || refY > 0 && refY < 1) {
 	                    ty = bbox.y + bbox.height * refY;
 	                } else if (scalableNode) {
@@ -7340,19 +7753,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            if (!(0, _utils.isUndefined)(yAlignment) || !(0, _utils.isUndefined)(xAlignment)) {
+	            if (!utils.isUndefined(yAlignment) || !utils.isUndefined(xAlignment)) {
 	
-	                var velBBox = vel.bbox(false, that.paper.drawPane);
+	                var velBBox = vel.getBBox(false, that.paper.drawPane);
 	
 	                if (yAlignment === 'middle') {
 	                    ty -= velBBox.height / 2;
-	                } else if ((0, _utils.isFinite)(yAlignment)) {
+	                } else if (utils.isFinite(yAlignment)) {
 	                    ty += yAlignment > -1 && yAlignment < 1 ? velBBox.height * yAlignment : yAlignment;
 	                }
 	
 	                if (xAlignment === 'middle') {
 	                    tx -= velBBox.width / 2;
-	                } else if ((0, _utils.isFinite)(xAlignment)) {
+	                } else if (utils.isFinite(xAlignment)) {
 	                    tx += xAlignment > -1 && xAlignment < 1 ? velBBox.width * xAlignment : xAlignment;
 	                }
 	            }
@@ -7390,50 +7803,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var that = this;
 	            var scalableNode = that.scalableNode;
 	
-	            if (!scalableNode) {
-	                return;
+	            if (scalableNode) {
+	
+	                // get bbox without transform
+	                var nativeBBox = scalableNode.getBBox(true);
+	
+	                // Make sure `scalableBBox.width` and `scalableBBox.height` are not
+	                // zero which can happen if the element does not have any content.
+	                // By making the width(height) 1, we prevent HTML errors of the type
+	                // `scale(Infinity, Infinity)`.
+	                var size = that.cell.size;
+	                var sx = size.width / (nativeBBox.width || 1);
+	                var sy = size.height / (nativeBBox.height || 1);
+	
+	                sx = utils.toFixed(sx, 2);
+	                sy = utils.toFixed(sy, 2);
+	
+	                scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
+	
+	                // let rotation = that.cell.rotation;
+	                // let angle = rotation.angle;
+	                //
+	                // // Cancel the rotation but now around a different origin,
+	                // // which is the center of the scaled object.
+	                // let rotatableNode = that.rotatableNode;
+	                // let rotateAttr = rotatableNode && rotatableNode.attr('transform');
+	                //
+	                // if (rotateAttr && rotateAttr !== 'null') {
+	                //
+	                //    rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
+	                //    let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
+	                //
+	                //    // Store new x, y and perform rotate() again against the new rotation origin.
+	                //    that.position = {
+	                //        x: rotatableBBox.x,
+	                //        y: rotatableBBox.y
+	                //    };
+	                //    that.rotate();
+	                // }
+	
+	                // Update must always be called on non-rotated element. Otherwise,
+	                // relative positioning would work with wrong (rotated) bounding boxes.
+	                that.update();
 	            }
-	
-	            // get bbox without transform
-	            var nativeBBox = scalableNode.bbox(true);
-	
-	            // Make sure `scalableBBox.width` and `scalableBBox.height` are not
-	            // zero which can happen if the element does not have any content.
-	            // By making the width(height) 1, we prevent HTML errors of the type
-	            // `scale(Infinity, Infinity)`.
-	            var size = that.cell.size;
-	            var sx = size.width / (nativeBBox.width || 1);
-	            var sy = size.height / (nativeBBox.height || 1);
-	
-	            sx = (0, _utils.toFixed)(sx, 2);
-	            sy = (0, _utils.toFixed)(sy, 2);
-	
-	            scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
-	
-	            //let rotation = that.cell.rotation;
-	            //let angle = rotation.angle;
-	            //
-	            //// Cancel the rotation but now around a different origin,
-	            //// which is the center of the scaled object.
-	            //let rotatableNode = that.rotatableNode;
-	            //let rotateAttr = rotatableNode && rotatableNode.attr('transform');
-	            //
-	            //if (rotateAttr && rotateAttr !== 'null') {
-	            //
-	            //    rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
-	            //    let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
-	            //
-	            //    // Store new x, y and perform rotate() again against the new rotation origin.
-	            //    that.position = {
-	            //        x: rotatableBBox.x,
-	            //        y: rotatableBBox.y
-	            //    };
-	            //    that.rotate();
-	            //}
-	
-	            // Update must always be called on non-rotated element. Otherwise,
-	            // relative positioning would work with wrong (rotated) bounding boxes.
-	            that.update();
 	
 	            return that;
 	        }
@@ -7470,7 +7882,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'getBBox',
-	        value: function getBBox() {}
+	        value: function getBBox() {
+	            return this.vel.getBBox();
+	        }
+	    }, {
+	        key: 'getStrokeWidth',
+	        value: function getStrokeWidth() {
+	
+	            var vel = this.vel;
+	            var vTarget = vel.findOne('rect') || vel.findOne('path') || vel.findOne('circle') || vel.findOne('ellipse') || vel.findOne('polyline') || vel.findOne('polygon');
+	
+	            if (vTarget && vTarget.node) {
+	
+	                var sw = utils.getComputedStyle(vTarget.node, 'stroke-width');
+	
+	                return sw && utils.toFloat(sw) || 0;
+	            }
+	
+	            return 0;
+	        }
+	    }, {
+	        key: 'getStrokeBBox',
+	        value: function getStrokeBBox() {
+	
+	            var cell = this.cell;
+	            var strokeWidth = this.getStrokeWidth();
+	
+	            var bbox = new _Rect2.default(cell.position.x, cell.position.y, cell.size.width, cell.size.height);
+	
+	            return strokeWidth ? bbox.grow(strokeWidth / 2) : bbox;
+	        }
 	    }], [{
 	        key: 'specialAttributes',
 	        get: function get() {
@@ -7499,11 +7940,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Visual2 = __webpack_require__(32);
 	
 	var _Visual3 = _interopRequireDefault(_Visual2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -7521,8 +7968,71 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    _createClass(Link, [{
+	        key: 'getRouter',
+	        value: function getRouter() {
+	
+	            var router = this.metadata.router || {};
+	
+	            if (!utils.isObject(router)) {
+	
+	                router = { name: router };
+	            }
+	
+	            return router;
+	        }
+	    }, {
+	        key: 'getConnector',
+	        value: function getConnector() {
+	
+	            var connector = this.metadata.connector || {};
+	            var selector = '.connector';
+	
+	            if (!utils.isObject(connector)) {
+	
+	                connector = { name: connector };
+	            }
+	
+	            connector.selector = selector;
+	
+	            return connector;
+	        }
+	    }, {
+	        key: 'getMarker',
+	        value: function getMarker(isSource) {
+	
+	            var that = this;
+	            var metadata = that.metadata;
+	            var marker = isSource ? metadata.sourceMarker : metadata.targetMarker;
+	            var selector = isSource ? '.source-marker' : '.target-marker';
+	
+	            if (!utils.isObject(marker)) {
+	
+	                marker = { name: marker };
+	            }
+	
+	            marker.selector = selector;
+	
+	            if (!utils.isObject(marker.options)) {
+	                marker.options = {};
+	            }
+	
+	            marker.options.markerStrokeWidth = that.getStrokeWidth(selector);
+	            marker.options.connectorStrokeWidth = that.getStrokeWidth('.connector');
+	
+	            return marker;
+	        }
+	    }, {
+	        key: 'getStrokeWidth',
+	        value: function getStrokeWidth(selector) {
+	
+	            var attr = this.attrs[selector];
+	
+	            return attr && utils.toFloat(attr['stroke-width']) || 0;
+	        }
+	    }, {
 	        key: 'isLink',
 	        get: function get() {
+	
 	            return true;
 	        }
 	    }]);
@@ -7532,23 +8042,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	Link.setDefaults({
 	
-	    markup: '' + '<path class="connection"/>' + '<path class="marker-source"/>' + '<path class="marker-target"/>' + '<path class="connection-wrap"/>' + '<g class="labels"/>' + '<g class="marker-vertices"/>' + '<g class="marker-arrowheads"/>' + '<g class="link-tools"/>',
+	    markup: '' + '<path class="connector"/>' + '<path class="connector-wrap"/>' + '<path class="source-marker"/>' + '<path class="target-marker"/>' + '<g class="labels"/>' + '<g class="marker-vertices"/>' + '<g class="marker-arrowheads"/>' + '<g class="link-tools"/>',
 	
 	    classNames: 'pane-link',
 	    router: null,
-	    marker: null,
-	    connector: null, // set `null` to use the default connector
+	    sourceMarker: null,
+	    targetMarker: null,
+	    connector: 'sharp',
 	    attrs: {
-	        '.connection': {
-	            'fill': 'none',
+	        '.source-marker': {
+	            'fill': '#000',
 	            'stroke': '#000',
 	            'stroke-width': 1
 	        },
-	        '.marker-source': {
-	            d: 'M 10 0 L 0 5 L 10 10 z'
+	        '.target-marker': {
+	            'fill': '#000',
+	            'stroke': '#000',
+	            'stroke-width': 1
 	        },
-	        '.marker-target': {
-	            d: 'M 10 0 L 0 5 L 10 10 z'
+	        '.connector': {
+	            'fill': 'none',
+	            'stroke': '#000',
+	            'stroke-width': 1
 	        }
 	    }
 	});
@@ -7645,12 +8160,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    markup: '',
 	    attrs: {}, // styles
 	    data: null, // attach data to the cell
-	    view: null };
+	    view: null // set `null` to use the default view
+	};
 	
 	// exports
 	// -------
 	
-	// set `null` to use the default view
 	exports.default = Visual;
 
 /***/ },
@@ -7665,11 +8180,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Visual2 = __webpack_require__(32);
 	
 	var _Visual3 = _interopRequireDefault(_Visual2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -7692,7 +8213,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // methods
 	        // -------
 	
-	        value: function translate() {}
+	        value: function translate(dx, dy) {
+	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	            var position = this.metadata.position;
+	
+	            if (options.relative) {
+	                position.x += dx;
+	                position.y += dy;
+	            } else {
+	                position.x = dx;
+	                position.y = dy;
+	            }
+	        }
 	    }, {
 	        key: 'resize',
 	        value: function resize(width, height) {}
@@ -7703,6 +8236,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getBBox',
 	        value: function getBBox() {
 	            return false;
+	        }
+	    }, {
+	        key: 'getStrokeWidth',
+	        value: function getStrokeWidth() {
+	
+	            var attrs = this.attrs;
+	            var attr = attrs.rect || attrs.path || attrs.circle || attrs.ellipse || attrs.polyline || attrs.polygon;
+	            var strokeWidth = attr['stroke-width'] || 0;
+	
+	            return utils.toFloat(strokeWidth) || 0;
 	        }
 	    }, {
 	        key: 'isNode',
@@ -7743,6 +8286,333 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function sharpConnector(sourcePoint, targetPoint, vertices) {
+	
+	    var d = ['M', sourcePoint.x, sourcePoint.y];
+	
+	    utils.forEach(vertices, function (vertex) {
+	
+	        d.push(vertex.x, vertex.y);
+	    });
+	
+	    d.push(targetPoint.x, targetPoint.y);
+	
+	    return d.join(' ');
+	}
+	
+	exports.default = sharpConnector;
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function roundedConnector(sourcePoint, targetPoint, vertices) {
+	    var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+	
+	    var offset = options.radius || 10;
+	
+	    var d1 = undefined;
+	    var d2 = undefined;
+	
+	    var d = ['M', sourcePoint.x, sourcePoint.y];
+	
+	    utils.forEach(vertices, function (vertex, index) {
+	
+	        // the closest vertices
+	        var prev = vertices[index - 1] || sourcePoint;
+	        var next = vertices[index + 1] || targetPoint;
+	        var cur = _Point2.default.fromPoint(vertex);
+	
+	        // a half distance to the closest vertex
+	        d1 = d2 || cur.distance(prev) / 2;
+	        d2 = cur.distance(next) / 2;
+	
+	        // control points
+	        var c1 = _Point2.default.fromPoint(vertex).move(prev, -Math.min(offset, d1)).smooth();
+	        var c2 = _Point2.default.fromPoint(vertex).move(next, -Math.min(offset, d2)).smooth();
+	
+	        d.push(c1.x, c1.y, 'S', vertex.x, vertex.y, c2.x, c2.y, 'L');
+	    });
+	
+	    d.push(targetPoint.x, targetPoint.y);
+	
+	    return d.join(' ');
+	}
+	
+	exports.default = roundedConnector;
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function classicMarker(vMarker, options) {
+	
+	    if (vMarker) {
+	
+	        // let markerStrokeWidth = options.markerStrokeWidth;
+	
+	        var size = options.size || 7;
+	
+	        console.log(size);
+	
+	        var pathArr = [];
+	
+	        var connectionX = size * 0.75;
+	        var connectionY = size / 2;
+	
+	        pathArr.push('M', 0, size / 2);
+	        pathArr.push('L', size, 0);
+	        pathArr.push('L', connectionX, connectionY);
+	        pathArr.push('L', size, size);
+	        pathArr.push('Z');
+	
+	        vMarker.attr('d', pathArr.join(' '));
+	
+	        //
+	        var connectorStrokeWidth = options.connectorStrokeWidth;
+	
+	        if (connectorStrokeWidth > 1) {
+	            connectionX += connectorStrokeWidth / 2 * (size - connectionX) / connectionY;
+	        }
+	
+	        // return the connection point on the marker
+	        return {
+	            rad: Math.atan2(size / 2, size),
+	            point: new _Point2.default(connectionX, connectionY)
+	        };
+	    }
+	}
+	
+	exports.default = classicMarker;
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function diamondMarker(vMarker, options) {
+	
+	    if (vMarker) {
+	
+	        var rx = options.rx || 5;
+	        var ry = options.ry || 2.5;
+	        var pathArr = [];
+	
+	        pathArr.push('M', rx, 0);
+	        pathArr.push('L', 0, ry);
+	        pathArr.push('L', rx, ry * 2);
+	        pathArr.push('L', rx * 2, ry);
+	        pathArr.push('Z');
+	
+	        vMarker.attr('d', pathArr.join(' '));
+	
+	        // return the connection point on the marker
+	        return {
+	            rad: Math.atan2(ry, rx),
+	            point: new _Point2.default(rx * 2 - 1, ry)
+	        };
+	    }
+	}
+	
+	exports.default = diamondMarker;
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function blockMarker(vMarker, options) {
+	
+	    if (vMarker) {
+	
+	        var size = options.size || 7;
+	        var pathArr = [];
+	
+	        pathArr.push('M', size, 0);
+	        pathArr.push('L', 0, size / 2);
+	        pathArr.push('L', size, size);
+	        pathArr.push('Z');
+	
+	        vMarker.attr({
+	            d: pathArr.join(' ')
+	        });
+	
+	        // return the connection point on the marker
+	        return {
+	            rad: Math.atan2(size / 2, size),
+	            point: new _Point2.default(size, size / 2)
+	        };
+	    }
+	}
+	
+	exports.default = blockMarker;
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _utils = __webpack_require__(1);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function clovenMarker(vMarker, options) {
+	
+	    if (vMarker) {
+	
+	        var rx = options.rx || 7;
+	        var ry = options.ry || 3.5;
+	        var size = options.size || 7;
+	        var pathArr = [];
+	
+	        pathArr.push('M', rx, 0);
+	        pathArr.push('L', 0, ry);
+	        pathArr.push('L', rx, ry * 2);
+	
+	        vMarker.attr('d', pathArr.join(' '));
+	
+	        // return true will use the connection point on the cell
+	
+	        return {
+	            rad: Math.atan2(ry, rx),
+	            point: new _Point2.default(0, ry)
+	        };
+	    }
+	}
+	
+	exports.default = clovenMarker;
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _vector = __webpack_require__(13);
+	
+	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _Point = __webpack_require__(15);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function ovalMarker(vMarker, options) {
+	
+	    // Note: vMarker should be a `g` element
+	
+	    if (vMarker) {
+	
+	        var rx = options.rx || 5;
+	        var ry = options.ry || rx;
+	
+	        var vEllipse = (0, _vector2.default)('ellipse');
+	
+	        vEllipse.attr({
+	            cx: rx,
+	            cy: ry,
+	            rx: rx,
+	            ry: ry
+	        });
+	
+	        vMarker.append(vEllipse);
+	
+	        // return the connection point on the marker
+	        return {
+	            rad: 0,
+	            point: new _Point2.default(rx * 2, ry)
+	        };
+	    }
+	}
+	
+	exports.default = ovalMarker;
+
+/***/ },
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7794,10 +8664,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Text;
 
 /***/ },
-/* 35 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -7824,6 +8696,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rect).apply(this, arguments));
 	    }
 	
+	    _createClass(Rect, [{
+	        key: 'getStrokeAttr',
+	        value: function getStrokeAttr() {
+	
+	            return this.attrs.rect;
+	        }
+	    }]);
+	
 	    return Rect;
 	})(_Node3.default);
 	
@@ -7838,16 +8718,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            'fill': '#fff',
 	            'stroke': '#000',
 	            'stroke-width': '1',
-	            'width': 100,
-	            'height': 40
+	            'width': 80,
+	            'height': 30
 	        },
 	        'text': {
 	            'fill': '#000',
-	            'font-size': 14,
+	            'font-size': 12,
 	            'ref-x': .5,
 	            'ref-y': .5,
 	            'text-anchor': 'middle',
-	            'y-alignment': 'middle'
+	            'y-alignment': 'middle',
+	            'font-family': 'Arial, helvetica, sans-serif'
 	        }
 	    }
 	});
@@ -7855,7 +8736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 36 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7925,7 +8806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Circle;
 
 /***/ },
-/* 37 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7996,7 +8877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Ellipse;
 
 /***/ },
-/* 38 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8054,7 +8935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Image;
 
 /***/ },
-/* 39 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8121,7 +9002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Path;
 
 /***/ },
-/* 40 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8188,7 +9069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polygon;
 
 /***/ },
-/* 41 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8255,7 +9136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Polyline;
 
 /***/ },
-/* 42 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8264,7 +9145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Path2 = __webpack_require__(39);
+	var _Path2 = __webpack_require__(46);
 	
 	var _Path3 = _interopRequireDefault(_Path2);
 	
@@ -8304,7 +9185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rhombus;
 
 /***/ },
-/* 43 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8354,96 +9235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rect;
 
 /***/ },
-/* 44 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function straight(sourcePoint, targetPoint, vertices) {
-	
-	    var d = ['M', sourcePoint.x, sourcePoint.y];
-	
-	    utils.forEach(vertices, function (vertex) {
-	
-	        d.push(vertex.x, vertex.y);
-	    });
-	
-	    d.push(targetPoint.x, targetPoint.y);
-	
-	    return d.join(' ');
-	}
-	
-	exports.default = straight;
-
-/***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _utils = __webpack_require__(1);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _Point = __webpack_require__(15);
-	
-	var _Point2 = _interopRequireDefault(_Point);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function rounded(sourcePoint, targetPoint, vertices) {
-	    var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
-	
-	    var offset = options.radius || 10;
-	
-	    var d1 = undefined,
-	        d2 = undefined;
-	
-	    var d = ['M', sourcePoint.x, sourcePoint.y];
-	
-	    utils.forEach(vertices, function (vertex, index) {
-	
-	        // the closest vertices
-	        var prev = vertices[index - 1] || sourcePoint;
-	        var next = vertices[index + 1] || targetPoint;
-	        var cur = _Point2.default.fromPoint(vertex);
-	
-	        // a half distance to the closest vertex
-	        d1 = d2 || cur.distance(prev) / 2;
-	        d2 = cur.distance(next) / 2;
-	
-	        // control points
-	        var c1 = _Point2.default.fromPoint(vertex).move(prev, -Math.min(offset, d1)).smooth();
-	        var c2 = _Point2.default.fromPoint(vertex).move(next, -Math.min(offset, d2)).smooth();
-	
-	        d.push(c1.x, c1.y, 'S', vertex.x, vertex.y, c2.x, c2.y, 'L');
-	    });
-	
-	    d.push(targetPoint.x, targetPoint.y);
-	
-	    return d.join(' ');
-	}
-	
-	exports.default = rounded;
-
-/***/ },
-/* 46 */
+/* 51 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin

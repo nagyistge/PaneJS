@@ -316,7 +316,7 @@ class Paper extends Events {
 
                     that
                         .validateView(cell.getParent(), false)
-                        .updateCellGeometry(cell)
+                        .updateNodeGeometry(cell)
                         .renderView(cell);
                 }
             }
@@ -334,7 +334,8 @@ class Paper extends Events {
     updateCellGeometry(cell) {
 
         return cell.isNode
-            ? this.updateNodeGeometry(cell) : cell.isLink
+            ? this.updateNodeGeometry(cell)
+            : cell.isLink
             ? this.updateLinkGeometry(cell)
             : this;
     }
@@ -858,12 +859,29 @@ class Paper extends Events {
     // router
     // ------
 
-    registerRouter(name, fn) {
+    static registerRouter(name, fn) {
 
+        let that = this;
+        let router = that.router;
+
+        if (!router) {
+            router = that.router = {};
+        }
+
+        router[name] = fn;
+
+        return that;
+    }
+
+    static getRouter(name) {
+
+        let router = this.router;
+        return router ? router[name] : null;
     }
 
     getRouter(name) {
 
+        return this.constructor.getRouter(name);
     }
 
     // connector

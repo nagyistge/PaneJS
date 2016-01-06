@@ -52,9 +52,9 @@ class Visual extends Cell {
 
 Visual.defaults = {
     markup: '',
-    attrs: {},    // styles
-    data: null,  // attach data to the cell
-    view: null,  // set `null` to use the default view
+    attrs: {},  // styles
+    data: null, // attach data to the cell
+    view: null  // set `null` to use the default view
 };
 
 

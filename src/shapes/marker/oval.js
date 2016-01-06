@@ -23,7 +23,10 @@ function ovalMarker(vMarker, options) {
         vMarker.append(vEllipse);
 
         // return the connection point on the marker
-        return new Point(rx * 2, ry);
+        return {
+            rad: 0,
+            point: new Point(rx * 2, ry)
+        };
     }
 }
 
