@@ -331,14 +331,6 @@ class Paper extends Events {
         return that;
     }
 
-    updateCellGeometry(cell) {
-
-        return cell.isNode
-            ? this.updateNodeGeometry(cell)
-            : cell.isLink
-            ? this.updateLinkGeometry(cell)
-            : this;
-    }
 
     updateNodeGeometry(node) {
 
@@ -480,99 +472,6 @@ class Paper extends Events {
 
         return this;
     }
-
-    updateLinkGeometry(link) {
-
-        let that = this;
-
-        link.routerPoints = that.parseRouter(link);
-        link.sourcePoint = that.getConnectionPoint(link, true);
-        link.targetPoint = that.getConnectionPoint(link, false);
-
-        return that;
-    }
-
-    parseRouter(link) {
-
-        let that = this;
-        let router = link.router || that.options.defaultRouter;
-        let vertices = link.vertices || [];
-
-        if (!router) {
-            return vertices;
-        }
-
-        let parser;
-        let options = {};
-
-        if (utils.isFunction(router)) {
-            parser = router;
-        } else {
-
-            let name;
-
-            if (utils.isObject(router)) {
-                name = router.name;
-                options = router.options;
-            } else {
-                name = '' + router;
-            }
-
-            parser = that.getRouter(name);
-
-            if (!utils.isFunction(parser)) {
-                throw new Error('Unknown router: "' + name + '"');
-            }
-        }
-
-        return parser.call(this, vertices, options);
-    }
-
-    getConnectionPoint(link, isSource) {
-
-        // find the connection point on the terminal
-
-        let that = this;
-        let spot;
-        let terminalView = that.getTerminalView(link, isSource);
-
-        if (terminalView) {
-
-            let spotBBox = terminalView.getStrokeBBox();
-            let vertices = link.routerPoints || [];
-            let reference = isSource ? vertices[0] : vertices[vertices.length - 1];
-
-            if (!reference) {
-
-                let referenceView = that.getTerminalView(link, !isSource);
-
-                if (referenceView) {
-
-                    let referenceBBox = referenceView.getStrokeBBox();
-
-                    reference = referenceBBox.intersectionWithLineFromCenterToPoint(spotBBox.getCenter());
-                    reference = reference || referenceBBox.getCenter();
-                }
-            }
-
-            if (!reference) {
-                reference = isSource ? link.targetPoint : link.sourcePoint;
-            }
-
-            if (reference) {
-                spot = spotBBox.intersectionWithLineFromCenterToPoint(reference);
-            }
-
-            spot = spot || spotBBox.getCenter();
-
-        } else {
-
-            spot = isSource ? link.sourcePoint : link.targetPoint;
-        }
-
-        return spot;
-    }
-
 
     // transform
     // ---------
