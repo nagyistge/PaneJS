@@ -24,10 +24,6 @@ let defaultOptions = {
     width: '100%',
     height: '100%',
     gridSize: 1,
-    viewportClassName: 'pane-viewport',
-    linkClassName: '',
-    nodeClassName: '',
-    getCellClassName (cell) {},
     getView (cell) {}
 };
 

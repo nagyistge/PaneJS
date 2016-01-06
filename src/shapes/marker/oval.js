@@ -8,7 +8,7 @@ function ovalMarker(vMarker, options) {
 
     if (vMarker) {
 
-        let rx = options.rx || 2.5;
+        let rx = options.rx || 3.5;
         let ry = options.ry || rx;
 
         let vEllipse = vector('ellipse');
@@ -25,6 +25,7 @@ function ovalMarker(vMarker, options) {
         // return the connection point on the marker
         return {
             rad: 0,
+            vel: vEllipse,
             point: new Point(rx * 2, ry)
         };
     }

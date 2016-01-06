@@ -27,36 +27,36 @@ class LinkView extends CellView {
             .updateConnector();
     }
 
-    updateAttributes() {
+    updateAttributes(attrs) {
 
         let that = this;
 
-        utils.forIn(that.cell.attrs, function (attrs, selector) {
+        utils.forIn(attrs || that.cell.attrs, function (attrMap, selector) {
 
             let processed = [];
 
-            if (utils.isObject(attrs.fill)) {
+            if (utils.isObject(attrMap.fill)) {
 
-                that.applyGradient(selector, 'fill', attrs.fill);
+                that.applyGradient(selector, 'fill', attrMap.fill);
                 processed.push('fill');
             }
 
-            if (utils.isObject(attrs.stroke)) {
+            if (utils.isObject(attrMap.stroke)) {
 
-                that.applyGradient(selector, 'stroke', attrs.stroke);
+                that.applyGradient(selector, 'stroke', attrMap.stroke);
                 processed.push('stroke');
             }
 
-            if (utils.isObject(attrs.filter)) {
+            if (utils.isObject(attrMap.filter)) {
 
-                that.applyFilter(selector, attrs.filter);
+                that.applyFilter(selector, attrMap.filter);
                 processed.push('filter');
             }
 
             // remove processed special attributes from attrs
             let surplus = {};
 
-            utils.forIn(attrs, function (value, key) {
+            utils.forIn(attrMap, function (value, key) {
                 if (!utils.contains(processed, key)) {
                     surplus[key] = value;
                 }
@@ -178,7 +178,7 @@ class LinkView extends CellView {
 
                 let rad = renderedMarker.rad || 0;
 
-                if (rad >= Math.PI / 4) {
+                if (rad >= Math.PI / 4 || rad === 0) {
                     bbox.grow(markerStrokeWidth / 2);
                 } else {
                     bbox.grow(markerStrokeWidth / Math.cos(rad));
@@ -240,28 +240,53 @@ class LinkView extends CellView {
 
         let that = this;
         let marker = isSource ? that.sourceMarker : that.targetMarker;
-        let vMarker = that.findOne(marker.selector);
+        let selector = marker.selector;
+        let vMarker = that.findOne(selector);
 
         if (marker && vMarker) {
-
-            // cache the marker vector element
-            if (isSource) {
-                that.sourceMarkerVel = vMarker;
-            } else {
-                that.targetMarkerVel = vMarker;
-            }
-
 
             let renderer = that.paper.getMarker(marker.name);
 
             if (renderer && utils.isFunction(renderer)) {
+
                 let result = renderer(vMarker, marker.options);
+                let replacedVel = result.vel;
+
+                if (replacedVel) {
+
+                    let elem = vMarker.node;
+                    let parent = elem.parentNode;
+
+                    parent.insertBefore(replacedVel.node, elem);
+                    parent.removeChild(elem);
+
+                    let className = selector;
+                    if (className[0] === '.') {
+                        className = className.substr(1);
+                    }
+
+                    replacedVel.addClass(className);
+
+                    let attrs = {};
+                    attrs[selector] = that.cell.attrs[selector];
+                    that.updateAttributes(attrs);
+
+                    vMarker = replacedVel;
+
+                }
 
                 if (isSource) {
                     that.renderedSourceMarker = result;
                 } else {
                     that.renderedTargetMarker = result;
                 }
+            }
+
+            // cache the marker vector element
+            if (isSource) {
+                that.sourceMarkerVel = vMarker;
+            } else {
+                that.targetMarkerVel = vMarker;
             }
         }
 
