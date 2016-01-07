@@ -54,7 +54,7 @@ server.listeningApp
 
     console.log('Dev server started on: ' + target);
 
-    open(target+'/demo/');
+    open(target + '/demo/index.html');
 
   })
   .on('error', function (err) {
