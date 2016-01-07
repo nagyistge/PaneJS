@@ -76,6 +76,21 @@
     ];
     model.addLink(link4);
 
+
+    var link5 = new pane.Link({
+        connector: 'smooth',
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
+
+    link5.sourcePoint = new pane.geometry.Point(560, 30);
+    link5.targetPoint = new pane.geometry.Point(760, 110);
+    link5.vertices = [
+        new pane.geometry.Point(620, 100),
+        new pane.geometry.Point(680, 50),
+    ];
+    model.addLink(link5);
+
 </script>
 
 </body>

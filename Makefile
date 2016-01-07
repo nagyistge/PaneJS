@@ -20,8 +20,11 @@ CMD_COVERALLS = $(DIR_BIN)/coveralls
 default: dev-server
 
 
-dev-server: build
+server:
 	node ./scripts/server.js
+
+
+dev-server: build server
 
 
 clean-dist:

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var path = require('path');
+var open = require('opn');
 var pkg = require('../package');
 var config = require('../webpack.config');
 var webpack = require('webpack');
@@ -52,6 +53,8 @@ server.listeningApp
     var target = 'http://' + host + ':' + port;
 
     console.log('Dev server started on: ' + target);
+
+    open(target+'/demo/');
 
   })
   .on('error', function (err) {
