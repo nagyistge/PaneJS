@@ -167,6 +167,10 @@ function getCurveDivider(p0, p1, p2, p3) {
 }
 
 
+// exports
+// -------
+
 export {
+    getCurveControlPoints,
     curveThroughPoints
 }
