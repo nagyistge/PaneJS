@@ -1,5 +1,10 @@
+import utils  from '../../common/utils';
 import Point  from '../../geometry/Point';
 import { getCurveControlPoints } from '../../geometry/bezier';
+
+function normalizeAngle(angle) {
+    return (angle % 360) + (angle < 0 ? 360 : 0);
+}
 
 function fixMarker(view, isSource, reference) {
 
@@ -18,6 +23,11 @@ function fixMarker(view, isSource, reference) {
 
         vel.rotate(-deg);
 
+        //console.log(link.sourcePointOnTerminal);
+
+        //
+        //view.transformMarker(isSource, reference);
+        //vel.translateAndAutoOrient(position, reference, drawPane);
         view.updateConnectionPointOnMarker(isSource);
     }
 }

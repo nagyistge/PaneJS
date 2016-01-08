@@ -228,12 +228,12 @@ class LinkView extends CellView {
             connectionPoint = connectionPoint || terminalOuterBox.getCenter();
 
             if (isSource) {
+                link.sourcePointOnTerminal = connectionPoint;
                 link.sourcePoint = connectionPoint;
             } else {
+                link.targetPointOnTerminal = connectionPoint;
                 link.targetPoint = connectionPoint;
             }
-
-            link[isSource ? 'sourcePoint' : 'targetPoint'] = connectionPoint;
         }
 
         return that;
@@ -296,7 +296,7 @@ class LinkView extends CellView {
         return that;
     }
 
-    transformMarker(isSource) {
+    transformMarker(isSource, ref) {
 
         let that = this;
         let renderedMarker = isSource
@@ -307,18 +307,19 @@ class LinkView extends CellView {
 
             let link = that.cell;
             let drawPane = that.paper.drawPane;
-            let sourcePoint = link.sourcePoint;
-            let targetPoint = link.targetPoint;
+            let sourcePoint = link.sourcePointOnTerminal || link.sourcePoint;
+            let targetPoint = link.targetPointOnTerminal || link.targetPoint;
             let routerPoints = link.routerPoints;
 
-            let startPoint = isSource ? sourcePoint : targetPoint;
-            let endPoint = isSource
+            let position = isSource ? sourcePoint : targetPoint;
+            let reference = ref || isSource
                 ? (routerPoints[0] || targetPoint)
                 : (routerPoints[routerPoints.length - 1] || sourcePoint);
 
             // make the marker at the right position
             let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
-            vMarker.translateAndAutoOrient(startPoint, endPoint, drawPane);
+
+            vMarker.translateAndAutoOrient(position, reference, drawPane);
         }
 
         return that;
@@ -344,8 +345,10 @@ class LinkView extends CellView {
             let newConnectionPoint = Point.fromPoint(p);
 
             if (isSource) {
+                link.sourcePointOnMarker = newConnectionPoint;
                 link.sourcePoint = newConnectionPoint;
             } else {
+                link.targetPointOnMarker = newConnectionPoint;
                 link.targetPoint = newConnectionPoint;
             }
         }
