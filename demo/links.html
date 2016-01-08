@@ -15,19 +15,6 @@
 </head>
 <body>
 <div id="container"></div>
-<p>
-    B(t)=(1-t)<sup>3</sup>P<sub>0</sub>+3(1-t)<sup>2</sup>tP<sub>1</sub>+3(1-t)t<sup>2</sup>P<sub>2</sub>+t<sup>3</sup>P<sub>3</sub> (1)
-</p>
-<p>
-    B’(t)=-3(1-t)<sup>2</sup>P<sub>0</sub>+3(3t<sup>2</sup>–4t+1)P<sub>1</sub>+3(2t–3t<sup>2</sup>)P<sub>2</sub>+3t<sup>2</sup>P<sub>3</sub>
-</p>
-<p>
-    B’’(t)=6(1 - t)P<sub>0</sub>+3(6t-4)P<sub>1</sub>+3(2–6t)P<sub>2</sub>+6tP<sub>3</sub>
-</p>
-
-<p>
-    3P<sub>1</sub> = 2P<sub>0</sub> + P<sub>3</sub> P<sub>2</sub> = 2P<sub>1</sub> – P<sub>0</sub>
-</p>
 <script src="../dist/pane.js"></script>
 <script>
 
@@ -93,7 +80,12 @@
     var link5 = new pane.Link({
         connector: 'smooth',
         sourceMarker: 'classic',
-        targetMarker: 'classic'
+        targetMarker: 'classic',
+        attrs: {
+            '.target-marker': {
+                fill: 'none'
+            }
+        }
     });
 
     link5.sourcePoint = new pane.geometry.Point(560, 30);
@@ -115,6 +107,54 @@
         new pane.geometry.Point(760, 220)
     ];
     model.addLink(link6);
+
+
+    var node1 = new pane.shapes.basic.Rect({
+        position: {
+            x: 100,
+            y: 310
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+            rect: {
+                'stroke-width': 1
+            },
+            text: {
+                text: 'Node1'
+            }
+        }
+    });
+
+    var node2 = new pane.shapes.basic.Rect({
+        position: {
+            x: 480,
+            y: 480
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+
+            text: {
+                text: 'Node2'
+            }
+        }
+    });
+
+    var link7 = link5.clone();
+
+    link7.vertices = [
+        new pane.geometry.Point(150, 480),
+        new pane.geometry.Point(400, 320),
+        new pane.geometry.Point(550, 420)
+    ];
+    model.addNode(node1);
+    model.addNode(node2);
+    model.addLink(link7, node1, node2);
 
 </script>
 
