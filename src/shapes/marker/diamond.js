@@ -26,5 +26,3 @@ function diamondMarker(vMarker, options) {
 }
 
 export default diamondMarker;
-
-

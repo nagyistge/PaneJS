@@ -4,7 +4,7 @@ import vector     from '../common/vector';
 import detector   from '../common/detector';
 
 import Point from '../geometry/Point';
-import Rect  from '../geometry/Rect';
+// import Rect  from '../geometry/Rect';
 
 import Model    from './Model';
 import Cell     from '../cells/Cell';
@@ -24,7 +24,7 @@ let defaultOptions = {
     width: '100%',
     height: '100%',
     gridSize: 1,
-    getView (cell) {}
+    getView(/* cell */) {}
 };
 
 class Paper extends Events {
@@ -96,8 +96,9 @@ class Paper extends Events {
         // This is a hack for Firefox! If there wasn't a fake (non-visible)
         // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
         // used below won't work.
+        let fakeRect;
         if (detector.IS_FF) {
-            let fakeRect = vector('rect', {
+            fakeRect = vector('rect', {
                 width: that.options.width,
                 height: that.options.height,
                 x: 0,
@@ -425,8 +426,8 @@ class Paper extends Events {
             }
 
             node.position = {
-                x: x,
-                y: y
+                x,
+                y
             };
         }
 
@@ -516,7 +517,10 @@ class Paper extends Events {
         options.width = width;
         options.height = height;
 
-        vector(that.svg).attr({ width: width, height: height });
+        vector(that.svg).attr({
+            width,
+            height
+        });
 
         that.trigger('paper:resize', width, height);
 
@@ -550,11 +554,11 @@ class Paper extends Events {
         return this.translate(x, y, true);
     }
 
-    translateBy(x, y) {
+    translateBy(/* x, y */) {
 
     }
 
-    scale(sx, sy, ox = 0, oy = 0) {
+    scale(/* sx, sy, ox = 0, oy = 0 */) {
 
     }
 
@@ -668,11 +672,11 @@ class Paper extends Events {
         return this.views[id];
     }
 
-    findViewByPoint(point) {
+    findViewByPoint(/* point */) {
 
     }
 
-    findViewsInArea(rect) {
+    findViewsInArea(/* rect */) {
 
     }
 
@@ -684,7 +688,7 @@ class Paper extends Events {
 
         let that = this;
 
-        console.log(changes);
+        // console.log(changes);
 
         utils.forEach(changes, function (change) {
             that.distributeChange(change);
@@ -711,7 +715,7 @@ class Paper extends Events {
         return that;
     }
 
-    onRootChanged(change) {
+    onRootChanged(/* change */) {
 
     }
 
@@ -724,15 +728,17 @@ class Paper extends Events {
 
         that.invalidate(change.child, true, true);
 
-        //if (newParent == null || this.isCellCollapsed(newParent)) {
-        //    this.view.invalidate(change.child, true, true);
-        //    this.removeStateForCell(change.child);
-        //
-        //    // Handles special case of current root of view being removed
-        //    if (this.view.currentRoot == change.child) {
-        //        this.home();
-        //    }
-        //}
+        /*
+        if (newParent == null || this.isCellCollapsed(newParent)) {
+            this.view.invalidate(change.child, true, true);
+            this.removeStateForCell(change.child);
+
+            // Handles special case of current root of view being removed
+            if (this.view.currentRoot == change.child) {
+                this.home();
+            }
+        }
+        */
 
         if (newParent !== oldParent) {
             // Refreshes the collapse/expand icons on the parents
@@ -847,15 +853,14 @@ class Paper extends Events {
 
         if (view && view.cell && view.cell instanceof Cell) {
             return true;
-        } else {
+        }
 
-            let that = this;
-            let svg = that.svg;
-            let target = e.target;
+        let that = this;
+        let svg = that.svg;
+        let target = e.target;
 
-            if (svg === target || utils.containsElem(svg, target)) {
-                return true;
-            }
+        if (svg === target || utils.containsElem(svg, target)) {
+            return true;
         }
     }
 
@@ -901,7 +906,7 @@ class Paper extends Events {
         }
     }
 
-    onClick(e) {}
+    onClick(/* e */) {}
 
     onPointerDown(e) {
 

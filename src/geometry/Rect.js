@@ -247,7 +247,7 @@ class Rect {
 
     grow(amount) {
 
-        var that = this;
+        let that = this;
 
         that.x -= amount;
         that.y -= amount;

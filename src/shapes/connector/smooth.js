@@ -11,7 +11,7 @@ function fixMarker(view, isSource, reference) {
     let renderedMarker = isSource
         ? view.renderedSourceMarker
         : view.renderedTargetMarker;
-    var vel = isSource
+    let vel = isSource
         ? view.sourceMarkerVel
         : view.targetMarkerVel;
 
@@ -35,8 +35,8 @@ function fixMarker(view, isSource, reference) {
 
 function smoothConnector(sourcePoint, targetPoint, vertices) {
 
-    var linkView = this;
-    var link = linkView.cell;
+    let linkView = this;
+    let link = linkView.cell;
     let pathArr;
     let sourceReference;
     let targetReference;
@@ -104,5 +104,3 @@ function smoothConnector(sourcePoint, targetPoint, vertices) {
 
 
 export default smoothConnector;
-
-

@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
 import vector     from '../common/vector';
-import Line       from '../geometry/Line';
+// import Line       from '../geometry/Line';
 import Point      from '../geometry/Point';
 import CellView   from './CellView';
 
@@ -142,7 +142,7 @@ class LinkView extends CellView {
             that.applyAttrs(connector.selector, { d: pathData });
 
         } else {
-            throw new Error('Unknown connector: "' + connectorName + '"');
+            throw new Error('Unknown connector: "' + connector.name + '"');
         }
 
         return that;

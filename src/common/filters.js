@@ -6,7 +6,7 @@ import { format, isFinite } from '../common/utils';
 
 export default {
 
-    outline: function (args) {
+    outline(args) {
 
         // `color` ... outline color
         // `width`... outline width
@@ -37,7 +37,7 @@ export default {
         });
     },
 
-    highlight: function (args) {
+    highlight(args) {
 
         // `color` ... color
         // `width`... width
@@ -61,7 +61,7 @@ export default {
         });
     },
 
-    blur: function (args) {
+    blur(args) {
 
         // `x` ... horizontal blur
         // `y` ... vertical blur (optional)
@@ -78,7 +78,7 @@ export default {
         });
     },
 
-    dropShadow: function (args) {
+    dropShadow(args) {
 
         // `dx` ... horizontal shift
         // `dy` ... vertical shift
@@ -99,7 +99,7 @@ export default {
         });
     },
 
-    grayScale: function (args) {
+    grayScale(args) {
 
         // `amount` ... the proportion of the conversion.
         // A value of 1 is completely grayscale.
@@ -124,7 +124,7 @@ export default {
         });
     },
 
-    sepia: function (args) {
+    sepia(args) {
 
         // `amount` ... the proportion of the conversion.
         // A value of 1 is completely sepia.
@@ -150,7 +150,7 @@ export default {
         });
     },
 
-    saturate: function (args) {
+    saturate(args) {
 
         // `amount` ... the proportion of the conversion.
         // A value of 0 is completely un-saturated.
@@ -168,7 +168,7 @@ export default {
         });
     },
 
-    hueRotate: function (args) {
+    hueRotate(args) {
 
         // `angle` ...  the number of degrees around the color
         // circle the input samples will be adjusted.
@@ -183,7 +183,7 @@ export default {
         });
     },
 
-    invert: function (args) {
+    invert(args) {
 
         // `amount` ... the proportion of the conversion.
         // A value of 1 is completely inverted.
@@ -201,12 +201,12 @@ export default {
         let amount = isFinite(args.amount) ? args.amount : 1;
 
         return format(template)({
-            amount: amount,
+            amount,
             amount2: 1 - amount
         });
     },
 
-    brightness: function (args) {
+    brightness(args) {
 
         // `amount` ... proportion of the conversion.
         // A value of 0 will create an image that is completely black.
@@ -226,7 +226,7 @@ export default {
         });
     },
 
-    contrast: function (args) {
+    contrast(args) {
 
         // `amount` ... proportion of the conversion.
         // A value of 0 will create an image that is completely black.
@@ -244,7 +244,7 @@ export default {
         let amount = isFinite(args.amount) ? args.amount : 1;
 
         return format(template)({
-            amount: amount,
+            amount,
             amount2: 0.5 - amount / 2
         });
     }

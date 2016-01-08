@@ -1,6 +1,6 @@
-import * as utils from '../common/utils'
+import * as utils from '../common/utils';
 import Point from '../geometry/Point';
-import Line  from '../geometry/Line';
+// import Line  from '../geometry/Line';
 
 function curveThroughPoints(points) {
 
@@ -110,6 +110,7 @@ function getFirstControlPoints(rhs) {
     return x;
 }
 
+/* FIXME not used
 function getInversionSolver(p0, p1, p2, p3) {
     let pts = arguments;
 
@@ -136,7 +137,9 @@ function getInversionSolver(p0, p1, p2, p3) {
         return lb / (lb - la);
     };
 }
+*/
 
+/*
 function getCurveDivider(p0, p1, p2, p3) {
 
     // Divide a Bezier curve into two at point defined by value 't' <0,1>.
@@ -153,7 +156,7 @@ function getCurveDivider(p0, p1, p2, p3) {
         let r = new Line(p, q).pointAt(t);
 
         return [{
-            p0: p0,
+            p0,
             p1: l,
             p2: p,
             p3: r
@@ -161,10 +164,11 @@ function getCurveDivider(p0, p1, p2, p3) {
             p0: r,
             p1: q,
             p2: n,
-            p3: p3
+            p3
         }];
     };
 }
+*/
 
 
 // exports
@@ -173,4 +177,4 @@ function getCurveDivider(p0, p1, p2, p3) {
 export {
     getCurveControlPoints,
     curveThroughPoints
-}
+};

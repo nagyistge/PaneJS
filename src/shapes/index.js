@@ -30,4 +30,4 @@ let shapes = {
 
 export {
     shapes
-}
+};

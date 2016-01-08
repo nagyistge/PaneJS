@@ -1,8 +1,8 @@
 require('./style/index.less');
 
 import * as utils         from './common/utils';
-import vector, {VElement} from './common/vector';
-import Events             from './common/Events';
+import vector, { VElement } from './common/vector';
+// import Events             from './common/Events';
 
 
 import Model from './core/Model';
@@ -19,10 +19,10 @@ import LinkView from './views/LinkView';
 import NodeView from './views/NodeView';
 
 
-import Change         from './changes/Change'
-import RootChange     from './changes/RootChange'
-import ChildChange    from './changes/ChildChange'
-import TerminalChange from './changes/TerminalChange'
+import Change         from './changes/Change';
+import RootChange     from './changes/RootChange';
+import ChildChange    from './changes/ChildChange';
+import TerminalChange from './changes/TerminalChange';
 
 
 // connectors
@@ -77,7 +77,7 @@ export {
 
     Model,
     Paper,
-}
+};
 
 export * from './geometry/index';
 export * from './shapes/index';

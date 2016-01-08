@@ -1,10 +1,10 @@
 import {
-    filter,
+    // filter,
     forEach,
     fixIndex,
     isNumeric,
-    isUndefined,
-    isNullOrUndefined,
+    // isUndefined,
+    // isNullOrUndefined,
 } from '../common/utils';
 
 import Events from '../common/Events';
@@ -14,7 +14,7 @@ import Cell from '../cells/Cell';
 import RootChange       from '../changes/RootChange';
 import ChildChange      from '../changes/ChildChange';
 import TerminalChange   from '../changes/TerminalChange';
-import ChangeCollection from '../changes/ChangeCollection'
+import ChangeCollection from '../changes/ChangeCollection';
 
 class Model extends Events {
 
@@ -106,15 +106,15 @@ class Model extends Events {
         return result;
     }
 
-    getParents(cells) {
-
+    getParents(/* cells */) {
+        /* FIXME
         let parents = [];
 
         if (cells) {
 
             let hash = {};
 
-            each(cells, function (cell) {
+            forEach(cells, function (cell) {
                 let parent = cell.parent;
 
                 if (parent) {
@@ -129,6 +129,7 @@ class Model extends Events {
         }
 
         return parents;
+        */
     }
 
 
@@ -231,13 +232,15 @@ class Model extends Events {
 
                     if (cell !== parent) {
 
-                        let parentChanged = cell.parent !== parent;
-
                         that.digest(new ChildChange(that, parent, cell, index));
 
+                        // let parentChanged = cell.parent !== parent;
+
+                        /* FIXME
                         if (parentChanged) {
 
                         }
+                        */
 
                         index++;
                     }
@@ -264,7 +267,7 @@ class Model extends Events {
 
         // connect link with node
 
-        var that = this;
+        let that = this;
 
         if (link) {
 
@@ -431,8 +434,9 @@ class Model extends Events {
         }
     }
 
-    getNearestCommonAncestor(cell1, cell2) {
+    getNearestCommonAncestor(/* cell1, cell2 */) {
 
+        /* FIXME
         if (cell1 && cell2) {
 
             let route1 = cellRoute.create(cell1);
@@ -463,6 +467,7 @@ class Model extends Events {
                 }
             }
         }
+        */
 
         return null;
     }
@@ -521,13 +526,17 @@ class Model extends Events {
     setTerminal(link, terminal, isSource) {
 
         let that = this;
-        let terminalChanged = terminal != that.getTerminal(link, isSource);
+        // FIXME: not used {
+            // let terminalChanged = terminal !== that.getTerminal(link, isSource);
+        // }
 
         that.digest(new TerminalChange(that, link, terminal, isSource));
 
-        //if (this.maintainEdgeParent && terminalChanged) {
-        //    this.updateEdgeParent(link, this.getRoot());
-        //}
+        /*
+        if (this.maintainEdgeParent && terminalChanged) {
+            this.updateEdgeParent(link, this.getRoot());
+        }
+        */
 
         return that;
     }
@@ -541,8 +550,7 @@ class Model extends Events {
         try {
             that.setTerminal(link, source, true);
             that.setTerminal(link, target, false);
-        }
-        finally {
+        } finally {
             that.endUpdate();
         }
 
@@ -551,8 +559,8 @@ class Model extends Events {
 
     terminalChanged(link, node, isSource) {
 
-        var that = this;
-        var previous = that.getTerminal(link, isSource);
+        let that = this;
+        let previous = that.getTerminal(link, isSource);
 
         if (node) {
             node.addLink(link, isSource);
@@ -560,7 +568,7 @@ class Model extends Events {
             previous.removeLink(link, isSource);
         }
 
-        return previous
+        return previous;
     }
 
 
