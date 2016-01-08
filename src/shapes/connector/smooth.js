@@ -30,5 +30,3 @@ function smoothConnector(sourcePoint, targetPoint, vertices) {
 
 
 export default smoothConnector;
-
-

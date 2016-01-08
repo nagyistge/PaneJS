@@ -1,20 +1,22 @@
-import * as utils from '../../common/utils'
+// import * as utils from '../../common/utils'
 
 
+/* FIXME: not used
 // default size of jump if not specified in options
-var JUMP_SIZE = 5;
+const JUMP_SIZE = 5;
 
 // available jump types
-var JUMP_TYPES = ['arc', 'gap', 'cubic'];
+const JUMP_TYPES = ['arc', 'gap', 'cubic'];
 
 // takes care of math. error for case when jump is too close to end of line
-var CLOSE_PROXIMITY_PADDING = 1;
+const CLOSE_PROXIMITY_PADDING = 1;
 
 // list of connector types not to jump over.
-var IGNORED_CONNECTORS = ['smooth'];
+const IGNORED_CONNECTORS = ['smooth'];
+*/
 
 
-function jumpover(sourcePoint, targetPoint, vertices, options = {}) {
+function jumpover(/* sourcePoint, targetPoint, vertices, options = {} */) {
 
 }
 

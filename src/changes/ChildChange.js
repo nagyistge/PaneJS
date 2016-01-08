@@ -7,7 +7,7 @@ class ChildChange extends Change {
 
         super();
 
-        var that = this;
+        let that = this;
 
         that.model = model;
         that.child = child;
@@ -19,23 +19,23 @@ class ChildChange extends Change {
 
     digest() {
 
-        var that = this;
-        var model = that.model;
-        var child = that.child;
-        var newParent = that.previous;
-        var newIndex = that.previousIndex;
-        var oldParent = child.parent;
-        var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
+        let that = this;
+        let model = that.model;
+        let child = that.child;
+        let newParent = that.previous;
+        let newIndex = that.previousIndex;
+        let oldParent = child.parent;
+        let oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
 
         // the new parent is null, then the child(link) will be removed
         if (!newParent) {
-            that.connect(child, false);
+            that.modifyConnect(child, false);
         }
 
         oldParent = model.childChanged(child, newParent, newIndex);
 
         if (newParent) {
-            that.connect(child, true);
+            that.modifyConnect(child, true);
         }
 
         that.parent = newParent;
@@ -46,15 +46,15 @@ class ChildChange extends Change {
         return that;
     }
 
-    connect(cell, connected) {
+    modifyConnect(cell, connected) {
 
-        var that = this;
-        var model = that.model;
+        let that = this;
+        let model = that.model;
 
         if (cell.isLink) {
 
-            var source = cell.getTerminal(true);
-            var target = cell.getTerminal(false);
+            let source = cell.getTerminal(true);
+            let target = cell.getTerminal(false);
 
             if (source) {
                 model.linkChanged(cell, connected ? source : null, true);
@@ -69,7 +69,7 @@ class ChildChange extends Change {
         }
 
         cell.eachChild(function (child) {
-            that.connect(child, connected);
+            that.modifyConnect(child, connected);
         });
 
         return that;

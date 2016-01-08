@@ -54,13 +54,12 @@ function decomposeMatrix(matrix) {
     let skewY = ((180 / Math.PI) * Math.atan2(py.y, py.x));
 
     return {
-
+        skewX,
+        skewY,
         translateX: matrix.e,
         translateY: matrix.f,
         scaleX: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b),
         scaleY: Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d),
-        skewX: skewX,
-        skewY: skewY,
         rotation: skewX // rotation is the same as skew x
     };
 }
@@ -180,7 +179,7 @@ export class VElement {
             if (d) {
 
                 vPath = createElement('path', {
-                    d: d,
+                    d,
                     id: createPathId()
                 });
 
@@ -242,7 +241,7 @@ export class VElement {
                     // Find the *compacted* annotations for this line.
                     let lineAnnotations = vector.annotateString(line, annotations, {
                         offset: -offset,
-                        includeAnnotationIndices: includeAnnotationIndices
+                        includeAnnotationIndices
                     });
 
                     utils.forEach(lineAnnotations, function (annotation) {
@@ -711,14 +710,11 @@ export class VElement {
         let node = this.node;
 
         if (!node) {
-
             return null;
-        } else {
-
-            return node.getTransformToElement
-                ? node.getTransformToElement(toElem)
-                : getTransformToElement(node, toElem);
         }
+        return node.getTransformToElement
+            ? node.getTransformToElement(toElem)
+            : getTransformToElement(node, toElem);
     }
 
     translateCenterToPoint() {}
@@ -783,7 +779,7 @@ export class VElement {
         that.translate(decomposition.translateX, decomposition.translateY);
         that.rotate(decomposition.rotation);
         // Note that scale has been already applied
-        //this.scale(decomposition.scaleX, decomposition.scaleY);
+        // this.scale(decomposition.scaleX, decomposition.scaleY);
 
         return that;
     }
@@ -822,9 +818,9 @@ export class VElement {
             let sample = node.getPointAtLength(distance);
 
             samples.push({
+                distance,
                 x: sample.x,
-                y: sample.y,
-                distance: distance
+                y: sample.y
             });
 
             distance += interval;
@@ -941,13 +937,13 @@ export class VElement {
                 if (distance < minDistance) {
                     minDistance = distance;
                     closestSamples = [{
-                        sample: sample,
-                        refDistance: refDistance
+                        sample,
+                        refDistance
                     }];
                 } else if (distance < minDistance + 1) {
                     closestSamples.push({
-                        sample: sample,
-                        refDistance: refDistance
+                        sample,
+                        refDistance
                     });
                 }
             }
