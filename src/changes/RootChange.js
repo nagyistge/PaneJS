@@ -7,7 +7,7 @@ class RootChange extends Change {
 
         super();
 
-        var that = this;
+        let that = this;
 
         that.model = model;
         that.root = root;
@@ -16,9 +16,9 @@ class RootChange extends Change {
 
     digest() {
 
-        var that = this;
-        var model = that.model;
-        var previous = that.previous;
+        let that = this;
+        let model = that.model;
+        let previous = that.previous;
 
         that.root = previous;
         that.previous = model.rootChanged(previous);

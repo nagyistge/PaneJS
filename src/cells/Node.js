@@ -28,7 +28,7 @@ class Node extends Visual {
         }
     }
 
-    resize(width, height) {}
+    resize(/* width, height */) {}
 
     rotate() { }
 

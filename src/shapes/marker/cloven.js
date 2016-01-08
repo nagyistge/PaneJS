@@ -1,4 +1,4 @@
-import * as utils from '../../common/utils';
+// import * as utils from '../../common/utils';
 import Point from '../../geometry/Point';
 
 function clovenMarker(vMarker, options) {
@@ -23,4 +23,3 @@ function clovenMarker(vMarker, options) {
 }
 
 export default clovenMarker;
-

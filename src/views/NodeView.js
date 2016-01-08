@@ -169,7 +169,7 @@ class NodeView extends CellView {
     positionRelative(vel, bbox, attributes, nodesBySelector) {
 
         let that = this;
-        let ref = attributes['ref'];
+        let ref = attributes.ref;
         let refDx = utils.toFloat(attributes['ref-dx']);
         let refDy = utils.toFloat(attributes['ref-dy']);
         let yAlignment = attributes['y-alignment'];

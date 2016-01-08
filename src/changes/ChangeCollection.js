@@ -5,14 +5,14 @@ class ChangeCollection {
     }
 
     hasChange() {
-        var changes = this.changes;
+        let changes = this.changes;
         return changes && changes.length;
     }
 
     add(change) {
 
-        var that = this;
-        var changes = that.changes;
+        let that = this;
+        let changes = that.changes;
 
         if (change) {
 
@@ -33,7 +33,7 @@ class ChangeCollection {
 
     notify() {
 
-        var that = this;
+        let that = this;
 
         that.model.trigger('change', that.changes);
 

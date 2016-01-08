@@ -16,8 +16,8 @@ function ovalMarker(vMarker, options) {
         vEllipse.attr({
             cx: rx,
             cy: ry,
-            rx: rx,
-            ry: ry
+            rx,
+            ry
         });
 
         // return the connection point on the marker
@@ -30,4 +30,3 @@ function ovalMarker(vMarker, options) {
 }
 
 export default ovalMarker;
-

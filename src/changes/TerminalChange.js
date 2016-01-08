@@ -7,7 +7,7 @@ class TerminalChange extends Change {
 
         super();
 
-        var that = this;
+        let that = this;
 
         that.model = model;
         that.link = link;
@@ -18,7 +18,7 @@ class TerminalChange extends Change {
 
     digest() {
 
-        var that = this;
+        let that = this;
 
         that.terminal = that.previous;
         that.previous = that.model.terminalChanged(that.link, that.previous, that.isSource);
@@ -32,4 +32,3 @@ class TerminalChange extends Change {
 // -------
 
 export default TerminalChange;
-

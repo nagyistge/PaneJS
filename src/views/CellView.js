@@ -1,5 +1,5 @@
 import * as utils from '../common/utils';
-import Events     from '../common/Events';
+// import Events     from '../common/Events';
 import vector     from '../common/vector';
 import filters    from '../common/filters';
 
