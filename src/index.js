@@ -28,10 +28,12 @@ import TerminalChange from './changes/TerminalChange'
 // connectors
 // ----------
 import sharpConnector   from './shapes/connector/sharp';
+import smoothConnector from './shapes/connector/smooth';
 import roundedConnector from './shapes/connector/rounded';
 
 Paper
     .registerConnector('sharp', sharpConnector)
+    .registerConnector('smooth', smoothConnector)
     .registerConnector('rounded', roundedConnector);
 
 
@@ -52,42 +54,6 @@ Paper
     .registerMarker('oval', ovalMarker);
 
 
-// shapes
-// ------
-
-import Text     from './shapes/basic/Text';
-import Rect     from './shapes/basic/Rect';
-import Circle   from './shapes/basic/Circle';
-import Ellipse  from './shapes/basic/Ellipse';
-import Image    from './shapes/basic/Image';
-import Path     from './shapes/basic/Path';
-import Polygon  from './shapes/basic/Polygon';
-import Polyline from './shapes/basic/Polyline';
-import Rhombus  from './shapes/basic/Rhombus';
-
-import PortRect  from './shapes/port/Rect';
-
-let shapes = {
-    basic: {
-        Text,
-        Rect,
-        Circle,
-        Ellipse,
-        Image,
-        Path,
-        Polygon,
-        Polyline,
-        Rhombus
-    },
-
-    port: {
-        Rect
-    }
-};
-
-
-import * as geometry from './geometry/index';
-
 // exports
 // -------
 
@@ -95,7 +61,6 @@ export {
     utils,
     vector,
     VElement,
-    geometry,
 
     Cell,
     Link,
@@ -112,6 +77,7 @@ export {
 
     Model,
     Paper,
-
-    shapes
 }
+
+export * from './geometry/index';
+export * from './shapes/index';

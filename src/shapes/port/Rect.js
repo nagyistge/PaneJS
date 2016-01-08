@@ -1,8 +1,8 @@
 import Node from '../../cells/Node';
 
-class Rect extends Node {}
+class RectPort extends Node {}
 
-Rect.setDefaults({
+RectPort.setDefaults({
     markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g></g>',
     attrs: {
         '.': { fill: '#ffffff', stroke: 'none' },
@@ -16,4 +16,4 @@ Rect.setDefaults({
     }
 });
 
-export default Rect;
+export default RectPort;
