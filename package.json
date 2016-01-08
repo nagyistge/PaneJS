@@ -48,6 +48,7 @@
     "less-loader": "^2.2.2",
     "mocha": "^2.3.4",
     "opn": "^3.0.3",
+    "pre-commit": "^1.1.2",
     "semver": "^5.1.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
@@ -55,5 +56,8 @@
   "scripts": {
     "lint": "make lint",
     "test": "make test"
-  }
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }
