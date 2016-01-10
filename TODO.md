@@ -1,7 +1,0 @@
-- 连线渲染
-- DOM 事件和交互
-- 固定的 port
-- foreignObject 的兼容方案
-- eslint
-- unit test, coverage
-- travis-ci
