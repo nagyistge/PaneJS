@@ -76,7 +76,7 @@ release-patch release-minor release-major: lint test build
 	node -e "\
 		var pkg = require('./package.json');\
 		pkg.version = '$(NEXT_VERSION)';\
-		var s = JSON.stringify(pkg, null, 2) + '\n';\
+		var s = JSON.stringify(pkg, null, 4) + '\n';\
 		require('fs').writeFileSync('./package.json', s);"
 
 	git commit package.json -m 'Version $(NEXT_VERSION)'
