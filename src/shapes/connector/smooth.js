@@ -1,4 +1,3 @@
-// import utils  from '../../common/utils';
 import Point  from '../../geometry/Point';
 import { getCurveControlPoints } from '../../geometry/bezier';
 
@@ -15,16 +14,13 @@ function fixMarker(view, isSource, reference) {
     if (renderedMarker && vel) {
 
         let link = view.cell;
-        let markerPoint = isSource ? link.sourcePoint : link.targetPoint;
-        let deg = markerPoint.theta(reference);
+        // get connection point of the marker connecting to the terminal
+        let position = isSource
+            ? link.sourcePointOnTerminal
+            : link.targetPointOnTerminal;
 
-        vel.rotate(-deg);
-
-        // console.log(link.sourcePointOnTerminal);
-
-        //
-        // view.transformMarker(isSource, reference);
-        // vel.translateAndAutoOrient(position, reference, drawPane);
+        vel.translateAndAutoOrient(position, reference, view.paper.drawPane);
+        // fix the connection point on the marker
         view.updateConnectionPointOnMarker(isSource);
     }
 }
@@ -91,13 +87,13 @@ function smoothConnector(sourcePoint, targetPoint, vertices) {
             'C', controlPointX, sourcePoint.y, controlPointX, targetPoint.y,
             targetPoint.x, targetPoint.y
         ];
-
-
     }
-
 
     return pathArr.join(' ');
 }
 
+
+// exports
+// -------
 
 export default smoothConnector;

@@ -1,8 +1,7 @@
 import * as utils from '../common/utils';
-import vector     from '../common/vector';
-// import Line       from '../geometry/Line';
-import Point      from '../geometry/Point';
-import CellView   from './CellView';
+import vector   from '../common/vector';
+import Point    from '../geometry/Point';
+import CellView from './CellView';
 
 class LinkView extends CellView {
 
@@ -228,13 +227,15 @@ class LinkView extends CellView {
             connectionPoint = connectionPoint || terminalOuterBox.getCenter();
 
             if (isSource) {
-                link.sourcePointOnTerminal = connectionPoint;
                 link.sourcePoint = connectionPoint;
             } else {
-                link.targetPointOnTerminal = connectionPoint;
                 link.targetPoint = connectionPoint;
             }
         }
+
+        // cache the connection point on the terminal node
+        link.sourcePointOnTerminal = link.sourcePoint;
+        link.targetPointOnTerminal = link.targetPoint;
 
         return that;
     }
@@ -328,13 +329,13 @@ class LinkView extends CellView {
     updateConnectionPointOnMarker(isSource) {
 
         let that = this;
+        let link = that.cell;
         let renderedMarker = isSource
             ? that.renderedSourceMarker
             : that.renderedTargetMarker;
 
         if (renderedMarker) {
 
-            let link = that.cell;
             let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
             let drawPane = that.paper.drawPane;
 
@@ -345,13 +346,15 @@ class LinkView extends CellView {
             let newConnectionPoint = Point.fromPoint(p);
 
             if (isSource) {
-                link.sourcePointOnMarker = newConnectionPoint;
                 link.sourcePoint = newConnectionPoint;
             } else {
-                link.targetPointOnMarker = newConnectionPoint;
                 link.targetPoint = newConnectionPoint;
             }
         }
+
+        // cache the connection point on the marker;
+        link.sourcePointOnMarker = link.sourcePoint;
+        link.targetPointOnMarker = link.targetPoint;
 
         return that;
     }
