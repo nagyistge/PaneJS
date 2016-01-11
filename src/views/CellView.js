@@ -209,7 +209,6 @@ class CellView {
 
     onMouseOut() {}
 
-
     destroy() {
 
         let that = this;
