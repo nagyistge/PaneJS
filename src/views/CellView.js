@@ -99,7 +99,8 @@ class CellView {
 
         let paper = that.paper;
         let svg = paper.svg;
-        let filterId = name + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(filter));
+        let hash = utils.hashCode(JSON.stringify(filter));
+        let filterId = name + '-' + paper.id + '-' + hash;
 
 
         if (!svg.getElementById(filterId)) {
@@ -125,7 +126,7 @@ class CellView {
         }
 
         utils.forEach(vels, function (vel) {
-            vel.attr(filter, 'url(#' + filterId + ')');
+            vel.attr('filter', 'url(#' + filterId + ')');
         });
 
         return that;

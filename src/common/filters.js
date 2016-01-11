@@ -1,5 +1,8 @@
-import { format, isFinite } from '../common/utils';
+//import { format, isFinite } from '../common/utils';
+import * as utils from '../common/utils';
 
+let format = utils.format;
+let isFinite = utils.isFinite;
 
 // exports
 // -------
@@ -13,7 +16,7 @@ export default {
         // `opacity` ... outline opacity
         // `margin` ... gap between outline and the element
 
-        let tpl = '' +
+        let template = '' +
             '<filter>' +
             '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' +
             '  <feMorphology in="SourceAlpha" result="morphedOuter" operator="dilate" radius="${outerRadius}" />' +
@@ -29,7 +32,7 @@ export default {
         let margin = isFinite(args.margin) ? args.margin : 2;
         let width = isFinite(args.width) ? args.width : 1;
 
-        return format(tpl)({
+        return format(template, {
             color: args.color || 'blue',
             opacity: isFinite(args.opacity) ? args.opacity : 1,
             outerRadius: margin + width,
@@ -44,7 +47,7 @@ export default {
         // `blur` ... blur
         // `opacity` ... opacity
 
-        let tpl = '' +
+        let template = '' +
             '<filter>' +
             '  <feFlood flood-color="${color}" flood-opacity="${opacity}" result="colored"/>' +
             '  <feMorphology result="morphed" in="SourceGraphic" operator="dilate" radius="${width}"/>' +
@@ -53,7 +56,7 @@ export default {
             '  <feBlend in="SourceGraphic" in2="blured" mode="normal"/>' +
             '</filter>';
 
-        return format(tpl)({
+        return format(template, {
             color: args.color || 'red',
             width: isFinite(args.width) ? args.width : 1,
             blur: isFinite(args.blur) ? args.blur : 0,
@@ -66,14 +69,14 @@ export default {
         // `x` ... horizontal blur
         // `y` ... vertical blur (optional)
 
-        let tpl = '' +
+        let template = '' +
             '<filter>' +
             '  <feGaussianBlur stdDeviation="${stdDeviation}"/>' +
             '</filter>';
 
         let x = isFinite(args.x) ? args.x : 2;
 
-        return format(tpl)({
+        return format(template, {
             stdDeviation: isFinite(args.y) ? [x, args.y] : x
         });
     },
@@ -86,11 +89,11 @@ export default {
         // `color` ... color
         // `opacity` ... opacity
 
-        let tpl = 'SVGFEDropShadowElement' in window
+        let template = 'SVGFEDropShadowElement' in window
             ? '<filter><feDropShadow stdDeviation="${blur}" dx="${dx}" dy="${dy}" flood-color="${color}" flood-opacity="${opacity}"/></filter>'
             : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
 
-        return format(tpl)({
+        return format(template, {
             dx: args.dx || 0,
             dy: args.dy || 0,
             opacity: isFinite(args.opacity) ? args.opacity : 1,
@@ -105,14 +108,14 @@ export default {
         // A value of 1 is completely grayscale.
         // A value of 0 leaves the input unchanged.
 
-        let tpl = '' +
+        let template = '' +
             '<filter>' +
             '  <feColorMatrix type="matrix" values="${a} ${b} ${c} 0 0 ${d} ${e} ${f} 0 0 ${g} ${b} ${h} 0 0 0 0 0 1 0"/>' +
             '</filter>';
 
         let amount = isFinite(args.amount) ? args.amount : 1;
 
-        return format(tpl)({
+        return format(template, {
             a: 0.2126 + 0.7874 * (1 - amount),
             b: 0.7152 - 0.7152 * (1 - amount),
             c: 0.0722 - 0.0722 * (1 - amount),
@@ -137,7 +140,7 @@ export default {
 
         let amount = isFinite(args.amount) ? args.amount : 1;
 
-        return format(template)({
+        return format(template, {
             a: 0.393 + 0.607 * (1 - amount),
             b: 0.769 - 0.769 * (1 - amount),
             c: 0.189 - 0.189 * (1 - amount),
@@ -163,7 +166,7 @@ export default {
 
         let amount = isFinite(args.amount) ? args.amount : 1;
 
-        return format(template)({
+        return format(template, {
             amount: 1 - amount
         });
     },
@@ -200,7 +203,7 @@ export default {
 
         let amount = isFinite(args.amount) ? args.amount : 1;
 
-        return format(template)({
+        return format(template, {
             amount,
             amount2: 1 - amount
         });
@@ -221,7 +224,7 @@ export default {
             '  </feComponentTransfer>' +
             '</filter>';
 
-        return format(template)({
+        return format(template, {
             amount: isFinite(args.amount) ? args.amount : 1
         });
     },
@@ -243,7 +246,7 @@ export default {
 
         let amount = isFinite(args.amount) ? args.amount : 1;
 
-        return format(template)({
+        return format(template, {
             amount,
             amount2: 0.5 - amount / 2
         });

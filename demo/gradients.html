@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gradients</title>
+    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <style>
+        #container {
+            width: 600px;
+            height: 400px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../dist/pane.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+
+    var model = new pane.Model();
+    var paper = new pane.Paper(container, model);
+
+    var node1 = new pane.shapes.basic.Rect({
+        position: { x: 60, y: 80 },
+        size: { width: 200, height: 100 },
+        attrs: {
+            rect: {
+                rx: 2,
+                ry: 2,
+                fill: {
+                    type: 'linearGradient',
+                    stops: [
+                        { offset: '0%', color: '#E67E22' },
+                        { offset: '20%', color: '#D35400' },
+                        { offset: '40%', color: '#E74C3C' },
+                        { offset: '60%', color: '#C0392B' },
+                        { offset: '80%', color: '#F39C12' }
+                    ]
+                },
+                'stroke': {
+                    type: 'linearGradient',
+                    stops: [
+                        { offset: '0%', color: '#3498DB' },
+                        { offset: '50%', color: '#9B59B6' }
+                    ]
+                },
+                filter: {
+                    name: 'dropShadow',
+                    args: {
+                        dx: 2,
+                        dy: 2,
+                        blur: 3
+                    }
+                },
+                'stroke-width': 20
+            },
+            text: {
+                'text': 'linearGradient\n(both fill and stroke)',
+                'font-size': 15,
+                'fill': '#333'
+            }
+        }
+    });
+
+    model.addNode(node1);
+
+    var node2 = new pane.shapes.basic.Rect({
+        position: { x: 340, y: 80 },
+        size: { width: 200, height: 100 },
+        attrs: {
+            rect: {
+                rx: 2,
+                ry: 2,
+                fill: {
+                    type: 'radialGradient',
+                    stops: [
+                        { offset: '0%', color: '#E67E22' },
+                        { offset: '20%', color: '#D35400' },
+                        { offset: '40%', color: '#E74C3C' },
+                        { offset: '60%', color: '#C0392B' },
+                        { offset: '80%', color: '#F39C12' }
+                    ]
+                },
+                'stroke': {
+                    type: 'radialGradient',
+                    stops: [
+                        { offset: '95%', color: '#3498DB' },
+                        { offset: '98%', color: '#9B59B6' }
+                    ]
+                },
+                'stroke-width': 20
+            },
+            text: {
+                'text': 'radialGradient\n(both fill and stroke)',
+                'font-size': 15,
+                'fill': '#333'
+            }
+        }
+    });
+
+    model.addNode(node2);
+
+</script>
+</body>
+</html>
