@@ -15,6 +15,9 @@ import RootChange     from '../changes/RootChange';
 import ChildChange    from '../changes/ChildChange';
 import TerminalChange from '../changes/TerminalChange';
 
+const WIN = window;
+const DOC = WIN.document;
+
 let counter = 0;
 
 // the default options for paper
@@ -24,6 +27,11 @@ let defaultOptions = {
     width: '100%',
     height: '100%',
     gridSize: 1,
+
+    // Allowed number of mouseMove events after which the pointerClick event
+    // will be still triggered.
+    clickThreshold: 0,
+
     getView(/* cell */) {}
 };
 
@@ -167,14 +175,31 @@ class Paper extends Events {
         utils.addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
         utils.addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
         utils.addEventListener(svg, 'click', that.onClick.bind(that));
-        utils.addEventListener(svg, 'mousedown', that.onPointerDown.bind(that));
-        utils.addEventListener(svg, 'touchstart', that.onPointerDown.bind(that));
-        utils.addEventListener(svg, 'mousemove', that.onPointerMove.bind(that));
-        utils.addEventListener(svg, 'touchmove', that.onPointerMove.bind(that));
         utils.addEventListener(svg, 'mouseover', '.pane-node', that.onCellMouseOver.bind(that));
         utils.addEventListener(svg, 'mouseout', '.pane-node', that.onCellMouseOut.bind(that));
         utils.addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
         utils.addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
+
+        let onPointerDown = that.onPointerDown.bind(that);
+        let onPointerMove = that.onPointerMove.bind(that);
+        let onPointerUp = that.onPointerUp.bind(that);
+
+        if (detector.IS_TOUCH) {
+            utils.addEventListener(svg, 'touchstart', onPointerDown);
+            utils.addEventListener(svg, 'touchmove', onPointerMove);
+            utils.addEventListener(DOC, 'touchend', onPointerUp);
+        } else {
+            utils.addEventListener(svg, 'mousedown', onPointerDown);
+            utils.addEventListener(svg, 'mousemove', onPointerMove);
+            utils.addEventListener(DOC, 'mouseup', onPointerUp);
+        }
+
+
+        // Hold the value when mouse has been moved: when mouse moved,
+        // no click event will be triggered.
+        that.mouseMoved = 0;
+
+        // TODO: IS_TOUCH
 
         // Disables built-in pan and zoom in IE10 and later
         if (detector.IS_POINTER) {
@@ -729,16 +754,16 @@ class Paper extends Events {
         that.invalidate(change.child, true, true);
 
         /*
-        if (newParent == null || this.isCellCollapsed(newParent)) {
-            this.view.invalidate(change.child, true, true);
-            this.removeStateForCell(change.child);
+         if (newParent == null || this.isCellCollapsed(newParent)) {
+         this.view.invalidate(change.child, true, true);
+         this.removeStateForCell(change.child);
 
-            // Handles special case of current root of view being removed
-            if (this.view.currentRoot == change.child) {
-                this.home();
-            }
-        }
-        */
+         // Handles special case of current root of view being removed
+         if (this.view.currentRoot == change.child) {
+         this.home();
+         }
+         }
+         */
 
         if (newParent !== oldParent) {
             // Refreshes the collapse/expand icons on the parents
@@ -784,6 +809,7 @@ class Paper extends Events {
 
         return this.constructor.getRouter(name);
     }
+
 
     // connector
     // ---------
@@ -843,19 +869,25 @@ class Paper extends Events {
     }
 
 
-    // event handlers
-    // --------------
+    // events
+    // ------
 
     isValidEvent(e, view) {
 
         // If the event is interesting, guard returns `true`.
-        // Otherwise, it return `false`.
+        // Otherwise, return `false`.
+
+        let that = this;
+
+        if (that.options.isValidEvent && !that.options.isValidEvent(e, view)) {
+            return false;
+        }
 
         if (view && view.cell && view.cell instanceof Cell) {
             return true;
         }
 
-        let that = this;
+
         let svg = that.svg;
         let target = e.target;
 
@@ -878,7 +910,6 @@ class Paper extends Events {
         let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
         if (view) {
-            that.sourceView = view;
             view.onContextMenu(e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
@@ -902,11 +933,32 @@ class Paper extends Events {
         if (view) {
             view.onDblClick(e, localPoint.x, localPoint.y);
         } else {
-            that.trigger('blank:pointerdblclick', e, localPoint.x, localPoint.y);
+            that.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
         }
     }
 
-    onClick(/* e */) {}
+    onClick(e) {
+
+        let that = this;
+
+        if (that.mouseMoved <= that.options.clickThreshold) {
+
+            e = utils.normalizeEvent(e);
+            let view = that.findViewByElem(e.target);
+
+            if (!that.isValidEvent(e, view)) {
+                return;
+            }
+
+            let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+
+            if (view) {
+                view.onClick(e, localPoint.x, localPoint.y);
+            } else {
+                that.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
+            }
+        }
+    }
 
     onPointerDown(e) {
 
@@ -919,9 +971,13 @@ class Paper extends Events {
             return;
         }
 
+        e.preventDefault();
+        that.mouseMoved = 0;
+
         let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
         if (view) {
+            that.sourceView = view;
             view.onPointerDown(e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
@@ -940,7 +996,7 @@ class Paper extends Events {
 
             let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
 
-            that._mouseMoved++;
+            that.mouseMoved++;
 
             sourceView.onPointerMove(e, localPoint.x, localPoint.y);
         }
@@ -971,11 +1027,9 @@ class Paper extends Events {
 
         if (view) {
 
-            if (!that.isValidEvent(e, view)) {
-                return;
+            if (that.isValidEvent(e, view)) {
+                view.onMouseOver(e);
             }
-
-            view.onMouseOver(e);
         }
     }
 
@@ -988,11 +1042,9 @@ class Paper extends Events {
 
         if (view) {
 
-            if (!that.isValidEvent(e, view)) {
-                return;
+            if (that.isValidEvent(e, view)) {
+                view.onMouseOut(e);
             }
-
-            view.onMouseOut(e);
         }
     }
 }

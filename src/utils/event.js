@@ -1,15 +1,16 @@
 import { isFunction } from './lang';
 import { some       } from './array';
+import detector from '../common/detector';
 
-
-let win = window;
-let doc = document;
+const WIN = window;
+const DOC = document;
+const IS_TOUCH = detector.IS_TOUCH;
 
 let isMatchSelector = function () {
 
-    let testDiv = doc.createElement('div');
+    let testDiv = DOC.createElement('div');
     // match selector
-    let matchesSelector    = testDiv.matches ||
+    let matchesSelector = testDiv.matches ||
         testDiv.webkitMatchesSelector ||
         testDiv.mozMatchesSelector ||
         testDiv.msMatchesSelector ||
@@ -27,7 +28,7 @@ let isMatchSelector = function () {
         // if the element is an orphan, and the browser doesn't support matching
         // orphans, append it to a documentFragment
         if (!parent && !hasMatchesSelector) {
-            parent = doc.createDocumentFragment();
+            parent = DOC.createDocumentFragment();
             parent.appendChild(elem);
         }
 
@@ -43,7 +44,7 @@ let isMatchSelector = function () {
 function fixEvent(event) {
 
     // add W3C standard event methods
-    event.preventDefault  = fixEvent.preventDefault;
+    event.preventDefault = fixEvent.preventDefault;
     event.stopPropagation = fixEvent.stopPropagation;
 
     return event;
@@ -61,11 +62,11 @@ fixEvent.stopPropagation = function () {
 
 function handleEvent(event) {
 
-    let result  = true;
+    let result = true;
     let element = this;
 
     // grab the event object (IE uses a global event object)
-    event = event || fixEvent((doc.parentWindow || win).event);
+    event = event || fixEvent((DOC.parentWindow || WIN).event);
 
     // get a reference to the hash table of event handlers
     let handlers = element.events[event.type];
@@ -189,7 +190,8 @@ function addEventListener(elem, type, selector, handler, once) {
 
 function normalizeEvent(evt) {
 
-    let touchEvt = evt.originalEvent
+    let touchEvt = IS_TOUCH
+        && evt.originalEvent
         && evt.originalEvent.changedTouches
         && evt.originalEvent.changedTouches[0];
 
