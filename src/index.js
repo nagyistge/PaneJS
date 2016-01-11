@@ -1,8 +1,8 @@
 require('./style/index.less');
 
-import * as utils         from './common/utils';
+import * as utils           from './common/utils';
 import vector, { VElement } from './common/vector';
-// import Events             from './common/Events';
+import Events               from './common/Events';
 
 
 import Model from './core/Model';
@@ -61,6 +61,7 @@ export {
     utils,
     vector,
     VElement,
+    Events,
 
     Cell,
     Link,

@@ -1,8 +1,8 @@
-//import { format, isFinite } from '../common/utils';
 import * as utils from '../common/utils';
 
 let format = utils.format;
 let isFinite = utils.isFinite;
+
 
 // exports
 // -------
@@ -181,7 +181,7 @@ export default {
             '  <feColorMatrix type="hueRotate" values="${angle}"/>' +
             '</filter>';
 
-        return format(template)({
+        return format(template, {
             angle: args.angle || 0
         });
     },
