@@ -25,7 +25,6 @@ function fixMarker(view, isSource, reference) {
     }
 }
 
-
 function smoothConnector(sourcePoint, targetPoint, vertices) {
 
     let linkView = this;

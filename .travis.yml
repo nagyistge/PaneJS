@@ -10,7 +10,7 @@ cache:
 install: npm install
 
 script:
-#  - make lint
+  - make lint
   - make test
 
 after_script:
