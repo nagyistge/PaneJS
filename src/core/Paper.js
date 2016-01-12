@@ -136,7 +136,7 @@ class Paper extends Events {
     }
 
 
-    // lift cycle
+    // life cycle
     // ----------
 
     init(container) {
