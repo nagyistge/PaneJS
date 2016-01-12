@@ -194,21 +194,21 @@ class CellView {
     // events
     // ------
 
-    onContextMenu() {}
+    // onContextMenu() {}
 
-    onDblClick() {}
+    // onDblClick() {}
 
-    onClick() {}
+    // onClick() {}
 
-    onPointerDown() {}
+    // onPointerDown() {}
 
-    onPointerMove() {}
+    // onPointerMove() {}
 
-    onPointerUp() {}
+    // onPointerUp() {}
 
-    onMouseOver() {}
+    // onMouseOver() {}
 
-    onMouseOut() {}
+    // onMouseOut() {}
 
     destroy() {
 

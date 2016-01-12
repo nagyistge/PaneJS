@@ -907,10 +907,14 @@ class Paper extends Events {
             return;
         }
 
-        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+        let localPoint = that.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
 
         if (view) {
-            view.onContextMenu(e, localPoint.x, localPoint.y);
+            that.trigger('cell:contextmenu', view.cell, view, e, localPoint.x, localPoint.y);
+            // view.onContextMenu(e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
         }
@@ -928,10 +932,14 @@ class Paper extends Events {
             return;
         }
 
-        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+        let localPoint = that.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
 
         if (view) {
-            view.onDblClick(e, localPoint.x, localPoint.y);
+            that.trigger('cell:pointerDblClick', view.cell, view, e, localPoint.x, localPoint.y);
+            // view.onDblClick(e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
         }
@@ -950,10 +958,14 @@ class Paper extends Events {
                 return;
             }
 
-            let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+            let localPoint = that.snapToGrid({
+                x: e.clientX,
+                y: e.clientY
+            });
 
             if (view) {
-                view.onClick(e, localPoint.x, localPoint.y);
+                that.trigger('cell:pointerClick', view.cell, view, e, localPoint.x, localPoint.y);
+                // view.onClick(e, localPoint.x, localPoint.y);
             } else {
                 that.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
             }
@@ -974,11 +986,15 @@ class Paper extends Events {
         e.preventDefault();
         that.mouseMoved = 0;
 
-        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+        let localPoint = that.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
 
         if (view) {
             that.sourceView = view;
-            view.onPointerDown(e, localPoint.x, localPoint.y);
+            // view.onPointerDown(e, localPoint.x, localPoint.y);
+            that.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
         } else {
             that.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
         }
@@ -994,11 +1010,15 @@ class Paper extends Events {
 
         if (sourceView) {
 
-            let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+            let localPoint = that.snapToGrid({
+                x: e.clientX,
+                y: e.clientY
+            });
 
             that.mouseMoved++;
 
-            sourceView.onPointerMove(e, localPoint.x, localPoint.y);
+            that.trigger('cell:pointerMove', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
+            // sourceView.onPointerMove(e, localPoint.x, localPoint.y);
         }
     }
 
@@ -1007,11 +1027,15 @@ class Paper extends Events {
         e = utils.normalizeEvent(e);
 
         let that = this;
-        let localPoint = that.snapToGrid({ x: e.clientX, y: e.clientY });
+        let localPoint = that.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
         let sourceView = that.sourceView;
 
         if (sourceView) {
-            sourceView.onPointerUp(e, localPoint.x, localPoint.y);
+            that.trigger('cell:pointerUp', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
+            // sourceView.onPointerUp(e, localPoint.x, localPoint.y);
             that.sourceView = null;
         } else {
             that.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
@@ -1028,7 +1052,8 @@ class Paper extends Events {
         if (view) {
 
             if (that.isValidEvent(e, view)) {
-                view.onMouseOver(e);
+                // view.onMouseOver(e);
+                that.trigger('cell:mouseOver', view.cell, view, e);
             }
         }
     }
@@ -1043,7 +1068,8 @@ class Paper extends Events {
         if (view) {
 
             if (that.isValidEvent(e, view)) {
-                view.onMouseOut(e);
+                // view.onMouseOut(e);
+                that.trigger('cell:mouseOut', view.cell, view, e);
             }
         }
     }
