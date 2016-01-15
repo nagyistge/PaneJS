@@ -29,7 +29,15 @@ function invoke(fn, args, context) {
 
 function bind(fn /* [, context, arg1[,arg2[,argN]]] */) {
 
-    return isFunction(fn) ? Function.prototype.bind.apply(arguments) : fn;
+    if (isFunction(fn)) {
+
+        let args = Array.prototype.slice.call(arguments, 1);
+
+        return invoke(Function.prototype.bind, args, fn);
+
+    } else {
+        return fn;
+    }
 }
 
 
