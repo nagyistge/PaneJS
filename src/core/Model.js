@@ -58,7 +58,7 @@ class Model extends Events {
     }
 
     isOrphan(cell) {
-        return !!(cell && cell.parent);
+        return !(cell && cell.parent);
     }
 
     contains(cell) {
