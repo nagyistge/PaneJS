@@ -17,6 +17,10 @@ function lc(str) {
     return ('' + str).toLowerCase();
 }
 
+function split(str, divider = /\s+/) {
+    return ('' + str).split(divider);
+}
+
 function trim(str) {
 
     return str ? proto.trim.call('' + str) : '';
@@ -82,6 +86,7 @@ function sanitizeText(text) {
 export {
     lc,
     uc,
+    split,
     trim,
     uuid,
     format,
