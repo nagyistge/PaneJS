@@ -149,9 +149,11 @@ class Paper extends Events {
             let root = utils.createSvgElement('g');
             let backgroundPane = utils.createSvgElement('g');
             let drawPane = utils.createSvgElement('g');
+            let overlayPane = utils.createSvgElement('g');
 
             root.appendChild(backgroundPane);
             root.appendChild(drawPane);
+            root.appendChild(overlayPane); // layer above the drawing pane, for handlers
             svg.appendChild(root);
             container.appendChild(svg);
 
@@ -159,6 +161,7 @@ class Paper extends Events {
             that.root = root;
             that.backgroundPane = backgroundPane;
             that.drawPane = drawPane;
+            that.overlayPane = overlayPane;
             that.container = container;
 
             that.trigger('paper:init', container);
