@@ -61,6 +61,9 @@ function contains(arr, item) {
     return arr && indexOf(arr, item) >= 0;
 }
 
+function slice(arr, start, end) {
+    return arr ? proto.slice.call(arr, start, end) : [];
+}
 
 // exports
 // -------
@@ -69,6 +72,7 @@ export {
     map,
     some,
     every,
+    slice,
     filter,
     reduce,
     forEach,

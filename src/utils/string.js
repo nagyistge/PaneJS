@@ -12,6 +12,10 @@ function uc(str) {
     return ('' + str).toUpperCase();
 }
 
+function ucFirst(str) {
+    return str.charAt(0).toUpperCase() + str.substring(1);
+}
+
 function lc(str) {
 
     return ('' + str).toLowerCase();
@@ -42,7 +46,7 @@ function hashCode(str) {
     // Return a simple hash code from a string.
     // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
 
-    let hash   = 0;
+    let hash = 0;
     let length = str.length;
 
     if (length === 0) {
@@ -51,8 +55,8 @@ function hashCode(str) {
 
     for (let i = 0; i < length; i++) {
         let c = str.charCodeAt(i);
-        hash  = ((hash << 5) - hash) + c;
-        hash  = hash & hash; // Convert to 32bit integer
+        hash = ((hash << 5) - hash) + c;
+        hash = hash & hash; // Convert to 32bit integer
     }
 
     return hash;
@@ -79,6 +83,16 @@ function sanitizeText(text) {
     return (text || '').replace(/ /g, '\u00A0');
 }
 
+function startWith(str, prefix) {
+    return ('' + str).indexOf(prefix) === 0;
+}
+
+function endWith(str, suffix) {
+
+    str = '' + str;
+
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
 
 // exports
 // -------
@@ -86,11 +100,14 @@ function sanitizeText(text) {
 export {
     lc,
     uc,
-    split,
+    ucFirst,
     trim,
+    split,
     uuid,
     format,
     hashCode,
     toString,
-    sanitizeText
+    sanitizeText,
+    startWith,
+    endWith,
 };

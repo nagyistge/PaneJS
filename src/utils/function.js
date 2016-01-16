@@ -1,4 +1,6 @@
 import { isFunction } from './lang';
+import { slice      } from './array';
+
 
 function invoke(fn, args, context) {
 
@@ -7,9 +9,9 @@ function invoke(fn, args, context) {
     if (isFunction(fn)) {
 
         let len = args.length;
-        let a1  = args[0];
-        let a2  = args[1];
-        let a3  = args[2];
+        let a1 = args[0];
+        let a2 = args[1];
+        let a3 = args[2];
 
         if (len === 0) {
             ret = fn.call(context);
@@ -31,13 +33,12 @@ function bind(fn /* [, context, arg1[,arg2[,argN]]] */) {
 
     if (isFunction(fn)) {
 
-        let args = Array.prototype.slice.call(arguments, 1);
+        let args = slice(arguments, 1);
 
         return invoke(Function.prototype.bind, args, fn);
-
-    } else {
-        return fn;
     }
+
+    return fn;
 }
 
 
