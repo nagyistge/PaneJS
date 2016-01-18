@@ -154,10 +154,10 @@ class Paper extends Events {
 
             that.backgroundPane = root.appendChild(utils.createSvgElement('g'));
             that.drawPane = root.appendChild(utils.createSvgElement('g'));
-            // layer above the drawing pane, for handlers
-            that.overlayPane = root.appendChild(utils.createSvgElement('g'));
-            // layer above the drawing pane and overlay pane, for decorators
-            that.decoratorPane = root.appendChild(utils.createSvgElement('g'));
+            // layer above the drawing pane, for controllers and handlers
+            that.controlPane = root.appendChild(utils.createSvgElement('g'));
+            // layer above the drawing pane and controller pane, for decorators
+            that.decoratePane = root.appendChild(utils.createSvgElement('g'));
             svg.appendChild(root);
             container.appendChild(svg);
 
