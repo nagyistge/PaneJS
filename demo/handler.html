@@ -1,10 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>handler example</title>
+    <meta charset="utf8"/>
+
+    <title>handlers</title>
+    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <style>
+        #container {
+            width: 500px;
+            height: 300px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
+<div id="container"></div>
+<script src="../dist/pane.js"></script>
+<script>
 
+    var container = document.getElementById('container');
+
+    var model = new pane.Model();
+    var paper = new pane.Paper(container, model);
+
+
+    model.beginUpdate();
+
+    var node1 = new pane.shapes.basic.Rect({
+        position: {
+            x: 70,
+            y: 40
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+            rect: {
+                'stroke-width': 1
+            },
+            text: {
+                text: 'Hello,'
+            }
+        }
+    });
+
+    var node2 = new pane.shapes.basic.Rect({
+        position: {
+            x: 200,
+            y: 200
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+
+            text: {
+                text: 'World!'
+            }
+        }
+    });
+
+    var link1 = new pane.Link({
+        targetMarker: 'classic'
+    });
+
+    model.addNode(node1);
+    model.addNode(node2);
+    model.addLink(link1, node1, node2);
+
+    model.endUpdate();
+    console.log(node1);
+</script>
 </body>
 </html>
