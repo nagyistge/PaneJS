@@ -448,7 +448,8 @@ class NodeView extends CellView {
             cell.position.x,
             cell.position.y,
             cell.size.width,
-            cell.size.height);
+            cell.size.height
+        );
 
         strokeWidth -= 1;
 
