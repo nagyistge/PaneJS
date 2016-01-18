@@ -8,10 +8,11 @@ class Handler extends Events {
         let that = this;
 
         that.paper = paper;
+        that.model = paper.model;
         that.disabled = false;
 
-        that.init(options)
-            .on('handler:initalized');
+        that.init(options);
+        that.on('handler:initalized');
     }
 
     // life cycle
@@ -37,6 +38,16 @@ class Handler extends Events {
 
         that.disabled = false;
         that.on('handler:enabled');
+
+        return that;
+    }
+
+    executeIfEnabled(callback) {
+        let that = this;
+
+        if (!that.disabled) {
+            callback();
+        }
 
         return that;
     }
