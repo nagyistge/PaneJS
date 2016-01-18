@@ -1,7 +1,5 @@
 import * as utils from '../common/utils';
 
-const splitter = /\s+/;
-
 
 function triggerEvents(callbacks, args, context) {
 
@@ -27,9 +25,7 @@ class Events {
 
         let listeners = that.__events || (that.__events = {});
 
-        events = events.split(splitter);
-
-        utils.forEach(events, function (event) {
+        utils.forEach(utils.split(events), function (event) {
             let list = listeners[event] || (listeners[event] = []);
             list.push(callback, context);
         });
@@ -64,7 +60,7 @@ class Events {
             return that;
         }
 
-        events = events ? events.split(splitter) : utils.keys(listeners);
+        events = events ? utils.split(events) : utils.keys(listeners);
 
         utils.forEach(events, function (event) {
 
@@ -104,7 +100,7 @@ class Events {
         let result = true;
         let commonCallbacks = listeners['*'];
 
-        utils.forEach(eventName.split(splitter), function (event) {
+        utils.forEach(utils.split(eventName), function (event) {
 
             let callbacks;
 
