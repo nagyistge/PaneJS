@@ -1,15 +1,14 @@
 import * as utils from '../common/utils';
 
-
 function triggerEvents(callbacks, args, context) {
 
-    let result = true;
+    let pass = true;
 
     for (let i = 0, l = callbacks.length; i < l; i += 2) {
-        result = utils.invoke(callbacks[i], args, callbacks[i + 1] || context) && result;
+        pass = utils.invoke(callbacks[i], args, callbacks[i + 1] || context) !== false && pass;
     }
 
-    return result;
+    return pass;
 }
 
 
@@ -97,8 +96,8 @@ class Events {
             return null;
         }
 
-        let result = true;
-        let commonCallbacks = listeners['*'];
+        let returned = true;
+        let all = listeners['*'];
 
         utils.forEach(utils.split(eventName), function (event) {
 
@@ -107,16 +106,16 @@ class Events {
             if (event !== '*') {
                 callbacks = listeners[event];
                 if (callbacks) {
-                    triggerEvents(callbacks, args, that);
+                    returned = triggerEvents(callbacks, args, that) && returned;
                 }
             }
 
-            if (commonCallbacks) {
-                triggerEvents(commonCallbacks, [event].concat(args), that);
+            if (all) {
+                returned = triggerEvents(all, [event].concat(args), that) && returned;
             }
         });
 
-        return result;
+        return returned;
     }
 }
 
