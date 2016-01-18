@@ -96,7 +96,7 @@ class Events {
             return null;
         }
 
-        let returned = true;
+        let pass = true;
         let all = listeners['*'];
 
         utils.forEach(utils.split(eventName), function (event) {
@@ -106,16 +106,16 @@ class Events {
             if (event !== '*') {
                 callbacks = listeners[event];
                 if (callbacks) {
-                    returned = triggerEvents(callbacks, args, that) && returned;
+                    pass = triggerEvents(callbacks, args, that) && pass;
                 }
             }
 
             if (all) {
-                returned = triggerEvents(all, [event].concat(args), that) && returned;
+                pass = triggerEvents(all, [event].concat(args), that) && pass;
             }
         });
 
-        return returned;
+        return pass;
     }
 }
 
