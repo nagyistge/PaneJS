@@ -15,6 +15,9 @@ import RootChange     from '../changes/RootChange';
 import ChildChange    from '../changes/ChildChange';
 import TerminalChange from '../changes/TerminalChange';
 
+// default handlers
+import SelectionHandler from '../handlers/Selection';
+
 const WIN = window;
 const DOC = WIN.document;
 
@@ -32,7 +35,8 @@ let defaultOptions = {
     // will be still triggered.
     clickThreshold: 0,
 
-    getView(/* cell */) {}
+    getView(/* cell */) {
+    }
 };
 
 class Paper extends Events {
@@ -147,21 +151,18 @@ class Paper extends Events {
 
             let svg = utils.createSvgDocument();
             let root = utils.createSvgElement('g');
-            let backgroundPane = utils.createSvgElement('g');
-            let drawPane = utils.createSvgElement('g');
-            let overlayPane = utils.createSvgElement('g');
 
-            root.appendChild(backgroundPane);
-            root.appendChild(drawPane);
-            root.appendChild(overlayPane); // layer above the drawing pane, for handlers
+            that.backgroundPane = root.appendChild(utils.createSvgElement('g'));
+            that.drawPane = root.appendChild(utils.createSvgElement('g'));
+            // layer above the drawing pane, for handlers
+            that.overlayPane = root.appendChild(utils.createSvgElement('g'));
+            // layer above the drawing pane and overlay pane, for decorators
+            that.decoratorPane = root.appendChild(utils.createSvgElement('g'));
             svg.appendChild(root);
             container.appendChild(svg);
 
             that.svg = svg;
             that.root = root;
-            that.backgroundPane = backgroundPane;
-            that.drawPane = drawPane;
-            that.overlayPane = overlayPane;
             that.container = container;
 
             that.trigger('paper:init', container);
@@ -212,6 +213,30 @@ class Paper extends Events {
         that.model.on('change', that.processChanges, that);
 
         that.trigger('paper:setup');
+
+        that.registerHandlers([
+            new SelectionHandler(that)
+        ]);
+
+        return that;
+    }
+
+    registerHandlers(handlers) {
+        let that = this;
+
+        handlers = utils.isArray(handlers) ? handlers : [handlers];
+
+        that.handlers = that.handlers || [];
+        that.handlerByName = that.handlerByName || {};
+
+        utils.forEach(handlers, function (handler) {
+            if (that.handlerByName[handler.name]) {
+                throw new Error('handler with name "' + handler.name + '" is already registered');
+            }
+            // handler = utils.isFunction(handler) ? new handler(that) : handler;
+            that.handlers.push(handler);
+            that.handlerByName[handler.name] = handler;
+        });
 
         return that;
     }
