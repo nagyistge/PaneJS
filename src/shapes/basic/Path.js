@@ -78,7 +78,9 @@ class Path extends Node {
         if (attrs.path) {
             attrs.path.d = d;
         } else {
-            attrs.path = { d };
+            attrs.path = {
+                d
+            };
         }
     }
 
