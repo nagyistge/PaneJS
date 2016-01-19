@@ -52,7 +52,7 @@ class VertexController extends Controller {
         let that = this;
 
         that.moveTo(cell.position)
-            .rotate(cell.rotation)
+            .rotate(cell)
             .setSize(cell.size)
             .drawBounds()
             .drawRotater()
@@ -77,10 +77,12 @@ class VertexController extends Controller {
         return that;
     }
 
-    rotate(angle) {
+    rotate(cell) {
         let that = this;
 
-        that.vel.rotate(angle);
+        let cx = cell.size.width / 2;
+        let cy = cell.size.height / 2;
+        that.vel.rotate(cell.rotation, cx, cy);
 
         return that;
     }
