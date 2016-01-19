@@ -60,7 +60,11 @@ class Path extends Node {
             }
 
             utils.forEach(group, function (point) {
-                formatted.push(point.x - minX, point.y - minY);
+
+                let x = utils.toFixed(point.x - minX, 2);
+                let y = utils.toFixed(point.y - minY, 2);
+
+                formatted.push(x, y);
             });
         });
 
