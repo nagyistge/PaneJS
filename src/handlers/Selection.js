@@ -2,6 +2,8 @@ import Handler from './Handler';
 import VertexController from '../controllers/Vertex';
 import * as utils from '../common/utils';
 
+// TODO if cell is a link
+
 const eventHasModifierKey = utils.eventHasModifierKey;
 
 class SelectHandler extends Handler {

@@ -8,7 +8,7 @@ const DEFAULT_OPTIONS = {
         'stroke-dasharray': '3px, 3px',
         stroke: '#0f0',
     },
-    rotaterOffset: -15,
+    rotaterOffset: -12,
     rotaterAttr: {
         rx: 5,
         ry: 5,
@@ -17,8 +17,8 @@ const DEFAULT_OPTIONS = {
         style: 'cursor:crosshair;'
     },
     resizerAttr: {
-        height: 7,
-        width: 7,
+        height: 6,
+        width: 6,
         fill: '#0f0',
         stroke: 'black',
     }
@@ -28,11 +28,11 @@ const RESIZER_NAMES = [
     'nw-resize',
     'n-resize',
     'ne-resize',
-    'w-resize',
     'e-resize',
-    'sw-resize',
-    's-resize',
     'se-resize',
+    's-resize',
+    'sw-resize',
+    'w-resize',
 ];
 
 class VertexController extends Controller {
@@ -53,7 +53,7 @@ class VertexController extends Controller {
         that.elem = vel.node;
         that.paper.controlPane.appendChild(that.elem);
 
-        let cell = options.cell;
+        let cell = that.cell = options.cell;
         that.redraw(cell);
 
         return that;
@@ -63,7 +63,7 @@ class VertexController extends Controller {
         let that = this;
 
         that.moveTo(cell.position)
-            .rotate(cell)
+            .rotate()
             .setSize(cell.size)
             .drawBounds()
             .drawRotater()
@@ -88,8 +88,9 @@ class VertexController extends Controller {
         return that;
     }
 
-    rotate(cell) {
+    rotate() {
         let that = this;
+        let cell = that.cell;
 
         let cx = cell.size.width / 2;
         let cy = cell.size.height / 2;
@@ -129,35 +130,56 @@ class VertexController extends Controller {
         let options = that.options;
 
         if (!that.resizers) {
-            that.resizers = {};
-            utils.forEach(RESIZER_NAMES, function (cursor) {
-                that.createResizer(cursor);
+            that.resizers = [];
+            utils.forEach(RESIZER_NAMES, function () {
+                that.createResizer();
             });
         }
 
+        // TODO change class and cursor style according to cell rotate angle
         let resizers = that.resizers;
         let rx = options.resizerAttr.width / 2;
         let ry = options.resizerAttr.height / 2;
         let h = that.size.height;
         let w = that.size.width;
-        resizers['nw-resize'].translate(-rx, -ry);
-        resizers['n-resize'].translate(-rx + w / 2, -ry);
-        resizers['ne-resize'].translate(-rx + w, -ry);
-        resizers['w-resize'].translate(-rx, -ry + h / 2);
-        resizers['e-resize'].translate(-rx + w, -ry + h / 2);
-        resizers['sw-resize'].translate(-rx, -ry + h);
-        resizers['s-resize'].translate(-rx + w / 2, -ry + h);
-        resizers['se-resize'].translate(-rx + w, -ry + h);
+        resizers[0].translate(-rx, -ry);
+        resizers[1].translate(-rx + w / 2, -ry);
+        resizers[2].translate(-rx + w, -ry);
+        resizers[3].translate(-rx + w, -ry + h / 2);
+        resizers[4].translate(-rx + w, -ry + h);
+        resizers[5].translate(-rx + w / 2, -ry + h);
+        resizers[6].translate(-rx, -ry + h);
+        resizers[7].translate(-rx, -ry + h / 2);
+
+        that.adjustResizers();
+
         return that;
     }
 
-    createResizer(cursor) {
+    adjustResizers() {
+        let that = this;
+        let cell = that.cell;
+
+        const STEP_ANGLE = 45;
+        let rotation = utils.normalizeAngle(cell.rotation);
+        let offset = Math.floor(rotation / STEP_ANGLE);
+        let length = RESIZER_NAMES.length;
+
+        utils.forEach(that.resizers, function (resizer, i) {
+            let name = RESIZER_NAMES[(i + offset) % length];
+            resizer.node.class = name;
+            resizer.css({
+                cursor: name
+            });
+        });
+        return that;
+    }
+
+    createResizer() {
         let that = this;
 
-        let resizerVel = vector('rect', utils.extend({
-            style: 'cursor:' + cursor + ';'
-        }, that.options.resizerAttr));
-        that.resizers[cursor] = resizerVel;
+        let resizerVel = vector('rect', that.options.resizerAttr);
+        that.resizers.push(resizerVel);
         that.vel.append(resizerVel);
         return that;
     }
@@ -172,7 +194,7 @@ class VertexController extends Controller {
 
         that.boundsVel.remove();
         that.rotaterVel.remove();
-        utils.forIn(that.resizers, function (vel) {
+        utils.forEach(that.resizers, function (vel) {
             vel.remove();
         });
         that.vel.remove();
