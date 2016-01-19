@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf8"/>
-
+    <meta charset="utf-8">
     <title>handlers</title>
     <link rel="stylesheet" type="text/css" href="../dist/pane.css">
     <style>
         #container {
-            width: 500px;
-            height: 300px;
+            width: 800px;
+            height: 600px;
             border: 1px solid #ddd;
         }
     </style>
@@ -24,54 +23,93 @@
     var paper = new pane.Paper(container, model);
 
 
-    model.beginUpdate();
+    var rectParent = new pane.shapes.basic.Rect({
+        size: {width: 100, height: 40},
+        position: {x: 50, y: 20},
+        //        rotation: {angle: 30},
+        attrs: {text: {text: 'Rect-Rect-Rect'}}
+    });
 
-    var node1 = new pane.shapes.basic.Rect({
-        position: {
-            x: 70,
-            y: 40
-        },
-        size: {
-            width: 80,
-            height: 30
-        },
+    var rectChild = new pane.shapes.port.Rect({
+        position: {x: 5, y: 5, relative: true},
+        rotation: {angle: 60},
+        size: {width: 15, height: 15}
+    });
+
+
+    model.addCell(rectParent);
+    model.addCell(rectChild, rectParent);
+
+
+    var rectParent1 = new pane.shapes.basic.Rect({
+        size: {width: 100, height: 40},
+        position: {x: 50, y: 100},
+        rotation: {angle: 45},
+        attrs: {text: {text: 'Rect-Rect-Rect'}}
+    });
+
+    var rectChild1 = new pane.shapes.port.Rect({
+        position: {x: 55, y: 105, relative: false},
+        rotation: {angle: 60},
+        size: {width: 15, height: 15}
+    });
+
+
+    model.addCell(rectParent1);
+    model.addCell(rectChild1, rectParent1);
+
+
+    var tb = new pane.shapes.basic.Text({
+        position: {x: 170, y: 50},
+        size: {width: 100, height: 30},
+        attrs: {text: {text: 'Text'}}
+    });
+    model.addCell(tb);
+
+    var cb = new pane.shapes.basic.Circle({
+        position: {x: 300, y: 70},
+        size: {width: 100, height: 40},
+        attrs: {text: {text: 'Circle'}}
+    });
+    model.addCell(cb);
+
+    var ib = new pane.shapes.basic.Image({
+        position: {x: 450, y: 50},
+        size: {width: 100, height: 100},
         attrs: {
-            rect: {
-                'stroke-width': 10
-            },
-            text: {
-                text: 'Hello,'
+            text: {text: 'Image'},
+            image: {
+                'xlink:href': 'http://placehold.it/96x96',
+                width: 96,
+                height: 96
             }
         }
     });
+    model.addCell(ib);
 
-    var node2 = new pane.shapes.basic.Rect({
-        position: {
-            x: 200,
-            y: 200
-        },
-        size: {
-            width: 80,
-            height: 30
-        },
+    var pb = new pane.shapes.basic.Path({
+        position: {x: 50, y: 150},
+        size: {width: 40, height: 40},
         attrs: {
-
-            text: {
-                text: 'World!'
-            }
+            path: {d: 'M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z'},
+            text: {text: 'Path'}
         }
     });
+    model.addCell(pb);
 
-    var link1 = new pane.Link({
-        targetMarker: 'classic'
+    var rh = new pane.shapes.basic.Rhombus({
+        position: {x: 50, y: 250},
+        size: {width: 70, height: 70},
+        attrs: {text: {text: 'Rhombus', 'font-size': 8}}
     });
+    model.addCell(rh);
 
-    model.addNode(node1);
-    model.addNode(node2);
-    model.addLink(link1, node1, node2);
 
-    model.endUpdate();
-    console.log(node1);
+    // 添加handlers
+    paper.registerHandlers([
+        new pane.SelectionHandler(paper)
+    ]);
+
 </script>
 </body>
 </html>
