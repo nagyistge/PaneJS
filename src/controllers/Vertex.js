@@ -24,6 +24,17 @@ const DEFAULT_OPTIONS = {
     }
 };
 
+const RESIZER_NAMES = [
+    'nw-resize',
+    'n-resize',
+    'ne-resize',
+    'w-resize',
+    'e-resize',
+    'sw-resize',
+    's-resize',
+    'se-resize',
+];
+
 class VertexController extends Controller {
     init(options) {
         /*
@@ -119,16 +130,7 @@ class VertexController extends Controller {
 
         if (!that.resizers) {
             that.resizers = {};
-            utils.forEach([
-                'nw-resize',
-                'n-resize',
-                'ne-resize',
-                'w-resize',
-                'e-resize',
-                'sw-resize',
-                's-resize',
-                'se-resize',
-            ], function (cursor) {
+            utils.forEach(RESIZER_NAMES, function (cursor) {
                 that.createResizer(cursor);
             });
         }
@@ -166,6 +168,16 @@ class VertexController extends Controller {
     }
 
     destroy() {
+        let that = this;
+
+        that.boundsVel.remove();
+        that.rotaterVel.remove();
+        utils.forIn(that.resizers, function (vel) {
+            vel.remove();
+        });
+        that.vel.remove();
+        utils.destroy(that);
+        return that;
     }
 }
 
