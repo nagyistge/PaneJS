@@ -46,8 +46,14 @@ function decomposeMatrix(matrix) {
     // @see https://gist.github.com/2052247
 
     // calculate delta transform point
-    let px = deltaTransformPoint(matrix, { x: 0, y: 1 });
-    let py = deltaTransformPoint(matrix, { x: 1, y: 0 });
+    let px = deltaTransformPoint(matrix, {
+        x: 0,
+        y: 1
+    });
+    let py = deltaTransformPoint(matrix, {
+        x: 1,
+        y: 0
+    });
 
     // calculate skew
     let skewX = ((180 / Math.PI) * Math.atan2(px.y, px.x) - 90);
@@ -121,8 +127,22 @@ export class VElement {
         return that;
     }
 
-    css(/* style */) {
+    css(style) {
+        let that = this;
 
+        if (!style) {
+            return node.style;
+        }
+
+        let node = that.node;
+        if (utils.isString(style)) {
+            style = vector.styleToObject(style);
+        }
+        utils.forIn(style, function (value, key) {
+            node.style[key] = value;
+        });
+
+        return that;
     }
 
     text(content, options) {
@@ -717,7 +737,8 @@ export class VElement {
             : getTransformToElement(node, toElem);
     }
 
-    translateCenterToPoint() {}
+    translateCenterToPoint() {
+    }
 
     translateAndAutoOrient(position, reference, target) {
 
@@ -784,7 +805,8 @@ export class VElement {
         return that;
     }
 
-    animateAlongPath() {}
+    animateAlongPath() {
+    }
 
     sample(interval) {
 
