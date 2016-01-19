@@ -7,9 +7,11 @@ import * as utils from '../common/utils';
 const eventHasModifierKey = utils.eventHasModifierKey;
 
 class SelectHandler extends Handler {
-    init(/* options */) {
+    init(options = {}) {
         let that = this;
         let paper = that.paper;
+
+        that.name = options.name || 'select';
 
         paper.selection = [];
         paper.on('cell:pointerDown', function (cell, view, e/* , x, y */) {

@@ -15,9 +15,6 @@ import RootChange     from '../changes/RootChange';
 import ChildChange    from '../changes/ChildChange';
 import TerminalChange from '../changes/TerminalChange';
 
-// default handlers
-import SelectionHandler from '../handlers/Selection';
-
 const WIN = window;
 const DOC = WIN.document;
 
@@ -214,9 +211,9 @@ class Paper extends Events {
 
         that.trigger('paper:setup');
 
-        that.registerHandlers([
-            new SelectionHandler(that)
-        ]);
+        // that.registerHandlers([
+        //     new SelectionHandler(that)
+        // ]);
 
         return that;
     }

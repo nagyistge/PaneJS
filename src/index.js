@@ -25,10 +25,14 @@ import ChildChange    from './changes/ChildChange';
 import TerminalChange from './changes/TerminalChange';
 
 
+import Handler          from './handlers/Handler';
+import SelectionHandler from './handlers/Selection';
+
+
 // connectors
 // ----------
 import sharpConnector   from './shapes/connector/sharp';
-import smoothConnector from './shapes/connector/smooth';
+import smoothConnector  from './shapes/connector/smooth';
 import roundedConnector from './shapes/connector/rounded';
 
 Paper
@@ -75,6 +79,9 @@ export {
     RootChange,
     ChildChange,
     TerminalChange,
+
+    Handler,
+    SelectionHandler,
 
     Model,
     Paper,
