@@ -110,6 +110,30 @@
         new pane.SelectionHandler(paper)
     ]);
 
+    setTimeout(function () {
+        model.setGeometry(pb, {
+            position: {
+                x: 0,
+                y: 0,
+            }
+        });
+    }, 1000);
+    setTimeout(function () {
+        model.setGeometry(pb, {
+            rotation: {
+                angle: 45,
+            }
+        });
+    }, 2000);
+    setTimeout(function () {
+        model.setGeometry(pb, {
+            size: {
+                width: 100,
+                height: 100,
+            }
+        });
+    }, 3000);
+
 </script>
 </body>
 </html>
