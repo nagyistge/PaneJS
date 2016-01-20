@@ -14,6 +14,7 @@ import NodeView from '../views/NodeView';
 import RootChange     from '../changes/RootChange';
 import ChildChange    from '../changes/ChildChange';
 import TerminalChange from '../changes/TerminalChange';
+import GeometryChange from '../changes/GeometryChange';
 
 const WIN = window;
 const DOC = WIN.document;
@@ -760,13 +761,13 @@ class Paper extends Events {
             that.onChildChanged(change);
         } else if (change instanceof TerminalChange) {
             that.onTerminalChange(change);
+        } else if (change instanceof GeometryChange) {
+            that.onGeometryChange(change);
         }
-
         return that;
     }
 
     onRootChanged(/* change */) {
-
     }
 
     onChildChanged(change) {
@@ -804,6 +805,11 @@ class Paper extends Events {
 
     onTerminalChange(change) {
         this.invalidate(change.link);
+    }
+
+    onGeometryChange(change) {
+        utils.merge(change.cell.metadata, change.geometry);
+        this.invalidate(change.cell, true, true);
     }
 
 

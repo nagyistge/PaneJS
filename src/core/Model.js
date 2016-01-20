@@ -14,6 +14,7 @@ import Cell from '../cells/Cell';
 import RootChange       from '../changes/RootChange';
 import ChildChange      from '../changes/ChildChange';
 import TerminalChange   from '../changes/TerminalChange';
+import GeometryChange   from '../changes/GeometryChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
 class Model extends Events {
@@ -108,28 +109,28 @@ class Model extends Events {
 
     getParents(/* cells */) {
         /* FIXME
-        let parents = [];
+         let parents = [];
 
-        if (cells) {
+         if (cells) {
 
-            let hash = {};
+         let hash = {};
 
-            forEach(cells, function (cell) {
-                let parent = cell.parent;
+         forEach(cells, function (cell) {
+         let parent = cell.parent;
 
-                if (parent) {
-                    let id = cellRoute.create(parent);
+         if (parent) {
+         let id = cellRoute.create(parent);
 
-                    if (!hash[id]) {
-                        hash[id] = parent;
-                        parents.push(parent);
-                    }
-                }
-            });
-        }
+         if (!hash[id]) {
+         hash[id] = parent;
+         parents.push(parent);
+         }
+         }
+         });
+         }
 
-        return parents;
-        */
+         return parents;
+         */
     }
 
 
@@ -237,10 +238,10 @@ class Model extends Events {
                         // let parentChanged = cell.parent !== parent;
 
                         /* FIXME
-                        if (parentChanged) {
+                         if (parentChanged) {
 
-                        }
-                        */
+                         }
+                         */
 
                         index++;
                     }
@@ -437,37 +438,37 @@ class Model extends Events {
     getNearestCommonAncestor(/* cell1, cell2 */) {
 
         /* FIXME
-        if (cell1 && cell2) {
+         if (cell1 && cell2) {
 
-            let route1 = cellRoute.create(cell1);
-            let route2 = cellRoute.create(cell2);
+         let route1 = cellRoute.create(cell1);
+         let route2 = cellRoute.create(cell2);
 
-            if (route1 && route2) {
+         if (route1 && route2) {
 
-                let cell = cell1;
-                let route = route2;
-                let current = route1;
+         let cell = cell1;
+         let route = route2;
+         let current = route1;
 
-                if (route1.length > route2.length) {
-                    cell = cell2;
-                    route = route1;
-                    current = route2;
-                }
+         if (route1.length > route2.length) {
+         cell = cell2;
+         route = route1;
+         current = route2;
+         }
 
-                while (cell) {
-                    let parent = cell.parent;
+         while (cell) {
+         let parent = cell.parent;
 
-                    // check if the cell path is equal to the beginning of the given cell path
-                    if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
-                        return cell;
-                    }
+         // check if the cell path is equal to the beginning of the given cell path
+         if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
+         return cell;
+         }
 
-                    cell = parent;
-                    current = cellRoute.getParentRoute(current);
-                }
-            }
-        }
-        */
+         cell = parent;
+         current = cellRoute.getParentRoute(current);
+         }
+         }
+         }
+         */
 
         return null;
     }
@@ -527,16 +528,16 @@ class Model extends Events {
 
         let that = this;
         // FIXME: not used {
-            // let terminalChanged = terminal !== that.getTerminal(link, isSource);
+        // let terminalChanged = terminal !== that.getTerminal(link, isSource);
         // }
 
         that.digest(new TerminalChange(that, link, terminal, isSource));
 
         /*
-        if (this.maintainEdgeParent && terminalChanged) {
-            this.updateEdgeParent(link, this.getRoot());
-        }
-        */
+         if (this.maintainEdgeParent && terminalChanged) {
+         this.updateEdgeParent(link, this.getRoot());
+         }
+         */
 
         return that;
     }
@@ -571,6 +572,20 @@ class Model extends Events {
         return previous;
     }
 
+    getGeometry(cell) {
+        return cell;
+    }
+
+    setGeometry(cell, geometry) {
+        let that = this;
+
+        that.digest(new GeometryChange(that, cell, geometry));
+        return that;
+    }
+
+    // geometryChanged(cell, geometry) {
+
+    // }
 
     // update
     // ------
