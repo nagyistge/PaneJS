@@ -38,6 +38,13 @@ class Cell {
         return that;
     }
 
+    // geometry
+    // --------
+    // TODO
+
+    getGeometry() {
+    }
+
 
     // children
     // --------
