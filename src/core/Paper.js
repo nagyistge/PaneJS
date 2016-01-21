@@ -509,6 +509,7 @@ class Paper extends Events {
                 center.rotate(parentCenter, -parent.rotation);
 
                 // move the node to the new position
+                // FIXME
                 position.x = center.x - size.width / 2;
                 position.y = center.y - size.height / 2;
 

@@ -53,14 +53,14 @@ class VertexController extends Controller {
         that.elem = vel.node;
         that.paper.controlPane.appendChild(that.elem);
 
-        let cell = that.cell = options.cell;
-        that.redraw(cell);
+        that.redraw();
 
         return that;
     }
 
-    redraw(cell) {
+    redraw() {
         let that = this;
+        let cell = that.cell;
 
         that.moveTo(cell.position)
             .rotate()
