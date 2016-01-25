@@ -11,6 +11,17 @@ function getClassName(elem) {
     return elem.getAttribute && elem.getAttribute('class') || '';
 }
 
+function fillSpaces(str) {
+    return ' ' + str + ' ';
+}
+
+function containsClassName(elem, classStr) {
+    if (elem.classList) {
+        return elem.classList.contains(classStr);
+    }
+    return fillSpaces(getClassName(elem)).indexOf(fillSpaces(classStr)) > -1;
+}
+
 function isNode(elem, nodeName, attrName, attrValue) {
 
     let ret = elem && !isNaN(elem.nodeType);
@@ -194,5 +205,6 @@ export {
     createSvgElement,
     createSvgDocument,
     contains as containsElem,
+    containsClassName,
     getComputedStyle
 };
