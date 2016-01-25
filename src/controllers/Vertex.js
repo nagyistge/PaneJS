@@ -1,6 +1,12 @@
-import vector from '../common/vector';
 import * as utils from '../common/utils';
 import Controller from './Controller';
+import detector   from '../common/detector';
+import vector from '../common/vector';
+
+const WIN = window;
+const DOC = WIN.document;
+
+// TODO listen to cell's change event to redraw
 
 const DEFAULT_OPTIONS = {
     boundsAttr: {
@@ -49,6 +55,7 @@ class VertexController extends Controller {
         let vel = vector('g', {
             'class': 'vertex-bounds'
         });
+        that.cell = options.cell;
         that.vel = vel;
         that.elem = vel.node;
         that.paper.controlPane.appendChild(that.elem);
@@ -69,6 +76,8 @@ class VertexController extends Controller {
             .drawRotater()
             .drawResizers();
 
+        that.bindEvents();
+
         return that;
     }
 
@@ -76,6 +85,7 @@ class VertexController extends Controller {
         let that = this;
 
         that.vel.translate(pos.x, pos.y);
+        that.position = pos;
 
         return that;
     }
@@ -88,13 +98,14 @@ class VertexController extends Controller {
         return that;
     }
 
-    rotate() {
+    rotate(rotation) {
         let that = this;
         let cell = that.cell;
 
         let cx = cell.size.width / 2;
         let cy = cell.size.height / 2;
-        that.vel.rotate(cell.rotation, cx, cy);
+        that.vel.rotate(rotation || cell.rotation, cx, cy);
+        that.rotation = rotation || cell.rotation;
 
         return that;
     }
@@ -167,7 +178,9 @@ class VertexController extends Controller {
 
         utils.forEach(that.resizers, function (resizer, i) {
             let name = RESIZER_NAMES[(i + offset) % length];
-            resizer.node.class = name;
+            resizer.attr({
+                class: 'resizer ' + name
+            });
             resizer.css({
                 cursor: name
             });
@@ -184,8 +197,139 @@ class VertexController extends Controller {
         return that;
     }
 
-    drawPreview() {
+    /*
+     drawPreview() {
+     let that = this;
+     return that;
+     }
+     */
+
+    hideRotater() {
         let that = this;
+
+        that.rotaterVel.hide();
+        return that;
+    }
+
+    showRotater() {
+        let that = this;
+
+        that.rotaterVel.show();
+        return that;
+    }
+
+    showResizers() {
+        let that = this;
+
+        utils.forEach(that.resizers, function (resizer) {
+            resizer.show();
+        });
+        return that;
+    }
+
+    hideResizers() {
+        let that = this;
+
+        utils.forEach(that.resizers, function (resizer) {
+            resizer.hide();
+        });
+        return that;
+    }
+
+    resetEvents(e) {
+        let that = this;
+
+        that.isRotating = false;
+        that.isResizing = false;
+        that.target = null;
+        if (e && e.target) {
+            that.target = e.target;
+            that.isRotating = (e.target === that.rotaterVel.node);
+            that.isResizing = utils.containsClassName(e.target, 'resizer');
+            that.oldEventPosition = {
+                x: e.x,
+                y: e.y
+            };
+        }
+        if (that.isRotating) {
+            that.hideResizers();
+        } else {
+            that.showResizers();
+        }
+        if (that.isResizing) {
+            that.hideRotater();
+        } else {
+            that.showRotater();
+        }
+        return that;
+    }
+
+    bindEvents() {
+        let that = this;
+        let elem = that.elem;
+        that.resetEvents();
+
+        let onPointerDown = that.onPointerDown.bind(that);
+        let onPointerMove = that.onPointerMove.bind(that);
+        let onPointerUp = that.onPointerUp.bind(that);
+        if (detector.IS_TOUCH) {
+            utils.addEventListener(elem, 'touchstart', onPointerDown);
+            utils.addEventListener(DOC, 'touchmove', onPointerMove);
+            utils.addEventListener(DOC, 'touchend', onPointerUp);
+        } else {
+            utils.addEventListener(elem, 'mousedown', onPointerDown);
+            utils.addEventListener(DOC, 'mousemove', onPointerMove);
+            utils.addEventListener(DOC, 'mouseup', onPointerUp);
+        }
+
+        return that;
+    }
+
+    onPointerDown(e) {
+        let that = this;
+
+        that.resetEvents(e);
+        e.stopPropagation();
+        return that;
+    }
+
+    onPointerMove(e) {
+        let that = this;
+
+        if (that.isRotating) {
+            // let paper = that.paper;
+            let dx = that.position.x + that.size.width / 2 - e.x;
+            let dy = that.position.y + that.size.height / 2 - e.y;
+
+            let alpha = (dx !== 0) ? Math.atan(dy / dx) * 180 / Math.PI + 90 : ((dy < 0) ? 180 : 0);
+            if (dx > 0) {
+                alpha -= 180;
+            }
+            that.rotate(alpha);
+
+            e.stopPropagation();
+        }
+        return that;
+    }
+
+    onPointerUp(e) {
+        let that = this;
+
+        if (that.isResizing || that.isRotating) {
+            let model = that.model;
+            // let cell = that.cell;
+            if (that.isRotating) {
+                model.beginUpdate();
+                model.setGeometry(that.cell, {
+                    rotation: {
+                        angle: that.rotation
+                    }
+                });
+                model.endUpdate();
+            }
+            that.resetEvents();
+            e.stopPropagation();
+        }
         return that;
     }
 
