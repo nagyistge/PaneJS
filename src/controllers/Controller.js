@@ -8,6 +8,7 @@ class Controller extends Events {
         let that = this;
 
         that.paper = paper;
+        that.model = paper.model;
 
         that.init(options);
         that.on('controller:initalized');
