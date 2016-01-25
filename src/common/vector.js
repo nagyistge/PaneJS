@@ -693,7 +693,7 @@ export class VElement {
 
         if (!withoutTransformations) {
 
-            let matrix = node.getTransformToElement(target || node.ownerSVGElement);
+            let matrix = that.getTransformToElement(target || node.ownerSVGElement);
             box = vector.transformRect(box, matrix);
         }
 
@@ -714,7 +714,7 @@ export class VElement {
         try {
             // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
             let globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-            let globalToLocalMatrix = that.node.getTransformToElement(svg).inverse();
+            let globalToLocalMatrix = that.getTransformToElement(svg).inverse();
             return globalPoint.matrixTransform(globalToLocalMatrix);
 
         } catch (e) {
@@ -921,7 +921,7 @@ export class VElement {
                 parseFloat(this.attr('height'))
             );
             // Get the rect transformation matrix with regards to the SVG document.
-            let rectMatrix = that.node.getTransformToElement(target);
+            let rectMatrix = that.getTransformToElement(target);
             // Decompose the matrix to find the rotation angle.
             let rectMatrixComponents = vector.decomposeMatrix(rectMatrix);
             // Now we want to rotate the rectangle back so that we
@@ -948,7 +948,7 @@ export class VElement {
                 let sample = samples[i];
                 // Convert the sample point in the local coordinate system to the global coordinate system.
                 let gp = vector.createSVGPoint(sample.x, sample.y);
-                gp = gp.matrixTransform(that.node.getTransformToElement(target));
+                gp = gp.matrixTransform(that.getTransformToElement(target));
                 sample = Point.fromPoint(gp);
                 let centerDistance = sample.distance(center);
                 // Penalize a higher distance to the reference point by 10%.
