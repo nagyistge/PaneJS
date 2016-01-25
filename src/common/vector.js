@@ -115,6 +115,24 @@ export class VElement {
         return that;
     }
 
+    show() {
+        let that = this;
+        that.css({
+            visibility: 'visible',
+            display: that.attr('olddisplay') || '',
+        });
+        return that;
+    }
+    hide() {
+        let that = this;
+        that.attr('olddisplay', that.css().display || '');
+        that.css({
+            visibility: 'hidden',
+            display: 'none',
+        });
+        return that;
+    }
+
     removeAttr(name) {
 
         let that = this;
@@ -131,7 +149,7 @@ export class VElement {
         let that = this;
 
         if (!style) {
-            return node.style;
+            return that.node.style;
         }
 
         let node = that.node;
