@@ -125,7 +125,9 @@ export class VElement {
     }
     hide() {
         let that = this;
-        that.attr('olddisplay', that.css().display || '');
+        let display = that.css().display;
+        display = (display === 'none') ? '' : display;
+        that.attr('olddisplay', display);
         that.css({
             visibility: 'hidden',
             display: 'none',

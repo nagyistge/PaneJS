@@ -227,11 +227,13 @@ class VertexController extends Controller {
         return that;
     }
 
-    hideResizers() {
+    hideResizers(exceptNode) {
         let that = this;
 
         utils.forEach(that.resizers, function (resizer) {
-            resizer.hide();
+            if (resizer.node !== exceptNode) {
+                resizer.hide();
+            }
         });
         return that;
     }
@@ -258,6 +260,7 @@ class VertexController extends Controller {
         }
         if (that.isResizing) {
             that.hideRotater();
+            that.hideResizers(e.target);
         } else {
             that.showRotater();
         }
@@ -306,7 +309,10 @@ class VertexController extends Controller {
                 alpha -= 180;
             }
             that.rotate(alpha);
-
+            e.stopPropagation();
+        }
+        if (that.isResizing) {
+            // let oldPos = that.oldEventPosition;
             e.stopPropagation();
         }
         return that;
@@ -326,6 +332,7 @@ class VertexController extends Controller {
                     }
                 });
                 model.endUpdate();
+                that.redraw();
             }
             that.resetEvents();
             e.stopPropagation();
