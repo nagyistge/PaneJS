@@ -121,6 +121,7 @@ export class VElement {
             visibility: 'visible',
             display: that.attr('olddisplay') || '',
         });
+        that.hidden = false;
         return that;
     }
     hide() {
@@ -132,6 +133,7 @@ export class VElement {
             visibility: 'hidden',
             display: 'none',
         });
+        that.hidden = true;
         return that;
     }
 
