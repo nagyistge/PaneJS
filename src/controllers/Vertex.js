@@ -2,6 +2,7 @@ import * as utils from '../common/utils';
 import Controller from './Controller';
 import detector   from '../common/detector';
 import vector from '../common/vector';
+import Rect from '../geometry/Rect';
 
 const WIN = window;
 const DOC = WIN.document;
@@ -98,14 +99,15 @@ class VertexController extends Controller {
         return that;
     }
 
-    rotate(rotation) {
+    rotate(rotation, cx, cy) {
         let that = this;
         let cell = that.cell;
 
-        let cx = cell.size.width / 2;
-        let cy = cell.size.height / 2;
-        that.vel.rotate(rotation || cell.rotation, cx, cy);
-        that.rotation = rotation || cell.rotation;
+        cx = utils.isNumeric(cx) ? cx : cell.size.width / 2;
+        cy = utils.isNumeric(cy) ? cy : cell.size.height / 2;
+        rotation = utils.isNumeric(rotation) ? rotation : cell.rotation;
+        that.vel.rotate(rotation, cx, cy);
+        that.rotation = rotation;
 
         return that;
     }
@@ -162,8 +164,20 @@ class VertexController extends Controller {
         resizers[6].translate(-rx, -ry + h);
         resizers[7].translate(-rx, -ry + h / 2);
 
+        that.cacheResizerBBox();
         that.adjustResizers();
 
+        return that;
+    }
+
+    cacheResizerBBox() {
+        let that = this;
+
+        utils.forEach(that.resizers, function (resizer) {
+            if (!resizer.hidden) {
+                resizer.cachedBBox = resizer.getBBox();
+            }
+        });
         return that;
     }
 
@@ -230,6 +244,7 @@ class VertexController extends Controller {
     hideResizers(exceptNode) {
         let that = this;
 
+        that.cacheResizerBBox();
         utils.forEach(that.resizers, function (resizer) {
             if (resizer.node !== exceptNode) {
                 resizer.hide();
@@ -243,9 +258,9 @@ class VertexController extends Controller {
 
         that.isRotating = false;
         that.isResizing = false;
-        that.target = null;
+        that.eventTarget = null;
         if (e && e.target) {
-            that.target = e.target;
+            that.eventTarget = e.target;
             that.isRotating = (e.target === that.rotaterVel.node);
             that.isResizing = utils.containsClassName(e.target, 'resizer');
             that.oldEventPosition = {
@@ -291,16 +306,17 @@ class VertexController extends Controller {
     onPointerDown(e) {
         let that = this;
 
-        that.resetEvents(e);
         e.stopPropagation();
+        that.resetEvents(e);
         return that;
     }
 
     onPointerMove(e) {
         let that = this;
+        // let paper = that.paper;
 
         if (that.isRotating) {
-            // let paper = that.paper;
+            e.stopPropagation();
             let dx = that.position.x + that.size.width / 2 - e.x;
             let dy = that.position.y + that.size.height / 2 - e.y;
 
@@ -309,11 +325,68 @@ class VertexController extends Controller {
                 alpha -= 180;
             }
             that.rotate(alpha);
-            e.stopPropagation();
         }
         if (that.isResizing) {
-            // let oldPos = that.oldEventPosition;
             e.stopPropagation();
+            let oldPos = that.oldEventPosition;
+            let newPos = {
+                x: e.x,
+                y: e.y
+            };
+            let eventTarget = that.eventTarget;
+            let currentResizerIndex = 0;
+            let isRotationResizer = false;
+            let isAntiRotationResizer = false;
+            utils.some(that.resizers, function (resizer, i) {
+                if (resizer.node === eventTarget) {
+                    currentResizerIndex = i;
+                    return true;
+                }
+                return false;
+            });
+            let oppositeResizerIndex = (currentResizerIndex - 4 + 8) % 8;
+            if (currentResizerIndex % 2 !== 0) {
+                if (currentResizerIndex === 1 || currentResizerIndex === 5) {
+                    isRotationResizer = true;
+                }
+                if (currentResizerIndex === 3 || currentResizerIndex === 7) {
+                    isAntiRotationResizer = true;
+                }
+                currentResizerIndex -= 1;
+                oppositeResizerIndex -= 1;
+            }
+            let edgePoint = that.resizers[oppositeResizerIndex].cachedBBox.getCenter();
+            let movingEdgePoint = that.resizers[currentResizerIndex].getBBox().getCenter();
+            let dx = 0;
+            let dy = 0;
+            if (isRotationResizer) {
+                dx = 0; // TODO
+                dy = 0; // TODO
+            } else if (isAntiRotationResizer) {
+                dx = 0; // TODO
+                dy = 0; // TODO
+            } else {
+                dx = newPos.x - oldPos.x;
+                dy = newPos.y - oldPos.y;
+            }
+            let newRect = Rect.fromVerticesAndRotation(edgePoint, {
+                x: movingEdgePoint.x + dx,
+                y: movingEdgePoint.y + dy
+            }, that.rotation);
+            let newCenter = newRect.getCenter();
+            that.moveTo({
+                x: newRect.x,
+                y: newRect.y
+            })
+            .setSize({
+                height: newRect.height,
+                width: newRect.width
+            })
+            .drawBounds()
+            .drawResizers()
+            .rotate(that.rotation, newCenter.x, newCenter.y);
+
+            that.oldEventPosition = newPos;
         }
         return that;
     }
@@ -322,20 +395,35 @@ class VertexController extends Controller {
         let that = this;
 
         if (that.isResizing || that.isRotating) {
+            e.stopPropagation();
             let model = that.model;
             // let cell = that.cell;
+            model.beginUpdate();
             if (that.isRotating) {
-                model.beginUpdate();
                 model.setGeometry(that.cell, {
                     rotation: {
                         angle: that.rotation
                     }
                 });
-                model.endUpdate();
-                that.redraw();
             }
+            if (that.isResizing) {
+                model.setGeometry(that.cell, {
+                    position: {
+                        x: that.position.x,
+                        y: that.position.y
+                    },
+                    rotation: {
+                        angle: that.rotation
+                    },
+                    size: {
+                        width: that.size.width,
+                        height: that.size.height,
+                    }
+                });
+            }
+            model.endUpdate();
+            that.redraw();
             that.resetEvents();
-            e.stopPropagation();
         }
         return that;
     }
