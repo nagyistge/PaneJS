@@ -9,9 +9,9 @@ class Rect {
 
         let that = this;
 
-        that.x      = x;
-        that.y      = y;
-        that.width  = width;
+        that.x = x;
+        that.y = y;
+        that.width = width;
         that.height = height;
     }
 
@@ -40,6 +40,22 @@ class Rect {
     static fromRect(rect) {
 
         return new Rect(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    static fromVerticesAndRotation(v1, v2, rotation = 0) {
+        let cx = (v1.x + v2.x) / 2;
+        let cy = (v1.y + v2.y) / 2;
+        let distance = new Point(v1.x, v1.y).distance(new Point(v2.x, v2.y));
+        let verticesAngle = Math.atan(Math.abs((v2.y - v1.y) / (v1.x - v2.x))) * 180 / Math.PI;
+        let width = Math.abs(distance * Math.sin((90 - rotation + verticesAngle) / 180 * Math.PI));
+        let height = Math.abs(distance * Math.cos((90 - rotation + verticesAngle) / 180 * Math.PI));
+        let x = cx - width / 2;
+        let y = cy - height / 2;
+        let rect = new Rect(x, y, width, height);
+        rect.cx = cx;
+        rect.cy = cy;
+        rect.rotation = rotation;
+        return rect;
     }
 
 
@@ -77,24 +93,24 @@ class Rect {
 
         let that = this;
 
-        let distToLeft   = point.x - that.x;
-        let distToTop    = point.y - that.y;
-        let distToRight  = (that.x + that.width) - point.x;
+        let distToLeft = point.x - that.x;
+        let distToTop = point.y - that.y;
+        let distToRight = (that.x + that.width) - point.x;
         let distToBottom = (that.y + that.height) - point.y;
 
         let closest = distToLeft;
-        let side    = 'left';
+        let side = 'left';
 
         if (distToRight < closest) {
 
             closest = distToRight;
-            side    = 'right';
+            side = 'right';
         }
 
         if (distToTop < closest) {
 
             closest = distToTop;
-            side    = 'top';
+            side = 'top';
         }
 
         if (distToBottom < closest) {
@@ -172,7 +188,7 @@ class Rect {
 
     intersect(rect) {
 
-        let that    = this;
+        let that = this;
         let origin1 = that.getOrigin();
         let corner1 = that.getCorner();
         let origin2 = rect.getOrigin();
@@ -200,7 +216,7 @@ class Rect {
         // in point p intersects me. If angle is specified, intersection with
         // rotated rectangle is computed.
 
-        let that   = this;
+        let that = this;
         let result;
         let center = that.getCenter();
 
@@ -266,9 +282,9 @@ class Rect {
         let w = that.width;
         let h = that.height;
 
-        that.x      = precision ? utils.toFixed(x, precision) : Math.round(x);
-        that.y      = precision ? utils.toFixed(y, precision) : Math.round(y);
-        that.width  = precision ? utils.toFixed(w, precision) : Math.round(w);
+        that.x = precision ? utils.toFixed(x, precision) : Math.round(x);
+        that.y = precision ? utils.toFixed(y, precision) : Math.round(y);
+        that.width = precision ? utils.toFixed(w, precision) : Math.round(w);
         that.height = precision ? utils.toFixed(h, precision) : Math.round(h);
 
         return that;
@@ -298,9 +314,9 @@ class Rect {
             h = -h;
         }
 
-        that.x      = x;
-        that.y      = y;
-        that.width  = w;
+        that.x = x;
+        that.y = y;
+        that.width = w;
         that.height = h;
 
         return that;
@@ -311,26 +327,26 @@ class Rect {
         let that = this;
 
         let theta = utils.toRad(angle || 0);
-        let st    = Math.abs(Math.sin(theta));
-        let ct    = Math.abs(Math.cos(theta));
-        let w     = that.width * ct + that.height * st;
-        let h     = that.width * st + that.height * ct;
+        let st = Math.abs(Math.sin(theta));
+        let ct = Math.abs(Math.cos(theta));
+        let w = that.width * ct + that.height * st;
+        let h = that.width * st + that.height * ct;
 
         return new Rect(that.x + (that.width - w) / 2, that.y + (that.height - h) / 2, w, h);
     }
 
     snapToGrid(gx, gy) {
 
-        let that   = this;
+        let that = this;
         let origin = that.getOrigin();
         let corner = that.getCorner();
 
         origin = origin.snapToGrid(gx, gy);
         corner = corner.snapToGrid(gx, gy);
 
-        that.x      = origin.x;
-        that.y      = origin.y;
-        that.width  = corner.x - origin.x;
+        that.x = origin.x;
+        that.y = origin.y;
+        that.width = corner.x - origin.x;
         that.height = corner.y - origin.y;
 
         return that;
