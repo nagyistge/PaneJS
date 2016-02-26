@@ -1,5 +1,5 @@
 {
-  "name": "pane",
+  "name": "panejs",
   "version": "0.0.1",
   "description": "JavaScript diagramming library",
   "main": "index.js",

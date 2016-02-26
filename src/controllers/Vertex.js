@@ -373,7 +373,7 @@ class VertexController extends Controller {
                 x: movingEdgePoint.x + dx,
                 y: movingEdgePoint.y + dy
             }, that.rotation);
-            let newCenter = newRect.getCenter();
+            // let newCenter = newRect.getCenter();
             that.moveTo({
                 x: newRect.x,
                 y: newRect.y
@@ -384,7 +384,7 @@ class VertexController extends Controller {
             })
             .drawBounds()
             .drawResizers()
-            .rotate(that.rotation, newCenter.x, newCenter.y);
+            .rotate(that.rotation/* , newCenter.x, newCenter.y */);
 
             that.oldEventPosition = newPos;
         }
