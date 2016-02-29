@@ -82,4 +82,5 @@ release-patch release-minor release-major: lint test build
 	git commit package.json -m 'Version $(NEXT_VERSION)'
 	git tag -a "v$(NEXT_VERSION)" -m "Version $(NEXT_VERSION)"
 	git push --tags origin HEAD:master
-	npm publish
+	npm  publish
+	cnpm sync panejs
