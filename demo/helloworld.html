@@ -4,7 +4,7 @@
     <meta charset="utf8"/>
 
     <title>Hello, World!</title>
-    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
         #container {
             width: 500px;
@@ -15,18 +15,18 @@
 </head>
 <body>
 <div id="container"></div>
-<script src="../dist/pane.js"></script>
+<script src="../dist/panejs.js"></script>
 <script>
 
     var container = document.getElementById('container');
 
-    var model = new pane.Model();
-    var paper = new pane.Paper(container, model);
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
 
 
     model.beginUpdate();
 
-    var node1 = new pane.shapes.basic.Rect({
+    var node1 = new panejs.shapes.basic.Rect({
         position: {
             x: 70,
             y: 40
@@ -45,7 +45,7 @@
         }
     });
 
-    var node2 = new pane.shapes.basic.Rect({
+    var node2 = new panejs.shapes.basic.Rect({
         position: {
             x: 200,
             y: 200
@@ -62,7 +62,7 @@
         }
     });
 
-    var link1 = new pane.Link({
+    var link1 = new panejs.Link({
         targetMarker: 'classic'
     });
 

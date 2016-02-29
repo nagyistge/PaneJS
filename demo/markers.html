@@ -4,7 +4,7 @@
     <meta charset="utf8"/>
 
     <title>Markers example for PaneJS</title>
-    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
         #container {
             width: 700px;
@@ -15,15 +15,15 @@
 </head>
 <body>
 <div id="container"></div>
-<script src="../dist/pane.js"></script>
+<script src="../dist/panejs.js"></script>
 <script>
 
     var container = document.getElementById('container');
 
-    var model = new pane.Model();
-    var paper = new pane.Paper(container, model);
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
 
-    var node1 = new pane.shapes.basic.Rect({
+    var node1 = new panejs.shapes.basic.Rect({
         position: {
             x: 100,
             y: 40
@@ -42,7 +42,7 @@
         }
     });
 
-    var node2 = new pane.shapes.basic.Rect({
+    var node2 = new panejs.shapes.basic.Rect({
         position: {
             x: 400,
             y: 40
@@ -61,7 +61,7 @@
     model.addNode(node1);
     model.addNode(node2);
 
-    var link1 = new pane.Link({
+    var link1 = new panejs.Link({
         sourceMarker: 'classic',
         targetMarker: {
             name: 'classic',
@@ -97,7 +97,7 @@
     node3.translate(100, 110);
     node4.translate(400, 110);
 
-    var link2 = new pane.Link({
+    var link2 = new panejs.Link({
         sourceMarker: 'block',
         targetMarker: {
             name: 'block',
@@ -134,7 +134,7 @@
     node5.translate(100, 180);
     node6.translate(400, 180);
 
-    var link3 = new pane.Link({
+    var link3 = new panejs.Link({
         sourceMarker: 'cloven',
         targetMarker: {
             name: 'cloven',
@@ -171,7 +171,7 @@
     node7.translate(100, 250);
     node8.translate(400, 250);
 
-    var link4 = new pane.Link({
+    var link4 = new panejs.Link({
         sourceMarker: 'diamond',
         targetMarker: {
             name: 'diamond',
@@ -208,7 +208,7 @@
     node9.translate(100, 320);
     node10.translate(400, 320);
 
-    var link5 = new pane.Link({
+    var link5 = new panejs.Link({
         markup: ''
         + '<path class="connector"/>'
         + '<g class="source-marker"/>'

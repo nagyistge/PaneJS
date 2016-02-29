@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gradients example for PaneJS</title>
-    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
         #container {
             width: 600px;
@@ -14,15 +14,15 @@
 </head>
 <body>
 <div id="container"></div>
-<script src="../dist/pane.js"></script>
+<script src="../dist/panejs.js"></script>
 <script>
 
     var container = document.getElementById('container');
 
-    var model = new pane.Model();
-    var paper = new pane.Paper(container, model);
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
 
-    var node1 = new pane.shapes.basic.Rect({
+    var node1 = new panejs.shapes.basic.Rect({
         position: { x: 60, y: 80 },
         size: { width: 200, height: 100 },
         attrs: {
@@ -66,7 +66,7 @@
 
     model.addNode(node1);
 
-    var node2 = new pane.shapes.basic.Rect({
+    var node2 = new panejs.shapes.basic.Rect({
         position: { x: 340, y: 80 },
         size: { width: 200, height: 100 },
         attrs: {

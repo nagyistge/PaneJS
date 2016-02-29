@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Basic shapes example for PaneJS</title>
-    <link rel="stylesheet" type="text/css" href="../dist/pane.css">
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
         #container {
             width: 800px;
@@ -14,22 +14,22 @@
 </head>
 <body>
 <div id="container"></div>
-<script src="../dist/pane.js"></script>
+<script src="../dist/panejs.js"></script>
 <script>
 
     var container = document.getElementById('container');
 
-    var model = new pane.Model();
-    var paper = new pane.Paper(container, model);
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
 
-    var rectParent = new pane.shapes.basic.Rect({
+    var rectParent = new panejs.shapes.basic.Rect({
         size: {width: 100, height: 40},
         position: {x: 50, y: 20},
         //        rotation: {angle: 30},
         attrs: {text: {text: 'Rect-Rect-Rect'}}
     });
 
-    var rectChild = new pane.shapes.port.Rect({
+    var rectChild = new panejs.shapes.port.Rect({
         position: {x: 5, y: 5, relative: true},
         rotation: {angle: 60},
         size: {width: 15, height: 15}
@@ -40,14 +40,14 @@
     model.addCell(rectChild, rectParent);
 
 
-    var rectParent1 = new pane.shapes.basic.Rect({
+    var rectParent1 = new panejs.shapes.basic.Rect({
         size: {width: 100, height: 40},
         position: {x: 50, y: 100},
         rotation: {angle: 45},
         attrs: {text: {text: 'Rect-Rect-Rect'}}
     });
 
-    var rectChild1 = new pane.shapes.port.Rect({
+    var rectChild1 = new panejs.shapes.port.Rect({
         position: {x: 55, y: 105, relative: false},
         rotation: {angle: 60},
         size: {width: 15, height: 15}
@@ -58,21 +58,21 @@
     model.addCell(rectChild1, rectParent1);
 
 
-    var tb = new pane.shapes.basic.Text({
+    var tb = new panejs.shapes.basic.Text({
         position: {x: 170, y: 50},
         size: {width: 100, height: 30},
         attrs: {text: {text: 'Text'}}
     });
     model.addCell(tb);
 
-    var cb = new pane.shapes.basic.Circle({
+    var cb = new panejs.shapes.basic.Circle({
         position: {x: 300, y: 70},
         size: {width: 100, height: 40},
         attrs: {text: {text: 'Circle'}}
     });
     model.addCell(cb);
 
-    var ib = new pane.shapes.basic.Image({
+    var ib = new panejs.shapes.basic.Image({
         position: {x: 450, y: 50},
         size: {width: 100, height: 100},
         attrs: {
@@ -86,7 +86,7 @@
     });
     model.addCell(ib);
 
-    var pb = new pane.shapes.basic.Path({
+    var pb = new panejs.shapes.basic.Path({
         position: {x: 50, y: 150},
         size: {width: 40, height: 40},
         attrs: {
@@ -96,7 +96,7 @@
     });
     model.addCell(pb);
 
-    var rh = new pane.shapes.basic.Rhombus({
+    var rh = new panejs.shapes.basic.Rhombus({
         position: {x: 50, y: 250},
         size: {width: 70, height: 70},
         attrs: {text: {text: 'Rhombus', 'font-size': 8}}
