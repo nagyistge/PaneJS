@@ -41,6 +41,10 @@ function fixIndex(index, max) {
         return max;
     }
 
+    while (index < 0) {
+        index += max;
+    }
+
     return Math.min(index, max);
 }
 

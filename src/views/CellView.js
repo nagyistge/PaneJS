@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import vector     from '../common/vector';
-import filters    from '../common/filters';
+import     vector from '../common/vector';
+import    filters from '../common/filters';
 
 
 class CellView {
@@ -11,7 +11,7 @@ class CellView {
 
         that.cell = cell;
         that.paper = paper;
-        that.invalid = true;
+        that.invalid = true; // default need repaint
 
         that.ensureElement();
     }
@@ -26,7 +26,11 @@ class CellView {
         that.elem = vel.node;
         that.elem.cellId = cell.id; // attach cell's id to elem
 
-        that.paper.drawPane.appendChild(that.elem);
+        let pane = that.getPane();
+
+        if (pane) {
+            pane.appendChild(that.elem);
+        }
 
         return that;
     }
@@ -34,6 +38,15 @@ class CellView {
     render() { return this; }
 
     update() { return this; }
+
+    getPane() {
+
+        let that = this;
+        let paper = that.paper;
+        let paneName = that.cell.paneName;
+
+        return paneName && paper[paneName] || paper.drawPane;
+    }
 
     renderMarkup() {
 
@@ -60,13 +73,15 @@ class CellView {
         return selector === '.' ? this.vel : this.vel.findOne(selector);
     }
 
-    applyAttrs(selector, attrs) {
+    applyAttr(selector, attrs) {
 
         let that = this;
 
-        utils.forEach(that.find(selector), function (vel) {
-            vel.attr(attrs);
-        });
+        if (attrs) {
+            utils.forEach(that.find(selector), function (vel) {
+                vel.attr(attrs);
+            });
+        }
 
         return that;
     }
@@ -75,12 +90,24 @@ class CellView {
 
         // `selector` is a CSS selector or `'.'`.
         // `filter` must be in the special filter format:
-        // `{ name: <name of the filter>, args: { <arguments>, ... }`.
-        // An example is: `{ filter: { name: 'blur', args: { radius: 5 } } }`.
+        //   {
+        //      name: <name of the filter>,
+        //      args: { <arguments>, ... }
+        //   }
+        //
+        // example:
+        //   {
+        //      name: 'blur',
+        //      args: {
+        //        radius: 5
+        //      }
+        //   }
 
         let that = this;
 
-        filter = filter || {};
+        if (!filter) {
+            return that;
+        }
 
         let name = filter.name || '';
         let args = filter.args || {};
@@ -88,7 +115,7 @@ class CellView {
         let filterFn = filters[name];
 
         if (!name || !filterFn) {
-            throw new Error('Non-existing filter: ' + name);
+            throw new Error('Invalided filter: "' + name + '"');
         }
 
         let vels = utils.isString(selector) ? that.find(selector) : selector;
@@ -97,12 +124,13 @@ class CellView {
             return that;
         }
 
+
         let paper = that.paper;
         let svg = paper.svg;
         let hash = utils.hashCode(JSON.stringify(filter));
         let filterId = name + '-' + paper.id + '-' + hash;
 
-
+        // define filter
         if (!svg.getElementById(filterId)) {
 
             let vFilter = vector(filterFn(args));
@@ -125,6 +153,7 @@ class CellView {
             vector(svg).getDefs().append(vFilter);
         }
 
+        // apply filter
         utils.forEach(vels, function (vel) {
             vel.attr('filter', 'url(#' + filterId + ')');
         });
@@ -137,18 +166,36 @@ class CellView {
         // `selector` is a CSS selector or `'.'`.
         // `attrName` is either a `'fill'` or `'stroke'`.
         // `gradient` must be in the special gradient format:
-        // `{ type: <linearGradient|radialGradient>, stops: [ { offset: <offset>, color: <color> }, ... ]`.
-        // An example is: `{ fill: { type: 'linearGradient', stops: [ { offset: '10%', color: 'green' }, { offset: '50%', color: 'blue' } ] } }`.
+        //   {
+        //     type: <linearGradient|radialGradient>,
+        //     stops: [ { offset: <offset>, color: <color> }, ... ]
+        //   }
+        //
+        // example:
+        //   {
+        //     type: 'linearGradient',
+        //     stops: [
+        //       {
+        //          offset: '10%',
+        //          color: 'green'
+        //       }, {
+        //          offset: '50%',
+        //          color: 'blue'
+        //       }
+        //     ]
+        //   }
 
         let that = this;
 
-        gradient = gradient || {};
+        if (!attrName || !gradient) {
+            return that;
+        }
 
         let type = gradient.type;
         let stops = gradient.stops;
         let attrs = gradient.attrs;
 
-        if (!attrName || !type || !stops || !stops.length) {
+        if (!type || !stops || !stops.length) {
             return that;
         }
 
@@ -162,6 +209,7 @@ class CellView {
         let svg = paper.svg;
         let gradientId = type + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
 
+        // define gradient
         if (!svg.getElementById(gradientId)) {
 
             let gradientString = [
@@ -183,6 +231,7 @@ class CellView {
             vector(svg).getDefs().append(vGradient);
         }
 
+        // apply gradient
         utils.forEach(vels, function (vel) {
             vel.attr(attrName, 'url(#' + gradientId + ')');
         });

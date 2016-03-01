@@ -1,7 +1,7 @@
-var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var pkg = require('./package');
 var path = require('path');
+var webpack = require('webpack');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var paths = {
   src: path.resolve(__dirname, 'src'),

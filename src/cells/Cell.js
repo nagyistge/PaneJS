@@ -42,8 +42,7 @@ class Cell {
     // --------
     // TODO
 
-    getGeometry() {
-    }
+    getGeometry() { }
 
 
     // children
@@ -88,16 +87,16 @@ class Cell {
                 index--;
             }
 
-
+            // update parent
             child.removeFromParent();
             child.parent = that;
 
 
             let children = that.children;
-
-            if (children) {
+            if (children && children.length) {
                 children.splice(index, 0, child);
             } else {
+                // speed up
                 children = that.children = [];
                 children.push(child);
             }
@@ -127,6 +126,7 @@ class Cell {
             }
         }
 
+        // return the removed child
         return child;
     }
 
@@ -169,8 +169,9 @@ class Cell {
             link.removeFromTerminal(outgoing);
             link.setTerminal(that, outgoing);
 
-            // 连线的起点和终点是同一个节点时，说明连线已经和节点关联，则不需要添加
             if (!links || that.indexOfLink(link) < 0 ||
+                    // 连线的起点和终点是同一个节点时,说明
+                    // 连线已经和节点关联，则不需要重复添加
                 link.getTerminal(!outgoing) !== that) {
 
                 if (!links) {
@@ -193,8 +194,8 @@ class Cell {
 
             // 连线的起点和终点是同一个节点时不需要移除
             if (links && link.getTerminal(!outgoing) !== that) {
-                let index = that.indexOfLink(link);
 
+                let index = that.indexOfLink(link);
                 if (index >= 0) {
                     links.splice(index, 1);
                 }

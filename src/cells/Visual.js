@@ -1,5 +1,5 @@
 import * as utils from '../common/utils';
-import Cell from './Cell';
+import       Cell from './Cell';
 
 
 class Visual extends Cell {
@@ -22,7 +22,7 @@ class Visual extends Cell {
     // --------------
 
     static setDefaults(options) {
-
+        // update global options
         this.defaults = utils.merge({}, this.defaults, options);
     }
 
@@ -33,6 +33,11 @@ class Visual extends Cell {
     get markup() {
 
         return this.metadata.markup;
+    }
+
+    get paneName() {
+
+        return this.metadata.pane;
     }
 
     get className() {
@@ -53,7 +58,7 @@ class Visual extends Cell {
 Visual.defaults = {
     markup: '',
     attrs: {},  // styles
-    data: null, // attach data to the cell
+    data: null, // cached data(business logic)
     view: null  // set `null` to use the default view
 };
 

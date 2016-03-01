@@ -1,5 +1,5 @@
 import * as utils from '../common/utils';
-import Visual from './Visual';
+import     Visual from '../cells/Visual';
 
 
 class Link extends Visual {
@@ -78,11 +78,17 @@ Link.setDefaults({
     + '<path class="target-marker"/>',
 
     classNames: 'pane-link',
+    pane: 'controlPane',
     router: null,
+    connector: 'sharp',
     sourceMarker: null,
     targetMarker: null,
-    connector: 'sharp',
     attrs: {
+        '.connector': {
+            'fill': 'none',
+            'stroke': '#000',
+            'stroke-width': 1
+        },
         '.source-marker': {
             'fill': '#000',
             'stroke': '#000',
@@ -90,11 +96,6 @@ Link.setDefaults({
         },
         '.target-marker': {
             'fill': '#000',
-            'stroke': '#000',
-            'stroke-width': 1
-        },
-        '.connector': {
-            'fill': 'none',
             'stroke': '#000',
             'stroke-width': 1
         }

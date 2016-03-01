@@ -149,6 +149,7 @@ class Paper extends Events {
 
             let svg = utils.createSvgDocument();
             let root = utils.createSvgElement('g');
+
             utils.setAttribute(root, 'class', 'viewport'); // default root classname
 
             that.backgroundPane = root.appendChild(utils.createSvgElement('g'));
@@ -157,6 +158,7 @@ class Paper extends Events {
             that.controlPane = root.appendChild(utils.createSvgElement('g'));
             // layer above the drawing pane and controller pane, for decorators
             that.decoratePane = root.appendChild(utils.createSvgElement('g'));
+
             svg.appendChild(root);
             container.appendChild(svg);
 

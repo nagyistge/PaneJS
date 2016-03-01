@@ -35,4 +35,7 @@ Rect.setDefaults({
 });
 
 
+// exports
+// -------
+
 export default Rect;

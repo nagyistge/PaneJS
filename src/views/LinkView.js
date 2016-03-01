@@ -61,7 +61,7 @@ class LinkView extends CellView {
                 }
             });
 
-            that.applyAttrs(selector, surplus);
+            that.applyAttr(selector, surplus);
         });
 
         return that;
@@ -138,7 +138,7 @@ class LinkView extends CellView {
                 connector.options || {}
             );
 
-            that.applyAttrs(connector.selector, { d: pathData });
+            that.applyAttr(connector.selector, { d: pathData });
 
         } else {
             throw new Error('Unknown connector: "' + connector.name + '"');
@@ -307,7 +307,7 @@ class LinkView extends CellView {
         if (renderedMarker) {
 
             let link = that.cell;
-            let drawPane = that.paper.drawPane;
+            let pane = that.getPane();
             let sourcePoint = link.sourcePointOnTerminal || link.sourcePoint;
             let targetPoint = link.targetPointOnTerminal || link.targetPoint;
             let routerPoints = link.routerPoints;
@@ -320,7 +320,7 @@ class LinkView extends CellView {
             // make the marker at the right position
             let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
 
-            vMarker.translateAndAutoOrient(position, reference, drawPane);
+            vMarker.translateAndAutoOrient(position, reference, pane);
         }
 
         return that;
@@ -337,11 +337,11 @@ class LinkView extends CellView {
         if (renderedMarker) {
 
             let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
-            let drawPane = that.paper.drawPane;
+            let pane = that.getPane();
 
             let connectionPoint = renderedMarker.point;
             let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
-            p = p.matrixTransform(vMarker.getTransformToElement(drawPane));
+            p = p.matrixTransform(vMarker.getTransformToElement(pane));
 
             let newConnectionPoint = Point.fromPoint(p);
 

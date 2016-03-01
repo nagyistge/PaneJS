@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import Rect     from '../geometry/Rect';
-import CellView from './CellView';
+import       Rect from '../geometry/Rect';
+import   CellView from '../views/CellView';
 
 
 class NodeView extends CellView {
@@ -291,7 +291,7 @@ class NodeView extends CellView {
 
         if (!utils.isUndefined(yAlignment) || !utils.isUndefined(xAlignment)) {
 
-            let velBBox = vel.getBBox(false, that.paper.drawPane);
+            let velBBox = vel.getBBox(false, that.getPane());
 
             if (yAlignment === 'middle') {
                 ty -= velBBox.height / 2;

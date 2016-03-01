@@ -1,5 +1,5 @@
 import * as utils from '../common/utils';
-import Visual from './Visual';
+import     Visual from '../cells/Visual';
 
 
 class Node extends Visual {
@@ -36,6 +36,7 @@ class Node extends Visual {
         return false;
     }
 
+    // FIXME: figure out a better way
     getStrokeWidth() {
 
         let attrs = this.attrs;
