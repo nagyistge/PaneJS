@@ -78,7 +78,7 @@ Link.setDefaults({
     + '<path class="target-marker"/>',
 
     classNames: 'pane-link',
-    pane: 'controlPane',
+    pane: 'linkPane',
     router: null,
     connector: 'sharp',
     sourceMarker: null,
