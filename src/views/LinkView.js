@@ -341,7 +341,7 @@ class LinkView extends CellView {
 
             let connectionPoint = renderedMarker.point;
             let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
-            p = p.matrixTransform(vMarker.node.getTransformToElement(drawPane));
+            p = p.matrixTransform(vMarker.getTransformToElement(drawPane));
 
             let newConnectionPoint = Point.fromPoint(p);
 
