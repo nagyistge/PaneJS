@@ -50,3 +50,9 @@ var server = new WebpackDevServer(compiler, {
 
 
 server.listen(port, host);
+server.listeningApp
+  .on('listening', function () {
+    var target = 'http://' + host + ':' + port;
+    console.log('Dev server started on: ' + target);
+    open(target + '/demo/');
+  });

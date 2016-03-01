@@ -153,8 +153,8 @@ class Paper extends Events {
             utils.setAttribute(root, 'class', 'viewport'); // default root classname
 
             that.backgroundPane = root.appendChild(utils.createSvgElement('g'));
-            that.drawPane = root.appendChild(utils.createSvgElement('g'));
             that.linkPane = root.appendChild(utils.createSvgElement('g'));
+            that.drawPane = root.appendChild(utils.createSvgElement('g'));
             // layer above the drawing pane, for controllers and handlers
             that.controlPane = root.appendChild(utils.createSvgElement('g'));
             // layer above the drawing pane and controller pane, for decorators
