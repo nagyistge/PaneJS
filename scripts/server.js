@@ -52,7 +52,22 @@ var server = new WebpackDevServer(compiler, {
 server.listen(port, host);
 server.listeningApp
   .on('listening', function () {
+
     var target = 'http://' + host + ':' + port;
+
     console.log('Dev server started on: ' + target);
-    open(target + '/demo/');
+
+    open(target + '/demo/index.html');
+
+  })
+  .on('error', function (err) {
+
+    if (err.code === 'EADDRINUSE') {
+      console.log('Port ' + port + ' is already in use by another process.');
+    } else {
+      console.log(err);
+    }
+
+    process.exit(err.code);
+
   });
