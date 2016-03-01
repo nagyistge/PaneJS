@@ -56,9 +56,7 @@ server.listeningApp
     var target = 'http://' + host + ':' + port;
 
     console.log('Dev server started on: ' + target);
-
     open(target + '/demo/index.html');
-
   })
   .on('error', function (err) {
 
@@ -69,5 +67,4 @@ server.listeningApp
     }
 
     process.exit(err.code);
-
   });
