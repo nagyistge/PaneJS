@@ -1,5 +1,6 @@
-import { forEach } from './array';
+import { forEach }                from './array';
 import { isArray, isPlainObject } from './lang';
+
 
 function hasKey(obj, key) {
 

@@ -1,5 +1,6 @@
 import * as utils from '../common/utils';
 
+
 function triggerEvents(callbacks, args, context) {
 
     let pass = true;
@@ -35,7 +36,7 @@ class Events {
     once(events, callback, context) {
 
         let that = this;
-        let cb = function () {
+        let cb   = function () {
             that.off(events, cb);
             callback.apply(context || that, arguments);
         };
@@ -45,7 +46,7 @@ class Events {
 
     off(events, callback, context) {
 
-        let that = this;
+        let that      = this;
         let listeners = that.__events;
 
         // No events.
@@ -88,7 +89,7 @@ class Events {
 
     trigger(eventName, ...args) {
 
-        let that = this;
+        let that      = this;
         let listeners = that.__events;
 
         // No events.
@@ -97,7 +98,7 @@ class Events {
         }
 
         let pass = true;
-        let all = listeners['*'];
+        let all  = listeners['*'];
 
         utils.forEach(utils.split(eventName), function (event) {
 

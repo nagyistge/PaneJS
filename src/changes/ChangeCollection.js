@@ -5,39 +5,40 @@ class ChangeCollection {
     }
 
     hasChange() {
+
         let changes = this.changes;
+
         return changes && changes.length;
     }
 
     add(change) {
 
-        let that = this;
-        let changes = that.changes;
+        let changes = this.changes;
 
         if (change) {
 
             if (!changes) {
-                changes = that.changes = [];
+                changes = this.changes = [];
             }
 
             changes.push(change);
         }
 
-        return change;
+        return this;
     }
 
     clear() {
+
         this.changes = null;
+
         return this;
     }
 
     notify() {
 
-        let that = this;
+        this.model.trigger('change', this.changes);
 
-        that.model.trigger('change', that.changes);
-
-        return that;
+        return this;
     }
 }
 

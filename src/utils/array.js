@@ -62,6 +62,7 @@ function contains(arr, item) {
 }
 
 function slice(arr, start, end) {
+
     return arr ? proto.slice.call(arr, start, end) : [];
 }
 

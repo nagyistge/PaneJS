@@ -85,8 +85,8 @@ function parseTransform(transform) {
 
     return {
         translate: parseTranslate(transform),
-        rotate: parseRotate(transform),
-        scale: parseScale(transform)
+        rotate   : parseRotate(transform),
+        scale    : parseScale(transform)
     };
 }
 

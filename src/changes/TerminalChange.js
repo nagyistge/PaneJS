@@ -9,8 +9,8 @@ class TerminalChange extends Change {
 
         let that = this;
 
-        that.model = model;
-        that.link = link;
+        that.model    = model;
+        that.link     = link;
         that.terminal = node;
         that.previous = node;
         that.isSource = isSource;

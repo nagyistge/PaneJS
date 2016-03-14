@@ -1,6 +1,8 @@
 import { getByPath } from './object';
 
+
 let proto = String.prototype;
+
 
 function toString(str) {
 
@@ -13,6 +15,7 @@ function uc(str) {
 }
 
 function ucFirst(str) {
+
     return str.charAt(0).toUpperCase() + str.substring(1);
 }
 
@@ -21,7 +24,13 @@ function lc(str) {
     return ('' + str).toLowerCase();
 }
 
+function lcFirst(str) {
+
+    return str.charAt(0).toLowerCase() + str.substring(1);
+}
+
 function split(str, divider = /\s+/) {
+
     return ('' + str).split(divider);
 }
 
@@ -46,7 +55,7 @@ function hashCode(str) {
     // Return a simple hash code from a string.
     // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
 
-    let hash = 0;
+    let hash   = 0;
     let length = str.length;
 
     if (length === 0) {
@@ -55,8 +64,8 @@ function hashCode(str) {
 
     for (let i = 0; i < length; i++) {
         let c = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + c;
-        hash = hash & hash; // Convert to 32bit integer
+        hash  = ((hash << 5) - hash) + c;
+        hash  = hash & hash; // Convert to 32bit integer
     }
 
     return hash;
@@ -84,6 +93,7 @@ function sanitizeText(text) {
 }
 
 function startWith(str, prefix) {
+
     return ('' + str).indexOf(prefix) === 0;
 }
 
@@ -94,6 +104,7 @@ function endWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+
 // exports
 // -------
 
@@ -101,6 +112,7 @@ export {
     lc,
     uc,
     ucFirst,
+    lcFirst,
     trim,
     split,
     uuid,

@@ -9,23 +9,23 @@ class ChildChange extends Change {
 
         let that = this;
 
-        that.model = model;
-        that.child = child;
-        that.parent = parent;
-        that.index = index;
-        that.previous = parent;
+        that.model         = model;
+        that.child         = child;
+        that.parent        = parent;
+        that.index         = index;
+        that.previous      = parent;
         that.previousIndex = index;
     }
 
     digest() {
 
-        let that = this;
-        let model = that.model;
-        let child = that.child;
+        let that      = this;
+        let model     = that.model;
+        let child     = that.child;
         let newParent = that.previous;
-        let newIndex = that.previousIndex;
+        let newIndex  = that.previousIndex;
         let oldParent = child.parent;
-        let oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
+        let oldIndex  = oldParent ? oldParent.indexOfChild(child) : 0;
 
         // the new parent is null, then the child(link) will be removed
         if (!newParent) {
@@ -38,9 +38,9 @@ class ChildChange extends Change {
             that.modifyConnect(child, true);
         }
 
-        that.parent = newParent;
-        that.index = newIndex;
-        that.previous = oldParent;
+        that.parent        = newParent;
+        that.index         = newIndex;
+        that.previous      = oldParent;
         that.previousIndex = oldIndex;
 
         return that;
@@ -48,7 +48,7 @@ class ChildChange extends Change {
 
     modifyConnect(cell, connected) {
 
-        let that = this;
+        let that  = this;
         let model = that.model;
 
         if (cell.isLink) {

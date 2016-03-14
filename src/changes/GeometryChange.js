@@ -1,15 +1,13 @@
-/**
- * Created by liangwensen on 1/20/16.
- */
 import Change from './Change';
+
 
 class GeometryChange extends Change {
     constructor(model, cell, geometry) {
         super();
 
-        let that = this;
-        that.model = model;
-        that.cell = cell;
+        let that      = this;
+        that.model    = model;
+        that.cell     = cell;
         that.geometry = geometry;
         return that;
     }
@@ -22,6 +20,7 @@ class GeometryChange extends Change {
         return that;
     }
 }
+
 
 // exports
 // -------

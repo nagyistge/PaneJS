@@ -1,6 +1,6 @@
 let objProto = Object.prototype;
 let toString = objProto.toString;
-let hasOwn = objProto.hasOwnProperty;
+let hasOwn   = objProto.hasOwnProperty;
 
 
 function isNull(obj) {
@@ -83,9 +83,9 @@ function isNumeric(obj) {
 function isPlainObject(obj) {
 
     // Not plain objects:
-    // - Any object or value whose internal [[Class]] property is not "[object Object]"
-    // - DOM nodes
-    // - window
+    //  - Any object or value whose internal [[Class]] property is not "[object Object]"
+    //  - DOM nodes
+    //  - window
     if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
         return false;
     }
@@ -103,7 +103,6 @@ function isEmptyObject(obj) {
 
     /* eslint guard-for-in: 0 */
     /* eslint no-unused-vars: 0 */
-
     for (let name in obj) {
         return false;
     }

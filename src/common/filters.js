@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
 
-let format = utils.format;
+let format   = utils.format;
 let isFinite = utils.isFinite;
 
 
@@ -11,10 +11,10 @@ export default {
 
     outline(args) {
 
-        // `color` ... outline color
-        // `width`... outline width
+        // `color`   ... outline color
+        // `width`   ... outline width
         // `opacity` ... outline opacity
-        // `margin` ... gap between outline and the element
+        // `margin`  ... gap between outline and the element
 
         let template = '' +
             '<filter>' +
@@ -30,11 +30,11 @@ export default {
             '</filter>';
 
         let margin = isFinite(args.margin) ? args.margin : 2;
-        let width = isFinite(args.width) ? args.width : 1;
+        let width  = isFinite(args.width) ? args.width : 1;
 
         return format(template, {
-            color: args.color || 'blue',
-            opacity: isFinite(args.opacity) ? args.opacity : 1,
+            color      : args.color || 'blue',
+            opacity    : isFinite(args.opacity) ? args.opacity : 1,
             outerRadius: margin + width,
             innerRadius: margin
         });
@@ -42,9 +42,9 @@ export default {
 
     highlight(args) {
 
-        // `color` ... color
-        // `width`... width
-        // `blur` ... blur
+        // `color`   ... color
+        // `width`   ... width
+        // `blur`    ... blur
         // `opacity` ... opacity
 
         let template = '' +
@@ -57,9 +57,9 @@ export default {
             '</filter>';
 
         return format(template, {
-            color: args.color || 'red',
-            width: isFinite(args.width) ? args.width : 1,
-            blur: isFinite(args.blur) ? args.blur : 0,
+            color  : args.color || 'red',
+            width  : isFinite(args.width) ? args.width : 1,
+            blur   : isFinite(args.blur) ? args.blur : 0,
             opacity: isFinite(args.opacity) ? args.opacity : 1
         });
     },
@@ -83,10 +83,10 @@ export default {
 
     dropShadow(args) {
 
-        // `dx` ... horizontal shift
-        // `dy` ... vertical shift
-        // `blur` ... blur
-        // `color` ... color
+        // `dx`      ... horizontal shift
+        // `dy`      ... vertical shift
+        // `blur`    ... blur
+        // `color`   ... color
         // `opacity` ... opacity
 
         let template = 'SVGFEDropShadowElement' in window
@@ -94,11 +94,11 @@ export default {
             : '<filter><feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/><feOffset dx="${dx}" dy="${dy}" result="offsetblur"/><feFlood flood-color="${color}"/><feComposite in2="offsetblur" operator="in"/><feComponentTransfer><feFuncA type="linear" slope="${opacity}"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
 
         return format(template, {
-            dx: args.dx || 0,
-            dy: args.dy || 0,
+            dx     : args.dx || 0,
+            dy     : args.dy || 0,
             opacity: isFinite(args.opacity) ? args.opacity : 1,
-            color: args.color || 'black',
-            blur: isFinite(args.blur) ? args.blur : 4
+            color  : args.color || 'black',
+            blur   : isFinite(args.blur) ? args.blur : 4
         });
     },
 
