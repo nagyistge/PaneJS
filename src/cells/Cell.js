@@ -38,6 +38,7 @@ class Cell {
         return that;
     }
 
+
     // geometry
     // --------
     // TODO
@@ -211,9 +212,58 @@ class Cell {
     // parent
     // ------
 
+    isOrphan() {
+
+        return !this.parent;
+    }
+
+    isAncestor(descendant) {
+
+        if (!descendant) {
+            return false;
+        }
+
+        while (descendant && descendant !== this) {
+            descendant = descendant.parent;
+        }
+
+        return descendant === this;
+    }
+
+    contains(descendant) {
+
+        return this.isAncestor(this, descendant);
+    }
+
     getParent() {
 
         return this.parent;
+    }
+
+    getAncestors() {
+
+        let result = [];
+        let parent = this.parent;
+
+        while (parent) {
+            result.push(parent);
+            parent = parent.parent;
+        }
+
+        return result;
+    }
+
+    getDescendants() {
+
+        let that   = this;
+        let result = [];
+
+        that.eachChild(function (child) {
+            result.push(child);
+            result = result.concat(that.getDescendants(child));
+        });
+
+        return result;
     }
 
     removeFromParent() {

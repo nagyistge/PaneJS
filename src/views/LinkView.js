@@ -1,14 +1,15 @@
 import * as utils from '../common/utils';
-import vector   from '../common/vector';
-import Point    from '../geometry/Point';
-import CellView from './CellView';
+import     vector from '../common/vector';
+import      Point from '../geometry/Point';
+import   CellView from '../views/CellView';
+
 
 class LinkView extends CellView {
 
     render() {
 
         let that = this;
-        let vel = that.vel;
+        let vel  = that.vel;
 
         vel.empty();
 
@@ -69,9 +70,9 @@ class LinkView extends CellView {
 
     parseRouter() {
 
-        let that = this;
-        let link = that.cell;
-        let router = link.getRouter();
+        let that     = this;
+        let link     = that.cell;
+        let router   = link.getRouter();
         let vertices = link.vertices || [];
 
         let parser = that.paper.getRouter(router.name);
@@ -88,11 +89,11 @@ class LinkView extends CellView {
         let that = this;
         let link = that.cell;
 
-        that.connector = link.getConnector();
+        that.connector    = link.getConnector();
         that.sourceMarker = link.getMarker(true);
         that.targetMarker = link.getMarker(false);
 
-        that.connectorStrokeWidth = that.getStrokeWidth(that.connector.selector);
+        that.connectorStrokeWidth    = that.getStrokeWidth(that.connector.selector);
         that.sourceMarkerStrokeWidth = that.getStrokeWidth(that.sourceMarker.selector);
         that.targetMarkerStrokeWidth = that.getStrokeWidth(that.targetMarker.selector);
 
@@ -100,11 +101,11 @@ class LinkView extends CellView {
         let options = that.sourceMarker.options;
 
         options.connectorStrokeWidth = that.connectorStrokeWidth;
-        options.markerStrokeWidth = that.sourceMarkerStrokeWidth;
+        options.markerStrokeWidth    = that.sourceMarkerStrokeWidth;
 
-        options = that.targetMarker.options;
+        options                      = that.targetMarker.options;
         options.connectorStrokeWidth = that.connectorStrokeWidth;
-        options.markerStrokeWidth = that.targetMarkerStrokeWidth;
+        options.markerStrokeWidth    = that.targetMarkerStrokeWidth;
 
         return that;
     }
@@ -124,9 +125,9 @@ class LinkView extends CellView {
 
     updateConnector() {
 
-        let that = this;
-        let link = that.cell;
-        let connector = that.connector;
+        let that        = this;
+        let link        = that.cell;
+        let connector   = that.connector;
         let connectorFn = that.paper.getConnector(connector.name);
 
         if (connectorFn && utils.isFunction(connectorFn)) {
@@ -163,16 +164,16 @@ class LinkView extends CellView {
 
     getTerminalOuterBox(isSource) {
 
-        let that = this;
+        let that         = this;
         let terminalView = that.paper.getTerminalView(that.cell, isSource);
 
         if (terminalView) {
 
-            let bbox = terminalView.getStrokeBBox();
+            let bbox              = terminalView.getStrokeBBox();
             let markerStrokeWidth = isSource
                 ? that.sourceMarkerStrokeWidth
                 : that.targetMarkerStrokeWidth;
-            let renderedMarker = isSource
+            let renderedMarker    = isSource
                 ? that.renderedSourceMarker
                 : that.renderedTargetMarker;
 
@@ -195,14 +196,14 @@ class LinkView extends CellView {
 
         // find the connection point on the terminal
 
-        let that = this;
-        let link = that.cell;
+        let that             = this;
+        let link             = that.cell;
         let terminalOuterBox = that.getTerminalOuterBox(isSource);
         let connectionPoint;
 
         if (terminalOuterBox) {
 
-            let vertices = link.routerPoints;
+            let vertices  = link.routerPoints;
             let reference = isSource ? vertices[0] : vertices[vertices.length - 1];
 
             if (!reference) {
@@ -242,10 +243,10 @@ class LinkView extends CellView {
 
     renderMarker(isSource) {
 
-        let that = this;
-        let marker = isSource ? that.sourceMarker : that.targetMarker;
+        let that     = this;
+        let marker   = isSource ? that.sourceMarker : that.targetMarker;
         let selector = marker.selector;
-        let vMarker = that.findOne(selector);
+        let vMarker  = that.findOne(selector);
 
         if (marker && vMarker) {
 
@@ -253,12 +254,12 @@ class LinkView extends CellView {
 
             if (renderer && utils.isFunction(renderer)) {
 
-                let result = renderer(vMarker, marker.options);
+                let result      = renderer(vMarker, marker.options);
                 let replacedVel = result.vel;
 
                 if (replacedVel) {
 
-                    let elem = vMarker.node;
+                    let elem   = vMarker.node;
                     let parent = elem.parentNode;
 
                     parent.insertBefore(replacedVel.node, elem);
@@ -271,7 +272,7 @@ class LinkView extends CellView {
 
                     replacedVel.addClass(className);
 
-                    let attrs = {};
+                    let attrs       = {};
                     attrs[selector] = that.cell.attrs[selector];
                     that.updateAttributes(attrs);
 
@@ -299,20 +300,20 @@ class LinkView extends CellView {
 
     transformMarker(isSource, ref) {
 
-        let that = this;
+        let that           = this;
         let renderedMarker = isSource
             ? that.renderedSourceMarker
             : that.renderedTargetMarker;
 
         if (renderedMarker) {
 
-            let link = that.cell;
-            let pane = that.getPane();
-            let sourcePoint = link.sourcePointOnTerminal || link.sourcePoint;
-            let targetPoint = link.targetPointOnTerminal || link.targetPoint;
+            let link         = that.cell;
+            let pane         = that.getPane();
+            let sourcePoint  = link.sourcePointOnTerminal || link.sourcePoint;
+            let targetPoint  = link.targetPointOnTerminal || link.targetPoint;
             let routerPoints = link.routerPoints;
 
-            let position = isSource ? sourcePoint : targetPoint;
+            let position  = isSource ? sourcePoint : targetPoint;
             let reference = ref || isSource
                 ? (routerPoints[0] || targetPoint)
                 : (routerPoints[routerPoints.length - 1] || sourcePoint);
@@ -328,8 +329,8 @@ class LinkView extends CellView {
 
     updateConnectionPointOnMarker(isSource) {
 
-        let that = this;
-        let link = that.cell;
+        let that           = this;
+        let link           = that.cell;
         let renderedMarker = isSource
             ? that.renderedSourceMarker
             : that.renderedTargetMarker;
@@ -337,11 +338,11 @@ class LinkView extends CellView {
         if (renderedMarker) {
 
             let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
-            let pane = that.getPane();
+            let pane    = that.getPane();
 
             let connectionPoint = renderedMarker.point;
-            let p = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
-            p = p.matrixTransform(vMarker.getTransformToElement(pane));
+            let p               = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
+            p                   = p.matrixTransform(vMarker.getTransformToElement(pane));
 
             let newConnectionPoint = Point.fromPoint(p);
 

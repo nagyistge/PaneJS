@@ -1,27 +1,24 @@
 class ChangeCollection {
 
     constructor(model) {
-        this.model = model;
+        this.model   = model;
+        this.changes = [];
     }
 
     hasChange() {
 
-        let changes = this.changes;
+        return !!this.changes.length;
+    }
 
-        return changes && changes.length;
+    getChanges() {
+
+        return this.changes;
     }
 
     add(change) {
 
-        let changes = this.changes;
-
         if (change) {
-
-            if (!changes) {
-                changes = this.changes = [];
-            }
-
-            changes.push(change);
+            this.changes.push(change);
         }
 
         return this;
@@ -29,7 +26,7 @@ class ChangeCollection {
 
     clear() {
 
-        this.changes = null;
+        this.changes = [];
 
         return this;
     }

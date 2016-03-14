@@ -11,7 +11,7 @@ class CellView {
 
         that.cell    = cell;
         that.paper   = paper;
-        that.invalid = true; // default need repaint
+        that.invalid = true; // default need to be repainted
 
         that.ensureElement();
     }
@@ -20,7 +20,7 @@ class CellView {
 
         let that = this;
         let cell = that.cell;
-        let vel  = vector('g', { 'class': cell.className });
+        let vel  = vector('g', { 'class': cell.getClassName() });
 
         that.vel  = vel;
         that.elem = vel.node;
@@ -28,7 +28,6 @@ class CellView {
         that.elem.cellId = cell.id;
 
         let pane = that.getPane();
-
         if (pane) {
             pane.appendChild(that.elem);
         }
@@ -42,11 +41,20 @@ class CellView {
 
     getPane() {
 
-        let that     = this;
-        let paper    = that.paper;
-        let paneName = that.cell.paneName;
+        let that  = this;
+        let paper = that.paper;
+        let pane  = that.cell.metadata.pane;
+        let result;
 
-        return paneName && paper[paneName] || paper.drawPane;
+        if (pane) {
+            if (utils.isString(pane)) {
+                result = paper[pane];
+            } else if (utils.isNode(pane)) {
+                result = pane;
+            }
+        }
+
+        return result || paper.drawPane;
     }
 
     renderMarkup() {
@@ -55,7 +63,7 @@ class CellView {
         // on the model if the default markup is not desirable.
 
         let that   = this;
-        let markup = that.cell.markup;
+        let markup = that.cell.getMarkup();
 
         if (markup) {
             that.vel.append(vector(markup));

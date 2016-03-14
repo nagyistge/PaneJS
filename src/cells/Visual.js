@@ -17,6 +17,19 @@ class Visual extends Cell {
         that.metadata = metadata;
     }
 
+    getClassName() {
+
+        let classNames = this.metadata.classNames;
+
+        return utils.isArray(classNames)
+            ? classNames.join(' ')
+            : classNames || '';
+    }
+
+    getMarkup() {
+
+        return this.metadata.markup;
+    }
 
     // static methods
     // --------------
@@ -25,30 +38,6 @@ class Visual extends Cell {
 
         // update global options
         this.defaults = utils.merge({}, this.defaults, options);
-    }
-
-
-    // props
-    // -----
-
-    get markup() {
-
-        return this.metadata.markup;
-    }
-
-    get paneName() {
-
-        return this.metadata.pane;
-    }
-
-    get className() {
-
-        let classNames = this.metadata.classNames;
-
-        return utils.isArray(classNames)
-            ? classNames.join(' ')
-            : classNames || '';
-
     }
 }
 
@@ -59,8 +48,9 @@ class Visual extends Cell {
 Visual.defaults = {
     markup: '',
     attrs : {},   // styles
-    data  : null, // cached data(business logic)
-    view  : null  // set `null` to use the default view
+    data  : null, // cached data(for business logic)
+    pane  : null, // specify the container of the view
+    view  : null  // specify the view's Constructor
 };
 
 

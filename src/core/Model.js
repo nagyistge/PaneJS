@@ -8,14 +8,14 @@ import {
 } from '../common/utils';
 
 import Events from '../common/Events';
-
-import Cell from '../cells/Cell';
+import Cell   from '../cells/Cell';
 
 import RootChange       from '../changes/RootChange';
 import ChildChange      from '../changes/ChildChange';
 import TerminalChange   from '../changes/TerminalChange';
 import GeometryChange   from '../changes/GeometryChange';
 import ChangeCollection from '../changes/ChangeCollection';
+
 
 class Model extends Events {
 
@@ -25,9 +25,10 @@ class Model extends Events {
 
         let that = this;
 
-        that.nextId = 0;
-        that.updateLevel = 0;
+        that.nextId       = 0;
+        that.updateLevel  = 0;
         that.endingUpdate = false;
+
         that.changes = new ChangeCollection(that);
 
         if (root) {
@@ -38,73 +39,43 @@ class Model extends Events {
     }
 
     clear() {
+
         return this.setRoot(this.createRoot());
     }
 
     getDefaultParent() {
+
         return this.getRoot().getChildAt(0);  // the first layer
     }
 
-    isAncestor(parent, child) {
-
-        if (!parent || !child) {
-            return false;
-        }
-
-        while (child && child !== parent) {
-            child = child.parent;
-        }
-
-        return child === parent;
-    }
-
     isOrphan(cell) {
-        return !(cell && cell.parent);
+
+        return cell && cell.isOrphan();
     }
 
-    contains(cell) {
-        return this.isAncestor(this.root, cell);
+    isAncestor(ancestor, descendant) {
+
+        return ancestor && ancestor.isAncestor(descendant);
     }
 
-    getCellById(id) {
-        return this.cells ? this.cells[id] : null;
-    }
+    contains(ancestor, descendant) {
 
-    createCellId() {
-        let that = this;
-        let id = that.nextId;
-
-        that.nextId += 1;
-
-        return 'cell-' + id;
-    }
-
-    getAncestors(child) {
-
-        let that = this;
-        let result = [];
-        let parent = child ? child.parent : null;
-
-        if (parent) {
-            result.push(parent);
-            result = result.concat(that.getAncestors(parent));
+        if (!descendant) {
+            descendant = ancestor;
+            ancestor   = this.root;
         }
 
-        return result;
+        return this.isAncestor(ancestor, descendant);
     }
 
-    getDescendants(parent) {
+    getAncestors(descendant) {
 
-        let that = this;
-        let result = [];
+        return descendant ? descendant.getAncestors() : [];
+    }
 
-        parent = parent || that.getRoot();
-        parent.eachChild(function (child) {
-            result.push(child);
-            result = result.concat(that.getDescendants(child));
-        });
+    getDescendants(ancestor) {
 
-        return result;
+        return ancestor ? ancestor.getDescendants() : [];
     }
 
     getParents(/* cells */) {
@@ -133,15 +104,32 @@ class Model extends Events {
          */
     }
 
+    getCellById(id) {
+
+        return this.cells ? this.cells[id] : null;
+    }
+
+    createCellId() {
+
+        let that = this;
+        let id   = that.nextId;
+
+        that.nextId += 1;
+
+        return 'cell-' + id;
+    }
+
 
     // root
     // ----
 
     isRoot(cell) {
+
         return cell && this.root === cell;
     }
 
     createRoot() {
+
         let root = new Cell();
 
         root.insertChild(this.createLayer());
@@ -151,33 +139,32 @@ class Model extends Events {
 
     getRoot(cell) {
 
-        let root = cell || this.root;
+        let root = this.root;
 
-        if (cell) {
-            while (cell) {
-                root = cell;
-                cell = cell.parent;
-            }
+        while (cell) {
+            root = cell;
+            cell = cell.parent;
         }
 
         return root;
     }
 
     setRoot(root) {
+
         return this.digest(new RootChange(this, root));
     }
 
-    rootChanged(newRoot) {
+    rootChanged(root) {
 
         let that = this;
-        let oldRoot = that.root;
+        let prev = that.root;
 
-        that.root = newRoot;
-        that.cells = null;
+        that.root   = root;
+        that.cells  = null;
         that.nextId = 0;
-        that.cellAdded(newRoot);
+        that.cellAdded(root);
 
-        return oldRoot;
+        return prev;
     }
 
 
@@ -185,14 +172,17 @@ class Model extends Events {
     // ------
 
     isLayer(cell) {
+
         return cell && this.isRoot(cell.parent);
     }
 
     getLayers() {
+
         return this.getRoot().children || [];
     }
 
     createLayer() {
+
         return new Cell();
     }
 
@@ -201,18 +191,22 @@ class Model extends Events {
     // -----
 
     getParent(cell) {
+
         return cell ? cell.parent : null;
     }
 
-    addNode(child, parent, index) {
-        return this.addCells([child], parent, index);
+    addNode(node, parent, index) {
+
+        return this.addCells([node], parent, index);
     }
 
-    addLink(child, source, target, parent, index) {
-        return this.addCells([child], parent, index, source, target);
+    addLink(link, source, target, parent, index) {
+
+        return this.addCells([link], parent, index, source, target);
     }
 
     addCell(cell, parent, index, source, target) {
+
         return this.addCells([cell], parent, index, source, target);
     }
 
@@ -221,19 +215,17 @@ class Model extends Events {
         let that = this;
 
         parent = parent || that.getDefaultParent();
-        index = fixIndex(index, parent.getChildCount());
+        index  = fixIndex(index, parent.getChildCount());
 
         that.beginUpdate();
 
         try {
+            forEach(cells, function (child) {
+                if (child) {
 
-            forEach(cells, function (cell) {
+                    if (child !== parent) {
 
-                if (cell) {
-
-                    if (cell !== parent) {
-
-                        that.digest(new ChildChange(that, parent, cell, index));
+                        that.digest(new ChildChange(that, parent, child, index));
 
                         // let parentChanged = cell.parent !== parent;
 
@@ -246,17 +238,10 @@ class Model extends Events {
                         index++;
                     }
 
-                    if (source) {
-                        that.cellConnected(cell, source, true);
-                    }
-
-                    if (target) {
-                        that.cellConnected(cell, target, false);
-                    }
+                    source && that.cellConnected(child, source, true);
+                    target && that.cellConnected(child, target, false);
                 }
-
             });
-
         } finally {
             that.endUpdate();
         }
@@ -271,13 +256,9 @@ class Model extends Events {
         let that = this;
 
         if (link) {
-
             that.beginUpdate();
-
             try {
-
                 that.setTerminal(link, terminal, isSource);
-
             } finally {
                 that.endUpdate();
             }
@@ -286,46 +267,49 @@ class Model extends Events {
         return that;
     }
 
-
     childChanged(cell, parent, index) {
 
         let that = this;
-        let previous = cell.parent;
+        let prev = cell.parent;
 
         if (parent) {
-            if (parent !== previous ||
-                previous.indexOfChild(cell) !== index) {
+            if (parent !== prev || prev.indexOfChild(cell) !== index) {
+                // `insertChild` will firstly remove cell from previous parent
                 parent.insertChild(cell, index);
             }
-        } else if (previous) {
-            previous.removeChild(cell);
+        } else if (prev) {
+            prev.removeChild(cell);
         }
 
-        // check if the previous parent was already in the
-        // model and avoids calling cellAdded if it was.
-        if (parent && !that.contains(previous)) {
-            that.cellAdded(cell);
-        } else if (!parent) {
+        if (parent) {
+            // check if the previous parent was already in the
+            // model and avoids calling cellAdded if it was.
+            if (!that.contains(prev)) {
+                that.cellAdded(cell);
+            }
+        } else {
             that.cellRemoved(cell);
         }
 
-        return previous;
+        return prev;
     }
 
-    linkChanged(link, newNode, isSource) {
+    linkChanged(link, terminal, isSource) {
 
-        let oldNode = link.getTerminal(isSource);
+        let prev = link.getTerminal(isSource);
 
-        if (newNode) {
-            newNode.addLink(link, isSource);
-        } else if (oldNode) {
-            oldNode.removeLink(link, isSource);
+        if (terminal) {
+            terminal.addLink(link, isSource);
+        } else if (prev) {
+            prev.removeLink(link, isSource);
         }
 
-        return oldNode;
+        return prev;
     }
 
     cellAdded(cell) {
+
+        // fix cell's id, and map the cell
 
         let that = this;
 
@@ -336,12 +320,12 @@ class Model extends Events {
             if (id) {
 
                 // distinct
-                let collision = that.getCellById(id);
+                let dist = that.getCellById(id);
 
-                if (collision !== cell) {
-                    while (collision) {
-                        id = that.createCellId(cell);
-                        collision = that.getCellById(id);
+                if (dist !== cell) {
+                    while (dist) {
+                        id   = that.createCellId(cell);
+                        dist = that.getCellById(id);
                     }
 
                     // as lazy as possible
@@ -350,6 +334,7 @@ class Model extends Events {
                     }
 
                     cell.id = id;
+                    // mapping
                     that.cells[id] = cell;
                 }
             }
@@ -389,8 +374,8 @@ class Model extends Events {
 
     updateLinkParent(link, root) {
 
-        let that = this;
-        let cell = null;
+        let that   = this;
+        let cell   = null;
         let source = link.getTerminal(true);
         let target = link.getTerminal(false);
 
@@ -498,7 +483,8 @@ class Model extends Events {
                 that.cellRemoved(child);
             });
 
-            let id = cell.id;
+            // un-map
+            let id    = cell.id;
             let cells = that.cells;
             if (cells && id) {
                 delete cells[id];
@@ -507,20 +493,28 @@ class Model extends Events {
     }
 
     getChildNodes(parent) {
+
         return this.getChildCells(parent, true, false);
     }
 
     getChildLinks(parent) {
+
         return this.getChildCells(parent, false, true);
     }
 
     getChildCells(parent, isNode, isLink) {
-        return parent ? parent.filterChild(function (child) {
-            return (isNode && child.isNode) || (isLink && child.isLink);
-        }) : [];
+
+        if (parent) {
+            return parent.filterChild(function (child) {
+                return (isNode && child.isNode) || (isLink && child.isLink);
+            });
+        }
+
+        return [];
     }
 
     getTerminal(link, isSource) {
+
         return link ? link.getTerminal(isSource) : null;
     }
 
@@ -561,15 +555,15 @@ class Model extends Events {
     terminalChanged(link, node, isSource) {
 
         let that = this;
-        let previous = that.getTerminal(link, isSource);
+        let prev = that.getTerminal(link, isSource);
 
         if (node) {
             node.addLink(link, isSource);
-        } else if (previous) {
-            previous.removeLink(link, isSource);
+        } else if (prev) {
+            prev.removeLink(link, isSource);
         }
 
-        return previous;
+        return prev;
     }
 
     getGeometry(cell) {
@@ -587,6 +581,7 @@ class Model extends Events {
 
     // }
 
+
     // update
     // ------
 
@@ -594,6 +589,7 @@ class Model extends Events {
 
         let that = this;
 
+        // take effect the change
         change.digest();
 
         that.beginUpdate();
@@ -627,20 +623,26 @@ class Model extends Events {
 
         if (!that.endingUpdate) {
 
-            let changeCollection = that.changes;
-
             that.endingUpdate = that.updateLevel === 0;
-            that.trigger('endUpdate', changeCollection.changes);
 
-            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 所以需要一种机制来管理
+            let changes = that.changes;
 
-            if (that.endingUpdate && changeCollection.hasChange()) {
-                changeCollection.notify().clear();
+            that.trigger('endUpdate', changes.getChanges());
+
+            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 还需要一种机制来管理
+            if (that.endingUpdate && changes.hasChange()) {
+                changes
+                    .notify()
+                    .clear();
             }
 
             that.endingUpdate = false;
         }
     }
 }
+
+
+// exports
+// -------
 
 export default Model;

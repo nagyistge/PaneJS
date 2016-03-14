@@ -26,6 +26,13 @@ class Node extends Visual {
             position.x = dx;
             position.y = dy;
         }
+
+        return this;
+    }
+
+    translateTo(x, y) {
+
+        return this.translate(x, y, { relative: true });
     }
 
     resize(/* width, height */) {}
