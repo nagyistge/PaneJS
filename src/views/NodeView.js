@@ -249,17 +249,17 @@ class NodeView extends CellView {
         // of the sub element relatively to the reference element size.
         if (utils.isFinite(refWidth)) {
             if (wPercentage || refWidth >= 0 && refWidth <= 1) {
-                vel.attr('width', refWidth * bbox.width);
+                vel.attr('width', utils.toFixed(refWidth * bbox.width, 2));
             } else {
-                vel.attr('width', Math.max(refWidth + bbox.width, 0));
+                vel.attr('width', Math.max(utils.toFixed(refWidth + bbox.width, 2), 0));
             }
         }
 
         if (utils.isFinite(refHeight)) {
             if (hPercentage || refHeight >= 0 && refHeight <= 1) {
-                vel.attr('height', refHeight * bbox.height);
+                vel.attr('height', utils.toFixed(refHeight * bbox.height, 2));
             } else {
-                vel.attr('height', Math.max(refHeight + bbox.height, 0));
+                vel.attr('height', Math.max(utils.toFixed(refHeight + bbox.height, 2), 0));
             }
         }
 
@@ -328,7 +328,7 @@ class NodeView extends CellView {
             }
         }
 
-        vel.translate(tx, ty);
+        vel.translate(utils.toFixed(tx, 2), utils.toFixed(ty, 2));
 
         return that;
     }

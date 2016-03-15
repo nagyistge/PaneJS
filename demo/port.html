@@ -31,12 +31,12 @@
             position: absolute;
         }
 
-        .pane-port {
+        .pane-port circle {
             cursor: crosshair;
             r: 4;
             stroke-width: 6;
             stroke: transparent;
-            fill: rgba(170, 170, 170, 0.9);
+            fill: rgb(170, 170, 170);
         }
     </style>
 </head>
@@ -55,14 +55,12 @@
         '<g class="pane-rotatable">' +
         '  <g class="pane-scalable">' +
         '    <rect/>' +
-//        '    <g class="pane-port in">' +
-//        '      <circle class="pane-port"></circle>' +
-//        '      <circle class="pane-port"></circle>' +
-//        '    </g>' +
-//        '    <g class="pane-outports">' +
-//        '      <circle class="pane-port"></circle>' +
-//        '      <circle class="pane-port"></circle>' +
-//        '    </g>' +
+        '  </g>' +
+        '  <g class="pane-port in">' +
+        '    <circle></circle>' +
+        '  </g>' +
+        '  <g class="pane-port out">' +
+        '    <circle></circle>' +
         '  </g>' +
         '  <text/>' +
         '</g>',
@@ -73,6 +71,15 @@
         attrs: {
             text: {
                 text: 'Port'
+            },
+
+            '.pane-port.in' : {
+                'ref-x': 50,
+                'ref-y': 0
+            },
+            '.pane-port.out': {
+                'ref-x': 50,
+                'ref-y': 40
             }
         }
     });
