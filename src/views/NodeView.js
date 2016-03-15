@@ -20,7 +20,7 @@ class NodeView extends CellView {
             'ref-height',
             'x-alignment',
             'y-alignment',
-            'port'
+            // 'port'
         ];
     }
 

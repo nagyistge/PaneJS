@@ -20,25 +20,25 @@ var entry = config.entry[pkg.name];
 delete config.entry[pkg.name + '-' + pkg.version];
 
 // config the dev server
-//config.entry[pkg.name] = [
-//  'webpack-dev-server/client?http://' + host + ':' + port,
-//  'webpack/hot/dev-server',
-//  entry
-//];
+config.entry[pkg.name] = [
+  'webpack-dev-server/client?http://' + host + ':' + port,
+  'webpack/hot/dev-server',
+  entry
+];
 
 
-//config.plugins.push(
-//  new webpack.HotModuleReplacementPlugin(),
-//  new webpack.NoErrorsPlugin()
-//);
+config.plugins.push(
+  new webpack.HotModuleReplacementPlugin(),
+  new webpack.NoErrorsPlugin()
+);
 
 var compiler = webpack(config);
 var server = new WebpackDevServer(compiler, {
   contentBase: wwwRoot,
   publicPath: config.output.publicPath,
-  //hot: true,
-  //noInfo: false,
-  //historyApiFallback: true,
+  hot: true,
+  noInfo: false,
+  historyApiFallback: true,
   stats: {
     cached: false,
     exclude: [

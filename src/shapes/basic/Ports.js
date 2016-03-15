@@ -22,38 +22,79 @@ class Ports extends Node {
         that.updatePortsAttrs();
     }
 
-    /*
-     insertPort(port, type = 'in') {
+    insertPort(port, index, type = 'in') {
 
-     let that = this;
-     let ports = type === 'in' ? that.inPorts : that.outPorts;
-     }
+        let that = this;
+        let ports = type === 'in' ? that.inPorts : that.outPorts;
 
-     insertInPort(port, index) {
+        index = utils.fixIndex(index, ports.length);
+        port = that.checkPort(port, index, type);
 
-     return this.insertPort(port, 'in');
-     }
+        ports.splice(index, 0, port);
 
-     insertOutPort(port, index) {
+        return that;
+    }
 
-     return this.insertPort(port, 'out');
-     }
+    insertInPort(port) {
 
-     removePort(port, type = 'in') {
+        return this.insertPort(port, 'in');
+    }
 
-     let that = this;
-     }
+    insertOutPort(port) {
 
-     removeInPort(port) {
+        return this.insertPort(port, 'out');
+    }
 
-     return this.removePort(port, 'in');
-     }
+    removePort(port, type = 'in') {
 
-     removeOutPort(port) {
+        let that = this;
+        let ports = type === 'in' ? that.inPorts : that.outPorts;
+        let index = utils.indexOf(ports, port);
 
-     return this.removePort(port, 'out');
-     }
-     */
+        if (index >= 0) {
+            ports.splice(index, 1);
+            that.afterRemovePort(port);
+        }
+
+        return that;
+    }
+
+    removeInPort(port) {
+
+        return this.removePort(port, 'in');
+    }
+
+    removeOutPort(port) {
+
+        return this.removePort(port, 'out');
+    }
+
+    removePortAt(index, type = 'in') {
+
+        let that = this;
+        let ports = type === 'in' ? that.inPorts : that.outPorts;
+        let port = ports[index];
+
+        if (port) {
+            ports.splice(index, 1);
+            that.afterRemovePort(port);
+        }
+
+        return port;
+    }
+
+    afterRemovePort(port) {
+
+        let that = this;
+        let attrs = that.attrs;
+
+        utils.forEach(port.selectors, function (selector) {
+            delete attrs[selector];
+        });
+
+        return that;
+    }
+
     updatePortsAttrs() {
 
         let that = this;
@@ -76,6 +117,7 @@ class Ports extends Node {
         return that;
     }
 
+    // check over the `port.name` and `port.id`
     checkPort(port, index, type) {
 
         let id = type + '-port-' + index;
@@ -84,7 +126,7 @@ class Ports extends Node {
             port = port.call(this);
         }
 
-        if (!utils.isObject()) {
+        if (!utils.isObject(port)) {
             port = {
                 name: port || id
             };
@@ -97,30 +139,23 @@ class Ports extends Node {
         return port;
     }
 
+    // get the attrs for every port, so we can customize
+    // the port's position, color, etc
     getPortAttrs(port, index, type) {
 
-        let ports = type === 'in' ? this.inPorts : this.outPorts;
         let attrs = {};
-        let selector = '.' + type + '>g:nth-child(' + (index + 1) + ')';
+        let ports = type === 'in' ? this.inPorts : this.outPorts;
+        let root = '.' + type + '>g:nth-child(' + (index + 1) + ')';
+        let label = root + '>.port-label';
 
-        // let bodySelector = selector + '>.port-body';
-        let labelSelector = selector + '>.port-label';
-
-        attrs[labelSelector] = { text: port.name };
-        // attrs[bodySelector] = {
-        //    port: {
-        //        id: port.id,
-        //        type: type
-        //    }
-        // };
-
-        attrs[selector] = {
-            'ref': 'rect',
+        attrs[label] = { text: port.name };
+        attrs[root] = {
+            'ref': '.node-body',
             'ref-y': (index + 0.5) * (1 / ports.length)
         };
 
-        if (type === '.out') {
-            attrs[selector]['ref-dx'] = 0;
+        if (type === 'out') {
+            attrs[root]['ref-dx'] = 0;
         }
 
         return attrs;
@@ -131,14 +166,20 @@ class Ports extends Node {
 Ports.setDefaults({
 
     view: PortsView,
+    inPorts: [],
+    outPorts: [],
+    size: {
+        width: 80,
+        height: 100
+    },
 
     markup: '' +
 
     '<g class="pane-rotatable">' +
     '  <g class="pane-scalable">' +
-    '    <rect/>' +
+    '    <rect class="node-body"/>' +
     '  </g>' +
-    '  <text/>' +
+    '  <text class="node-label"/>' +
     '  <g class="pane-ports in" />' +
     '  <g class="pane-ports out" />' +
     '</g>',
@@ -150,53 +191,23 @@ Ports.setDefaults({
     '  <text class="port-label"/>' +
     '</g>',
 
-    inPorts: [],
-    outPorts: [],
 
     attrs: {
-        '.': {
-            'fill': '#fff',
-            'stroke': 'none'
-        },
-
-        'rect': {
-            'fill': '#fff',
-            'stroke': '#000',
-            'stroke-width': '1',
-            'width': 80,
-            'height': 30
-        },
-
-        'text': {
-            'fill': '#000',
-            'font-size': 12,
+        '.node-label': {
+            'text': 'port',
             'ref-x': 0.5,
             'ref-y': 0.5,
-            'text-anchor': 'middle',
             'y-alignment': 'middle',
-            'font-family': 'Arial, helvetica, sans-serif'
+            'text-anchor': 'middle'
         },
-
         '.in .port-label': {
             x: -15,
-            dy: 4,
-            fill: '#000000',
-            'text-anchor': 'end'
+            dy: 4
         },
-
         '.out .port-label': {
             x: 15,
-            dy: 4,
-            fill: '#000000'
-        },
-
-        '.port-body': {
-            r: 5,
-            stroke: '#000000'
-        },
-
-        'pane-port port-body': {},
-        'pane-port port-label': {}
+            dy: 4
+        }
     }
 });
 

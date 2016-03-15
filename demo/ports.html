@@ -12,31 +12,35 @@
         }
 
         .pane-node {
-            position: relative;
+            fill: #FFF;
+            stroke: none;
         }
 
-        .pane-inports,
-        .pane-outports {
-            position: absolute;
-            display: -webkit-flex;
-            display: flex;
+        .node-body {
+            fill: #FFF;
+            stroke: #000;
+            stroke-width: 1px;
+            width: 80px;
+            height: 100px;
         }
 
-        .pane-inports {
-            left: 0;
-            right: 0;
+        .node-label,
+        .port-label {
+            fill: #000;
+            font-size: 12px;
+            font-family: Arial, helvetica, sans-serif;
         }
 
-        .pane-outports {
-            position: absolute;
-        }
-
-        .pane-port circle {
-            cursor: crosshair;
-            r: 4;
+        .port-body {
+            r: 5;
             stroke-width: 6;
             stroke: transparent;
-            fill: rgb(170, 170, 170);
+            fill: #a0a0a0;
+            cursor: crosshair;
+        }
+
+        .in .port-label {
+            text-anchor: end;
         }
     </style>
 </head>
@@ -49,42 +53,32 @@
     var model = new panejs.Model();
     var paper = new panejs.Paper(container, model);
 
+    var ports = new panejs.shapes.basic.Ports({
 
-    var rectParent = new panejs.shapes.basic.Rect({
-        markup: '' +
-        '<g class="pane-rotatable">' +
-        '  <g class="pane-scalable">' +
-        '    <rect/>' +
-        '  </g>' +
-        '  <g class="pane-port in">' +
-        '    <circle></circle>' +
-        '  </g>' +
-        '  <g class="pane-port out">' +
-        '    <circle></circle>' +
-        '  </g>' +
-        '  <text/>' +
-        '</g>',
+        position: { x: 100, y: 50 },
 
-        size    : { width: 100, height: 30 },
-        position: { x: 50, y: 20 },
-
-        attrs: {
-            text: {
-                text: 'Port'
+        inPorts: [
+            {
+                name: 'in-1'
             },
-
-            '.pane-port.in' : {
-                'ref-x': 50,
-                'ref-y': 0
-            },
-            '.pane-port.out': {
-                'ref-x': 50,
-                'ref-y': 30
+            {
+                name: 'in-2'
             }
-        }
+        ],
+
+        outPorts: [
+            {
+                name: 'out-1'
+            },
+            {
+                name: 'out-2'
+            }
+        ]
     });
 
-    model.addCell(rectParent);
+    model.addCell(ports);
+
+
 </script>
 </body>
 </html>

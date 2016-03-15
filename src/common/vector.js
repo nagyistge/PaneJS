@@ -188,9 +188,12 @@ export class VElement {
         }
 
         // An empty text gets rendered into the DOM in webkit-based browsers.
-        // In order to unify this behaviour across all browsers
-        // we rather hide the text element when it's empty.
-        that.attr('display', content ? null : 'none');
+        // In order to unify this behaviour across all browsers we rather
+        // hide the text element when it's empty.
+        if (!content) {
+            that.attr('display', 'none');
+        }
+        // that.attr('display', content ? null : 'none');
 
         // Preserve spaces. In other words, we do not want consecutive spaces to get collapsed to one.
         textNode.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
