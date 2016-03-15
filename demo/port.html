@@ -49,8 +49,7 @@
     var model = new panejs.Model();
     var paper = new panejs.Paper(container, model);
 
-
-    var rectParent = new panejs.shapes.basic.Rect({
+    var rect1 = new panejs.shapes.basic.Rect({
         markup: '' +
         '<g class="pane-rotatable">' +
         '  <g class="pane-scalable">' +
@@ -65,15 +64,15 @@
         '  <text/>' +
         '</g>',
 
-        size    : { width: 100, height: 40 },
-        position: { x: 50, y: 20 },
+        size: {width: 100, height: 40},
+        position: {x: 50, y: 20},
 
         attrs: {
             text: {
-                text: 'Port'
+                text: 'Port1'
             },
 
-            '.pane-port.in' : {
+            '.pane-port.in': {
                 'ref-x': 50,
                 'ref-y': 0
             },
@@ -84,7 +83,48 @@
         }
     });
 
-    model.addCell(rectParent);
+    var rect2 = new panejs.shapes.basic.Rect({
+        markup: '' +
+        '<g class="pane-rotatable">' +
+        '  <g class="pane-scalable">' +
+        '    <rect/>' +
+        '  </g>' +
+        '  <g class="pane-port in">' +
+        '    <circle></circle>' +
+        '  </g>' +
+        '  <g class="pane-port out">' +
+        '    <circle></circle>' +
+        '  </g>' +
+        '  <text/>' +
+        '</g>',
+
+        size: {width: 100, height: 40},
+        position: {x: 150, y: 220},
+
+        attrs: {
+            text: {
+                text: 'Port2'
+            },
+
+            '.pane-port.in': {
+                'ref-x': 50,
+                'ref-y': 0
+            },
+            '.pane-port.out': {
+                'ref-x': 50,
+                'ref-y': 40
+            }
+        }
+    });
+
+    model.addCell(rect1);
+    model.addCell(rect2);
+
+    // 添加handlers
+    paper.registerHandlers([
+        new panejs.SelectionHandler(paper),
+        new panejs.ConnectionHandler(paper)
+    ]);
 </script>
 </body>
 </html>
