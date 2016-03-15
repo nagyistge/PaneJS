@@ -25,8 +25,9 @@ import ChildChange    from './changes/ChildChange';
 import TerminalChange from './changes/TerminalChange';
 
 
-import Handler          from './handlers/Handler';
-import SelectionHandler from './handlers/Selection';
+import Handler           from './handlers/Handler';
+import SelectionHandler  from './handlers/Selection';
+import ConnectionHandler from './handlers/Connection';
 
 
 // connectors
@@ -82,6 +83,7 @@ export {
 
     Handler,
     SelectionHandler,
+    ConnectionHandler,
 
     Model,
     Paper,
