@@ -54,8 +54,8 @@ function merge(target) {
             /* eslint guard-for-in: 0 */
             for (let name in source) {
 
-                let src         = target[name];
-                let copy        = source[name];
+                let src = target[name];
+                let copy = source[name];
                 let copyIsArray = isArray(copy);
 
                 if (copyIsArray || isPlainObject(copy)) {

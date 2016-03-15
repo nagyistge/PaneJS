@@ -33,14 +33,14 @@ function polylineToPathData(polyline) {
 
 function rectToPathData(rect) {
 
-    let x  = parseFloat(rect.getAttribute('x')) || 0;
-    let y  = parseFloat(rect.getAttribute('y')) || 0;
-    let w  = parseFloat(rect.getAttribute('width')) || 0;
-    let h  = parseFloat(rect.getAttribute('height')) || 0;
+    let x = parseFloat(rect.getAttribute('x')) || 0;
+    let y = parseFloat(rect.getAttribute('y')) || 0;
+    let w = parseFloat(rect.getAttribute('width')) || 0;
+    let h = parseFloat(rect.getAttribute('height')) || 0;
     let rx = parseFloat(rect.getAttribute('rx')) || 0;
     let ry = parseFloat(rect.getAttribute('ry')) || 0;
-    let r  = x + w;
-    let b  = y + h;
+    let r = x + w;
+    let b = y + h;
 
     let d;
 
@@ -79,7 +79,7 @@ function circleToPathData(circle) {
 
     let cx = parseFloat(circle.getAttribute('cx')) || 0;
     let cy = parseFloat(circle.getAttribute('cy')) || 0;
-    let r  = parseFloat(circle.getAttribute('r'));
+    let r = parseFloat(circle.getAttribute('r'));
     let cd = r * KAPPA; // Control distance.
 
     return [
@@ -94,10 +94,10 @@ function circleToPathData(circle) {
 
 function ellipseToPathData(ellipse) {
 
-    let cx  = parseFloat(ellipse.getAttribute('cx')) || 0;
-    let cy  = parseFloat(ellipse.getAttribute('cy')) || 0;
-    let rx  = parseFloat(ellipse.getAttribute('rx'));
-    let ry  = parseFloat(ellipse.getAttribute('ry')) || rx;
+    let cx = parseFloat(ellipse.getAttribute('cx')) || 0;
+    let cy = parseFloat(ellipse.getAttribute('cy')) || 0;
+    let rx = parseFloat(ellipse.getAttribute('rx'));
+    let ry = parseFloat(ellipse.getAttribute('ry')) || rx;
     let cdx = rx * KAPPA; // Control distance x.
     let cdy = ry * KAPPA; // Control distance y.
 

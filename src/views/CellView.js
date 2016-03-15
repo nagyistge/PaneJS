@@ -9,8 +9,8 @@ class CellView {
 
         let that = this;
 
-        that.cell    = cell;
-        that.paper   = paper;
+        that.cell = cell;
+        that.paper = paper;
         that.invalid = true; // default need to be repainted
 
         that.ensureElement();
@@ -20,9 +20,9 @@ class CellView {
 
         let that = this;
         let cell = that.cell;
-        let vel  = vector('g', { 'class': cell.getClassName() });
+        let vel = vector('g', { 'class': cell.getClassName() });
 
-        that.vel  = vel;
+        that.vel = vel;
         that.elem = vel.node;
         // attach cell's id to elem
         that.elem.cellId = cell.id;
@@ -41,9 +41,9 @@ class CellView {
 
     getPane() {
 
-        let that  = this;
+        let that = this;
         let paper = that.paper;
-        let pane  = that.cell.metadata.pane;
+        let pane = that.cell.metadata.pane;
         let result;
 
         if (pane) {
@@ -62,7 +62,7 @@ class CellView {
         // `markup` is rendered by default. Set the `markup` attribute
         // on the model if the default markup is not desirable.
 
-        let that   = this;
+        let that = this;
         let markup = that.cell.getMarkup();
 
         if (markup) {
@@ -120,9 +120,9 @@ class CellView {
             return that;
         }
 
-        let name     = filter.name || '';
-        let args     = filter.args || {};
-        let attrs    = filter.attrs;
+        let name = filter.name || '';
+        let args = filter.args || {};
+        let attrs = filter.attrs;
         let filterFn = filters[name];
 
         if (!name || !filterFn) {
@@ -136,9 +136,9 @@ class CellView {
         }
 
 
-        let paper    = that.paper;
-        let svg      = paper.svg;
-        let hash     = utils.hashCode(JSON.stringify(filter));
+        let paper = that.paper;
+        let svg = paper.svg;
+        let hash = utils.hashCode(JSON.stringify(filter));
         let filterId = name + '-' + paper.id + '-' + hash;
 
         // define filter
@@ -150,9 +150,9 @@ class CellView {
             vFilter.attr({
                 filterUnits: 'objectBoundingBox',
 
-                x     : -1,
-                y     : -1,
-                width : 3,
+                x: -1,
+                y: -1,
+                width: 3,
                 height: 3
             });
 
@@ -203,7 +203,7 @@ class CellView {
             return that;
         }
 
-        let type  = gradient.type;
+        let type = gradient.type;
         let stops = gradient.stops;
         let attrs = gradient.attrs;
 
@@ -217,8 +217,8 @@ class CellView {
             return that;
         }
 
-        let paper      = that.paper;
-        let svg        = paper.svg;
+        let paper = that.paper;
+        let svg = paper.svg;
         let gradientId = type + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
 
         // define gradient

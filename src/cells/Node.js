@@ -46,8 +46,8 @@ class Node extends Visual {
     // FIXME: figure out a better way
     getStrokeWidth() {
 
-        let attrs       = this.attrs;
-        let attr        = attrs.rect ||
+        let attrs = this.attrs;
+        let attr = attrs.rect ||
             attrs.path ||
             attrs.circle ||
             attrs.ellipse ||
@@ -64,19 +64,19 @@ Node.setDefaults({
     classNames: 'pane-node',
 
     size: {
-        width   : 1,
-        height  : 1,
+        width: 1,
+        height: 1,
         relative: false
     },
 
     position: {
-        x       : 0,
-        y       : 0,
+        x: 0,
+        y: 0,
         relative: false
     },
 
     rotation: {
-        angle    : 0,
+        angle: 0,
         inherited: true // inherit the parent's rotation
     }
 });

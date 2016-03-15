@@ -22,50 +22,51 @@ class Ports extends Node {
         that.updatePortsAttrs();
     }
 
-    insertPort(port, type = 'in') {
+    /*
+     insertPort(port, type = 'in') {
 
-        let that  = this;
-        let ports = type === 'in' ? that.inPorts : that.outPorts;
-    }
+     let that = this;
+     let ports = type === 'in' ? that.inPorts : that.outPorts;
+     }
 
-    insertInPort(port, index) {
+     insertInPort(port, index) {
 
-        return this.insertPort(port, 'in');
-    }
+     return this.insertPort(port, 'in');
+     }
 
-    insertOutPort(port, index) {
+     insertOutPort(port, index) {
 
-        return this.insertPort(port, 'out');
-    }
+     return this.insertPort(port, 'out');
+     }
 
-    removePort(port, type = 'in') {
+     removePort(port, type = 'in') {
 
-        let that = this;
-    }
+     let that = this;
+     }
 
-    removeInPort(port) {
+     removeInPort(port) {
 
-        return this.removePort(port, 'in');
-    }
+     return this.removePort(port, 'in');
+     }
 
-    removeOutPort(port) {
+     removeOutPort(port) {
 
-        return this.removePort(port, 'out');
-    }
-
+     return this.removePort(port, 'out');
+     }
+     */
     updatePortsAttrs() {
 
-        var that  = this;
-        var attrs = {};
+        let that = this;
+        let attrs = {};
 
         utils.forEach(this.inPorts, function (port, index) {
-            var specials   = that.getPortAttrs(port, index, 'in');
+            let specials = that.getPortAttrs(port, index, 'in');
             port.selectors = utils.keys(specials);
             utils.merge(attrs, specials);
         });
 
         utils.forEach(this.outPorts, function (port, index) {
-            var specials   = that.getPortAttrs(port, index, 'out');
+            let specials = that.getPortAttrs(port, index, 'out');
             port.selectors = utils.keys(specials);
             utils.merge(attrs, specials);
         });
@@ -77,7 +78,7 @@ class Ports extends Node {
 
     checkPort(port, index, type) {
 
-        var id = type + '-port-' + index;
+        let id = type + '-port-' + index;
 
         if (utils.isFunction(port)) {
             port = port.call(this);
@@ -98,23 +99,24 @@ class Ports extends Node {
 
     getPortAttrs(port, index, type) {
 
-        var attrs    = {};
+        let ports = type === 'in' ? this.inPorts : this.outPorts;
+        let attrs = {};
         let selector = '.' + type + '>g:nth-child(' + (index + 1) + ')';
 
-        var bodySelector  = selector + '>.port-body';
-        var labelSelector = selector + '>.port-label';
+        // let bodySelector = selector + '>.port-body';
+        let labelSelector = selector + '>.port-label';
 
         attrs[labelSelector] = { text: port.name };
-        attrs[bodySelector]  = {
-            port: {
-                id  : port.id,
-                type: type
-            }
-        };
+        // attrs[bodySelector] = {
+        //    port: {
+        //        id: port.id,
+        //        type: type
+        //    }
+        // };
 
         attrs[selector] = {
-            'ref'  : 'rect',
-            'ref-y': (index + 0.5) * (1 / total)
+            'ref': 'rect',
+            'ref-y': (index + 0.5) * (1 / ports.length)
         };
 
         if (type === '.out') {
@@ -148,52 +150,52 @@ Ports.setDefaults({
     '  <text class="port-label"/>' +
     '</g>',
 
-    inPorts : [],
+    inPorts: [],
     outPorts: [],
 
     attrs: {
         '.': {
-            'fill'  : '#fff',
+            'fill': '#fff',
             'stroke': 'none'
         },
 
         'rect': {
-            'fill'        : '#fff',
-            'stroke'      : '#000',
+            'fill': '#fff',
+            'stroke': '#000',
             'stroke-width': '1',
-            'width'       : 80,
-            'height'      : 30
+            'width': 80,
+            'height': 30
         },
 
         'text': {
-            'fill'       : '#000',
-            'font-size'  : 12,
-            'ref-x'      : 0.5,
-            'ref-y'      : 0.5,
+            'fill': '#000',
+            'font-size': 12,
+            'ref-x': 0.5,
+            'ref-y': 0.5,
             'text-anchor': 'middle',
             'y-alignment': 'middle',
             'font-family': 'Arial, helvetica, sans-serif'
         },
 
         '.in .port-label': {
-            x            : -15,
-            dy           : 4,
-            fill         : '#000000',
+            x: -15,
+            dy: 4,
+            fill: '#000000',
             'text-anchor': 'end'
         },
 
         '.out .port-label': {
-            x   : 15,
-            dy  : 4,
+            x: 15,
+            dy: 4,
             fill: '#000000'
         },
 
         '.port-body': {
-            r     : 5,
+            r: 5,
             stroke: '#000000'
         },
 
-        'pane-port port-body' : {},
+        'pane-port port-body': {},
         'pane-port port-label': {}
     }
 });

@@ -27,12 +27,12 @@ class NodeView extends CellView {
     render() {
 
         let that = this;
-        let vel  = that.vel;
+        let vel = that.vel;
 
         vel.empty();
         that.renderMarkup();
 
-        that.scalableNode  = vel.findOne('.pane-scalable');
+        that.scalableNode = vel.findOne('.pane-scalable');
         that.rotatableNode = vel.findOne('.pane-rotatable');
 
         return that
@@ -47,9 +47,9 @@ class NodeView extends CellView {
         // process the `attrs` object and set attributes
         // on sub elements based on the selectors.
 
-        let that      = this;
-        let cell      = that.cell;
-        let allAttrs  = cell.attrs;
+        let that = this;
+        let cell = that.cell;
+        let allAttrs = cell.attrs;
         let rotatable = that.rotatableNode;
         let rotation;
 
@@ -58,7 +58,7 @@ class NodeView extends CellView {
             rotatable.attr('transform', '');
         }
 
-        let relatives   = [];
+        let relatives = [];
         let nodeMapping = {};
 
         utils.forIn(specifiedAttrs || allAttrs, function (attrs, selector) {
@@ -96,8 +96,8 @@ class NodeView extends CellView {
                 specials.push('lineHeight', 'textPath', 'annotations');
                 utils.forEach(vElements, function (vel) {
                     vel.text(attrs.text + '', {
-                        textPath   : attrs.textPath,
-                        lineHeight : attrs.lineHeight,
+                        textPath: attrs.textPath,
+                        lineHeight: attrs.lineHeight,
                         annotations: attrs.annotations
                     });
                 });
@@ -162,15 +162,15 @@ class NodeView extends CellView {
         // because we are already inside a transformed coordinate system.
         let size = cell.size;
         let bbox = {
-            x     : 0,
-            y     : 0,
-            width : size.width,
+            x: 0,
+            y: 0,
+            width: size.width,
             height: size.height
         };
 
         utils.forEach(relatives, function (selector) {
 
-            let attrs     = allAttrs[selector];
+            let attrs = allAttrs[selector];
             let specified = specifiedAttrs && specifiedAttrs[selector];
             if (specified) {
                 attrs = utils.merge({}, attrs, specified);
@@ -190,8 +190,8 @@ class NodeView extends CellView {
 
     positionRelative(vel, bbox, attrs, nodeMapping) {
 
-        let that  = this;
-        let ref   = attrs.ref;
+        let that = this;
+        let ref = attrs.ref;
         let refDx = utils.toFloat(attrs['ref-dx']);
         let refDy = utils.toFloat(attrs['ref-dy']);
 
@@ -201,21 +201,21 @@ class NodeView extends CellView {
         // 'ref-y', 'ref-x', 'ref-width', 'ref-height' can be
         // defined by value or by percentage e.g 4, 0.5, '200%'.
 
-        let refX        = attrs['ref-x'];
+        let refX = attrs['ref-x'];
         let xPercentage = utils.isPercentage(refX);
-        refX            = utils.toFloat(refX, xPercentage);
+        refX = utils.toFloat(refX, xPercentage);
 
-        let refY        = attrs['ref-y'];
+        let refY = attrs['ref-y'];
         let yPercentage = utils.isPercentage(refY);
-        refY            = utils.toFloat(refY, yPercentage);
+        refY = utils.toFloat(refY, yPercentage);
 
-        let refWidth    = attrs['ref-width'];
+        let refWidth = attrs['ref-width'];
         let wPercentage = utils.isPercentage(refWidth);
-        refWidth        = utils.toFloat(refWidth, wPercentage);
+        refWidth = utils.toFloat(refWidth, wPercentage);
 
-        let refHeight   = attrs['ref-height'];
+        let refHeight = attrs['ref-height'];
         let hPercentage = utils.isPercentage(refHeight);
-        refHeight       = utils.toFloat(refHeight, hPercentage);
+        refHeight = utils.toFloat(refHeight, hPercentage);
 
 
         // Check if the node is a descendant of the scalable group.
@@ -281,7 +281,7 @@ class NodeView extends CellView {
         if (utils.isFinite(refDx)) {
             if (scalableNode) {
                 scale = scalableNode.scale();
-                tx    = bbox.x + bbox.width + refDx / scale.sx;
+                tx = bbox.x + bbox.width + refDx / scale.sx;
             } else {
                 tx = bbox.x + bbox.width + refDx;
             }
@@ -290,7 +290,7 @@ class NodeView extends CellView {
         if (utils.isFinite(refDy)) {
             if (scalableNode) {
                 scale = scale || scalableNode.scale();
-                ty    = bbox.y + bbox.height + refDy / scale.sy;
+                ty = bbox.y + bbox.height + refDy / scale.sy;
             } else {
                 ty = bbox.y + bbox.height + refDy;
             }
@@ -301,7 +301,7 @@ class NodeView extends CellView {
                 tx = bbox.x + bbox.width * refX;
             } else if (scalableNode) {
                 scale = scale || scalableNode.scale();
-                tx    = bbox.x + refX / scale.sx;
+                tx = bbox.x + refX / scale.sx;
             } else {
                 tx = bbox.x + refX;
             }
@@ -312,7 +312,7 @@ class NodeView extends CellView {
                 ty = bbox.y + bbox.height * refY;
             } else if (scalableNode) {
                 scale = scale || scalableNode.scale();
-                ty    = bbox.y + refY / scale.sy;
+                ty = bbox.y + refY / scale.sy;
             } else {
                 ty = bbox.y + refY;
             }
@@ -347,7 +347,7 @@ class NodeView extends CellView {
 
     resize() {
 
-        let that     = this;
+        let that = this;
         let scalable = that.scalableNode;
 
         if (!scalable) {
@@ -363,8 +363,8 @@ class NodeView extends CellView {
         // By making the width(height) 1, we prevent HTML errors of the type
         // `scale(Infinity, Infinity)`.
         let size = that.cell.size;
-        let sx   = size.width / (nativeBBox.width || 1);
-        let sy   = size.height / (nativeBBox.height || 1);
+        let sx = size.width / (nativeBBox.width || 1);
+        let sy = size.height / (nativeBBox.height || 1);
 
         sx = utils.toFixed(sx, 2);
         sy = utils.toFixed(sy, 2);
@@ -408,8 +408,8 @@ class NodeView extends CellView {
 
             let cell = that.cell;
             let size = cell.size;
-            let ox   = size.width / 2;
-            let oy   = size.height / 2;
+            let ox = size.width / 2;
+            let oy = size.height / 2;
 
             node.attr('transform', 'rotate(' + cell.rotation + ',' + ox + ',' + oy + ')');
         }
@@ -420,7 +420,7 @@ class NodeView extends CellView {
     translate() {
 
         let that = this;
-        let pos  = that.cell.position;
+        let pos = that.cell.position;
 
         that.vel.attr('transform', 'translate(' + pos.x + ',' + pos.y + ')');
 
@@ -433,7 +433,7 @@ class NodeView extends CellView {
 
     getStrokeWidth() {
 
-        let vel     = this.vel;
+        let vel = this.vel;
         let vTarget = vel.findOne('rect')
             || vel.findOne('path')
             || vel.findOne('circle')
@@ -453,7 +453,7 @@ class NodeView extends CellView {
 
     getStrokeBBox() {
 
-        let cell        = this.cell;
+        let cell = this.cell;
         let strokeWidth = this.getStrokeWidth();
 
         let bbox = new Rect(

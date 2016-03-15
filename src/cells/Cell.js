@@ -113,8 +113,8 @@ class Cell {
 
     removeChildAt(index) {
 
-        let that     = this;
-        let child    = null;
+        let that = this;
+        let child = null;
         let children = that.children;
 
         if (children && index >= 0) {
@@ -162,7 +162,7 @@ class Cell {
 
     addLink(link, outgoing) {
 
-        let that  = this;
+        let that = this;
         let links = that.links;
 
         if (link) {
@@ -188,7 +188,7 @@ class Cell {
 
     removeLink(link, outgoing) {
 
-        let that  = this;
+        let that = this;
         let links = that.links;
 
         if (link) {
@@ -255,7 +255,7 @@ class Cell {
 
     getDescendants() {
 
-        let that   = this;
+        let that = this;
         let result = [];
 
         that.eachChild(function (child) {
@@ -268,7 +268,7 @@ class Cell {
 
     removeFromParent() {
 
-        let that   = this;
+        let that = this;
         let parent = that.parent;
 
         if (parent) {
@@ -314,10 +314,10 @@ class Cell {
 
     clone(cloneData) {
 
-        let that     = this;
+        let that = this;
         let metadata = utils.merge({}, that.metadata);
 
-        metadata.data    = cloneData === true ? that.cloneData() : that.data;
+        metadata.data = cloneData === true ? that.cloneData() : that.data;
         metadata.visible = that.visible;
 
         return new that.constructor(metadata);

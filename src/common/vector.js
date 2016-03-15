@@ -2,7 +2,7 @@ import * as utils from '../common/utils';
 import Rect       from '../geometry/Rect';
 import Point      from '../geometry/Point';
 
-let rclass    = /[\t\r\n\f]/g;
+let rclass = /[\t\r\n\f]/g;
 let rnotwhite = (/\S+/g);
 
 let pathCount = 0;
@@ -64,9 +64,9 @@ function decomposeMatrix(matrix) {
         skewY,
         translateX: matrix.e,
         translateY: matrix.f,
-        scaleX    : Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b),
-        scaleY    : Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d),
-        rotation  : skewX // rotation is the same as skew x
+        scaleX: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b),
+        scaleY: Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d),
+        rotation: skewX // rotation is the same as skew x
     };
 }
 
@@ -86,7 +86,7 @@ export class VElement {
 
         let that = this;
         let node = that.node;
-        let len  = arguments.length;
+        let len = arguments.length;
 
         // return all attributes
         if (!len) {
@@ -119,20 +119,20 @@ export class VElement {
         let that = this;
         that.css({
             visibility: 'visible',
-            display   : that.attr('olddisplay') || '',
+            display: that.attr('olddisplay') || '',
         });
         that.hidden = false;
         return that;
     }
 
     hide() {
-        let that    = this;
+        let that = this;
         let display = that.css().display;
-        display     = (display === 'none') ? '' : display;
+        display = (display === 'none') ? '' : display;
         that.attr('olddisplay', display);
         that.css({
             visibility: 'hidden',
-            display   : 'none',
+            display: 'none',
         });
         that.hidden = true;
         return that;
@@ -170,7 +170,7 @@ export class VElement {
 
     text(content, options) {
 
-        let that     = this;
+        let that = this;
         let textNode = that.node;
 
         content = utils.sanitizeText(content);
@@ -251,9 +251,9 @@ export class VElement {
         }
 
 
-        let offset      = 0;
-        let lines       = content.split('\n');
-        let lineHeight  = options.lineHeight;
+        let offset = 0;
+        let lines = content.split('\n');
+        let lineHeight = options.lineHeight;
         let annotations = options.annotations;
 
         let includeAnnotationIndices = options.includeAnnotationIndices;
@@ -269,7 +269,7 @@ export class VElement {
 
             let vLine = createElement('tspan', {
                 dy: i ? lineHeight : '0',
-                x : that.attr('x') || 0
+                x: that.attr('x') || 0
             });
 
             vLine.addClass('pane-text-line');
@@ -336,7 +336,7 @@ export class VElement {
                 // `dy=1em` won't work with empty lines otherwise.
                 vLine.addClass('pane-text-empty');
                 vLine.node.style.opacity = 0;
-                vLine.node.textContent   = '-';
+                vLine.node.textContent = '-';
             }
 
             textNode.appendChild(vLine.node);
@@ -370,7 +370,7 @@ export class VElement {
 
         if (value && utils.isString(value) && node.nodeType === 1) {
 
-            let classes  = value.match(rnotwhite) || [];
+            let classes = value.match(rnotwhite) || [];
             let oldValue = (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ');
             let newValue = utils.reduce(classes, function (ret, cls) {
                 if (ret.indexOf(' ' + cls + ' ') < 0) {
@@ -400,7 +400,7 @@ export class VElement {
 
         if ((!value || utils.isString(value)) && node.nodeType === 1) {
 
-            let classes  = (value || '').match(rnotwhite) || [];
+            let classes = (value || '').match(rnotwhite) || [];
             let oldValue = (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ');
             let newValue = utils.reduce(classes, function (ret, cls) {
                 if (ret.indexOf(' ' + cls + ' ') > -1) {
@@ -516,7 +516,7 @@ export class VElement {
     getDefs() {
 
         let defs = null;
-        let svg  = this.getSVG();
+        let svg = this.getSVG();
 
         utils.some(svg.node.childNodes, function (node) {
             if (utils.isNode(node, 'defs')) {
@@ -535,7 +535,7 @@ export class VElement {
 
     clone() {
 
-        let node   = this.node;
+        let node = this.node;
         let cloned = vectorize(node.cloneNode(true));
 
         if (node.id) {
@@ -576,7 +576,7 @@ export class VElement {
 
     index() {
 
-        let idx  = 0;
+        let idx = 0;
         let node = this.node.previousSibling;
 
         while (node) {
@@ -593,7 +593,7 @@ export class VElement {
     translate(tx, ty, relative) {
 
         let raw = this.attr('transform') || '';
-        let ts  = utils.parseTranslate(raw);
+        let ts = utils.parseTranslate(raw);
 
         if (!arguments.length) {
             return ts;
@@ -616,7 +616,7 @@ export class VElement {
     rotate(angle, cx, cy, relative) {
 
         let raw = this.attr('transform') || '';
-        let rt  = utils.parseRotate(raw);
+        let rt = utils.parseRotate(raw);
 
         if (!arguments.length) {
             return rt;
@@ -626,7 +626,7 @@ export class VElement {
 
         angle %= 360;
 
-        let newAngle  = relative ? rt.angle + angle : angle;
+        let newAngle = relative ? rt.angle + angle : angle;
         let newOrigin = utils.isUndefined(cx) || utils.isUndefined(cy) ? '' : ',' + cx + ',' + cy;
 
         let final = 'rotate(' + newAngle + newOrigin + ')';
@@ -641,7 +641,7 @@ export class VElement {
     scale(sx, sy, relative) {
 
         let raw = this.attr('transform') || '';
-        let sc  = utils.parseScale(raw);
+        let sc = utils.parseScale(raw);
         let len = arguments.length;
 
         if (!len) {
@@ -655,7 +655,7 @@ export class VElement {
         } else if (len === 2) {
             if (utils.isBoolean(sy)) {
                 relative = sy;
-                sy       = sx;
+                sy = sx;
             }
         }
 
@@ -685,9 +685,9 @@ export class VElement {
         // box defined and so fall back to 'zero' dimension element.
         if (!node.ownerSVGElement) {
             return {
-                x     : 0,
-                y     : 0,
-                width : 0,
+                x: 0,
+                y: 0,
+                width: 0,
                 height: 0
             };
         }
@@ -699,17 +699,17 @@ export class VElement {
             // We are creating a new object as the standard says that
             // you can't modify the attributes of a bbox.
             box = {
-                x     : box.x,
-                y     : box.y,
-                width : box.width,
+                x: box.x,
+                y: box.y,
+                width: box.width,
                 height: box.height
             };
         } catch (e) {
             // fallback for IE
             box = {
-                x     : node.clientLeft,
-                y     : node.clientTop,
-                width : node.clientWidth,
+                x: node.clientLeft,
+                y: node.clientTop,
+                width: node.clientWidth,
                 height: node.clientHeight
             };
         }
@@ -717,7 +717,7 @@ export class VElement {
         if (!withoutTransformations) {
 
             let matrix = that.getTransformToElement(target || node.ownerSVGElement);
-            box        = vector.transformRect(box, matrix);
+            box = vector.transformRect(box, matrix);
         }
 
         return Rect.fromRect(box);
@@ -727,8 +727,8 @@ export class VElement {
 
         // Convert global point into the coordinate space of this element.
 
-        let that  = this;
-        let svg   = that.getSVG().node;
+        let that = this;
+        let svg = that.getSVG().node;
         let point = svg.createSVGPoint();
 
         point.x = x;
@@ -736,7 +736,7 @@ export class VElement {
 
         try {
             // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
-            let globalPoint         = point.matrixTransform(svg.getScreenCTM().inverse());
+            let globalPoint = point.matrixTransform(svg.getScreenCTM().inverse());
             let globalToLocalMatrix = that.getTransformToElement(svg).inverse();
             return globalPoint.matrixTransform(globalToLocalMatrix);
 
@@ -781,11 +781,11 @@ export class VElement {
         // element is scaled by the factor 2, not 8.
 
         let that = this;
-        let s    = that.scale();
+        let s = that.scale();
         that.attr('transform', '');
         that.scale(s.sx, s.sy);
 
-        let svg  = that.getSVG().node;
+        let svg = that.getSVG().node;
         let bbox = that.getBBox(false, target);
 
         // 1. Translate to origin.
@@ -794,16 +794,16 @@ export class VElement {
 
         // 2. Rotate around origin.
         let rotateAroundOrigin = svg.createSVGTransform();
-        let angle              = Point.fromPoint(position).changeInAngle(position.x - reference.x, position.y - reference.y, reference);
+        let angle = Point.fromPoint(position).changeInAngle(position.x - reference.x, position.y - reference.y, reference);
         rotateAroundOrigin.setRotate(angle, 0, 0);
 
         // 3. Translate to the `position` + the offset (half my width) towards the `reference` point.
         let translateFinal = svg.createSVGTransform();
-        let finalPosition  = Point.fromPoint(position).move(reference, bbox.width / 2);
+        let finalPosition = Point.fromPoint(position).move(reference, bbox.width / 2);
         translateFinal.setTranslate(position.x + (position.x - finalPosition.x), position.y + (position.y - finalPosition.y));
 
         // 4. Apply transformations.
-        let ctm       = that.getTransformToElement(target);
+        let ctm = that.getTransformToElement(target);
         let transform = svg.createSVGTransform();
         transform.setMatrix(
             translateFinal.matrix.multiply(
@@ -851,10 +851,10 @@ export class VElement {
 
         interval = interval || 1;
 
-        let node     = this.node;
-        let length   = node.getTotalLength();
+        let node = this.node;
+        let length = node.getTotalLength();
         let distance = 0;
-        let samples  = [];
+        let samples = [];
 
         while (distance < length) {
 
@@ -876,7 +876,7 @@ export class VElement {
 
         let that = this;
         let path = vectorize(utils.createSvgElement('path'));
-        let d    = that.toPathData();
+        let d = that.toPathData();
 
         path.attr(that.attr());
 
@@ -916,13 +916,13 @@ export class VElement {
         // Returns `undefined` otherwise.
 
         let that = this;
-        let svg  = that.getSVG().node;
+        let svg = that.getSVG().node;
 
         target = target || svg;
 
-        let bbox   = Rect.fromRect(that.getBBox(false, target));
+        let bbox = Rect.fromRect(that.getBBox(false, target));
         let center = bbox.getCenter();
-        let spot   = bbox.intersectionWithLineFromCenterToPoint(ref);
+        let spot = bbox.intersectionWithLineFromCenterToPoint(ref);
 
         if (!spot) {
             return undefined;
@@ -959,26 +959,26 @@ export class VElement {
             || tagName === 'CIRCLE'
             || tagName === 'ELLIPSE') {
 
-            let pathNode       = (tagName === 'PATH') ? that : that.toPath();
-            let samples        = pathNode.sample();
-            let minDistance    = Infinity;
+            let pathNode = (tagName === 'PATH') ? that : that.toPath();
+            let samples = pathNode.sample();
+            let minDistance = Infinity;
             let closestSamples = [];
 
             for (let i = 0, len = samples.length; i < len; i++) {
 
                 let sample = samples[i];
                 // Convert the sample point in the local coordinate system to the global coordinate system.
-                let gp             = vector.createSVGPoint(sample.x, sample.y);
-                gp                 = gp.matrixTransform(that.getTransformToElement(target));
-                sample             = Point.fromPoint(gp);
+                let gp = vector.createSVGPoint(sample.x, sample.y);
+                gp = gp.matrixTransform(that.getTransformToElement(target));
+                sample = Point.fromPoint(gp);
                 let centerDistance = sample.distance(center);
                 // Penalize a higher distance to the reference point by 10%.
                 // This gives better results. This is due to
                 // inaccuracies introduced by rounding errors and getPointAtLength() returns.
                 let refDistance = sample.distance(ref) * 1.1;
-                let distance    = centerDistance + refDistance;
+                let distance = centerDistance + refDistance;
                 if (distance < minDistance) {
-                    minDistance    = distance;
+                    minDistance = distance;
                     closestSamples = [{
                         sample,
                         refDistance
@@ -1140,9 +1140,9 @@ vector.transformRect = function (rect, matrix) {
     let maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
 
     return {
-        x     : minX,
-        y     : minY,
-        width : maxX - minX,
+        x: minX,
+        y: minY,
+        width: maxX - minX,
         height: maxY - minY
     };
 };

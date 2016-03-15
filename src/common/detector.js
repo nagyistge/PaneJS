@@ -58,8 +58,8 @@ export default {
 
         if (document.createElementNS) {
 
-            var toString = Object.prototype.toString;
-            var foreign  = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+            let toString = Object.prototype.toString;
+            let foreign = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
 
             return /SVGForeignObject/.test(toString.call(foreign));
         }

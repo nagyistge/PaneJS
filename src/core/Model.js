@@ -25,8 +25,8 @@ class Model extends Events {
 
         let that = this;
 
-        that.nextId       = 0;
-        that.updateLevel  = 0;
+        that.nextId = 0;
+        that.updateLevel = 0;
         that.endingUpdate = false;
 
         that.changes = new ChangeCollection(that);
@@ -62,7 +62,7 @@ class Model extends Events {
 
         if (!descendant) {
             descendant = ancestor;
-            ancestor   = this.root;
+            ancestor = this.root;
         }
 
         return this.isAncestor(ancestor, descendant);
@@ -112,7 +112,7 @@ class Model extends Events {
     createCellId() {
 
         let that = this;
-        let id   = that.nextId;
+        let id = that.nextId;
 
         that.nextId += 1;
 
@@ -159,8 +159,8 @@ class Model extends Events {
         let that = this;
         let prev = that.root;
 
-        that.root   = root;
-        that.cells  = null;
+        that.root = root;
+        that.cells = null;
         that.nextId = 0;
         that.cellAdded(root);
 
@@ -215,7 +215,7 @@ class Model extends Events {
         let that = this;
 
         parent = parent || that.getDefaultParent();
-        index  = fixIndex(index, parent.getChildCount());
+        index = fixIndex(index, parent.getChildCount());
 
         that.beginUpdate();
 
@@ -324,7 +324,7 @@ class Model extends Events {
 
                 if (dist !== cell) {
                     while (dist) {
-                        id   = that.createCellId(cell);
+                        id = that.createCellId(cell);
                         dist = that.getCellById(id);
                     }
 
@@ -374,8 +374,8 @@ class Model extends Events {
 
     updateLinkParent(link, root) {
 
-        let that   = this;
-        let cell   = null;
+        let that = this;
+        let cell = null;
         let source = link.getTerminal(true);
         let target = link.getTerminal(false);
 
@@ -484,7 +484,7 @@ class Model extends Events {
             });
 
             // un-map
-            let id    = cell.id;
+            let id = cell.id;
             let cells = that.cells;
             if (cells && id) {
                 delete cells[id];

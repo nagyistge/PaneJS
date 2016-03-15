@@ -2,15 +2,15 @@ import { isFunction } from '../utils/lang';
 import { some       } from '../utils/array';
 import detector       from '../common/detector';
 
-const WIN      = window;
-const DOC      = document;
+const WIN = window;
+const DOC = document;
 const IS_TOUCH = detector.IS_TOUCH;
 
 let isMatchSelector = function () {
 
     let testDiv = DOC.createElement('div');
     // match selector
-    let matchesSelector    = testDiv.matches ||
+    let matchesSelector = testDiv.matches ||
         testDiv.webkitMatchesSelector ||
         testDiv.mozMatchesSelector ||
         testDiv.msMatchesSelector ||
@@ -44,7 +44,7 @@ let isMatchSelector = function () {
 function fixEvent(event) {
 
     // add W3C standard event methods
-    event.preventDefault  = fixEvent.preventDefault;
+    event.preventDefault = fixEvent.preventDefault;
     event.stopPropagation = fixEvent.stopPropagation;
 
     return event;
@@ -62,7 +62,7 @@ fixEvent.stopPropagation = function () {
 
 function handleEvent(event) {
 
-    let result  = true;
+    let result = true;
     let element = this;
 
     // grab the event object (IE uses a global event object)

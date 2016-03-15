@@ -7,7 +7,7 @@ ForeignObject.setDefaults({
         '<g class="pane-rotatable">' +
         '  <g class="pane-scalable">' +
         '    <rect/>' +
-        '    '+
+        '    ' +
         '  </g>' +
         '<switch>',
 
@@ -25,26 +25,26 @@ ForeignObject.setDefaults({
     ].join(''),
 
     attrs: {
-        '.'       : {
-            'fill'  : '#ffffff',
+        '.': {
+            'fill': '#ffffff',
             'stroke': 'none'
         },
-        rect      : {
-            fill  : '#ffffff',
+        rect: {
+            fill: '#ffffff',
             stroke: '#000000',
-            width : 80,
+            width: 80,
             height: 100
         },
-        text      : {
-            fill         : '#000000',
-            'font-size'  : 14,
+        text: {
+            fill: '#000000',
+            'font-size': 14,
             'font-family': 'Arial, helvetica, sans-serif'
         },
         '.content': {
-            text         : '',
-            ref          : 'rect',
-            'ref-x'      : .5,
-            'ref-y'      : .5,
+            text: '',
+            ref: 'rect',
+            'ref-x': .5,
+            'ref-y': .5,
             'y-alignment': 'middle',
             'x-alignment': 'middle'
         }
@@ -54,4 +54,3 @@ ForeignObject.setDefaults({
 });
 
 export default ForeignObject;
-

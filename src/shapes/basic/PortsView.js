@@ -8,7 +8,7 @@ class PortsView extends NodeView {
     render() {
 
         let that = this;
-        let vel  = that.vel;
+        let vel = that.vel;
 
         that.inPortContainer = vel.findOne('.pane-ports.in');
         that.inPortContainer = vel.findOne('.pane-ports.out');
@@ -27,23 +27,23 @@ class PortsView extends NodeView {
 
 
         let that = this;
-        let vel  = that.vel;
+        let vel = that.vel;
         let cell = that.cell;
 
-        let portMarkup  = cell.metadata.portMarkup;
-        let inPortWrap  = vel.findOne('.pane-ports.in');
+        let portMarkup = cell.metadata.portMarkup;
+        let inPortWrap = vel.findOne('.pane-ports.in');
         let outPortWrap = vel.findOne('.pane-ports.out');
 
         inPortWrap.empty();
 
-        utils.forEach(cell.inPorts, function (port) {
+        utils.forEach(cell.inPorts, function () {
             inPortWrap.append(vector(portMarkup));
         });
 
 
         outPortWrap.empty();
 
-        utils.forEach(cell.outPorts, function (port) {
+        utils.forEach(cell.outPorts, function () {
             inPortWrap.append(vector(portMarkup));
         });
     }

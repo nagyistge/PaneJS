@@ -12,7 +12,7 @@ class Handler extends Events {
         that.disabled = false;
 
         that.init(options);
-        that.on('handler:initalized');
+        that.trigger('handler:initalized');
     }
 
     // life cycle
@@ -28,7 +28,7 @@ class Handler extends Events {
         let that = this;
 
         that.disabled = true;
-        that.on('handler:disabled');
+        that.trigger('handler:disabled');
 
         return that;
     }
@@ -37,7 +37,7 @@ class Handler extends Events {
         let that = this;
 
         that.disabled = false;
-        that.on('handler:enabled');
+        that.trigger('handler:enabled');
 
         return that;
     }

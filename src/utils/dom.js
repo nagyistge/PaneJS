@@ -37,12 +37,12 @@ function isNode(elem, nodeName, attrName, attrValue) {
     return ret;
 }
 
-let docElem  = document.documentElement;
+let docElem = document.documentElement;
 let contains = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         let aDown = context.nodeType === 9 ? context.documentElement : context;
-        let bUp   = elem && elem.parentNode;
+        let bUp = elem && elem.parentNode;
 
         return context === bUp || !!(bUp && bUp.nodeType === 1 && (
                 aDown.contains
@@ -76,7 +76,7 @@ function getWindow(elem) {
 function getOffset(elem) {
 
     let box = {
-        top : 0,
+        top: 0,
         left: 0
     };
 
@@ -102,7 +102,7 @@ function getOffset(elem) {
     let win = getWindow(doc);
 
     return {
-        top : box.top + (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0),
+        top: box.top + (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0),
         left: box.left + (win.pageXOffset || docElement.scrollLeft) - (docElement.clientLeft || 0)
     };
 }
