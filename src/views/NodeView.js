@@ -73,21 +73,25 @@ class NodeView extends CellView {
 
             let specials = NodeView.specialAttributes.slice();
 
+            // filter
             if (utils.isObject(attrs.filter)) {
                 specials.push('filter');
                 that.applyFilter(vElements, attrs.filter);
             }
 
+            // gradient
             if (utils.isObject(attrs.fill)) {
                 specials.push('fill');
                 that.applyGradient(vElements, 'fill', attrs.fill);
             }
 
+            // gradient
             if (utils.isObject(attrs.stroke)) {
                 specials.push('stroke');
                 that.applyGradient(vElements, 'stroke', attrs.stroke);
             }
 
+            // text
             if (!utils.isUndefined(attrs.text)) {
                 specials.push('lineHeight', 'textPath', 'annotations');
                 utils.forEach(vElements, function (vel) {
@@ -98,6 +102,7 @@ class NodeView extends CellView {
                     });
                 });
             }
+
 
             let surplus = {};
 
@@ -126,18 +131,17 @@ class NodeView extends CellView {
             //    });
             // }
 
-            // TODO: attrs.html
-
-            // if (!utils.isUndefined(attrs.html)) {
-            //    utils.forEach(vElements, function (vel) {
-            //
-            //    });
-            // }
+            // html
+            if (!utils.isUndefined(attrs.html)) {
+                utils.forEach(vElements, function (vel) {
+                    vel.node.innerHTML = attrs.html;
+                });
+            }
 
 
             // Special `ref-x` and `ref-y` attributes make it possible to
             // set both absolute or relative positioning of sub elements.
-            let hasRelative = utils.some([
+            let isRelative = utils.some([
                 'ref-x',
                 'ref-y',
                 'ref-dx',
@@ -150,7 +154,7 @@ class NodeView extends CellView {
                 return !utils.isUndefined(attrs[key]);
             });
 
-            hasRelative && relatives.push(selector);
+            isRelative && relatives.push(selector);
         });
 
 
@@ -193,6 +197,9 @@ class NodeView extends CellView {
 
         let yAlign = attrs['y-alignment'];
         let xAlign = attrs['x-alignment'];
+
+        // 'ref-y', 'ref-x', 'ref-width', 'ref-height' can be
+        // defined by value or by percentage e.g 4, 0.5, '200%'.
 
         let refX        = attrs['ref-x'];
         let xPercentage = utils.isPercentage(refX);

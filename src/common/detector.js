@@ -52,5 +52,18 @@ export default {
 
     IS_TOUCH: 'ontouchstart' in document.documentElement,
 
-    IS_POINTER: window.navigator.msPointerEnabled || false
+    IS_POINTER: window.navigator.msPointerEnabled || false,
+
+    SUPPORT_FOREIGN_OBJECT: (function () {
+
+        if (document.createElementNS) {
+
+            var toString = Object.prototype.toString;
+            var foreign  = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+
+            return /SVGForeignObject/.test(toString.call(foreign));
+        }
+
+        return false;
+    })()
 };

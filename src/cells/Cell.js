@@ -282,6 +282,10 @@ class Cell {
     // common
     // ------
 
+    addTo() {}
+
+    getView() {}
+
     valueOf() {}
 
     toString() {}
