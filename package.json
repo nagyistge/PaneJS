@@ -60,6 +60,5 @@
     "test": "make test"
   },
   "pre-commit": [
-    "lint"
   ]
 }
