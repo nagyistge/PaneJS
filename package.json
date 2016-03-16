@@ -60,5 +60,6 @@
     "test": "make test"
   },
   "pre-commit": [
+    "make test"
   ]
 }
