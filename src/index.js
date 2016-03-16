@@ -1,28 +1,29 @@
+// styles
+// ------
 require('./style/index.less');
 
+// common
+// ------
 import * as utils           from './common/utils';
 import vector, { VElement } from './common/vector';
 import Events               from './common/Events';
 
-
+// core
+// ----
 import Model from './core/Model';
 import Paper from './core/Paper';
 
-
+// models
+// ------
 import Cell from './cells/Cell';
 import Link from './cells/Link';
 import Node from './cells/Node';
 
-
+// views
+// -----
 import CellView from './views/CellView';
 import LinkView from './views/LinkView';
 import NodeView from './views/NodeView';
-
-
-import Change         from './changes/Change';
-import RootChange     from './changes/RootChange';
-import ChildChange    from './changes/ChildChange';
-import TerminalChange from './changes/TerminalChange';
 
 
 import Handler           from './handlers/Handler';
@@ -44,7 +45,6 @@ Paper
 
 // markers
 // -------
-
 import classicMarker from './shapes/marker/classic';
 import diamondMarker from './shapes/marker/diamond';
 import blockMarker   from './shapes/marker/block';
@@ -68,6 +68,9 @@ export {
     VElement,
     Events,
 
+    Model,
+    Paper,
+
     Cell,
     Link,
     Node,
@@ -76,18 +79,12 @@ export {
     LinkView,
     NodeView,
 
-    Change,
-    RootChange,
-    ChildChange,
-    TerminalChange,
-
     Handler,
     SelectionHandler,
     ConnectionHandler,
-
-    Model,
-    Paper,
 };
 
-export * from './geometry/index';
 export * from './shapes/index';
+export * from './changes/index';
+export * from './geometry/index';
+

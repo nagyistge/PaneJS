@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import Rect       from '../geometry/Rect';
-import Point      from '../geometry/Point';
+import       Rect from '../geometry/Rect';
+import      Point from '../geometry/Point';
 
 let rclass = /[\t\r\n\f]/g;
 let rnotwhite = (/\S+/g);
