@@ -25,7 +25,6 @@ class ConnectionHandler extends Handler {
             }
         });
         paper.on('cell:mouseOut', function (cell, view, e/* , x, y */) {
-            console.log(e);
             if (that.connecting) {
                 if (that.targetCellView === view && that._isOut(view, e.toElement)) {
                     that.setTargetCellView(null);
@@ -35,6 +34,36 @@ class ConnectionHandler extends Handler {
                     that.setSourceCellView(null);
                 }
             }
+        });
+
+        utils.addEventListener(paper.decoratePane, 'mouseout', '.port-decorator.out', function (e) {
+            if (!that.connecting && !utils.containsClassName(e.toElement, 'port-decorator-layer')) {
+                that.setSourceCellView(null);
+            }
+        });
+        utils.addEventListener(paper.decoratePane, 'mousedown', '.port-decorator.out', function (e) {
+            that.connecting = true;
+            that.sourcePort = e.delegateTarget;
+        });
+        utils.addEventListener(paper.decoratePane, 'mousemove', function (e) {
+            if (that.connecting) {
+            }
+        });
+        paper.on('cell:pointerUp', function (cell, view, e/* , x, y */) {
+            console.log('cell:mouseup');
+            if (that.connecting) {
+            } else {
+            }
+            that.connecting = false;
+            that.setSourceCellView(null);
+        });
+        paper.on('blank:pointerUp', function (cell, view, e/* , x, y */) {
+            console.log('blank:mouseup');
+            if (that.connecting) {
+            } else {
+            }
+            that.connecting = false;
+            that.setSourceCellView(null);
         });
         return that;
     }
@@ -72,9 +101,9 @@ class ConnectionHandler extends Handler {
         utils.forEach(ports, function (port) {
             let bbox = Rect.fromRect(vector(port).getBBox(false));
             let center = bbox.getCenter();
-            console.log(decoratorMarkup.replace(/\$cx/g, center.x).replace(/\$cy/g, center.y));
             let decorator = vector(decoratorMarkup.replace(/\$cx/g, center.x).replace(/\$cy/g, center.y));
             decoratePane.appendChild(decorator.node);
+            decorator.node.cellView = view;
         });
     }
 
