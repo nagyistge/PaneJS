@@ -53,7 +53,7 @@
     var model = new panejs.Model();
     var paper = new panejs.Paper(container, model);
 
-    var ports = new panejs.shapes.basic.Ports({
+    var ports1 = new panejs.shapes.basic.Ports({
 
         position: { x: 100, y: 50 },
 
@@ -75,10 +75,37 @@
             }
         ]
     });
+    var ports2 = new panejs.shapes.basic.Ports({
 
-    model.addCell(ports);
+        position: { x: 300, y: 150 },
 
+        inPorts: [
+            {
+                name: 'in-1'
+            },
+            {
+                name: 'in-2'
+            }
+        ],
 
+        outPorts: [
+            {
+                name: 'out-1'
+            },
+            {
+                name: 'out-2'
+            }
+        ]
+    });
+
+    model.addCell(ports1);
+    model.addCell(ports2);
+
+    // 添加handlers
+    paper.registerHandlers([
+        new panejs.SelectionHandler(paper),
+        new panejs.ConnectionHandler(paper)
+    ]);
 </script>
 </body>
 </html>

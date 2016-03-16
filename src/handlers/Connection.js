@@ -66,7 +66,7 @@ class ConnectionHandler extends Handler {
             '<circle class="front port-decorator-layer" r="3" cx="$cx" cy="$cy"></circle>',
             '</g>'
         ].join('').replace(/\$className/, inOrOut);
-        let ports = view.elem.querySelectorAll('.pane-port.' + inOrOut);
+        let ports = view.elem.querySelectorAll('.pane-ports.' + inOrOut + ' .pane-port .port-body');
         let paper = that.paper;
         let decoratePane = paper.decoratePane;
         utils.forEach(ports, function (port) {
