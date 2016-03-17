@@ -30,5 +30,3 @@ LabelLink.setDefaults({
 
 
 export default LabelLink;
-
-

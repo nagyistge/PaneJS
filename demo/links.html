@@ -9,7 +9,7 @@
         #container {
             width: 800px;
             height: 600px;
-            border: 1px solid #ddd;
+            border: 1px solid #DDD;
         }
     </style>
 </head>
@@ -28,26 +28,22 @@
         targetMarker: 'classic'
     });
 
-    link1.sourcePoint = new panejs.geometry.Point(40, 30);
-    link1.targetPoint = new panejs.geometry.Point(240, 30);
-    link1.vertices = [
-        new panejs.geometry.Point(40, 80),
-        new panejs.geometry.Point(140, 110),
-        new panejs.geometry.Point(240, 80)
-    ];
+    link1.insertVertice([
+        { x: 40, y: 80 },
+        { x: 140, y: 110 },
+        { x: 240, y: 80 }
+    ]);
 
-    model.addLink(link1);
+    model.addLink(link1, { x: 40, y: 30 }, { x: 240, y: 30 });
 
 
     var link2 = link1.clone();
-    link2.sourcePoint = new panejs.geometry.Point(40, 160);
-    link2.targetPoint = new panejs.geometry.Point(240, 160);
-    link2.vertices = [
-        new panejs.geometry.Point(40, 250),
-        new panejs.geometry.Point(140, 200),
-        new panejs.geometry.Point(240, 250)
-    ];
-    model.addLink(link2);
+    link2.insertVertice([
+        { x: 40, y: 250 },
+        { x: 140, y: 200 },
+        { x: 240, y: 250 }
+    ]);
+    model.addLink(link2, { x: 40, y: 160 }, { x: 240, y: 160 });
 
 
     var link3 = new panejs.Link({
@@ -56,26 +52,20 @@
         targetMarker: 'classic'
     });
 
-    link3.sourcePoint = new panejs.geometry.Point(300, 30);
-    link3.targetPoint = new panejs.geometry.Point(500, 30);
-    link3.vertices = [
-        new panejs.geometry.Point(300, 80),
-        new panejs.geometry.Point(400, 110),
-        new panejs.geometry.Point(500, 80)
-    ];
-
-    model.addLink(link3);
+    link3.insertVertice([
+        { x: 300, y: 80 },
+        { x: 400, y: 110 },
+        { x: 500, y: 80 }
+    ]);
+    model.addLink(link3, { x: 300, y: 30 }, { x: 500, y: 30 });
 
     var link4 = link3.clone();
-    link4.sourcePoint = new panejs.geometry.Point(300, 160);
-    link4.targetPoint = new panejs.geometry.Point(500, 160);
-    link4.vertices = [
-        new panejs.geometry.Point(300, 250),
-        new panejs.geometry.Point(400, 200),
-        new panejs.geometry.Point(500, 250)
-    ];
-    model.addLink(link4);
-
+    link4.insertVertice([
+        { x: 300, y: 250 },
+        { x: 400, y: 200 },
+        { x: 500, y: 250 }
+    ]);
+    model.addLink(link4, { x: 300, y: 160 }, { x: 500, y: 160 });
 
     var link5 = new panejs.Link({
         connector: 'smooth',
@@ -87,26 +77,21 @@
             }
         }
     });
-
-    link5.sourcePoint = new panejs.geometry.Point(560, 30);
-    link5.targetPoint = new panejs.geometry.Point(760, 110);
-    link5.vertices = [
-        new panejs.geometry.Point(620, 100),
-        new panejs.geometry.Point(680, 50),
-    ];
-    model.addLink(link5);
+    link5.insertVertice([
+        { x: 620, y: 100 },
+        { x: 680, y: 50 }
+    ]);
+    model.addLink(link5, { x: 560, y: 30 }, { x: 760, y: 110 });
 
 
     var link6 = link5.clone();
 
-    link6.sourcePoint = new panejs.geometry.Point(560, 160);
-    link6.targetPoint = new panejs.geometry.Point(760, 160);
-    link6.vertices = [
-        new panejs.geometry.Point(590, 240),
-        new panejs.geometry.Point(660, 160),
-        new panejs.geometry.Point(760, 220)
-    ];
-    model.addLink(link6);
+    link6.insertVertice([
+        { x: 590, y: 240 },
+        { x: 660, y: 160 },
+        { x: 760, y: 220 }
+    ]);
+    model.addLink(link6, { x: 560, y: 160 }, { x: 760, y: 160 });
 
 
     var node1 = new panejs.shapes.basic.Rect({
@@ -146,12 +131,11 @@
     });
 
     var link7 = link5.clone();
-
-    link7.vertices = [
-        new panejs.geometry.Point(150, 480),
-        new panejs.geometry.Point(400, 320),
-        new panejs.geometry.Point(550, 420)
-    ];
+    link7.insertVertice([
+        { x: 150, y: 480 },
+        { x: 400, y: 320 },
+        { x: 550, y: 420 }
+    ]);
     model.addNode(node1);
     model.addNode(node2);
     model.addLink(link7, node1, node2);

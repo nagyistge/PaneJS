@@ -136,6 +136,9 @@ class Ports extends Node {
             port.id = id;
         }
 
+        // which node belong to
+        port.node = this;
+
         return port;
     }
 

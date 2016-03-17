@@ -35,6 +35,21 @@ class Point {
         return new Point(x, y);
     }
 
+    static isPoint(p) {
+        return p && p instanceof Point;
+    }
+
+    static isPointLike(p) {
+
+        if (this.isPoint(p)) {
+            return true;
+        } else if (p) {
+            return utils.hasKey(p, 'x') && utils.hasKey(p, 'y');
+        }
+
+        return false;
+    }
+
     static fromPoint(p) {
 
         return new Point(p.x, p.y);
@@ -116,7 +131,7 @@ class Point {
         // Move point on the line from `ref` to me by `distance`.
 
         let that = this;
-        let rad = utils.toRad(ref.theta(that));
+        let rad  = utils.toRad(ref.theta(that));
 
         return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
     }

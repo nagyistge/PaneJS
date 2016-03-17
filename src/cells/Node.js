@@ -4,6 +4,13 @@ import     Visual from '../cells/Visual';
 
 class Node extends Visual {
 
+    // static
+    // ------
+
+    static isNode(node) {
+        return node && node instanceof Node;
+    }
+
     // props
     // -----
 
@@ -46,8 +53,8 @@ class Node extends Visual {
     // FIXME: figure out a better way
     getStrokeWidth() {
 
-        let attrs = this.attrs;
-        let attr = attrs.rect ||
+        let attrs       = this.attrs;
+        let attr        = attrs.rect ||
             attrs.path ||
             attrs.circle ||
             attrs.ellipse ||

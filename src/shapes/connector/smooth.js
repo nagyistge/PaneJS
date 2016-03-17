@@ -1,52 +1,71 @@
-import Point  from '../../geometry/Point';
-import { getCurveControlPoints } from '../../geometry/bezier';
+import       Point from '../../geometry/Point';
+import * as bezier from '../../geometry/bezier';
 
 
 function fixMarker(view, isSource, reference) {
 
+    let cache = view.cache;
+
     let renderedMarker = isSource
-        ? view.renderedSourceMarker
-        : view.renderedTargetMarker;
-    let vel = isSource
-        ? view.sourceMarkerVel
-        : view.targetMarkerVel;
+        ? cache.renderedSourceMarker
+        : cache.renderedTargetMarker;
 
-    if (renderedMarker && vel) {
+    let markerVel = isSource
+        ? cache.sourceMarkerVel
+        : cache.targetMarkerVel;
 
-        let link = view.cell;
+    if (renderedMarker && markerVel) {
+
         // get connection point of the marker connecting to the terminal
         let position = isSource
-            ? link.sourcePointOnTerminal
-            : link.targetPointOnTerminal;
+            ? cache.sourcePointOnTerminal || cache.fixedSourcePoint
+            : cache.targetPointOnTerminal || cache.fixedTargetPoint;
 
-        vel.translateAndAutoOrient(position, reference, view.paper.drawPane);
-        // fix the connection point on the marker
-        view.updateConnectionPointOnMarker(isSource);
+        if (position) {
+            markerVel.translateAndAutoOrient(position, reference, view.getPane());
+            // fix the connection point on the marker
+            view.updateConnectionPointOnMarker(isSource);
+        }
     }
+}
+
+function getConnectionPoint(view, isSource) {
+
+    let cache = view.cache;
+
+    if (isSource) {
+        return cache.sourcePointOnMarker
+            || cache.sourcePointOnTerminal
+            || cache.fixedSourcePoint;
+    }
+
+    return cache.targetPointOnMarker ||
+        cache.targetPointOnTerminal ||
+        cache.fixedTargetPoint;
+
 }
 
 function smoothConnector(sourcePoint, targetPoint, vertices) {
 
-    let linkView = this;
-    let link = linkView.cell;
+    let view = this;
     let pathArr;
     let sourceReference;
     let targetReference;
 
     if (vertices && vertices.length) {
 
-        let knots = [sourcePoint].concat(vertices).concat([targetPoint]);
-        let controlPoints = getCurveControlPoints(knots);
-        let length = controlPoints[0].length;
+        let knots         = [sourcePoint].concat(vertices).concat([targetPoint]);
+        let controlPoints = bezier.getCurveControlPoints(knots);
+        let length        = controlPoints[0].length;
 
         sourceReference = Point.fromPoint(controlPoints[0][0]);
         targetReference = Point.fromPoint(controlPoints[1][length - 1]);
 
-        fixMarker(linkView, true, sourceReference);
-        fixMarker(linkView, false, targetReference);
+        fixMarker(view, true, sourceReference);
+        fixMarker(view, false, targetReference);
 
-        knots[0] = link.sourcePoint;
-        knots[knots.length - 1] = link.targetPoint;
+        knots[0]                = getConnectionPoint(view, true);
+        knots[knots.length - 1] = getConnectionPoint(view, false);
 
         pathArr = ['M', knots[0].x, knots[0].y];
 
@@ -75,11 +94,11 @@ function smoothConnector(sourcePoint, targetPoint, vertices) {
         sourceReference = new Point(controlPointX, sourcePoint.y);
         targetReference = new Point(controlPointX, targetPoint.y);
 
-        fixMarker(linkView, true, sourceReference);
-        fixMarker(linkView, false, targetReference);
+        fixMarker(view, true, sourceReference);
+        fixMarker(view, false, targetReference);
 
-        sourcePoint = link.sourcePoint;
-        targetPoint = link.targetPoint;
+        sourcePoint = getConnectionPoint(view, true);
+        targetPoint = getConnectionPoint(view, false);
 
         pathArr = [
             'M', sourcePoint.x, sourcePoint.y,

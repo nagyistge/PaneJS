@@ -53,7 +53,7 @@ class LinkView extends CellView {
                 processed.push('filter');
             }
 
-            // remove processed special attributes from attrs
+            // remove processed attributes from attrs
             let surplus = {};
 
             utils.forIn(attrMap, function (value, key) {
@@ -70,42 +70,71 @@ class LinkView extends CellView {
 
     parseRouter() {
 
-        let that     = this;
-        let link     = that.cell;
-        let router   = link.getRouter();
-        let vertices = link.vertices || [];
+        // convert vertices to router points
+
+        let that   = this;
+        let link   = that.cell;
+        let router = link.getRouter();
+        let cache  = that.cache = {};
+        let vertices = utils.filter(link.vertices || [], function (p) {
+            return Point.isPointLike(p);
+        });
+
+        vertices = utils.map(vertices, function (p) {
+            return Point.fromPoint(p);
+        });
 
         let parser = that.paper.getRouter(router.name);
 
-        link.routerPoints = parser && utils.isFunction(parser)
+        // parsed vertices
+        cache.routerPoints = parser && utils.isFunction(parser)
             ? parser.call(that, vertices, router.options || {})
             : vertices;
+
+
+        // fixed point
+        cache.fixedSourcePoint = link.sourcePoint;
+        cache.fixedTargetPoint = link.targetPoint;
 
         return that;
     }
 
     parseConnection() {
 
-        let that = this;
-        let link = that.cell;
+        let that  = this;
+        let link  = that.cell;
+        let cache = that.cache;
 
-        that.connector    = link.getConnector();
-        that.sourceMarker = link.getMarker(true);
-        that.targetMarker = link.getMarker(false);
+        let connector    = link.getConnector();
+        let sourceMarker = link.getMarker(true);
+        let targetMarker = link.getMarker(false);
 
-        that.connectorStrokeWidth    = that.getStrokeWidth(that.connector.selector);
-        that.sourceMarkerStrokeWidth = that.getStrokeWidth(that.sourceMarker.selector);
-        that.targetMarkerStrokeWidth = that.getStrokeWidth(that.targetMarker.selector);
+        let connectorStrokeWidth    = that.getStrokeWidth(connector.selector);
+        let sourceMarkerStrokeWidth = that.getStrokeWidth(sourceMarker.selector);
+        let targetMarkerStrokeWidth = that.getStrokeWidth(targetMarker.selector);
+
+        // update stroke width to marker options
+        let sourceMarkerOptions = sourceMarker.options;
+        if (!sourceMarkerOptions) {
+            sourceMarkerOptions = sourceMarker.options = {};
+        }
+
+        sourceMarkerOptions.connectorStrokeWidth = connectorStrokeWidth;
+        sourceMarkerOptions.markerStrokeWidth    = sourceMarkerStrokeWidth;
+
+        let targetMarkerOptions = targetMarker.options;
+        if (!targetMarkerOptions) {
+            targetMarkerOptions = targetMarker.options = {};
+        }
+
+        targetMarkerOptions.connectorStrokeWidth = connectorStrokeWidth;
+        targetMarkerOptions.markerStrokeWidth    = targetMarkerStrokeWidth;
 
 
-        let options = that.sourceMarker.options;
-
-        options.connectorStrokeWidth = that.connectorStrokeWidth;
-        options.markerStrokeWidth    = that.sourceMarkerStrokeWidth;
-
-        options                      = that.targetMarker.options;
-        options.connectorStrokeWidth = that.connectorStrokeWidth;
-        options.markerStrokeWidth    = that.targetMarkerStrokeWidth;
+        // cache
+        cache.connector    = connector;
+        cache.sourceMarker = sourceMarker;
+        cache.targetMarker = targetMarker;
 
         return that;
     }
@@ -126,16 +155,16 @@ class LinkView extends CellView {
     updateConnector() {
 
         let that        = this;
-        let link        = that.cell;
-        let connector   = that.connector;
+        let cache       = that.cache;
+        let connector   = cache.connector;
         let connectorFn = that.paper.getConnector(connector.name);
 
         if (connectorFn && utils.isFunction(connectorFn)) {
 
             let pathData = connectorFn.call(that,
-                link.sourcePoint,
-                link.targetPoint,
-                link.routerPoints,
+                cache.sourcePointOnMarker || cache.sourcePointOnTerminal,
+                cache.targetPointOnMarker || cache.targetPointOnTerminal,
+                cache.routerPoints,
                 connector.options || {}
             );
 
@@ -164,18 +193,20 @@ class LinkView extends CellView {
 
     getTerminalOuterBox(isSource) {
 
-        let that         = this;
-        let terminalView = that.paper.getTerminalView(that.cell, isSource);
+        let that = this;
+        let view = that.paper.getTerminalView(that.cell, isSource);
 
-        if (terminalView) {
+        if (view) {
 
-            let bbox              = terminalView.getStrokeBBox();
+            let bbox  = view.getStrokeBBox();
+            let cache = that.cache;
+
             let markerStrokeWidth = isSource
-                ? that.sourceMarkerStrokeWidth
-                : that.targetMarkerStrokeWidth;
+                ? cache.sourceMarkerStrokeWidth
+                : cache.targetMarkerStrokeWidth;
             let renderedMarker    = isSource
-                ? that.renderedSourceMarker
-                : that.renderedTargetMarker;
+                ? cache.renderedSourceMarker
+                : cache.renderedTargetMarker;
 
             if (renderedMarker && markerStrokeWidth) {
 
@@ -192,19 +223,83 @@ class LinkView extends CellView {
         }
     }
 
+    renderMarker(isSource) {
+
+        let that     = this;
+        let cache    = that.cache;
+        let marker   = isSource ? cache.sourceMarker : cache.targetMarker;
+        let selector = marker.selector;
+        let vMarker  = that.findOne(selector);
+
+        let renderedMarker;
+
+        if (marker && vMarker) {
+
+            let renderer = that.paper.getMarker(marker.name);
+
+            if (renderer && utils.isFunction(renderer)) {
+
+                renderedMarker = renderer(vMarker, marker.options);
+
+                let newVel = renderedMarker.vel;
+                if (newVel) {
+
+                    let elem   = vMarker.node;
+                    let parent = elem.parentNode;
+
+                    parent.insertBefore(newVel.node, elem);
+                    parent.removeChild(elem);
+
+                    let className = selector;
+                    if (className[0] === '.') {
+                        className = className.substr(1);
+                    }
+
+                    newVel.addClass(className);
+
+                    let attrs       = {};
+                    attrs[selector] = that.cell.attrs[selector];
+                    that.updateAttributes(attrs);
+
+                    vMarker = newVel;
+                }
+            }
+
+            // cache the marker vector element
+            if (isSource) {
+                cache.renderedSourceMarker = renderedMarker;
+                cache.sourceMarkerVel      = vMarker;
+            } else {
+                cache.renderedTargetMarker = renderedMarker;
+                cache.targetMarkerVel      = vMarker;
+            }
+        }
+
+        return that;
+    }
+
     updateConnectionPointOnTerminal(isSource) {
 
         // find the connection point on the terminal
 
-        let that             = this;
-        let link             = that.cell;
+        let that  = this;
+        let cache = that.cache;
+
         let terminalOuterBox = that.getTerminalOuterBox(isSource);
         let connectionPoint;
 
         if (terminalOuterBox) {
 
-            let vertices  = link.routerPoints;
-            let reference = isSource ? vertices[0] : vertices[vertices.length - 1];
+            let reference = isSource
+                ? cache.fixedTargetPoint
+                : cache.fixedSourcePoint;
+
+            if (!reference) {
+
+                let vertices = cache.routerPoints;
+
+                reference = isSource ? vertices[0] : vertices[vertices.length - 1];
+            }
 
             if (!reference) {
 
@@ -217,82 +312,18 @@ class LinkView extends CellView {
                 }
             }
 
-            if (!reference) {
-                reference = isSource ? link.targetPoint : link.sourcePoint;
-            }
-
             if (reference) {
                 connectionPoint = terminalOuterBox.intersectionWithLineFromCenterToPoint(reference);
             }
 
             connectionPoint = connectionPoint || terminalOuterBox.getCenter();
-
-            if (isSource) {
-                link.sourcePoint = connectionPoint;
-            } else {
-                link.targetPoint = connectionPoint;
-            }
         }
 
         // cache the connection point on the terminal node
-        link.sourcePointOnTerminal = link.sourcePoint;
-        link.targetPointOnTerminal = link.targetPoint;
-
-        return that;
-    }
-
-    renderMarker(isSource) {
-
-        let that     = this;
-        let marker   = isSource ? that.sourceMarker : that.targetMarker;
-        let selector = marker.selector;
-        let vMarker  = that.findOne(selector);
-
-        if (marker && vMarker) {
-
-            let renderer = that.paper.getMarker(marker.name);
-
-            if (renderer && utils.isFunction(renderer)) {
-
-                let result      = renderer(vMarker, marker.options);
-                let replacedVel = result.vel;
-
-                if (replacedVel) {
-
-                    let elem   = vMarker.node;
-                    let parent = elem.parentNode;
-
-                    parent.insertBefore(replacedVel.node, elem);
-                    parent.removeChild(elem);
-
-                    let className = selector;
-                    if (className[0] === '.') {
-                        className = className.substr(1);
-                    }
-
-                    replacedVel.addClass(className);
-
-                    let attrs       = {};
-                    attrs[selector] = that.cell.attrs[selector];
-                    that.updateAttributes(attrs);
-
-                    vMarker = replacedVel;
-
-                }
-
-                if (isSource) {
-                    that.renderedSourceMarker = result;
-                } else {
-                    that.renderedTargetMarker = result;
-                }
-            }
-
-            // cache the marker vector element
-            if (isSource) {
-                that.sourceMarkerVel = vMarker;
-            } else {
-                that.targetMarkerVel = vMarker;
-            }
+        if (isSource) {
+            cache.sourcePointOnTerminal = connectionPoint;
+        } else {
+            cache.targetPointOnTerminal = connectionPoint;
         }
 
         return that;
@@ -300,28 +331,31 @@ class LinkView extends CellView {
 
     transformMarker(isSource, ref) {
 
-        let that           = this;
+        let that  = this;
+        let cache = that.cache;
+
         let renderedMarker = isSource
-            ? that.renderedSourceMarker
-            : that.renderedTargetMarker;
+            ? cache.renderedSourceMarker
+            : cache.renderedTargetMarker;
 
         if (renderedMarker) {
 
-            let link         = that.cell;
-            let pane         = that.getPane();
-            let sourcePoint  = link.sourcePointOnTerminal || link.sourcePoint;
-            let targetPoint  = link.targetPointOnTerminal || link.targetPoint;
-            let routerPoints = link.routerPoints;
+            let pane        = that.getPane();
+            let vertices    = cache.routerPoints;
+            let sourcePoint = cache.sourcePointOnTerminal || cache.fixedSourcePoint;
+            let targetPoint = cache.targetPointOnTerminal || cache.fixedTargetPoint;
 
             let position  = isSource ? sourcePoint : targetPoint;
             let reference = ref || isSource
-                ? (routerPoints[0] || targetPoint)
-                : (routerPoints[routerPoints.length - 1] || sourcePoint);
+                ? (vertices[0] || targetPoint)
+                : (vertices[vertices.length - 1] || sourcePoint);
 
             // make the marker at the right position
-            let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
+            let markerVel = isSource
+                ? cache.sourceMarkerVel
+                : cache.targetMarkerVel;
 
-            vMarker.translateAndAutoOrient(position, reference, pane);
+            markerVel.translateAndAutoOrient(position, reference, pane);
         }
 
         return that;
@@ -329,33 +363,34 @@ class LinkView extends CellView {
 
     updateConnectionPointOnMarker(isSource) {
 
-        let that           = this;
-        let link           = that.cell;
+        let that  = this;
+        let cache = that.cache;
+
         let renderedMarker = isSource
-            ? that.renderedSourceMarker
-            : that.renderedTargetMarker;
+            ? cache.renderedSourceMarker
+            : cache.renderedTargetMarker;
+        let connectionPoint;
 
         if (renderedMarker) {
 
-            let vMarker = isSource ? that.sourceMarkerVel : that.targetMarkerVel;
-            let pane    = that.getPane();
+            let pane  = that.getPane();
+            let point = renderedMarker.point;
 
-            let connectionPoint = renderedMarker.point;
-            let p               = vector.createSVGPoint(connectionPoint.x, connectionPoint.y);
-            p                   = p.matrixTransform(vMarker.getTransformToElement(pane));
+            let markerVel = isSource
+                ? cache.sourceMarkerVel
+                : cache.targetMarkerVel;
 
-            let newConnectionPoint = Point.fromPoint(p);
+            let p = vector.createSVGPoint(point.x, point.y);
+            p     = p.matrixTransform(markerVel.getTransformToElement(pane));
 
-            if (isSource) {
-                link.sourcePoint = newConnectionPoint;
-            } else {
-                link.targetPoint = newConnectionPoint;
-            }
+            connectionPoint = Point.fromPoint(p);
         }
 
-        // cache the connection point on the marker;
-        link.sourcePointOnMarker = link.sourcePoint;
-        link.targetPointOnMarker = link.targetPoint;
+        if (isSource) {
+            cache.sourcePointOnMarker = connectionPoint;
+        } else {
+            cache.targetPointOnMarker = connectionPoint;
+        }
 
         return that;
     }

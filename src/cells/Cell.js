@@ -3,6 +3,13 @@ import * as utils from '../common/utils';
 
 class Cell {
 
+    // static
+    // ------
+
+    static isCell(cell) {
+        return cell && cell instanceof Cell;
+    }
+
     // link
     // ----
 
@@ -11,31 +18,137 @@ class Cell {
         return isSource ? this.source : this.target;
     }
 
-    setTerminal(node, isSource) {
-
-        let that = this;
+    setTerminal(terminal, isSource) {
 
         if (isSource) {
-            that.source = node;
+            this.source = terminal;
+
+            if (terminal) {
+                this.sourceNode  = terminal.node;
+                this.sourcePort  = terminal.port;
+                this.sourcePoint = terminal.point;
+            } else {
+                this.sourceNode  = null;
+                this.sourcePort  = null;
+                this.sourcePoint = null;
+            }
+
         } else {
-            that.target = node;
+            this.target = terminal;
+
+            if (terminal) {
+                this.targetNode  = terminal.node;
+                this.targetPort  = terminal.port;
+                this.targetPoint = terminal.point;
+            } else {
+                this.targetNode  = null;
+                this.targetPort  = null;
+                this.targetPoint = null;
+            }
         }
 
-        return that;
+        return this;
+    }
+
+    getTerminalNode(isSource) {
+
+        let node = isSource ? this.sourceNode : this.targetNode;
+
+        if (!node) {
+
+            let terminal = this.getTerminal(isSource);
+
+            node = terminal && terminal.node || null;
+        }
+
+        return node;
+    }
+
+    setTerminalNode(node, isSource) {
+
+        if (isSource) {
+            this.sourceNode = node;
+        } else {
+            this.targetNode = node;
+        }
+
+        let terminal = this.getTerminal(isSource);
+        if (terminal) {
+            terminal.node = node;
+        }
+
+        return this;
+    }
+
+    getTerminalPort(isSource) {
+
+        let port = isSource ? this.sourcePort : this.targetPort;
+
+        if (!port) {
+
+            let terminal = this.getTerminal(isSource);
+
+            port = terminal && terminal.port || null;
+        }
+
+        return port;
+    }
+
+    setTerminalPort(port, isSource) {
+
+        if (isSource) {
+            this.sourcePort = port;
+        } else {
+            this.targetPort = port;
+        }
+
+        let terminal = this.getTerminal(isSource);
+        if (terminal) {
+            terminal.port = port;
+        }
+
+        return this;
+    }
+
+    getTerminalPoint(isSource) {
+
+        let point = isSource ? this.sourcePoint : this.targetPoint;
+
+        if (!point) {
+
+            let terminal = this.getTerminal(isSource);
+
+            point = terminal && terminal.point || null;
+        }
+
+        return point;
+    }
+
+    setTerminalPoint(point, isSource) {
+
+        if (isSource) {
+            this.sourcePoint = point;
+        } else {
+            this.targetPoint = point;
+        }
+
+        let terminal = this.getTerminal(isSource);
+        if (terminal) {
+            terminal.point = point;
+        }
+
+        return this;
     }
 
     removeFromTerminal(isSource) {
 
-        // remove link from node
-
-        let that = this;
-        let node = that.getTerminal(isSource);
-
-        if (node) {
-            node.removeLink(that, isSource);
+        // remove link from terminal
+        let terminal = this.getTerminal(isSource);
+        if (terminal) {
+            terminal.removeLink(this, isSource);
         }
 
-        return that;
+        return this;
     }
 
 
@@ -113,8 +226,8 @@ class Cell {
 
     removeChildAt(index) {
 
-        let that = this;
-        let child = null;
+        let that     = this;
+        let child    = null;
         let children = that.children;
 
         if (children && index >= 0) {
@@ -162,18 +275,17 @@ class Cell {
 
     addLink(link, outgoing) {
 
-        let that = this;
+        let that  = this;
         let links = that.links;
 
         if (link) {
 
             link.removeFromTerminal(outgoing);
-            link.setTerminal(that, outgoing);
 
             if (!links || that.indexOfLink(link) < 0 ||
                     // 连线的起点和终点是同一个节点时,说明
                     // 连线已经和节点关联，则不需要重复添加
-                link.getTerminal(!outgoing) !== that) {
+                link.getTerminalNode(!outgoing) !== that) {
 
                 if (!links) {
                     links = that.links = [];
@@ -181,6 +293,8 @@ class Cell {
 
                 links.push(link);
             }
+
+            link.setTerminalNode(that, outgoing);
         }
 
         return that;
@@ -188,13 +302,13 @@ class Cell {
 
     removeLink(link, outgoing) {
 
-        let that = this;
+        let that  = this;
         let links = that.links;
 
         if (link) {
 
             // 连线的起点和终点是同一个节点时不需要移除
-            if (links && link.getTerminal(!outgoing) !== that) {
+            if (links && link.getTerminalNode(!outgoing) !== that) {
 
                 let index = that.indexOfLink(link);
                 if (index >= 0) {
@@ -255,7 +369,7 @@ class Cell {
 
     getDescendants() {
 
-        let that = this;
+        let that   = this;
         let result = [];
 
         that.eachChild(function (child) {
@@ -268,7 +382,7 @@ class Cell {
 
     removeFromParent() {
 
-        let that = this;
+        let that   = this;
         let parent = that.parent;
 
         if (parent) {
@@ -282,7 +396,12 @@ class Cell {
     // common
     // ------
 
-    addTo() {}
+    addTo(model, parent, index) {
+
+        model.addCell(this, parent, index);
+
+        return this;
+    }
 
     getView() {}
 
@@ -312,12 +431,12 @@ class Cell {
         return data;
     }
 
-    clone(cloneData) {
+    clone(options, withData) {
 
-        let that = this;
-        let metadata = utils.merge({}, that.metadata);
+        let that     = this;
+        let metadata = utils.merge({}, that.metadata, options);
 
-        metadata.data = cloneData === true ? that.cloneData() : that.data;
+        metadata.data    = withData === true ? that.cloneData() : that.data;
         metadata.visible = that.visible;
 
         return new that.constructor(metadata);

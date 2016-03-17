@@ -18,4 +18,4 @@ let changes = {
 
 export {
     changes
-}
+};

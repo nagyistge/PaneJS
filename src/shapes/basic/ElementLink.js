@@ -30,4 +30,3 @@ ElementLink.setDefaults({
 
 
 export default ElementLink;
-

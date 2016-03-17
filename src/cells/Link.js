@@ -4,9 +4,85 @@ import     Visual from '../cells/Visual';
 
 class Link extends Visual {
 
+    // static
+    // ------
+
+    static isLink(link) {
+        return link && link instanceof Link;
+    }
+
     get isLink() {
 
         return true;
+    }
+
+    insertVertice(points, index) {
+
+        let vertices = this.vertices;
+
+        if (!vertices) {
+            vertices = this.vertices = [];
+        }
+
+        let length = vertices.length;
+
+        index = utils.fixIndex(index, length);
+
+        if (!utils.isArray(points)) {
+            points = [points];
+        }
+
+        if (index === length) {
+            Array.prototype.push.apply(vertices, points);
+        } else {
+            vertices.splice(index, 0, points);
+        }
+
+        return this;
+    }
+
+    removeVertice(point) {
+
+        if (point) {
+
+            let index = -1;
+            utils.some(this.vertices, function (vertice, i) {
+                if (point.x === vertice.x && point.y === vertice.y) {
+                    index = i;
+                    return true;
+                }
+            });
+
+            if (index >= 0) {
+                this.removeVerticeAt(index);
+            }
+
+        }
+
+        return this;
+    }
+
+    removeVerticeAt(index) {
+
+        let vertice;
+        let vertices = this.vertices;
+
+        if (vertices && vertices.length) {
+            vertice = vertices[index];
+
+            if (vertice) {
+                vertices.splice(index, 1);
+            }
+        }
+
+        return vertice;
+    }
+
+    clearVertices() {
+
+        this.vertices = [];
+
+        return this;
     }
 
     getRouter() {
@@ -14,7 +90,6 @@ class Link extends Visual {
         let router = this.metadata.router || {};
 
         if (!utils.isObject(router)) {
-
             router = { name: router };
         }
 
@@ -23,11 +98,10 @@ class Link extends Visual {
 
     getConnector() {
 
+        let selector  = '.connector';
         let connector = this.metadata.connector || {};
-        let selector = '.connector';
 
         if (!utils.isObject(connector)) {
-
             connector = { name: connector };
         }
 
@@ -38,34 +112,18 @@ class Link extends Visual {
 
     getMarker(isSource) {
 
-        let that = this;
-        let metadata = that.metadata;
-        let marker = isSource ? metadata.sourceMarker : metadata.targetMarker;
+        let that     = this;
+        let meta     = that.metadata;
+        let marker   = isSource ? meta.sourceMarker : meta.targetMarker;
         let selector = isSource ? '.source-marker' : '.target-marker';
 
         if (!utils.isObject(marker)) {
-
             marker = { name: marker };
         }
 
         marker.selector = selector;
 
-        if (!utils.isObject(marker.options)) {
-            marker.options = {};
-        }
-
-        marker.options.markerStrokeWidth = that.getStrokeWidth(selector);
-        marker.options.connectorStrokeWidth = that.getStrokeWidth('.connector');
-
-
         return marker;
-    }
-
-    getStrokeWidth(selector) {
-
-        let attr = this.attrs[selector];
-
-        return attr && utils.toFloat(attr['stroke-width']) || 0;
     }
 }
 
