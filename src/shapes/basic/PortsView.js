@@ -14,11 +14,11 @@ class PortsView extends NodeView {
     renderPorts() {
 
         let that = this;
-        let vel = that.vel;
+        let vel  = that.vel;
         let cell = that.cell;
 
-        let portMarkup = cell.metadata.portMarkup;
-        let inPortWrap = vel.findOne('.pane-ports.in');
+        let portMarkup  = cell.metadata.portMarkup;
+        let inPortWrap  = vel.findOne('.pane-ports.in');
         let outPortWrap = vel.findOne('.pane-ports.out');
 
         inPortWrap.empty();

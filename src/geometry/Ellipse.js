@@ -47,6 +47,14 @@ class Ellipse {
         return new Rect(this.x - this.a, this.y - this.b, 2 * this.a, 2 * this.b);
     }
 
+    grow(amount) {
+
+        this.a += amount;
+        this.b += amount;
+
+        return this;
+    }
+
     intersectionWithLineFromCenterToPoint(point, angle) {
 
         // Find point on me where line from my center to `point` intersects with

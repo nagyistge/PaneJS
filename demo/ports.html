@@ -35,7 +35,7 @@
             r: 5;
             stroke-width: 6;
             stroke: transparent;
-            fill: #a0a0a0;
+            fill: #A0A0A0;
             cursor: crosshair;
         }
 
@@ -53,9 +53,9 @@
     var model = new panejs.Model();
     var paper = new panejs.Paper(container, model);
 
-    var ports = new panejs.shapes.basic.Ports({
+    var ports1 = new panejs.shapes.basic.Ports({
 
-        position: { x: 100, y: 50 },
+        position: { x: 100, y: 80 },
 
         inPorts: [
             {
@@ -76,8 +76,42 @@
         ]
     });
 
-    model.addCell(ports);
+    var ports2 = new panejs.shapes.basic.Ports({
 
+        position: { x: 350, y: 150 },
+
+        inPorts: [
+            {
+                name: 'in-1'
+            },
+            {
+                name: 'in-2'
+            }
+        ],
+
+        outPorts: [
+            {
+                name: 'out-1'
+            },
+            {
+                name: 'out-2'
+            }
+        ]
+    });
+
+    var link1 = new panejs.Link({
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
+
+    model.addCells([ports1, ports2]);
+    model.addLink(link1, {
+        node: ports1,
+        port: { name: 'out-2' }
+    }, {
+        node: ports2,
+        port: { name: 'in-2' }
+    });
 
 </script>
 </body>
