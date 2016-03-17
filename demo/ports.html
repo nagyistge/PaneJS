@@ -113,6 +113,18 @@
         port: { name: 'in-2' }
     });
 
+    var link2 = new panejs.Link({
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
+
+    model.addLink(link2, {
+        node: ports1
+    }, {
+        node: ports2,
+        port: { name: 'in-1' }
+    });
+
 </script>
 </body>
 </html>
