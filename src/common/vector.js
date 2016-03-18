@@ -577,6 +577,18 @@ export class VElement {
         return null;
     }
 
+    parent() {
+
+        let node       = this.node;
+        let parentNode = node && node.parentNode;
+
+        if (parentNode) {
+            return vectorize(parentNode);
+        }
+
+        return null;
+    }
+
     index() {
 
         let idx  = 0;

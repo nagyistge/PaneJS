@@ -36,6 +36,44 @@ class PortsView extends NodeView {
             outPortWrap.append(vector(html));
         });
     }
+
+    findPortByElem(elem) {
+
+        let that  = this;
+        let vel   = that.vel;
+        let cell  = that.cell;
+        let vPort = vector(elem).findParent('.pane-port', vel.node);
+
+        if (vPort) {
+
+            let vWrap = vPort.parent();
+            if (vWrap) {
+
+                let index = vPort.index();
+                let type  = vWrap.hasClass('in')
+                    ? 'in' : vWrap.hasClass('out')
+                    ? 'out' : '';
+                let ports = type === 'in'
+                    ? cell.inPorts : type === 'out'
+                    ? cell.outPorts
+                    : [];
+
+                let selector = cell.getPortSelector(type, index);
+                let result   = null;
+
+                utils.some(ports, function (port) {
+                    if (port.selector === selector) {
+                        result = port;
+                        return true;
+                    }
+                });
+
+                return result;
+            }
+        }
+
+        return null;
+    }
 }
 
 

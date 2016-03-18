@@ -1,6 +1,6 @@
 let objProto = Object.prototype;
 let toString = objProto.toString;
-let hasOwn = objProto.hasOwnProperty;
+let hasOwn   = objProto.hasOwnProperty;
 
 
 function isNull(obj) {
