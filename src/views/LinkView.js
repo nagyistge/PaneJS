@@ -205,8 +205,8 @@ class LinkView extends CellView {
         if (connectorFn && utils.isFunction(connectorFn)) {
 
             let pathData = connectorFn.call(that,
-                cache.sourcePointOnMarker || cache.sourcePointOnTerminal,
-                cache.targetPointOnMarker || cache.targetPointOnTerminal,
+                that.getLinkEndPoint(true),
+                that.getLinkEndPoint(false),
                 cache.routerPoints,
                 connector.options || {}
             );
@@ -256,7 +256,6 @@ class LinkView extends CellView {
             // cache
             if (bbox) {
                 if (isSource) {
-                    console.log(bbox);
                     cache.sourceTerminalBBox = bbox;
                 } else {
                     cache.targetTerminalBBox = bbox;
@@ -322,7 +321,7 @@ class LinkView extends CellView {
                 if (rad >= Math.PI / 4 || rad === 0) {
                     bbox.grow(markerStrokeWidth / 2);
                 } else {
-                    bbox.grow(markerStrokeWidth / Math.sin(rad)/2);
+                    bbox.grow(markerStrokeWidth / Math.sin(rad) / 2);
                 }
             }
         }
@@ -542,14 +541,14 @@ class LinkView extends CellView {
         let cache = this.cache;
 
         if (isSource) {
-            return cache.sourcePointOnPort
-                || cache.sourcePointOnTerminal
-                || cache.fixedSourcePoint;
+            return cache.fixedSourcePoint
+                || cache.sourcePointOnPort
+                || cache.sourcePointOnTerminal;
         }
 
-        return cache.targetPointOnPort
-            || cache.targetPointOnTerminal
-            || cache.fixedTargetPoint;
+        return cache.fixedTargetPoint
+            || cache.targetPointOnPort
+            || cache.targetPointOnTerminal;
     }
 
     transformMarker(isSource, ref) {
