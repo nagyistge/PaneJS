@@ -35,7 +35,7 @@
             r: 5;
             stroke-width: 6;
             stroke: transparent;
-            fill: #a0a0a0;
+            fill: #A0A0A0;
             cursor: crosshair;
         }
 
@@ -55,7 +55,7 @@
 
     var ports1 = new panejs.shapes.basic.Ports({
 
-        position: { x: 100, y: 50 },
+        position: { x: 100, y: 80 },
 
         inPorts: [
             {
@@ -77,7 +77,7 @@
     });
     var ports2 = new panejs.shapes.basic.Ports({
 
-        position: { x: 300, y: 150 },
+        position: { x: 350, y: 150 },
 
         inPorts: [
             {
@@ -98,8 +98,31 @@
         ]
     });
 
-    model.addCell(ports1);
-    model.addCell(ports2);
+    var link1 = new panejs.Link({
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
+
+    model.addCells([ports1, ports2]);
+    model.addLink(link1, {
+        node: ports1,
+        port: { name: 'out-2' }
+    }, {
+        node: ports2,
+        port: { name: 'in-2' }
+    });
+
+    var link2 = new panejs.Link({
+        sourceMarker: 'classic',
+        targetMarker: 'classic'
+    });
+
+    model.addLink(link2, {
+        node: ports1
+    }, {
+        node: ports2,
+        port: { name: 'in-1' }
+    });
 
     // 添加handlers
     paper.registerHandlers([

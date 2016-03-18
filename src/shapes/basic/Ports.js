@@ -12,11 +12,11 @@ class Ports extends Node {
         let that = this;
 
         that.inPorts = utils.map(that.metadata.inPorts, function (port, index) {
-            return that.checkPort(port, index, 'in');
+            return that.normalize(port, index, 'in');
         });
 
         that.outPorts = utils.map(that.metadata.outPorts, function (port, index) {
-            return that.checkPort(port, index, 'out');
+            return that.normalize(port, index, 'out');
         });
 
         that.updatePortsAttrs();
@@ -24,11 +24,11 @@ class Ports extends Node {
 
     insertPort(port, index, type = 'in') {
 
-        let that = this;
+        let that  = this;
         let ports = type === 'in' ? that.inPorts : that.outPorts;
 
         index = utils.fixIndex(index, ports.length);
-        port = that.checkPort(port, index, type);
+        port  = that.normalize(port, index, type);
 
         ports.splice(index, 0, port);
 
@@ -47,7 +47,7 @@ class Ports extends Node {
 
     removePort(port, type = 'in') {
 
-        let that = this;
+        let that  = this;
         let ports = type === 'in' ? that.inPorts : that.outPorts;
         let index = utils.indexOf(ports, port);
 
@@ -71,9 +71,9 @@ class Ports extends Node {
 
     removePortAt(index, type = 'in') {
 
-        let that = this;
+        let that  = this;
         let ports = type === 'in' ? that.inPorts : that.outPorts;
-        let port = ports[index];
+        let port  = ports[index];
 
         if (port) {
             ports.splice(index, 1);
@@ -83,9 +83,38 @@ class Ports extends Node {
         return port;
     }
 
+    getPortAt(index, type = 'in') {
+
+        let ports = type === 'in' ? this.inPorts : this.outPorts;
+
+        return ports[index];
+    }
+
+    queryPort(filter) {
+
+        if (filter) {
+
+            let type  = filter.type;
+            let ports = type === 'in'
+                ? this.inPorts : type === 'out'
+                ? this.outPorts
+                : this.inPorts.concat(this.outPorts);
+
+            let keys = utils.keys(filter);
+
+            return utils.filter(ports, function (item) {
+                return utils.every(keys, function (key) {
+                    return item[key] === filter[key];
+                });
+            });
+        }
+
+        return [];
+    }
+
     afterRemovePort(port) {
 
-        let that = this;
+        let that  = this;
         let attrs = that.attrs;
 
         utils.forEach(port.selectors, function (selector) {
@@ -97,17 +126,17 @@ class Ports extends Node {
 
     updatePortsAttrs() {
 
-        let that = this;
+        let that  = this;
         let attrs = {};
 
         utils.forEach(this.inPorts, function (port, index) {
-            let specials = that.getPortAttrs(port, index, 'in');
+            let specials   = that.getPortAttrs(port, index, 'in');
             port.selectors = utils.keys(specials);
             utils.merge(attrs, specials);
         });
 
         utils.forEach(this.outPorts, function (port, index) {
-            let specials = that.getPortAttrs(port, index, 'out');
+            let specials   = that.getPortAttrs(port, index, 'out');
             port.selectors = utils.keys(specials);
             utils.merge(attrs, specials);
         });
@@ -117,8 +146,7 @@ class Ports extends Node {
         return that;
     }
 
-    // check over the `port.name` and `port.id`
-    checkPort(port, index, type) {
+    normalize(port, index, type) {
 
         let id = type + '-port-' + index;
 
@@ -136,6 +164,13 @@ class Ports extends Node {
             port.id = id;
         }
 
+        // the port selector
+        port.selector = this.getPortSelector(type, index);
+
+        // which node belong to
+        port.node = this;
+
+
         return port;
     }
 
@@ -145,20 +180,26 @@ class Ports extends Node {
 
         let attrs = {};
         let ports = type === 'in' ? this.inPorts : this.outPorts;
-        let root = '.' + type + '>g:nth-child(' + (index + 1) + ')';
-        let label = root + '>.port-label';
 
-        attrs[label] = { text: port.name };
-        attrs[root] = {
+        let rootSelector  = this.getPortSelector(type, index);
+        let labelSelector = rootSelector + '>.port-label';
+
+        attrs[labelSelector] = { text: port.name };
+        attrs[rootSelector]  = {
             'ref': '.node-body',
             'ref-y': (index + 0.5) * (1 / ports.length)
         };
 
         if (type === 'out') {
-            attrs[root]['ref-dx'] = 0;
+            attrs[rootSelector]['ref-dx'] = 0;
         }
 
         return attrs;
+    }
+
+    getPortSelector(type, index) {
+
+        return '.' + type + '>g:nth-child(' + (index + 1) + ')';
     }
 }
 

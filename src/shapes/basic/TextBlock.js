@@ -3,20 +3,20 @@ import Node from '../../cells/Node';
 class TextBlock extends Node {}
 
 TextBlock.setDefaults({
-    markup: [
-        '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><switch>',
-
+    markup: '' +
+    '<g class="pane-rotatable">' +
+    '  <g class="pane-scalable">' +
+    '    <rect/>' +
+    '  </g>' +
+    '  <switch>' +
         // if foreignObject supported
-
-        '<foreignObject requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" class="fobj">',
-        '<div/>',
-        '</foreignObject>',
-
+    '    <foreignObject requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" class="fobj">' +
+    '      <div/>' +
+    '    </foreignObject>' +
         // else foreignObject is not supported (fallback for IE)
-        '<text class="content"/>',
-
-        '</switch></g>'
-    ].join(''),
+    '    <text class="content"/>' +
+    '  </switch>' +
+    '</g>',
 
     attrs: {
         '.': {

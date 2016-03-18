@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hyperlinks</title>
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
+    <style>
+        #container {
+            width: 600px;
+            height: 400px;
+            border: 1px solid #DDD;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../dist/panejs.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
+
+    var eleLink = new panejs.shapes.basic.ElementLink({
+        position: {
+            x: 80,
+            y: 80
+        },
+        size: {
+            width: 170,
+            height: 100
+        },
+        attrs: {
+            rect: { fill: '#E67E22', stroke: '#D35400', 'stroke-width': 5 },
+            a: {
+                'xlink:href': 'http://PaneJS.com',
+                'xlink:show': 'new',
+                cursor: 'pointer'
+            },
+            text: {
+                text: 'Element as a link:\nhttp://PaneJS.com',
+                fill: 'white'
+            }
+        }
+    });
+
+    model.addCell(eleLink);
+
+    var labelLink = new panejs.shapes.basic.LabelLink({
+        position: {
+            x: 370,
+            y: 160
+        }, size: {
+            width: 170,
+            height: 100
+        },
+        attrs: {
+            rect: {
+                fill: '#9B59B6',
+                stroke: '#8E44AD',
+                'stroke-width': 5
+            },
+            a: { 'xlink:href': 'http://PaneJS.com', cursor: 'pointer' },
+            text: {
+                text: 'Only label as a link:\nhttp://PaneJS.com',
+                fill: 'white'
+            }
+        }
+    });
+
+
+    model.addCell(labelLink);
+</script>
+</body>
+</html>

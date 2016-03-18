@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>textpath</title>
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
+    <style>
+        #container {
+            width: 600px;
+            height: 400px;
+            border: 1px solid #DDD;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../dist/panejs.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
+    var vector = panejs.vector;
+
+    var markerElement = vector('<marker><path d="M 2 0 L 0 1 L 2 2 z" fill="#333333"/></marker>').attr({
+        id: 'marker-def',
+        markerWidth: 5,
+        markerHeight: 5,
+        refX: 1.9,
+        refY: 1,
+        orient: 'auto',
+        viewBox: '0 0 6 6',
+        markerUnits: 'strokeWidth'
+    });
+
+    vector(paper.svg).getDefs().append(markerElement);
+
+    var Arrow = panejs.Node;
+
+    Arrow.setDefaults({
+        markup: '<g class="pane-rotatable"><g class="pane-scalable"></g><path/><text/></g>',
+        size: {
+            width: 150,
+            height: 50
+        },
+        attrs: {
+            path: {
+                d: 'M 0 50 Q 50 0 100 20',
+                stroke: '#333333',
+                'stroke-width': 40,
+                fill: 'none',
+                'marker-start': 'url(#marker-def)',
+                'stroke-linejoin': "round"
+            },
+            text: {
+                fill: '#ffffff',
+                'font-size': 14,
+                'text-anchor': 'center',
+                'font-family': "Comfortaa",
+                text: ''
+            }
+        }
+    });
+
+
+    var arrow1 = new Arrow({
+        position: { x: 340, y: 80 },
+        attrs: {
+            text: {
+                text: 'PaneJS',
+                'font-size': 35,
+                'textPath': {
+                    d: 'M 0 50 Q 50 0 100 20',
+                    'dominant-baseline': 'central'
+                }
+            }
+        }
+    });
+
+    var arrow2 = new Arrow({
+        position: { x: 340, y: 200 },
+        attrs: {
+            text: {
+                text: 'This is an example\nof an arrow',
+                textPath: 'M 0 20 Q 50 70 100 50'
+            },
+            path: { d: 'M 0 20 Q 50 70 100 50' }
+        }
+    });
+
+    var arrow4 = new Arrow({
+        position: { x: 150, y: 200 },
+        attrs: {
+            text: {
+                text: 'This is an example\nof an arrow',
+                textPath: { d: 'M 0 50 Q 50 70 100 20', startOffset: 5 }
+            },
+            path: { d: 'M 100 20 Q 50 70 0 50' }
+        }
+    });
+
+    var arrow3 = new Arrow({
+        position: { x: 150, y: 80 },
+        attrs: {
+            text: {
+                text: 'This is an example\nof an arrow',
+                textPath: { d: 'M 0 20 Q 50 0 100 50', startOffset: 5 }
+            },
+            path: { d: 'M 100 50 Q 50 0 0 20' }
+        }
+    });
+
+    model.addCells([arrow1, arrow2, arrow3, arrow4]);
+</script>
+</body>
+</html>

@@ -22,8 +22,8 @@ function ovalMarker(vMarker, options) {
 
         // return the connection point on the marker
         return {
-            rad: 0,
             vel: vEllipse,
+            rad: 0,
             point: new Point(rx * 2, ry)
         };
     }

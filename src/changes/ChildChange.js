@@ -27,7 +27,7 @@ class ChildChange extends Change {
         let oldParent = child.parent;
         let oldIndex  = oldParent ? oldParent.indexOfChild(child) : 0;
 
-        // the new parent is null, then the child(link) will be removed
+        // the new parent is null, then the child(and link) will be removed
         if (!newParent) {
             that.modifyConnect(child, false);
         }

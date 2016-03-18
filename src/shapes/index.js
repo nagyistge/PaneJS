@@ -1,14 +1,16 @@
-import Text      from './basic/Text';
-import Rect      from './basic/Rect';
-import Path      from './basic/Path';
-import Ports     from './basic/Ports';
-import Image     from './basic/Image';
-import Circle    from './basic/Circle';
-import Rhombus   from './basic/Rhombus';
-import Ellipse   from './basic/Ellipse';
-import Polygon   from './basic/Polygon';
-import Polyline  from './basic/Polyline';
-import PortsView from './basic/PortsView';
+import Rect        from './basic/Rect';
+import Path        from './basic/Path';
+import Text        from './basic/Text';
+import Ports       from './basic/Ports';
+import Image       from './basic/Image';
+import Circle      from './basic/Circle';
+import Rhombus     from './basic/Rhombus';
+import Ellipse     from './basic/Ellipse';
+import Polygon     from './basic/Polygon';
+import Polyline    from './basic/Polyline';
+import PortsView   from './basic/PortsView';
+import LabelLink   from './basic/LabelLink';
+import ElementLink from './basic/ElementLink';
 
 import RectPort  from './port/Rect';
 
@@ -24,7 +26,9 @@ let shapes = {
         Ellipse,
         Polygon,
         Polyline,
-        PortsView
+        PortsView,
+        LabelLink,
+        ElementLink
     },
     port: {
         Rect: RectPort

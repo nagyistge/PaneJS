@@ -7,12 +7,10 @@ ForeignObject.setDefaults({
         '<g class="pane-rotatable">' +
         '  <g class="pane-scalable">' +
         '    <rect/>' +
-        '    ' +
         '  </g>' +
         '<switch>',
 
         // if foreignObject supported
-
         '<foreignObject requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" class="fobj">',
         '<div/>',
         '</foreignObject>',

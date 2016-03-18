@@ -4,16 +4,26 @@ import       Cell from './Cell';
 
 class Visual extends Cell {
 
+    // static
+    // ------
+
+    static setDefaults(options) {
+
+        // update global options
+        this.defaults = utils.merge({}, this.defaults, options);
+    }
+
+
     constructor(options) {
 
         super();
 
-        let that = this;
+        let that     = this;
         let metadata = utils.merge({}, that.constructor.defaults, options);
 
-        that.data = metadata.data;
-        that.attrs = metadata.attrs;
-        that.visible = metadata.visible !== false;
+        that.data     = metadata.data;
+        that.attrs    = metadata.attrs;
+        that.visible  = metadata.visible !== false;
         that.metadata = metadata;
     }
 
@@ -31,14 +41,7 @@ class Visual extends Cell {
         return this.metadata.markup;
     }
 
-    // static methods
-    // --------------
 
-    static setDefaults(options) {
-
-        // update global options
-        this.defaults = utils.merge({}, this.defaults, options);
-    }
 }
 
 
