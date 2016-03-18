@@ -148,16 +148,15 @@ class Ports extends Node {
 
     normalize(port, index, type) {
 
-        let id = type + '-port-' + index;
-
-        if (utils.isFunction(port)) {
-            port = port.call(this);
-        }
+        let id  = type + '-port-' + index;
 
         if (!utils.isObject(port)) {
             port = {
                 name: port || id
             };
+        } else {
+            port = utils.merge({}, port);
+
         }
 
         if (!port.id) {

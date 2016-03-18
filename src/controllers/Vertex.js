@@ -431,12 +431,12 @@ class VertexController extends Controller {
     destroy() {
         let that = this;
 
-        that.boundsVel.remove();
-        that.rotaterVel.remove();
+        that.boundsVel.removeCell();
+        that.rotaterVel.removeCell();
         utils.forEach(that.resizers, function (vel) {
-            vel.remove();
+            vel.removeCell();
         });
-        that.vel.remove();
+        that.vel.removeCell();
         utils.destroy(that);
         return that;
     }

@@ -204,15 +204,19 @@ class LinkView extends CellView {
 
         if (connectorFn && utils.isFunction(connectorFn)) {
 
-            let pathData = connectorFn.call(that,
-                that.getLinkEndPoint(true),
-                that.getLinkEndPoint(false),
-                cache.routerPoints,
-                connector.options || {}
-            );
+            let sourcePoint = that.getLinkEndPoint(true);
+            let targetPoint = that.getLinkEndPoint(false);
 
-            that.applyAttr(connector.selector, { d: pathData });
+            if (sourcePoint && targetPoint) {
+                let pathData = connectorFn.call(that,
+                    sourcePoint,
+                    targetPoint,
+                    cache.routerPoints,
+                    connector.options || {}
+                );
 
+                that.applyAttr(connector.selector, { d: pathData });
+            }
         } else {
             throw new Error('Unknown connector: "' + connector.name + '"');
         }

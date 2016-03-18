@@ -104,7 +104,7 @@ class ConnectionHandler extends Handler {
         let paper = that.paper;
         if (that.sourceCellView) {
             utils.forEach(paper.decoratePane.querySelectorAll('.port-decorator.out'), function (decorator) {
-                vector(decorator).remove();
+                vector(decorator).removeCell();
             });
         }
         that.sourceCellView = view;
@@ -124,7 +124,7 @@ class ConnectionHandler extends Handler {
         let that = this;
         let paper = that.paper;
         utils.forEach(paper.decoratePane.querySelectorAll('.port-decorator.in'), function (decorator) {
-            vector(decorator).remove();
+            vector(decorator).removeCell();
         });
         return that;
     }

@@ -451,7 +451,7 @@ class Model extends Events {
         return null;
     }
 
-    remove(cell) {
+    removeCell(cell) {
 
         let that = this;
 

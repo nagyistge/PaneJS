@@ -118,7 +118,7 @@ class Paper extends Events {
         let paperOffset = utils.getOffset(svg);
 
         if (detector.IS_FF) {
-            fakeRect.remove();
+            fakeRect.removeCell();
         }
 
         let doc        = document;
@@ -131,7 +131,9 @@ class Paper extends Events {
         svgPoint.y += scrollTop - paperOffset.top;
 
         // Transform point into the viewport coordinate system.
-        return Point.fromPoint(svgPoint.matrixTransform(that.drawPane.getCTM().inverse()));
+        let result = svgPoint.matrixTransform(that.drawPane.getCTM().inverse());
+
+        return Point.fromPoint(result);
     }
 
 
@@ -765,6 +767,10 @@ class Paper extends Events {
         let oldParent = change.previous;
 
         that.invalidate(change.child, true, true);
+
+        if (!newParent) {
+            that.removeView(change.child);
+        }
 
         /*
          if (newParent == null || this.isCellCollapsed(newParent)) {
