@@ -75,7 +75,6 @@
             }
         ]
     });
-
     var ports2 = new panejs.shapes.basic.Ports({
 
         position: { x: 350, y: 150 },
@@ -125,6 +124,11 @@
         port: { name: 'in-1' }
     });
 
+    // 添加handlers
+    paper.registerHandlers([
+        new panejs.SelectionHandler(paper),
+        new panejs.ConnectionHandler(paper)
+    ]);
 </script>
 </body>
 </html>
