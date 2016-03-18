@@ -42,7 +42,13 @@ class PortsView extends NodeView {
         let that  = this;
         let vel   = that.vel;
         let cell  = that.cell;
-        let vPort = vector(elem).findParent('.pane-port', vel.node);
+        let vPort = vector(elem);
+
+        let className = 'pane-port';
+
+        if (!vPort.hasClass(className)) {
+            vPort = vPort.findParent(className, vel.node);
+        }
 
         if (vPort) {
 
