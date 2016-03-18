@@ -131,7 +131,7 @@ class Paper extends Events {
         svgPoint.y += scrollTop - paperOffset.top;
 
         // Transform point into the viewport coordinate system.
-        return svgPoint.matrixTransform(that.drawPane.getCTM().inverse());
+        return Point.fromPoint(svgPoint.matrixTransform(that.drawPane.getCTM().inverse()));
     }
 
 
