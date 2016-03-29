@@ -6,11 +6,10 @@
 .gitignore
 .npmignore
 .travis.yml
-/npm-debug.log
-/CHANGELOG.yml
-/Makefile
-/webpack.config.min.js
-/webpack.config.js
+npm-debug.log
+CHANGELOG.yml
+webpack.config.min.js
+webpack.config.js
 
 /node_modules
 /scripts
