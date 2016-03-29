@@ -1,15 +1,17 @@
-var pkg = require('./package');
-var path = require('path');
-var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var pkg          = require('./package');
+var path         = require('path');
+var webpack      = require('webpack');
+var ExtractText  = require('extract-text-webpack-plugin');
+var autoprefixer = require('autoprefixer');
+
 
 var paths = {
   src: path.resolve(__dirname, 'src'),
   dist: path.resolve(__dirname, 'dist')
 };
 
-var entry = {};
-entry[pkg.name] = './src/index.js';
+var entry                           = {};
+entry[pkg.name]                     = './src/index.js';
 entry[pkg.name + '-' + pkg.version] = './src/index.js';
 
 module.exports = {
@@ -38,6 +40,7 @@ module.exports = {
         loader: 'babel',
         query: {
           babelrc: false,
+          cacheDirectory: true,
           presets: ['es2015'],
           plugins: [
 
@@ -61,16 +64,23 @@ module.exports = {
         }
       }, {
         test: /\.less?$/,
-        loader: ExtractTextPlugin.extract(
-          'css?sourceMap&-minimize!' + 'less?sourceMap'
+        include: paths.src,
+        loader: ExtractText.extract(
+          'css-loader?sourceMap&-minimize!' +
+          'postcss-loader!' +
+          'less-loader?sourceMap'
         )
       }
     ]
   },
 
   plugins: [
-    new ExtractTextPlugin('[name].css')
+    new ExtractText('[name].css')
   ],
+
+  postcss: function () {
+    return [autoprefixer({ browsers: ['last 2 versions'] })];
+  },
 
   devtool: 'source-map'
 };

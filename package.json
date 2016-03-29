@@ -25,6 +25,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "autoprefixer": "^6.3.5",
     "babel-cli": "^6.3.17",
     "babel-core": "^6.2.1",
     "babel-loader": "^6.2.0",
@@ -50,14 +51,30 @@
     "less-loader": "^2.2.2",
     "mocha": "^2.3.4",
     "opn": "^3.0.3",
+    "postcss-loader": "^0.8.2",
     "pre-commit": "^1.1.2",
     "semver": "^5.1.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
   "scripts": {
-    "lint": "./node_modules/.bin/eslint ./src --ext .js",
-    "test": "make test"
+    "clean:dist": "rm -rf ./dist",
+    "clean:cov": "rm -rf ./test/coverage",
+    "clean": "npm run clean:dist && npm run clean:cov",
+    "lint": "eslint ./src --ext .js",
+    "pretest": "npm run lint",
+    "test": "babel-node ./node_modules/.bin/_mocha -R spec",
+    "test:cov": "npm run clean:cov && babel-node ./node_modules/.bin/isparta cover ./node_modules/.bin/_mocha --dir ./test/coverage -- -R spec",
+    "test:rpt": "cat ./test/coverage/lcov.info | coveralls",
+    "preserver": "mkdir -p ./demo/lib && cp ./node_modules/jquery/dist/* ./demo/lib/",
+    "start": "node ./scripts/server.js",
+    "build": "npm run clean:dist && webpack && webpack --config webpack.config.min.js",
+    "debug": "npm run build && npm run server",
+    "prepublish": "npm run build",
+    "release:patch": "npm version patch && npm publish && git push --follow-tags",
+    "release:minor": "npm version minor && npm publish && git push --follow-tags",
+    "release:major": "npm version major && npm publish && git push --follow-tags",
+    "release": "npm run release:patch"
   },
   "pre-commit": [
     "lint"
