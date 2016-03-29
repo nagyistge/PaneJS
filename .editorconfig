@@ -15,9 +15,6 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size  = 4
 
-[Makefile]
-indent_style = tab
-
 [{package.json,.travis.yml}]
 indent_style = space
 indent_size = 2
