@@ -39,6 +39,11 @@ class Visual extends Cell {
 
         return this.metadata.markup;
     }
+
+    getRoot() {
+
+        return this.metadata.root || 'g';
+    }
 }
 
 
@@ -47,6 +52,7 @@ class Visual extends Cell {
 
 Visual.defaults = {
     markup: '',
+    root: 'g',   // root node
     attrs: {},   // styles
     data: null,  // cached data(for business logic)
     pane: null,  // specify the container of the view

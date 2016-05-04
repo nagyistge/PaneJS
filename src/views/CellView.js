@@ -16,13 +16,12 @@ class CellView {
 
     ensureElement() {
 
-        let cell = this.cell;
-        let vel  = vector('g', { 'class': cell.getClassName() });
-
-        this.vel  = vel;
-        this.elem = vel.node;
+        this.vel  = vector(this.cell.getRoot(), {
+            'class': this.cell.getClassName()
+        });
+        this.elem = this.vel.node;
         // attach cell's id to elem
-        this.elem.cellId = cell.id;
+        this.elem.cellId = this.cell.id;
 
         let pane = this.getPane();
         if (pane) {
