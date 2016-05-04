@@ -367,12 +367,11 @@ class Cell {
     getDescendants() {
 
         let result = [];
-        let that   = this;
 
         this.eachChild(function (child) {
             result.push(child);
-            result = result.concat(that.getDescendants(child));
-        });
+            result = result.concat(this.getDescendants(child));
+        }, this);
 
         return result;
     }

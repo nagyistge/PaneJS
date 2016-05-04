@@ -1,18 +1,18 @@
 import * as utils from '../common/utils';
-import Events     from '../common/Events';
-import vector     from '../common/vector';
-import detector   from '../common/detector';
+import     Events from '../common/Events';
+import     vector from '../common/vector';
+import   detector from '../common/detector';
 
 import Point from '../geometry/Point';
 // import Rect  from '../geometry/Rect';
 
-import Model    from '../core/Model';
-import Cell     from '../cells/Cell';
+import    Model from '../core/Model';
+import     Cell from '../cells/Cell';
 import LinkView from '../views/LinkView';
 import NodeView from '../views/NodeView';
 
-import RootChange     from '../changes/RootChange';
-import ChildChange    from '../changes/ChildChange';
+import     RootChange from '../changes/RootChange';
+import    ChildChange from '../changes/ChildChange';
 import TerminalChange from '../changes/TerminalChange';
 import GeometryChange from '../changes/GeometryChange';
 
@@ -40,15 +40,14 @@ class Paper extends Events {
 
         super();
 
-        let that = this;
+        this.id    = 'paper' + counter++;
+        this.model = model || new Model();
 
-        that.id    = 'paper' + counter++;
-        that.model = model || new Model();
-
-        that.configure(options);
+        this.configure(options);
 
         if (container) {
-            that.init(container)
+            this
+                .init(container)
                 .setup()
                 .resize()
                 .translate();
@@ -67,12 +66,10 @@ class Paper extends Events {
 
     configure(options) {
 
-        let that = this;
+        this.options = utils.merge({}, defaultOptions, options);
+        this.trigger('paper:configure', this.options);
 
-        that.options = utils.merge({}, defaultOptions, options);
-        that.trigger('paper:configure', that.options);
-
-        return that;
+        return this;
     }
 
     snapToGrid(point) {
@@ -80,10 +77,8 @@ class Paper extends Events {
         // Convert global coordinates to the local ones of the `drawPane`.
         // Otherwise, improper transformation would be applied when the
         // drawPane gets transformed (scaled/rotated).
-
-        let that       = this;
-        let gridSize   = that.options.gridSize || 1;
-        let localPoint = vector(that.drawPane).toLocalPoint(point.x, point.y);
+        let gridSize   = this.options.gridSize || 1;
+        let localPoint = vector(this.drawPane).toLocalPoint(point.x, point.y);
 
         return {
             x: utils.snapToGrid(localPoint.x, gridSize),
@@ -93,8 +88,7 @@ class Paper extends Events {
 
     toLocalPoint(point) {
 
-        let that     = this;
-        let svg      = that.svg;
+        let svg      = this.svg;
         let svgPoint = svg.createSVGPoint();
 
         svgPoint.x = point.x;
@@ -106,8 +100,8 @@ class Paper extends Events {
         let fakeRect;
         if (detector.IS_FF) {
             fakeRect = vector('rect', {
-                width: that.options.width,
-                height: that.options.height,
+                width: this.options.width,
+                height: this.options.height,
                 x: 0,
                 y: 0,
                 opacity: 0
@@ -131,7 +125,7 @@ class Paper extends Events {
         svgPoint.y += scrollTop - paperOffset.top;
 
         // Transform point into the viewport coordinate system.
-        let result = svgPoint.matrixTransform(that.drawPane.getCTM().inverse());
+        let result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
 
         return Point.fromPoint(result);
     }
@@ -142,8 +136,6 @@ class Paper extends Events {
 
     init(container) {
 
-        let that = this;
-
         if (container) {
 
             let svg  = utils.createSvgDocument();
@@ -151,45 +143,44 @@ class Paper extends Events {
 
             utils.setAttribute(root, 'class', 'viewport');
 
-            that.backgroundPane = root.appendChild(utils.createSvgElement('g'));
+            this.backgroundPane = root.appendChild(utils.createSvgElement('g'));
             // container of links
-            that.linkPane = root.appendChild(utils.createSvgElement('g'));
+            this.linkPane = root.appendChild(utils.createSvgElement('g'));
             // container of nodes
-            that.drawPane = root.appendChild(utils.createSvgElement('g'));
+            this.drawPane = root.appendChild(utils.createSvgElement('g'));
             // layer above the drawing pane, for controllers and handlers
-            that.controlPane = root.appendChild(utils.createSvgElement('g'));
+            this.controlPane = root.appendChild(utils.createSvgElement('g'));
             // layer above the drawing pane and controller pane, for decorators
-            that.decoratePane = root.appendChild(utils.createSvgElement('g'));
+            this.decoratePane = root.appendChild(utils.createSvgElement('g'));
 
             svg.appendChild(root);
             container.appendChild(svg);
 
-            that.svg       = svg;
-            that.root      = root;
-            that.container = container;
+            this.svg       = svg;
+            this.root      = root;
+            this.container = container;
 
-            that.trigger('paper:init', container);
+            this.trigger('paper:init', container);
         }
 
-        return that;
+        return this;
     }
 
     setup() {
 
-        let that = this;
-        let svg  = that.svg;
+        let svg = this.svg;
 
-        utils.addEventListener(svg, 'contextmenu', that.onContextMenu.bind(that));
-        utils.addEventListener(svg, 'dblclick', that.onDblClick.bind(that));
-        utils.addEventListener(svg, 'click', that.onClick.bind(that));
-        utils.addEventListener(svg, 'mouseover', '.pane-node', that.onCellMouseOver.bind(that));
-        utils.addEventListener(svg, 'mouseout', '.pane-node', that.onCellMouseOut.bind(that));
-        utils.addEventListener(svg, 'mouseover', '.pane-link', that.onCellMouseOver.bind(that));
-        utils.addEventListener(svg, 'mouseout', '.pane-link', that.onCellMouseOut.bind(that));
+        utils.addEventListener(svg, 'contextmenu', this.onContextMenu.bind(this));
+        utils.addEventListener(svg, 'dblclick', this.onDblClick.bind(this));
+        utils.addEventListener(svg, 'click', this.onClick.bind(this));
+        utils.addEventListener(svg, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
+        utils.addEventListener(svg, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
+        utils.addEventListener(svg, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
+        utils.addEventListener(svg, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
 
-        let onPointerDown = that.onPointerDown.bind(that);
-        let onPointerMove = that.onPointerMove.bind(that);
-        let onPointerUp   = that.onPointerUp.bind(that);
+        let onPointerDown = this.onPointerDown.bind(this);
+        let onPointerMove = this.onPointerMove.bind(this);
+        let onPointerUp   = this.onPointerUp.bind(this);
 
         if (detector.IS_TOUCH) {
             utils.addEventListener(svg, 'touchstart', onPointerDown);
@@ -203,44 +194,43 @@ class Paper extends Events {
 
         // Hold the value when mouse has been moved: when mouse moved,
         // no click event will be triggered.
-        that.mouseMoved = 0;
+        this.mouseMoved = 0;
 
         // TODO: IS_TOUCH
 
         // Disables built-in pan and zoom in IE10 and later
         if (detector.IS_POINTER) {
-            that.container.style.msTouchAction = 'none';
+            this.container.style.msTouchAction = 'none';
         }
 
-        that.model.on('change', that.handleChanges, that);
+        this.model.on('change', this.handleChanges, this);
 
-        that.trigger('paper:setup');
+        this.trigger('paper:setup');
 
         // that.registerHandlers([
         //     new SelectionHandler(that)
         // ]);
 
-        return that;
+        return this;
     }
 
     registerHandlers(handlers) {
-        let that = this;
 
         handlers = utils.isArray(handlers) ? handlers : [handlers];
 
-        that.handlers      = that.handlers || [];
-        that.handlerByName = that.handlerByName || {};
+        this.handlers      = this.handlers || [];
+        this.handlerByName = this.handlerByName || {};
 
         utils.forEach(handlers, function (handler) {
-            if (that.handlerByName[handler.name]) {
+            if (this.handlerByName[handler.name]) {
                 throw new Error('handler with name "' + handler.name + '" is already registered');
             }
             // handler = utils.isFunction(handler) ? new handler(that) : handler;
-            that.handlers.push(handler);
-            that.handlerByName[handler.name] = handler;
-        });
+            this.handlers.push(handler);
+            this.handlerByName[handler.name] = handler;
+        }, this);
 
-        return that;
+        return this;
     }
 
     remove() { }
@@ -257,34 +247,33 @@ class Paper extends Events {
     // --------
 
     reValidate() {
-        return this.invalidate().validate();
+        return this
+            .invalidate()
+            .validate();
     }
 
     clear(cell, force = false, recurse = true) {
 
-        let that  = this;
-        let model = that.model;
+        let model = this.model;
 
         cell = cell || model.getRoot();
 
-        that.removeState(cell);
+        this.removeState(cell);
 
-        if (recurse && (force || cell !== that.currentRoot)) {
+        if (recurse && (force || cell !== this.currentRoot)) {
             cell.eachChild(function (child) {
-                that.clear(child, force, recurse);
-            });
+                this.clear(child, force, recurse);
+            }, this);
         } else {
-            that.invalidate(cell, true, true);
+            this.invalidate(cell, true, true);
         }
 
-        return that;
+        return this;
     }
 
     invalidate(cell = this.model.getRoot(), recurse = true, includeLink = true) {
 
-        let that = this;
-        let view = that.getView(cell);
-
+        let view = this.getView(cell);
         if (view) {
             view.invalid = true;
         }
@@ -295,20 +284,20 @@ class Paper extends Events {
 
             if (recurse) {
                 cell.eachChild(function (child) {
-                    that.invalidate(child, recurse, includeLink);
-                });
+                    this.invalidate(child, recurse, includeLink);
+                }, this);
             }
 
             if (includeLink) {
                 cell.eachLink(function (link) {
-                    that.invalidate(link, recurse, includeLink);
-                });
+                    this.invalidate(link, recurse, includeLink);
+                }, this);
             }
 
             cell.invalidating = false;
         }
 
-        return that;
+        return this;
     }
 
     validate(cell = this.model.getRoot()) {
@@ -321,37 +310,31 @@ class Paper extends Events {
     validateCell(cell, visible = true) {
 
         // create or remove view for cell
-
-        let that = this;
-
         if (cell) {
 
             visible = visible && cell.visible;
 
-            let view = that.getView(cell, visible);
+            let view = this.getView(cell, visible);
 
             if (view && !visible) {
-                that.removeView(cell);
+                this.removeView(cell);
             }
 
             cell.eachChild(function (child) {
-                that.validateCell(child, visible);
-            });
+                this.validateCell(child, visible);
+            }, this);
         }
 
-        return that;
+        return this;
     }
 
     validateView(cell, recurse = true) {
 
-        let that = this;
-
         if (cell) {
-
-            let view = that.getView(cell);
+            let view = this.getView(cell);
             if (view) {
                 if (view.invalid) {
-                    that.validateView(cell.getParent(), false)
+                    this.validateView(cell.getParent(), false)
                         .updateNodeGeometry(cell)
                         .renderView(cell);
 
@@ -361,12 +344,12 @@ class Paper extends Events {
 
             if (recurse) {
                 cell.eachChild(function (child) {
-                    that.validateView(child, recurse);
-                });
+                    this.validateView(child, recurse);
+                }, this);
             }
         }
 
-        return that;
+        return this;
     }
 
     updateNodeGeometry(node) {
@@ -516,8 +499,7 @@ class Paper extends Events {
 
     resize(width, height, relative) {
 
-        let that         = this;
-        let options      = that.options;
+        let options      = this.options;
         let nativeWidth  = options.width;
         let nativeHeight = options.height;
 
@@ -526,7 +508,7 @@ class Paper extends Events {
 
         if (relative === true) {
 
-            let svg             = that.svg;
+            let svg             = this.svg;
             let isPercent       = utils.isPercentage(width);
             let isNativePercent = utils.isPercentage(nativeWidth);
 
@@ -558,14 +540,14 @@ class Paper extends Events {
         options.width  = width;
         options.height = height;
 
-        vector(that.svg).attr({
+        vector(this.svg).attr({
             width,
             height
         });
 
-        that.trigger('paper:resize', width, height);
+        this.trigger('paper:resize', width, height);
 
-        return that;
+        return this;
     }
 
     resizeTo(width, height) {
@@ -578,17 +560,16 @@ class Paper extends Events {
 
     translate(x, y, absolute) {
 
-        let that    = this;
-        let options = that.options;
+        let options = this.options;
 
         x = options.x = x || options.x;
         y = options.y = y || options.y;
 
-        vector(that.root).translate(x, y, absolute);
+        vector(this.root).translate(x, y, absolute);
 
-        that.trigger('paper:translate', x, y);
+        this.trigger('paper:translate', x, y);
 
-        return that;
+        return this;
     }
 
     translateTo(x, y) {
@@ -609,15 +590,10 @@ class Paper extends Events {
 
     getView(cell, create) {
 
-        let that  = this;
-        let views = that.views;
-
         if (cell) {
-
-            let view = views ? views[cell.id] : null;
-
+            let view = this.views ? this.views[cell.id] : null;
             if (!view && create && cell.visible) {
-                view = that.createView(cell);
+                view = this.createView(cell);
             }
 
             return view;
@@ -635,26 +611,23 @@ class Paper extends Events {
 
         if (cell) {
 
-            let that = this;
             let View = cell.metadata.view;
 
             if (!View) {
-                View = cell.isLink
-                    ? LinkView : cell.isNode
-                    ? NodeView
+                View = cell.isLink ? LinkView
+                    : cell.isNode ? NodeView
                     : null;
             }
 
             if (View) {
 
-                let view  = new View(that, cell);
-                let views = that.views;
+                let view = new View(this, cell);
 
-                if (!views) {
-                    views = that.views = {};
+                if (!this.views) {
+                    this.views = {};
                 }
 
-                views[cell.id] = view;
+                this.views[cell.id] = view;
 
                 return view;
             }
@@ -663,33 +636,28 @@ class Paper extends Events {
 
     removeView(cell) {
 
-        let that = this;
-        let view = that.getView(cell);
-
+        let view = this.getView(cell);
         if (view) {
-            delete that.views[cell.id];
+            delete this.views[cell.id];
             view.destroy();
         }
 
-        return that;
+        return this;
     }
 
     renderView(cell) {
 
-        let that = this;
-        let view = that.getView(cell);
-
+        let view = this.getView(cell);
         if (view) {
             view.render();
         }
 
-        return that;
+        return this;
     }
 
     findViewByElem(elem) {
 
-        let that = this;
-        let svg  = that.svg;
+        let svg = this.svg;
 
         elem = utils.isString(elem) ? svg.querySelector(elem) : elem;
 
@@ -697,7 +665,7 @@ class Paper extends Events {
 
             let cellId = elem.cellId;
             if (cellId) {
-                return that.views[cellId];
+                return this.views[cellId];
             }
 
             elem = elem.parentNode;
@@ -727,49 +695,42 @@ class Paper extends Events {
 
     handleChanges(changes) {
 
-        let that = this;
-
         // console.log(changes);
 
         utils.forEach(changes, function (change) {
-            that.distributeChange(change);
-        });
+            this.distributeChange(change);
+        }, this);
 
-        that.validate();
+        this.validate();
 
-        return that;
+        return this;
     }
 
     distributeChange(change) {
 
-        let that = this;
-
         if (change instanceof RootChange) {
-            that.onRootChanged(change);
+            this.onRootChanged(change);
         } else if (change instanceof ChildChange) {
-            that.onChildChanged(change);
+            this.onChildChanged(change);
         } else if (change instanceof TerminalChange) {
-            that.onTerminalChange(change);
+            this.onTerminalChange(change);
         } else if (change instanceof GeometryChange) {
-            that.onGeometryChange(change);
+            this.onGeometryChange(change);
         }
-        return that;
+        return this;
     }
 
-    onRootChanged(/* change */) {
-    }
+    onRootChanged(/* change */) { }
 
     onChildChanged(change) {
-
-        let that = this;
 
         let newParent = change.parent;
         let oldParent = change.previous;
 
-        that.invalidate(change.child, true, true);
+        this.invalidate(change.child, true, true);
 
         if (!newParent) {
-            that.removeView(change.child);
+            this.removeView(change.child);
         }
 
         /*
@@ -785,8 +746,8 @@ class Paper extends Events {
          */
 
         if (newParent !== oldParent) {
-            newParent && that.invalidate(newParent, false, false);
-            oldParent && that.invalidate(oldParent, false, false);
+            newParent && this.invalidate(newParent, false, false);
+            oldParent && this.invalidate(oldParent, false, false);
         }
     }
 
@@ -805,22 +766,18 @@ class Paper extends Events {
 
     static registerRouter(name, fn) {
 
-        let that   = this;
-        let router = that.router;
-
-        if (!router) {
-            router = that.router = {};
+        if (!this.router) {
+            this.router = {};
         }
 
-        router[name] = fn;
+        this.router[name] = fn;
 
-        return that;
+        return this;
     }
 
     static getRouter(name) {
 
-        let router = this.router;
-        return router ? router[name] : null;
+        return this.router ? this.router[name] : null;
     }
 
     getRouter(name) {
@@ -834,22 +791,18 @@ class Paper extends Events {
 
     static registerConnector(name, fn) {
 
-        let that       = this;
-        let connectors = that.connectors;
-
-        if (!connectors) {
-            connectors = that.connectors = {};
+        if (!this.connectors) {
+            this.connectors = {};
         }
 
-        connectors[name] = fn;
+        this.connectors[name] = fn;
 
-        return that;
+        return this;
     }
 
     static getConnector(name) {
 
-        let connectors = this.connectors;
-        return connectors ? connectors[name] : null;
+        return this.connectors ? this.connectors[name] : null;
     }
 
     getConnector(name) {
@@ -863,22 +816,18 @@ class Paper extends Events {
 
     static registerMarker(name, fn) {
 
-        let that    = this;
-        let markers = that.markers;
-
-        if (!markers) {
-            markers = that.markers = {};
+        if (!this.markers) {
+            this.markers = {};
         }
 
-        markers[name] = fn;
+        this.markers[name] = fn;
 
-        return that;
+        return this;
     }
 
     static getMarker(name) {
 
-        let markers = this.markers;
-        return markers ? markers[name] : null;
+        return this.markers ? this.markers[name] : null;
     }
 
     getMarker(name) {
@@ -895,9 +844,7 @@ class Paper extends Events {
         // If the event is interesting, guard returns `true`.
         // Otherwise, return `false`.
 
-        let that = this;
-
-        if (that.options.isValidEvent && !that.options.isValidEvent(e, view)) {
+        if (this.options.isValidEvent && !this.options.isValidEvent(e, view)) {
             return false;
         }
 
@@ -906,7 +853,7 @@ class Paper extends Events {
         }
 
 
-        let svg    = that.svg;
+        let svg    = this.svg;
         let target = e.target;
 
         if (svg === target || utils.containsElem(svg, target)) {
@@ -918,23 +865,22 @@ class Paper extends Events {
 
         e = utils.normalizeEvent(e);
 
-        let that = this;
-        let view = that.findViewByElem(e.target);
+        let view = this.findViewByElem(e.target);
 
-        if (!that.isValidEvent(e, view)) {
+        if (!this.isValidEvent(e, view)) {
             return;
         }
 
-        let localPoint = that.snapToGrid({
+        let localPoint = this.snapToGrid({
             x: e.clientX,
             y: e.clientY
         });
 
         if (view) {
-            that.trigger('cell:contextmenu', view.cell, view, e, localPoint.x, localPoint.y);
+            this.trigger('cell:contextmenu', view.cell, view, e, localPoint.x, localPoint.y);
             // view.onContextMenu(e, localPoint.x, localPoint.y);
         } else {
-            that.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
+            this.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
         }
     }
 
@@ -943,49 +889,46 @@ class Paper extends Events {
         e.preventDefault();
         e = utils.normalizeEvent(e);
 
-        let that = this;
-        let view = that.findViewByElem(e.target);
+        let view = this.findViewByElem(e.target);
 
-        if (!that.isValidEvent(e, view)) {
+        if (!this.isValidEvent(e, view)) {
             return;
         }
 
-        let localPoint = that.snapToGrid({
+        let localPoint = this.snapToGrid({
             x: e.clientX,
             y: e.clientY
         });
 
         if (view) {
-            that.trigger('cell:pointerDblClick', view.cell, view, e, localPoint.x, localPoint.y);
+            this.trigger('cell:pointerDblClick', view.cell, view, e, localPoint.x, localPoint.y);
             // view.onDblClick(e, localPoint.x, localPoint.y);
         } else {
-            that.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
+            this.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
         }
     }
 
     onClick(e) {
 
-        let that = this;
-
-        if (that.mouseMoved <= that.options.clickThreshold) {
+        if (this.mouseMoved <= this.options.clickThreshold) {
 
             e        = utils.normalizeEvent(e);
-            let view = that.findViewByElem(e.target);
+            let view = this.findViewByElem(e.target);
 
-            if (!that.isValidEvent(e, view)) {
+            if (!this.isValidEvent(e, view)) {
                 return;
             }
 
-            let localPoint = that.snapToGrid({
+            let localPoint = this.snapToGrid({
                 x: e.clientX,
                 y: e.clientY
             });
 
             if (view) {
-                that.trigger('cell:pointerClick', view.cell, view, e, localPoint.x, localPoint.y);
+                this.trigger('cell:pointerClick', view.cell, view, e, localPoint.x, localPoint.y);
                 // view.onClick(e, localPoint.x, localPoint.y);
             } else {
-                that.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
+                this.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
             }
         }
     }
@@ -994,27 +937,26 @@ class Paper extends Events {
 
         e = utils.normalizeEvent(e);
 
-        let that = this;
-        let view = that.findViewByElem(e.target);
+        let view = this.findViewByElem(e.target);
 
-        if (!that.isValidEvent(e, view)) {
+        if (!this.isValidEvent(e, view)) {
             return;
         }
 
         e.preventDefault();
-        that.mouseMoved = 0;
+        this.mouseMoved = 0;
 
-        let localPoint = that.snapToGrid({
+        let localPoint = this.snapToGrid({
             x: e.clientX,
             y: e.clientY
         });
 
         if (view) {
-            that.sourceView = view;
+            this.sourceView = view;
             // view.onPointerDown(e, localPoint.x, localPoint.y);
-            that.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
+            this.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
         } else {
-            that.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
+            this.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
         }
     }
 
@@ -1023,19 +965,18 @@ class Paper extends Events {
         e.preventDefault();
         e = utils.normalizeEvent(e);
 
-        let that       = this;
-        let sourceView = that.sourceView;
+        let sourceView = this.sourceView;
 
         if (sourceView) {
 
-            let localPoint = that.snapToGrid({
+            let localPoint = this.snapToGrid({
                 x: e.clientX,
                 y: e.clientY
             });
 
-            that.mouseMoved++;
+            this.mouseMoved++;
 
-            that.trigger('cell:pointerMove', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
+            this.trigger('cell:pointerMove', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
             // sourceView.onPointerMove(e, localPoint.x, localPoint.y);
         }
     }
@@ -1044,19 +985,18 @@ class Paper extends Events {
 
         e = utils.normalizeEvent(e);
 
-        let that       = this;
-        let localPoint = that.snapToGrid({
+        let localPoint = this.snapToGrid({
             x: e.clientX,
             y: e.clientY
         });
-        let sourceView = that.sourceView;
+        let sourceView = this.sourceView;
 
         if (sourceView) {
-            that.trigger('cell:pointerUp', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
+            this.trigger('cell:pointerUp', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
             // sourceView.onPointerUp(e, localPoint.x, localPoint.y);
-            that.sourceView = null;
+            this.sourceView = null;
         } else {
-            that.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
+            this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
         }
     }
 
@@ -1064,14 +1004,11 @@ class Paper extends Events {
 
         e = utils.normalizeEvent(e);
 
-        let that = this;
-        let view = that.findViewByElem(e.target);
-
+        let view = this.findViewByElem(e.target);
         if (view) {
-
-            if (that.isValidEvent(e, view)) {
+            if (this.isValidEvent(e, view)) {
                 // view.onMouseOver(e);
-                that.trigger('cell:mouseOver', view.cell, view, e);
+                this.trigger('cell:mouseOver', view.cell, view, e);
             }
         }
     }
@@ -1080,14 +1017,11 @@ class Paper extends Events {
 
         e = utils.normalizeEvent(e);
 
-        let that = this;
-        let view = that.findViewByElem(e.target);
-
+        let view = this.findViewByElem(e.target);
         if (view) {
-
-            if (that.isValidEvent(e, view)) {
+            if (this.isValidEvent(e, view)) {
                 // view.onMouseOut(e);
-                that.trigger('cell:mouseOut', view.cell, view, e);
+                this.trigger('cell:mouseOut', view.cell, view, e);
             }
         }
     }

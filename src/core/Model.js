@@ -3,10 +3,10 @@ import     Events from '../common/Events';
 import       Cell from '../cells/Cell';
 import   Terminal from '../cells/Terminal';
 
-import RootChange       from '../changes/RootChange';
-import ChildChange      from '../changes/ChildChange';
-import TerminalChange   from '../changes/TerminalChange';
-import GeometryChange   from '../changes/GeometryChange';
+import      RootChange  from '../changes/RootChange';
+import      ChildChange from '../changes/ChildChange';
+import   TerminalChange from '../changes/TerminalChange';
+import   GeometryChange from '../changes/GeometryChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
 
@@ -16,18 +16,16 @@ class Model extends Events {
 
         super();
 
-        let that = this;
+        this.nextId       = 0;
+        this.updateLevel  = 0;
+        this.endingUpdate = false;
 
-        that.nextId       = 0;
-        that.updateLevel  = 0;
-        that.endingUpdate = false;
-
-        that.changes = new ChangeCollection(that);
+        this.changes = new ChangeCollection(this);
 
         if (root) {
-            that.setRoot(root);
+            this.setRoot(root);
         } else {
-            that.clear();
+            this.clear();
         }
     }
 
@@ -38,7 +36,8 @@ class Model extends Events {
 
     getDefaultParent() {
 
-        return this.getRoot().getChildAt(0);  // the first layer
+        // the first layer
+        return this.getRoot().getChildAt(0);
     }
 
     isOrphan(cell) {
@@ -104,10 +103,8 @@ class Model extends Events {
 
     createCellId() {
 
-        let that = this;
-        let id   = that.nextId;
-
-        that.nextId += 1;
+        let id = this.nextId;
+        this.nextId += 1;
 
         return 'cell-' + id;
     }
@@ -149,13 +146,12 @@ class Model extends Events {
 
     rootChanged(root) {
 
-        let that = this;
-        let prev = that.root;
+        let prev = this.root;
 
-        that.root   = root;
-        that.cells  = null;
-        that.nextId = 0;
-        that.cellAdded(root);
+        this.root   = root;
+        this.cells  = null;
+        this.nextId = 0;
+        this.cellAdded(root);
 
         return prev;
     }
@@ -205,17 +201,16 @@ class Model extends Events {
 
     addCells(cells, parent, index, source, target) {
 
-        let that = this;
-
-        parent = parent || that.getDefaultParent();
+        parent = parent || this.getDefaultParent();
         index  = utils.fixIndex(index, parent.getChildCount());
 
-        that.beginUpdate();
+        this.beginUpdate();
 
         try {
+            let that = this;
+
             utils.forEach(cells, function (child) {
                 if (child) {
-
                     if (child !== parent) {
 
                         that.digest(new ChildChange(that, parent, child, index));
@@ -236,33 +231,29 @@ class Model extends Events {
                 }
             });
         } finally {
-            that.endUpdate();
+            this.endUpdate();
         }
 
-        return that;
+        return this;
     }
 
     cellConnected(link, terminal, isSource) {
 
         // connect link with node
-
-        let that = this;
-
         if (link) {
-            that.beginUpdate();
+            this.beginUpdate();
             try {
-                that.setTerminal(link, terminal, isSource);
+                this.setTerminal(link, terminal, isSource);
             } finally {
-                that.endUpdate();
+                this.endUpdate();
             }
         }
 
-        return that;
+        return this;
     }
 
     childChanged(cell, parent, index) {
 
-        let that = this;
         let prev = cell.parent;
 
         if (parent) {
@@ -277,11 +268,11 @@ class Model extends Events {
         if (parent) {
             // check if the previous parent was already in the
             // model and avoids calling cellAdded if it was.
-            if (!that.contains(prev)) {
-                that.cellAdded(cell);
+            if (!this.contains(prev)) {
+                this.cellAdded(cell);
             }
         } else {
-            that.cellRemoved(cell);
+            this.cellRemoved(cell);
         }
 
         return prev;
@@ -303,41 +294,35 @@ class Model extends Events {
     cellAdded(cell) {
 
         // fix cell's id, and map the cell
-
-        let that = this;
-
         if (cell) {
 
-            let id = cell.id || that.createCellId(cell);
-
+            let id = cell.id || this.createCellId(cell);
             if (id) {
-
                 // distinct
-                let dist = that.getCellById(id);
-
+                let dist = this.getCellById(id);
                 if (dist !== cell) {
                     while (dist) {
-                        id   = that.createCellId(cell);
-                        dist = that.getCellById(id);
+                        id   = this.createCellId(cell);
+                        dist = this.getCellById(id);
                     }
 
                     // as lazy as possible
-                    if (!that.cells) {
-                        that.cells = {};
+                    if (!this.cells) {
+                        this.cells = {};
                     }
 
                     cell.id = id;
                     // mapping
-                    that.cells[id] = cell;
+                    this.cells[id] = cell;
                 }
             }
 
             // fix nextId
             if (utils.isNumeric(id)) {
-                that.nextId = Math.max(that.nextId, id);
+                this.nextId = Math.max(this.nextId, id);
             }
 
-            cell.eachChild(that.cellAdded, that);
+            cell.eachChild(this.cellAdded, this);
         }
     }
 
@@ -345,24 +330,22 @@ class Model extends Events {
 
         // Updates the parent for all links that are connected to node
 
-        let that = this;
-
-        root = root || that.getRoot(cell);
+        root = root || this.getRoot(cell);
 
         // update links on children first
         cell.eachChild(function (child) {
-            that.updateLinkParents(child, root);
-        });
+            this.updateLinkParents(child, root);
+        }, this);
 
         // update the parents of all connected links
         cell.eachLink(function (link) {
             // update edge parent if edge and child have
             // a common root node (does not need to be the
             // model root node)
-            if (that.isAncestor(root, link)) {
-                that.updateLinkParent(link, root);
+            if (this.isAncestor(root, link)) {
+                this.updateLinkParent(link, root);
             }
-        });
+        }, this);
     }
 
     updateLinkParent(link, root) {
@@ -453,13 +436,11 @@ class Model extends Events {
 
     removeCell(cell) {
 
-        let that = this;
-
         if (cell) {
-            if (cell === that.root) {
-                that.setRoot(null);
+            if (cell === this.root) {
+                this.setRoot(null);
             } else if (cell.parent) {
-                that.digest(new ChildChange(that, null, cell));
+                this.digest(new ChildChange(this, null, cell));
             }
         }
 
@@ -468,17 +449,15 @@ class Model extends Events {
 
     cellRemoved(cell) {
 
-        let that = this;
-
         if (cell) {
 
             cell.eachChild(function (child) {
-                that.cellRemoved(child);
-            });
+                this.cellRemoved(child);
+            }, this);
 
             // un-map
             let id    = cell.id;
-            let cells = that.cells;
+            let cells = this.cells;
             if (cells && id) {
                 delete cells[id];
             }
@@ -529,24 +508,21 @@ class Model extends Events {
 
     setTerminals(link, source, target) {
 
-        let that = this;
-
-        that.beginUpdate();
+        this.beginUpdate();
 
         try {
-            that.setTerminal(link, source, true);
-            that.setTerminal(link, target, false);
+            this.setTerminal(link, source, true);
+            this.setTerminal(link, target, false);
         } finally {
-            that.endUpdate();
+            this.endUpdate();
         }
 
-        return that;
+        return this;
     }
 
     terminalChanged(link, terminal, isSource) {
 
-        let that = this;
-        let prev = that.getTerminal(link, isSource);
+        let prev = this.getTerminal(link, isSource);
 
         if (terminal) {
             terminal.addLink(link, isSource);
@@ -562,10 +538,10 @@ class Model extends Events {
     }
 
     setGeometry(cell, geometry) {
-        let that = this;
 
-        that.digest(new GeometryChange(that, cell, geometry));
-        return that;
+        this.digest(new GeometryChange(this, cell, geometry));
+
+        return this;
     }
 
     // geometryChanged(cell, geometry) {
@@ -578,56 +554,50 @@ class Model extends Events {
 
     digest(change) {
 
-        let that = this;
-
         // take effect the change
         change.digest();
 
-        that.beginUpdate();
-        that.changes.add(change);
-        that.endUpdate();
+        this.beginUpdate();
+        this.changes.add(change);
+        this.endUpdate();
 
-        return that;
+        return this;
     }
 
     beginUpdate() {
 
-        let that = this;
+        this.updateLevel += 1;
+        this.trigger('beginUpdate');
 
-        that.updateLevel += 1;
-        that.trigger('beginUpdate');
-
-        if (that.updateLevel === 1) {
-            that.trigger('startEdit');
+        if (this.updateLevel === 1) {
+            this.trigger('startEdit');
         }
     }
 
     endUpdate() {
 
-        let that = this;
+        this.updateLevel -= 1;
 
-        that.updateLevel -= 1;
-
-        if (that.updateLevel === 0) {
-            that.trigger('endEdit');
+        if (this.updateLevel === 0) {
+            this.trigger('endEdit');
         }
 
-        if (!that.endingUpdate) {
+        if (!this.endingUpdate) {
 
-            that.endingUpdate = that.updateLevel === 0;
+            this.endingUpdate = this.updateLevel === 0;
 
-            let changes = that.changes;
+            let changes = this.changes;
 
-            that.trigger('endUpdate', changes.getChanges());
+            this.trigger('endUpdate', changes.getChanges());
 
             // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 还需要一种机制来管理
-            if (that.endingUpdate && changes.hasChange()) {
+            if (this.endingUpdate && changes.hasChange()) {
                 changes
                     .notify()
                     .clear();
             }
 
-            that.endingUpdate = false;
+            this.endingUpdate = false;
         }
     }
 }

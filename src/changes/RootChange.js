@@ -7,23 +7,20 @@ class RootChange extends Change {
 
         super();
 
-        let that = this;
-
-        that.model    = model;
-        that.root     = root;
-        that.previous = root;
+        this.model    = model;
+        this.root     = root;
+        this.previous = root;
     }
 
     digest() {
 
-        let that     = this;
-        let model    = that.model;
-        let previous = that.previous;
+        let model    = this.model;
+        let previous = this.previous;
 
-        that.root     = previous;
-        that.previous = model.rootChanged(previous);
+        this.root     = previous;
+        this.previous = model.rootChanged(previous);
 
-        return that;
+        return this;
     }
 }
 
