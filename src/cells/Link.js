@@ -11,20 +11,26 @@ class Link extends Visual {
         return link && link instanceof Link;
     }
 
+
+    // props
+    // -----
+
     get isLink() {
 
         return true;
     }
 
+
+    // methods
+    // -------
+
     insertVertice(points, index) {
 
-        let vertices = this.vertices;
-
-        if (!vertices) {
-            vertices = this.vertices = [];
+        if (!this.vertices) {
+            this.vertices = [];
         }
 
-        let length = vertices.length;
+        let length = this.vertices.length;
 
         index = utils.fixIndex(index, length);
 
@@ -33,9 +39,9 @@ class Link extends Visual {
         }
 
         if (index === length) {
-            Array.prototype.push.apply(vertices, points);
+            Array.prototype.push.apply(this.vertices, points);
         } else {
-            vertices.splice(index, 0, points);
+            this.vertices.splice(index, 0, points);
         }
 
         return this;
@@ -46,6 +52,7 @@ class Link extends Visual {
         if (point) {
 
             let index = -1;
+
             utils.some(this.vertices, function (vertice, i) {
                 if (point.x === vertice.x && point.y === vertice.y) {
                     index = i;
@@ -56,7 +63,6 @@ class Link extends Visual {
             if (index >= 0) {
                 this.removeVerticeAt(index);
             }
-
         }
 
         return this;
@@ -65,13 +71,12 @@ class Link extends Visual {
     removeVerticeAt(index) {
 
         let vertice;
-        let vertices = this.vertices;
 
-        if (vertices && vertices.length) {
-            vertice = vertices[index];
+        if (this.vertices && this.vertices.length) {
+            vertice = this.vertices[index];
 
             if (vertice) {
-                vertices.splice(index, 1);
+                this.vertices.splice(index, 1);
             }
         }
 
@@ -96,34 +101,34 @@ class Link extends Visual {
         return router;
     }
 
+    getMarker(isSource) {
+
+        let marker = isSource
+            ? this.metadata.sourceMarker
+            : this.metadata.targetMarker;
+
+        if (!utils.isObject(marker)) {
+            marker = { name: marker };
+        }
+
+        marker.selector = isSource
+            ? '.source-marker'
+            : '.target-marker';
+
+        return marker;
+    }
+
     getConnector() {
 
-        let selector  = '.connector';
         let connector = this.metadata.connector || {};
 
         if (!utils.isObject(connector)) {
             connector = { name: connector };
         }
 
-        connector.selector = selector;
+        connector.selector = '.connector';
 
         return connector;
-    }
-
-    getMarker(isSource) {
-
-        let that     = this;
-        let meta     = that.metadata;
-        let marker   = isSource ? meta.sourceMarker : meta.targetMarker;
-        let selector = isSource ? '.source-marker' : '.target-marker';
-
-        if (!utils.isObject(marker)) {
-            marker = { name: marker };
-        }
-
-        marker.selector = selector;
-
-        return marker;
     }
 }
 

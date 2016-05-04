@@ -18,13 +18,12 @@ class Visual extends Cell {
 
         super();
 
-        let that     = this;
-        let metadata = utils.merge({}, that.constructor.defaults, options);
+        let metadata = utils.merge({}, this.constructor.defaults, options);
 
-        that.data     = metadata.data;
-        that.attrs    = metadata.attrs;
-        that.visible  = metadata.visible !== false;
-        that.metadata = metadata;
+        this.data     = metadata.data;
+        this.attrs    = metadata.attrs;
+        this.visible  = metadata.visible !== false;
+        this.metadata = metadata;
     }
 
     getClassName() {
@@ -40,8 +39,6 @@ class Visual extends Cell {
 
         return this.metadata.markup;
     }
-
-
 }
 
 
@@ -53,7 +50,7 @@ Visual.defaults = {
     attrs: {},   // styles
     data: null,  // cached data(for business logic)
     pane: null,  // specify the container of the view
-    view: null   // specify the view's Constructor
+    view: null   // specify the constructor of the view
 };
 
 

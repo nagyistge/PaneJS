@@ -28,7 +28,11 @@ class Terminal {
     addLink(link, isSource) {
 
         if (link) {
-            this.node && this.node.addLink(link, isSource);
+
+            if (this.node) {
+                this.node.addLink(link, isSource);
+            }
+
             link.setTerminal(this, isSource);
         }
 
@@ -38,13 +42,18 @@ class Terminal {
     removeLink(link, isSource) {
 
         if (link) {
-            this.node && this.node.removeLink(link, isSource);
+
+            if (this.node) {
+                this.node.removeLink(link, isSource);
+            }
+
             link.setTerminal(null, isSource);
         }
 
         return this;
     }
 }
+
 
 // exports
 // -------

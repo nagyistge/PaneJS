@@ -10,6 +10,7 @@ class Cell {
         return cell && cell instanceof Cell;
     }
 
+
     // link
     // ----
 
@@ -52,7 +53,9 @@ class Cell {
 
     getTerminalNode(isSource) {
 
-        let node = isSource ? this.sourceNode : this.targetNode;
+        let node = isSource
+            ? this.sourceNode
+            : this.targetNode;
 
         if (!node) {
 
@@ -82,7 +85,9 @@ class Cell {
 
     getTerminalPort(isSource) {
 
-        let port = isSource ? this.sourcePort : this.targetPort;
+        let port = isSource
+            ? this.sourcePort
+            : this.targetPort;
 
         if (!port) {
 
@@ -112,7 +117,9 @@ class Cell {
 
     getTerminalPoint(isSource) {
 
-        let point = isSource ? this.sourcePoint : this.targetPoint;
+        let point = isSource
+            ? this.sourcePoint
+            : this.targetPoint;
 
         if (!point) {
 
@@ -189,34 +196,32 @@ class Cell {
 
     insertChild(child, index) {
 
-        let that = this;
-
         if (child) {
 
-            let childCount = that.getChildCount();
+            let childCount = this.getChildCount();
 
             index = utils.fixIndex(index, childCount);
 
-            if (child.parent === that && index === childCount) {
+            if (child.parent === this && index === childCount) {
                 index--;
             }
 
             // update parent
             child.removeFromParent();
-            child.parent = that;
+            child.parent = this;
 
 
-            let children = that.children;
+            let children = this.children;
             if (children && children.length) {
                 children.splice(index, 0, child);
             } else {
                 // speed up
-                children = that.children = [];
+                children = this.children = [];
                 children.push(child);
             }
         }
 
-        return that;
+        return this;
     }
 
     removeChild(child) {
@@ -226,13 +231,11 @@ class Cell {
 
     removeChildAt(index) {
 
-        let that     = this;
         let child    = null;
-        let children = that.children;
-
+        let children = this.children;
         if (children && index >= 0) {
 
-            child = that.getChildAt(index);
+            child = this.getChildAt(index);
 
             if (child) {
                 children.splice(index, 1);
@@ -275,44 +278,38 @@ class Cell {
 
     addLink(link, outgoing) {
 
-        let that  = this;
-        let links = that.links;
-
         if (link) {
 
             link.removeFromTerminal(outgoing);
 
-            if (!links || that.indexOfLink(link) < 0 ||
+            if (!this.links || this.indexOfLink(link) < 0 ||
                     // 连线的起点和终点是同一个节点时,说明
                     // 连线已经和节点关联，则不需要重复添加
-                link.getTerminalNode(!outgoing) !== that) {
+                link.getTerminalNode(!outgoing) !== this) {
 
-                if (!links) {
-                    links = that.links = [];
+                if (!this.links) {
+                    this.links = [];
                 }
 
-                links.push(link);
+                this.links.push(link);
             }
 
-            link.setTerminalNode(that, outgoing);
+            link.setTerminalNode(this, outgoing);
         }
 
-        return that;
+        return this;
     }
 
     removeLink(link, outgoing) {
 
-        let that  = this;
-        let links = that.links;
 
         if (link) {
-
             // 连线的起点和终点是同一个节点时不需要移除
-            if (links && link.getTerminalNode(!outgoing) !== that) {
+            if (this.links && link.getTerminalNode(!outgoing) !== this) {
 
-                let index = that.indexOfLink(link);
+                let index = this.indexOfLink(link);
                 if (index >= 0) {
-                    links.splice(index, 1);
+                    this.links.splice(index, 1);
                 }
             }
 
@@ -369,10 +366,10 @@ class Cell {
 
     getDescendants() {
 
-        let that   = this;
         let result = [];
+        let that   = this;
 
-        that.eachChild(function (child) {
+        this.eachChild(function (child) {
             result.push(child);
             result = result.concat(that.getDescendants(child));
         });
@@ -382,14 +379,11 @@ class Cell {
 
     removeFromParent() {
 
-        let that   = this;
-        let parent = that.parent;
-
-        if (parent) {
-            parent.removeChild(that);
+        if (this.parent) {
+            this.parent.removeChild(this);
         }
 
-        return that;
+        return this;
     }
 
 
@@ -433,13 +427,12 @@ class Cell {
 
     clone(options, withData) {
 
-        let that     = this;
-        let metadata = utils.merge({}, that.metadata, options);
+        let metadata = utils.merge({}, this.metadata, options);
 
-        metadata.data    = withData === true ? that.cloneData() : that.data;
-        metadata.visible = that.visible;
+        metadata.data    = withData === true ? this.cloneData() : this.data;
+        metadata.visible = this.visible;
 
-        return new that.constructor(metadata);
+        return new this.constructor(metadata);
     }
 
     destroy() {}
