@@ -37,19 +37,18 @@ class CellView {
 
     getPane() {
 
-        let paper = this.paper;
-        let pane  = this.cell.metadata.pane;
+        let pane = this.cell.metadata.pane;
         let result;
 
         if (pane) {
             if (utils.isString(pane)) {
-                result = paper[pane];
+                result = this.paper[pane];
             } else if (utils.isNode(pane)) {
                 result = pane;
             }
         }
 
-        return result || paper.drawPane;
+        return result || this.paper.drawPane;
     }
 
     renderMarkup() {
@@ -58,7 +57,6 @@ class CellView {
         // if the default markup is not desirable.
 
         let markup = this.cell.getMarkup();
-
         if (markup) {
             this.vel.append(vector(markup));
         } else {
@@ -106,42 +104,37 @@ class CellView {
         //      }
         //   }
 
-        let that = this;
-
         if (!filter) {
-            return that;
+            return this;
         }
 
-        let name     = filter.name || '';
-        let args     = filter.args || {};
-        let attrs    = filter.attrs;
-        let filterFn = filters[name];
+        let name   = filter.name || '';
+        let args   = filter.args || {};
+        let attrs  = filter.attrs;
+        let render = filters[name];
 
-        if (!name || !filterFn) {
+        if (!name || !render) {
             throw new Error('Invalided filter: "' + name + '"');
         }
 
-        let vels = utils.isString(selector) ? that.find(selector) : selector;
-
+        let vels = utils.isString(selector) ? this.find(selector) : selector;
         if (!vels.length) {
-            return that;
+            return this;
         }
 
 
-        let paper    = that.paper;
-        let svg      = paper.svg;
-        let hash     = utils.hashCode(JSON.stringify(filter));
-        let filterId = name + '-' + paper.id + '-' + hash;
+        let svg  = this.paper.svg;
+        let hash = utils.hashCode(JSON.stringify(filter));
+        let id   = name + '-' + this.paper.id + '-' + hash;
 
         // define filter
-        if (!svg.getElementById(filterId)) {
+        if (!svg.getElementById(id)) {
 
-            let vFilter = vector(filterFn(args));
+            let vFilter = vector(render(args));
             // Set the filter area to be 3x the bounding box of the cell
             // and center the filter around the cell.
             vFilter.attr({
                 filterUnits: 'objectBoundingBox',
-
                 x: -1,
                 y: -1,
                 width: 3,
@@ -152,17 +145,17 @@ class CellView {
                 vFilter.attr(attrs);
             }
 
-            vFilter.node.id = filterId;
+            vFilter.node.id = id;
 
             vector(svg).getDefs().append(vFilter);
         }
 
         // apply filter
         utils.forEach(vels, function (vel) {
-            vel.attr('filter', 'url(#' + filterId + ')');
+            vel.attr('filter', 'url(#' + id + ')');
         });
 
-        return that;
+        return this;
     }
 
     applyGradient(selector, attrName, gradient) {
@@ -189,10 +182,8 @@ class CellView {
         //     ]
         //   }
 
-        let that = this;
-
         if (!attrName || !gradient) {
-            return that;
+            return this;
         }
 
         let type  = gradient.type;
@@ -200,23 +191,21 @@ class CellView {
         let attrs = gradient.attrs;
 
         if (!type || !stops || !stops.length) {
-            return that;
+            return this;
         }
 
-        let vels = utils.isString(selector) ? that.find(selector) : selector;
-
+        let vels = utils.isString(selector) ? this.find(selector) : selector;
         if (!vels.length) {
-            return that;
+            return this;
         }
 
-        let paper      = that.paper;
-        let svg        = paper.svg;
-        let gradientId = type + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
+        let svg = this.paper.svg;
+        let id  = type + '-' + this.paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
 
         // define gradient
-        if (!svg.getElementById(gradientId)) {
+        if (!svg.getElementById(id)) {
 
-            let gradientString = [
+            let gradientStr = [
                 '<' + type + '>',
                 utils.map(stops, function (stop) {
                     return '<stop offset="' + stop.offset + '" stop-color="' + stop.color + '" stop-opacity="' + (utils.isFinite(stop.opacity) ? stop.opacity : 1) + '" />';
@@ -224,23 +213,22 @@ class CellView {
                 '</' + type + '>'
             ].join('');
 
-            let vGradient = vector(gradientString);
+            let vGradient = vector(gradientStr);
 
             if (attrs) {
                 vGradient.attr(attrs);
             }
 
-            vGradient.node.id = gradientId;
-
+            vGradient.node.id = id;
             vector(svg).getDefs().append(vGradient);
         }
 
         // apply gradient
         utils.forEach(vels, function (vel) {
-            vel.attr(attrName, 'url(#' + gradientId + ')');
+            vel.attr(attrName, 'url(#' + id + ')');
         });
 
-        return that;
+        return this;
     }
 
 

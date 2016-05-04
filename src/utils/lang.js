@@ -13,6 +13,11 @@ function isUndefined(obj) {
     return typeof obj === 'undefined';
 }
 
+function isNil(obj) {
+
+    return isUndefined(obj) || isNull(obj);
+}
+
 function isString(obj) {
 
     return typeof obj === 'string';
@@ -115,6 +120,7 @@ function isEmptyObject(obj) {
 // -------
 
 export {
+    isNil,
     isNull,
     isType,
     isArray,
