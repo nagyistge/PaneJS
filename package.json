@@ -69,7 +69,7 @@
     "preserver": "mkdir -p ./demo/lib && cp ./node_modules/jquery/dist/* ./demo/lib/",
     "start": "node ./scripts/server.js",
     "build": "npm run clean:dist && webpack && webpack --config webpack.config.min.js",
-    "debug": "npm run build && npm run server",
+    "debug": "npm run build && npm start",
     "prepublish": "npm run build",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
     "release:minor": "npm version minor && npm publish && git push --follow-tags",

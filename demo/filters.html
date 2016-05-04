@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf8"/>
 
-    <title>Filters example for PaneJS</title>
+    <title>Filters example for paneJS</title>
     <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
         #container {
@@ -20,10 +20,10 @@
 
     var container = document.getElementById('container');
 
-    var model = new pane.Model();
-    var paper = new pane.Paper(container, model);
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
 
-    var node1 = new pane.shapes.basic.Rect({
+    var node1 = new panejs.shapes.basic.Rect({
         position: { x: 30, y: 30 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -53,7 +53,7 @@
 
     model.addCell(node1);
 
-    var node2 = new pane.shapes.basic.Rect({
+    var node2 = new panejs.shapes.basic.Rect({
         position: { x: 170, y: 30 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -81,7 +81,7 @@
     model.addCell(node2);
 
 
-    var node3 = new pane.shapes.basic.Rect({
+    var node3 = new panejs.shapes.basic.Rect({
         position: { x: 310, y: 30 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -105,7 +105,7 @@
 
     model.addCell(node3);
 
-    var node4 = new pane.shapes.basic.Rect({
+    var node4 = new panejs.shapes.basic.Rect({
         position: { x: 450, y: 30 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -129,7 +129,7 @@
 
     model.addCell(node4);
 
-    var node5 = new pane.shapes.basic.Rect({
+    var node5 = new panejs.shapes.basic.Rect({
         position: { x: 30, y: 110 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -156,7 +156,7 @@
 
     model.addCell(node5);
 
-    var node6 = new pane.shapes.basic.Rect({
+    var node6 = new panejs.shapes.basic.Rect({
         position: { x: 170, y: 110 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -181,7 +181,7 @@
     model.addCell(node6);
 
 
-    var node7 = new pane.shapes.basic.Rect({
+    var node7 = new panejs.shapes.basic.Rect({
         position: { x: 310, y: 110 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -206,7 +206,7 @@
     model.addCell(node7);
 
 
-    var node8 = new pane.shapes.basic.Rect({
+    var node8 = new panejs.shapes.basic.Rect({
         position: { x: 450, y: 110 },
         size: { width: 100, height: 40 },
         attrs: {
@@ -231,7 +231,7 @@
     model.addCell(node8);
 
 
-    var node9 = new pane.shapes.basic.Rect({
+    var node9 = new panejs.shapes.basic.Rect({
         position: { x: 30, y: 190 },
         size: { width: 100, height: 40 },
         attrs: {

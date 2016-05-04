@@ -7,32 +7,29 @@ class CellView {
 
     constructor(paper, cell) {
 
-        let that = this;
+        this.cell    = cell;
+        this.paper   = paper;
+        this.invalid = true;  // default need to be repainted
 
-        that.cell = cell;
-        that.paper = paper;
-        that.invalid = true; // default need to be repainted
-
-        that.ensureElement();
+        this.ensureElement();
     }
 
     ensureElement() {
 
-        let that = this;
-        let cell = that.cell;
-        let vel = vector('g', { 'class': cell.getClassName() });
+        let cell = this.cell;
+        let vel  = vector('g', { 'class': cell.getClassName() });
 
-        that.vel = vel;
-        that.elem = vel.node;
+        this.vel  = vel;
+        this.elem = vel.node;
         // attach cell's id to elem
-        that.elem.cellId = cell.id;
+        this.elem.cellId = cell.id;
 
-        let pane = that.getPane();
+        let pane = this.getPane();
         if (pane) {
-            pane.appendChild(that.elem);
+            pane.appendChild(this.elem);
         }
 
-        return that;
+        return this;
     }
 
     render() { return this; }
@@ -41,9 +38,8 @@ class CellView {
 
     getPane() {
 
-        let that = this;
-        let paper = that.paper;
-        let pane = that.cell.metadata.pane;
+        let paper = this.paper;
+        let pane  = this.cell.metadata.pane;
         let result;
 
         if (pane) {
@@ -59,19 +55,18 @@ class CellView {
 
     renderMarkup() {
 
-        // `markup` is rendered by default. Set the `markup` attribute
-        // on the model if the default markup is not desirable.
+        // `markup` is rendered by default. Set the `markup` on model
+        // if the default markup is not desirable.
 
-        let that = this;
-        let markup = that.cell.getMarkup();
+        let markup = this.cell.getMarkup();
 
         if (markup) {
-            that.vel.append(vector(markup));
+            this.vel.append(vector(markup));
         } else {
-            throw new Error('`markup` is missing while the default render() implementation is used.');
+            throw new Error('`markup` is missing while the default `render()` implementation is used.');
         }
 
-        return that;
+        return this;
     }
 
     find(selector) {
@@ -86,15 +81,13 @@ class CellView {
 
     applyAttr(selector, attrs) {
 
-        let that = this;
-
         if (attrs) {
-            utils.forEach(that.find(selector), function (vel) {
+            utils.forEach(this.find(selector), function (vel) {
                 vel.attr(attrs);
             });
         }
 
-        return that;
+        return this;
     }
 
     applyFilter(selector, filter) {
@@ -120,9 +113,9 @@ class CellView {
             return that;
         }
 
-        let name = filter.name || '';
-        let args = filter.args || {};
-        let attrs = filter.attrs;
+        let name     = filter.name || '';
+        let args     = filter.args || {};
+        let attrs    = filter.attrs;
         let filterFn = filters[name];
 
         if (!name || !filterFn) {
@@ -136,9 +129,9 @@ class CellView {
         }
 
 
-        let paper = that.paper;
-        let svg = paper.svg;
-        let hash = utils.hashCode(JSON.stringify(filter));
+        let paper    = that.paper;
+        let svg      = paper.svg;
+        let hash     = utils.hashCode(JSON.stringify(filter));
         let filterId = name + '-' + paper.id + '-' + hash;
 
         // define filter
@@ -203,7 +196,7 @@ class CellView {
             return that;
         }
 
-        let type = gradient.type;
+        let type  = gradient.type;
         let stops = gradient.stops;
         let attrs = gradient.attrs;
 
@@ -217,8 +210,8 @@ class CellView {
             return that;
         }
 
-        let paper = that.paper;
-        let svg = paper.svg;
+        let paper      = that.paper;
+        let svg        = paper.svg;
         let gradientId = type + '-' + paper.id + '-' + utils.hashCode(JSON.stringify(gradient));
 
         // define gradient
@@ -273,13 +266,11 @@ class CellView {
 
     destroy() {
 
-        let that = this;
-        let elem = that.elem;
+        let elem = this.elem;
 
         if (elem && elem.parentNode) {
             elem.parentNode.removeChild(elem);
         }
-
     }
 }
 
