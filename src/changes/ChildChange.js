@@ -3,7 +3,7 @@ import Change from './Change';
 
 class ChildChange extends Change {
 
-    constructor(model, parent, child, index) {
+    constructor(model, child, parent, index) {
 
         super();
 

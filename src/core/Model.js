@@ -179,11 +179,6 @@ class Model extends Events {
     // cell
     // ----
 
-    getParent(cell) {
-
-        return cell ? cell.parent : null;
-    }
-
     addNode(node, parent, index) {
 
         return this.addCells([node], parent, index);
@@ -207,26 +202,15 @@ class Model extends Events {
         this.beginUpdate();
 
         try {
-
             utils.forEach(cells, function (child) {
                 if (child) {
                     if (child !== parent) {
-
-                        // let parentChanged = cell.parent !== parent;
-
-                        this.digest(new ChildChange(this, parent, child, index));
-
-                        /* FIXME
-                         if (parentChanged) {
-
-                         }
-                         */
-
+                        this.setParent(child, parent, index);
                         index++;
                     }
 
-                    source && this.cellConnected(child, source, true);
-                    target && this.cellConnected(child, target, false);
+                    source && this.setTerminal(child, source, true);
+                    target && this.setTerminal(child, target, false);
                 }
             }, this);
 
@@ -237,13 +221,26 @@ class Model extends Events {
         return this;
     }
 
-    cellConnected(link, terminal, isSource) {
+    getParent(child) {
 
-        // connect link with node
-        if (link) {
-            this.beginUpdate();
+        return child ? child.parent : null;
+    }
+
+    setParent(child, parent, index) {
+
+        if (child) {
+
             try {
-                this.setTerminal(link, terminal, isSource);
+                this.beginUpdate();
+                // let parentChanged = cell.parent !== parent;
+
+                this.digest(new ChildChange(this, child, parent, index));
+
+                /* FIXME
+                 if (parentChanged) {
+
+                 }
+                 */
             } finally {
                 this.endUpdate();
             }
@@ -252,27 +249,27 @@ class Model extends Events {
         return this;
     }
 
-    childChanged(cell, parent, index) {
+    childChanged(child, parent, index) {
 
-        let previous = this.getParent(cell);
+        let previous = this.getParent(child);
 
         if (parent) {
-            if (parent !== previous || previous.indexOfChild(cell) !== index) {
+            if (parent !== previous || previous.indexOfChild(child) !== index) {
                 // `insertChild` will firstly remove cell from previous parent
-                parent.insertChild(cell, index);
+                parent.insertChild(child, index, { silent: true });
             }
         } else if (previous) {
-            previous.removeChild(cell);
+            previous.removeChild(child, { silent: true });
         }
 
         if (parent) {
             // check if the previous parent was already in the
             // model and avoids calling cellAdded if it was.
             if (!this.contains(previous)) {
-                this.cellAdded(cell);
+                this.cellAdded(child);
             }
         } else {
-            this.cellRemoved(cell);
+            this.cellRemoved(child);
         }
 
         return previous;
@@ -323,6 +320,7 @@ class Model extends Events {
                 this.nextId = Math.max(this.nextId, id);
             }
 
+            cell.setModel(this);
             // recursively processes child cells
             cell.eachChild(this.cellAdded, this);
         }
@@ -460,6 +458,8 @@ class Model extends Events {
             if (this.cells && id) {
                 delete this.cells[id];
             }
+
+            cell.setModel(null);
         }
     }
 
@@ -546,17 +546,26 @@ class Model extends Events {
     }
 
     setTerminal(link, terminal, isSource) {
-        // FIXME: not used {
-        // let terminalChanged = terminal !== that.getTerminal(link, isSource);
-        // }
 
-        this.digest(new TerminalChange(this, link, new Terminal(terminal), isSource));
+        if (link) {
+            try {
+                this.beginUpdate();
 
-        /*
-         if (this.maintainEdgeParent && terminalChanged) {
-         this.updateEdgeParent(link, this.getRoot());
-         }
-         */
+                // FIXME: not used {
+                // let terminalChanged = terminal !== that.getTerminal(link, isSource);
+                // }
+
+                this.digest(new TerminalChange(this, link, new Terminal(terminal), isSource));
+
+                /*
+                 if (this.maintainEdgeParent && terminalChanged) {
+                 this.updateEdgeParent(link, this.getRoot());
+                 }
+                 */
+            } finally {
+                this.endUpdate();
+            }
+        }
 
         return this;
     }
@@ -598,6 +607,10 @@ class Model extends Events {
         this.digest(new GeometryChange(this, cell, geometry));
 
         return this;
+    }
+
+    geometryChanged() {
+
     }
 
 
@@ -651,6 +664,22 @@ class Model extends Events {
 
             this.endingUpdate = false;
         }
+    }
+
+
+    // common
+    // ------
+
+    getPaper() {
+
+        return this.paper;
+    }
+
+    setPaper(paper) {
+
+        this.paper = paper || null;
+
+        return this;
     }
 }
 

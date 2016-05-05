@@ -13,7 +13,8 @@ class GeometryChange extends Change {
     }
 
     digest() {
-        // that.model.geometryChanged(that.cell, that.geometry);
+
+        this.model.geometryChanged(this.cell, this.geometry);
 
         return this;
     }

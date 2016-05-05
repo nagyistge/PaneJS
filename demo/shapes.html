@@ -23,45 +23,45 @@
     var paper = new panejs.Paper(container, model);
 
     var rect = new panejs.shapes.basic.Rect({
-        size    : { width: 100, height: 40 },
+        size: { width: 100, height: 40 },
         position: { x: 50, y: 50 },
-        attrs   : { text: { text: 'Rect' } }
+        attrs: { text: { text: 'Rect' } }
     });
 
     model.addCell(rect);
 
     var text = new panejs.shapes.basic.Text({
-        size    : { width: 100, height: 40 },
+        size: { width: 100, height: 40 },
         position: { x: 240, y: 50 },
-        attrs   : { text: { text: 'Text' } }
+        attrs: { text: { text: 'Text' } }
     });
     model.addCell(text);
 
     var circle = new panejs.shapes.basic.Circle({
-        size    : { width: 100, height: 40 },
+        size: { width: 100, height: 40 },
         position: { x: 400, y: 50 },
-        attrs   : { text: { text: 'Circle' } }
+        attrs: { text: { text: 'Circle' } }
     });
     model.addCell(circle);
 
     var image = new panejs.shapes.basic.Image({
-        size    : { width: 100, height: 100 },
+        size: { width: 100, height: 100 },
         position: { x: 580, y: 20 },
-        attrs   : {
-            text : { text: 'Image' },
+        attrs: {
+            text: { text: 'Image' },
             image: {
                 'xlink:href': 'http://placehold.it/96x96',
-                width       : 96,
-                height      : 96
+                width: 96,
+                height: 96
             }
         }
     });
     model.addCell(image);
 
     var path = new panejs.shapes.basic.Path({
-        size    : { width: 40, height: 40 },
+        size: { width: 40, height: 40 },
         position: { x: 80, y: 150 },
-        attrs   : {
+        attrs: {
             path: { d: 'M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z' },
             text: { text: 'Path' }
         }
@@ -69,12 +69,11 @@
     model.addCell(path);
 
     var rhombus = new panejs.shapes.basic.Rhombus({
-        size    : { width: 70, height: 70 },
+        size: { width: 70, height: 70 },
         position: { x: 65, y: 250 },
-        attrs   : { text: { text: 'Rhombus', 'font-size': 8 } }
+        attrs: { text: { text: 'Rhombus', 'font-size': 8 } }
     });
     model.addCell(rhombus);
-
 
 </script>
 </body>

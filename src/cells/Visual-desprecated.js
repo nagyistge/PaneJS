@@ -25,6 +25,11 @@ class Visual extends Cell {
         this.metadata = metadata;
     }
 
+    isVisible() {
+
+        return this.metadata.visible !== false;
+    }
+
     getMarkup() {
 
         return this.metadata.markup;

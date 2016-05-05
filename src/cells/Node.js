@@ -1,8 +1,8 @@
 import * as utils from '../common/utils';
-import     Visual from '../cells/Visual';
+import       Cell from '../cells/Cell';
 
 
-class Node extends Visual {
+class Node extends Cell {
 
     // static
     // ------
@@ -12,16 +12,12 @@ class Node extends Visual {
     }
 
 
-    // props
-    // -----
+    // methods
+    // -------
 
     isNode() {
         return true;
     }
-
-
-    // methods
-    // -------
 
     translate(dx, dy, options = {}) {
 
@@ -70,7 +66,14 @@ class Node extends Visual {
 
 
 Node.setDefaults({
+    tagName: 'g',
+    markup: '',
     classNames: 'pane-node',
+    pane: null,   // specify the drawPane of the view
+    view: null,   // specify the constructor of the view
+    data: null,   // cached data(for business logic)
+    attrs: null,  // styles
+
     size: {
         width: 1,
         height: 1,

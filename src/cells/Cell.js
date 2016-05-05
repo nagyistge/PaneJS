@@ -3,11 +3,14 @@ import * as utils from '../common/utils';
 
 class Cell {
 
-    // static
-    // ------
+    constructor(options) {
 
-    static isCell(cell) {
-        return cell && cell instanceof Cell;
+        let metadata = utils.merge({}, this.constructor.defaults, options);
+
+        this.data     = metadata.data;
+        this.attrs    = metadata.attrs;
+        this.visible  = metadata.visible !== false;
+        this.metadata = metadata;
     }
 
 
@@ -191,52 +194,49 @@ class Cell {
         return utils.filter(this.children, iterator, context);
     }
 
-    insertChild(child, index) {
+    insertChild(child, index, options = {}) {
 
-        if (child) {
+        if (!child) {
+            return this;
+        }
 
-            let childCount = this.getChildCount();
+        if (utils.isObject(index)) {
+            options = index;
+        }
 
-            index = utils.fixIndex(index, childCount);
+        if (!options.silent) {
+            child.setParent(this, index);
+        }
 
-            if (child.parent === this && index === childCount) {
-                index--;
-            }
-
-            // update parent
-            child.removeFromParent();
-            child.parent = this;
-
-            if (this.children && this.children.length) {
-                this.children.splice(index, 0, child);
-            } else {
-                // speed up
-                this.children = [];
-                this.children.push(child);
-            }
+        if (!child.setParent.scheduled) {
+            Cell.insertChild(this, child, index);
         }
 
         return this;
     }
 
-    removeChild(child) {
+    removeChild(child, options = {}) {
 
-        return this.removeChildAt(this.indexOfChild(child));
+        return this.removeChildAt(this.indexOfChild(child), options);
     }
 
-    removeChildAt(index) {
+    removeChildAt(index, options = {}) {
 
-        if (this.children && this.children.length && index >= 0) {
+        let child = this.getChildAt(index);
+        if (child) {
 
-            let child = this.getChildAt(index);
-            if (child) {
+            if (!options.silent) {
+                child.setParent(null);
+            }
+
+            if (!child.setParent.scheduled) {
                 this.children.splice(index, 1);
                 child.parent = null;
             }
-
-            // return the removed child
-            return child;
         }
+
+        // return the removed child
+        return child;
     }
 
 
@@ -320,6 +320,44 @@ class Cell {
     // parent
     // ------
 
+    getParent() {
+
+        return this.parent;
+    }
+
+    setParent(parent, index, options = {}) {
+
+        // state
+        this.setParent.scheduled = false;
+
+        // try to schedule a change
+        if (!options.silent) {
+
+            var model = this.getModel();
+
+            // this cell maybe not in a model, try get parent's model
+            if (!model && parent) {
+                model = parent.getModel();
+            }
+
+            // schedule a change
+            if (model) {
+                model.setParent(this, parent, index);
+                this.setParent.scheduled = true;
+            }
+        }
+
+        if (!this.setParent.scheduled) {
+            if (parent) {
+                Cell.insertChild(parent, this, index);
+            } else {
+                this.parent = null;
+            }
+        }
+
+        return this;
+    }
+
     isOrphan() {
 
         return utils.isNil(this.parent);
@@ -341,11 +379,6 @@ class Cell {
     contains(descendant) {
 
         return this.isAncestor(this, descendant);
-    }
-
-    getParent() {
-
-        return this.parent;
     }
 
     getAncestors() {
@@ -373,10 +406,10 @@ class Cell {
         return result;
     }
 
-    removeFromParent() {
+    remove(options = {}) {
 
         if (this.parent) {
-            this.parent.removeChild(this);
+            this.parent.removeChild(this, options);
         }
 
         return this;
@@ -390,7 +423,7 @@ class Cell {
     getGeometry() { }
 
 
-    // common
+    // access
     // ------
 
     getId() {
@@ -401,14 +434,90 @@ class Cell {
         this.id = id;
     }
 
-    addTo(model, parent, index) {
+    getModel() {
 
-        model.addCell(this, parent, index);
+        return this.model;
+    }
+
+    setModel(model) {
+
+        this.model = model || null;
 
         return this;
     }
 
-    getView() {}
+    addTo(parent, index, model = this.getModel()) {
+
+        if (model) {
+            model.addCell(this, parent, index);
+        }
+
+        return this;
+    }
+
+    getView(model = this.getModel()) {
+
+        let paper = model && model.getPaper();
+        if (paper) {
+            return paper.getView(this);
+        }
+
+        return null;
+    }
+
+    getMarkup() {
+
+        return this.metadata.markup;
+    }
+
+    getTagName() {
+
+        return this.metadata.tagName || 'g';
+    }
+
+    getClassName() {
+
+        let classNames = this.metadata.classNames;
+
+        return utils.isArray(classNames)
+            ? classNames.join(' ')
+            : classNames || '';
+    }
+
+    isVisible() {
+
+        return this.visible !== false;
+    }
+
+    show() {
+
+        this.visible = true;
+    }
+
+    hide() {
+
+        this.visible = false;
+    }
+
+    getSize(raw) {
+
+    }
+
+    getPosition(raw) {
+
+    }
+
+    getRotation(raw) {
+
+    }
+
+    setPosition() {
+
+    }
+
+
+    // common
+    // ------
 
     valueOf() {
 
@@ -451,7 +560,43 @@ class Cell {
         return new this.constructor(metadata);
     }
 
-    destroy() {}
+    destroy() {
+
+        utils.destroy(this);
+    }
+
+
+    // static
+    // ------
+
+    static setDefaults(options) {
+
+        // update global options
+        this.defaults = utils.merge({}, this.defaults, options);
+    }
+
+    static insertChild(parent, child, index) {
+
+        let childCount = parent.getChildCount();
+
+        index = utils.fixIndex(index, childCount);
+
+        if (child.parent === parent && index === childCount) {
+            index--;
+        }
+
+        // update parent
+        child.remove({ silent: true });
+        child.parent = parent;
+
+        if (parent.children && parent.children.length) {
+            parent.children.splice(index, 0, child);
+        } else {
+            // speed up
+            parent.children = [];
+            parent.children.push(child);
+        }
+    }
 }
 
 

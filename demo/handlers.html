@@ -8,7 +8,7 @@
         #container {
             width: 800px;
             height: 600px;
-            border: 1px solid #ddd;
+            border: 1px solid #DDD;
         }
     </style>
 </head>
@@ -24,62 +24,58 @@
 
 
     var rectParent = new panejs.shapes.basic.Rect({
-        size: {width: 100, height: 40},
-        position: {x: 50, y: 20},
+        size: { width: 100, height: 40 },
+        position: { x: 50, y: 20 },
         //        rotation: {angle: 30},
-        attrs: {text: {text: 'Rect-Rect-Rect'}}
+        attrs: { text: { text: 'Rect-Rect-Rect' } }
     });
-
     var rectChild = new panejs.shapes.port.Rect({
-        position: {x: 5, y: 5, relative: true},
-        rotation: {angle: 60},
-        size: {width: 15, height: 15}
+        position: { x: 5, y: 5, relative: true },
+        rotation: { angle: 60 },
+        size: { width: 15, height: 15 }
     });
-
 
     model.addCell(rectParent);
     model.addCell(rectChild, rectParent);
 
 
     var rectParent1 = new panejs.shapes.basic.Rect({
-        size: {width: 100, height: 40},
-        position: {x: 50, y: 100},
-        rotation: {angle: 45},
-        attrs: {text: {text: 'Rect-Rect-Rect'}}
+        size: { width: 100, height: 40 },
+        position: { x: 50, y: 100 },
+        rotation: { angle: 45 },
+        attrs: { text: { text: 'Rect-Rect-Rect' } }
     });
-
     var rectChild1 = new panejs.shapes.port.Rect({
         // position: {x: 5, y: 5, relative: true},
-        position: {x: 55, y: 105},
+        position: { x: 55, y: 105 },
         // rotation: {angle: 60, inherited: false},
         // rotation: {angle: 60},
-        size: {width: 15, height: 15}
+        size: { width: 15, height: 15 }
     });
-
 
     model.addCell(rectParent1);
     model.addCell(rectChild1, rectParent1);
 
 
     var tb = new panejs.shapes.basic.Text({
-        position: {x: 170, y: 50},
-        size: {width: 100, height: 30},
-        attrs: {text: {text: 'Text'}}
+        position: { x: 170, y: 50 },
+        size: { width: 100, height: 30 },
+        attrs: { text: { text: 'Text' } }
     });
     model.addCell(tb);
 
     var cb = new panejs.shapes.basic.Circle({
-        position: {x: 300, y: 70},
-        size: {width: 100, height: 40},
-        attrs: {text: {text: 'Circle'}}
+        position: { x: 300, y: 70 },
+        size: { width: 100, height: 40 },
+        attrs: { text: { text: 'Circle' } }
     });
     model.addCell(cb);
 
     var ib = new panejs.shapes.basic.Image({
-        position: {x: 450, y: 50},
-        size: {width: 100, height: 100},
+        position: { x: 450, y: 50 },
+        size: { width: 100, height: 100 },
         attrs: {
-            text: {text: 'Image'},
+            text: { text: 'Image' },
             image: {
                 'xlink:href': 'http://placehold.it/96x96',
                 width: 96,
@@ -90,26 +86,28 @@
     model.addCell(ib);
 
     var pb = new panejs.shapes.basic.Path({
-        position: {x: 50, y: 150},
-        size: {width: 40, height: 40},
+        position: { x: 50, y: 150 },
+        size: { width: 40, height: 40 },
         attrs: {
-            path: {d: 'M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z'},
-            text: {text: 'Path'}
+            path: { d: 'M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z' },
+            text: { text: 'Path' }
         }
     });
     model.addCell(pb);
 
     var rh = new panejs.shapes.basic.Rhombus({
-        position: {x: 50, y: 250},
-        size: {width: 70, height: 70},
-        attrs: {text: {text: 'Rhombus', 'font-size': 8}}
+        position: { x: 50, y: 250 },
+        size: { width: 70, height: 70 },
+        attrs: { text: { text: 'Rhombus', 'font-size': 8 } }
     });
     model.addCell(rh);
 
-    // 添加handlers
+
+    // handlers
     paper.registerHandlers([
         new panejs.SelectionHandler(paper)
     ]);
+
 
     setTimeout(function () {
         model.setGeometry(pb, {
@@ -119,6 +117,7 @@
             }
         });
     }, 1000);
+
     setTimeout(function () {
         model.setGeometry(pb, {
             rotation: {
@@ -126,6 +125,7 @@
             }
         });
     }, 2000);
+
     setTimeout(function () {
         model.setGeometry(pb, {
             size: {

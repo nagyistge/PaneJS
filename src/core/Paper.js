@@ -41,6 +41,7 @@ class Paper extends Events {
 
         this.id    = 'paper' + counter++;
         this.model = model || new Model();
+        this.model.setPaper(this);
 
         this.configure(options);
 
@@ -246,7 +247,7 @@ class Paper extends Events {
         // create or remove view for cell
         if (cell) {
 
-            visible = visible && cell.visible;
+            visible = visible && cell.isVisible();
 
             let view = this.getView(cell, visible);
             if (view && !visible) {
@@ -525,7 +526,7 @@ class Paper extends Events {
 
         if (cell) {
             let view = this.getViewById(cell.id);
-            if (!view && create && cell.visible) {
+            if (!view && create && cell.isVisible()) {
                 view = this.createView(cell);
             }
 
@@ -569,11 +570,18 @@ class Paper extends Events {
                 return view;
             }
         }
+
+        return null;
     }
 
     removeView(cell) {
 
         if (cell) {
+
+            cell.eachChild(function (child) {
+                this.removeView(child);
+            }, this);
+
             let view = this.getView(cell);
             if (view) {
                 delete this.views[cell.id];

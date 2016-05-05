@@ -1,8 +1,8 @@
 import * as utils from '../common/utils';
-import     Visual from '../cells/Visual';
+import       Cell from '../cells/Cell';
 
 
-class Link extends Visual {
+class Link extends Cell {
 
     // static
     // ------
@@ -130,14 +130,15 @@ class Link extends Visual {
 
 
 Link.setDefaults({
-
+    tagName: 'g',
     markup: ''
     + '<path class="connector"/>'
     + '<path class="source-marker"/>'
     + '<path class="target-marker"/>',
-
     classNames: 'pane-link',
     pane: 'linkPane',
+    view: null,   // specify the constructor of the view
+    data: null,   // cached data(for business logic)
     router: null,
     connector: 'sharp',
     sourceMarker: null,

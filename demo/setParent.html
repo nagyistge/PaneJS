@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>setParent example for PaneJS</title>
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
+    <style>
+        #container {
+            width: 800px;
+            height: 600px;
+            border: 1px solid #DDD;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../dist/panejs.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
+
+    var rect0 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 50, y: 50 },
+        attrs: { text: { text: 'Rect0' } }
+    });
+
+    model.addCell(rect0);
+
+    var defaultLayer = model.getDefaultParent();
+    var rect1 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 200, y: 50 },
+        attrs: { text: { text: 'Rect1' } }
+    });
+
+    var rect2 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 350, y: 50 },
+        attrs: { text: { text: 'Rect2' } }
+    });
+
+    var rect3 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 200, y: 120 },
+        attrs: { text: { text: 'Rect3' } }
+    });
+
+    var rect4 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 350, y: 120 },
+        attrs: { text: { text: 'Rect4' } }
+    });
+
+    defaultLayer.insertChild(rect1);
+    defaultLayer.insertChild(rect2);
+    defaultLayer.insertChild(rect3);
+    rect4.setParent(defaultLayer);
+
+    setTimeout(function () {
+        defaultLayer.removeChild(rect1);
+    }, 3000);
+
+    setTimeout(function () {
+        rect2.remove();
+    }, 4000);
+
+    setTimeout(function () {
+        defaultLayer.removeChildAt(defaultLayer.indexOfChild(rect3))
+    }, 5000);
+
+    var rect5 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 200, y: 190 },
+        attrs: { text: { text: 'Rect5' } }
+    });
+
+    var rect6 = new panejs.shapes.basic.Rect({
+        size: { width: 100, height: 40 },
+        position: { x: 350, y: 190 },
+        attrs: { text: { text: 'Rect6' } }
+    });
+
+    rect5.insertChild(rect6);
+    defaultLayer.insertChild(rect5);
+
+    setTimeout(function () {
+        rect5.remove();
+        console.log(rect5);
+        console.log(rect6);
+    }, 6000);
+</script>
+</body>
+</html>
