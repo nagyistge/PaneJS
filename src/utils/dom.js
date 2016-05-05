@@ -115,7 +115,7 @@ function showHide(elem, show) {
 
     if (elem && elem.style) {
 
-        var display = elem.style.display;
+        let display = elem.style.display;
 
         if (show) {
             if (display === 'none') {
@@ -204,7 +204,7 @@ function setAttribute(elem, name, value) {
         elem.id = value;
     } else {
 
-        var qualified = qualifyAttributeName(name);
+        let qualified = qualifyAttributeName(name);
 
         qualified.ns
             // attribute names can be namespaced. E.g. `image` elements
@@ -216,7 +216,7 @@ function setAttribute(elem, name, value) {
 
 function removeAttribute(elem, name) {
 
-    var qualified = qualifyAttributeName(name);
+    let qualified = qualifyAttributeName(name);
 
     if (qualified.ns) {
         if (elem.hasAttributeNS(qualified.ns, qualified.local)) {
@@ -230,7 +230,7 @@ function removeAttribute(elem, name) {
 function qualifyAttributeName(name) {
 
     if (name.indexOf(':') !== -1) {
-        var combined = name.split(':');
+        let combined = name.split(':');
         return {
             ns: ns[combined[0]],
             local: combined[1]

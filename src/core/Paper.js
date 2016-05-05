@@ -1,20 +1,19 @@
-import * as utils from '../common/utils';
-import     Events from '../common/Events';
-import     vector from '../common/vector';
-import   detector from '../common/detector';
+import     * as utils from '../common/utils';
+import         vector from '../common/vector';
+import       detector from '../common/detector';
+import         Events from '../common/Events';
+import          Point from '../geometry/Point';
 
-import Point from '../geometry/Point';
-// import Rect  from '../geometry/Rect';
-
-import    Model from '../core/Model';
-import     Cell from '../cells/Cell';
-import LinkView from '../views/LinkView';
-import NodeView from '../views/NodeView';
+import          Model from '../core/Model';
+import           Cell from '../cells/Cell';
+import       LinkView from '../views/LinkView';
+import       NodeView from '../views/NodeView';
 
 import     RootChange from '../changes/RootChange';
 import    ChildChange from '../changes/ChildChange';
 import TerminalChange from '../changes/TerminalChange';
 import GeometryChange from '../changes/GeometryChange';
+
 
 const WIN = window;
 const DOC = WIN.document;
@@ -57,82 +56,22 @@ class Paper extends Events {
 
     // events
     // ------
-    //  - paper:configure
-    //  - paper:init
-    //  - paper:setup
-    //  - paper:destroy
-    //  - paper:resize
+    //  - configure
+    //  - init
+    //  - setup
+    //  - destroy
+    //  - resize
 
+    // life cycle
+    // ----------
 
     configure(options) {
 
         this.options = utils.merge({}, defaultOptions, options);
-        this.trigger('paper:configure', this.options);
+        this.trigger('configure', this.options);
 
         return this;
     }
-
-    snapToGrid(point) {
-
-        // Convert global coordinates to the local ones of the `drawPane`.
-        // Otherwise, improper transformation would be applied when the
-        // drawPane gets transformed (scaled/rotated).
-        let gridSize   = this.options.gridSize || 1;
-        let localPoint = vector(this.drawPane).toLocalPoint(point.x, point.y);
-
-        return {
-            x: utils.snapToGrid(localPoint.x, gridSize),
-            y: utils.snapToGrid(localPoint.y, gridSize)
-        };
-    }
-
-    toLocalPoint(point) {
-
-        let svg      = this.svg;
-        let svgPoint = svg.createSVGPoint();
-
-        svgPoint.x = point.x;
-        svgPoint.y = point.y;
-
-        // This is a hack for Firefox! If there wasn't a fake (non-visible)
-        // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
-        // used below won't work.
-        let fakeRect;
-        if (detector.IS_FF) {
-            fakeRect = vector('rect', {
-                width: this.options.width,
-                height: this.options.height,
-                x: 0,
-                y: 0,
-                opacity: 0
-            });
-            svg.appendChild(fakeRect.node);
-        }
-
-        let paperOffset = utils.getOffset(svg);
-
-        if (detector.IS_FF) {
-            fakeRect.removeCell();
-        }
-
-        let doc        = document;
-        let body       = doc.body;
-        let docElem    = doc.documentElement;
-        let scrollTop  = body.scrollTop || docElem.scrollTop;
-        let scrollLeft = body.scrollLeft || docElem.scrollLeft;
-
-        svgPoint.x += scrollLeft - paperOffset.left;
-        svgPoint.y += scrollTop - paperOffset.top;
-
-        // Transform point into the viewport coordinate system.
-        let result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
-
-        return Point.fromPoint(result);
-    }
-
-
-    // life cycle
-    // ----------
 
     init(container) {
 
@@ -141,7 +80,7 @@ class Paper extends Events {
             let svg  = utils.createSvgDocument();
             let root = utils.createSvgElement('g');
 
-            utils.setAttribute(root, 'class', 'viewport');
+            utils.setAttribute(root, 'class', 'pane-viewport');
 
             this.backgroundPane = root.appendChild(utils.createSvgElement('g'));
             // container of links
@@ -160,7 +99,7 @@ class Paper extends Events {
             this.root      = root;
             this.container = container;
 
-            this.trigger('paper:init', container);
+            this.trigger('init', container);
         }
 
         return this;
@@ -168,27 +107,25 @@ class Paper extends Events {
 
     setup() {
 
-        let svg = this.svg;
-
-        utils.addEventListener(svg, 'contextmenu', this.onContextMenu.bind(this));
-        utils.addEventListener(svg, 'dblclick', this.onDblClick.bind(this));
-        utils.addEventListener(svg, 'click', this.onClick.bind(this));
-        utils.addEventListener(svg, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
-        utils.addEventListener(svg, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-        utils.addEventListener(svg, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
-        utils.addEventListener(svg, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+        utils.addEventListener(this.svg, 'contextmenu', this.onContextMenu.bind(this));
+        utils.addEventListener(this.svg, 'dblclick', this.onDblClick.bind(this));
+        utils.addEventListener(this.svg, 'click', this.onClick.bind(this));
+        utils.addEventListener(this.svg, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
+        utils.addEventListener(this.svg, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
+        utils.addEventListener(this.svg, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
+        utils.addEventListener(this.svg, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
 
         let onPointerDown = this.onPointerDown.bind(this);
         let onPointerMove = this.onPointerMove.bind(this);
         let onPointerUp   = this.onPointerUp.bind(this);
 
         if (detector.IS_TOUCH) {
-            utils.addEventListener(svg, 'touchstart', onPointerDown);
-            utils.addEventListener(svg, 'touchmove', onPointerMove);
+            utils.addEventListener(this.svg, 'touchstart', onPointerDown);
+            utils.addEventListener(this.svg, 'touchmove', onPointerMove);
             utils.addEventListener(DOC, 'touchend', onPointerUp);
         } else {
-            utils.addEventListener(svg, 'mousedown', onPointerDown);
-            utils.addEventListener(svg, 'mousemove', onPointerMove);
+            utils.addEventListener(this.svg, 'mousedown', onPointerDown);
+            utils.addEventListener(this.svg, 'mousemove', onPointerMove);
             utils.addEventListener(DOC, 'mouseup', onPointerUp);
         }
 
@@ -205,7 +142,7 @@ class Paper extends Events {
 
         this.model.on('change', this.handleChanges, this);
 
-        this.trigger('paper:setup');
+        this.trigger('setup');
 
         // that.registerHandlers([
         //     new SelectionHandler(that)
@@ -237,9 +174,9 @@ class Paper extends Events {
 
     destroy() {
 
-        this.trigger('paper:destroy');
+        this.trigger('destroy');
 
-        return this;
+        utils.destroy(this);
     }
 
 
@@ -247,18 +184,15 @@ class Paper extends Events {
     // --------
 
     reValidate() {
+
         return this
             .invalidate()
             .validate();
     }
 
-    clear(cell, force = false, recurse = true) {
+    clear(cell = this.model.getRoot(), force = false, recurse = true) {
 
-        let model = this.model;
-
-        cell = cell || model.getRoot();
-
-        this.removeState(cell);
+        this.removeView(cell);
 
         if (recurse && (force || cell !== this.currentRoot)) {
             cell.eachChild(function (child) {
@@ -315,7 +249,6 @@ class Paper extends Events {
             visible = visible && cell.visible;
 
             let view = this.getView(cell, visible);
-
             if (view && !visible) {
                 this.removeView(cell);
             }
@@ -368,13 +301,13 @@ class Paper extends Events {
         // only update the node's size
         if (node && node.isNode()) {
 
-            let raw    = node.metadata.size || {};
-            let width  = !utils.isUndefined(raw.width) ? raw.width : 1;
-            let height = !utils.isUndefined(raw.height) ? raw.height : 1;
+            let size   = node.metadata.size || {};
+            let width  = !utils.isUndefined(size.width) ? size.width : 1;
+            let height = !utils.isUndefined(size.height) ? size.height : 1;
 
             let parent = node.parent;
 
-            if (raw.relative && parent && parent.isNode()) {
+            if (size.relative && parent && parent.isNode()) {
 
                 let parentSize = parent.size;
                 let isPercent  = utils.isPercentage(width);
@@ -401,6 +334,7 @@ class Paper extends Events {
                 height = utils.fixNumber(height, false, 1);
             }
 
+            // update size attribute of node
             node.size = {
                 width: Math.max(width, 1),
                 height: Math.max(height, 1)
@@ -414,25 +348,25 @@ class Paper extends Events {
 
         if (node && node.isNode()) {
 
-            let raw = node.metadata.position || {};
-            let x   = !utils.isUndefined(raw.x) ? raw.x : 0;
-            let y   = !utils.isUndefined(raw.y) ? raw.y : 0;
+            let pos = node.metadata.position || {};
+            let x   = !utils.isUndefined(pos.x) ? pos.x : 0;
+            let y   = !utils.isUndefined(pos.y) ? pos.y : 0;
 
             let parent = node.parent;
 
-            if (raw.relative && parent && parent.isNode()) {
+            if (pos.relative && parent && parent.isNode()) {
 
-                let parentSize     = parent.size;
-                let parentPosition = parent.position;
+                let parentPos  = parent.position;
+                let parentSize = parent.size;
 
                 let isPercent = utils.isPercentage(x);
 
                 x = utils.fixNumber(x, isPercent, 0);
 
                 if (isPercent || x > -1 && x < 1) {
-                    x = parentPosition.x + parentSize.width * x;
+                    x = parentPos.x + parentSize.width * x;
                 } else {
-                    x += parentPosition.x;
+                    x += parentPos.x;
                 }
 
                 isPercent = utils.isPercentage(y);
@@ -440,9 +374,9 @@ class Paper extends Events {
                 y = utils.fixNumber(y, isPercent, 0);
 
                 if (isPercent || y > -1 && y < 1) {
-                    y = parentPosition.y + parentSize.height * y;
+                    y = parentPos.y + parentSize.height * y;
                 } else {
-                    y += parentPosition.y;
+                    y += parentPos.y;
                 }
 
             } else {
@@ -468,21 +402,20 @@ class Paper extends Events {
             if (raw.inherited && parent && parent.isNode() && parent.rotation !== 0) {
 
                 // update node's position
-                let size     = node.size;
-                let position = node.position;
-                let center   = new Point(position.x + size.width / 2, position.y + size.height / 2);
+                let pos    = node.position;
+                let size   = node.size;
+                let center = new Point(pos.x + size.width / 2, pos.y + size.height / 2);
 
-                let parentSize     = parent.size;
-                let parentPosition = parent.position;
-                let parentCenter   = new Point(parentPosition.x + parentSize.width / 2, parentPosition.y + parentSize.height / 2);
+                let parentPos    = parent.position;
+                let parentSize   = parent.size;
+                let parentCenter = new Point(parentPos.x + parentSize.width / 2, parentPos.y + parentSize.height / 2);
 
                 // angle is according to the clockwise
                 center.rotate(parentCenter, -parent.rotation);
 
                 // move the node to the new position
-                // FIXME
-                position.x = center.x - size.width / 2;
-                position.y = center.y - size.height / 2;
+                pos.x = center.x - size.width / 2;
+                pos.y = center.y - size.height / 2;
 
                 angle += parent.rotation;
             }
@@ -545,7 +478,7 @@ class Paper extends Events {
             height
         });
 
-        this.trigger('paper:resize', width, height);
+        this.trigger('resize', width, height);
 
         return this;
     }
@@ -567,7 +500,7 @@ class Paper extends Events {
 
         vector(this.root).translate(x, y, absolute);
 
-        this.trigger('paper:translate', x, y);
+        this.trigger('translate', x, y);
 
         return this;
     }
@@ -591,13 +524,18 @@ class Paper extends Events {
     getView(cell, create) {
 
         if (cell) {
-            let view = this.views ? this.views[cell.id] : null;
+            let view = this.getViewById(cell.id);
             if (!view && create && cell.visible) {
                 view = this.createView(cell);
             }
 
             return view;
         }
+    }
+
+    getViewById(cellId) {
+
+        return this.views ? this.views[cellId] : null;
     }
 
     getTerminalView(link, isSource) {
@@ -612,7 +550,6 @@ class Paper extends Events {
         if (cell) {
 
             let View = cell.metadata.view;
-
             if (!View) {
                 View = cell.isLink() ? LinkView
                     : cell.isNode() ? NodeView
@@ -636,10 +573,12 @@ class Paper extends Events {
 
     removeView(cell) {
 
-        let view = this.getView(cell);
-        if (view) {
-            delete this.views[cell.id];
-            view.destroy();
+        if (cell) {
+            let view = this.getView(cell);
+            if (view) {
+                delete this.views[cell.id];
+                view.destroy();
+            }
         }
 
         return this;
@@ -657,18 +596,21 @@ class Paper extends Events {
 
     findViewByElem(elem) {
 
-        let svg = this.svg;
+        if (this.views) {
 
-        elem = utils.isString(elem) ? svg.querySelector(elem) : elem;
+            elem = utils.isString(elem)
+                ? this.svg.querySelector(elem)
+                : elem;
 
-        while (elem && elem !== svg && elem !== document) {
+            while (elem && elem !== this.svg && elem !== document) {
 
-            let cellId = elem.cellId;
-            if (cellId) {
-                return this.views[cellId];
+                let cellId = elem.cellId;
+                if (cellId) {
+                    return this.views[cellId];
+                }
+
+                elem = elem.parentNode;
             }
-
-            elem = elem.parentNode;
         }
 
         return null;
@@ -676,9 +618,9 @@ class Paper extends Events {
 
     findViewByCell(cell) {
 
-        let id = utils.isString(cell) ? cell : cell.id;
-
-        return this.views[id];
+        return utils.isString(cell)
+            ? this.getViewById(cell)
+            : this.getView(cell);
     }
 
     findViewByPoint(/* point */) {
@@ -1025,6 +967,69 @@ class Paper extends Events {
             }
         }
     }
+
+
+    // utils
+    // -----
+
+    snapToGrid(point) {
+
+        // Convert global coordinates to the local ones of the `drawPane`.
+        // Otherwise, improper transformation would be applied when the
+        // drawPane gets transformed (scaled/rotated).
+        let gridSize   = this.options.gridSize || 1;
+        let localPoint = vector(this.drawPane).toLocalPoint(point.x, point.y);
+
+        return {
+            x: utils.snapToGrid(localPoint.x, gridSize),
+            y: utils.snapToGrid(localPoint.y, gridSize)
+        };
+    }
+
+    toLocalPoint(point) {
+
+        let svg      = this.svg;
+        let svgPoint = svg.createSVGPoint();
+
+        svgPoint.x = point.x;
+        svgPoint.y = point.y;
+
+        // This is a hack for Firefox! If there wasn't a fake (non-visible)
+        // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
+        // used below won't work.
+        let fakeRect;
+        if (detector.IS_FF) {
+            fakeRect = vector('rect', {
+                width: this.options.width,
+                height: this.options.height,
+                x: 0,
+                y: 0,
+                opacity: 0
+            });
+            svg.appendChild(fakeRect.node);
+        }
+
+        let paperOffset = utils.getOffset(svg);
+
+        if (detector.IS_FF) {
+            fakeRect.removeCell();
+        }
+
+        let doc        = document;
+        let body       = doc.body;
+        let docElem    = doc.documentElement;
+        let scrollTop  = body.scrollTop || docElem.scrollTop;
+        let scrollLeft = body.scrollLeft || docElem.scrollLeft;
+
+        svgPoint.x += scrollLeft - paperOffset.left;
+        svgPoint.y += scrollTop - paperOffset.top;
+
+        // Transform point into the viewport coordinate system.
+        let result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
+
+        return Point.fromPoint(result);
+    }
+
 }
 
 

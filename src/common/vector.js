@@ -1017,7 +1017,7 @@ export class VElement {
 
 function getLastVElement(elem) {
 
-    var vel = elem instanceof VElement ? elem : createVElement(elem);
+    let vel = vector.isVElement(elem) ? elem : createVElement(elem);
 
     return utils.isArray(vel) ? vel[vel.length - 1] : vel;
 }
@@ -1026,7 +1026,7 @@ function eachElem(elem, iterator, context) {
 
     if (elem) {
 
-        var vel = utils.map(utils.isArray(elem) ? elem : [elem], function (item) {
+        let vel = utils.map(utils.isArray(elem) ? elem : [elem], function (item) {
             return vector.isVElement(item) ? item : createVElement(elem);
         });
 
@@ -1257,7 +1257,7 @@ utils.extend(vector, {
                 compacted.push(batch);
                 batch = item;
 
-            } else if (V.isObject(prev)) {
+            } else if (utils.isObject(prev)) {
                 // Previous item was an annotation, current item is a string.
                 compacted.push(batch);
                 batch = item;
