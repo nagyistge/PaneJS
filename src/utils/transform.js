@@ -2,9 +2,6 @@ import { trim    } from './string';
 import { toFloat } from './number';
 
 
-// parse transform
-// ---------------
-
 function parseTranslate(transform) {
 
     let translate = { tx: 0, ty: 0 };
@@ -89,10 +86,6 @@ function parseTransform(transform) {
         scale: parseScale(transform)
     };
 }
-
-
-// clear transform
-// ---------------
 
 function clearTranslate(transform) {
 

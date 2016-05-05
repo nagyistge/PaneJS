@@ -16,7 +16,7 @@ class CellView {
 
     ensureElement() {
 
-        this.vel  = vector(this.cell.getRoot(), {
+        this.vel  = vector(this.cell.getTagName(), {
             'class': this.cell.getClassName()
         });
         this.elem = this.vel.node;
@@ -37,9 +37,9 @@ class CellView {
 
     getPane() {
 
-        let pane = this.cell.metadata.pane;
         let result;
 
+        let pane = this.cell.metadata.pane;
         if (pane) {
             if (utils.isString(pane)) {
                 result = this.paper[pane];

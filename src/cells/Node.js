@@ -15,7 +15,7 @@ class Node extends Visual {
     // props
     // -----
 
-    get isNode() {
+    isNode() {
         return true;
     }
 

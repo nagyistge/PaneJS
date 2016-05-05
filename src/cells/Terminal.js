@@ -1,5 +1,6 @@
-import  Node from '../cells/Node';
-import Point from '../geometry/Point';
+import * as utils from '../common/utils';
+import       Node from '../cells/Node';
+import      Point from '../geometry/Point';
 
 
 class Terminal {
@@ -18,7 +19,7 @@ class Terminal {
 
             this.point = Point.fromPoint(terminal);
 
-        } else {
+        } else if (utils.isObject(terminal)) {
             this.node  = terminal.node;
             this.port  = terminal.port;
             this.point = terminal.point;

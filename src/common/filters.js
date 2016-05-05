@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
 
-let format = utils.format;
+let format   = utils.format;
 let isFinite = utils.isFinite;
 
 
@@ -30,7 +30,7 @@ export default {
             '</filter>';
 
         let margin = isFinite(args.margin) ? args.margin : 2;
-        let width = isFinite(args.width) ? args.width : 1;
+        let width  = isFinite(args.width) ? args.width : 1;
 
         return format(template, {
             color: args.color || 'blue',

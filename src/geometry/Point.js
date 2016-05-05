@@ -1,38 +1,22 @@
 import * as utils from '../common/utils';
 
-
 class Point {
 
     constructor(x = 0, y = 0) {
-
-        let that = this;
-
-        that.x = x;
-        that.y = y;
+        this.x = x;
+        this.y = y;
     }
 
 
-    // static methods
-    // --------------
+    // statics
+    // -------
 
     static equals(p1, p2) {
 
-        return p1 && p2
-            && p1 instanceof Point
-            && p2 instanceof Point
+        return this.isPoint(p1)
+            && this.isPoint(p2)
             && p1.x === p2.x
             && p1.y === p2.y;
-    }
-
-    static random(x1, x2, y1, y2) {
-
-        // Create a point with random coordinates that fall
-        // into the range `[x1, x2]` and `[y1, y2]`.
-
-        let x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
-        let y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
-
-        return new Point(x, y);
     }
 
     static isPoint(p) {
@@ -44,7 +28,7 @@ class Point {
         if (this.isPoint(p)) {
             return true;
         } else if (p) {
-            return utils.hasKey(p, 'x') && utils.hasKey(p, 'y');
+            return utils.hasOwn(p, 'x') && utils.hasOwn(p, 'y');
         }
 
         return false;
@@ -55,9 +39,9 @@ class Point {
         return new Point(p.x, p.y);
     }
 
-    static fromPolar(r, angle, o) {
+    static fromPolar(r, angle, origin) {
 
-        o = o || new Point(0, 0);
+        origin = origin || new Point(0, 0);
 
         let x = Math.abs(r * Math.cos(angle));
         let y = Math.abs(r * Math.sin(angle));
@@ -73,7 +57,7 @@ class Point {
             x = -x;
         }
 
-        return new Point(o.x + x, o.y + y);
+        return new Point(origin.x + x, origin.y + y);
     }
 
     static fromString(str) {
@@ -83,57 +67,71 @@ class Point {
         return new Point(utils.toFloat(arr[0]), utils.toFloat(arr[1]));
     }
 
+    static random(x1, x2, y1, y2) {
+
+        // Create a point with random coordinates that fall
+        // into the range `[x1, x2]` and `[y1, y2]`.
+
+        let x = Math.floor(Math.random() * (x2 - x1 + 1) + x1);
+        let y = Math.floor(Math.random() * (y2 - y1 + 1) + y1);
+
+        return new Point(x, y);
+    }
+
 
     // methods
     // -------
 
     update(x = 0, y = 0) {
 
-        let that = this;
+        this.x = x;
+        this.y = y;
 
-        that.x = x;
-        that.y = y;
-
-        return that;
+        return this;
     }
 
-    rotate(o, angle) {
+    translate(dx = 0, dy = 0) {
+
+        this.x += dx;
+        this.y += dy;
+
+        return this;
+    }
+
+    rotate(origin, angle) {
 
         // Rotate point by angle around origin `origin`.
 
         angle = (angle + 360) % 360;
 
-        let that = this;
+        this.toPolar(origin);
+        this.y += utils.toRad(angle);
 
-        that.toPolar(o);
-        that.y += utils.toRad(angle);
+        let p = Point.fromPolar(this.x, this.y, origin);
 
-        let p = Point.fromPolar(that.x, that.y, o);
+        this.x = p.x;
+        this.y = p.y;
 
-        that.x = p.x;
-        that.y = p.y;
-
-        return that;
+        return this;
     }
 
-    translate(dx = 0, dy = 0) {
+    scale(sx, sy, origin) {
 
-        let that = this;
+        origin = origin || new Point(0, 0);
 
-        that.x += dx;
-        that.y += dy;
+        this.x = origin.x + sx * (this.x - origin.x);
+        this.y = origin.y + sy * (this.y - origin.y);
 
-        return that;
+        return this;
     }
 
     move(ref, distance) {
 
         // Move point on the line from `ref` to me by `distance`.
 
-        let that = this;
-        let rad  = utils.toRad(ref.theta(that));
+        let rad = utils.toRad(ref.theta(this));
 
-        return that.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
+        return this.translate(Math.cos(rad) * distance, -Math.sin(rad) * distance);
     }
 
     reflect(ref) {
@@ -144,14 +142,17 @@ class Point {
         return ref.move(this, this.distance(ref));
     }
 
+    diff(point) {
+
+        return new Point(this.x - point.x, this.y - point.y);
+    }
+
     round(precision) {
 
-        let that = this;
+        this.x = precision ? utils.toFixed(this.x, precision) : Math.round(this.x);
+        this.y = precision ? utils.toFixed(this.y, precision) : Math.round(this.y);
 
-        that.x = precision ? utils.toFixed(that.x, precision) : Math.round(that.x);
-        that.y = precision ? utils.toFixed(that.y, precision) : Math.round(that.y);
-
-        return that;
+        return this;
     }
 
     smooth() {
@@ -159,22 +160,17 @@ class Point {
         return this.round(2);
     }
 
-    diff(p) {
-
-        return new Point(this.x - p.x, this.y - p.y);
-    }
-
-    theta(p) {
+    theta(point) {
 
         // Compute the angle between me and `point` and the x axis.
         // (cartesian-to-polar coordinates conversion)
         // Return theta angle in degrees.
 
-        p = p || new Point();
+        point = point || new Point();
 
         // invert the y-axis.
-        let y = -(p.y - this.y);
-        let x = p.x - this.x;
+        let y = -(point.y - this.y);
+        let x = point.x - this.x;
 
         let PRECISION = 10;
         // Note that `atan2` is not defined for `x`, `y` both equal zero.
@@ -190,56 +186,53 @@ class Point {
         return utils.toDeg(rad);
     }
 
-    distance(p) {
+    distance(point) {
 
         // Returns distance between me and point `point`.
 
-        p = p || new Point();
+        point = point || new Point();
 
-        let dx = p.x - this.x;
-        let dy = p.y - this.y;
+        let dx = point.x - this.x;
+        let dy = point.y - this.y;
 
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    manhattanDistance(p) {
+    manhattanDistance(point) {
 
         // Returns a manhattan (taxi-cab) distance between me and point `p`.
 
-        p = p || new Point();
+        point = point || new Point();
 
-        return Math.abs(p.x - this.x) + Math.abs(p.y - this.y);
+        return Math.abs(point.x - this.x) + Math.abs(point.y - this.y);
     }
 
-    toPolar(o) {
+    toPolar(origin) {
 
         // Converts rectangular to polar coordinates.
         // An origin can be specified, otherwise it's `0 0`.
 
-        o = o || new Point(0, 0);
+        origin = origin || new Point(0, 0);
 
-        let that = this;
+        let dx = this.x - origin.x;
+        let dy = this.y - origin.y;
 
-        let x = that.x;
-        let y = that.y;
+        this.y = utils.toRad(origin.theta(Point.fromPoint(this)));
+        this.x = Math.sqrt(dx * dx + dy * dy);
 
-        that.x = Math.sqrt((x - o.x) * (x - o.x) + (y - o.y) * (y - o.y));
-        that.y = utils.toRad(o.theta(new Point(x, y)));
-
-        return that;
+        return this;
     }
 
     normalize(len = 1) {
 
-        // Scale the line segment between (0,0) and me to have a length of len.
+        // Scale the line segment between (0,0)
+        // and me to have a length of len.
 
-        let that = this;
-
-        let x = that.x;
-        let y = that.y;
+        let x = this.x;
+        let y = this.y;
 
         if (x === 0 && y === 0) {
-            return that;
+            return this;
         }
 
         let scale;
@@ -249,13 +242,13 @@ class Point {
         } else if (y === 0) {
             scale = len / x;
         } else {
-            scale = len / that.distance(new Point());
+            scale = len / this.distance(new Point());
         }
 
-        that.x = scale * x;
-        that.y = scale * y;
+        this.x = scale * x;
+        this.y = scale * y;
 
-        return that;
+        return this;
     }
 
     changeInAngle(dx, dy, ref) {
@@ -269,12 +262,10 @@ class Point {
 
     snapToGrid(gx, gy) {
 
-        let that = this;
+        this.x = utils.snapToGrid(this.x, gx);
+        this.y = utils.snapToGrid(this.y, gy || gx);
 
-        that.x = utils.snapToGrid(that.x, gx);
-        that.y = utils.snapToGrid(that.y, gy || gx);
-
-        return that;
+        return this;
     }
 
     adhereToRect(rect) {
@@ -282,18 +273,20 @@ class Point {
         // If point lies outside rectangle `rect`, return the nearest point on
         // the boundary of rect `rect`, otherwise return point itself.
 
-        let that = this;
-
-        if (rect.containsPoint(that)) {
-            return that;
+        if (rect.containsPoint(this)) {
+            return this;
         }
 
-        that.x = Math.min(Math.max(that.x, rect.x), rect.x + rect.width);
-        that.y = Math.min(Math.max(that.y, rect.y), rect.y + rect.height);
+        this.x = Math.min(Math.max(this.x, rect.x), rect.x + rect.width);
+        this.y = Math.min(Math.max(this.y, rect.y), rect.y + rect.height);
 
-        return that;
+        return this;
     }
 
+    magnitude() {
+
+        return Math.sqrt((this.x * this.x) + (this.y * this.y)) || 0.01;
+    }
 
     // common
     // ------

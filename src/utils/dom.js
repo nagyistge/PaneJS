@@ -1,4 +1,8 @@
-import { isUndefined, isNullOrUndefined, isWindow } from './lang';
+import {
+    isNil,
+    isWindow,
+    isUndefined
+} from './lang';
 
 
 function getNodeName(elem) {
@@ -27,22 +31,22 @@ function isNode(elem, nodeName, attrName, attrValue) {
     let ret = elem && !isNaN(elem.nodeType);
 
     if (ret) {
-        ret = isNullOrUndefined(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+        ret = isNil(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
     }
 
     if (ret) {
-        ret = isNullOrUndefined(attrName) || elem.getAttribute(attrName) === attrValue;
+        ret = isNil(attrName) || elem.getAttribute(attrName) === attrValue;
     }
 
     return ret;
 }
 
-let docElem = document.documentElement;
+let docElem  = document.documentElement;
 let contains = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         let aDown = context.nodeType === 9 ? context.documentElement : context;
-        let bUp = elem && elem.parentNode;
+        let bUp   = elem && elem.parentNode;
 
         return context === bUp || !!(bUp && bUp.nodeType === 1 && (
                 aDown.contains
@@ -95,7 +99,7 @@ function getOffset(elem) {
 
     // If we don't have gBCR, just use 0,0 rather than error
     // BlackBerry 5, iOS 3 (original iPhone)
-    if (!isUndefined(elem.getBoundingClientRect)) {
+    if (elem.getBoundingClientRect) {
         box = elem.getBoundingClientRect();
     }
 
@@ -166,7 +170,7 @@ function setAttribute(elem, name, value) {
         let combined = name.split(':');
 
         combined.length > 1
-            // Attribute names can be namespaced. E.g. `image` elements
+            // attribute names can be namespaced. E.g. `image` elements
             // have a `xlink:href` attribute to set the source of the image.
             ? elem.setAttributeNS(ns[combined[0]], combined[1], value)
             : elem.setAttribute(name, value);

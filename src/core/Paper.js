@@ -354,7 +354,7 @@ class Paper extends Events {
 
     updateNodeGeometry(node) {
         // update the node's geometry
-        if (node && node.isNode) {
+        if (node && node.isNode()) {
             this.updateNodeSize(node)
                 .updateNodePosition(node)
                 .updateNodeRotation(node);
@@ -366,7 +366,7 @@ class Paper extends Events {
     updateNodeSize(node) {
 
         // only update the node's size
-        if (node && node.isNode) {
+        if (node && node.isNode()) {
 
             let raw    = node.metadata.size || {};
             let width  = !utils.isUndefined(raw.width) ? raw.width : 1;
@@ -374,7 +374,7 @@ class Paper extends Events {
 
             let parent = node.parent;
 
-            if (raw.relative && parent && parent.isNode) {
+            if (raw.relative && parent && parent.isNode()) {
 
                 let parentSize = parent.size;
                 let isPercent  = utils.isPercentage(width);
@@ -412,7 +412,7 @@ class Paper extends Events {
 
     updateNodePosition(node) {
 
-        if (node && node.isNode) {
+        if (node && node.isNode()) {
 
             let raw = node.metadata.position || {};
             let x   = !utils.isUndefined(raw.x) ? raw.x : 0;
@@ -420,7 +420,7 @@ class Paper extends Events {
 
             let parent = node.parent;
 
-            if (raw.relative && parent && parent.isNode) {
+            if (raw.relative && parent && parent.isNode()) {
 
                 let parentSize     = parent.size;
                 let parentPosition = parent.position;
@@ -459,13 +459,13 @@ class Paper extends Events {
 
     updateNodeRotation(node) {
 
-        if (node && node.isNode) {
+        if (node && node.isNode()) {
 
             let raw    = node.metadata.rotation || {};
             let angle  = utils.fixNumber(raw.angle, false, 0);
             let parent = node.parent;
 
-            if (raw.inherited && parent && parent.isNode && parent.rotation !== 0) {
+            if (raw.inherited && parent && parent.isNode() && parent.rotation !== 0) {
 
                 // update node's position
                 let size     = node.size;
@@ -614,8 +614,8 @@ class Paper extends Events {
             let View = cell.metadata.view;
 
             if (!View) {
-                View = cell.isLink ? LinkView
-                    : cell.isNode ? NodeView
+                View = cell.isLink() ? LinkView
+                    : cell.isNode() ? NodeView
                     : null;
             }
 

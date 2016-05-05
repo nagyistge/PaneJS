@@ -3,27 +3,23 @@ import Change from './Change';
 
 class TerminalChange extends Change {
 
-    constructor(model, link, node, isSource) {
+    constructor(model, link, terminal, isSource) {
 
         super();
 
-        let that = this;
-
-        that.model    = model;
-        that.link     = link;
-        that.terminal = node;
-        that.previous = node;
-        that.isSource = isSource;
+        this.model    = model;
+        this.link     = link;
+        this.terminal = terminal;
+        this.previous = terminal;
+        this.isSource = isSource;
     }
 
     digest() {
 
-        let that = this;
+        this.terminal = this.previous;
+        this.previous = this.model.terminalChanged(this.link, this.previous, this.isSource);
 
-        that.terminal = that.previous;
-        that.previous = that.model.terminalChanged(that.link, that.previous, that.isSource);
-
-        return that;
+        return this;
     }
 }
 

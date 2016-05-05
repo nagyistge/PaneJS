@@ -1,6 +1,7 @@
 class ChangeCollection {
 
     constructor(model) {
+
         this.model   = model;
         this.changes = [];
     }

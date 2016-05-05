@@ -1,34 +1,31 @@
 import * as utils from '../common/utils';
-import Point from './Point';
+import      Point from './Point';
 
 
 class Line {
 
     constructor(start, end) {
 
-        let that = this;
-
         if (!start) {
-            throw new Error('The start point of line must be specified.');
+            throw new Error('The start point of line must be specified');
         }
 
         if (!end) {
-            throw new Error('The end point of line must be specified.');
+            throw new Error('The end point of line must be specified');
         }
 
-        that.start = start;
-        that.end   = end;
+        this.start = start;
+        this.end   = end;
     }
 
 
-    // static methods
-    // --------------
+    // statics
+    // -------
 
     static equals(line1, line2) {
 
-        return line1 && line2
-            && line1 instanceof Line
-            && line2 instanceof Line
+        return this.isLine(line1)
+            && this.isLine(line2)
             && ((line1.start && line1.start.equals(line2.start)) || (!line1.start && !line2.start))
             && ((line1.end && line1.end.equals(line2.end)) || (!line1.end && !line2.end));
     }
@@ -36,6 +33,11 @@ class Line {
     static fromLine(line) {
 
         return new Line(line.start.clone(), line.end.clone());
+    }
+
+    static isLine(line) {
+
+        return line && line instanceof Line;
     }
 
 
@@ -53,20 +55,16 @@ class Line {
         // Note that for applications where the exact length
         // is not necessary (e.g. compare only)
 
-        let that = this;
-
-        let dx = that.end.x - that.start.x;
-        let dy = that.end.y - that.end.x;
+        let dx = this.end.x - this.start.x;
+        let dy = this.end.y - this.end.x;
 
         return dx * dx + dy * dy;
     }
 
     getMidpoint() {
 
-        let that = this;
-
-        let x = (that.start.x + that.end.x) / 2;
-        let y = (that.start.y + that.end.y) / 2;
+        let x = (this.start.x + this.end.x) / 2;
+        let y = (this.start.y + this.end.y) / 2;
 
         return new Point(x, y);
     }
@@ -75,20 +73,16 @@ class Line {
 
         // get point at `percent` (0~1).
 
-        let that = this;
-
-        let x = (1 - percent) * that.start.x + percent * that.end.x;
-        let y = (1 - percent) * that.start.y + percent * that.end.y;
+        let x = (1 - percent) * this.start.x + percent * this.end.x;
+        let y = (1 - percent) * this.start.y + percent * this.end.y;
 
         return new Point(x, y);
     }
 
     intersection(line) {
 
-        let that = this;
-
-        let start1 = that.start;
-        let end1   = that.end;
+        let start1 = this.start;
+        let end1   = this.end;
 
         let start2 = line.start;
         let end2   = line.end;
@@ -124,9 +118,8 @@ class Line {
         // get cardinal direction of the line.
         // One of the following bearings : NE, E, SE, S, SW, W, NW, N.
 
-        let that  = this;
-        let start = that.start;
-        let end   = that.end;
+        let start = this.start;
+        let end   = this.end;
 
         let lat1 = utils.toRad(start.y);
         let lat2 = utils.toRad(end.y);
@@ -137,11 +130,9 @@ class Line {
         let y = Math.sin(dLon) * Math.cos(lat2);
         let x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
 
-        let brng = utils.toDeg(Math.atan2(y, x));
-
         let bearings = ['NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-
-        let index = brng - 22.5;
+        let brng     = utils.toDeg(Math.atan2(y, x));
+        let index    = brng - 22.5;
 
         if (index < 0) {
             index += 360;
@@ -152,16 +143,14 @@ class Line {
         return bearings[index];
     }
 
-    pointOffset(point) {
+    getOffset(point) {
 
         // get the offset of the `point` from the line.
         // + if the `point` is on the right side of the line,
         // - if on the left and `0` if on the line.
 
-        let that = this;
-
-        let start = that.start;
-        let end   = that.end;
+        let start = this.start;
+        let end   = this.end;
 
         // Find the sign of the determinant of vectors (start,end), where p is the query point.
         return ((end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x)) / 2;

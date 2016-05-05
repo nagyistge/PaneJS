@@ -14,6 +14,10 @@ class Cell {
     // link
     // ----
 
+    isLink() {
+        return false;
+    }
+
     getTerminal(isSource) {
 
         return isSource ? this.source : this.target;
@@ -159,13 +163,6 @@ class Cell {
     }
 
 
-    // geometry
-    // --------
-    // TODO
-
-    getGeometry() { }
-
-
     // children
     // --------
 
@@ -210,14 +207,12 @@ class Cell {
             child.removeFromParent();
             child.parent = this;
 
-
-            let children = this.children;
-            if (children && children.length) {
-                children.splice(index, 0, child);
+            if (this.children && this.children.length) {
+                this.children.splice(index, 0, child);
             } else {
                 // speed up
-                children = this.children = [];
-                children.push(child);
+                this.children = [];
+                this.children.push(child);
             }
         }
 
@@ -231,25 +226,26 @@ class Cell {
 
     removeChildAt(index) {
 
-        let child    = null;
-        let children = this.children;
-        if (children && index >= 0) {
+        if (this.children && this.children.length && index >= 0) {
 
-            child = this.getChildAt(index);
-
+            let child = this.getChildAt(index);
             if (child) {
-                children.splice(index, 1);
+                this.children.splice(index, 1);
                 child.parent = null;
             }
-        }
 
-        // return the removed child
-        return child;
+            // return the removed child
+            return child;
+        }
     }
 
 
     // node
-    // -----
+    // ----
+
+    isNode() {
+        return false;
+    }
 
     getLinkCount() {
 
@@ -283,14 +279,15 @@ class Cell {
             link.removeFromTerminal(outgoing);
 
             if (!this.links || this.indexOfLink(link) < 0 ||
-                    // 连线的起点和终点是同一个节点时,说明
-                    // 连线已经和节点关联，则不需要重复添加
+                    // when source and target are the same node, these's
+                    // no need to relate link with node once more.
                 link.getTerminalNode(!outgoing) !== this) {
 
                 if (!this.links) {
                     this.links = [];
                 }
 
+                // links are unordered, push it to the array directly.
                 this.links.push(link);
             }
 
@@ -302,9 +299,8 @@ class Cell {
 
     removeLink(link, outgoing) {
 
-
         if (link) {
-            // 连线的起点和终点是同一个节点时不需要移除
+            // when the source and target are the same, do not remove it
             if (this.links && link.getTerminalNode(!outgoing) !== this) {
 
                 let index = this.indexOfLink(link);
@@ -313,6 +309,7 @@ class Cell {
                 }
             }
 
+            // fixme: should call `link.setTerminalNode()` ?
             link.setTerminal(null, outgoing);
         }
 
@@ -325,7 +322,7 @@ class Cell {
 
     isOrphan() {
 
-        return !this.parent;
+        return utils.isNil(this.parent);
     }
 
     isAncestor(descendant) {
@@ -386,8 +383,23 @@ class Cell {
     }
 
 
+    // geometry
+    // --------
+    // TODO
+
+    getGeometry() { }
+
+
     // common
     // ------
+
+    getId() {
+        return this.id;
+    }
+
+    setId(id) {
+        this.id = id;
+    }
 
     addTo(model, parent, index) {
 
@@ -398,14 +410,19 @@ class Cell {
 
     getView() {}
 
-    valueOf() {}
+    valueOf() {
 
-    toString() {}
+        return this.data;
+    }
+
+    toString() {
+
+        return this.getId() || Object.toString.call(this);
+    }
 
     cloneData() {
 
         let data = this.data;
-
         if (data) {
 
             if (data.clone && utils.isFunction(data.clone)) {

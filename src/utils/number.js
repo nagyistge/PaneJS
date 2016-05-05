@@ -1,4 +1,4 @@
-import { isString, isNullOrUndefined } from './lang';
+import { isString, isNil } from './lang';
 
 function isFinite(value) {
 
@@ -37,7 +37,7 @@ function fixNumber(num, percentage, defaultValue) {
 
 function fixIndex(index, max) {
 
-    if (isNullOrUndefined(index)) {
+    if (isNil(index)) {
         return max;
     }
 

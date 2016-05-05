@@ -53,13 +53,12 @@ class NodeView extends CellView {
             rotatable.attr('transform', '');
         }
 
-        let that      = this;
         let nodesMap  = {};
         let relatives = [];
 
         utils.forIn(specifiedAttrs || allAttrs, function (attrs, selector) {
 
-            let vels = that.find(selector);
+            let vels = this.find(selector);
             if (!vels.length) {
                 return;
             }
@@ -71,19 +70,19 @@ class NodeView extends CellView {
             // filter
             if (utils.isObject(attrs.filter)) {
                 specials.push('filter');
-                that.applyFilter(vels, attrs.filter);
+                this.applyFilter(vels, attrs.filter);
             }
 
             // gradient
             if (utils.isObject(attrs.fill)) {
                 specials.push('fill');
-                that.applyGradient(vels, 'fill', attrs.fill);
+                this.applyGradient(vels, 'fill', attrs.fill);
             }
 
             // gradient
             if (utils.isObject(attrs.stroke)) {
                 specials.push('stroke');
-                that.applyGradient(vels, 'stroke', attrs.stroke);
+                this.applyGradient(vels, 'stroke', attrs.stroke);
             }
 
             // text
@@ -114,6 +113,8 @@ class NodeView extends CellView {
                 });
             }
 
+            // `port` attribute contains the `id` of the port
+            // that the underlying magnet represents.
             // if (attrs.port) {
             //    forEach(vels, function (vel) {
             //        vel.attr('port', isUndefined(attrs.port.id) ? attrs.port : attrs.port.id);
@@ -154,7 +155,7 @@ class NodeView extends CellView {
             if (isRelative) {
                 relatives.push(selector);
             }
-        });
+        }, this);
 
 
         // Note that we're using the bounding box without transformation
@@ -176,9 +177,10 @@ class NodeView extends CellView {
             }
 
             utils.forEach(nodesMap[selector], function (vel) {
-                that.positionRelative(vel, bbox, attrs, nodesMap);
-            });
-        });
+                this.positionRelative(vel, bbox, attrs, nodesMap);
+            }, this);
+
+        }, this);
 
         if (rotatable) {
             rotatable.attr('transform', rotation || '');
@@ -335,6 +337,7 @@ class NodeView extends CellView {
         return this;
     }
 
+    // Scale the whole `<g>` group.
     scale(sx, sy) {
         this.vel.scale(sx, sy);
         return this;
@@ -432,9 +435,9 @@ class NodeView extends CellView {
 
         if (vTarget && vTarget.node) {
 
-            let sw = utils.getComputedStyle(vTarget.node, 'stroke-width');
+            let strokeWidth = utils.getComputedStyle(vTarget.node, 'stroke-width');
 
-            return sw && utils.toFloat(sw) || 0;
+            return strokeWidth && utils.toFloat(strokeWidth) || 0;
         }
 
         return 0;
@@ -442,14 +445,14 @@ class NodeView extends CellView {
 
     getStrokeBBox() {
 
-        let cell        = this.cell;
+        let node        = this.cell;
         let strokeWidth = this.getStrokeWidth();
 
         let bbox = new Rect(
-            cell.position.x,
-            cell.position.y,
-            cell.size.width,
-            cell.size.height
+            node.position.x,
+            node.position.y,
+            node.size.width,
+            node.size.height
         );
 
         strokeWidth -= 1;

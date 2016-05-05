@@ -17,47 +17,42 @@ class Events {
 
     on(events, callback, context) {
 
-        let that = this;
-
         if (!callback) {
-            return that;
+            return this;
         }
 
-        let listeners = that.__events || (that.__events = {});
+        let listeners = this.__events || (this.__events = {});
 
         utils.forEach(utils.split(events), function (event) {
             let list = listeners[event] || (listeners[event] = []);
             list.push(callback, context);
         });
 
-        return that;
+        return this;
     }
 
     once(events, callback, context) {
 
         let that = this;
-        let cb = function () {
+        let cb   = function () {
             that.off(events, cb);
             callback.apply(context || that, arguments);
         };
 
-        return that.on(events, cb, context);
+        return this.on(events, cb, context);
     }
 
     off(events, callback, context) {
 
-        let that = this;
-        let listeners = that.__events;
-
-        // No events.
+        let listeners = this.__events;
         if (!listeners) {
-            return that;
+            return this;
         }
 
         // removing *all* events.
         if (!(events || callback || context)) {
-            delete that.__events;
-            return that;
+            delete this.__events;
+            return this;
         }
 
         events = events ? utils.split(events) : utils.keys(listeners);
@@ -65,7 +60,6 @@ class Events {
         utils.forEach(events, function (event) {
 
             let list = listeners[event];
-
             if (!list) {
                 return;
             }
@@ -84,21 +78,18 @@ class Events {
             }
         });
 
-        return that;
+        return this;
     }
 
     trigger(eventName, ...args) {
 
-        let that = this;
-        let listeners = that.__events;
-
-        // No events.
+        let listeners = this.__events;
         if (!listeners || !eventName) {
             return null;
         }
 
         let pass = true;
-        let all = listeners['*'];
+        let all  = listeners['*'];
 
         utils.forEach(utils.split(eventName), function (event) {
 
@@ -107,14 +98,14 @@ class Events {
             if (event !== '*') {
                 callbacks = listeners[event];
                 if (callbacks) {
-                    pass = triggerEvents(callbacks, args, that) && pass;
+                    pass = triggerEvents(callbacks, args, this) && pass;
                 }
             }
 
             if (all) {
-                pass = triggerEvents(all, [event].concat(args), that) && pass;
+                pass = triggerEvents(all, [event].concat(args), this) && pass;
             }
-        });
+        }, this);
 
         return pass;
     }

@@ -1,27 +1,26 @@
+import { isNil } from './lang';
 import { getByPath } from './object';
 
-
 let proto = String.prototype;
-
 
 function toString(str) {
 
     return '' + str;
 }
 
-function uc(str) {
+function toUpper(str) {
 
-    return ('' + str).toUpperCase();
+    return toString(str).toUpperCase();
+}
+
+function toLower(str) {
+
+    return toString(str).toLowerCase();
 }
 
 function ucFirst(str) {
 
     return str.charAt(0).toUpperCase() + str.substring(1);
-}
-
-function lc(str) {
-
-    return ('' + str).toLowerCase();
 }
 
 function lcFirst(str) {
@@ -31,7 +30,7 @@ function lcFirst(str) {
 
 function split(str, divider = /\s+/) {
 
-    return ('' + str).split(divider);
+    return toString(str).split(divider);
 }
 
 function trim(str) {
@@ -55,7 +54,7 @@ function hashCode(str) {
     // Return a simple hash code from a string.
     // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
 
-    let hash = 0;
+    let hash   = 0;
     let length = str.length;
 
     if (length === 0) {
@@ -64,8 +63,8 @@ function hashCode(str) {
 
     for (let i = 0; i < length; i++) {
         let c = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + c;
-        hash = hash & hash; // Convert to 32bit integer
+        hash  = ((hash << 5) - hash) + c;
+        hash  = hash & hash; // Convert to 32bit integer
     }
 
     return hash;
@@ -104,13 +103,63 @@ function endWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+function padStr(str, max, pad, isStart) {
+
+    if (isNil(str) || isNil(max)) {
+        return str;
+    }
+
+    let result    = String(str);
+    let targetLen = typeof max === 'number'
+        ? max
+        : parseInt(max, 10);
+
+    if (isNaN(targetLen) || !isFinite(targetLen)) {
+        return result;
+    }
+
+
+    let length = result.length;
+    if (length >= targetLen) {
+        return result;
+    }
+
+
+    let fill = isNil(pad) ? '' : String(pad);
+    if (fill === '') {
+        fill = ' ';
+    }
+
+    let fillLen = targetLen - length;
+
+    while (fill.length < fillLen) {
+        fill += fill;
+    }
+
+    let truncated = fill.length > fillLen ? fill.substr(0, fillLen) : fill;
+
+    return isStart
+        ? truncated + result
+        : result + truncated;
+}
+
+function padStart(str, max, pad) {
+
+    return padStr(str, max, pad, true);
+}
+
+function padEnd(str, max, pad) {
+
+    return padStr(str, max, pad, false);
+}
+
 
 // exports
 // -------
 
 export {
-    lc,
-    uc,
+    toLower,
+    toUpper,
     ucFirst,
     lcFirst,
     trim,
@@ -122,4 +171,6 @@ export {
     sanitizeText,
     startWith,
     endWith,
+    padStart,
+    padEnd
 };

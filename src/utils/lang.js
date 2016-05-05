@@ -28,11 +28,6 @@ function isBoolean(obj) {
     return typeof obj === 'boolean';
 }
 
-function isNullOrUndefined(obj) {
-
-    return isUndefined(obj) || isNull(obj);
-}
-
 function isType(obj, type) {
 
     return toString.call(obj) === '[object ' + type + ']';
@@ -133,6 +128,5 @@ export {
     isArrayLike,
     isUndefined,
     isPlainObject,
-    isEmptyObject,
-    isNullOrUndefined,
+    isEmptyObject
 };

@@ -7,61 +7,58 @@ class ChildChange extends Change {
 
         super();
 
-        let that = this;
+        this.model  = model;
+        this.child  = child;
+        this.parent = parent;
+        this.index  = index;
 
-        that.model         = model;
-        that.child         = child;
-        that.parent        = parent;
-        that.index         = index;
-        that.previous      = parent;
-        that.previousIndex = index;
+        this.previous      = parent;
+        this.previousIndex = index;
     }
 
     digest() {
 
-        let that      = this;
-        let model     = that.model;
-        let child     = that.child;
-        let newParent = that.previous;
-        let newIndex  = that.previousIndex;
+        let model = this.model;
+        let child = this.child;
+
+        let newParent = this.previous;
+        let newIndex  = this.previousIndex;
+
         let oldParent = child.parent;
         let oldIndex  = oldParent ? oldParent.indexOfChild(child) : 0;
 
         // the new parent is null, then the child(and link) will be removed
         if (!newParent) {
-            that.modifyConnect(child, false);
+            this.connect(child, false);
         }
 
         oldParent = model.childChanged(child, newParent, newIndex);
 
         if (newParent) {
-            that.modifyConnect(child, true);
+            this.connect(child, true);
         }
 
-        that.parent        = newParent;
-        that.index         = newIndex;
-        that.previous      = oldParent;
-        that.previousIndex = oldIndex;
+        this.parent        = newParent;
+        this.index         = newIndex;
+        this.previous      = oldParent;
+        this.previousIndex = oldIndex;
 
-        return that;
+        return this;
     }
 
-    modifyConnect(cell, connected) {
+    connect(cell, connected) {
 
-        let that  = this;
-        let model = that.model;
-
-        if (cell.isLink) {
+        if (cell.isLink()) {
 
             let source = cell.getTerminal(true);
             let target = cell.getTerminal(false);
 
             if (source) {
-                model.linkChanged(cell, connected ? source : null, true);
+                this.model.linkChanged(cell, connected ? source : null, true);
             }
 
             if (target) {
-                model.linkChanged(cell, connected ? target : null, false);
+                this.model.linkChanged(cell, connected ? target : null, false);
             }
 
             cell.setTerminal(source, true);
@@ -69,10 +66,10 @@ class ChildChange extends Change {
         }
 
         cell.eachChild(function (child) {
-            that.modifyConnect(child, connected);
-        });
+            this.connect(child, connected);
+        }, this);
 
-        return that;
+        return this;
     }
 }
 

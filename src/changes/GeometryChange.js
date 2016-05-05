@@ -2,22 +2,20 @@ import Change from './Change';
 
 
 class GeometryChange extends Change {
+
     constructor(model, cell, geometry) {
+
         super();
 
-        let that      = this;
-        that.model    = model;
-        that.cell     = cell;
-        that.geometry = geometry;
-        return that;
+        this.model    = model;
+        this.cell     = cell;
+        this.geometry = geometry;
     }
 
     digest() {
-        let that = this;
-
         // that.model.geometryChanged(that.cell, that.geometry);
 
-        return that;
+        return this;
     }
 }
 

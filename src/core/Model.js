@@ -176,8 +176,8 @@ class Model extends Events {
     }
 
 
-    // child
-    // -----
+    // cell
+    // ----
 
     getParent(cell) {
 
@@ -207,15 +207,14 @@ class Model extends Events {
         this.beginUpdate();
 
         try {
-            let that = this;
 
             utils.forEach(cells, function (child) {
                 if (child) {
                     if (child !== parent) {
 
-                        that.digest(new ChildChange(that, parent, child, index));
-
                         // let parentChanged = cell.parent !== parent;
+
+                        this.digest(new ChildChange(this, parent, child, index));
 
                         /* FIXME
                          if (parentChanged) {
@@ -226,10 +225,11 @@ class Model extends Events {
                         index++;
                     }
 
-                    source && that.cellConnected(child, source, true);
-                    target && that.cellConnected(child, target, false);
+                    source && this.cellConnected(child, source, true);
+                    target && this.cellConnected(child, target, false);
                 }
-            });
+            }, this);
+
         } finally {
             this.endUpdate();
         }
@@ -254,28 +254,28 @@ class Model extends Events {
 
     childChanged(cell, parent, index) {
 
-        let prev = cell.parent;
+        let previous = this.getParent(cell);
 
         if (parent) {
-            if (parent !== prev || prev.indexOfChild(cell) !== index) {
+            if (parent !== previous || previous.indexOfChild(cell) !== index) {
                 // `insertChild` will firstly remove cell from previous parent
                 parent.insertChild(cell, index);
             }
-        } else if (prev) {
-            prev.removeChild(cell);
+        } else if (previous) {
+            previous.removeChild(cell);
         }
 
         if (parent) {
             // check if the previous parent was already in the
             // model and avoids calling cellAdded if it was.
-            if (!this.contains(prev)) {
+            if (!this.contains(previous)) {
                 this.cellAdded(cell);
             }
         } else {
             this.cellRemoved(cell);
         }
 
-        return prev;
+        return previous;
     }
 
     linkChanged(link, terminal, isSource) {
@@ -293,35 +293,37 @@ class Model extends Events {
 
     cellAdded(cell) {
 
-        // fix cell's id, and map the cell
-        if (cell) {
+        // create an Id for the cell and map it
 
-            let id = cell.id || this.createCellId(cell);
+        if (cell) {
+            // creates an Id for the cell if not Id exists
+            let id = cell.getId() || this.createCellId(cell);
             if (id) {
-                // distinct
-                let dist = this.getCellById(id);
-                if (dist !== cell) {
-                    while (dist) {
-                        id   = this.createCellId(cell);
-                        dist = this.getCellById(id);
+                let collision = this.getCellById(id);
+
+                if (collision !== cell) {
+                    // creates new Id for the cell as long as there is a collision
+                    while (collision) {
+                        id        = this.createCellId(cell);
+                        collision = this.getCellById(id);
                     }
 
-                    // as lazy as possible
+                    // lazily creates the cells dictionary
                     if (!this.cells) {
                         this.cells = {};
                     }
 
-                    cell.id = id;
-                    // mapping
+                    cell.setId(id);
                     this.cells[id] = cell;
                 }
             }
 
-            // fix nextId
+            // makes sure IDs of deleted cells are not reused
             if (utils.isNumeric(id)) {
                 this.nextId = Math.max(this.nextId, id);
             }
 
+            // recursively processes child cells
             cell.eachChild(this.cellAdded, this);
         }
     }
@@ -356,12 +358,12 @@ class Model extends Events {
         let target = link.getTerminal(false);
 
         // use the first non-relative descendants of the source terminal
-        while (source && !source.isLink && source.geometry && source.geometry.relative) {
+        while (source && !source.isLink() && source.geometry && source.geometry.relative) {
             source = source.parent;
         }
 
         // use the first non-relative descendants of the target terminal
-        while (target && !target.isLink && target.geometry && target.geometry.relative) {
+        while (target && !target.isLink() && target.geometry && target.geometry.relative) {
             target = target.parent;
         }
 
@@ -437,9 +439,9 @@ class Model extends Events {
     removeCell(cell) {
 
         if (cell) {
-            if (cell === this.root) {
+            if (this.isRoot(cell)) {
                 this.setRoot(null);
-            } else if (cell.parent) {
+            } else if (this.getParent(cell)) {
                 this.digest(new ChildChange(this, null, cell));
             }
         }
@@ -450,19 +452,20 @@ class Model extends Events {
     cellRemoved(cell) {
 
         if (cell) {
-
             cell.eachChild(function (child) {
                 this.cellRemoved(child);
             }, this);
 
-            // un-map
-            let id    = cell.id;
-            let cells = this.cells;
-            if (cells && id) {
-                delete cells[id];
+            let id = cell.getId();
+            if (this.cells && id) {
+                delete this.cells[id];
             }
         }
     }
+
+
+    // children
+    // --------
 
     getChildNodes(parent) {
 
@@ -478,11 +481,63 @@ class Model extends Events {
 
         if (parent) {
             return parent.filterChild(function (child) {
-                return (isNode && child.isNode) || (isLink && child.isLink);
+                return (isNode && child.isNode()) || (isLink && child.isLink());
             });
         }
 
         return [];
+    }
+
+    indexOfChild(cell, child) {
+
+        return cell ? cell.indexOfChild(child) : -1;
+    }
+
+    getChildAt(cell, index) {
+
+        return cell ? cell.getChildAt(index) : null;
+    }
+
+    getChildren(cell) {
+
+        return cell ? cell.children : null;
+    }
+
+    getChildCount(cell) {
+
+        return cell ? cell.getChildCount() : 0;
+    }
+
+
+    // node
+    // ----
+
+    isNode(cell) {
+
+        return cell ? cell.isNode() : false;
+    }
+
+    getLinkCount(cell) {
+
+        return cell ? cell.getLinkCount() : 0;
+    }
+
+    indexOfLink(cell, link) {
+        return cell ? cell.indexOfLink(link) : -1;
+    }
+
+    getLinkAt(cell, index) {
+
+        return cell ? cell.getLinkAt(index) : null;
+    }
+
+
+    // link
+    // ----
+
+    isLink(link) {
+
+        return link ? link.isLink() : false;
     }
 
     getTerminal(link, isSource) {
@@ -533,6 +588,7 @@ class Model extends Events {
         return prev;
     }
 
+
     getGeometry(cell) {
         return cell;
     }
@@ -543,10 +599,6 @@ class Model extends Events {
 
         return this;
     }
-
-    // geometryChanged(cell, geometry) {
-
-    // }
 
 
     // update

@@ -2,7 +2,7 @@ import { forEach }                from './array';
 import { isArray, isPlainObject } from './lang';
 
 
-function hasKey(obj, key) {
+function hasOwn(obj, key) {
 
     return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
 }
@@ -121,7 +121,7 @@ function destroy(obj) {
 // -------
 
 export {
-    hasKey,
+    hasOwn,
     keys,
     forIn,
     merge,

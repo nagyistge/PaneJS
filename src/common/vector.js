@@ -4,8 +4,8 @@ import      Point from '../geometry/Point';
 
 let rclass    = /[\t\r\n\f]/g;
 let rnotwhite = (/\S+/g);
-
 let pathCount = 0;
+
 
 function createPathId() {
 
@@ -693,8 +693,7 @@ export class VElement {
         // If `target` is specified, bounding box will be computed
         // relatively to `target` element.
 
-        let that = this;
-        let node = that.node;
+        let node = this.node;
 
         // If the element is not in the live DOM, it does not have a bounding
         // box defined and so fall back to 'zero' dimension element.
@@ -726,8 +725,9 @@ export class VElement {
 
         if (!withoutTransformations) {
 
-            let matrix = that.getTransformToElement(target || node.ownerSVGElement);
-            box        = vector.transformRect(box, matrix);
+            let matrix = this.getTransformToElement(target || node.ownerSVGElement);
+
+            box = vector.transformRect(box, matrix);
         }
 
         return Rect.fromRect(box);

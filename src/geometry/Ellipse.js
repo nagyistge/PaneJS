@@ -1,27 +1,24 @@
-import Rect  from './Rect';
+import  Rect from './Rect';
 import Point from './Point';
 
 class Ellipse {
 
     constructor(x = 0, y = 0, a = 0, b = 0) {
 
-        let that = this;
-
-        that.x = x;
-        that.y = y;
-        that.a = a;
-        that.b = b;
+        this.x = x;
+        this.y = y;
+        this.a = a;
+        this.b = b;
     }
 
 
-    // static methods
-    // --------------
+    // statics
+    // -------
 
     static equals(e1, e2) {
 
-        return e1 && e1
-            && e1 instanceof Ellipse
-            && e2 instanceof Ellipse
+        return this.isEllipse(e1)
+            && this.isEllipse(e2)
             && e1.x === e2.x
             && e1.y === e2.y
             && e1.a === e2.a
@@ -31,6 +28,11 @@ class Ellipse {
     static fromEllipse(e) {
 
         return new Ellipse(e.x, e.y, e.a, e.b);
+    }
+
+    static isEllipse(e) {
+
+        return e && e instanceof Ellipse;
     }
 
 
@@ -61,21 +63,18 @@ class Ellipse {
         // my boundary.
         // If angle is specified, intersection with rotated ellipse is computed.
 
-        let that   = this;
-        let center = that.getCenter();
+        let result;
+        let center = this.getCenter();
 
         if (angle) {
             point.rotate(center, angle);
         }
 
-        let dx = point.x - that.x;
-        let dy = point.y - that.y;
-
-        let result;
-
+        let dx = point.x - this.x;
+        let dy = point.y - this.y;
         if (dx === 0) {
 
-            result = that.getBBox().getNearestPointToPoint(point);
+            result = this.getBBox().getNearestPointToPoint(point);
 
             if (angle) {
                 return result.rotate(center, -angle);
@@ -86,15 +85,15 @@ class Ellipse {
 
         let m  = dy / dx;
         let mm = m * m;
-        let aa = that.a * that.a;
-        let bb = that.b * that.b;
+        let aa = this.a * this.a;
+        let bb = this.b * this.b;
         let x  = Math.sqrt(1 / ((1 / aa) + (mm / bb)));
 
         x = dx < 0 ? -x : x;
 
         let y = m * x;
 
-        result = new Point(that.x + x, that.y + y);
+        result = new Point(this.x + x, this.y + y);
 
         if (angle) {
             return result.rotate(center, -angle);

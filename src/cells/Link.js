@@ -12,17 +12,13 @@ class Link extends Visual {
     }
 
 
-    // props
-    // -----
+    // methods
+    // -------
 
-    get isLink() {
+    isLink() {
 
         return true;
     }
-
-
-    // methods
-    // -------
 
     insertVertice(points, index) {
 

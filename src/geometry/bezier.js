@@ -1,5 +1,5 @@
 import * as utils from '../common/utils';
-import Point from '../geometry/Point';
+import      Point from '../geometry/Point';
 // import Line  from '../geometry/Line';
 
 function curveThroughPoints(points) {
