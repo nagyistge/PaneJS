@@ -2,6 +2,7 @@ import * as utils from '../common/utils';
 import       Rect from '../geometry/Rect';
 import      Point from '../geometry/Point';
 
+
 let rclass    = /[\t\r\n\f]/g;
 let rnotwhite = (/\S+/g);
 let pathCount = 0;
@@ -17,20 +18,6 @@ function createPathId() {
     } while (document.getElementById(id));
 
     return id;
-}
-
-function getTransformToElement(source, target) {
-
-    // chrome 48 removed svg getTransformToElement api
-
-    let matrix;
-    try {
-        matrix = target.getScreenCTM().inverse();
-    } catch (e) {
-        throw new Error('Can not inverse source element\'s ctm.');
-    }
-
-    return matrix.multiply(source.getScreenCTM());
 }
 
 function deltaTransformPoint(matrix, point) {
@@ -70,13 +57,20 @@ function decomposeMatrix(matrix) {
     };
 }
 
-
 export class VElement {
 
     constructor(elem) {
 
+        if (!(this instanceof VElement)) {
+            return new VElement(elem);
+        }
+
         if (elem instanceof VElement) {
             elem = elem.node;
+        }
+
+        if (!elem) {
+            throw new Error('Unknown elem for VElement');
         }
 
         this.node = elem;
@@ -84,95 +78,200 @@ export class VElement {
 
     attr(name, value) {
 
-        let that = this;
-        let node = that.node;
-        let len  = arguments.length;
-
-        // return all attributes
-        if (!len) {
-
-            let attrs = {};
-
-            utils.forEach(node.attributes, function (attr) {
-                attrs[attr.nodeName] = attr.nodeValue;
-            });
-
-            return attrs;
+        if (utils.isUndefined(name)) {
+            // return all attributes.
+            return utils.reduce(this.node.attributes, function (result, attr) {
+                result[attr.nodeName] = attr.nodeValue;
+                return result;
+            }, {});
         }
 
-        if (len === 1) {
-            if (utils.isObject(name)) {
-                utils.forIn(name, function (attrValue, attrName) {
-                    utils.setAttribute(node, attrName, attrValue);
-                });
-            } else {
-                return node.getAttribute(name);
-            }
+        if (utils.isString(name) && utils.isUndefined(value)) {
+            return this.node.getAttribute(name);
+        }
+
+        if (utils.isObject(name)) {
+            this.setAttrs(name);
         } else {
-            utils.setAttribute(node, name, value);
+            this.setAttr(name, value);
         }
 
-        return that;
+        return this;
     }
 
-    show() {
-        let that = this;
-        that.css({
-            visibility: 'visible',
-            display: that.attr('olddisplay') || '',
-        });
-        that.hidden = false;
-        return that;
+    setAttr(name, value) {
+
+        if (utils.isNil(value)) {
+            this.removeAttr(name);
+        } else {
+            utils.setAttribute(this.node, name, value);
+        }
+
+        return this;
     }
 
-    hide() {
-        let that    = this;
-        let display = that.css().display;
-        display     = (display === 'none') ? '' : display;
-        that.attr('olddisplay', display);
-        that.css({
-            visibility: 'hidden',
-            display: 'none',
-        });
-        that.hidden = true;
-        return that;
+    setAttrs(attrs) {
+
+        utils.forIn(attrs, function (value, name) {
+            this.setAttr(name, value);
+        }, this);
+
+        return this;
     }
 
     removeAttr(name) {
 
-        let that = this;
-        let node = that.node;
+        utils.removeAttribute(this.node, name);
 
-        if (node && name) {
-            node.removeAttribute(name);
+        return this;
+    }
+
+    show() {
+
+        utils.showHide(this.node, true);
+
+        return this;
+    }
+
+    hide() {
+
+        utils.showHide(this.node, false);
+
+        return this;
+    }
+
+    toggle(state) {
+
+        if (utils.isBoolean(state)) {
+            return state ? this.show() : this.hide();
         }
 
-        return that;
+        if (utils.isHidden(this.node)) {
+            this.show();
+        } else {
+            this.hide();
+        }
+
+        return this;
+    }
+
+    hasClass(selector) {
+
+        let className = ' ' + selector + ' ';
+
+        return this.node.nodeType === 1
+            ? (' ' + utils.getClassName(this.node) + ' ').replace(rclass, ' ').indexOf(className) > -1
+            : false;
+    }
+
+    addClass(value) {
+
+        if (utils.isFunction(value)) {
+            return this.addClass(value.call(this.node, utils.getClassName(this.node)));
+        }
+
+        if (value && utils.isString(value) && this.node.nodeType === 1) {
+
+            let classes  = value.match(rnotwhite) || [];
+            let oldValue = (' ' + utils.getClassName(this.node) + ' ').replace(rclass, ' ');
+            let newValue = utils.reduce(classes, function (ret, cls) {
+
+                if (ret.indexOf(' ' + cls + ' ') < 0) {
+                    ret += cls + ' ';
+                }
+
+                return ret;
+
+            }, oldValue);
+
+            newValue = utils.trim(newValue);
+
+            if (oldValue !== newValue) {
+                this.node.setAttribute('class', newValue);
+            }
+        }
+
+        return this;
+    }
+
+    removeClass(value) {
+
+        if (utils.isFunction(value)) {
+            return this.removeClass(value.call(this.node, utils.getClassName(this.node)));
+        }
+
+        if ((!value || utils.isString(value)) && this.node.nodeType === 1) {
+
+            let classes  = (value || '').match(rnotwhite) || [];
+            let oldValue = (' ' + utils.getClassName(this.node) + ' ').replace(rclass, ' ');
+            let newValue = utils.reduce(classes, function (ret, cls) {
+
+                if (ret.indexOf(' ' + cls + ' ') > -1) {
+                    ret = ret.replace(' ' + cls + ' ', ' ');
+                }
+
+                return ret;
+
+            }, oldValue);
+
+            newValue = value ? utils.trim(newValue) : '';
+
+            if (oldValue !== newValue) {
+                this.node.setAttribute('class', newValue);
+            }
+        }
+
+        return this;
+    }
+
+    toggleClass(value, stateVal) {
+
+        if (utils.isBoolean(stateVal) && utils.isString(value)) {
+            return stateVal ? this.addClass(value) : this.removeClass(value);
+        }
+
+        if (utils.isFunction(value)) {
+            return this.toggleClass(value.call(this.node, utils.getClassName(this.node), stateVal), stateVal);
+        }
+
+        if (value && utils.isString(value)) {
+
+            let classes = value.match(rnotwhite) || [];
+
+            utils.forEach(classes, function (cls) {
+
+                this.hasClass(cls)
+                    ? this.removeClass(cls)
+                    : this.addClass(cls);
+
+            }, this);
+        }
+
+        return this;
     }
 
     css(style) {
-        let that = this;
 
         if (!style) {
-            return that.node.style;
+            return this.node.style;
         }
 
-        let node = that.node;
         if (utils.isString(style)) {
             style = vector.styleToObject(style);
         }
-        utils.forIn(style, function (value, key) {
-            node.style[key] = value;
-        });
 
-        return that;
+        utils.forIn(style, function (value, key) {
+            this.node.style[key] = value;
+        }, this);
+
+        return this;
     }
 
     text(content, options) {
 
-        let that     = this;
-        let textNode = that.node;
-
+        // replace all spaces with the Unicode No-break space
+        // (http://www.fileformat.info/info/unicode/char/a0/index.htm).
+        // IE would otherwise collapse all spaces into one.
         content = utils.sanitizeText(content);
         options = options || {};
 
@@ -182,41 +281,40 @@ export class VElement {
         // in the top left corner we translate the `<text>` element by `0.8em`.
         // See `http://www.w3.org/Graphics/SVG/WG/wiki/How_to_determine_dominant_baseline`.
         // See also `http://apike.ca/prog_svg_text_style.html`.
-        let y = that.attr('y');
+        let y = this.attr('y');
         if (!y) {
-            that.attr('y', '0.8em');
+            this.attr('y', '0.8em');
         }
 
         // An empty text gets rendered into the DOM in webkit-based browsers.
         // In order to unify this behaviour across all browsers we rather
         // hide the text element when it's empty.
-        if (!content) {
-            that.attr('display', 'none');
-        }
-        // that.attr('display', content ? null : 'none');
+        this.attr('display', content ? null : 'none');
 
         // Preserve spaces. In other words, we do not want consecutive spaces to get collapsed to one.
-        textNode.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+        this.attr('xml:space', 'preserve');
 
-        // clear all `<tspan>` children
-        textNode.textContent = '';
+        // Easy way to erase all `<tspan>` children;
+        this.node.textContent = '';
 
+
+        let textNode        = this.node;
         let textPathOptions = options.textPath;
         if (textPathOptions) {
 
             // Wrap the text in the SVG <textPath> element that points to a path
             // defined by `options.textPath` inside the internal `<defs>` element.
-            let defs = that.find('defs');
+            let defs = this.find('defs');
             if (!defs.length) {
-                defs = createElement('defs');
-                that.append(defs);
+                defs = createVElement('defs');
+                this.append(defs);
             }
 
             // If `opt.textPath` is a plain string, consider it to be directly
             // the SVG path data for the text to go along (this is a shortcut).
             // Otherwise if it is an object and contains the `d` property,
             // then this is our path.
-            let isTextPathObject = utils.isObject(textPathOptions);
+            let isTextPathObject = Object(textPathOptions) === textPathOptions;
             // d attr
             let d = isTextPathObject ? textPathOptions.d : textPathOptions;
 
@@ -224,7 +322,7 @@ export class VElement {
 
             if (d) {
 
-                vPath = createElement('path', {
+                vPath = createVElement('path', {
                     d,
                     id: createPathId()
                 });
@@ -232,7 +330,7 @@ export class VElement {
                 defs.append(vPath);
             }
 
-            let vTextPath = createElement('textPath');
+            let vTextPath = createVElement('textPath');
 
             // Set attributes on the `<textPath>`. The most important one
             // is the `xlink:href` that points to our newly created `<path/>` element in `<defs/>`.
@@ -240,16 +338,17 @@ export class VElement {
             // `t.text('my text', {textPath: {'xlink:href': '#my-other-path'}})`.
             // In other words, one can completely skip the auto-creation of the path
             // and use any other arbitrary path that is in the document.
+            if (!textPathOptions['xlink:href'] && vPath) {
+                vTextPath.attr('xlink:href', '#' + vPath.node.id);
+            }
+
             if (isTextPathObject) {
-
-                if (!textPathOptions['xlink:href'] && vPath) {
-                    vTextPath.attr('xlink:href', '#' + vPath.node.id);
-                }
-
                 vTextPath.attr(textPathOptions);
             }
 
-            that.append(vTextPath);
+            this.append(vTextPath);
+
+            // Now all the `<tspan>`s will be inside the `<textPath>`.
             textNode = vTextPath.node;
         }
 
@@ -270,9 +369,9 @@ export class VElement {
 
         utils.forEach(lines, function (line, i) {
 
-            let vLine = createElement('tspan', {
+            let vLine = createVElement('tspan', {
                 dy: i ? lineHeight : '0',
-                x: that.attr('x') || 0
+                x: this.attr('x') || 0
             });
 
             vLine.addClass('pane-text-line');
@@ -301,7 +400,7 @@ export class VElement {
                                 maxFontSize = fontSize;
                             }
 
-                            tspan = createElement('tspan', annotation.attrs);
+                            tspan = createVElement('tspan', annotation.attrs);
                             if (includeAnnotationIndices) {
                                 // If `includeAnnotationIndices` is `true`,
                                 // set the list of indices of all the applied annotations
@@ -345,191 +444,110 @@ export class VElement {
             textNode.appendChild(vLine.node);
 
             offset += line.length + 1;      // + 1 = newline character.
-        });
 
-        return that;
-    }
+        }, this);
 
-    hasClass(selector) {
-
-        let that = this;
-        let node = that.node;
-
-        let className = ' ' + selector + ' ';
-
-        return node.nodeType === 1
-            ? (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ').indexOf(className) > -1
-            : false;
-    }
-
-    addClass(value) {
-
-        let that = this;
-        let node = that.node;
-
-        if (utils.isFunction(value)) {
-            return that.addClass(value.call(node, utils.getClassName(node)));
-        }
-
-        if (value && utils.isString(value) && node.nodeType === 1) {
-
-            let classes  = value.match(rnotwhite) || [];
-            let oldValue = (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ');
-            let newValue = utils.reduce(classes, function (ret, cls) {
-                if (ret.indexOf(' ' + cls + ' ') < 0) {
-                    ret += cls + ' ';
-                }
-                return ret;
-            }, oldValue);
-
-            newValue = utils.trim(newValue);
-
-            if (oldValue !== newValue) {
-                node.setAttribute('class', newValue);
-            }
-        }
-
-        return that;
-    }
-
-    removeClass(value) {
-
-        let that = this;
-        let node = that.node;
-
-        if (utils.isFunction(value)) {
-            return that.removeClass(value.call(node, utils.getClassName(node)));
-        }
-
-        if ((!value || utils.isString(value)) && node.nodeType === 1) {
-
-            let classes  = (value || '').match(rnotwhite) || [];
-            let oldValue = (' ' + utils.getClassName(node) + ' ').replace(rclass, ' ');
-            let newValue = utils.reduce(classes, function (ret, cls) {
-                if (ret.indexOf(' ' + cls + ' ') > -1) {
-                    ret = ret.replace(' ' + cls + ' ', ' ');
-                }
-                return ret;
-            }, oldValue);
-
-            newValue = value ? utils.trim(newValue) : '';
-
-            if (oldValue !== newValue) {
-                node.setAttribute('class', newValue);
-            }
-        }
-
-        return that;
-    }
-
-    toggleClass(value, stateVal) {
-
-        let that = this;
-        let node = that.node;
-
-        if (utils.isBoolean(stateVal) && utils.isString(value)) {
-            return stateVal ? that.addClass(value) : that.removeClass(value);
-        }
-
-        if (utils.isFunction(value)) {
-            return that.toggleClass(value.call(node, utils.getClassName(node), stateVal), stateVal);
-        }
-
-        if (value && utils.isString(value)) {
-            let classes = value.match(rnotwhite) || [];
-            utils.forEach(classes, function (cls) {
-                that.hasClass(cls) ? that.removeClass(cls) : that.addClass(cls);
-            });
-        }
-
-        return that;
+        return this;
     }
 
     remove() {
 
-        let that = this;
-        let node = that.node;
-
-        if (node && node.parentNode) {
-            node.parentNode.removeChild(node);
+        if (this.node.parentNode) {
+            this.node.parentNode.removeChild(this.node);
         }
 
-        return that;
+        return this;
     }
 
     empty() {
 
-        let that = this;
-        let node = that.node;
-
-        if (node) {
-            while (node.lastChild) {
-                node.removeChild(node.lastChild);
-            }
+        while (this.node.firstChild) {
+            this.node.removeChild(this.node.firstChild);
         }
 
-        return that;
+        return this;
     }
 
     append(elem) {
+        eachElem(elem, function (item) {
+            this.node.appendChild(normalize(item));
+        }, this);
 
-        let that = this;
-
-        elem && utils.forEach(utils.toArray(elem), function (item) {
-            that.node.appendChild(normalize(item));
-        });
-
-        return that;
+        return this;
     }
 
     prepend(elem) {
+        eachElem(elem, function (item) {
+            this.node.insertBefore(normalize(item), this.node.firstChild);
+        }, this);
 
-        let that = this;
-        let node = that.node;
-
-        elem && node.insertBefore(normalize(elem), node.firstChild);
-
-        return that;
+        return this;
     }
 
-    appendTo(/* elem */) {
-        // elem.appendChild(this.node);
-        // return this;
+    before(elem) {
+        eachElem(elem, function (item) {
+            if (this.node.parentNode) {
+                this.node.parentNode.insertBefore(normalize(item), this.node);
+            }
+        }, this);
+
+        return this;
     }
 
-    prependTo(/* elem */) {
+    after(elem) {
+        eachElem(elem, function (item) {
+            if (this.node.parentNode) {
+                this.node.parentNode.insertBefore(normalize(item), this.node.nextSibling);
+            }
+        }, this);
 
+        return this;
     }
 
-    before(/* elem */) {
+    appendTo(elem) {
 
+        getLastVElement(elem).append(this);
+
+        return this;
     }
 
-    after(/* elem */) {
+    prependTo(elem) {
 
+        getLastVElement(elem).prepend(this);
+
+        return this;
+    }
+
+    insertBefore(elem) {
+
+        getLastVElement(elem).before(this);
+
+        return this;
+    }
+
+    insertAfter(elem) {
+
+        getLastVElement(elem).after(this);
+
+        return this;
     }
 
     getSVG() {
-        let that = this;
-        let node = that.node;
 
-        return node instanceof window.SVGSVGElement ? that : vectorize(node.ownerSVGElement);
+        return this.node instanceof window.SVGSVGElement
+            ? this
+            : vectorize(this.node.ownerSVGElement);
     }
 
     getDefs() {
 
-        let defs = null;
         let svg  = this.getSVG();
+        let defs = svg.node.getElementsByTagName('defs');
 
-        utils.some(svg.node.childNodes, function (node) {
-            if (utils.isNode(node, 'defs')) {
-                defs = vectorize(node);
-                return true;
-            }
-        });
-
-        if (!defs) {
-            defs = createElement('defs');
+        if (defs && defs.length) {
+            defs = vectorize(defs[0]);
+        } else {
+            defs = createVElement('defs');
             svg.append(defs);
         }
 
@@ -538,12 +556,12 @@ export class VElement {
 
     clone() {
 
-        let node   = this.node;
-        let cloned = vectorize(node.cloneNode(true));
+        let cloned = vectorize(this.node.cloneNode(true));
 
-        if (node.id) {
+        if (this.node.id) {
             cloned.node.removeAttribute('id');
         }
+
         return cloned;
     }
 
@@ -560,10 +578,8 @@ export class VElement {
 
     findParent(className, terminator) {
 
-        let node = this.node;
-        let stop = terminator || node.ownerSVGElement;
-
-        node = node.parentNode;
+        let stop = terminator || this.node.ownerSVGElement;
+        let node = this.node.parentNode;
 
         while (node && node !== stop) {
             let vel = vectorize(node);
@@ -579,9 +595,7 @@ export class VElement {
 
     parent() {
 
-        let node       = this.node;
-        let parentNode = node && node.parentNode;
-
+        let parentNode = this.node && this.node.parentNode;
         if (parentNode) {
             return vectorize(parentNode);
         }
@@ -610,22 +624,25 @@ export class VElement {
         let raw = this.attr('transform') || '';
         let ts  = utils.parseTranslate(raw);
 
-        if (!arguments.length) {
+        if (utils.isUndefined(tx)) {
             return ts;
         }
 
+        tx = relative ? ts.tx + tx : tx;
+        ty = relative ? ts.ty + ty : ty;
+
         let mutant = utils.clearTranslate(raw);
+        let final  = 'translate(' + tx + ',' + ty + ')';
 
-        let dx = relative ? ts.tx + tx : tx;
-        let dy = relative ? ts.ty + ty : ty;
-
-        let final = 'translate(' + dx + ',' + dy + ')';
-
+        // Note that `translate()` is always the first transformation.
+        // This is usually the desired case.
         if (mutant) {
             final = final + ' ' + mutant;
         }
 
-        return this.attr('transform', final);
+        this.attr('transform', final);
+
+        return this;
     }
 
     rotate(angle, cx, cy, relative) {
@@ -633,18 +650,17 @@ export class VElement {
         let raw = this.attr('transform') || '';
         let rt  = utils.parseRotate(raw);
 
-        if (!arguments.length) {
+        if (utils.isUndefined(angle)) {
             return rt;
         }
-
-        let mutant = utils.clearRotate(raw);
 
         angle %= 360;
 
         let newAngle  = relative ? rt.angle + angle : angle;
         let newOrigin = utils.isUndefined(cx) || utils.isUndefined(cy) ? '' : ',' + cx + ',' + cy;
 
-        let final = 'rotate(' + newAngle + newOrigin + ')';
+        let mutant = utils.clearRotate(raw);
+        let final  = 'rotate(' + newAngle + newOrigin + ')';
 
         if (mutant) {
             final = mutant + ' ' + final;
@@ -657,27 +673,21 @@ export class VElement {
 
         let raw = this.attr('transform') || '';
         let sc  = utils.parseScale(raw);
-        let len = arguments.length;
 
-        if (!len) {
+        if (utils.isUndefined(sx)) {
             return sc;
         }
 
-        let mutant = utils.clearScale(raw);
-
-        if (len === 1) {
+        if (utils.isUndefined(sy)) {
             sy = sx;
-        } else if (len === 2) {
-            if (utils.isBoolean(sy)) {
-                relative = sy;
-                sy       = sx;
-            }
         }
+
 
         sx = relative ? sc.sx * sx : sx;
         sy = relative ? sc.sy * sy : sy;
 
-        let final = 'scale(' + sx + ',' + sy + ')';
+        let mutant = utils.clearScale(raw);
+        let final  = 'scale(' + sx + ',' + sy + ')';
 
         if (mutant) {
             final = mutant + ' ' + final;
@@ -693,18 +703,15 @@ export class VElement {
         // If `target` is specified, bounding box will be computed
         // relatively to `target` element.
 
-        let node = this.node;
-
         // If the element is not in the live DOM, it does not have a bounding
         // box defined and so fall back to 'zero' dimension element.
-        if (!node.ownerSVGElement) {
+        if (!this.node.ownerSVGElement) {
             return new Rect(0, 0, 0, 0);
         }
 
-
         let box;
         try {
-            box = node.getBBox();
+            box = this.node.getBBox();
             // We are creating a new object as the standard says that
             // you can't modify the attributes of a bbox.
             box = {
@@ -716,16 +723,16 @@ export class VElement {
         } catch (e) {
             // fallback for IE
             box = {
-                x: node.clientLeft,
-                y: node.clientTop,
-                width: node.clientWidth,
-                height: node.clientHeight
+                x: this.node.clientLeft,
+                y: this.node.clientTop,
+                width: this.node.clientWidth,
+                height: this.node.clientHeight
             };
         }
 
         if (!withoutTransformations) {
 
-            let matrix = this.getTransformToElement(target || node.ownerSVGElement);
+            let matrix = this.getTransformToElement(target || this.node.ownerSVGElement);
 
             box = vector.transformRect(box, matrix);
         }
@@ -736,9 +743,7 @@ export class VElement {
     toLocalPoint(x, y) {
 
         // Convert global point into the coordinate space of this element.
-
-        let that  = this;
-        let svg   = that.getSVG().node;
+        let svg   = this.getSVG().node;
         let point = svg.createSVGPoint();
 
         point.x = x;
@@ -747,7 +752,7 @@ export class VElement {
         try {
             // ref: https://msdn.microsoft.com/zh-cn/library/hh535760(v=vs.85).aspx
             let globalPoint         = point.matrixTransform(svg.getScreenCTM().inverse());
-            let globalToLocalMatrix = that.getTransformToElement(svg).inverse();
+            let globalToLocalMatrix = this.getTransformToElement(svg).inverse();
             return globalPoint.matrixTransform(globalToLocalMatrix);
 
         } catch (e) {
@@ -760,17 +765,18 @@ export class VElement {
 
     getTransformToElement(toElem) {
 
-        let node = this.node;
-
-        if (!node) {
-            return null;
-        }
-        return node.getTransformToElement
-            ? node.getTransformToElement(toElem)
-            : getTransformToElement(node, toElem);
+        return utils.getTransformToElement(this.node, toElem);
     }
 
-    translateCenterToPoint() { }
+    translateCenterToPoint(point) {
+
+        let bbox   = this.getBBox();
+        let center = bbox.getCenter();
+
+        this.translate(point.x - center.x, point.y - center.y);
+
+        return this;
+    }
 
     translateAndAutoOrient(position, reference, target) {
 
@@ -790,13 +796,12 @@ export class VElement {
         // consider: `this.scale(2).scale(2).scale(2)`. The result is that the
         // element is scaled by the factor 2, not 8.
 
-        let that  = this;
-        let scale = that.scale();
-        that.attr('transform', '');
-        that.scale(scale.sx, scale.sy);
+        let scale = this.scale();
+        this.attr('transform', '');
+        this.scale(scale.sx, scale.sy);
 
-        let svg  = that.getSVG().node;
-        let bbox = that.getBBox(false, target);
+        let svg  = this.getSVG().node;
+        let bbox = this.getBBox(false, target);
 
         // 1. Translate to origin.
         let translateToOrigin = svg.createSVGTransform();
@@ -819,7 +824,7 @@ export class VElement {
 
 
         // 4. Apply transformations.
-        let matrix    = that.getTransformToElement(target);
+        let matrix    = this.getTransformToElement(target);
         let transform = svg.createSVGTransform();
         transform.setMatrix(
             translateFinal.matrix.multiply(
@@ -835,12 +840,12 @@ export class VElement {
 
         let decomposition = decomposeMatrix(transform.matrix);
 
-        that.translate(utils.toFixed(decomposition.translateX, 2), utils.toFixed(decomposition.translateY, 2));
-        that.rotate(utils.toFixed(decomposition.rotation, 2));
+        this.translate(utils.toFixed(decomposition.translateX, 2), utils.toFixed(decomposition.translateY, 2));
+        this.rotate(utils.toFixed(decomposition.rotation, 2));
         // Note that scale has been already applied
         // this.scale(decomposition.scaleX, decomposition.scaleY);
 
-        return that;
+        return this;
     }
 
     animateAlongPath() { }
@@ -867,14 +872,13 @@ export class VElement {
 
         interval = interval || 1;
 
-        let node     = this.node;
-        let length   = node.getTotalLength();
+        let length   = this.node.getTotalLength();
         let distance = 0;
         let samples  = [];
 
         while (distance < length) {
 
-            let sample = node.getPointAtLength(distance);
+            let sample = this.node.getPointAtLength(distance);
 
             samples.push({
                 distance,
@@ -890,11 +894,10 @@ export class VElement {
 
     toPath() {
 
-        let that = this;
         let path = vectorize(utils.createSvgElement('path'));
-        let d    = that.toPathData();
+        let d    = this.toPathData();
 
-        path.attr(that.attr());
+        path.attr(this.attr());
 
         d && path.attr('d', d);
 
@@ -903,19 +906,14 @@ export class VElement {
 
     toPathData() {
 
-        let that = this;
-        let node = that.node;
-
-        let tagName = node.tagName.toLowerCase();
-
+        let tagName = this.node.tagName.toLowerCase();
         if (tagName === 'path') {
-            return that.attr('d');
+            return this.attr('d');
         }
 
         let method = utils[tagName + 'ToPathData'];
-
         if (utils.isFunction(method)) {
-            return method(node);
+            return method(this.node);
         }
 
         throw new Error(tagName + ' cannot be converted to PATH.');
@@ -1017,6 +1015,24 @@ export class VElement {
     }
 }
 
+function getLastVElement(elem) {
+
+    var vel = elem instanceof VElement ? elem : createVElement(elem);
+
+    return utils.isArray(vel) ? vel[vel.length - 1] : vel;
+}
+
+function eachElem(elem, iterator, context) {
+
+    if (elem) {
+
+        var vel = utils.map(utils.isArray(elem) ? elem : [elem], function (item) {
+            return vector.isVElement(item) ? item : createVElement(elem);
+        });
+
+        utils.forEach(vel, iterator, context);
+    }
+}
 
 function vectorize(node) {
     return new VElement(node);
@@ -1026,158 +1042,239 @@ function normalize(elem) {
     return elem instanceof VElement ? elem.node : elem;
 }
 
-function createElement(elem, attrs, children) {
+function createVElement(elem, attrs, children) {
 
     if (!elem) {
         return null;
     }
 
-    // If `el` is an object, it is probably a native SVG element.
-    // Wrap it to VElement.
-    if (utils.isObject(elem)) {
-        return vectorize(elem);
+    if (elem instanceof VElement) {
+        elem = elem.node;
     }
 
-    if (elem.toLowerCase() === 'svg') {
-        // If `el` is a `'svg'` or `'SVG'` string, create a new SVG canvas.
-        return vectorize(utils.createSvgDocument());
+    if (utils.isString(elem)) {
 
-    } else if (elem[0] === '<') {
+        if (elem.toLowerCase() === 'svg') {
+            // create a new SVG canvas
+            elem = utils.createSvgDocument();
 
-        // Create element from an SVG string.
-        let svgDoc = utils.createSvgDocument(elem);
-        if (svgDoc.childNodes.length > 1) {
-            return utils.map(svgDoc.childNodes, function (childNode) {
-                return vectorize(document.importNode(childNode, true));
-            });
+        } else if (elem[0] === '<') {
+
+            // Create element from an SVG string.
+            let svgDoc = utils.createSvgDocument(elem);
+            if (svgDoc.childNodes.length > 1) {
+                return utils.map(svgDoc.childNodes, function (childNode) {
+                    return vectorize(document.importNode(childNode, true));
+                });
+            }
+
+            elem = document.importNode(svgDoc.firstChild, true);
+        } else {
+            // create svg node by tagName.
+            elem = utils.createSvgElement(elem);
         }
-
-        return vectorize(document.importNode(svgDoc.firstChild, true));
     }
 
-
-    // create svg node by tagName.
-    elem = utils.createSvgElement(elem);
+    let vel = vectorize(elem);
 
     // set attributes.
-    attrs && utils.forIn(attrs, function (value, attr) {
-        utils.setAttribute(elem, attr, value);
-    });
+    attrs && vel.setAttrs(attrs);
 
     // append children.
-    if (children) {
-        children = utils.isArray(children) ? children : [children];
+    children && vel.append(children);
 
-        utils.forEach(children, function (child) {
-            elem.appendChild(child instanceof VElement ? child.node : child);
-        });
-    }
-
-    return vectorize(elem);
+    return vel;
 }
 
 
 // vector
 // ------
 
-let vector = VElement.createElement = createElement;
-let svgDocument = createElement('svg').node;
+let vector = VElement.create = createVElement;
+let svgDocument = createVElement('svg').node;
 
-vector.isVElement = function (obj) {
-    return obj instanceof VElement;
-};
 
-vector.createSVGMatrix = function (matrix) {
+utils.extend(vector, {
 
-    let svgMatrix = svgDocument.createSVGMatrix();
+    isVElement(obj) {
 
-    /* eslint guard-for-in: 0 */
-    for (let key in matrix) {
-        svgMatrix[key] = matrix[key];
-    }
+        return obj instanceof VElement;
+    },
 
-    return svgMatrix;
-};
+    styleToObject(styleStr) {
 
-vector.createSVGTransform = function (matrix) {
+        return utils.reduce(utils.split(styleStr, ';'), function (result, style) {
+            if (style) {
 
-    if (!utils.isUndefined(matrix)) {
+                let pairs = utils.split(style, '=');
 
-        if (!(matrix instanceof SVGMatrix)) {
-            matrix = vector.createSVGMatrix(matrix);
+                result[utils.trim(pairs[0])] = utils.trim(pairs[1]);
+            }
+
+            return result;
+        }, {});
+    },
+
+    createSVGPoint(x, y) {
+
+        let point = svgDocument.createSVGPoint();
+
+        point.x = x;
+        point.y = y;
+
+        return point;
+    },
+
+    createSVGMatrix(matrix) {
+
+        let svgMatrix = svgDocument.createSVGMatrix();
+
+        /* eslint guard-for-in: 0 */
+        for (let key in matrix) {
+            svgMatrix[key] = matrix[key];
         }
-        return svgDocument.createSVGTransformFromMatrix(matrix);
-    }
 
-    return svgDocument.createSVGTransform();
-};
+        return svgMatrix;
+    },
 
-vector.createSVGPoint = function (x, y) {
+    createSVGTransform(matrix) {
 
-    let point = svgDocument.createSVGPoint();
+        if (!utils.isUndefined(matrix)) {
 
-    point.x = x;
-    point.y = y;
-
-    return point;
-};
-
-vector.transformRect = function (rect, matrix) {
-
-    let point = svgDocument.createSVGPoint();
-
-    point.x = rect.x;
-    point.y = rect.y;
-
-    let corner1 = point.matrixTransform(matrix);
-
-
-    point.x = rect.x + rect.width;
-    point.y = rect.y;
-
-    let corner2 = point.matrixTransform(matrix);
-
-
-    point.x = rect.x + rect.width;
-    point.y = rect.y + rect.height;
-
-    let corner3 = point.matrixTransform(matrix);
-
-
-    point.x = rect.x;
-    point.y = rect.y + rect.height;
-
-    let corner4 = point.matrixTransform(matrix);
-
-
-    let minX = Math.min(corner1.x, corner2.x, corner3.x, corner4.x);
-    let maxX = Math.max(corner1.x, corner2.x, corner3.x, corner4.x);
-    let minY = Math.min(corner1.y, corner2.y, corner3.y, corner4.y);
-    let maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
-
-    return {
-        x: minX,
-        y: minY,
-        width: maxX - minX,
-        height: maxY - minY
-    };
-};
-
-vector.styleToObject = function (styleString) {
-
-    let ret = {};
-
-    utils.forEach(styleString.split(';'), function (style) {
-
-        if (style) {
-            let pair = style.split('=');
-
-            ret[utils.trim(pair[0])] = utils.trim(pair[1]);
+            if (!(matrix instanceof SVGMatrix)) {
+                matrix = vector.createSVGMatrix(matrix);
+            }
+            return svgDocument.createSVGTransformFromMatrix(matrix);
         }
-    });
 
-    return ret;
-};
+        return svgDocument.createSVGTransform();
+    },
+
+    transformRect(rect, matrix) {
+
+        let point = svgDocument.createSVGPoint();
+
+        point.x = rect.x;
+        point.y = rect.y;
+
+        let corner1 = point.matrixTransform(matrix);
+
+
+        point.x = rect.x + rect.width;
+        point.y = rect.y;
+
+        let corner2 = point.matrixTransform(matrix);
+
+
+        point.x = rect.x + rect.width;
+        point.y = rect.y + rect.height;
+
+        let corner3 = point.matrixTransform(matrix);
+
+
+        point.x = rect.x;
+        point.y = rect.y + rect.height;
+
+        let corner4 = point.matrixTransform(matrix);
+
+
+        let minX = Math.min(corner1.x, corner2.x, corner3.x, corner4.x);
+        let maxX = Math.max(corner1.x, corner2.x, corner3.x, corner4.x);
+        let minY = Math.min(corner1.y, corner2.y, corner3.y, corner4.y);
+        let maxY = Math.max(corner1.y, corner2.y, corner3.y, corner4.y);
+
+        return {
+            x: minX,
+            y: minY,
+            width: maxX - minX,
+            height: maxY - minY
+        };
+    },
+
+    annotations(t, annotations, options) {
+
+        annotations = annotations || [];
+        annotations = utils.isArray(annotations) ? annotations : [annotations];
+        options     = options || {};
+
+        let compacted = [];
+        let ret       = [];
+        let offset    = options.offset || 0;
+        let batch;
+        let item;
+        let prev;
+
+        for (let i = 0, l = t.length; i < l; i++) {
+
+            item = ret[i] = t[i];
+
+            for (let j = 0, k = annotations.length; j < k; j++) {
+
+                let annotation = annotations[j];
+                let start      = annotation.start + offset;
+                let end        = annotation.end + offset;
+
+                if (i >= start && i < end) {
+                    // Annotation applies.
+                    if (utils.isObject(item)) {
+                        // There is more than one annotation to be applied => Merge attributes.
+                        item.attrs = utils.merge({}, item.attrs, annotation.attrs);
+                    } else {
+                        item = ret[i] = {
+                            t: t[i],
+                            attrs: annotation.attrs
+                        };
+                    }
+                    if (options.includeAnnotationIndices) {
+
+                        if (!item.annotations) {
+                            item.annotations = [];
+                        }
+
+                        item.annotations.push(j);
+                    }
+                }
+            }
+
+            prev = ret[i - 1];
+
+            if (!prev) {
+
+                batch = item;
+
+            } else if (utils.isObject(item) && utils.isObject(prev)) {
+                // Both previous item and the current one are annotations. If the attributes
+                // didn't change, merge the text.
+                if (JSON.stringify(item.attrs) === JSON.stringify(prev.attrs)) {
+                    batch.t += item.t;
+                } else {
+                    compacted.push(batch);
+                    batch = item;
+                }
+
+            } else if (utils.isObject(item)) {
+                // Previous item was a string, current item is an annotation.
+                compacted.push(batch);
+                batch = item;
+
+            } else if (V.isObject(prev)) {
+                // Previous item was an annotation, current item is a string.
+                compacted.push(batch);
+                batch = item;
+
+            } else {
+                // Both previous and current item are strings.
+                batch = (batch || '') + item;
+            }
+        }
+
+        if (batch) {
+            compacted.push(batch);
+        }
+
+        return compacted;
+    }
+});
 
 
 // exports

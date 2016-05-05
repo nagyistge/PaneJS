@@ -111,9 +111,42 @@ function getOffset(elem) {
     };
 }
 
+function showHide(elem, show) {
+
+    if (elem && elem.style) {
+
+        var display = elem.style.display;
+
+        if (show) {
+            if (display === 'none') {
+                if (!isUndefined(elem.__display)) {
+                    display = elem.__display;
+                    delete elem.__display;
+                }
+
+                elem.style.display = display || '';
+            }
+        } else {
+            if (display !== 'none') {
+
+                if (display) {
+                    elem.__display = display;
+                }
+
+                elem.style.display = 'none';
+            }
+        }
+    }
+}
+
+function isHidden(elem) {
+
+    return elem && (elem.style.display === 'none' || !contains(elem.ownerDocument, elem));
+}
 
 // xml namespaces.
 let ns = {
+    xml: 'http://www.w3.org/XML/1998/namespace',
     xmlns: 'http://www.w3.org/2000/svg',
     xlink: 'http://www.w3.org/1999/xlink'
 };
@@ -163,18 +196,51 @@ function createSvgElement(tagName, doc) {
 
 function setAttribute(elem, name, value) {
 
+    if (isNil(value)) {
+        return removeAttribute(elem, name);
+    }
+
     if (name === 'id') {
         elem.id = value;
     } else {
 
-        let combined = name.split(':');
+        var qualified = qualifyAttributeName(name);
 
-        combined.length > 1
+        qualified.ns
             // attribute names can be namespaced. E.g. `image` elements
             // have a `xlink:href` attribute to set the source of the image.
-            ? elem.setAttributeNS(ns[combined[0]], combined[1], value)
+            ? elem.setAttributeNS(qualified.ns, name, value)
             : elem.setAttribute(name, value);
     }
+}
+
+function removeAttribute(elem, name) {
+
+    var qualified = qualifyAttributeName(name);
+
+    if (qualified.ns) {
+        if (elem.hasAttributeNS(qualified.ns, qualified.local)) {
+            elem.removeAttributeNS(qualified.ns, qualified.local);
+        }
+    } else if (elem.hasAttribute(name)) {
+        elem.removeAttribute(name);
+    }
+}
+
+function qualifyAttributeName(name) {
+
+    if (name.indexOf(':') !== -1) {
+        var combined = name.split(':');
+        return {
+            ns: ns[combined[0]],
+            local: combined[1]
+        };
+    }
+
+    return {
+        ns: null,
+        local: name
+    };
 }
 
 function getComputedStyle(elem, name) {
@@ -192,20 +258,43 @@ function getComputedStyle(elem, name) {
     return computed;
 }
 
+function getTransformToElement(source, target) {
+
+    if (source.getTransformToElement) {
+        return source.getTransformToElement(target);
+    }
+
+    // chrome 48 removed svg getTransformToElement api
+
+    let matrix;
+    try {
+        matrix = target.getScreenCTM().inverse();
+    } catch (e) {
+        throw new Error('Can not inverse source element\'s ctm.');
+    }
+
+    return matrix.multiply(source.getScreenCTM());
+}
+
 
 // exports
 // -------
 
 export {
     isNode,
+    showHide,
+    isHidden,
     getWindow,
     getOffset,
     getNodeName,
     getClassName,
     setAttribute,
+    removeAttribute,
+    qualifyAttributeName,
     createSvgElement,
     createSvgDocument,
     contains as containsElem,
     containsClassName,
-    getComputedStyle
+    getComputedStyle,
+    getTransformToElement
 };
