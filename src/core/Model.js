@@ -6,8 +6,12 @@ import         Terminal from '../cells/Terminal';
 import       RootChange from '../changes/RootChange';
 import      ChildChange from '../changes/ChildChange';
 import    VisibleChange from '../changes/VisibleChange';
+import       SizeChange from '../changes/SizeChange';
+import   PositionChange from '../changes/PositionChange';
+import   RotationChange from '../changes/RotationChange';
 import   TerminalChange from '../changes/TerminalChange';
 import   GeometryChange from '../changes/GeometryChange';
+import  AttributeChange from '../changes/AttributeChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
 
@@ -283,7 +287,7 @@ class Model extends Events {
         return previous;
     }
 
-    //linkChanged(link, terminal, isSource) {
+    // linkChanged(link, terminal, isSource) {
     //
     //    let prev = link.getTerminal(isSource);
     //
@@ -294,7 +298,7 @@ class Model extends Events {
     //    }
     //
     //    return prev;
-    //}
+    // }
 
     cellAdded(cell) {
 
@@ -585,11 +589,11 @@ class Model extends Events {
         // partial replace the terminal port
 
         if (link) {
-            var terminal = this.getTerminal(link, isSource);
+            let terminal = this.getTerminal(link, isSource);
 
             terminal = terminal
-                ? terminal.clone({ port: port })
-                : new Terminal({ port: port });
+                ? terminal.clone({ port })
+                : new Terminal({ port });
 
             this.setTerminal(link, terminal, isSource);
         }
@@ -662,17 +666,50 @@ class Model extends Events {
             }
         }
 
-        return visible;
+        return this;
     }
 
     visibleChanged(cell, visible) {
 
-        var previous = this.isVisible(cell);
+        let previous = this.isVisible(cell);
 
         cell.setVisible(visible, { silent: true });
 
         return previous;
     }
+
+
+    // attribute
+    // ---------
+
+    getAttribute(cell) {
+
+        return cell ? cell.getAttribute() : null;
+    }
+
+    setAttribute(cell, attrs) {
+
+        if (cell) {
+            try {
+                this.beginUpdate();
+                this.digest(new AttributeChange(this, cell, attrs));
+            } finally {
+                this.endUpdate();
+            }
+        }
+
+        return this;
+    }
+
+    attributeChanged(cell, attrs) {
+
+        let previous = this.getAttribute(cell);
+
+        cell.setAttribute(attrs, { silent: true });
+
+        return previous;
+    }
+
 
     // geometry
     // --------
@@ -690,6 +727,133 @@ class Model extends Events {
 
     geometryChanged() {
 
+    }
+
+    getPosition(cell, raw) {
+
+        return cell ? cell.getPosition(raw) : null;
+    }
+
+    setPosition(cell, position) {
+
+        if (cell && position) {
+
+            let previous = cell.getPosition(true) || {};
+
+            position.relative = position.relative === true;
+            previous.relative = previous.relative === true;
+
+            if (previous.x !== position.x ||
+                previous.y !== position.y ||
+                previous.relative !== position.relative) {
+
+                try {
+                    this.beginUpdate();
+                    this.digest(new PositionChange(this, cell, {
+                        x: position.x,
+                        y: position.y,
+                        relative: position.relative
+                    }));
+                } finally {
+                    this.endUpdate();
+                }
+            }
+        }
+
+        return this;
+    }
+
+    positionChanged(cell, position) {
+
+        let previous = cell.getPosition(true);
+
+        cell.setPosition(position, { silent: true });
+
+        return previous;
+    }
+
+    getSize(cell, raw) {
+
+        return cell ? cell.getSize(raw) : null;
+    }
+
+    setSize(cell, size) {
+
+        if (cell && size) {
+
+            let prev = cell.getSize(true) || {};
+
+            size.relative = size.relative === true;
+            prev.relative = prev.relative === true;
+
+            if (prev.width !== size.width ||
+                prev.height !== size.height ||
+                prev.relative !== size.relative) {
+
+                try {
+                    this.beginUpdate();
+                    this.digest(new SizeChange(this, cell, {
+                        width: size.width,
+                        height: size.height,
+                        relative: size.relative
+                    }));
+                } finally {
+                    this.endUpdate();
+                }
+            }
+        }
+
+        return this;
+    }
+
+    sizeChanged(cell, size) {
+
+        let previous = cell.getSize(true);
+
+        cell.setSize(size, { silent: true });
+
+        return previous;
+    }
+
+    getRotation(cell, raw) {
+
+        return cell ? cell.getRotation(raw) : null;
+    }
+
+    setRotation(cell, rotation) {
+
+        if (cell && rotation) {
+
+            let previous = cell.getRotation(true) || {};
+
+            rotation.relative = rotation.relative === true;
+            previous.relative = previous.relative === true;
+
+            if (previous.angle !== rotation.angle ||
+                previous.relative !== rotation.relative) {
+
+                try {
+                    this.beginUpdate();
+                    this.digest(new RotationChange(this, cell, {
+                        angle: rotation.angle,
+                        relative: rotation.relative
+                    }));
+                } finally {
+                    this.endUpdate();
+                }
+            }
+        }
+
+        return this;
+    }
+
+    rotationChanged(cell, rotation) {
+
+        let previous = cell.getRotation(true);
+
+        cell.setRotation(rotation, { silent: true });
+
+        return previous;
     }
 
 

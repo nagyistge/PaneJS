@@ -1,19 +1,23 @@
-import     * as utils from '../common/utils';
-import         vector from '../common/vector';
-import       detector from '../common/detector';
-import         Events from '../common/Events';
-import          Point from '../geometry/Point';
+import      * as utils from '../common/utils';
+import          vector from '../common/vector';
+import        detector from '../common/detector';
+import          Events from '../common/Events';
+import           Point from '../geometry/Point';
 
-import          Model from '../core/Model';
-import           Cell from '../cells/Cell';
-import       LinkView from '../views/LinkView';
-import       NodeView from '../views/NodeView';
+import           Model from '../core/Model';
+import            Cell from '../cells/Cell';
+import        LinkView from '../views/LinkView';
+import        NodeView from '../views/NodeView';
 
-import     RootChange from '../changes/RootChange';
-import    ChildChange from '../changes/ChildChange';
-import  VisibleChange from '../changes/VisibleChange';
-import TerminalChange from '../changes/TerminalChange';
-import GeometryChange from '../changes/GeometryChange';
+import      RootChange from '../changes/RootChange';
+import     ChildChange from '../changes/ChildChange';
+import   VisibleChange from '../changes/VisibleChange';
+import      SizeChange from '../changes/SizeChange';
+import  PositionChange from '../changes/PositionChange';
+import  RotationChange from '../changes/RotationChange';
+import  TerminalChange from '../changes/TerminalChange';
+import  GeometryChange from '../changes/GeometryChange';
+import AttributeChange from '../changes/AttributeChange';
 
 
 const WIN = window;
@@ -617,8 +621,8 @@ class Paper extends Events {
 
     canRenderLink(link) {
 
-        var sourceNode = link.getTerminalNode(true);
-        var targetNode = link.getTerminalNode(false);
+        let sourceNode = link.getTerminalNode(true);
+        let targetNode = link.getTerminalNode(false);
 
         // unVisible or do not in the paper(view is null)
         if (sourceNode && (!sourceNode.isVisible() || !this.getView(sourceNode))) {
@@ -690,20 +694,54 @@ class Paper extends Events {
     distributeChange(change) {
 
         if (change instanceof RootChange) {
+
             this.onRootChanged(change);
+
         } else if (change instanceof ChildChange) {
+
             this.onChildChanged(change);
+
         } else if (change instanceof VisibleChange) {
+
             this.onVisibleChange(change);
+
         } else if (change instanceof TerminalChange) {
+
             this.onTerminalChange(change);
+
+        } else if (change instanceof SizeChange) {
+
+            this.onSizeChange(change);
+
+        } else if (change instanceof PositionChange) {
+
+            this.onPositionChange(change);
+
+        } else if (change instanceof RotationChange) {
+
+            this.onRotationChange(change);
+
+        } else if (change instanceof AttributeChange) {
+
+            this.onAttributeChange(change);
         } else if (change instanceof GeometryChange) {
+
             this.onGeometryChange(change);
         }
+
         return this;
     }
 
-    onRootChanged(/* change */) { }
+    onRootChanged(change) {
+
+        if (change.root) {
+            this.invalidate(change.root, true, true);
+        }
+
+        if (change.previous) {
+            this.removeView(change.previous, true, true);
+        }
+    }
 
     onChildChanged(change) {
 
@@ -723,11 +761,33 @@ class Paper extends Events {
     }
 
     onVisibleChange(change) {
+
         this.invalidate(change.cell, true, true);
     }
 
     onTerminalChange(change) {
-        this.invalidate(change.link);
+
+        this.invalidate(change.link, true, true);
+    }
+
+    onSizeChange(change) {
+
+        this.invalidate(change.cell, true, true);
+    }
+
+    onPositionChange(change) {
+
+        this.invalidate(change.cell, true, true);
+    }
+
+    onRotationChange(change) {
+
+        this.invalidate(change.cell, true, true);
+    }
+
+    onAttributeChange(change) {
+
+        this.invalidate(change.cell, true, true);
     }
 
     onGeometryChange(change) {

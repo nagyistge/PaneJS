@@ -50,7 +50,7 @@ class Terminal {
             scheduleSetTerminal.call(link, false);
 
             if (!options.silent) {
-                var model = link.getModel() || this.getModel();
+                let model = link.getModel() || this.getModel();
                 if (model) {
                     model.setTerminal(link, this, isSource);
                     scheduleSetTerminal.call(link, true);
@@ -77,7 +77,7 @@ class Terminal {
             scheduleSetTerminal.call(link, false);
 
             if (!options.silent) {
-                var model = link.getModel() || this.getModel();
+                let model = link.getModel() || this.getModel();
                 if (model) {
                     model.setTerminal(link, null, isSource);
                     scheduleSetTerminal.call(link, true);
@@ -99,7 +99,7 @@ class Terminal {
 
     clone(terminal) {
 
-        var cloned = new Terminal(terminal);
+        let cloned = new Terminal(terminal);
 
         // copy the missing properties
         utils.forEach(['node', 'port', 'point'], function (key) {

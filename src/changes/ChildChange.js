@@ -28,15 +28,15 @@ class ChildChange extends Change {
         let oldIndex  = oldParent ? oldParent.indexOfChild(child) : 0;
 
         // the new parent is null, then the child(and link) will be removed
-        //if (!newParent) {
+        // if (!newParent) {
         //    this.connect(child, false);
-        //}
+        // }
 
         oldParent = model.childChanged(child, newParent, newIndex);
 
-        //if (newParent) {
+        // if (newParent) {
         //    this.connect(child, true);
-        //}
+        // }
 
         this.parent        = newParent;
         this.index         = newIndex;
@@ -46,7 +46,7 @@ class ChildChange extends Change {
         return this;
     }
 
-    //connect(cell, connected) {
+    // connect(cell, connected) {
     //
     //    if (cell.isLink()) {
     //
@@ -70,7 +70,7 @@ class ChildChange extends Change {
     //    }, this);
     //
     //    return this;
-    //}
+    // }
 }
 
 

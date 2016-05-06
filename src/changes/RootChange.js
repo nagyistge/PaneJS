@@ -1,6 +1,5 @@
 import Change from './Change';
 
-
 class RootChange extends Change {
 
     constructor(model, root) {
@@ -14,11 +13,8 @@ class RootChange extends Change {
 
     digest() {
 
-        let model    = this.model;
-        let previous = this.previous;
-
-        this.root     = previous;
-        this.previous = model.rootChanged(previous);
+        this.root     = this.previous;
+        this.previous = this.model.rootChanged(this.previous);
 
         return this;
     }

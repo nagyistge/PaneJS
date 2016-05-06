@@ -1,6 +1,5 @@
 import Change from './Change';
 
-
 class VisibleChange extends Change {
 
     constructor(model, cell, visible) {
@@ -27,4 +26,3 @@ class VisibleChange extends Change {
 // -------
 
 export default VisibleChange;
-

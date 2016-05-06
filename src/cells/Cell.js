@@ -1,5 +1,6 @@
 import * as utils from '../common/utils';
-import   Terminal from '../cells/Terminal'
+import   Terminal from '../cells/Terminal';
+
 
 // private
 // -------
@@ -31,7 +32,7 @@ function insertChild(child, index) {
 
 function getModel(primary, backup) {
 
-    var model = primary && primary.getModel();
+    let model = primary && primary.getModel();
 
     if (!model && backup && backup.getModel) {
         model = backup.getModel();
@@ -106,7 +107,7 @@ class Cell {
 
         if (!options.silent) {
 
-            var model = getModel(this, terminal);
+            let model = getModel(this, terminal);
             if (model) {
                 // fully replace the previous terminal
                 model.setTerminal(this, terminal, isSource);
@@ -170,7 +171,7 @@ class Cell {
         scheduleSetTerminal.call(this, false);
 
         if (!options.silent) {
-            var model = getModel(this, node);
+            let model = getModel(this, node);
             if (model) {
                 model.setTerminalNode(this, node, isSource);
                 scheduleSetTerminal.call(this, true);
@@ -217,7 +218,7 @@ class Cell {
         scheduleSetTerminal.call(this, false);
 
         if (!options.silent) {
-            var model = getModel(this);
+            let model = getModel(this);
             if (model) {
                 model.setTerminalPort(this, port, isSource);
                 scheduleSetTerminal.call(this, true);
@@ -262,7 +263,7 @@ class Cell {
         scheduleSetTerminal.call(this, false);
 
         if (!options.silent) {
-            var model = getModel(this);
+            let model = getModel(this);
             if (model) {
                 model.setTerminalPoint(this, point, isSource);
                 scheduleSetTerminal.call(this, true);
@@ -295,7 +296,7 @@ class Cell {
             scheduleSetTerminal.call(this, false);
 
             if (!options.silent) {
-                var model = getModel(this, terminal);
+                let model = getModel(this, terminal);
                 if (model) {
                     model.removeFromTerminal(this, isSource);
                     scheduleSetTerminal.call(this, true);
@@ -513,7 +514,7 @@ class Cell {
         if (!options.silent) {
 
             // this cell maybe not in a model, try get parent's model
-            var model = getModel(this, parent);
+            let model = getModel(this, parent);
             // schedule a change
             if (model) {
                 model.setParent(this, parent, index);
@@ -536,11 +537,11 @@ class Cell {
 
         if (this.parent) {
 
-            var scheduled = false;
+            let scheduled = false;
 
             // try to schedule a change
             if (!options.silent) {
-                var model = getModel(this, this.parent);
+                let model = getModel(this, this.parent);
                 if (model) {
                     model.removeCell(this);
                     scheduled = true;
@@ -606,31 +607,111 @@ class Cell {
 
     // geometry
     // --------
-    // TODO
 
     getGeometry() { }
 
     getSize(raw) {
 
+        return raw ? this.metadata.size : this.size;
     }
 
-    setSize() {}
+    setSize(width, height, options = {}) {
+
+        let scheduled = false;
+
+        let size = {
+            width,
+            height,
+            relative: options.relative === true
+        };
+
+        if (!options.silent) {
+            let model = this.getModel();
+            if (model) {
+                model.setSize(this, size);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled && this.metadata) {
+            this.metadata.size = size;
+        }
+
+        return this;
+
+    }
+
+    resize(width, height, options = {}) {
+
+        return this.setSize(width, height, options);
+    }
 
     getPosition(raw) {
 
+        return raw ? this.metadata.position : this.position;
     }
 
-    setPosition() {}
+    setPosition(x, y, options = {}) {
 
-    translate() {}
+        let scheduled = false;
+        let position  = {
+            x,
+            y,
+            relative: options.relative === true
+        };
+
+        if (!options.silent) {
+            let model = this.getModel();
+            if (model) {
+                model.setPosition(this, position);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled && this.metadata) {
+            this.metadata.position = position;
+        }
+
+        return this;
+    }
+
+    translate(x, y, options = {}) {
+
+        return this.setPosition(x, y, options);
+    }
 
     getRotation(raw) {
 
+        return raw ? this.metadata.rotation : this.rotation;
     }
 
-    setRotation() {}
+    setRotation(angle, options = {}) {
 
-    rotate() {}
+        let scheduled = false;
+        let rotation  = {
+            angle,
+            relative: options.relative === true
+        };
+
+        if (!options.silent) {
+            let model = this.getModel();
+            if (model) {
+                model.setRotation(this, rotation);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled && this.metadata) {
+            this.metadata.rotation = rotation;
+        }
+
+        return this;
+    }
+
+    rotate(rotation, options = {}) {
+
+        return this.setRotation(rotation, options);
+    }
 
 
     // visible
@@ -643,11 +724,11 @@ class Cell {
 
     setVisible(visible, options = {}) {
 
-        var scheduled = false;
+        let scheduled = false;
 
         if (!options.silent) {
 
-            var model = getModel(this);
+            let model = getModel(this);
             if (model) {
                 model.setVisible(this, visible);
                 scheduled = true;
@@ -681,6 +762,35 @@ class Cell {
         this.isVisible()
             ? this.hide(options)
             : this.show(options);
+
+        return this;
+    }
+
+
+    // style
+    // -----
+
+    getAttribute() {
+
+        return this.metadata.attrs;
+    }
+
+    setAttribute(attrs, options = {}) {
+
+        let scheduled = false;
+
+        if (!options.silent) {
+
+            let model = this.getModel();
+            if (model) {
+                model.setAttribute(this, attrs);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled && this.metadata) {
+            this.metadata.attrs = utils.merge({}, this.getAttribute(), attrs);
+        }
 
         return this;
     }
