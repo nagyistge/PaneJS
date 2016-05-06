@@ -596,10 +596,20 @@ class Paper extends Events {
 
         let view = this.getView(cell);
         if (view) {
-            view.render();
+            if (cell.isLink() && !this.canRenderLink(cell)) {
+                this.removeView(cell);
+            } else {
+                view.render();
+            }
         }
 
         return this;
+    }
+
+    canRenderLink(link) {
+
+        return (link.getTerminalNode(true) || link.getTerminalPoint(true))
+            && (link.getTerminalNode(false) || link.getTerminalPoint(false));
     }
 
     findViewByElem(elem) {

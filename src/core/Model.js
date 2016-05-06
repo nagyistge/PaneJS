@@ -1,9 +1,9 @@
-import * as utils from '../common/utils';
-import     Events from '../common/Events';
-import       Cell from '../cells/Cell';
-import   Terminal from '../cells/Terminal';
+import       * as utils from '../common/utils';
+import           Events from '../common/Events';
+import             Cell from '../cells/Cell';
+import         Terminal from '../cells/Terminal';
 
-import      RootChange  from '../changes/RootChange';
+import       RootChange from '../changes/RootChange';
 import      ChildChange from '../changes/ChildChange';
 import   TerminalChange from '../changes/TerminalChange';
 import   GeometryChange from '../changes/GeometryChange';
@@ -221,6 +221,19 @@ class Model extends Events {
         return this;
     }
 
+    removeCell(cell) {
+
+        if (cell) {
+            if (this.isRoot(cell)) {
+                this.setRoot(null);
+            } else if (this.getParent(cell)) {
+                this.digest(new ChildChange(this, cell, null));
+            }
+        }
+
+        return cell;
+    }
+
     getParent(child) {
 
         return child ? child.parent : null;
@@ -229,23 +242,17 @@ class Model extends Events {
     setParent(child, parent, index) {
 
         if (child) {
-
-            try {
-                this.beginUpdate();
-                // let parentChanged = cell.parent !== parent;
-
-                this.digest(new ChildChange(this, child, parent, index));
-
-                /* FIXME
-                 if (parentChanged) {
-
-                 }
-                 */
-            } finally {
-                this.endUpdate();
+            if (parent) {
+                try {
+                    this.beginUpdate();
+                    this.digest(new ChildChange(this, child, parent, index));
+                } finally {
+                    this.endUpdate();
+                }
+            } else {
+                this.removeCell(child);
             }
         }
-
         return this;
     }
 
@@ -275,18 +282,18 @@ class Model extends Events {
         return previous;
     }
 
-    linkChanged(link, terminal, isSource) {
-
-        let prev = link.getTerminal(isSource);
-
-        if (terminal) {
-            terminal.addLink(link, isSource);
-        } else if (prev) {
-            prev.removeLink(link, isSource);
-        }
-
-        return prev;
-    }
+    //linkChanged(link, terminal, isSource) {
+    //
+    //    let prev = link.getTerminal(isSource);
+    //
+    //    if (terminal) {
+    //        terminal.addLink(link, isSource);
+    //    } else if (prev) {
+    //        prev.removeLink(link, isSource);
+    //    }
+    //
+    //    return prev;
+    //}
 
     cellAdded(cell) {
 
@@ -323,6 +330,22 @@ class Model extends Events {
             cell.setModel(this);
             // recursively processes child cells
             cell.eachChild(this.cellAdded, this);
+        }
+    }
+
+    cellRemoved(cell) {
+
+        if (cell) {
+            cell.eachChild(function (child) {
+                this.cellRemoved(child);
+            }, this);
+
+            let id = cell.getId();
+            if (this.cells && id) {
+                delete this.cells[id];
+            }
+
+            cell.setModel(null);
         }
     }
 
@@ -434,35 +457,6 @@ class Model extends Events {
         return null;
     }
 
-    removeCell(cell) {
-
-        if (cell) {
-            if (this.isRoot(cell)) {
-                this.setRoot(null);
-            } else if (this.getParent(cell)) {
-                this.digest(new ChildChange(this, null, cell));
-            }
-        }
-
-        return cell;
-    }
-
-    cellRemoved(cell) {
-
-        if (cell) {
-            cell.eachChild(function (child) {
-                this.cellRemoved(child);
-            }, this);
-
-            let id = cell.getId();
-            if (this.cells && id) {
-                delete this.cells[id];
-            }
-
-            cell.setModel(null);
-        }
-    }
-
 
     // children
     // --------
@@ -545,26 +539,67 @@ class Model extends Events {
         return link ? link.getTerminal(isSource) : null;
     }
 
+    getTerminalNode(link, isSource) {
+
+        return link ? link.getTerminalNode(isSource) : null;
+    }
+
+    getTerminalPort(link, isSource) {
+
+        return link ? link.getTerminalPort(isSource) : null;
+    }
+
+    getTerminalPoint(link, isSource) {
+
+        return link ? link.getTerminalPoint(isSource) : null;
+    }
+
     setTerminal(link, terminal, isSource) {
+
+        // fully replace the terminal
 
         if (link) {
             try {
                 this.beginUpdate();
-
-                // FIXME: not used {
-                // let terminalChanged = terminal !== that.getTerminal(link, isSource);
-                // }
-
                 this.digest(new TerminalChange(this, link, new Terminal(terminal), isSource));
-
-                /*
-                 if (this.maintainEdgeParent && terminalChanged) {
-                 this.updateEdgeParent(link, this.getRoot());
-                 }
-                 */
             } finally {
                 this.endUpdate();
             }
+        }
+
+        return this;
+    }
+
+    setTerminalNode(link, node, isSource) {
+
+        if (link) {
+            this.setTerminal(link, node, isSource);
+        }
+
+        return this;
+    }
+
+    setTerminalPort(link, port, isSource) {
+
+        // partial replace the terminal port
+
+        if (link) {
+            var terminal = this.getTerminal(link, isSource);
+
+            terminal = terminal
+                ? terminal.clone({ port: port })
+                : new Terminal({ port: port });
+
+            this.setTerminal(link, terminal, isSource);
+        }
+
+        return this;
+    }
+
+    setTerminalPoint(link, point, isSource) {
+
+        if (link) {
+            this.setTerminal(link, point, isSource);
         }
 
         return this;
@@ -584,19 +619,31 @@ class Model extends Events {
         return this;
     }
 
+    removeFromTerminal(link, isSource) {
+
+        if (link) {
+            this.setTerminal(link, null, isSource);
+        }
+
+        return this;
+    }
+
     terminalChanged(link, terminal, isSource) {
 
         let prev = this.getTerminal(link, isSource);
 
         if (terminal) {
-            terminal.addLink(link, isSource);
+            terminal.addLink(link, isSource, { silent: true });
         } else if (prev) {
-            prev.removeLink(link, isSource);
+            prev.removeLink(link, isSource, { silent: true });
         }
 
         return prev;
     }
 
+
+    // geometry
+    // --------
 
     getGeometry(cell) {
         return cell;
@@ -667,8 +714,8 @@ class Model extends Events {
     }
 
 
-    // common
-    // ------
+    // properties
+    // ----------
 
     getPaper() {
 

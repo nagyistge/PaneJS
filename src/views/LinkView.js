@@ -559,7 +559,9 @@ class LinkView extends CellView {
                 ? cache.sourceMarkerVel
                 : cache.targetMarkerVel;
 
-            markerVel.translateAndAutoOrient(position, reference, pane);
+            if (position && reference) {
+                markerVel.translateAndAutoOrient(position, reference, pane);
+            }
         }
 
         return this;

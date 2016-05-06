@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ports</title>
+    <title>setTerminal</title>
     <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
         #container {
@@ -67,7 +67,6 @@
             name: 'out-2'
         }]
     });
-
     var ports2 = new panejs.shapes.basic.Ports({
 
         position: { x: 350, y: 150 },
@@ -103,22 +102,49 @@
         targetMarker: 'classic'
     });
 
-    model.addLink(link2, {
-        node: ports1
-    }, {
-        node: ports2,
-        port: { name: 'in-1' }
-    });
-
-    // 添加handlers
-    paper.registerHandlers([
-        new panejs.SelectionHandler(paper),
-        new panejs.ConnectionHandler(paper)
-    ]);
+    model.addCell(link2);
+    model.setTerminals(link2, ports1, { node: ports2, port: { name: 'in-1' } });
 
 
     setTimeout(function () {
-        model.removeCell(link2);
+        link2.setTerminal({
+            point: { x: 200, y: 20 }
+        }, true);
+
+        setTimeout(function () {
+            link2.setTerminal({ point: { x: 300, y: 50 } }, false);
+
+            setTimeout(function () {
+                link2.setTerminal({
+                    node: ports1,
+                    port: { name: 'out-1' }
+                }, true);
+
+                setTimeout(function () {
+                    link2.setTerminalPort({ name: 'out-2' }, true);
+
+                    setTimeout(function () {
+                        link2.setTerminalNode(ports2, false);
+
+                        setTimeout(function () {
+
+                            link2.removeFromTerminal(false);
+
+                            link2.setTerminalPoint({
+                                x: 300,
+                                y: 80
+                            }, false);
+
+                        }, 1000);
+
+                    }, 1000);
+
+                }, 1000);
+
+            }, 1000);
+
+        }, 1000);
+
     }, 3000);
 
 </script>

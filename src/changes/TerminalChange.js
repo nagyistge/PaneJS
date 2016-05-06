@@ -17,7 +17,7 @@ class TerminalChange extends Change {
     digest() {
 
         this.terminal = this.previous;
-        this.previous = this.model.terminalChanged(this.link, this.previous, this.isSource);
+        this.previous = this.model.terminalChanged(this.link, this.terminal, this.isSource);
 
         return this;
     }

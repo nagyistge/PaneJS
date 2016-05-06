@@ -65,11 +65,11 @@
     }, 3000);
 
     setTimeout(function () {
-        rect2.remove();
+        rect2.removeFromParent();
     }, 4000);
 
     setTimeout(function () {
-        defaultLayer.removeChildAt(defaultLayer.indexOfChild(rect3))
+        defaultLayer.removeChildAt(defaultLayer.indexOfChild(rect3));
     }, 5000);
 
     var rect5 = new panejs.shapes.basic.Rect({
@@ -84,11 +84,13 @@
         attrs: { text: { text: 'Rect6' } }
     });
 
+    // rect5 and rect6 are not in the model
     rect5.insertChild(rect6);
+    // add them to model
     defaultLayer.insertChild(rect5);
 
     setTimeout(function () {
-        rect5.remove();
+        rect5.removeFromParent();
         console.log(rect5);
         console.log(rect6);
     }, 6000);

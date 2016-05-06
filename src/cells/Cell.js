@@ -1,4 +1,68 @@
 import * as utils from '../common/utils';
+import   Terminal from '../cells/Terminal'
+
+// private
+// -------
+
+function insertChild(child, index) {
+
+    let childCount = this.getChildCount();
+
+    index = utils.fixIndex(index, childCount);
+
+    if (child.parent === this && index === childCount) {
+        index--;
+    }
+
+    // update parent
+    child.removeFromParent({ silent: true });
+    child.parent = this;
+
+    if (this.children && this.children.length) {
+        this.children.splice(index, 0, child);
+    } else {
+        // speed up
+        this.children = [];
+        this.children.push(child);
+    }
+
+    return this;
+}
+
+function getModel(primary, backup) {
+
+    var model = primary && primary.getModel();
+
+    if (!model && backup && backup.getModel) {
+        model = backup.getModel();
+    }
+
+    return model;
+}
+
+function scheduleSetParent(scheduled) {
+
+    this.setParent.scheduled = scheduled;
+
+    return this;
+}
+
+function isSetParentScheduled() {
+
+    return this.setParent.scheduled === true;
+}
+
+function scheduleSetTerminal(scheduled) {
+
+    this.setTerminal.scheduled = scheduled;
+
+    return this;
+}
+
+function isSetTerminalScheduled() {
+
+    return this.setTerminal.scheduled === true;
+}
 
 
 class Cell {
@@ -14,6 +78,16 @@ class Cell {
     }
 
 
+    // static
+    // ------
+
+    static setDefaults(options) {
+
+        // update global options
+        this.defaults = utils.merge({}, this.defaults, options);
+    }
+
+
     // link
     // ----
 
@@ -21,44 +95,61 @@ class Cell {
         return false;
     }
 
-    getTerminal(isSource) {
+    getTerminal(isSource = true) {
 
         return isSource ? this.source : this.target;
     }
 
-    setTerminal(terminal, isSource) {
+    setTerminal(terminal, isSource = true, options = {}) {
 
-        if (isSource) {
-            this.source = terminal;
+        scheduleSetTerminal.call(this, false);
 
-            if (terminal) {
-                this.sourceNode  = terminal.node;
-                this.sourcePort  = terminal.port;
-                this.sourcePoint = terminal.point;
-            } else {
-                this.sourceNode  = null;
-                this.sourcePort  = null;
-                this.sourcePoint = null;
+        if (!options.silent) {
+
+            var model = getModel(this, terminal);
+            if (model) {
+                // fully replace the previous terminal
+                model.setTerminal(this, terminal, isSource);
+                scheduleSetTerminal.call(this, true);
             }
+        }
 
-        } else {
-            this.target = terminal;
+        if (!isSetTerminalScheduled.call(this)) {
 
-            if (terminal) {
-                this.targetNode  = terminal.node;
-                this.targetPort  = terminal.port;
-                this.targetPoint = terminal.point;
+            terminal = new Terminal(terminal);
+
+            if (isSource) {
+                this.source = terminal;
+
+                if (terminal) {
+                    this.sourceNode  = terminal.node;
+                    this.sourcePort  = terminal.port;
+                    this.sourcePoint = terminal.point;
+                } else {
+                    this.sourceNode  = null;
+                    this.sourcePort  = null;
+                    this.sourcePoint = null;
+                }
+
             } else {
-                this.targetNode  = null;
-                this.targetPort  = null;
-                this.targetPoint = null;
+                this.target = terminal;
+
+                if (terminal) {
+                    this.targetNode  = terminal.node;
+                    this.targetPort  = terminal.port;
+                    this.targetPoint = terminal.point;
+                } else {
+                    this.targetNode  = null;
+                    this.targetPort  = null;
+                    this.targetPoint = null;
+                }
             }
         }
 
         return this;
     }
 
-    getTerminalNode(isSource) {
+    getTerminalNode(isSource = true) {
 
         let node = isSource
             ? this.sourceNode
@@ -74,23 +165,36 @@ class Cell {
         return node;
     }
 
-    setTerminalNode(node, isSource) {
+    setTerminalNode(node, isSource = true, options = {}) {
 
-        if (isSource) {
-            this.sourceNode = node;
-        } else {
-            this.targetNode = node;
+        scheduleSetTerminal.call(this, false);
+
+        if (!options.silent) {
+            var model = getModel(this, node);
+            if (model) {
+                model.setTerminalNode(this, node, isSource);
+                scheduleSetTerminal.call(this, true);
+            }
         }
 
-        let terminal = this.getTerminal(isSource);
-        if (terminal) {
-            terminal.node = node;
+        if (!isSetTerminalScheduled.call(this)) {
+
+            if (isSource) {
+                this.sourceNode = node;
+            } else {
+                this.targetNode = node;
+            }
+
+            let terminal = this.getTerminal(isSource);
+            if (terminal) {
+                terminal.node = node;
+            }
         }
 
         return this;
     }
 
-    getTerminalPort(isSource) {
+    getTerminalPort(isSource = true) {
 
         let port = isSource
             ? this.sourcePort
@@ -106,23 +210,38 @@ class Cell {
         return port;
     }
 
-    setTerminalPort(port, isSource) {
+    setTerminalPort(port, isSource = true, options = {}) {
 
-        if (isSource) {
-            this.sourcePort = port;
-        } else {
-            this.targetPort = port;
+        // partial replace the terminal port
+
+        scheduleSetTerminal.call(this, false);
+
+        if (!options.silent) {
+            var model = getModel(this);
+            if (model) {
+                model.setTerminalPort(this, port, isSource);
+                scheduleSetTerminal.call(this, true);
+            }
         }
 
-        let terminal = this.getTerminal(isSource);
-        if (terminal) {
-            terminal.port = port;
+        if (!isSetTerminalScheduled.call(this)) {
+
+            if (isSource) {
+                this.sourcePort = port;
+            } else {
+                this.targetPort = port;
+            }
+
+            let terminal = this.getTerminal(isSource);
+            if (terminal) {
+                terminal.port = port;
+            }
         }
 
         return this;
     }
 
-    getTerminalPoint(isSource) {
+    getTerminalPoint(isSource = true) {
 
         let point = isSource
             ? this.sourcePoint
@@ -138,28 +257,161 @@ class Cell {
         return point;
     }
 
-    setTerminalPoint(point, isSource) {
+    setTerminalPoint(point, isSource = true, options = {}) {
 
-        if (isSource) {
-            this.sourcePoint = point;
-        } else {
-            this.targetPoint = point;
+        scheduleSetTerminal.call(this, false);
+
+        if (!options.silent) {
+            var model = getModel(this);
+            if (model) {
+                model.setTerminalPoint(this, point, isSource);
+                scheduleSetTerminal.call(this, true);
+            }
         }
 
-        let terminal = this.getTerminal(isSource);
-        if (terminal) {
-            terminal.point = point;
+        if (!isSetTerminalScheduled.call(this)) {
+
+            if (isSource) {
+                this.sourcePoint = point;
+            } else {
+                this.targetPoint = point;
+            }
+
+            let terminal = this.getTerminal(isSource);
+            if (terminal) {
+                terminal.point = point;
+            }
         }
 
         return this;
     }
 
-    removeFromTerminal(isSource) {
+    removeFromTerminal(isSource = true, options = {}) {
 
         // remove link from terminal
         let terminal = this.getTerminal(isSource);
         if (terminal) {
-            terminal.removeLink(this, isSource);
+
+            scheduleSetTerminal.call(this, false);
+
+            if (!options.silent) {
+                var model = getModel(this, terminal);
+                if (model) {
+                    model.removeFromTerminal(this, isSource);
+                    scheduleSetTerminal.call(this, true);
+                }
+            }
+
+            if (!isSetTerminalScheduled.call(this)) {
+                terminal.removeLink(this, isSource, { silent: true });
+            }
+        }
+
+        return this;
+    }
+
+
+    // node
+    // ----
+
+    isNode() {
+        return false;
+    }
+
+    getLinkCount() {
+
+        return this.links ? this.links.length : 0;
+    }
+
+    indexOfLink(link) {
+
+        return utils.indexOf(this.links, link);
+    }
+
+    getLinkAt(index) {
+
+        return this.links ? this.links[index] : null;
+    }
+
+    eachLink(iterator, context) {
+
+        return utils.forEach(this.links, iterator, context);
+    }
+
+    filterLink(iterator, context) {
+
+        return utils.filter(this.links, iterator, context);
+    }
+
+    addLink(link, outgoing = true, options = {}) {
+
+        if (!link) {
+            return this;
+        }
+
+        scheduleSetTerminal.call(link, false);
+
+        if (!options.silent) {
+            let model = getModel(link, this);
+            if (model) {
+                // fully replace the previous terminal
+                model.setTerminal(link, this, outgoing);
+                scheduleSetTerminal.call(link, true);
+            }
+        }
+
+        if (!isSetTerminalScheduled.call(link)) {
+
+            link.removeFromTerminal(outgoing, { silent: true });
+
+            // when source and target are the same node, these's
+            // no need to relate link with node once more.
+            if (!this.links || this.indexOfLink(link) < 0
+                || link.getTerminalNode(!outgoing) !== this) {
+
+                if (!this.links) {
+                    this.links = [];
+                }
+
+                // links are unordered, push it to the array directly.
+                this.links.push(link);
+            }
+
+            link.setTerminal(this, outgoing, { silent: true });
+        }
+
+        return this;
+    }
+
+    removeLink(link, outgoing = true, options = {}) {
+
+        if (!link) {
+            return this;
+        }
+
+        scheduleSetTerminal.call(link, false);
+
+        if (!options.silent) {
+            let model = getModel(link, this);
+            if (model) {
+                // fully remove the previous terminal
+                model.setTerminal(link, null, outgoing);
+                scheduleSetTerminal.call(link, true);
+            }
+        }
+
+        if (!isSetTerminalScheduled.call(link)) {
+
+            // when the source and target are the same, do not remove it
+            if (this.links && link.getTerminalNode(!outgoing) !== this) {
+
+                let index = this.indexOfLink(link);
+                if (index >= 0) {
+                    this.links.splice(index, 1);
+                }
+            }
+
+            link.setTerminal(null, outgoing, { silent: true });
         }
 
         return this;
@@ -204,12 +456,15 @@ class Cell {
             options = index;
         }
 
+        scheduleSetParent.call(child, false);
+
         if (!options.silent) {
             child.setParent(this, index);
         }
 
-        if (!child.setParent.scheduled) {
-            Cell.insertChild(this, child, index);
+        if (!isSetParentScheduled.call(child)) {
+            // if unscheduled, insert it directly
+            insertChild.call(this, child, index);
         }
 
         return this;
@@ -225,11 +480,13 @@ class Cell {
         let child = this.getChildAt(index);
         if (child) {
 
+            scheduleSetParent.call(child, false);
+
             if (!options.silent) {
                 child.setParent(null);
             }
 
-            if (!child.setParent.scheduled) {
+            if (!isSetParentScheduled.call(child)) {
                 this.children.splice(index, 1);
                 child.parent = null;
             }
@@ -237,83 +494,6 @@ class Cell {
 
         // return the removed child
         return child;
-    }
-
-
-    // node
-    // ----
-
-    isNode() {
-        return false;
-    }
-
-    getLinkCount() {
-
-        return this.links ? this.links.length : 0;
-    }
-
-    indexOfLink(link) {
-
-        return utils.indexOf(this.links, link);
-    }
-
-    getLinkAt(index) {
-
-        return this.links ? this.links[index] : null;
-    }
-
-    eachLink(iterator, context) {
-
-        return utils.forEach(this.links, iterator, context);
-    }
-
-    filterLink(iterator, context) {
-
-        return utils.filter(this.links, iterator, context);
-    }
-
-    addLink(link, outgoing) {
-
-        if (link) {
-
-            link.removeFromTerminal(outgoing);
-
-            if (!this.links || this.indexOfLink(link) < 0 ||
-                    // when source and target are the same node, these's
-                    // no need to relate link with node once more.
-                link.getTerminalNode(!outgoing) !== this) {
-
-                if (!this.links) {
-                    this.links = [];
-                }
-
-                // links are unordered, push it to the array directly.
-                this.links.push(link);
-            }
-
-            link.setTerminalNode(this, outgoing);
-        }
-
-        return this;
-    }
-
-    removeLink(link, outgoing) {
-
-        if (link) {
-            // when the source and target are the same, do not remove it
-            if (this.links && link.getTerminalNode(!outgoing) !== this) {
-
-                let index = this.indexOfLink(link);
-                if (index >= 0) {
-                    this.links.splice(index, 1);
-                }
-            }
-
-            // fixme: should call `link.setTerminalNode()` ?
-            link.setTerminal(null, outgoing);
-        }
-
-        return link;
     }
 
 
@@ -327,31 +507,48 @@ class Cell {
 
     setParent(parent, index, options = {}) {
 
-        // state
-        this.setParent.scheduled = false;
+        scheduleSetParent.call(this, false);
 
         // try to schedule a change
         if (!options.silent) {
 
-            var model = this.getModel();
-
             // this cell maybe not in a model, try get parent's model
-            if (!model && parent) {
-                model = parent.getModel();
-            }
-
+            var model = getModel(this, parent);
             // schedule a change
             if (model) {
                 model.setParent(this, parent, index);
-                this.setParent.scheduled = true;
+                scheduleSetParent.call(this, true);
             }
         }
 
-        if (!this.setParent.scheduled) {
+        if (!isSetParentScheduled.call(this)) {
             if (parent) {
-                Cell.insertChild(parent, this, index);
+                insertChild.call(parent, this, index);
             } else {
-                this.parent = null;
+                this.removeFromParent({ silent: true });
+            }
+        }
+
+        return this;
+    }
+
+    removeFromParent(options = {}) {
+
+        if (this.parent) {
+
+            var scheduled = false;
+
+            // try to schedule a change
+            if (!options.silent) {
+                var model = getModel(this, this.parent);
+                if (model) {
+                    model.removeCell(this);
+                    scheduled = true;
+                }
+            }
+
+            if (!scheduled) {
+                this.parent.removeChild(this, { silent: true });
             }
         }
 
@@ -406,21 +603,53 @@ class Cell {
         return result;
     }
 
-    remove(options = {}) {
-
-        if (this.parent) {
-            this.parent.removeChild(this, options);
-        }
-
-        return this;
-    }
-
 
     // geometry
     // --------
     // TODO
 
     getGeometry() { }
+
+    getSize(raw) {
+
+    }
+
+    setSize() {}
+
+    getPosition(raw) {
+
+    }
+
+    setPosition() {}
+
+    translate() {}
+
+    getRotation(raw) {
+
+    }
+
+    setRotation() {}
+
+    rotate() {}
+
+
+    // visible
+    // -------
+
+    isVisible() {
+
+        return this.visible !== false;
+    }
+
+    show() {
+
+        this.visible = true;
+    }
+
+    hide() {
+
+        this.visible = false;
+    }
 
 
     // access
@@ -484,37 +713,6 @@ class Cell {
             : classNames || '';
     }
 
-    isVisible() {
-
-        return this.visible !== false;
-    }
-
-    show() {
-
-        this.visible = true;
-    }
-
-    hide() {
-
-        this.visible = false;
-    }
-
-    getSize(raw) {
-
-    }
-
-    getPosition(raw) {
-
-    }
-
-    getRotation(raw) {
-
-    }
-
-    setPosition() {
-
-    }
-
 
     // common
     // ------
@@ -563,39 +761,6 @@ class Cell {
     destroy() {
 
         utils.destroy(this);
-    }
-
-
-    // static
-    // ------
-
-    static setDefaults(options) {
-
-        // update global options
-        this.defaults = utils.merge({}, this.defaults, options);
-    }
-
-    static insertChild(parent, child, index) {
-
-        let childCount = parent.getChildCount();
-
-        index = utils.fixIndex(index, childCount);
-
-        if (child.parent === parent && index === childCount) {
-            index--;
-        }
-
-        // update parent
-        child.remove({ silent: true });
-        child.parent = parent;
-
-        if (parent.children && parent.children.length) {
-            parent.children.splice(index, 0, child);
-        } else {
-            // speed up
-            parent.children = [];
-            parent.children.push(child);
-        }
     }
 }
 
