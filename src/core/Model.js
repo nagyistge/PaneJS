@@ -5,6 +5,7 @@ import         Terminal from '../cells/Terminal';
 
 import       RootChange from '../changes/RootChange';
 import      ChildChange from '../changes/ChildChange';
+import    VisibleChange from '../changes/VisibleChange';
 import   TerminalChange from '../changes/TerminalChange';
 import   GeometryChange from '../changes/GeometryChange';
 import ChangeCollection from '../changes/ChangeCollection';
@@ -641,6 +642,37 @@ class Model extends Events {
         return prev;
     }
 
+
+    // visible
+    // -------
+
+    isVisible(cell) {
+
+        return cell ? cell.isVisible() : false;
+    }
+
+    setVisible(cell, visible) {
+
+        if (cell && visible !== this.isVisible(cell)) {
+            try {
+                this.beginUpdate();
+                this.digest(new VisibleChange(this, cell, visible));
+            } finally {
+                this.endUpdate();
+            }
+        }
+
+        return visible;
+    }
+
+    visibleChanged(cell, visible) {
+
+        var previous = this.isVisible(cell);
+
+        cell.setVisible(visible, { silent: true });
+
+        return previous;
+    }
 
     // geometry
     // --------

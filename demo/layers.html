@@ -1,10 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Layers example for PaneJS</title>
+    <meta charset="utf8"/>
+
+    <title>Layers</title>
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
+    <style>
+        #container {
+            width: 500px;
+            height: 300px;
+            border: 1px solid #DDD;
+        }
+    </style>
 </head>
 <body>
+<div id="container"></div>
+<div style="padding: 10px 0">
+    <button id="btnLayer1">Layer1</button>
+    <button id="btnLayer2">Layer2</button>
+</div>
+<script src="../dist/panejs.js"></script>
+<script>
 
+    var container = document.getElementById('container');
+
+    var model = new panejs.Model();
+    var paper = new panejs.Paper(container, model);
+
+    var root = model.getRoot();
+    var layer1 = model.createLayer();
+    var layer2 = model.createLayer();
+
+    model.beginUpdate();
+
+    root.insertChild(layer1);
+    root.insertChild(layer2);
+
+    var node0 = new panejs.shapes.basic.Rect({
+        position: {
+            x: 70,
+            y: 40
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+            rect: {
+                'stroke-width': 1,
+                'fill': '#C0C0C0'
+            },
+            text: {
+                text: 'Hello,'
+            }
+        }
+    });
+    var node1 = new panejs.shapes.basic.Rect({
+        position: {
+            x: 320,
+            y: 40
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+            rect: {
+                'stroke-width': 1,
+                'fill': '#C0C0C0'
+            },
+            text: {
+                text: 'Hello,'
+            }
+        }
+    });
+    var node2 = new panejs.shapes.basic.Rect({
+        position: {
+            x: 200,
+            y: 200
+        },
+        size: {
+            width: 80,
+            height: 30
+        },
+        attrs: {
+
+            text: {
+                text: 'World!'
+            }
+        }
+    });
+
+    var link1 = new panejs.Link({
+        targetMarker: 'classic'
+    });
+
+    var link2 = new panejs.Link({
+        targetMarker: 'classic'
+    });
+
+    var link3 = new panejs.Link();
+
+    link1.insertVertice({ x: 360, y: 215 });
+    link2.insertVertice({ x: 110, y: 215 });
+
+    model.addNode(node0, layer1);
+    model.addNode(node1, layer1);
+    model.addLink(link3, node0, node1, layer1);
+
+    model.addNode(node2, layer2);
+    model.addLink(link1, node1, node2, layer2);
+    model.addLink(link2, node0, node2, layer2);
+
+    model.endUpdate();
+
+    document.getElementById('btnLayer1').addEventListener('click', function () {
+        layer1.toggle();
+    }, false);
+
+    document.getElementById('btnLayer2').addEventListener('click', function () {
+        layer2.toggle();
+    }, false);
+
+    console.log(root);
+</script>
 </body>
 </html>

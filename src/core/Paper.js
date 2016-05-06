@@ -11,6 +11,7 @@ import       NodeView from '../views/NodeView';
 
 import     RootChange from '../changes/RootChange';
 import    ChildChange from '../changes/ChildChange';
+import  VisibleChange from '../changes/VisibleChange';
 import TerminalChange from '../changes/TerminalChange';
 import GeometryChange from '../changes/GeometryChange';
 
@@ -251,7 +252,7 @@ class Paper extends Events {
 
             let view = this.getView(cell, visible);
             if (view && !visible) {
-                this.removeView(cell);
+                this.removeView(cell, false, false);
             }
 
             cell.eachChild(function (child) {
@@ -574,13 +575,21 @@ class Paper extends Events {
         return null;
     }
 
-    removeView(cell) {
+    removeView(cell, recurse = true, includeLink = true) {
 
         if (cell) {
 
-            cell.eachChild(function (child) {
-                this.removeView(child);
-            }, this);
+            if (recurse) {
+                cell.eachChild(function (child) {
+                    this.removeView(child, recurse, includeLink);
+                }, this);
+            }
+
+            if (includeLink) {
+                cell.eachLink(function (link) {
+                    this.removeView(link, recurse, includeLink);
+                }, this);
+            }
 
             let view = this.getView(cell);
             if (view) {
@@ -608,8 +617,20 @@ class Paper extends Events {
 
     canRenderLink(link) {
 
-        return (link.getTerminalNode(true) || link.getTerminalPoint(true))
-            && (link.getTerminalNode(false) || link.getTerminalPoint(false));
+        var sourceNode = link.getTerminalNode(true);
+        var targetNode = link.getTerminalNode(false);
+
+        // unVisible or do not in the paper(view is null)
+        if (sourceNode && (!sourceNode.isVisible() || !this.getView(sourceNode))) {
+            return false;
+        }
+
+        if (targetNode && (!targetNode.isVisible() || !this.getView(sourceNode))) {
+            return false;
+        }
+
+        return (sourceNode || link.getTerminalPoint(true))
+            && (targetNode || link.getTerminalPoint(false));
     }
 
     findViewByElem(elem) {
@@ -672,6 +693,8 @@ class Paper extends Events {
             this.onRootChanged(change);
         } else if (change instanceof ChildChange) {
             this.onChildChanged(change);
+        } else if (change instanceof VisibleChange) {
+            this.onVisibleChange(change);
         } else if (change instanceof TerminalChange) {
             this.onTerminalChange(change);
         } else if (change instanceof GeometryChange) {
@@ -690,25 +713,17 @@ class Paper extends Events {
         this.invalidate(change.child, true, true);
 
         if (!newParent) {
-            this.removeView(change.child);
+            this.removeView(change.child, true, true);
         }
-
-        /*
-         if (newParent == null || this.isCellCollapsed(newParent)) {
-         this.view.invalidate(change.child, true, true);
-         this.removeStateForCell(change.child);
-
-         // Handles special case of current root of view being removed
-         if (this.view.currentRoot == change.child) {
-         this.home();
-         }
-         }
-         */
 
         if (newParent !== oldParent) {
             newParent && this.invalidate(newParent, false, false);
             oldParent && this.invalidate(oldParent, false, false);
         }
+    }
+
+    onVisibleChange(change) {
+        this.invalidate(change.cell, true, true);
     }
 
     onTerminalChange(change) {

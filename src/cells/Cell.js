@@ -641,14 +641,48 @@ class Cell {
         return this.visible !== false;
     }
 
-    show() {
+    setVisible(visible, options = {}) {
 
-        this.visible = true;
+        var scheduled = false;
+
+        if (!options.silent) {
+
+            var model = getModel(this);
+            if (model) {
+                model.setVisible(this, visible);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled) {
+
+            this.visible = visible;
+        }
+
+        return this;
     }
 
-    hide() {
+    show(options = {}) {
 
-        this.visible = false;
+        this.setVisible(true, options);
+
+        return this;
+    }
+
+    hide(options = {}) {
+
+        this.setVisible(false, options);
+
+        return this;
+    }
+
+    toggle(options = {}) {
+
+        this.isVisible()
+            ? this.hide(options)
+            : this.show(options);
+
+        return this;
     }
 
 

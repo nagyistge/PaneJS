@@ -15,9 +15,10 @@ import Paper from './core/Paper';
 
 // models
 // ------
-import Cell from './cells/Cell';
-import Link from './cells/Link';
-import Node from './cells/Node';
+import     Cell from './cells/Cell';
+import     Link from './cells/Link';
+import     Node from './cells/Node';
+import Terminal from './cells/Terminal';
 
 // views
 // -----
@@ -74,6 +75,7 @@ export {
     Cell,
     Link,
     Node,
+    Terminal,
 
     CellView,
     LinkView,
