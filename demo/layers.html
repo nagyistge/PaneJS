@@ -119,7 +119,12 @@
     }, false);
 
     document.getElementById('btnLayer2').addEventListener('click', function () {
-        layer2.toggle();
+
+        if(layer2.isVisible()){
+            layer2.hide();
+        }else{
+            layer2.show();
+        }
     }, false);
 
     console.log(root);
