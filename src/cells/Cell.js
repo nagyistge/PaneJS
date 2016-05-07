@@ -608,8 +608,6 @@ class Cell {
     // geometry
     // --------
 
-    getGeometry() { }
-
     getSize(raw) {
 
         return raw ? this.metadata.size : this.size;
@@ -711,6 +709,33 @@ class Cell {
     rotate(rotation, options = {}) {
 
         return this.setRotation(rotation, options);
+    }
+
+    getGeometry(raw) {
+
+        return {
+            size: this.getSize(raw),
+            position: this.getPosition(raw),
+            rotation: this.getRotation(raw)
+        }
+    }
+
+    setGeometry(geom, options = {}) {
+
+        var scheduled = false;
+
+        if (!options.silent) {
+
+            var model = this.getModel();
+            if (model) {
+                model.setGeometry(this, geom);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled) {
+
+        }
     }
 
 

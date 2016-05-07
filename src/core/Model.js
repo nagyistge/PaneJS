@@ -714,21 +714,6 @@ class Model extends Events {
     // geometry
     // --------
 
-    getGeometry(cell) {
-        return cell;
-    }
-
-    setGeometry(cell, geometry) {
-
-        this.digest(new GeometryChange(this, cell, geometry));
-
-        return this;
-    }
-
-    geometryChanged() {
-
-    }
-
     getPosition(cell, raw) {
 
         return cell ? cell.getPosition(raw) : null;
@@ -856,6 +841,21 @@ class Model extends Events {
         return previous;
     }
 
+    getGeometry(cell, raw) {
+
+        return cell ? cell.getGeometry(raw) : null;
+    }
+
+    setGeometry(cell, geom) {
+
+        this.digest(new GeometryChange(this, cell, geom));
+
+        return this;
+    }
+
+    geometryChanged() {
+
+    }
 
     // update
     // ------
