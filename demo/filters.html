@@ -19,9 +19,11 @@
 <script>
 
     var container = document.getElementById('container');
-
     var model = new panejs.Model();
-    var paper = new panejs.Paper(container, model);
+    var paper = new panejs.Paper({
+        container: container,
+        model: model
+    });
 
     var node1 = new panejs.shapes.basic.Rect({
         position: { x: 30, y: 30 },

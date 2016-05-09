@@ -119,9 +119,12 @@ function showHide(elem, show) {
 
         if (show) {
             if (display === 'none') {
+
                 if (!isUndefined(elem.__display)) {
                     display = elem.__display;
                     delete elem.__display;
+                } else {
+                    display = '';
                 }
 
                 elem.style.display = display || '';

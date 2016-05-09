@@ -49,9 +49,11 @@
 <script src="../dist/panejs.js"></script>
 <script>
     var container = document.getElementById('container');
-
     var model = new panejs.Model();
-    var paper = new panejs.Paper(container, model);
+    var paper = new panejs.Paper({
+        container: container,
+        model: model
+    });
 
     var ports1 = new panejs.shapes.basic.Ports({
 

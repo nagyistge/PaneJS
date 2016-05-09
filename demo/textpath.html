@@ -18,9 +18,12 @@
 <script>
 
     var container = document.getElementById('container');
-
     var model = new panejs.Model();
-    var paper = new panejs.Paper(container, model);
+    var paper = new panejs.Paper({
+        container: container,
+        model: model
+    });
+
     var vector = panejs.vector;
 
     var markerElement = vector('<marker><path d="M 2 0 L 0 1 L 2 2 z" fill="#333333"/></marker>').attr({

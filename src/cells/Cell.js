@@ -774,7 +774,9 @@ class Cell {
 
         if (!scheduled) {
 
-            this.visible = visible;
+            this.visible = visible ? true : false;
+
+            this.metadata.visible = this.visible;
         }
 
         return this;
@@ -863,16 +865,6 @@ class Cell {
         }
 
         return this;
-    }
-
-    getView(model = this.getModel()) {
-
-        let paper = model && model.getPaper();
-        if (paper) {
-            return paper.getView(this);
-        }
-
-        return null;
     }
 
     getMarkup() {

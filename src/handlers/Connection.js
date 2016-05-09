@@ -1,34 +1,41 @@
-import Handler from './Handler';
-import Rect from '../geometry/Rect';
-import vector from '../common/vector';
 import * as utils from '../common/utils';
-import Link from '../cells/Link';
+import     vector from '../common/vector';
+import       Rect from '../geometry/Rect';
+import       Link from '../cells/Link';
+import    Handler from './Handler';
+
 
 class ConnectionHandler extends Handler {
+
     init(options = {}) {
-        let that = this;
-        let paper = that.paper;
-        let model = that.model;
 
-        that.name = options.name || 'connect';
+        let that  = this;
+        let paper = this.getPaper();
+        let model = this.getModel();
 
-        that.sourceCellView = null;
-        that.sourcePort = null;
-        that.targetCellView = null;
-        that.targetPort = null;
-        that.connecting = false;
-        that.previewingLink = null;
+        this.name = options.name || 'connection';
+
+        this.sourceCellView = null;
+        this.targetCellView = null;
+        this.sourcePort     = null;
+        this.targetPort     = null;
+
+        this.connecting     = false;
+        this.previewingLink = null;
 
         paper.on('cell:mouseOver', function (cell, view) {
             if (that.sourceCellView !== view) {
-                if (that.connecting) { // 加校验
+                if (that.connecting) {
+                    // 加校验
                     that.setTargetCellView(view);
-                } else { // 加校验
+                } else {
+                    // 加校验
                     that.setSourceCellView(view);
                 }
             }
         });
-        paper.on('cell:mouseOut', function (cell, view, e/* , x, y */) {
+
+        paper.on('cell:mouseOut', function (cell, view, e) {
             if (that.connecting) {
                 if (that.targetCellView === view && that._isOut(view, e.toElement)) {
                     that.setTargetCellView(null);
@@ -45,12 +52,14 @@ class ConnectionHandler extends Handler {
                 that.setSourceCellView(null);
             }
         });
+
         utils.addEventListener(paper.decoratePane, 'mousedown', '.port-decorator.out', function (e) {
-            that.connecting = true;
+            that.connecting   = true;
             let decoratorNode = e.delegateTarget;
-            that.sourcePort = decoratorNode.cellView.findPortByElem(decoratorNode.portBody);
+            that.sourcePort   = decoratorNode.cellView.findPortByElem(decoratorNode.portBody);
             that._drawInPortDecorators();
         });
+
         utils.addEventListener(paper.container, 'mousemove', function (e) {
             if (that.connecting) {
                 if (that.previewingLink) {
@@ -92,7 +101,8 @@ class ConnectionHandler extends Handler {
             that.setSourceCellView(null);
             that._clearInPortDecorators();
         });
-        return that;
+
+        return this;
     }
 
     _isOut(view, elem) {
@@ -100,18 +110,22 @@ class ConnectionHandler extends Handler {
     }
 
     setSourceCellView(view) {
-        let that = this;
-        let paper = that.paper;
-        if (that.sourceCellView) {
+
+        let that  = this;
+        let paper = this.getPaper();
+        if (this.sourceCellView) {
             utils.forEach(paper.decoratePane.querySelectorAll('.port-decorator.out'), function (decorator) {
-                vector(decorator).removeCell();
+                vector(decorator).remove();
             });
         }
+
         that.sourceCellView = view;
+
         if (view) {
             that._drawPortDecorators(view, 'out');
         }
-        return that;
+
+        return this;
     }
 
     _drawInPortDecorators() {
@@ -121,28 +135,30 @@ class ConnectionHandler extends Handler {
     }
 
     _clearInPortDecorators() {
-        let that = this;
+        let that  = this;
         let paper = that.paper;
         utils.forEach(paper.decoratePane.querySelectorAll('.port-decorator.in'), function (decorator) {
-            vector(decorator).removeCell();
+            vector(decorator).remove();
         });
         return that;
     }
 
     _drawPortDecorators(view, inOrOut) {
-        let that = this;
+
         let decoratorMarkup = [
             '<g class="port-decorator ${className}">',
             '<circle class="back port-decorator-layer" r="8" cx="${x}" cy="${y}"></circle>',
             '<circle class="front port-decorator-layer" r="3" cx="${x}" cy="${y}"></circle>',
             '</g>'
         ].join('');
-        let portBodies = view.elem.querySelectorAll('.pane-ports.' + inOrOut + ' .pane-port .port-body');
-        let paper = that.paper;
-        let decoratePane = paper.decoratePane;
+
+        let portBodies      = view.elem.querySelectorAll('.pane-ports.' + inOrOut + ' .pane-port .port-body');
+        let paper           = this.getPaper();
+        let decoratePane    = paper.decoratePane;
+
         utils.forEach(portBodies, function (portBody) {
-            let bbox = Rect.fromRect(vector(portBody).getBBox(false));
-            let center = bbox.getCenter();
+            let bbox      = Rect.fromRect(vector(portBody).getBBox(false));
+            let center    = bbox.getCenter();
             let decorator = vector(utils.format(decoratorMarkup, utils.extend({
                 className: inOrOut
             }, center)));

@@ -210,7 +210,7 @@ function normalizeEvent(evt) {
     return evt;
 }
 
-function eventHasModifierKey(evt) {
+function hasModifierKey(evt) {
 
     return (evt.ctrlKey || evt.metaKey || evt.shiftKey);
 }
@@ -221,7 +221,7 @@ function eventHasModifierKey(evt) {
 
 export {
     normalizeEvent,
-    eventHasModifierKey,
+    hasModifierKey,
     addEventListener,
     removeEventListener
 };

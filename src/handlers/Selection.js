@@ -1,55 +1,65 @@
-import Handler from './Handler';
-import vector from '../common/vector';
+import       * as utils from '../common/utils';
+import           vector from '../common/vector';
+import          Handler from './Handler';
 import VertexController from '../controllers/Vertex';
-import * as utils from '../common/utils';
 
 // TODO if cell is a link
 
-const eventHasModifierKey = utils.eventHasModifierKey;
 
 class SelectHandler extends Handler {
+
     init(options = {}) {
+
         let that = this;
-        let paper = that.paper;
-        let model = that.model;
 
-        that.previewVel = vector('rect', {
-            fill: 'none',
+        this.name = options.name || 'select';
+
+        let paper = this.getPaper();
+        let model = this.getModel();
+
+        this.previewVel  = vector('rect', {
+            'fill': 'none',
             'stroke-dasharray': '3px, 3px',
-            stroke: 'black'
+            'stroke': 'black'
         });
-        that.previewElem = that.previewVel.node;
-        paper.controlPane.appendChild(that.previewElem);
-        that.hidePreview();
+        this.previewElem = this.previewVel.node;
 
-        that.name = options.name || 'select';
+        paper.controlPane.appendChild(this.previewElem);
+
+        this.hidePreview();
 
         paper.selection = [];
 
-        that.previousPosition = {
+        this.previousPosition = {
             x: 0,
             y: 0
         };
-        paper.on('cell:pointerDown', function (cell, view, e/* , x, y */) {
+
+        paper.on('cell:pointerDown', function (cell, view, e) {
+
             that.executeIfEnabled(function () {
                 that.previousPosition = {
                     x: e.x,
                     y: e.y
                 };
-                that.selectCell(cell, eventHasModifierKey(e));
+                that.selectCell(cell, utils.hasModifierKey(e));
             });
         });
-        paper.on('cell:pointerMove', function (cell, view, e/* , x, y */) {
+
+        paper.on('cell:pointerMove', function (cell, view, e) {
             that.executeIfEnabled(function () {
                 that.showPreview()
                     .redrawPreview(e);
             });
         });
-        paper.on('cell:pointerUp', function (cell, view, e/* , x, y */) {
+
+        paper.on('cell:pointerUp', function (cell, view, e) {
             that.executeIfEnabled(function () {
                 let previousPosition = that.previousPosition;
                 if (e.x !== previousPosition.x || e.y !== previousPosition.y) {
+
                     model.beginUpdate();
+
                     utils.forEach(paper.selection, function (c) {
                         let position = c.metadata.position;
                         model.setGeometry(c, {
@@ -60,7 +70,9 @@ class SelectHandler extends Handler {
                             }
                         });
                     });
+
                     model.endUpdate();
+
                     utils.forEach(paper.selection, function (c) {
                         c.vertexController.redraw();
                     });
@@ -68,41 +80,39 @@ class SelectHandler extends Handler {
                 that.hidePreview();
             });
         });
-        paper.on('blank:pointerDown', function (e/* , x, y */) {
+
+        paper.on('blank:pointerDown', function (e) {
             that.executeIfEnabled(function () {
-                if (!eventHasModifierKey(e)) {
+                if (!utils.hasModifierKey(e)) {
                     that.clearSelection();
                 }
             });
         });
-        return that;
+
+        return this;
     }
 
     hidePreview() {
-        let that = this;
 
-        that.previewVel.css({
-            display: 'none'
-        });
-        return that;
+        this.previewVel.hide();
+
+        return this;
     }
 
     showPreview() {
-        let that = this;
 
-        that.previewVel.css({
-            display: ''
-        });
-        return that;
+        this.previewVel.show();
+        return this;
     }
 
     redrawPreview(position) {
-        let that = this;
-        let paper = that.paper;
-        let selection = paper.selection;
-        let previewVel = that.previewVel;
+
+        let paper      = this.getPaper();
+        let previewVel = this.previewVel;
+        let selection  = paper.selection;
 
         if (selection.length) {
+
             let minP = {
                 x: Number.MAX_VALUE,
                 y: Number.MAX_VALUE
@@ -111,6 +121,7 @@ class SelectHandler extends Handler {
                 x: 0,
                 y: 0
             };
+
             utils.forEach(selection, function (cell) {
                 let view = paper.getView(cell);
                 let bbox = view.vel.getBBox();
@@ -127,7 +138,9 @@ class SelectHandler extends Handler {
                     maxP.y = bbox.y + bbox.height;
                 }
             });
-            let previousPosition = that.previousPosition;
+
+            let previousPosition = this.previousPosition;
+
             previewVel.attr({
                 x: minP.x + (position.x - previousPosition.x),
                 y: minP.y + (position.y - previousPosition.y),
@@ -135,24 +148,25 @@ class SelectHandler extends Handler {
                 height: maxP.y - minP.y
             });
         }
-        return that;
+
+        return this;
     }
 
     _selectCell(cell) {
-        let that = this;
-        let paper = that.paper;
+
+        let paper = this.getPaper();
 
         cell.vertexController = new VertexController(paper, {
             cell
         });
-        cell.selected = true;
+        cell.selected         = true;
         paper.selection.push(cell);
-        return that;
+        return this;
     }
 
     _unselectCell(cell) {
-        let that = this;
-        let paper = that.paper;
+
+        let paper     = this.getPaper();
         let selection = paper.selection;
 
         if (utils.contains(selection, cell)) {
@@ -161,42 +175,45 @@ class SelectHandler extends Handler {
 
         cell.vertexController.destroy();
         cell.selected = false;
-        return that;
+
+        return this;
     }
 
-    selectCell(cell, isMultiSelection) {
-        let that = this;
+    selectCell(cell, multi) {
 
-        if (!isMultiSelection) {
-            that.clearSelection();
+        if (!multi) {
+            this.clearSelection();
         } else {
-            return cell.selected ? that._unselectCell(cell) : that._selectCell(cell);
+            return cell.selected
+                ? this._unselectCell(cell)
+                : this._selectCell(cell);
         }
 
         if (cell.selected) {
-            return that;
+            return this;
         }
 
-        that.clearSelection();
-        that._selectCell(cell);
+        this.clearSelection();
+        this._selectCell(cell);
 
-        return that;
+        return this;
     }
 
     clearSelection() {
-        let that = this;
-        let paper = that.paper;
 
-        utils.forEach(paper.selection, function (selectedCell) {
-            selectedCell.vertexController.destroy();
-            selectedCell.selected = false;
+        utils.forEach(this.paper.selection, function (cell) {
+            cell.vertexController.destroy();
+            cell.selected = false;
         });
-        paper.selection = [];
-        return that;
-    }
 
-    drawPreview() {
+        this.paper.selection = [];
+
+        return this;
     }
 }
+
+
+// exports
+// -------
 
 export default SelectHandler;

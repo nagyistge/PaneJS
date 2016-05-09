@@ -1,28 +1,26 @@
-// import * as utils from '../common/utils';
 import Events from '../common/Events';
 
+
 class Controller extends Events {
+
     constructor(paper, options = {}) {
+
         super();
 
-        let that = this;
+        this.paper = paper;
+        this.model = paper.model;
 
-        that.paper = paper;
-        that.model = paper.model;
-
-        that.init(options);
-        that.on('controller:initalized');
+        this.init(options);
+        this.on('controller:initalized');
     }
 
-    // life cycle
-    // ----------
     init() {
         return this;
     }
 
-    destroy() {
-    }
+    destroy() { }
 }
+
 
 // exports
 // -------

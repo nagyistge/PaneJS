@@ -18,9 +18,11 @@
 <script>
 
     var container = document.getElementById('container');
-
     var model = new panejs.Model();
-    var paper = new panejs.Paper(container, model);
+    var paper = new panejs.Paper({
+        container: container,
+        model: model
+    });
 
     var rect = new panejs.shapes.basic.Rect({
         size: { width: 100, height: 40 },

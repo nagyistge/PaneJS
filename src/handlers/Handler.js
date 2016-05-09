@@ -1,57 +1,70 @@
-// import * as utils from '../common/utils';
 import Events from '../common/Events';
 
+
 class Handler extends Events {
+
     constructor(paper, options = {}) {
+
         super();
 
-        let that = this;
+        this.paper    = paper;
+        this.disabled = false;
 
-        that.paper = paper;
-        that.model = paper.model;
-        that.disabled = false;
-
-        that.init(options);
-        that.trigger('handler:initalized');
+        this.init(options);
+        this.trigger('handler:initalized');
     }
 
-    // life cycle
-    // ----------
     init() {
+
         return this;
     }
 
     destroy() {
+
+        this.trigger('destroy');
+    }
+
+    getPaper() {
+
+        return this.paper;
+    }
+
+    getModel() {
+
+        return this.paper && this.paper.model;
+    }
+
+    isDisabled() {
+
+        return this.disabled === true;
     }
 
     disable() {
-        let that = this;
 
-        that.disabled = true;
-        that.trigger('handler:disabled');
+        this.disabled = true;
+        this.trigger('handler:disabled');
 
-        return that;
+        return this;
     }
 
     enable() {
-        let that = this;
 
-        that.disabled = false;
-        that.trigger('handler:enabled');
+        this.disabled = false;
+        this.trigger('handler:enabled');
 
-        return that;
+        return this;
     }
 
-    executeIfEnabled(callback) {
-        let that = this;
+    executeIfEnabled(callback, context) {
 
-        if (!that.disabled) {
-            callback();
+        if (!this.isDisabled()) {
+            callback.call(context);
         }
 
-        return that;
+        return this;
     }
 }
+
 
 // exports
 // -------

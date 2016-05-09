@@ -35,6 +35,21 @@ class CellView {
 
     update() { return this; }
 
+    getCell() {
+
+        return this.cell;
+    }
+
+    getPaper() {
+
+        return this.paper;
+    }
+
+    getModel() {
+
+        return this.paper && this.paper.getModel();
+    }
+
     getPane() {
 
         let result;
@@ -230,26 +245,6 @@ class CellView {
 
         return this;
     }
-
-
-    // events
-    // ------
-
-    // onContextMenu() {}
-
-    // onDblClick() {}
-
-    // onClick() {}
-
-    // onPointerDown() {}
-
-    // onPointerMove() {}
-
-    // onPointerUp() {}
-
-    // onMouseOver() {}
-
-    // onMouseOut() {}
 
     destroy() {
 

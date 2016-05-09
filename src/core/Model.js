@@ -926,22 +926,6 @@ class Model extends Events {
             this.endingUpdate = false;
         }
     }
-
-
-    // properties
-    // ----------
-
-    getPaper() {
-
-        return this.paper;
-    }
-
-    setPaper(paper) {
-
-        this.paper = paper || null;
-
-        return this;
-    }
 }
 
 

@@ -20,13 +20,16 @@ import  GeometryChange from '../changes/GeometryChange';
 import AttributeChange from '../changes/AttributeChange';
 
 
-const WIN = window;
-const DOC = WIN.document;
+const win = window;
+const doc = win.document;
 
 let counter = 0;
 
 // the default options for paper
 let defaultOptions = {
+    container: null,
+    model: null,
+    manually: false, // for listening life-cycle events should be `true`
     x: 0,
     y: 0,
     width: '100%',
@@ -40,73 +43,83 @@ let defaultOptions = {
 
 class Paper extends Events {
 
-    constructor(container, model, options) {
+    constructor(options = {}) {
 
         super();
 
-        this.id    = 'paper' + counter++;
-        this.model = model || new Model();
-        this.model.setPaper(this);
+        this.id = 'paper-' + counter++;
 
-        this.configure(options);
-
-        if (container) {
-            this
-                .init(container)
-                .setup()
-                .resize()
-                .translate();
+        if (!options.manually) {
+            this.init(options);
         }
     }
 
 
     // events
     // ------
-    //  - configure
-    //  - init
-    //  - setup
-    //  - destroy
-    //  - resize
+    //  - paper:configure
+    //  - paper:createPanes
+    //  - paper:setup
+    //  - paper:init
+    //  - paper:destroy
+    //  - paper:resize
+    //  - paper:translate
+    //  - paper:scale
 
-    // life cycle
-    // ----------
 
     configure(options) {
 
         this.options = utils.merge({}, defaultOptions, options);
-        this.trigger('configure', this.options);
+        this.trigger('paper:configure', this.options);
 
         return this;
     }
 
-    init(container) {
+    init(options = {}) {
 
-        if (container) {
+        this.configure(options);
+        this.container = options.container;
 
-            let svg  = utils.createSvgDocument();
-            let root = utils.createSvgElement('g');
-
-            utils.setAttribute(root, 'class', 'pane-viewport');
-
-            this.backgroundPane = root.appendChild(utils.createSvgElement('g'));
-            // container of links
-            this.linkPane = root.appendChild(utils.createSvgElement('g'));
-            // container of nodes
-            this.drawPane = root.appendChild(utils.createSvgElement('g'));
-            // layer above the drawing pane, for controllers and handlers
-            this.controlPane = root.appendChild(utils.createSvgElement('g'));
-            // layer above the drawing pane and controller pane, for decorators
-            this.decoratePane = root.appendChild(utils.createSvgElement('g'));
-
-            svg.appendChild(root);
-            container.appendChild(svg);
-
-            this.svg       = svg;
-            this.root      = root;
-            this.container = container;
-
-            this.trigger('init', container);
+        if (!this.container) {
+            throw new Error('Invalid container');
         }
+
+        this.createPanes()
+            .setup()
+            .resize()
+            .translate()
+            .scale()
+            .setModel(options.model);
+
+        this.trigger('paper:init', this.options);
+
+        return this;
+    }
+
+    createPanes() {
+
+        let svg  = utils.createSvgDocument();
+        let root = utils.createSvgElement('g');
+
+        utils.setAttribute(root, 'class', 'pane-viewport');
+
+        this.backgroundPane = root.appendChild(utils.createSvgElement('g'));
+        // container of links
+        this.linkPane = root.appendChild(utils.createSvgElement('g'));
+        // container of nodes
+        this.drawPane = root.appendChild(utils.createSvgElement('g'));
+        // layer above the drawing pane, for controllers and handlers
+        this.controlPane = root.appendChild(utils.createSvgElement('g'));
+        // layer above the drawing pane and controller pane, for decorators
+        this.decoratePane = root.appendChild(utils.createSvgElement('g'));
+
+        svg.appendChild(root);
+        this.container.appendChild(svg);
+
+        this.svg  = svg;
+        this.root = root;
+
+        this.trigger('paper:createPanes', this.container);
 
         return this;
     }
@@ -125,36 +138,65 @@ class Paper extends Events {
         let onPointerMove = this.onPointerMove.bind(this);
         let onPointerUp   = this.onPointerUp.bind(this);
 
+        // save it for destroy
+        this.docMouseUpEvent = onPointerUp;
+
         if (detector.IS_TOUCH) {
             utils.addEventListener(this.svg, 'touchstart', onPointerDown);
             utils.addEventListener(this.svg, 'touchmove', onPointerMove);
-            utils.addEventListener(DOC, 'touchend', onPointerUp);
+            utils.addEventListener(doc, 'touchend', onPointerUp);
         } else {
             utils.addEventListener(this.svg, 'mousedown', onPointerDown);
             utils.addEventListener(this.svg, 'mousemove', onPointerMove);
-            utils.addEventListener(DOC, 'mouseup', onPointerUp);
+            utils.addEventListener(doc, 'mouseup', onPointerUp);
         }
 
         // Hold the value when mouse has been moved: when mouse moved,
         // no click event will be triggered.
         this.mouseMoved = 0;
 
-        // TODO: IS_TOUCH
-
         // Disables built-in pan and zoom in IE10 and later
         if (detector.IS_POINTER) {
             this.container.style.msTouchAction = 'none';
         }
 
-        this.model.on('change', this.handleChanges, this);
-
-        this.trigger('setup');
-
-        // that.registerHandlers([
-        //     new SelectionHandler(that)
-        // ]);
+        this.trigger('paper:setup');
 
         return this;
+    }
+
+    getModel() {
+
+        return this.model;
+    }
+
+    setModel(model = new Model()) {
+
+        // one model can be used in different papers
+
+        this.model = model;
+        this.model.on('change', this.handleChanges, this);
+
+        this.reValidate();
+
+        return this;
+    }
+
+    destroy() {
+
+        this.svg.parentNode.removeChild(this.svg);
+
+        let eventName = detector.IS_TOUCH ? 'touchend' : 'mouseup';
+        utils.removeEventListener(doc, eventName, this.docMouseUpEvent);
+
+        if (detector.IS_POINTER) {
+            this.container.style.msTouchAction = '';
+        }
+
+        this.model.destroy();
+        this.trigger('paper:destroy');
+
+        utils.destroy(this);
     }
 
     registerHandlers(handlers) {
@@ -174,15 +216,6 @@ class Paper extends Events {
         }, this);
 
         return this;
-    }
-
-    remove() { }
-
-    destroy() {
-
-        this.trigger('destroy');
-
-        utils.destroy(this);
     }
 
 
@@ -484,7 +517,7 @@ class Paper extends Events {
             height
         });
 
-        this.trigger('resize', width, height);
+        this.trigger('paper:resize', width, height);
 
         return this;
     }
@@ -497,30 +530,33 @@ class Paper extends Events {
         return this.resize(width, height, true);
     }
 
-    translate(x, y, absolute) {
+    translate(x, y, relative) {
 
         let options = this.options;
 
         x = options.x = x || options.x;
         y = options.y = y || options.y;
 
-        vector(this.root).translate(x, y, absolute);
+        vector(this.root).translate(x, y, relative);
 
-        this.trigger('translate', x, y);
+        this.trigger('paper:translate', x, y);
 
         return this;
     }
 
     translateTo(x, y) {
-        return this.translate(x, y, true);
+
+        return this.translate(x, y, false);
     }
 
-    translateBy(/* x, y */) {
+    translateBy(x, y) {
 
+        return this.translate(x, y, true);
     }
 
     scale(/* sx, sy, ox = 0, oy = 0 */) {
 
+        return this;
     }
 
 
@@ -947,7 +983,8 @@ class Paper extends Events {
 
         if (this.mouseMoved <= this.options.clickThreshold) {
 
-            e        = utils.normalizeEvent(e);
+            e = utils.normalizeEvent(e);
+
             let view = this.findViewByElem(e.target);
 
             if (!this.isValidEvent(e, view)) {
