@@ -848,13 +848,31 @@ class Model extends Events {
 
     setGeometry(cell, geom) {
 
-        this.digest(new GeometryChange(this, cell, geom));
+        if (cell && geom) {
+            try {
+                this.beginUpdate();
+                this.digest(new GeometryChange(this, cell, geom));
+            } finally {
+                this.endUpdate();
+            }
+        }
 
         return this;
     }
 
-    geometryChanged() {
+    geometryChanged(cell, geom) {
 
+        let previous = cell.getGeometry(true) || {};
+
+        utils.forEach(['size', 'position', 'rotation'], function (key) {
+
+            if (geom[key]) {
+                this[key + 'Changed'](cell, geom[key]);
+            }
+
+        }, this);
+
+        return previous;
     }
 
     // update

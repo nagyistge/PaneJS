@@ -19,30 +19,6 @@ class Node extends Cell {
         return true;
     }
 
-    translate(dx, dy, options = {}) {
-
-        let position = this.metadata.position;
-
-        if (options.relative) {
-            position.x += dx;
-            position.y += dy;
-        } else {
-            position.x = dx;
-            position.y = dy;
-        }
-
-        return this;
-    }
-
-    translateTo(x, y) {
-
-        return this.translate(x, y, { relative: true });
-    }
-
-    resize(/* width, height */) {}
-
-    rotate() { }
-
     getBBox() {
         return false;
     }

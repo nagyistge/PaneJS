@@ -791,7 +791,7 @@ class Paper extends Events {
     }
 
     onGeometryChange(change) {
-        utils.merge(change.cell.metadata, change.geometry);
+
         this.invalidate(change.cell, true, true);
     }
 

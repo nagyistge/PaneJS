@@ -613,14 +613,14 @@ class Cell {
         return raw ? this.metadata.size : this.size;
     }
 
-    setSize(width, height, options = {}) {
+    setSize(size, options = {}) {
 
         let scheduled = false;
 
-        let size = {
-            width,
-            height,
-            relative: options.relative === true
+        size = {
+            width: size.width,
+            height: size.height,
+            relative: size.relative === true
         };
 
         if (!options.silent) {
@@ -641,7 +641,7 @@ class Cell {
 
     resize(width, height, options = {}) {
 
-        return this.setSize(width, height, options);
+        return this.setSize({ width, height }, options);
     }
 
     getPosition(raw) {
@@ -649,13 +649,14 @@ class Cell {
         return raw ? this.metadata.position : this.position;
     }
 
-    setPosition(x, y, options = {}) {
+    setPosition(position, options = {}) {
 
         let scheduled = false;
-        let position  = {
-            x,
-            y,
-            relative: options.relative === true
+
+        position = {
+            x: position.x,
+            y: position.y,
+            relative: position.relative === true
         };
 
         if (!options.silent) {
@@ -675,7 +676,7 @@ class Cell {
 
     translate(x, y, options = {}) {
 
-        return this.setPosition(x, y, options);
+        return this.setPosition({ x, y }, options);
     }
 
     getRotation(raw) {
@@ -683,12 +684,13 @@ class Cell {
         return raw ? this.metadata.rotation : this.rotation;
     }
 
-    setRotation(angle, options = {}) {
+    setRotation(rotation, options = {}) {
 
         let scheduled = false;
-        let rotation  = {
-            angle,
-            relative: options.relative === true
+
+        rotation = {
+            angle: rotation.angle,
+            relative: rotation.relative === true
         };
 
         if (!options.silent) {
@@ -706,9 +708,9 @@ class Cell {
         return this;
     }
 
-    rotate(rotation, options = {}) {
+    rotate(angle, options = {}) {
 
-        return this.setRotation(rotation, options);
+        return this.setRotation({ angle }, options);
     }
 
     getGeometry(raw) {
@@ -735,7 +737,17 @@ class Cell {
 
         if (!scheduled) {
 
+            utils.forEach(['size', 'position', 'rotation'], function (key) {
+
+                var val = geom[key];
+                if (val) {
+                    this['set' + utils.ucFirst(key)](val, { silent: true });
+                }
+
+            }, this);
         }
+
+        return this;
     }
 
 
@@ -792,8 +804,8 @@ class Cell {
     }
 
 
-    // style
-    // -----
+    // attribute
+    // ---------
 
     getAttribute() {
 

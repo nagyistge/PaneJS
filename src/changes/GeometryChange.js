@@ -10,11 +10,14 @@ class GeometryChange extends Change {
         this.model    = model;
         this.cell     = cell;
         this.geometry = geometry;
+        this.previous = geometry;
+
     }
 
     digest() {
 
-        this.model.geometryChanged(this.cell, this.geometry);
+        this.geometry = this.previous;
+        this.previous = this.model.geometryChanged(this.cell, this.previous);
 
         return this;
     }
