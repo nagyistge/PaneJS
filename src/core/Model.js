@@ -592,7 +592,7 @@ class Model extends Events {
             let terminal = this.getTerminal(link, isSource);
 
             terminal = terminal
-                ? terminal.clone({ port })
+                ? terminal.duplicate({ port })
                 : new Terminal({ port });
 
             this.setTerminal(link, terminal, isSource);

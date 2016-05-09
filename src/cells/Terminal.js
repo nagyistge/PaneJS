@@ -97,7 +97,7 @@ class Terminal {
         return this;
     }
 
-    clone(terminal) {
+    duplicate(terminal) {
 
         let cloned = new Terminal(terminal);
 

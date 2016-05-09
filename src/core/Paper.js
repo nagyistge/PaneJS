@@ -629,7 +629,7 @@ class Paper extends Events {
             return false;
         }
 
-        if (targetNode && (!targetNode.isVisible() || !this.getView(sourceNode))) {
+        if (targetNode && (!targetNode.isVisible() || !this.getView(targetNode))) {
             return false;
         }
 
