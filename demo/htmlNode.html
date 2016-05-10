@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HtmlNode</title>
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
+    <style>
+        #container {
+            position: relative;
+            width: 700px;
+            height: 500px;
+            border: 1px solid #DDD;
+        }
+
+        .pane-html-pane {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .pane-node,
+        .pane-node-content {
+            width: 180px;
+            height: 30px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 15px;
+        }
+
+        .pane-node {
+            position: absolute;
+            left: 0;
+            top: 0;
+            cursor: move;
+        }
+
+        .pane-node-content {
+            background-color: rgba(255, 255, 255, .9);
+            border: 1px solid #289DE9;
+            text-align: center;
+            font-size: 12px;
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="js/lib/jquery-2.2.3.min.js"></script>
+<script src="../dist/panejs.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+    var model = new panejs.Model();
+    var paper = new panejs.ext.HTMLPaper({
+        container: container,
+        model: model
+    });
+
+    model.beginUpdate();
+
+    var node1 = new panejs.ext.HTMLNode({
+        markup: '<div class="pane-node-content"></div>',
+        position: {
+            x: 70,
+            y: 40
+        },
+        size: {
+            width: 180,
+            height: 30
+        },
+        attrs: {
+            '.pane-node-content': {
+                text: 'HTML, '
+            }
+        }
+    });
+
+
+    var node2 =  new panejs.ext.HTMLNode({
+        markup: '<div class="pane-node-content"></div>',
+        position: {
+            x: 200,
+            y: 200
+        },
+        size: {
+            width: 180,
+            height: 30
+        },
+        attrs: {
+            '.pane-node-content': {
+                text: 'Node'
+            }
+        }
+    });
+
+    var link1 = new panejs.Link({
+        targetMarker: 'classic'
+    });
+
+    model.addNode(node1);
+    model.addNode(node2);
+    model.addLink(link1, node1, node2);
+
+    model.endUpdate();
+</script>
+</body>
+</html>

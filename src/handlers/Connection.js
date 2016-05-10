@@ -48,7 +48,7 @@ class ConnectionHandler extends Handler {
         });
 
         utils.addEventListener(paper.decoratePane, 'mouseout', '.port-decorator.out', function (e) {
-            if (!that.connecting && !utils.containsClassName(e.toElement, 'port-decorator-layer')) {
+            if (!that.connecting && !utils.hasClass(e.toElement, 'port-decorator-layer')) {
                 that.setSourceCellView(null);
             }
         });
@@ -106,7 +106,7 @@ class ConnectionHandler extends Handler {
     }
 
     _isOut(view, elem) {
-        return !utils.containsElem(view.elem, elem) && !utils.containsClassName(elem, 'port-decorator-layer');
+        return !utils.containsElement(view.elem, elem) && !utils.hasClass(elem, 'port-decorator-layer');
     }
 
     setSourceCellView(view) {

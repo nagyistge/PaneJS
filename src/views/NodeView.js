@@ -1,9 +1,9 @@
 import * as utils from '../common/utils';
 import       Rect from '../geometry/Rect';
-import   CellView from '../views/CellView';
+import VectorView from '../views/VectorView';
 
 
-class NodeView extends CellView {
+class NodeView extends VectorView {
 
     static get specialAttributes() {
 
@@ -29,8 +29,8 @@ class NodeView extends CellView {
         this.vel.empty();
         this.renderMarkup();
 
-        this.scalableNode  = this.vel.findOne('.pane-scalable');
-        this.rotatableNode = this.vel.findOne('.pane-rotatable');
+        this.scalableNode  = this.findOne('.pane-scalable');
+        this.rotatableNode = this.findOne('.pane-rotatable');
 
         return this
             .update()
@@ -339,25 +339,26 @@ class NodeView extends CellView {
 
     // Scale the whole `<g>` group.
     scale(sx, sy) {
+
         this.vel.scale(sx, sy);
+
         return this;
     }
 
     resize() {
 
-        let scalable = this.scalableNode;
-        if (!scalable) {
+        if (!this.scalableNode) {
             return this;
         }
 
         // get bbox without transform
-        let nativeBBox = scalable.getBBox(true);
+        let nativeBBox = this.scalableNode.getBBox(true);
 
         // Make sure `scalableBBox.width` and `scalableBBox.height` are not
         // zero which can happen if the element does not have any content.
         // By making the width(height) 1, we prevent HTML errors of the type
         // `scale(Infinity, Infinity)`.
-        let size = this.cell.size;
+        let size = this.cell.getSize();
 
         let sx = size.width / (nativeBBox.width || 1);
         let sy = size.height / (nativeBBox.height || 1);
@@ -365,28 +366,7 @@ class NodeView extends CellView {
         sx = utils.toFixed(sx, 2);
         sy = utils.toFixed(sy, 2);
 
-        scalable.attr('transform', 'scale(' + sx + ',' + sy + ')');
-
-        // let rotation = that.cell.rotation;
-        // let angle = rotation.angle;
-        //
-        // // Cancel the rotation but now around a different origin,
-        // // which is the center of the scaled object.
-        // let rotatableNode = that.rotatableNode;
-        // let rotateAttr = rotatableNode && rotatableNode.attr('transform');
-        //
-        // if (rotateAttr && rotateAttr !== 'null') {
-        //
-        //    rotatableNode.attr('transform', rotateAttr + ' rotate(' + (-angle) + ',' + (size.width / 2) + ',' + (size.height / 2) + ')');
-        //    let rotatableBBox = scalableNode.bbox(false, that.paper.drawPane);
-        //
-        //    // Store new x, y and perform rotate() again against the new rotation origin.
-        //    that.position = {
-        //        x: rotatableBBox.x,
-        //        y: rotatableBBox.y
-        //    };
-        //    that.rotate();
-        // }
+        this.scalableNode.attr('transform', 'scale(' + sx + ',' + sy + ')');
 
         // Update must always be called on non-rotated element. Otherwise,
         // relative positioning would work with wrong (rotated) bounding boxes.
@@ -397,14 +377,13 @@ class NodeView extends CellView {
 
     rotate() {
 
-        let rotatable = this.rotatableNode;
-        if (rotatable) {
+        if (this.rotatableNode) {
 
-            let size = this.cell.size;
+            let size = this.cell.getSize();
             let ox   = size.width / 2;
             let oy   = size.height / 2;
 
-            rotatable.attr('transform', 'rotate(' + this.cell.rotation + ',' + ox + ',' + oy + ')');
+            this.rotatableNode.attr('transform', 'rotate(' + this.cell.getRotation() + ',' + ox + ',' + oy + ')');
         }
 
         return this;
@@ -412,7 +391,7 @@ class NodeView extends CellView {
 
     translate() {
 
-        let position = this.cell.position;
+        let position = this.cell.getPosition();
 
         this.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
 
@@ -425,13 +404,12 @@ class NodeView extends CellView {
 
     getStrokeWidth() {
 
-        let vel     = this.vel;
-        let vTarget = vel.findOne('rect')
-            || vel.findOne('path')
-            || vel.findOne('circle')
-            || vel.findOne('ellipse')
-            || vel.findOne('polyline')
-            || vel.findOne('polygon');
+        let vTarget = this.findOne('rect')
+            || this.findOne('path')
+            || this.findOne('circle')
+            || this.findOne('ellipse')
+            || this.findOne('polyline')
+            || this.findOne('polygon');
 
         if (vTarget && vTarget.node) {
 

@@ -29,27 +29,29 @@ let counter = 0;
 let defaultOptions = {
     container: null,
     model: null,
-    manually: false, // for listening life-cycle events should be `true`
     x: 0,
     y: 0,
     width: '100%',
     height: '100%',
     gridSize: 1,
 
-    // Allowed number of mouseMove events after which the pointerClick event
-    // will be still triggered.
+    // Allowed number of mouseMove events after which the
+    // pointerClick event will be still triggered.
     clickThreshold: 0
 };
 
 class Paper extends Events {
 
-    constructor(options = {}) {
+    constructor(options) {
 
         super();
 
         this.id = 'paper-' + counter++;
 
-        if (!options.manually) {
+        // You should call `init` manually when `options` is empty.
+        // That's useful when you want to listen life-cycle events.
+
+        if (options) {
             this.init(options);
         }
     }
@@ -114,7 +116,12 @@ class Paper extends Events {
         this.decoratePane = root.appendChild(utils.createSvgElement('g'));
 
         svg.appendChild(root);
-        this.container.appendChild(svg);
+
+        if (this.container.firstChild) {
+            this.container.insertBefore(svg, this.container.firstChild);
+        } else {
+            this.container.appendChild(svg);
+        }
 
         this.svg  = svg;
         this.root = root;
@@ -136,7 +143,7 @@ class Paper extends Events {
 
         let onPointerDown = this.onPointerDown.bind(this);
         let onPointerMove = this.onPointerMove.bind(this);
-        let onPointerUp   = this.onPointerUp.bind(this);
+        let onPointerUp   = this.docMouseUpEvent || this.onPointerUp.bind(this);
 
         // save it for destroy
         this.docMouseUpEvent = onPointerUp;
@@ -184,7 +191,7 @@ class Paper extends Events {
 
     destroy() {
 
-        this.svg.parentNode.removeChild(this.svg);
+        utils.removeElement(this.svg);
 
         let eventName = detector.IS_TOUCH ? 'touchend' : 'mouseup';
         utils.removeEventListener(doc, eventName, this.docMouseUpEvent);
@@ -539,7 +546,7 @@ class Paper extends Events {
 
         vector(this.root).translate(x, y, relative);
 
-        this.trigger('paper:translate', x, y);
+        this.trigger('paper:translate', x, y, relative);
 
         return this;
     }
@@ -927,7 +934,7 @@ class Paper extends Events {
         let svg    = this.svg;
         let target = e.target;
 
-        if (svg === target || utils.containsElem(svg, target)) {
+        if (svg === target || utils.containsElement(svg, target)) {
             return true;
         }
     }
@@ -1159,7 +1166,6 @@ class Paper extends Events {
 
         return Point.fromPoint(result);
     }
-
 }
 
 

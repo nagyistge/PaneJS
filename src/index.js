@@ -1,6 +1,8 @@
 // styles
 // ------
+
 require('./style/index.less');
+
 
 // common
 // ------
@@ -8,10 +10,12 @@ import * as utils           from './common/utils';
 import vector, { VElement } from './common/vector';
 import Events               from './common/Events';
 
+
 // core
 // ----
 import Model from './core/Model';
 import Paper from './core/Paper';
+
 
 // models
 // ------
@@ -20,11 +24,14 @@ import     Link from './cells/Link';
 import     Node from './cells/Node';
 import Terminal from './cells/Terminal';
 
+
 // views
 // -----
-import CellView from './views/CellView';
-import LinkView from './views/LinkView';
-import NodeView from './views/NodeView';
+import     CellView from './views/CellView';
+import     LinkView from './views/LinkView';
+import     NodeView from './views/NodeView';
+import   VectorView from './views/VectorView';
+import HtmlNodeView from './views/HtmlNodeView';
 
 
 import Handler           from './handlers/Handler';
@@ -80,12 +87,14 @@ export {
     CellView,
     LinkView,
     NodeView,
+    VectorView,
 
     Handler,
     SelectionHandler,
     ConnectionHandler,
 };
 
+export * from './ext/index';
 export * from './shapes/index';
 export * from './changes/index';
 export * from './geometry/index';

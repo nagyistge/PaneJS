@@ -246,7 +246,7 @@ class VertexController extends Controller {
         if (e && e.target) {
             this.eventTarget      = e.target;
             this.isRotating       = (e.target === this.rotaterVel.node);
-            this.isResizing       = utils.containsClassName(e.target, 'resizer');
+            this.isResizing       = utils.hasClass(e.target, 'resizer');
             this.oldEventPosition = {
                 x: e.x,
                 y: e.y

@@ -18,26 +18,6 @@ class Node extends Cell {
     isNode() {
         return true;
     }
-
-    getBBox() {
-        return false;
-    }
-
-    // FIXME: figure out a better way
-    getStrokeWidth() {
-
-        let attrs = this.attrs;
-        let attr  = attrs.rect ||
-            attrs.path ||
-            attrs.circle ||
-            attrs.ellipse ||
-            attrs.polyline ||
-            attrs.polygon;
-
-        let strokeWidth = attr['stroke-width'] || 0;
-
-        return utils.toFloat(strokeWidth) || 0;
-    }
 }
 
 

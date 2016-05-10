@@ -2,10 +2,10 @@ import * as utils from '../common/utils';
 import     vector from '../common/vector';
 import      Point from '../geometry/Point';
 import    Ellipse from '../geometry/Ellipse';
-import   CellView from '../views/CellView';
+import VectorView from '../views/VectorView';
 
 
-class LinkView extends CellView {
+class LinkView extends VectorView {
 
     render() {
 

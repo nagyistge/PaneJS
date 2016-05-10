@@ -1,48 +1,138 @@
 import {
     isNil,
+    isString,
     isWindow,
+    isBoolean,
+    isFunction,
     isUndefined
 } from './lang';
 
+import { forEach, reduce } from './array'
+import { trim            } from './string'
 
-function getNodeName(elem) {
 
-    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
-}
+const rclass    = /[\t\r\n\f]/g;
+const rnotwhite = (/\S+/g);
 
 function getClassName(elem) {
 
     return elem.getAttribute && elem.getAttribute('class') || '';
 }
 
+function hasClass(node, selector) {
+
+    if (isNil(node) || isNil(selector)) {
+        return false;
+    }
+
+    let classNames = fillSpaces(getClassName(node));
+    let className  = fillSpaces(selector);
+
+    return node.nodeType === 1
+        ? classNames.replace(rclass, ' ').indexOf(className) > -1
+        : false;
+}
+
+function addClass(node, selector) {
+
+    if (isNil(node) || isNil(selector)) {
+        return;
+    }
+
+    if (isFunction(selector)) {
+        return addClass(node, selector.call(node, getClassName(node)));
+    }
+
+    if (isString(selector) && node.nodeType === 1) {
+
+        let classes  = selector.match(rnotwhite) || [];
+        let oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
+        let newValue = reduce(classes, function (ret, cls) {
+
+            if (ret.indexOf(fillSpaces(cls)) < 0) {
+                ret += cls + ' ';
+            }
+
+            return ret;
+
+        }, oldValue);
+
+        newValue = trim(newValue);
+
+        if (oldValue !== newValue) {
+            node.setAttribute('class', newValue);
+        }
+    }
+}
+
+function removeClass(node, selector) {
+
+    if (isNil(node)) {
+        return;
+    }
+
+    if (isFunction(selector)) {
+        return removeClass(node, selector.call(node, getClassName(node)));
+    }
+
+    if ((!selector || isString(selector)) && node.nodeType === 1) {
+
+        let classes  = (selector || '').match(rnotwhite) || [];
+        let oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
+        let newValue = reduce(classes, function (ret, cls) {
+
+            let className = fillSpaces(cls);
+
+            if (ret.indexOf(className) > -1) {
+                ret = ret.replace(className, ' ');
+            }
+
+            return ret;
+
+        }, oldValue);
+
+        newValue = selector ? trim(newValue) : '';
+
+        if (oldValue !== newValue) {
+            node.setAttribute('class', newValue);
+        }
+    }
+}
+
+function toggleClass(node, selector, stateVal) {
+
+    if (isNil(node) || isNil(selector)) {
+        return;
+    }
+
+    if (isBoolean(stateVal) && isString(selector)) {
+        return stateVal
+            ? addClass(node, selector)
+            : removeClass(node, selector);
+    }
+
+    if (isFunction(selector)) {
+        return toggleClass(node, selector.call(node, getClassName(node), stateVal), stateVal);
+    }
+
+    if (isString(selector)) {
+        forEach(selector.match(rnotwhite) || [], function (cls) {
+
+            hasClass(node, cls)
+                ? removeClass(node, cls)
+                : addClass(node, cls);
+
+        });
+    }
+}
+
 function fillSpaces(str) {
     return ' ' + str + ' ';
 }
 
-function containsClassName(elem, classStr) {
-    if (elem.classList) {
-        return elem.classList.contains(classStr);
-    }
-    return fillSpaces(getClassName(elem)).indexOf(fillSpaces(classStr)) > -1;
-}
 
-function isNode(elem, nodeName, attrName, attrValue) {
-
-    let ret = elem && !isNaN(elem.nodeType);
-
-    if (ret) {
-        ret = isNil(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
-    }
-
-    if (ret) {
-        ret = isNil(attrName) || elem.getAttribute(attrName) === attrValue;
-    }
-
-    return ret;
-}
-
-let docElem  = document.documentElement;
-let contains = docElem.compareDocumentPosition || docElem.contains ?
+const docElem         = document.documentElement;
+const containsElement = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         let aDown = context.nodeType === 9 ? context.documentElement : context;
@@ -69,6 +159,47 @@ let contains = docElem.compareDocumentPosition || docElem.contains ?
         return false;
     };
 
+function createElement(tagName, doc) {
+
+    return (doc || document).createElement(tagName);
+}
+
+function removeElement(elem) {
+
+    if (elem && elem.parentNode) {
+        elem.parentNode.removeChild(elem);
+    }
+}
+
+function emptyElement(elem) {
+
+    if (elem) {
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+        }
+    }
+}
+
+function getNodeName(elem) {
+
+    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
+}
+
+function isNode(elem, nodeName, attrName, attrValue) {
+
+    let ret = elem && !isNaN(elem.nodeType);
+
+    if (ret) {
+        ret = isNil(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+    }
+
+    if (ret) {
+        ret = isNil(attrName) || elem.getAttribute(attrName) === attrValue;
+    }
+
+    return ret;
+}
+
 function getWindow(elem) {
 
     return isWindow(elem)
@@ -93,7 +224,7 @@ function getOffset(elem) {
     let docElement = doc.documentElement;
 
     // Make sure it's not a disconnected DOM node
-    if (!contains(docElement, elem)) {
+    if (!containsElement(docElement, elem)) {
         return box;
     }
 
@@ -144,7 +275,7 @@ function showHide(elem, show) {
 
 function isHidden(elem) {
 
-    return elem && (elem.style.display === 'none' || !contains(elem.ownerDocument, elem));
+    return elem && (elem.style.display === 'none' || !containsElement(elem.ownerDocument, elem));
 }
 
 // xml namespaces.
@@ -197,6 +328,7 @@ function createSvgElement(tagName, doc) {
     return (doc || document).createElementNS(ns.xmlns, tagName);
 }
 
+
 function setAttribute(elem, name, value) {
 
     if (isNil(value)) {
@@ -246,6 +378,7 @@ function qualifyAttributeName(name) {
     };
 }
 
+
 function getComputedStyle(elem, name) {
 
     // IE9+
@@ -280,6 +413,91 @@ function getTransformToElement(source, target) {
 }
 
 
+const transformKey = (function () {
+
+    if (isUndefined(document)) {
+        return '';
+    }
+
+    const element    = createElement('div');
+    const transforms = ['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform'];
+
+    for (let i = 0; i < transforms.length; ++i) {
+
+        const key = transforms[i];
+
+        if (element.style[key] !== undefined) {
+            return key;
+        }
+    }
+})();
+
+function setScale(elem, sx, sy) {
+
+    if (elem) {
+        elem.style[transformKey] = 'scale(' + sx + ',' + sy + ')';
+    }
+}
+
+function setRotation(elem, angle, ox, oy) {
+
+    if (elem) {
+        elem.style[transformKey] = 'rotate(' + angle + ',' + ox + ',' + oy + ')';
+    }
+}
+
+function setTranslate(elem, tx, ty) {
+
+    if (elem) {
+
+        var translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
+
+        if (transformKey !== 'msTransform') {
+            // The Z transform will keep this in the GPU (faster, and prevents artifacts),
+            // but IE9 doesn't support 3d transforms and will choke.
+            translate += ' translateZ(0)';
+        }
+
+        elem.style[transformKey] = translate;
+    }
+}
+
+function getBounds(elem) {
+
+    let doc;
+
+    if (elem === document) {
+        doc  = document;
+        elem = document.documentElement;
+    } else {
+        doc = elem.ownerDocument;
+    }
+
+    const docElem = doc.documentElement;
+    const result  = {};
+    // The original object returned by getBoundingClientRect is immutable, so we clone it
+    // We can't use extend because the properties are not considered part of the object by hasOwnProperty in IE9
+    const rect = elem.getBoundingClientRect();
+    for (let k in rect) {
+        result[k] = rect[k];
+    }
+
+    if (isUndefined(result.width)) {
+        result.width = document.body.scrollWidth - result.left - result.right;
+    }
+    if (isUndefined(result.height)) {
+        result.height = document.body.scrollHeight - result.top - result.bottom;
+    }
+
+    result.top    = result.top - docElem.clientTop;
+    result.left   = result.left - docElem.clientLeft;
+    result.right  = doc.body.clientWidth - result.width - result.left;
+    result.bottom = doc.body.clientHeight - result.height - result.top;
+
+    return result;
+}
+
+
 // exports
 // -------
 
@@ -290,14 +508,31 @@ export {
     getWindow,
     getOffset,
     getNodeName,
+
+    createElement,
+    createSvgDocument,
+    createSvgElement,
+    emptyElement,
+    removeElement,
+    containsElement,
+
+
+    hasClass,
+    addClass,
+    removeClass,
+    toggleClass,
     getClassName,
+
+
     setAttribute,
     removeAttribute,
     qualifyAttributeName,
-    createSvgElement,
-    createSvgDocument,
-    contains as containsElem,
-    containsClassName,
+
+    setScale,
+    setRotation,
+    setTranslate,
+
+    getBounds,
     getComputedStyle,
     getTransformToElement
 };

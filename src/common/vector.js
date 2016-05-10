@@ -3,10 +3,7 @@ import       Rect from '../geometry/Rect';
 import      Point from '../geometry/Point';
 
 
-let rclass    = /[\t\r\n\f]/g;
-let rnotwhite = (/\S+/g);
 let pathCount = 0;
-
 
 function createPathId() {
 
@@ -157,95 +154,26 @@ export class VElement {
 
     hasClass(selector) {
 
-        let className = ' ' + selector + ' ';
-
-        return this.node.nodeType === 1
-            ? (' ' + utils.getClassName(this.node) + ' ').replace(rclass, ' ').indexOf(className) > -1
-            : false;
+        return utils.hasClass(this.node, selector);
     }
 
-    addClass(value) {
+    addClass(selector) {
 
-        if (utils.isFunction(value)) {
-            return this.addClass(value.call(this.node, utils.getClassName(this.node)));
-        }
-
-        if (value && utils.isString(value) && this.node.nodeType === 1) {
-
-            let classes  = value.match(rnotwhite) || [];
-            let oldValue = (' ' + utils.getClassName(this.node) + ' ').replace(rclass, ' ');
-            let newValue = utils.reduce(classes, function (ret, cls) {
-
-                if (ret.indexOf(' ' + cls + ' ') < 0) {
-                    ret += cls + ' ';
-                }
-
-                return ret;
-
-            }, oldValue);
-
-            newValue = utils.trim(newValue);
-
-            if (oldValue !== newValue) {
-                this.node.setAttribute('class', newValue);
-            }
-        }
+        utils.addClass(this.node, selector);
 
         return this;
     }
 
-    removeClass(value) {
+    removeClass(selector) {
 
-        if (utils.isFunction(value)) {
-            return this.removeClass(value.call(this.node, utils.getClassName(this.node)));
-        }
-
-        if ((!value || utils.isString(value)) && this.node.nodeType === 1) {
-
-            let classes  = (value || '').match(rnotwhite) || [];
-            let oldValue = (' ' + utils.getClassName(this.node) + ' ').replace(rclass, ' ');
-            let newValue = utils.reduce(classes, function (ret, cls) {
-
-                if (ret.indexOf(' ' + cls + ' ') > -1) {
-                    ret = ret.replace(' ' + cls + ' ', ' ');
-                }
-
-                return ret;
-
-            }, oldValue);
-
-            newValue = value ? utils.trim(newValue) : '';
-
-            if (oldValue !== newValue) {
-                this.node.setAttribute('class', newValue);
-            }
-        }
+        utils.removeClass(this.node, selector);
 
         return this;
     }
 
-    toggleClass(value, stateVal) {
+    toggleClass(selector, stateVal) {
 
-        if (utils.isBoolean(stateVal) && utils.isString(value)) {
-            return stateVal ? this.addClass(value) : this.removeClass(value);
-        }
-
-        if (utils.isFunction(value)) {
-            return this.toggleClass(value.call(this.node, utils.getClassName(this.node), stateVal), stateVal);
-        }
-
-        if (value && utils.isString(value)) {
-
-            let classes = value.match(rnotwhite) || [];
-
-            utils.forEach(classes, function (cls) {
-
-                this.hasClass(cls)
-                    ? this.removeClass(cls)
-                    : this.addClass(cls);
-
-            }, this);
-        }
+        utils.removeClass(this.node, selector, stateVal);
 
         return this;
     }
@@ -452,18 +380,14 @@ export class VElement {
 
     remove() {
 
-        if (this.node.parentNode) {
-            this.node.parentNode.removeChild(this.node);
-        }
+        utils.removeElement(this.node);
 
         return this;
     }
 
     empty() {
 
-        while (this.node.firstChild) {
-            this.node.removeChild(this.node.firstChild);
-        }
+        utils.emptyElement(this.node);
 
         return this;
     }
