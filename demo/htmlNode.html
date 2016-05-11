@@ -10,6 +10,7 @@
             width: 700px;
             height: 500px;
             border: 1px solid #DDD;
+            margin: 50px 0 0 50px;
         }
 
         .pane-html-pane {
@@ -28,7 +29,8 @@
             border-radius: 15px;
         }
 
-        .pane-node {
+        .pane-node,
+        .pane-selection-preview {
             position: absolute;
             left: 0;
             top: 0;
@@ -41,7 +43,39 @@
             text-align: center;
             font-size: 12px;
             line-height: 30px;
+            transition: background-color .2s;
         }
+
+        .pane-node-content:hover,
+        .pane-node.selected .pane-node-content {
+            background-color: rgba(227, 244, 255, .9);
+        }
+
+        .pane-selection-preview {
+            position: absolute;
+            border: 1px dashed #333;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .pane-selection-preview.single {
+            border-radius: 15px;
+        }
+
+        .pane-selection-range {
+            position: absolute;
+            left: 0;
+            top: 0;
+            border: 1px solid #00D;
+            background-color: #9CF;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            opacity: .3;
+        }
+
     </style>
 </head>
 <body>
@@ -56,6 +90,9 @@
         container: container,
         model: model
     });
+
+    var selectionHandler = new panejs.ext.SelectionHandler(paper);
+
 
     model.beginUpdate();
 
@@ -77,7 +114,7 @@
     });
 
 
-    var node2 =  new panejs.ext.HTMLNode({
+    var node2 = new panejs.ext.HTMLNode({
         markup: '<div class="pane-node-content"></div>',
         position: {
             x: 200,

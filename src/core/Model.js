@@ -106,6 +106,38 @@ class Model extends Events {
         return this.cells ? this.cells[id] : null;
     }
 
+    findCellAtPoint(localPoint) {
+
+        var cells = [];
+
+        localPoint && this.cells && utils.forIn(this.cells, function (cell) {
+            if (cell.isNode()) {
+                var rect = cell.getBBox();
+                if (rect && rect.containsPoint(localPoint)) {
+                    cells.push(cell);
+                }
+            }
+        });
+
+        return cells;
+    }
+
+    findCellInArea(area) {
+
+        var cells = [];
+
+        area && this.cells && utils.forIn(this.cells, function (cell) {
+            if (cell.isNode()) {
+                var rect = cell.getBBox();
+                if (rect && area.containsRect(rect)) {
+                    cells.push(cell);
+                }
+            }
+        });
+
+        return cells;
+    }
+
     createCellId() {
 
         let id = this.nextId;

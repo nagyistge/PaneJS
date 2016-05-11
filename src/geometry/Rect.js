@@ -151,7 +151,8 @@ class Rect {
     }
 
     containsPoint(point) {
-        return point.x >= this.x
+        return point
+            && point.x >= this.x
             && point.x <= this.x + this.width
             && point.y >= this.y
             && point.y <= this.y + this.height;
@@ -213,7 +214,7 @@ class Rect {
         let cornerX = Math.max(corner1.x, corner2.x);
         let cornerY = Math.max(corner1.y, corner2.y);
 
-        return rect(originX, originY, cornerX - originX, cornerY - originY);
+        return new Rect(originX, originY, cornerX - originX, cornerY - originY);
     }
 
     intersectionWithLineFromCenterToPoint(point, angle) {

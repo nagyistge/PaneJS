@@ -1,4 +1,5 @@
-import Events from '../common/Events';
+import * as utils from '../common/utils';
+import     Events from '../common/Events';
 
 
 class Handler extends Events {
@@ -10,18 +11,17 @@ class Handler extends Events {
         this.paper    = paper;
         this.disabled = false;
 
-        this.init(options);
-        this.trigger('handler:initalized');
+        this.configure(options)
+            .init();
     }
 
-    init() {
+    configure() { return this; }
 
-        return this;
-    }
+    init() { return this; }
 
     destroy() {
 
-        this.trigger('destroy');
+        utils.destroy(this);
     }
 
     getPaper() {
@@ -37,6 +37,12 @@ class Handler extends Events {
     isDisabled() {
 
         return this.disabled === true;
+    }
+
+    isEnabled() {
+
+        return this.disabled === false;
+
     }
 
     disable() {
@@ -55,7 +61,7 @@ class Handler extends Events {
         return this;
     }
 
-    executeIfEnabled(callback, context) {
+    invoke(callback, context) {
 
         if (!this.isDisabled()) {
             callback.call(context);

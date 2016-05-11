@@ -27,21 +27,7 @@ class HTMLPaper extends Paper {
         utils.addEventListener(drawPane, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
         utils.addEventListener(drawPane, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
 
-        let onPointerDown = this.onPointerDown.bind(this);
-        let onPointerMove = this.onPointerMove.bind(this);
-        let onPointerUp   = this.docMouseUpEvent || this.onPointerUp.bind(this);
-
-        this.docMouseUpEvent = onPointerUp;
-
-        if (detector.IS_TOUCH) {
-            utils.addEventListener(drawPane, 'touchstart', onPointerDown);
-            utils.addEventListener(drawPane, 'touchmove', onPointerMove);
-            utils.addEventListener(document, 'touchend', onPointerUp);
-        } else {
-            utils.addEventListener(drawPane, 'mousedown', onPointerDown);
-            utils.addEventListener(drawPane, 'mousemove', onPointerMove);
-            utils.addEventListener(document, 'mouseup', onPointerUp);
-        }
+        utils.addEventListener(drawPane, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 
         return super.setup();
     }

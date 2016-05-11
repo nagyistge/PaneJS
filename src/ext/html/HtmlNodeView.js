@@ -173,7 +173,10 @@ class HTMLNodeView extends CellView {
     }
 
     getBBox() {
-        return utils.getBounds(this.elem);
+        var bounds = utils.getBounds(this.elem);
+        if (bounds) {
+            return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
+        }
     }
 
     getStrokeBBox() {

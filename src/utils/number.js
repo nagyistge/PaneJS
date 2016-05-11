@@ -48,6 +48,12 @@ function fixIndex(index, max) {
     return Math.min(index, max);
 }
 
+function clamp(value, min, max) {
+    return min < max
+        ? (value < min ? min : value > max ? max : value)
+        : (value < max ? max : value > min ? min : value);
+}
+
 
 // exports
 // -------
@@ -56,8 +62,12 @@ export {
     toInt,
     toFloat,
     toFixed,
-    fixIndex,
+
     isFinite,
     isPercentage,
-    fixNumber
+
+    fixIndex,
+    fixNumber,
+
+    clamp
 };

@@ -141,22 +141,7 @@ class Paper extends Events {
         utils.addEventListener(this.svg, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
         utils.addEventListener(this.svg, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
 
-        let onPointerDown = this.onPointerDown.bind(this);
-        let onPointerMove = this.onPointerMove.bind(this);
-        let onPointerUp   = this.docMouseUpEvent || this.onPointerUp.bind(this);
-
-        // save it for destroy
-        this.docMouseUpEvent = onPointerUp;
-
-        if (detector.IS_TOUCH) {
-            utils.addEventListener(this.svg, 'touchstart', onPointerDown);
-            utils.addEventListener(this.svg, 'touchmove', onPointerMove);
-            utils.addEventListener(doc, 'touchend', onPointerUp);
-        } else {
-            utils.addEventListener(this.svg, 'mousedown', onPointerDown);
-            utils.addEventListener(this.svg, 'mousemove', onPointerMove);
-            utils.addEventListener(doc, 'mouseup', onPointerUp);
-        }
+        utils.addEventListener(this.svg, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 
         // Hold the value when mouse has been moved: when mouse moved,
         // no click event will be triggered.
@@ -194,7 +179,7 @@ class Paper extends Events {
         utils.removeElement(this.svg);
 
         let eventName = detector.IS_TOUCH ? 'touchend' : 'mouseup';
-        utils.removeEventListener(doc, eventName, this.docMouseUpEvent);
+        utils.removeEventListener(doc, eventName, this.onMouseUpHandler);
 
         if (detector.IS_POINTER) {
             this.container.style.msTouchAction = '';
@@ -956,7 +941,6 @@ class Paper extends Events {
 
         if (view) {
             this.trigger('cell:contextmenu', view.cell, view, e, localPoint.x, localPoint.y);
-            // view.onContextMenu(e, localPoint.x, localPoint.y);
         } else {
             this.trigger('blank:contextmenu', e, localPoint.x, localPoint.y);
         }
@@ -980,7 +964,6 @@ class Paper extends Events {
 
         if (view) {
             this.trigger('cell:pointerDblClick', view.cell, view, e, localPoint.x, localPoint.y);
-            // view.onDblClick(e, localPoint.x, localPoint.y);
         } else {
             this.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
         }
@@ -1005,77 +988,9 @@ class Paper extends Events {
 
             if (view) {
                 this.trigger('cell:pointerClick', view.cell, view, e, localPoint.x, localPoint.y);
-                // view.onClick(e, localPoint.x, localPoint.y);
             } else {
                 this.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
             }
-        }
-    }
-
-    onPointerDown(e) {
-
-        e = utils.normalizeEvent(e);
-
-        let view = this.findViewByElem(e.target);
-
-        if (!this.isValidEvent(e, view)) {
-            return;
-        }
-
-        e.preventDefault();
-        this.mouseMoved = 0;
-
-        let localPoint = this.snapToGrid({
-            x: e.clientX,
-            y: e.clientY
-        });
-
-        if (view) {
-            this.sourceView = view;
-            // view.onPointerDown(e, localPoint.x, localPoint.y);
-            this.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
-        } else {
-            this.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
-        }
-    }
-
-    onPointerMove(e) {
-
-        e.preventDefault();
-        e = utils.normalizeEvent(e);
-
-        let sourceView = this.sourceView;
-
-        if (sourceView) {
-
-            let localPoint = this.snapToGrid({
-                x: e.clientX,
-                y: e.clientY
-            });
-
-            this.mouseMoved++;
-
-            this.trigger('cell:pointerMove', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
-            // sourceView.onPointerMove(e, localPoint.x, localPoint.y);
-        }
-    }
-
-    onPointerUp(e) {
-
-        e = utils.normalizeEvent(e);
-
-        let localPoint = this.snapToGrid({
-            x: e.clientX,
-            y: e.clientY
-        });
-        let sourceView = this.sourceView;
-
-        if (sourceView) {
-            this.trigger('cell:pointerUp', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
-            // sourceView.onPointerUp(e, localPoint.x, localPoint.y);
-            this.sourceView = null;
-        } else {
-            this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
         }
     }
 
@@ -1103,6 +1018,78 @@ class Paper extends Events {
                 this.trigger('cell:mouseOut', view.cell, view, e);
             }
         }
+    }
+
+    onPointerDown(e) {
+
+        e = utils.normalizeEvent(e);
+
+        let view = this.findViewByElem(e.target);
+
+        if (!this.isValidEvent(e, view)) {
+            return;
+        }
+
+        e.preventDefault();
+        this.mouseMoved = 0;
+
+        let localPoint = this.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
+
+        if (view) {
+            this.sourceView = view;
+            this.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
+        } else {
+            this.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
+        }
+
+        this.onMouseMoveHandler = this.onMouseMoveHandler || this.onPointerMove.bind(this);
+        this.onMouseUpHandler   = this.onMouseUpHandler || this.onPointerUp.bind(this);
+
+        utils.addEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+        utils.addEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+    }
+
+    onPointerMove(e) {
+
+        e.preventDefault();
+        e = utils.normalizeEvent(e);
+
+        let localPoint = this.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
+
+        let sourceView = this.sourceView;
+        if (sourceView) {
+            this.mouseMoved++;
+            this.trigger('cell:pointerMove', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
+        } else {
+            this.trigger('blank:pointerMove', e, localPoint.x, localPoint.y);
+        }
+    }
+
+    onPointerUp(e) {
+
+        e = utils.normalizeEvent(e);
+
+        let localPoint = this.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
+
+        let sourceView = this.sourceView;
+        if (sourceView) {
+            this.trigger('cell:pointerUp', sourceView.cell, sourceView, e, localPoint.x, localPoint.y);
+            this.sourceView = null;
+        } else {
+            this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
+        }
+
+        utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+        utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
     }
 
 

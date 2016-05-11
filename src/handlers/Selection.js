@@ -3,9 +3,6 @@ import           vector from '../common/vector';
 import          Handler from './Handler';
 import VertexController from '../controllers/Vertex';
 
-// TODO if cell is a link
-
-
 class SelectHandler extends Handler {
 
     init(options = {}) {
@@ -30,15 +27,15 @@ class SelectHandler extends Handler {
 
         paper.selection = [];
 
-        this.previousPosition = {
+        this.startPosition = {
             x: 0,
             y: 0
         };
 
         paper.on('cell:pointerDown', function (cell, view, e) {
 
-            that.executeIfEnabled(function () {
-                that.previousPosition = {
+            that.invoke(function () {
+                that.startPosition = {
                     x: e.x,
                     y: e.y
                 };
@@ -47,15 +44,15 @@ class SelectHandler extends Handler {
         });
 
         paper.on('cell:pointerMove', function (cell, view, e) {
-            that.executeIfEnabled(function () {
+            that.invoke(function () {
                 that.showPreview()
                     .redrawPreview(e);
             });
         });
 
         paper.on('cell:pointerUp', function (cell, view, e) {
-            that.executeIfEnabled(function () {
-                let previousPosition = that.previousPosition;
+            that.invoke(function () {
+                let previousPosition = that.startPosition;
                 if (e.x !== previousPosition.x || e.y !== previousPosition.y) {
 
                     model.beginUpdate();
@@ -82,7 +79,7 @@ class SelectHandler extends Handler {
         });
 
         paper.on('blank:pointerDown', function (e) {
-            that.executeIfEnabled(function () {
+            that.invoke(function () {
                 if (!utils.hasModifierKey(e)) {
                     that.clearSelection();
                 }
@@ -139,7 +136,7 @@ class SelectHandler extends Handler {
                 }
             });
 
-            let previousPosition = this.previousPosition;
+            let previousPosition = this.startPosition;
 
             previewVel.attr({
                 x: minP.x + (position.x - previousPosition.x),
