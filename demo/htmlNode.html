@@ -76,6 +76,50 @@
             opacity: .3;
         }
 
+        .pane-in-ports,
+        .pane-out-ports {
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+
+        .pane-in-ports {
+            top: 0;
+        }
+
+        .pane-out-ports {
+            bottom: 0;
+        }
+
+        .pane-port-item {
+            float: left;
+            height: 1px;
+            position: relative;
+        }
+
+        .pane-port-item .port-magnet {
+            position: absolute;
+            left: 50%;
+            top: -5px;
+            margin-left: -5px;
+            box-sizing: border-box;
+            width: 10px;
+            height: 10px;
+
+            border: 1px solid #808080;
+            border-radius: 50%;
+            background-color: #FFF;
+            transition: background-color .2s;
+        }
+
+        .pane-out-ports .port-magnet {
+            cursor: crosshair;
+        }
+
+        .pane-out-ports .port-magnet:hover {
+            background-color: #808080;
+        }
+
     </style>
 </head>
 <body>
@@ -92,9 +136,8 @@
     });
 
     var selectionHandler = new panejs.ext.SelectionHandler(paper);
+    var connectionHandler = new panejs.ext.ConnectionHandler(paper);
 
-
-    model.beginUpdate();
 
     var node1 = new panejs.ext.HTMLNode({
         markup: '<div class="pane-node-content"></div>',
@@ -115,7 +158,14 @@
 
 
     var node2 = new panejs.ext.HTMLNode({
-        markup: '<div class="pane-node-content"></div>',
+        markup: '<div class="pane-node-content">' +
+        '<span class="icon"></span>' +
+        '<span class="name"></span>' +
+        '<span class="status"></span>' +
+        '<div class="pane-in-ports"></div>' +
+        '<div class="pane-out-ports"></div>' +
+        '</div>',
+        portMarkup: '<div class="pane-port-item"><span class="port-magnet"></span></div>',
         position: {
             x: 200,
             y: 200
@@ -124,19 +174,53 @@
             width: 180,
             height: 30
         },
+
         attrs: {
-            '.pane-node-content': {
-                text: 'Node'
-            }
-        }
+            //            '.pane-node-content': {
+            //                text: 'Node'
+            //            }
+        },
+        inPorts: [{ id: 1 }, { id: 2 }],
+        outPorts: [{ id: 3 }]
+    });
+
+    var node3 = new panejs.ext.HTMLNode({
+        markup: '<div class="pane-node-content">' +
+        '<span class="icon"></span>' +
+        '<span class="name"></span>' +
+        '<span class="status"></span>' +
+        '<div class="pane-in-ports"></div>' +
+        '<div class="pane-out-ports"></div>' +
+        '</div>',
+        portMarkup: '<div class="pane-port-item"><span class="port-magnet"></span></div>',
+        position: {
+            x: 270,
+            y: 80
+        },
+        size: {
+            width: 180,
+            height: 30
+        },
+        inPorts: [
+            { id: 1 },
+            { id: 2 }
+        ],
+        outPorts: [
+            { id: 3 }
+        ]
     });
 
     var link1 = new panejs.Link({
+        connector: 'smooth',
         targetMarker: 'classic'
     });
 
+
+    model.beginUpdate();
+
     model.addNode(node1);
     model.addNode(node2);
+    model.addNode(node3);
     model.addLink(link1, node1, node2);
 
     model.endUpdate();

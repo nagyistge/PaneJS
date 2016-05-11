@@ -18,16 +18,18 @@ class HTMLNodeView extends CellView {
 
     render() {
 
-        this.renderMarkup();
+        this.renderMarkup()
+            .renderPorts();
 
         this.scalableNode  = this.findOne('.pane-scalable');
         this.rotatableNode = this.findOne('.pane-rotatable');
 
-        return this
-            .update()
+        this.update()
             .resize()
             .rotate()
             .translate();
+
+        return this;
     }
 
     ensureElement() {
@@ -55,6 +57,49 @@ class HTMLNodeView extends CellView {
 
         return this;
     }
+
+    renderPorts() {
+
+        let inPorts  = this.cell.getInPorts();
+        let outPorts = this.cell.getOutPorts();
+        let markup   = this.cell.getPortMarkup();
+
+        if (inPorts.length) {
+            let inPortsWrap = this.findOne('.pane-in-ports');
+
+            let width = utils.toFixed(100 / inPorts.length, 4);
+
+            utils.forEach(inPorts, function (port) {
+                $(markup).css({ width: width + '%' }).appendTo(inPortsWrap);
+            });
+        }
+
+        if (outPorts.length) {
+            let outPortsWrap = this.findOne('.pane-out-ports');
+
+            let width = utils.toFixed(100 / outPorts.length, 4);
+
+            utils.forEach(inPorts, function (port) {
+                $(markup).css({ width: width + '%' }).appendTo(outPortsWrap);
+            });
+        }
+
+
+        return this;
+    }
+
+    isPort(target) {
+
+        while (target && target !== this.elem) {
+            if (utils.hasClass(target, 'port-magnet')) {
+                return true;
+            }
+            target = target.parentNode;
+        }
+
+        return false;
+    }
+
 
     find(selector) {
 

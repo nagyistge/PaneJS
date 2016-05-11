@@ -4,13 +4,18 @@ import       Rect from '../../geometry/Rect';
 import    Handler from '../../handlers/Handler';
 
 
+const classNames = {
+    preview: 'pane-selection-preview',
+    area: 'pane-selection-area'
+};
+
 class SelectHandler extends Handler {
 
     configure(options) {
 
         this.options = utils.merge({
             multi: true,
-            region: true
+            area: true
         }, options);
 
         return this;
@@ -19,10 +24,10 @@ class SelectHandler extends Handler {
     init() {
 
         this.previewElem = utils.createElement('div');
-        this.rangeElem   = utils.createElement('div');
+        this.areaElem    = utils.createElement('div');
 
-        utils.addClass(this.previewElem, 'pane-selection-preview');
-        utils.addClass(this.rangeElem, 'pane-selection-range');
+        utils.addClass(this.previewElem, classNames.preview);
+        utils.addClass(this.areaElem, classNames.area);
 
         this.selectedCells = [];
         this.startPosition = null;
@@ -46,11 +51,14 @@ class SelectHandler extends Handler {
             return;
         }
 
+        if (view.isPort(e.target)) {
+            return;
+        }
+
         this.startPosition = {
             x: e.x,
             y: e.y
         };
-
 
         if (!cell.selected || this.selectedCells.length < 2) {
             this.selectCell(cell, view, utils.hasModifierKey(e));
@@ -61,7 +69,7 @@ class SelectHandler extends Handler {
 
     onCellMouseMove(cell, view, e) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || !this.startPosition) {
             return;
         }
 
@@ -116,7 +124,7 @@ class SelectHandler extends Handler {
 
     onCellMouseUp(cell, view, e) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || !this.startPosition) {
             return;
         }
 
@@ -152,8 +160,9 @@ class SelectHandler extends Handler {
             }
         }
 
-        this.mouseMoving = false;
-        this.lazyCheck   = false;
+        this.lazyCheck     = false;
+        this.mouseMoving   = false;
+        this.startPosition = null;
     }
 
     onBlankMouseDown(e, x, y) {
@@ -162,10 +171,20 @@ class SelectHandler extends Handler {
             return;
         }
 
-        this.startPosition = { x, y };
+        if (!this.options.region) {
+            if (!utils.hasModifierKey(e)) {
+                this.clearSelection();
+            }
+        } else {
+            this.startPosition = { x, y };
+        }
     }
 
     onBlankMouseMove(e, x, y) {
+
+        if (this.isDisabled()) {
+            return;
+        }
 
         if (!this.mouseMoving) {
 
@@ -210,10 +229,10 @@ class SelectHandler extends Handler {
                 }
             }
 
-            utils.setTranslate(this.rangeElem, x, y);
+            utils.setTranslate(this.areaElem, x, y);
 
-            this.rangeElem.style.width  = width + 'px';
-            this.rangeElem.style.height = height + 'px';
+            this.areaElem.style.width  = width + 'px';
+            this.areaElem.style.height = height + 'px';
 
             this.areaBounds = {
                 x,
@@ -225,6 +244,10 @@ class SelectHandler extends Handler {
     }
 
     onBlankMouseUp(e) {
+
+        if (this.isDisabled()) {
+            return;
+        }
 
         if (!utils.hasModifierKey(e)) {
             this.clearSelection();
@@ -259,7 +282,7 @@ class SelectHandler extends Handler {
 
     hideRange() {
 
-        utils.removeElement(this.rangeElem);
+        utils.removeElement(this.areaElem);
 
         return this;
     }
@@ -268,7 +291,7 @@ class SelectHandler extends Handler {
 
         var paper = this.getPaper();
         if (paper && paper.HTMLDrawPane) {
-            paper.HTMLDrawPane.appendChild(this.rangeElem);
+            paper.HTMLDrawPane.appendChild(this.areaElem);
         }
 
         return this;

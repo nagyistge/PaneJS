@@ -31,7 +31,6 @@ import     CellView from './views/CellView';
 import     LinkView from './views/LinkView';
 import     NodeView from './views/NodeView';
 import   VectorView from './views/VectorView';
-import HtmlNodeView from './views/HtmlNodeView';
 
 
 import Handler           from './handlers/Handler';
