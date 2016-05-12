@@ -322,8 +322,8 @@ class SelectHandler extends Handler {
 
     updatePreview(resize) {
 
-        let bounds = this.bounds;
         let elem   = this.previewRect;
+        let bounds = this.bounds;
 
         if (bounds && elem) {
 
@@ -377,8 +377,8 @@ class SelectHandler extends Handler {
 
     updateSelectionRect() {
 
-        let bounds = this.bounds;
         let elem   = this.selectionRect;
+        let bounds = this.bounds;
 
         if (bounds && elem) {
 
@@ -404,6 +404,8 @@ class SelectHandler extends Handler {
 
             if (localX < container.scrollLeft && container.scrollLeft > 0) {
 
+                // scroll left
+
                 scrolled = true;
                 localX -= sense;
 
@@ -412,11 +414,17 @@ class SelectHandler extends Handler {
 
             } else if (localX > container.scrollLeft + container.clientWidth && container.scrollLeft < container.scrollWidth - container.clientWidth) {
 
-                scrolled             = true;
+                // scroll right
+
+                scrolled = true;
+                localX += sense;
+
                 bounds.width         = Math.min(container.scrollWidth - bounds.x, bounds.width + sense);
                 container.scrollLeft = Math.min(container.scrollWidth - container.clientWidth, container.scrollLeft + sense);
 
             } else if (localY < container.scrollTop && container.scrollTop > 0) {
+
+                // scroll top
 
                 scrolled = true;
                 localY -= sense;
@@ -426,7 +434,11 @@ class SelectHandler extends Handler {
 
             } else if (localY > container.scrollTop + container.clientHeight && container.scrollTop < container.scrollHeight - container.clientHeight) {
 
-                scrolled            = true;
+                // scroll bottom
+
+                scrolled = true;
+                localY += sense;
+
                 bounds.height       = Math.min(container.scrollHeight - bounds.y, bounds.height + sense);
                 container.scrollTop = Math.min(container.scrollHeight - container.clientHeight, container.scrollTop + sense);
             }
