@@ -719,16 +719,16 @@ class Cell {
             size: this.getSize(raw),
             position: this.getPosition(raw),
             rotation: this.getRotation(raw)
-        }
+        };
     }
 
     setGeometry(geom, options = {}) {
 
-        var scheduled = false;
+        let scheduled = false;
 
         if (!options.silent) {
 
-            var model = this.getModel();
+            let model = this.getModel();
             if (model) {
                 model.setGeometry(this, geom);
                 scheduled = true;
@@ -739,7 +739,7 @@ class Cell {
 
             utils.forEach(['size', 'position', 'rotation'], function (key) {
 
-                var val = geom[key];
+                let val = geom[key];
                 if (val) {
                     this['set' + utils.ucFirst(key)](val, { silent: true });
                 }

@@ -1,6 +1,4 @@
 import * as utils from '../../common/utils';
-import     vector from '../../common/vector';
-import    filters from '../../common/filters';
 import       Rect from '../../geometry/Rect';
 import   CellView from '../../views/CellView';
 
@@ -38,7 +36,7 @@ class HTMLNodeView extends CellView {
         // attach cell's id to elem
         this.elem.cellId = this.cell.id;
 
-        var className = this.cell.getClassName();
+        let className = this.cell.getClassName();
         if (className) {
             utils.addClass(this.elem, className);
         }
@@ -53,7 +51,14 @@ class HTMLNodeView extends CellView {
 
     renderMarkup() {
 
-        this.elem.innerHTML = this.cell.getMarkup() || '';
+        let markup = this.cell.getMarkup() || '';
+
+        if (utils.isFunction(markup)) {
+            markup = markup(this.cell.data);
+        }
+
+
+        this.elem.innerHTML = markup;
 
         return this;
     }
@@ -63,24 +68,38 @@ class HTMLNodeView extends CellView {
         let inPorts  = this.cell.getInPorts();
         let outPorts = this.cell.getOutPorts();
         let markup   = this.cell.getPortMarkup();
+        let isRender = utils.isFunction(markup);
 
         if (inPorts.length) {
+
             let inPortsWrap = this.findOne('.pane-in-ports');
 
             let width = utils.toFixed(100 / inPorts.length, 4);
 
             utils.forEach(inPorts, function (port) {
-                $(markup).css({ width: width + '%' }).appendTo(inPortsWrap);
+
+                let html = isRender ? markup(port) : markup;
+
+                $(html)
+                    .css({ width: width + '%' })
+                    .appendTo(inPortsWrap);
             });
         }
 
         if (outPorts.length) {
+
             let outPortsWrap = this.findOne('.pane-out-ports');
 
             let width = utils.toFixed(100 / outPorts.length, 4);
 
-            utils.forEach(inPorts, function (port) {
-                $(markup).css({ width: width + '%' }).appendTo(outPortsWrap);
+            utils.forEach(outPorts, function (port) {
+
+                let html = isRender ? markup(port) : markup;
+
+                $(html)
+                    .css({ width: width + '%' })
+                    .appendTo(outPortsWrap);
+
             });
         }
 
@@ -100,10 +119,9 @@ class HTMLNodeView extends CellView {
         return false;
     }
 
-
     find(selector) {
 
-        return selector === '.' ? [this.elem] : this.elem.querySelectorAll(selector)
+        return selector === '.' ? [this.elem] : this.elem.querySelectorAll(selector);
     }
 
     findOne(selector) {
@@ -218,7 +236,7 @@ class HTMLNodeView extends CellView {
     }
 
     getBBox() {
-        var bounds = utils.getBounds(this.elem);
+        let bounds = utils.getBounds(this.elem);
         if (bounds) {
             return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
         }
@@ -229,7 +247,7 @@ class HTMLNodeView extends CellView {
         let position = this.cell.getPosition();
         let size     = this.cell.getSize();
 
-        var bbox = new Rect(
+        let bbox = new Rect(
             position.x,
             position.y,
             size.width,

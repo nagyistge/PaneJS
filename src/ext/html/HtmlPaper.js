@@ -7,7 +7,7 @@ class HTMLPaper extends Paper {
 
     createPanes() {
 
-        var drawPane = utils.createElement('div');
+        let drawPane = utils.createElement('div');
 
         utils.addClass(drawPane, 'pane-html-pane');
 

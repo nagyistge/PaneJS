@@ -7,8 +7,9 @@ import {
     isUndefined
 } from './lang';
 
-import { forEach, reduce } from './array'
-import { trim            } from './string'
+import { forEach, reduce } from './array';
+import { trim            } from './string';
+import { forIn           } from './object';
 
 
 const rclass    = /[\t\r\n\f]/g;
@@ -40,7 +41,8 @@ function addClass(node, selector) {
     }
 
     if (isFunction(selector)) {
-        return addClass(node, selector.call(node, getClassName(node)));
+        addClass(node, selector.call(node, getClassName(node)));
+        return;
     }
 
     if (isString(selector) && node.nodeType === 1) {
@@ -72,7 +74,8 @@ function removeClass(node, selector) {
     }
 
     if (isFunction(selector)) {
-        return removeClass(node, selector.call(node, getClassName(node)));
+        removeClass(node, selector.call(node, getClassName(node)));
+        return;
     }
 
     if ((!selector || isString(selector)) && node.nodeType === 1) {
@@ -106,13 +109,17 @@ function toggleClass(node, selector, stateVal) {
     }
 
     if (isBoolean(stateVal) && isString(selector)) {
-        return stateVal
+        stateVal
             ? addClass(node, selector)
             : removeClass(node, selector);
+
+        return;
     }
 
     if (isFunction(selector)) {
-        return toggleClass(node, selector.call(node, getClassName(node), stateVal), stateVal);
+        toggleClass(node, selector.call(node, getClassName(node), stateVal), stateVal);
+
+        return;
     }
 
     if (isString(selector)) {
@@ -450,7 +457,7 @@ function setTranslate(elem, tx, ty) {
 
     if (elem) {
 
-        var translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
+        let translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
 
         if (transformKey !== 'msTransform') {
             // The Z transform will keep this in the GPU (faster, and prevents artifacts),
@@ -473,14 +480,15 @@ function getBounds(elem) {
         doc = elem.ownerDocument;
     }
 
-    const docElem = doc.documentElement;
-    const result  = {};
+    const docEle = doc.documentElement;
+    const result = {};
     // The original object returned by getBoundingClientRect is immutable, so we clone it
     // We can't use extend because the properties are not considered part of the object by hasOwnProperty in IE9
     const rect = elem.getBoundingClientRect();
-    for (let k in rect) {
-        result[k] = rect[k];
-    }
+
+    forIn(rect, function (val, key) {
+        result[key] = val;
+    });
 
     if (isUndefined(result.width)) {
         result.width = document.body.scrollWidth - result.left - result.right;
@@ -489,8 +497,8 @@ function getBounds(elem) {
         result.height = document.body.scrollHeight - result.top - result.bottom;
     }
 
-    result.top    = result.top - docElem.clientTop;
-    result.left   = result.left - docElem.clientLeft;
+    result.top    = result.top - docEle.clientTop;
+    result.left   = result.left - docEle.clientLeft;
     result.right  = doc.body.clientWidth - result.width - result.left;
     result.bottom = doc.body.clientHeight - result.height - result.top;
 

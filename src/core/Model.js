@@ -108,11 +108,11 @@ class Model extends Events {
 
     findCellAtPoint(localPoint) {
 
-        var cells = [];
+        let cells = [];
 
         localPoint && this.cells && utils.forIn(this.cells, function (cell) {
             if (cell.isNode()) {
-                var rect = cell.getBBox();
+                let rect = cell.getBBox();
                 if (rect && rect.containsPoint(localPoint)) {
                     cells.push(cell);
                 }
@@ -124,11 +124,11 @@ class Model extends Events {
 
     findCellInArea(area) {
 
-        var cells = [];
+        let cells = [];
 
         area && this.cells && utils.forIn(this.cells, function (cell) {
             if (cell.isNode()) {
-                var rect = cell.getBBox();
+                let rect = cell.getBBox();
                 if (rect && area.containsRect(rect)) {
                     cells.push(cell);
                 }

@@ -15,4 +15,3 @@ let ext = {
 export {
     ext
 };
-

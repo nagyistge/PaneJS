@@ -1139,7 +1139,6 @@ class Paper extends Events {
             fakeRect.removeCell();
         }
 
-        let doc        = document;
         let body       = doc.body;
         let docElem    = doc.documentElement;
         let scrollTop  = body.scrollTop || docElem.scrollTop;

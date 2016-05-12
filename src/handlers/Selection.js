@@ -19,15 +19,15 @@ class SelectHandler extends Handler {
             'stroke-dasharray': '3px, 3px',
             'stroke': 'black'
         });
-        this.previewElem = this.previewVel.node;
+        this.previewRect = this.previewVel.node;
 
-        paper.controlPane.appendChild(this.previewElem);
+        paper.controlPane.appendChild(this.previewRect);
 
         this.hidePreview();
 
         paper.selection = [];
 
-        this.startPosition = {
+        this.origin = {
             x: 0,
             y: 0
         };
@@ -35,7 +35,7 @@ class SelectHandler extends Handler {
         paper.on('cell:pointerDown', function (cell, view, e) {
 
             that.invoke(function () {
-                that.startPosition = {
+                that.origin = {
                     x: e.x,
                     y: e.y
                 };
@@ -52,7 +52,7 @@ class SelectHandler extends Handler {
 
         paper.on('cell:pointerUp', function (cell, view, e) {
             that.invoke(function () {
-                let previousPosition = that.startPosition;
+                let previousPosition = that.origin;
                 if (e.x !== previousPosition.x || e.y !== previousPosition.y) {
 
                     model.beginUpdate();
@@ -136,7 +136,7 @@ class SelectHandler extends Handler {
                 }
             });
 
-            let previousPosition = this.startPosition;
+            let previousPosition = this.origin;
 
             previewVel.attr({
                 x: minP.x + (position.x - previousPosition.x),

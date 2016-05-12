@@ -359,7 +359,9 @@ class VertexController extends Controller {
                 y: movingEdgePoint.y + dy
             }, that.rotation);
             // let newCenter = newRect.getCenter();
-            that.moveTo({
+
+            that
+                .moveTo({
                     x: newRect.x,
                     y: newRect.y
                 })

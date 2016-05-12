@@ -1,13 +1,7 @@
 import * as utils from '../../common/utils';
-import     vector from '../../common/vector';
 import       Rect from '../../geometry/Rect';
 import    Handler from '../../handlers/Handler';
 
-
-const classNames = {
-    preview: 'pane-selection-preview',
-    area: 'pane-selection-area'
-};
 
 class SelectHandler extends Handler {
 
@@ -15,7 +9,8 @@ class SelectHandler extends Handler {
 
         this.options = utils.merge({
             multi: true,
-            area: true
+            area: true,
+            sense: 50
         }, options);
 
         return this;
@@ -23,29 +18,29 @@ class SelectHandler extends Handler {
 
     init() {
 
-        this.previewElem = utils.createElement('div');
-        this.areaElem    = utils.createElement('div');
+        this.previewRect   = utils.createElement('div');
+        this.selectionRect = utils.createElement('div');
 
-        utils.addClass(this.previewElem, classNames.preview);
-        utils.addClass(this.areaElem, classNames.area);
+        utils.addClass(this.previewRect, 'pane-selection-preview');
+        utils.addClass(this.selectionRect, 'pane-selection-rect');
 
+        this.origin        = null;
         this.selectedCells = [];
-        this.startPosition = null;
-        this.previewBounds = null;
+        this.bounds        = null;
+        this.bounds        = null;
 
-        let paper = this.getPaper();
-
-        paper.on('cell:pointerDown', this.onCellMouseDown.bind(this));
-        paper.on('cell:pointerMove', this.onCellMouseMove.bind(this));
-        paper.on('cell:pointerUp', this.onCellMouseUp.bind(this));
-        paper.on('blank:pointerDown', this.onBlankMouseDown.bind(this));
-        paper.on('blank:pointerMove', this.onBlankMouseMove.bind(this));
-        paper.on('blank:pointerUp', this.onBlankMouseUp.bind(this));
+        this.getPaper()
+            .on('cell:pointerDown', this.onCellMouseDown.bind(this))
+            .on('cell:pointerMove', this.onCellMouseMove.bind(this))
+            .on('cell:pointerUp', this.onCellMouseUp.bind(this))
+            .on('blank:pointerDown', this.onBlankMouseDown.bind(this))
+            .on('blank:pointerMove', this.onBlankMouseMove.bind(this))
+            .on('blank:pointerUp', this.onBlankMouseUp.bind(this));
 
         return this;
     }
 
-    onCellMouseDown(cell, view, e) {
+    onCellMouseDown(cell, view, e, localX, localY) {
 
         if (this.isDisabled()) {
             return;
@@ -55,10 +50,7 @@ class SelectHandler extends Handler {
             return;
         }
 
-        this.startPosition = {
-            x: e.x,
-            y: e.y
-        };
+        this.origin = { x: localX, y: localY };
 
         if (!cell.selected || this.selectedCells.length < 2) {
             this.selectCell(cell, view, utils.hasModifierKey(e));
@@ -67,20 +59,19 @@ class SelectHandler extends Handler {
         }
     }
 
-    onCellMouseMove(cell, view, e) {
+    onCellMouseMove(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || !this.startPosition) {
+        if (this.isDisabled() || cell.isLink() || !this.origin) {
             return;
         }
 
-        if (!this.mouseMoving) {
+        if (!this.moving) {
 
             let bounds = null;
 
-            utils.forEach(this.selectedCells, function (cell) {
-                // only move node
-                if (cell.isNode()) {
-                    let rect = cell.getBBox();
+            utils.forEach(this.selectedCells, function (node) {
+                if (node.isNode()) {
+                    let rect = node.getBBox();
                     if (rect) {
                         bounds = bounds ? bounds.union(rect) : rect;
                     }
@@ -88,62 +79,65 @@ class SelectHandler extends Handler {
             });
 
             if (bounds) {
+                this.bounds         = bounds;
+                this.previewOriginX = bounds.x;
+                this.previewOriginY = bounds.y;
 
-                utils.setTranslate(this.previewElem, bounds.x, bounds.y);
-
-                this.previewElem.style.width  = bounds.width + 'px';
-                this.previewElem.style.height = bounds.height + 'px';
-
-                this.previewBounds = bounds;
-
-                utils.toggleClass(this.previewElem, 'single', this.getSelectedNodesCount() === 1);
-
-                this.getContainerBounds();
+                this.updatePreview(true);
                 this.showPreview();
             }
 
-            this.mouseMoving = true;
+            this.moving = true;
         }
 
-        if (this.previewBounds) {
+        if (this.bounds) {
 
-            let x = this.previewBounds.x + e.x - this.startPosition.x;
-            let y = this.previewBounds.y + e.y - this.startPosition.y
+            this.stopScrollTimer();
 
-            x = utils.clamp(x, 0, this.containerBounds.width - this.previewBounds.width);
-            y = utils.clamp(y, 0, this.containerBounds.height - this.previewBounds.height);
+            let x = this.previewOriginX + localX - this.origin.x;
+            let y = this.previewOriginY + localY - this.origin.y;
 
-            this.dx = x - this.previewBounds.x;
-            this.dy = y - this.previewBounds.y;
+            let container = this.getPaper().container;
 
-            utils.setTranslate(this.previewElem, x, y);
+            x = utils.clamp(x, container.scrollLeft, container.clientWidth + container.scrollLeft - this.bounds.width);
+            y = utils.clamp(y, container.scrollTop, container.clientHeight + container.scrollTop - this.bounds.height);
+
+            this.bounds.x = x;
+            this.bounds.y = y;
+
+            this.updatePreview();
+            this.autoScrollPreview();
         }
-
-        return this;
     }
 
-    onCellMouseUp(cell, view, e) {
+    onCellMouseUp(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || !this.startPosition) {
+        if (this.isDisabled() || cell.isLink() || !this.origin) {
             return;
         }
 
-        if (this.mouseMoving) {
+        if (this.moving) {
 
-            if (this.dx !== 0 || this.dy !== 0) {
+            this.stopScrollTimer();
+            this.hidePreview();
+
+            let dx = localX - this.origin.x;
+            let dy = localY - this.origin.y;
+
+            if (dx !== 0 || dy !== 0) {
 
                 let model = this.getModel();
 
                 model.beginUpdate();
 
-                utils.forEach(this.selectedCells, function (cell) {
-                    if (cell.isNode()) {
+                utils.forEach(this.selectedCells, function (node) {
+                    if (node.isNode()) {
 
-                        let position = cell.getPosition();
+                        let position = node.getPosition();
 
-                        cell.setPosition({
-                            x: position.x + this.dx,
-                            y: position.y + this.dy,
+                        node.setPosition({
+                            x: position.x + dx,
+                            y: position.y + dy,
                             relative: position.relative === true
                         });
                     }
@@ -151,95 +145,98 @@ class SelectHandler extends Handler {
 
                 model.endUpdate();
             }
-
-            this.hidePreview();
-
         } else {
             if (this.lazyCheck) {
                 this.selectCell(cell, view, false);
             }
         }
 
-        this.lazyCheck     = false;
-        this.mouseMoving   = false;
-        this.startPosition = null;
+        this.origin    = null;
+        this.bounds    = null;
+        this.moving    = false;
+        this.lazyCheck = false;
     }
 
-    onBlankMouseDown(e, x, y) {
+    onBlankMouseDown(e, localX, localY) {
 
         if (this.isDisabled()) {
             return;
         }
 
-        if (!this.options.region) {
+        if (!this.options.area) {
             if (!utils.hasModifierKey(e)) {
                 this.clearSelection();
             }
         } else {
-            this.startPosition = { x, y };
+            this.origin = { x: localX, y: localY };
         }
     }
 
-    onBlankMouseMove(e, x, y) {
+    onBlankMouseMove(e, localX, localY) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || !this.origin) {
             return;
         }
 
-        if (!this.mouseMoving) {
-
-            this.showRange();
-            this.getContainerBounds();
-
-            this.mouseMoving = true;
+        if (!this.moving) {
+            this.showSelectionRect();
+            this.moving = true;
         }
 
-        if (this.mouseMoving) {
+        if (this.moving) {
 
-            let width  = Math.abs(x - this.startPosition.x);
-            let height = Math.abs(y - this.startPosition.y);
+            let x      = localX;
+            let y      = localY;
+            let width  = Math.abs(x - this.origin.x);
+            let height = Math.abs(y - this.origin.y);
 
-            if (x > this.startPosition.x) {
-                x = this.startPosition.x;
+            let container = this.getPaper().container;
+            let origin    = this.origin;
 
-                let maxWidth = this.containerBounds.width - x;
+            let maxWidth;
+            let maxHeight;
+
+            if (x > origin.x) {
+
+                x        = origin.x;
+                maxWidth = container.scrollLeft + container.clientWidth - x;
+
                 if (maxWidth < width) {
                     width = maxWidth;
                 }
+
             } else {
-                if (width > this.startPosition.x) {
-                    width = this.startPosition.x;
-                    x     = 0;
+
+                maxWidth = this.origin.x - container.scrollLeft;
+
+                if (width > maxWidth) {
+                    width = maxWidth;
+                    x     = container.scrollLeft;
                 }
             }
 
-            if (y > this.startPosition.y) {
+            if (y > this.origin.y) {
 
-                y = this.startPosition.y;
+                y         = this.origin.y;
+                maxHeight = container.scrollTop + container.clientHeight - y;
 
-                let maxHeight = this.containerBounds.height - y;
                 if (maxHeight < height) {
                     height = maxHeight;
                 }
             } else {
 
-                if (height > this.startPosition.y) {
-                    height = this.startPosition.y;
-                    y      = 0;
+                maxHeight = this.origin.y - container.scrollTop;
+
+                if (height > maxHeight) {
+                    height = maxHeight;
+                    y      = container.scrollTop;
                 }
             }
 
-            utils.setTranslate(this.areaElem, x, y);
-
-            this.areaElem.style.width  = width + 'px';
-            this.areaElem.style.height = height + 'px';
-
-            this.areaBounds = {
-                x,
-                y,
-                width,
-                height
-            };
+            this.bounds = { x, y, width, height };
+            this.stopScrollTimer();
+            this.updateSelectionRect();
+            this.autoScrollSelectionRect(localX, localY);
         }
     }
 
@@ -253,45 +250,191 @@ class SelectHandler extends Handler {
             this.clearSelection();
         }
 
-        if (this.mouseMoving && this.areaBounds) {
-            this.selectCellInArea(this.areaBounds);
+        if (this.moving && this.bounds) {
+            this.stopScrollTimer();
+            this.hideSelectionRect();
+            this.selectCellsInRect(this.bounds);
         }
 
-        this.hideRange();
+        this.bounds = null;
+        this.origin = null;
+        this.moving = false;
+    }
 
-        this.areaBounds  = null;
-        this.mouseMoving = false;
+    stopScrollTimer() {
+
+        if (this.scrollTimer) {
+            clearTimeout(this.scrollTimer);
+            this.scrollTimer = 0;
+        }
+
+        return this;
+    }
+
+    autoScrollPreview() {
+
+        let container  = this.getPaper().container;
+        let scrollable = container.scrollWidth > container.clientWidth;
+
+        if (scrollable) {
+
+            let sense    = this.options.sense;
+            let bounds   = this.bounds;
+            let scrolled = false;
+
+            if ((container.scrollLeft - bounds.x) === 0 && container.scrollLeft > 0) {
+
+                scrolled = true;
+
+                bounds.x             = Math.max(0, bounds.x - sense);
+                container.scrollLeft = Math.max(0, container.scrollLeft - sense);
+
+            } else if (((bounds.x + bounds.width) - (container.scrollLeft + container.clientWidth)) === 0 && container.scrollLeft < container.scrollWidth - container.clientWidth) {
+
+                scrolled = true;
+
+                bounds.x             = Math.min(container.scrollWidth - bounds.width, bounds.x + sense);
+                container.scrollLeft = Math.min(container.scrollWidth - container.clientWidth, container.scrollLeft + sense);
+
+            } else if ((container.scrollTop - bounds.y) === 0 && container.scrollTop > 0) {
+
+                scrolled = true;
+
+                bounds.y            = Math.max(0, bounds.y - sense);
+                container.scrollTop = Math.max(0, container.scrollTop - sense);
+
+            } else if (((bounds.y + bounds.height) - (container.scrollTop + container.clientHeight)) === 0 && container.scrollTop < container.scrollHeight - container.clientHeight) {
+
+                scrolled = true;
+
+                bounds.y            = Math.min(container.scrollHeight - bounds.height, bounds.y + sense);
+                container.scrollTop = Math.min(container.scrollHeight - container.clientHeight, container.scrollTop + sense);
+            }
+
+            if (scrolled) {
+                this.updatePreview();
+                this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this), 30);
+            }
+        }
+
+        return this;
+    }
+
+    updatePreview(resize) {
+
+        let bounds = this.bounds;
+        let elem   = this.previewRect;
+
+        if (bounds && elem) {
+
+            utils.setTranslate(elem, bounds.x, bounds.y);
+
+            if (resize) {
+                elem.style.width  = bounds.width + 'px';
+                elem.style.height = bounds.height + 'px';
+
+                utils.toggleClass(elem, 'single', this.getSelectedNodesCount() === 1);
+            }
+        }
+
+
+        return this;
     }
 
     hidePreview() {
 
-        utils.removeElement(this.previewElem);
+        utils.removeElement(this.previewRect);
 
         return this;
     }
 
     showPreview() {
 
-        var paper = this.getPaper();
+        let paper = this.getPaper();
         if (paper && paper.HTMLDrawPane) {
-            paper.HTMLDrawPane.appendChild(this.previewElem);
+            paper.HTMLDrawPane.appendChild(this.previewRect);
         }
 
         return this;
     }
 
-    hideRange() {
+    hideSelectionRect() {
 
-        utils.removeElement(this.areaElem);
+        utils.removeElement(this.selectionRect);
 
         return this;
     }
 
-    showRange() {
+    showSelectionRect() {
 
-        var paper = this.getPaper();
+        let paper = this.getPaper();
         if (paper && paper.HTMLDrawPane) {
-            paper.HTMLDrawPane.appendChild(this.areaElem);
+            paper.HTMLDrawPane.appendChild(this.selectionRect);
+        }
+
+        return this;
+    }
+
+    updateSelectionRect() {
+
+        let bounds = this.bounds;
+        let elem   = this.selectionRect;
+
+        if (bounds && elem) {
+
+            utils.setTranslate(elem, bounds.x, bounds.y);
+
+            elem.style.width  = bounds.width + 'px';
+            elem.style.height = bounds.height + 'px';
+        }
+
+        return this;
+    }
+
+    autoScrollSelectionRect(localX, localY) {
+
+        let container  = this.getPaper().container;
+        let scrollable = container.scrollWidth > container.clientWidth;
+
+        if (scrollable) {
+
+            let sense    = this.options.sense;
+            let bounds   = this.bounds;
+            let scrolled = false;
+
+            if (localX < container.scrollLeft && container.scrollLeft > 0) {
+
+                scrolled = true;
+                localX -= sense;
+
+                bounds.x             = Math.max(0, bounds.x - sense);
+                container.scrollLeft = Math.max(0, container.scrollLeft - sense);
+
+            } else if (localX > container.scrollLeft + container.clientWidth && container.scrollLeft < container.scrollWidth - container.clientWidth) {
+
+                scrolled             = true;
+                bounds.width         = Math.min(container.scrollWidth - bounds.x, bounds.width + sense);
+                container.scrollLeft = Math.min(container.scrollWidth - container.clientWidth, container.scrollLeft + sense);
+
+            } else if (localY < container.scrollTop && container.scrollTop > 0) {
+
+                scrolled = true;
+                localY -= sense;
+
+                bounds.y            = Math.max(0, bounds.y - sense);
+                container.scrollTop = Math.max(0, container.scrollTop - sense);
+
+            } else if (localY > container.scrollTop + container.clientHeight && container.scrollTop < container.scrollHeight - container.clientHeight) {
+
+                scrolled            = true;
+                bounds.height       = Math.min(container.scrollHeight - bounds.y, bounds.height + sense);
+                container.scrollTop = Math.min(container.scrollHeight - container.clientHeight, container.scrollTop + sense);
+            }
+
+            if (scrolled) {
+                this.updateSelectionRect();
+                this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), 30);
+            }
         }
 
         return this;
@@ -299,7 +442,7 @@ class SelectHandler extends Handler {
 
     getSelectedNodesCount() {
 
-        var count = 0;
+        let count = 0;
 
         utils.forEach(this.selectedCells, function (cell) {
             if (cell.isNode()) {
@@ -310,19 +453,7 @@ class SelectHandler extends Handler {
         return count;
     }
 
-    getContainerBounds() {
-
-        let container = this.getPaper().container;
-
-        this.containerBounds = {
-            x: 0,
-            y: 0,
-            width: container.clientWidth || container.offsetWidth,
-            height: container.clientHeight || container.offsetHeight
-        };
-    }
-
-    selectCellInArea(area) {
+    selectCellsInRect(area) {
 
         let paper = this.getPaper();
         let model = this.getModel();

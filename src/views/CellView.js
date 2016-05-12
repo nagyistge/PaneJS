@@ -1,6 +1,4 @@
 import * as utils from '../common/utils';
-import     vector from '../common/vector';
-import    filters from '../common/filters';
 
 
 class CellView {

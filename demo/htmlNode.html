@@ -11,6 +11,7 @@
             height: 500px;
             border: 1px solid #DDD;
             margin: 50px 0 0 50px;
+            overflow: auto;
         }
 
         .pane-html-pane {
@@ -64,7 +65,7 @@
             border-radius: 15px;
         }
 
-        .pane-selection-range {
+        .pane-selection-rect {
             position: absolute;
             left: 0;
             top: 0;
@@ -131,6 +132,8 @@
     var container = document.getElementById('container');
     var model = new panejs.Model();
     var paper = new panejs.ext.HTMLPaper({
+        width: 2000,
+        height: 2000,
         container: container,
         model: model
     });
