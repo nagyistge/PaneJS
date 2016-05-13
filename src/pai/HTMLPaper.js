@@ -1,6 +1,6 @@
-import * as utils from '../../common/utils';
-import   detector from '../../common/detector';
-import      Paper from '../../core/Paper';
+import * as utils from '../common/utils';
+import   detector from '../common/detector';
+import      Paper from '../core/Paper';
 
 
 class HTMLPaper extends Paper {

@@ -89,12 +89,33 @@ class Portal extends Node {
 }
 
 
-Node.setDefaults({
+Portal.setDefaults({
+    tagName: 'g',
+    markup: '',
     portMarkup: '',
+    classNames: 'pane-node',
+    pane: null,
+    view: PortalView,
+    data: null,
+    attrs: null,
+
     inPorts: [],
     outPorts: [],
-    view: PortalView
 
+    size: {
+        width: 1,
+        height: 1,
+        relative: false
+    },
+    position: {
+        x: 0,
+        y: 0,
+        relative: false
+    },
+    rotation: {
+        angle: 0,
+        inherited: true
+    }
 });
 
 

@@ -137,24 +137,31 @@
 <body>
 <div id="container"></div>
 <script src="js/lib/jquery-2.2.3.min.js"></script>
-<script src="../dist/panejs.js"></script>
+<script src="../dist/panejs-pai.js"></script>
 <script>
 
     var container = document.getElementById('container');
     var model = new panejs.Model();
-    var paper = new panejs.ext.HTMLPaper({
+    var paper = new panejs.pai.HTMLPaper({
         width: 2000,
         height: 2000,
         container: container,
         model: model
     });
 
-    var connectionHandler = new panejs.ext.ConnectionHandler(paper);
-    var selectionHandler = new panejs.ext.SelectionHandler(paper);
+    var connectionHandler = new panejs.pai.ConnectionHandler(paper);
+    var selectionHandler = new panejs.pai.SelectionHandler(paper);
 
 
-    var node1 = new panejs.ext.HTMLNode({
-        markup: '<div class="pane-node-content"></div>',
+    var node1 = new panejs.pai.HTMLNode({
+        markup: '<div class="pane-node-content">' +
+        '<span class="icon"></span>' +
+        '<span class="name"></span>' +
+        '<span class="status"></span>' +
+        '<div class="pane-ports in"></div>' +
+        '<div class="pane-ports out"></div>' +
+        '</div>',
+        portMarkup: '<div class="pane-port" data-id="${id}"><span class="port-magnet"></span></div>',
         position: {
             x: 70,
             y: 40
@@ -163,15 +170,12 @@
             width: 180,
             height: 30
         },
-        attrs: {
-            '.pane-node-content': {
-                text: 'HTML, '
-            }
-        }
+        inPorts: [{ id: 1 }, { id: 2 }],
+        outPorts: [{ id: 3 }]
     });
 
 
-    var node2 = new panejs.ext.HTMLNode({
+    var node2 = new panejs.pai.HTMLNode({
         markup: '<div class="pane-node-content">' +
         '<span class="icon"></span>' +
         '<span class="name"></span>' +
@@ -188,17 +192,11 @@
             width: 180,
             height: 30
         },
-
-        attrs: {
-            //            '.pane-node-content': {
-            //                text: 'Node'
-            //            }
-        },
         inPorts: [{ id: 1 }, { id: 2 }],
         outPorts: [{ id: 3 }]
     });
 
-    var node3 = new panejs.ext.HTMLNode({
+    var node3 = new panejs.pai.HTMLNode({
         markup: '<div class="pane-node-content">' +
         '<span class="icon"></span>' +
         '<span class="name"></span>' +
@@ -225,17 +223,17 @@
     });
 
     var link1 = new panejs.Link({
-        connector: 'smooth',
-        targetMarker: 'classic'
+        view: panejs.pai.LinkView,
+        connector: panejs.pai.quadratic,
+        targetMarker: 'block'
     });
-
 
     model.beginUpdate();
 
     model.addNode(node1);
     model.addNode(node2);
     model.addNode(node3);
-    model.addLink(link1, node1, { node: node2, port: 2 });
+    model.addLink(link1, { node: node1, port: 3 }, { node: node2, port: 2 });
 
     model.endUpdate();
 </script>

@@ -1,12 +1,6 @@
 import Node from '../../cells/Node';
 
-class Rect extends Node {
-
-    getStrokeAttr() {
-
-        return this.attrs.rect;
-    }
-}
+class Rect extends Node {}
 
 Rect.setDefaults({
     markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',

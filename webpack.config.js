@@ -10,9 +10,13 @@ var paths = {
   dist: path.resolve(__dirname, 'dist')
 };
 
-var entry                           = {};
+var entry = {};
+
 entry[pkg.name]                     = './src/index.js';
 entry[pkg.name + '-' + pkg.version] = './src/index.js';
+
+entry[pkg.name + '-pai']                     = './src/pai.js';
+entry[pkg.name + '-pai' + '-' + pkg.version] = './src/pai.js';
 
 module.exports = {
 

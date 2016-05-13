@@ -1,5 +1,5 @@
-import   * as utils from '../../common/utils';
-import       Portal from '../../cells/Portal';
+import   * as utils from '../common/utils';
+import       Portal from '../cells/Portal';
 import HTMLNodeView from './HTMLNodeView';
 
 

@@ -1,7 +1,8 @@
-import * as utils from '../../common/utils';
-import       Rect from '../../geometry/Rect';
-import    Ellipse from '../../geometry/Ellipse';
-import   CellView from '../../views/CellView';
+import * as utils from '../common/utils';
+import       Rect from '../geometry/Rect';
+import      Point from '../geometry/Point';
+import    Ellipse from '../geometry/Ellipse';
+import   CellView from '../views/CellView';
 
 
 class HTMLNodeView extends CellView {
@@ -237,25 +238,14 @@ class HTMLNodeView extends CellView {
         return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
     }
 
-
-    getConnectionPointOnBorder() {
-
-        return null;
-    }
-
-    getConnectionPointOnPort() {
-
-        return null;
-    }
-
-    getPortBodyBBox(port) {
+    getPortBodyBBox(port, isOutPort) {
 
         let node   = this.getCell();
         let portId = utils.isObject(port) ? port.id : port;
 
         port = node.getPortById(portId);
 
-        let selector = node.getPortSelector(port, node.isInPort(port));
+        let selector = node.getPortSelector(port, !isOutPort);
         if (selector) {
             let elem = this.findOne(selector + '>.port-magnet');
             if (elem) {
@@ -268,15 +258,6 @@ class HTMLNodeView extends CellView {
 
                 return new Rect(point.x, point.y, bounds.width, bounds.height);
             }
-        }
-    }
-
-    getPortBodyGeom(port) {
-
-        let rect = this.getPortBodyBBox(port);
-        if (rect) {
-            let center = rect.getCenter();
-            return new Ellipse(center.x, center.y, rect.width / 2, rect.height / 2);
         }
     }
 

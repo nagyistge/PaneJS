@@ -1,9 +1,3 @@
-// styles
-// ------
-
-require('./style/index.less');
-
-
 // common
 // ------
 import * as utils           from './common/utils';
@@ -34,23 +28,16 @@ import     NodeView from './views/NodeView';
 import   PortalView from './views/PortalView';
 import   VectorView from './views/VectorView';
 
-
 import Handler           from './handlers/Handler';
-import SelectionHandler  from './handlers/Selection';
-import ConnectionHandler from './handlers/Connection';
-
 
 // connectors
 // ----------
 import sharpConnector   from './shapes/connector/sharp';
-import smoothConnector  from './shapes/connector/smooth';
 import roundedConnector from './shapes/connector/rounded';
 
 Paper
     .registerConnector('sharp', sharpConnector)
-    .registerConnector('smooth', smoothConnector)
     .registerConnector('rounded', roundedConnector);
-
 
 // markers
 // -------
@@ -76,6 +63,7 @@ export {
     vector,
     VElement,
     Events,
+    Handler,
 
     Model,
     Paper,
@@ -92,11 +80,8 @@ export {
     PortalView,
     VectorView,
 
-    Handler,
-    SelectionHandler,
-    ConnectionHandler,
 };
 
-export * from './shapes/index';
+export * from './pai/index';
 export * from './changes/index';
 export * from './geometry/index';

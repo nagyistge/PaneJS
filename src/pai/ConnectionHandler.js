@@ -1,8 +1,8 @@
-import * as utils from '../../common/utils';
-import     vector from '../../common/vector';
-import       Rect from '../../geometry/Rect';
-import       Link from '../../cells/Link';
-import    Handler from '../../handlers/Handler';
+import * as utils from '../common/utils';
+import     vector from '../common/vector';
+import       Rect from '../geometry/Rect';
+import       Link from '../cells/Link';
+import    Handler from '../handlers/Handler';
 
 
 class ConnectionHandler extends Handler {

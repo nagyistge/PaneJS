@@ -161,7 +161,7 @@ class Rect {
     containsRect(rect) {
 
         this.normalize();
-        rect.standardizePort();
+        rect.normalize();
 
         let x2 = rect.x;
         let y2 = rect.y;
