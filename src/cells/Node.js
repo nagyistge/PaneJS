@@ -1,5 +1,6 @@
-import Rect from '../geometry/Rect';
-import Cell from '../cells/Cell';
+import * as utils from '../common/utils';
+import       Rect from '../geometry/Rect';
+import       Cell from '../cells/Cell';
 
 
 class Node extends Cell {
@@ -16,15 +17,16 @@ class Node extends Cell {
     // -------
 
     isNode() {
+
         return true;
     }
 
     getBBox() {
 
-        let position = this.getPosition();
-        let size     = this.getSize();
+        let pos  = this.getPosition();
+        let size = this.getSize();
 
-        return new Rect(position.x, position.y, size.width, size.height);
+        return new Rect(pos.x, pos.y, size.width, size.height);
     }
 }
 

@@ -1,5 +1,6 @@
 import * as utils from '../../common/utils';
 import       Rect from '../../geometry/Rect';
+import    Ellipse from '../../geometry/Ellipse';
 import   CellView from '../../views/CellView';
 
 
@@ -51,12 +52,7 @@ class HTMLNodeView extends CellView {
 
     renderMarkup() {
 
-        let markup = this.cell.getMarkup() || '';
-
-        if (utils.isFunction(markup)) {
-            markup = markup(this.cell.data);
-        }
-
+        let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
 
         this.elem.innerHTML = markup;
 
@@ -65,58 +61,43 @@ class HTMLNodeView extends CellView {
 
     renderPorts() {
 
-        let inPorts  = this.cell.getInPorts();
-        let outPorts = this.cell.getOutPorts();
-        let markup   = this.cell.getPortMarkup();
-        let isRender = utils.isFunction(markup);
+        let node     = this.getCell();
+        let inPorts  = node.getInPorts();
+        let outPorts = node.getOutPorts();
+        let markup   = node.getPortMarkup();
 
         if (inPorts.length) {
 
-            let inPortsWrap = this.findOne('.pane-in-ports');
-
-            let width = utils.toFixed(100 / inPorts.length, 4);
+            let inPortsWrap = this.findOne('.pane-ports.in');
+            let width       = utils.toFixed(100 / inPorts.length, 4);
 
             utils.forEach(inPorts, function (port) {
 
-                let html = isRender ? markup(port) : markup;
+                let html = this.compileMarkup(markup, port);
 
                 $(html)
                     .css({ width: width + '%' })
                     .appendTo(inPortsWrap);
-            });
+            }, this);
         }
 
         if (outPorts.length) {
 
-            let outPortsWrap = this.findOne('.pane-out-ports');
-
-            let width = utils.toFixed(100 / outPorts.length, 4);
+            let outPortsWrap = this.findOne('.pane-ports.out');
+            let width        = utils.toFixed(100 / outPorts.length, 4);
 
             utils.forEach(outPorts, function (port) {
 
-                let html = isRender ? markup(port) : markup;
+                let html = this.compileMarkup(markup, port);
 
                 $(html)
                     .css({ width: width + '%' })
                     .appendTo(outPortsWrap);
 
-            });
+            }, this);
         }
-
 
         return this;
-    }
-
-    isPort(target) {
-
-        while (target && target !== this.elem) {
-            if (utils.hasClass(target, 'port-magnet')) {
-                return true;
-            }
-            target = target.parentNode;
-        }
-
-        return false;
     }
 
     find(selector) {
@@ -236,25 +217,102 @@ class HTMLNodeView extends CellView {
     }
 
     getBBox() {
+
         let bounds = utils.getBounds(this.elem);
         if (bounds) {
             return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
         }
     }
 
-    getStrokeBBox() {
+    getStrokedBBox() {
 
-        let position = this.cell.getPosition();
-        let size     = this.cell.getSize();
+        let bbox        = this.cell.getBBox();
+        let borderWidth = 0;
+        let contentElem = this.findOne('.pane-node-content');
 
-        let bbox = new Rect(
-            position.x,
-            position.y,
-            size.width,
-            size.height
-        );
+        if (contentElem) {
+            borderWidth = utils.getComputedStyle(contentElem, 'border-width') - 1;
+        }
 
-        return bbox.grow(0);
+        return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+    }
+
+
+    getConnectionPointOnBorder() {
+
+        return null;
+    }
+
+    getConnectionPointOnPort() {
+
+        return null;
+    }
+
+    getPortBodyBBox(port) {
+
+        let node   = this.getCell();
+        let portId = utils.isObject(port) ? port.id : port;
+
+        port = node.getPortById(portId);
+
+        let selector = node.getPortSelector(port, node.isInPort(port));
+        if (selector) {
+            let elem = this.findOne(selector + '>.port-magnet');
+            if (elem) {
+
+                let bounds = utils.getBounds(elem);
+                let point  = this.getPaper().toLocalPoint({
+                    x: bounds.left,
+                    y: bounds.top
+                });
+
+                return new Rect(point.x, point.y, bounds.width, bounds.height);
+            }
+        }
+    }
+
+    getPortBodyGeom(port) {
+
+        let rect = this.getPortBodyBBox(port);
+        if (rect) {
+            let center = rect.getCenter();
+            return new Ellipse(center.x, center.y, rect.width / 2, rect.height / 2);
+        }
+    }
+
+    getPortElem(elem) {
+
+        while (elem && elem !== this.elem) {
+            if (utils.hasClass(elem, 'pane-port')) {
+                return elem;
+            }
+            elem = elem.parentNode;
+        }
+
+        return null;
+    }
+
+    isPort(elem) {
+
+        return this.getPortElem(elem) ? true : false;
+    }
+
+    isOutPort(elem) {
+
+        elem = this.getPortElem(elem);
+
+        while (elem && elem !== this.elem) {
+            if (utils.hasClass(elem, 'pane-ports out')) {
+                return true;
+            }
+            elem = elem.parentNode;
+        }
+
+        return false;
+    }
+
+    findPortByElem(elem) {
+
     }
 }
 

@@ -28,7 +28,7 @@ class VectorView extends CellView {
         // `markup` is rendered by default. Set the `markup` on model
         // if the default markup is not desirable.
 
-        let markup = this.cell.getMarkup();
+        let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
         if (markup) {
             this.vel.append(vector(markup));
         } else {

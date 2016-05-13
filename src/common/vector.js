@@ -152,6 +152,11 @@ export class VElement {
         return this;
     }
 
+    getClassName() {
+
+        return utils.getClassName(this.node);
+    }
+
     hasClass(selector) {
 
         return utils.hasClass(this.node, selector);

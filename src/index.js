@@ -22,6 +22,7 @@ import Paper from './core/Paper';
 import     Cell from './cells/Cell';
 import     Link from './cells/Link';
 import     Node from './cells/Node';
+import   Portal from './cells/Portal';
 import Terminal from './cells/Terminal';
 
 
@@ -30,6 +31,7 @@ import Terminal from './cells/Terminal';
 import     CellView from './views/CellView';
 import     LinkView from './views/LinkView';
 import     NodeView from './views/NodeView';
+import   PortalView from './views/PortalView';
 import   VectorView from './views/VectorView';
 
 
@@ -81,11 +83,13 @@ export {
     Cell,
     Link,
     Node,
+    Portal,
     Terminal,
 
     CellView,
     LinkView,
     NodeView,
+    PortalView,
     VectorView,
 
     Handler,

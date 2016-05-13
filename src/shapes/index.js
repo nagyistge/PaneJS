@@ -8,11 +8,8 @@ import Rhombus     from './basic/Rhombus';
 import Ellipse     from './basic/Ellipse';
 import Polygon     from './basic/Polygon';
 import Polyline    from './basic/Polyline';
-import PortsView   from './basic/PortsView';
 import LabelLink   from './basic/LabelLink';
 import ElementLink from './basic/ElementLink';
-
-import RectPort  from './port/Rect';
 
 let shapes = {
     basic: {
@@ -26,12 +23,8 @@ let shapes = {
         Ellipse,
         Polygon,
         Polyline,
-        PortsView,
         LabelLink,
         ElementLink
-    },
-    port: {
-        Rect: RectPort
     }
 };
 

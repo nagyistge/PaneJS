@@ -73,7 +73,7 @@ class Cell {
         let metadata = utils.merge({}, this.constructor.defaults, options);
 
         this.data     = metadata.data;
-        this.attrs    = metadata.attrs;
+        this.attrs    = metadata.attrs || {};
         this.visible  = metadata.visible !== false;
         this.metadata = metadata;
     }
@@ -867,16 +867,6 @@ class Cell {
         return this;
     }
 
-    getMarkup() {
-
-        return this.metadata.markup;
-    }
-
-    getTagName() {
-
-        return this.metadata.tagName || 'g';
-    }
-
     getClassName() {
 
         let classNames = this.metadata.classNames;
@@ -886,9 +876,19 @@ class Cell {
             : classNames || '';
     }
 
+    getTagName() {
 
-    // common
-    // ------
+        return this.metadata.tagName || 'g';
+    }
+
+    getMarkup() {
+
+        return this.metadata.markup;
+    }
+
+
+    // lang
+    // ----
 
     valueOf() {
 

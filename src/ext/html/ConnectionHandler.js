@@ -20,39 +20,62 @@ class ConnectionHandler extends Handler {
         this.connecting     = false;
         this.previewingLink = null;
 
-        paper.on('cell:pointerDown', this.onCellMouseDown.bind(this));
-        paper.on('cell:pointerMove', this.onCellMouseMove.bind(this));
-        paper.on('cell:pointerUp', this.onCellMouseUp.bind(this));
+        paper
+            .on('cell:pointerDown', this.onCellMouseDown.bind(this))
+            .on('cell:pointerMove', this.onCellMouseMove.bind(this))
+            .on('cell:pointerUp', this.onCellMouseUp.bind(this));
 
         return this;
     }
 
     onCellMouseDown(cell, view, e) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || !view.isOutPort(e.target)) {
             return;
         }
 
-        if (!view.isPort(e.target)) {
-            return;
-        }
+        let portElem = view.getPortElem(e.target);
+        let portId   = utils.toInt(portElem.getAttribute('data-id'));
 
+        utils.some(cell.getOutPorts(), function (port) {
+            if (port.id === portId) {
+                this.sourcePort = port;
+            }
+        }, this);
 
-        let outPorts = cell.getOutPorts();
-        if (!outPorts.length) {
-            return;
-        }
+        this.sourceNode = cell;
 
-        console.log(e);
-
+        console.log(this.sourcePort);
     }
 
-    onCellMouseMove(cell, view, e) {
+    onCellMouseMove(cell, view, e, localX, localY) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || !this.sourceNode || !this.sourcePort) {
             return;
         }
 
+        if (!this.connecting) {
+
+            this.link = new Link({
+                pane: 'decoratePane',
+                connector: 'smooth',
+                targetMarker: 'block',
+                attrs: null
+            });
+
+            let model = this.getModel();
+
+            model.addLink(this.link, {
+                node: this.sourceNode,
+                port: this.sourcePort.id
+            });
+
+            this.connecting = true;
+        }
+
+        if (this.link) {
+            this.link.setTerminal({ x: localX, y: localY }, false);
+        }
     }
 
     onCellMouseUp(cell, view, e) {
@@ -61,6 +84,7 @@ class ConnectionHandler extends Handler {
             return;
         }
 
+        this.connecting = false;
     }
 
     _isOut(view, elem) {

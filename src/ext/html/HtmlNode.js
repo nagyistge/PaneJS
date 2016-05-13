@@ -1,37 +1,18 @@
 import   * as utils from '../../common/utils';
-import         Node from '../../cells/Node';
+import       Portal from '../../cells/Portal';
 import HTMLNodeView from './HTMLNodeView';
 
 
-class HTMLNode extends Node {
+class HTMLNode extends Portal {
 
-    getPortMarkup() {
-
-        return this.metadata.portMarkup;
+    getPortSelector(port, isInPort) {
+        return this.getPortsWrapSelector(isInPort) + '>.pane-port[data-id="' + port.id + '"]';
     }
 
-    getPorts(isIn) {
-
-        let metadata = this.metadata;
-
-        if (isIn === true) {
-            return metadata && metadata.inPorts || [];
-        } else if (isIn === false) {
-            return metadata && metadata.outPorts || [];
-        }
-
-        return this.getInPorts().concat(this.getOutPorts());
+    getPortsWrapSelector(isInPort) {
+        return '.pane-ports.' + (isInPort ? 'in' : 'out');
     }
 
-    getInPorts() {
-
-        return this.getPorts(true);
-    }
-
-    getOutPorts() {
-
-        return this.getPorts(false);
-    }
 }
 
 HTMLNode.setDefaults({

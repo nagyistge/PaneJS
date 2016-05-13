@@ -486,9 +486,9 @@ function getBounds(elem) {
     // We can't use extend because the properties are not considered part of the object by hasOwnProperty in IE9
     const rect = elem.getBoundingClientRect();
 
-    forIn(rect, function (val, key) {
-        result[key] = val;
-    });
+    for (let k in rect) {
+        result[k] = rect[k];
+    }
 
     if (isUndefined(result.width)) {
         result.width = document.body.scrollWidth - result.left - result.right;

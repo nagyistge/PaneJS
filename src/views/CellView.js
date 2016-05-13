@@ -18,6 +18,13 @@ class CellView {
 
     update() { return this; }
 
+    compileMarkup(markup, data) {
+
+        return utils.isFunction(markup)
+            ? markup(data)
+            : utils.format(markup, data);
+    }
+
     getCell() {
 
         return this.cell;

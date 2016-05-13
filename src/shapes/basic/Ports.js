@@ -1,220 +1,75 @@
 import * as utils from '../../common/utils';
-import       Node from '../../cells/Node';
-import  PortsView from '../basic/PortsView';
+import     Portal from '../../cells/Portal';
 
 
-class Ports extends Node {
+class Ports extends Portal {
 
     constructor(options) {
 
         super(options);
 
-        let that = this;
-
-        that.inPorts = utils.map(that.metadata.inPorts, function (port, index) {
-            return that.normalize(port, index, 'in');
-        });
-
-        that.outPorts = utils.map(that.metadata.outPorts, function (port, index) {
-            return that.normalize(port, index, 'out');
-        });
-
-        that.updatePortsAttrs();
-    }
-
-    insertPort(port, index, type = 'in') {
-
-        let that  = this;
-        let ports = type === 'in' ? that.inPorts : that.outPorts;
-
-        index = utils.fixIndex(index, ports.length);
-        port  = that.normalize(port, index, type);
-
-        ports.splice(index, 0, port);
-
-        return that;
-    }
-
-    insertInPort(port) {
-
-        return this.insertPort(port, 'in');
-    }
-
-    insertOutPort(port) {
-
-        return this.insertPort(port, 'out');
-    }
-
-    removePort(port, type = 'in') {
-
-        let that  = this;
-        let ports = type === 'in' ? that.inPorts : that.outPorts;
-        let index = utils.indexOf(ports, port);
-
-        if (index >= 0) {
-            ports.splice(index, 1);
-            that.afterRemovePort(port);
-        }
-
-        return that;
-    }
-
-    removeInPort(port) {
-
-        return this.removePort(port, 'in');
-    }
-
-    removeOutPort(port) {
-
-        return this.removePort(port, 'out');
-    }
-
-    removePortAt(index, type = 'in') {
-
-        let that  = this;
-        let ports = type === 'in' ? that.inPorts : that.outPorts;
-        let port  = ports[index];
-
-        if (port) {
-            ports.splice(index, 1);
-            that.afterRemovePort(port);
-        }
-
-        return port;
-    }
-
-    getPortAt(index, type = 'in') {
-
-        let ports = type === 'in' ? this.inPorts : this.outPorts;
-
-        return ports[index];
-    }
-
-    queryPort(filter) {
-
-        if (filter) {
-
-            let type  = filter.type;
-            let ports = type === 'in'
-                ? this.inPorts : type === 'out'
-                ? this.outPorts
-                : this.inPorts.concat(this.outPorts);
-
-            let keys = utils.keys(filter);
-
-            return utils.filter(ports, function (item) {
-                return utils.every(keys, function (key) {
-                    return item[key] === filter[key];
-                });
-            });
-        }
-
-        return [];
-    }
-
-    afterRemovePort(port) {
-
-        let that  = this;
-        let attrs = that.attrs;
-
-        utils.forEach(port.selectors, function (selector) {
-            delete attrs[selector];
-        });
-
-        return that;
+        this.updatePortsAttrs();
     }
 
     updatePortsAttrs() {
 
-        let that  = this;
         let attrs = {};
 
         utils.forEach(this.inPorts, function (port, index) {
-            let specials   = that.getPortAttrs(port, index, 'in');
-            port.selectors = utils.keys(specials);
-            utils.merge(attrs, specials);
-        });
+            utils.merge(attrs, this.getPortAttrs(port, index, true));
+        }, this);
 
         utils.forEach(this.outPorts, function (port, index) {
-            let specials   = that.getPortAttrs(port, index, 'out');
-            port.selectors = utils.keys(specials);
-            utils.merge(attrs, specials);
-        });
+            utils.merge(attrs, this.getPortAttrs(port, index, false));
+        }, this);
 
-        utils.merge(that.attrs, attrs);
+        utils.merge(this.attrs, attrs);
 
-        return that;
-    }
-
-    normalize(port, index, type) {
-
-        let id  = type + '-port-' + index;
-
-        if (!utils.isObject(port)) {
-            port = {
-                name: port || id
-            };
-        } else {
-            port = utils.merge({}, port);
-
-        }
-
-        if (!port.id) {
-            port.id = id;
-        }
-
-        // the port selector
-        port.selector = this.getPortSelector(type, index);
-
-        // which node belong to
-        port.node = this;
-
-
-        return port;
+        return this;
     }
 
     // get the attrs for every port, so we can customize
     // the port's position, color, etc
-    getPortAttrs(port, index, type) {
+    getPortAttrs(port, index, isInPort) {
 
         let attrs = {};
-        let ports = type === 'in' ? this.inPorts : this.outPorts;
+        let ports = isInPort ? this.inPorts : this.outPorts;
 
-        let rootSelector  = this.getPortSelector(type, index);
+        let rootSelector  = this.getPortSelector(port, isInPort);
         let labelSelector = rootSelector + '>.port-label';
 
-        attrs[labelSelector] = { text: port.name };
+        attrs[labelSelector] = { text: port.id };
         attrs[rootSelector]  = {
             'ref': '.node-body',
             'ref-y': (index + 0.5) * (1 / ports.length)
         };
 
-        if (type === 'out') {
+        if (!isInPort) {
             attrs[rootSelector]['ref-dx'] = 0;
         }
 
         return attrs;
     }
 
-    getPortSelector(type, index) {
+    getPortSelector(port, isInPort) {
 
-        return '.' + type + '>g:nth-child(' + (index + 1) + ')';
+        return this.getPortsWrapSelector(isInPort) + '>.pane-port[data-id="' + port.id + '"]';
+    }
+
+    getPortsWrapSelector(isInPort) {
+
+        return '.pane-ports.' + (isInPort ? 'in' : 'out');
     }
 }
 
 
 Ports.setDefaults({
-
-    view: PortsView,
-    inPorts: [],
-    outPorts: [],
     size: {
         width: 80,
         height: 100
     },
 
     markup: '' +
-
     '<g class="pane-rotatable">' +
     '  <g class="pane-scalable">' +
     '    <rect class="node-body"/>' +
@@ -225,12 +80,10 @@ Ports.setDefaults({
     '</g>',
 
     portMarkup: '' +
-
-    '<g class="pane-port">' +
+    '<g class="pane-port" data-id="${id}">' +
     '  <circle class="port-body"/>' +
     '  <text class="port-label"/>' +
     '</g>',
-
 
     attrs: {
         '.node-label': {

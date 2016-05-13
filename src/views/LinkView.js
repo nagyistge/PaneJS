@@ -10,42 +10,45 @@ class LinkView extends VectorView {
     render() {
 
         this.vel.empty();
-        this.renderMarkup();
 
-        return this.update();
+        this.renderMarkup()
+            .update();
+
+        return this;
     }
 
     update() {
+
+        this.cache = {};
+
         return this
-            .updateAttributes()
             .parseRouter()
-            .parseConnection()
+            .parseConnector()
             .parseTerminal(true)
             .parseTerminal(false)
             .updateMarker()
-            .updateConnector();
+            .updateConnector()
+            .updateAttributes();
     }
 
     updateAttributes(attrs) {
-
-        let that = this;
 
         utils.forIn(attrs || this.cell.attrs, function (attrMap, selector) {
 
             let processed = [];
 
             if (utils.isObject(attrMap.fill)) {
-                that.applyGradient(selector, 'fill', attrMap.fill);
+                this.applyGradient(selector, 'fill', attrMap.fill);
                 processed.push('fill');
             }
 
             if (utils.isObject(attrMap.stroke)) {
-                that.applyGradient(selector, 'stroke', attrMap.stroke);
+                this.applyGradient(selector, 'stroke', attrMap.stroke);
                 processed.push('stroke');
             }
 
             if (utils.isObject(attrMap.filter)) {
-                that.applyFilter(selector, attrMap.filter);
+                this.applyFilter(selector, attrMap.filter);
                 processed.push('filter');
             }
 
@@ -58,8 +61,8 @@ class LinkView extends VectorView {
                 }
             });
 
-            that.applyAttr(selector, normal);
-        });
+            this.applyAttr(selector, normal);
+        }, this);
 
         return this;
     }
@@ -67,9 +70,7 @@ class LinkView extends VectorView {
     parseRouter() {
 
         // convert vertices to router points
-
-        let link  = this.cell;
-        let cache = this.cache = {};
+        let link     = this.cell;
         let router   = link.getRouter();
         let vertices = utils.filter(link.vertices || [], function (p) {
             return Point.isPointLike(p);
@@ -79,26 +80,23 @@ class LinkView extends VectorView {
             return Point.fromPoint(p);
         });
 
-        let parser = this.paper.getRouter(router.name);
+        let parser = router.parse && utils.isFunction(router.parse)
+            ? router.parse
+            : router.name && this.paper.getRouter(router.name);
 
         // parsed vertices
-        cache.routerPoints = parser && utils.isFunction(parser)
+        let routerPoints = parser && utils.isFunction(parser)
             ? parser.call(this, vertices, router.options || {})
             : vertices;
 
-
-        // fixed point
-        cache.fixedSourcePoint = link.sourcePoint;
-        cache.fixedTargetPoint = link.targetPoint;
+        this.cacheRouterPoints(routerPoints);
 
         return this;
     }
 
-    parseConnection() {
+    parseConnector() {
 
-        let link  = this.cell;
-        let cache = this.cache;
-
+        let link         = this.cell;
         let connector    = link.getConnector();
         let sourceMarker = link.getMarker(true);
         let targetMarker = link.getMarker(false);
@@ -124,11 +122,10 @@ class LinkView extends VectorView {
         targetMarkerOptions.connectorStrokeWidth = connectorStrokeWidth;
         targetMarkerOptions.markerStrokeWidth    = targetMarkerStrokeWidth;
 
-
         // cache
-        cache.connector    = connector;
-        cache.sourceMarker = sourceMarker;
-        cache.targetMarker = targetMarker;
+        this.cacheConnector(connector);
+        this.cacheMarker(sourceMarker, true);
+        this.cacheMarker(targetMarker, false);
 
         return this;
     }
@@ -136,38 +133,14 @@ class LinkView extends VectorView {
     parseTerminal(isSource) {
 
         let link  = this.cell;
-        let cache = this.cache;
+        let point = link.getTerminalPoint(isSource);
+        let node  = link.getTerminalNode(isSource);
+        let view  = node && this.paper.getView(node);
+        let port  = link.getTerminalPort(isSource);
 
-        let node     = isSource ? link.sourceNode : link.targetNode;
-        let filter   = isSource ? link.sourcePort : link.targetPort;
-        let nodeView = this.paper.getView(node);
-
-        if (nodeView) {
-            if (isSource) {
-                cache.sourceNodeView = nodeView;
-            } else {
-                cache.targetNodeView = nodeView;
-            }
-        }
-
-        if (node && node.queryPort && filter) {
-
-            let ports = node.queryPort(filter);
-            let port  = ports && ports[0];
-
-            if (port) {
-
-                let portVel = nodeView.findOne(port.selector);
-
-                if (isSource) {
-                    cache.sourcePort    = port;
-                    cache.sourcePortVel = portVel;
-                } else {
-                    cache.targetPort    = port;
-                    cache.targetPortVel = portVel;
-                }
-            }
-        }
+        this.cacheStaticConnPoint(point, isSource);
+        this.cacheTerminalView(view, isSource);
+        this.cacheTerminalPort(port, isSource);
 
         return this;
     }
@@ -187,31 +160,155 @@ class LinkView extends VectorView {
 
     updateConnector() {
 
-        let that        = this;
-        let cache       = this.cache;
-        let connector   = cache.connector;
-        let connectorFn = this.paper.getConnector(connector.name);
+        let connector = this.fetchConnector();
 
-        if (connectorFn && utils.isFunction(connectorFn)) {
+        let parser = connector.parse && utils.isFunction(connector.parse)
+            ? connector.parse
+            : connector.name && this.paper.getConnector(connector.name);
 
-            let sourcePoint = this.getLinkEndPoint(true);
-            let targetPoint = this.getLinkEndPoint(false);
+        if (parser && utils.isFunction(parser)) {
+
+            let sourcePoint = this.getConnectionPoint(true);
+            let targetPoint = this.getConnectionPoint(false);
 
             if (sourcePoint && targetPoint) {
-                let pathData = connectorFn.call(this,
+
+                let pathData = parser.call(this,
                     sourcePoint,
                     targetPoint,
-                    cache.routerPoints,
+                    this.fetchRouterPoints(),
                     connector.options || {}
                 );
 
-                that.applyAttr(connector.selector, { d: pathData });
+                this.applyAttr(connector.selector, { d: pathData });
+            } else {
+                this.vel.empty();
             }
         } else {
             throw new Error('Unknown connector: "' + connector.name + '"');
         }
 
         return this;
+    }
+
+    renderMarker(isSource) {
+
+        let marker  = this.fetchMarker(isSource);
+        let vMarker = this.findOne(marker.selector);
+
+        if (marker && vMarker) {
+
+            let parser = marker.parse && utils.isFunction(marker.parse)
+                ? marker.parse
+                : marker.name && this.paper.getMarker(marker.name);
+
+            if (parser && utils.isFunction(parser)) {
+
+                let renderedMarker = parser(vMarker, marker.options);
+
+                // if return a new marker element, replace the old one
+                let newVel = renderedMarker.vel;
+                if (newVel) {
+
+                    // replace
+                    let elem      = vMarker.node;
+                    let parent    = elem.parentNode;
+                    let className = vMarker.getClassName();
+
+                    parent.insertBefore(newVel.node, elem);
+                    parent.removeChild(elem);
+                    newVel.addClass(className);
+
+                    vMarker = newVel;
+                }
+
+                this.cacheMarkerVel(vMarker, isSource);
+                this.cacheRenderedMarker(renderedMarker, isSource);
+            }
+        }
+
+        return this;
+    }
+
+    updateConnectionPoint(isSource) {
+
+        let staticPoint = this.fetchStaticConnPoint(isSource);
+        if (!staticPoint) {
+            this.updateConnPointOnPort(isSource)
+            || this.updateConnPointOnNode(isSource);
+        }
+
+        return this;
+    }
+
+    updateConnPointOnPort(isSource) {
+
+        let point = this.fetchConnPointOnPort(isSource);
+        if (!point) {
+
+            let view = this.fetchTerminalView(isSource);
+            let port = this.fetchTerminalPort(isSource);
+            if (port && view) {
+
+                if (view.getConnectionPointOnPort) {
+                    point = view.getConnectionPointOnPort();
+                }
+
+                if (!point) {
+                    let bbox = this.getPortBodyBBox(isSource);
+                    if (bbox) {
+
+                        let ref  = this.getReferencePoint(bbox, isSource);
+                        let geom = this.getPortBodyGeom(isSource) || bbox;
+
+                        if (ref) {
+                            point = geom.intersectionWithLineFromCenterToPoint(ref);
+                        }
+
+                        point = point || geom.getCenter();
+                    }
+                }
+
+                this.cacheConnPointOnPort(point, isSource);
+            }
+        }
+
+        return point;
+    }
+
+    updateConnPointOnNode(isSource) {
+
+        // find the connection point on the terminal
+
+        let point = this.fetchConnPointOnNode(isSource);
+        if (!point) {
+
+            let view = this.fetchTerminalView(isSource);
+            if (view) {
+
+                if (view.getConnectionPointOnBorder) {
+                    point = view.getConnectionPointOnBorder();
+                }
+
+                if (!point) {
+
+                    let bbox = this.getTerminalBBox(isSource);
+                    if (bbox) {
+
+                        let reference = this.getReferencePoint(bbox, isSource);
+                        if (reference) {
+                            point = bbox.intersectionWithLineFromCenterToPoint(reference);
+                        }
+
+                        point = point || bbox.getCenter();
+                    }
+                }
+
+                this.cacheConnPointOnNode(point, isSource);
+            }
+        }
+
+        return point;
     }
 
     getStrokeWidth(selector) {
@@ -229,165 +326,60 @@ class LinkView extends VectorView {
 
     getTerminalBBox(isSource) {
 
-        let cache = this.cache;
-        let bbox  = isSource
-            ? cache.sourceTerminalBBox
-            : cache.targetTerminalBBox;
-
+        let bbox = this.fetchTerminalBBox(isSource);
         if (!bbox) {
 
-            let view = isSource
-                ? cache.sourceNodeView
-                : cache.targetNodeView;
-
+            let view = this.fetchTerminalView(isSource);
             if (view) {
-                bbox = view.getStrokeBBox();
-                bbox = this.fixConnectionBBox(bbox, isSource);
+                bbox = view.getStrokedBBox();
+                bbox = this.fixStrokedBBox(bbox, isSource);
             }
 
             // cache
-            if (bbox) {
-                if (isSource) {
-                    cache.sourceTerminalBBox = bbox;
-                } else {
-                    cache.targetTerminalBBox = bbox;
-                }
-            }
+            this.cacheTerminalBBox(bbox, isSource);
         }
 
         return bbox;
     }
 
-    getPortBodyBBox(isSource) {
-
-        let cache = this.cache;
-        let bbox  = isSource ? cache.sourcePortBBox : cache.targetPortBBox;
-
-        if (!bbox) {
-
-            let view = isSource ? cache.sourceNodeView : cache.targetNodeView;
-            let vel  = isSource ? cache.sourcePortVel : cache.targetPortVel;
-
-            if (view && vel) {
-
-                let bodyVel = vel.findOne('.port-body');
-                if (bodyVel) {
-                    bbox = bodyVel.getBBox();
-                    bbox = this.fixConnectionBBox(bbox, isSource);
-                }
-            }
-
-            // cache
-            if (bbox) {
-                if (isSource) {
-                    cache.sourcePortBBox = bbox;
-                } else {
-                    cache.targetPortBBox = bbox;
-                }
-            }
-        }
-
-        return bbox;
-    }
-
-    fixConnectionBBox(bbox, isSource) {
+    fixStrokedBBox(bbox, isSource) {
 
         if (bbox) {
 
-            let cache  = this.cache;
-            let marker = isSource ? cache.sourceMarker : cache.targetMarker;
+            let marker         = this.fetchMarker(isSource);
+            let renderedMarker = this.fetchRenderedMarker(isSource);
 
-            let markerStrokeWidth = marker && marker.options
-                && marker.options.markerStrokeWidth;
+            if (marker && renderedMarker) {
 
-            let renderedMarker = isSource
-                ? cache.renderedSourceMarker
-                : cache.renderedTargetMarker;
+                let markerStrokeWidth = marker.options.markerStrokeWidth;
+                if (markerStrokeWidth) {
 
-            if (renderedMarker && markerStrokeWidth) {
-
-                let rad = renderedMarker.rad || 0;
-
-                if (rad >= Math.PI / 4 || rad === 0) {
-                    bbox.grow(markerStrokeWidth / 2);
-                } else {
-                    bbox.grow(markerStrokeWidth / Math.sin(rad) / 2);
+                    let rad = renderedMarker.rad || 0;
+                    if (rad >= Math.PI / 4 || rad === 0) {
+                        bbox.grow(markerStrokeWidth / 2);
+                    } else {
+                        bbox.grow(markerStrokeWidth / Math.sin(rad) / 2);
+                    }
                 }
             }
         }
 
         return bbox;
-    }
-
-    renderMarker(isSource) {
-
-        let cache    = this.cache;
-        let marker   = isSource ? cache.sourceMarker : cache.targetMarker;
-        let selector = marker.selector;
-        let vMarker  = this.findOne(selector);
-
-        let renderedMarker;
-
-        if (marker && vMarker) {
-
-            let renderer = this.paper.getMarker(marker.name);
-
-            if (renderer && utils.isFunction(renderer)) {
-
-                renderedMarker = renderer(vMarker, marker.options);
-
-                let newVel = renderedMarker.vel;
-                if (newVel) {
-
-                    let elem   = vMarker.node;
-                    let parent = elem.parentNode;
-
-                    parent.insertBefore(newVel.node, elem);
-                    parent.removeChild(elem);
-
-                    let className = selector;
-                    if (className[0] === '.') {
-                        className = className.substr(1);
-                    }
-
-                    newVel.addClass(className);
-
-                    let attrs       = {};
-                    attrs[selector] = this.cell.attrs[selector];
-                    this.updateAttributes(attrs);
-
-                    vMarker = newVel;
-                }
-            }
-
-            // cache the marker vector element
-            if (isSource) {
-                cache.renderedSourceMarker = renderedMarker;
-                cache.sourceMarkerVel      = vMarker;
-            } else {
-                cache.renderedTargetMarker = renderedMarker;
-                cache.targetMarkerVel      = vMarker;
-            }
-        }
-
-        return this;
     }
 
     getReferencePoint(bbox, isSource) {
 
-        let cache = this.cache;
-
-        // fixed point
-        let reference = isSource
-            ? cache.fixedTargetPoint
-            : cache.fixedSourcePoint;
+        // static point
+        let reference = this.fetchStaticConnPoint(isSource);
 
         // vertices
         if (!reference) {
 
-            let vertices = cache.routerPoints;
+            let vertices = this.fetchRouterPoints();
 
-            reference = isSource ? vertices[0] : vertices[vertices.length - 1];
+            reference = isSource
+                ? vertices[0]
+                : vertices[vertices.length - 1];
         }
 
         // port
@@ -404,7 +396,6 @@ class LinkView extends VectorView {
         if (!reference) {
 
             let terminalBBox = this.getTerminalBBox(!isSource);
-
             if (terminalBBox) {
                 reference = terminalBBox.intersectionWithLineFromCenterToPoint(bbox.getCenter());
                 reference = reference || terminalBBox.getCenter();
@@ -415,151 +406,78 @@ class LinkView extends VectorView {
         return reference;
     }
 
+    getPortBodyBBox(isSource) {
+
+        let bbox = this.fetchPortBodyBBox(isSource);
+        if (!bbox) {
+
+            let view = this.fetchTerminalView(isSource);
+            let port = this.fetchTerminalPort(isSource);
+            if (view && port) {
+
+                if (view.getPortBodyBBox) {
+                    bbox = view.getPortBodyBBox(port);
+                }
+
+                if (bbox) {
+                    bbox = this.fixStrokedBBox(bbox, isSource);
+                    this.cachePortBodyBBox(bbox, isSource);
+                }
+            }
+        }
+
+        return bbox;
+    }
+
     getPortBodyGeom(isSource) {
 
-        let cache = this.cache;
-        let vel   = isSource ? cache.sourcePortVel : cache.targetPortVel;
-        let body  = vel && vel.findOne('.port-body');
-        let elem  = body && body.node;
+        let geom = this.fetchPortBodyGeom(isSource);
+        if (!geom) {
 
-        if (elem) {
+            let view = this.fetchTerminalView(isSource);
+            let port = this.fetchTerminalPort(isSource);
+            if (view && port) {
 
-            let view   = isSource ? cache.sourceNodeView : cache.targetNodeView;
-            let bbox   = body.getBBox(false, view.getPane());
-            let center = bbox.getCenter();
-            let result;
-
-            if (utils.isNode(elem, 'circle')) {
-                let r = utils.getComputedStyle(elem, 'r');
-
-                r = utils.toFloat(r);
-
-                if (r) {
-                    result = new Ellipse(center.x, center.y, r, r);
+                if (view.getPortBodyGeom) {
+                    geom = view.getPortBodyGeom(port);
                 }
-            } else if (utils.isNode(elem, 'ellipse')) {
-                let rx = utils.getComputedStyle(elem, 'rx');
-                let ry = utils.getComputedStyle(elem, 'ry');
 
-                rx = utils.toFloat(rx);
-                ry = utils.toFloat(ry);
-
-                if (rx && ry) {
-                    result = new Ellipse(center.x, center.y, rx, ry);
+                if (geom) {
+                    geom = this.fixStrokedBBox(geom, isSource);
+                    this.cachePortBodyGeom(geom, isSource);
                 }
-            } else {
-                result = bbox;
             }
-
-            return this.fixConnectionBBox(result, isSource);
         }
+
+        return geom;
     }
 
-    updateConnectionPoint(isSource) {
+    getConnectionPoint(isSource) {
 
-        if (!this.updateConnectionPointOnPort(isSource)) {
-            this.updateConnectionPointOnTerminal(isSource);
-        }
-
-        return this;
-    }
-
-    updateConnectionPointOnPort(isSource) {
-
-        let cache = this.cache;
-        let bbox  = this.getPortBodyBBox(isSource);
-        let result;
-
-        if (bbox) {
-
-            let ref  = this.getReferencePoint(bbox, isSource);
-            let geom = this.getPortBodyGeom(isSource) || bbox;
-
-            if (ref) {
-                result = geom.intersectionWithLineFromCenterToPoint(ref);
-            }
-
-            result = result || geom.getCenter();
-        }
-
-        if (isSource) {
-            cache.sourcePointOnPort = result;
-        } else {
-            cache.targetPointOnPort = result;
-        }
-
-        return result;
-    }
-
-    updateConnectionPointOnTerminal(isSource) {
-
-        // find the connection point on the terminal
-
-        let point;
-        let cache = this.cache;
-        let bbox  = this.getTerminalBBox(isSource);
-
-        if (bbox) {
-
-            let reference = this.getReferencePoint(bbox, isSource);
-            if (reference) {
-                point = bbox.intersectionWithLineFromCenterToPoint(reference);
-            }
-
-            point = point || bbox.getCenter();
-        }
-
-        // cache the connection point on the terminal node
-        if (isSource) {
-            cache.sourcePointOnTerminal = point;
-        } else {
-            cache.targetPointOnTerminal = point;
-        }
-
-        return point;
-    }
-
-    getLinkEndPoint(isSource) {
-
-        let cache = this.cache;
-
-        if (isSource) {
-            return cache.fixedSourcePoint
-                || cache.sourcePointOnPort
-                || cache.sourcePointOnTerminal;
-        }
-
-        return cache.fixedTargetPoint
-            || cache.targetPointOnPort
-            || cache.targetPointOnTerminal;
+        return this.fetchStaticConnPoint(isSource)
+            || this.fetchConnPointOnMarker(isSource)
+            || this.fetchConnPointOnPort(isSource)
+            || this.fetchConnPointOnNode(isSource);
     }
 
     transformMarker(isSource, ref) {
 
-        let cache = this.cache;
-
-        let renderedMarker = isSource
-            ? cache.renderedSourceMarker
-            : cache.renderedTargetMarker;
-
+        let renderedMarker = this.fetchRenderedMarker(isSource);
         if (renderedMarker) {
 
             let pane        = this.getPane();
-            let vertices    = cache.routerPoints;
-            let sourcePoint = this.getLinkEndPoint(true);
-            let targetPoint = this.getLinkEndPoint(false);
+            let vertices    = this.fetchRouterPoints();
+            let sourcePoint = this.getConnectionPoint(true);
+            let targetPoint = this.getConnectionPoint(false);
 
             let position  = isSource ? sourcePoint : targetPoint;
             let reference = ref || isSource
                 ? (vertices[0] || targetPoint)
                 : (vertices[vertices.length - 1] || sourcePoint);
-
             // make the marker at the right position
-            let markerVel = isSource
-                ? cache.sourceMarkerVel
-                : cache.targetMarkerVel;
+            let markerVel = this.fetchMarkerVel(isSource);
 
-            if (position && reference) {
+            if (position && reference && markerVel) {
                 markerVel.translateAndAutoOrient(position, reference, pane);
             }
         }
@@ -569,36 +487,238 @@ class LinkView extends VectorView {
 
     updateConnectionPointOnMarker(isSource) {
 
-        let cache = this.cache;
+        let markerVel      = this.fetchMarkerVel(isSource);
+        let renderedMarker = this.fetchRenderedMarker(isSource);
 
-        let connectionPoint;
-
-        let renderedMarker = isSource
-            ? cache.renderedSourceMarker
-            : cache.renderedTargetMarker;
-
-        if (renderedMarker) {
+        if (markerVel && renderedMarker) {
 
             let pane  = this.getPane();
             let point = renderedMarker.point;
 
-            let markerVel = isSource
-                ? cache.sourceMarkerVel
-                : cache.targetMarkerVel;
-
             let p = vector.createSVGPoint(point.x, point.y);
-            p     = p.matrixTransform(markerVel.getTransformToElement(pane));
 
-            connectionPoint = Point.fromPoint(p);
-        }
+            p = p.matrixTransform(markerVel.getTransformToElement(pane));
 
-        if (isSource) {
-            cache.sourcePointOnMarker = connectionPoint;
-        } else {
-            cache.targetPointOnMarker = connectionPoint;
+            let connectionPoint = Point.fromPoint(p);
+
+            this.cacheConnPointOnMarker(connectionPoint, isSource);
         }
 
         return this;
+    }
+
+
+    // cache
+    // -----
+
+    cacheRouterPoints(points) {
+
+        this.cache.routerPoints = points;
+    }
+
+    fetchRouterPoints() {
+
+        return this.cache.routerPoints;
+    }
+
+    cacheConnector(connector) {
+
+        this.cache.connector = connector;
+    }
+
+    fetchConnector() {
+
+        return this.cache.connector;
+    }
+
+    cacheMarker(marker, isSource) {
+
+        if (isSource) {
+            this.cache.sourceMarker = marker;
+        } else {
+            this.cache.targetMarker = marker;
+        }
+    }
+
+    fetchMarker(isSource) {
+
+        return isSource ? this.cache.sourceMarker : this.cache.targetMarker;
+    }
+
+    cacheRenderedMarker(renderedMarker, isSource) {
+
+        if (renderedMarker) {
+            if (isSource) {
+                this.cache.renderedSourceMarker = renderedMarker;
+            } else {
+                this.cache.renderedTargetMarker = renderedMarker;
+            }
+        }
+    }
+
+    fetchRenderedMarker(isSource) {
+
+        return isSource ? this.cache.renderedSourceMarker : this.cache.renderedTargetMarker;
+    }
+
+    cacheMarkerVel(vel, isSource) {
+
+        if (vel) {
+            if (isSource) {
+                this.cache.sourceMarkerVel = vel;
+            } else {
+                this.cache.targetMarkerVel = vel;
+            }
+        }
+    }
+
+    fetchMarkerVel(isSource) {
+
+        return isSource ? this.cache.sourceMarkerVel : this.cache.targetMarkerVel;
+    }
+
+    cacheTerminalView(view, isSource) {
+
+        if (view) {
+            if (isSource) {
+                this.cache.sourceView = view;
+            } else {
+                this.cache.targetView = view;
+            }
+        }
+    }
+
+    fetchTerminalView(isSource) {
+
+        return isSource ? this.cache.sourceView : this.cache.targetView;
+    }
+
+    cacheTerminalPort(port, isSource) {
+
+        if (!utils.isNil(port)) {
+            if (isSource) {
+                this.cache.sourcePort = port;
+            } else {
+                this.cache.targetPort = port;
+            }
+        }
+    }
+
+    fetchTerminalPort(isSource) {
+
+        return isSource ? this.cache.sourcePort : this.cache.targetPort;
+    }
+
+    cacheStaticConnPoint(point, isSource) {
+
+        if (point) {
+            if (isSource) {
+                this.cache.staticSourcePoint = point;
+            } else {
+                this.cache.staticTargetPoint = point;
+            }
+        }
+    }
+
+    fetchStaticConnPoint(isSource) {
+
+        return isSource ? this.cache.staticSourcePoint : this.cache.staticTargetPoint;
+    }
+
+    cacheConnPointOnMarker(point, isSource) {
+
+        if (point) {
+            if (isSource) {
+                this.cache.sourcePointOnMarker = point;
+            } else {
+                this.cache.targetPointOnMarker = point;
+            }
+        }
+    }
+
+    fetchConnPointOnMarker(isSource) {
+
+        return isSource ? this.cache.sourcePointOnMarker : this.cache.targetPointOnMarker;
+    }
+
+    cacheConnPointOnPort(point, isSource) {
+
+        if (point) {
+            if (isSource) {
+                this.cache.sourcePointOnPort = point;
+            } else {
+                this.cache.targetPointOnPort = point;
+            }
+        }
+    }
+
+    fetchConnPointOnPort(isSource) {
+
+        return isSource ? this.cache.sourcePointOnPort : this.cache.targetPointOnPort;
+    }
+
+    cacheConnPointOnNode(point, isSource) {
+
+        if (point) {
+            if (isSource) {
+                this.cache.sourcePointOnTerminal = point;
+            } else {
+                this.cache.targetPointOnTerminal = point;
+            }
+        }
+    }
+
+    fetchConnPointOnNode(isSource) {
+
+        return isSource ? this.cache.sourcePointOnTerminal : this.cache.targetPointOnTerminal;
+    }
+
+    cacheTerminalBBox(bbox, isSource) {
+
+        if (bbox) {
+            if (isSource) {
+                this.cache.sourceTerminalBBox = bbox;
+            } else {
+                this.cache.targetTerminalBBox = bbox;
+            }
+        }
+    }
+
+    fetchTerminalBBox(isSource) {
+
+        return isSource ? this.cache.sourceTerminalBBox : this.cache.targetTerminalBBox;
+    }
+
+    cachePortBodyBBox(bbox, isSource) {
+
+        if (bbox) {
+            if (isSource) {
+                this.cache.sourcePortBBox = bbox;
+            } else {
+                this.cache.targetPortBBox = bbox;
+            }
+        }
+    }
+
+    fetchPortBodyBBox(isSource) {
+
+        return isSource ? this.cache.sourcePortBBox : this.cache.targetPortBBox;
+    }
+
+    cachePortBodyGeom(geom, isSource) {
+
+        if (geom) {
+            if (isSource) {
+                this.cache.sourcePortGeom = geom;
+            } else {
+                this.cache.targetPortGeom = geom;
+            }
+        }
+    }
+
+    fetchPortBodyGeom(isSource) {
+
+        return isSource ? this.cache.sourcePortGeom : this.cache.targetPortGeom;
     }
 }
 

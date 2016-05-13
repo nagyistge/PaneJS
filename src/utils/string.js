@@ -72,12 +72,14 @@ function hashCode(str) {
 
 function format(tpl, data) {
 
-    data = data || {};
+    if (tpl && data) {
+        return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
+            let val = getByPath(data, key);
+            return val !== undefined ? val : input;
+        });
+    }
 
-    return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
-        let val = getByPath(data, key);
-        return val !== undefined ? val : input;
-    });
+    return tpl;
 }
 
 function sanitizeText(text) {

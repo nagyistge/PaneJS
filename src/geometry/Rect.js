@@ -22,8 +22,8 @@ class Rect {
         let result = this.isRect(rect1) && this.isRect(rect2);
         if (result) {
 
-            rect1.normalize();
-            rect2.normalize();
+            rect1.standardizePort();
+            rect2.standardizePort();
 
             result = rect1.x === rect2.x
                 && rect1.y === rect2.y
@@ -161,7 +161,7 @@ class Rect {
     containsRect(rect) {
 
         this.normalize();
-        rect.normalize();
+        rect.standardizePort();
 
         let x2 = rect.x;
         let y2 = rect.y;

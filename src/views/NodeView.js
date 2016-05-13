@@ -399,6 +399,7 @@ class NodeView extends VectorView {
     }
 
     getBBox() {
+
         return this.vel.getBBox();
     }
 
@@ -421,21 +422,17 @@ class NodeView extends VectorView {
         return 0;
     }
 
-    getStrokeBBox() {
+    getStrokedBBox() {
 
-        let node        = this.cell;
-        let strokeWidth = this.getStrokeWidth();
+        let sw   = this.getStrokeWidth() - 1;
+        let bbox = this.getCell().getBBox();
 
-        let bbox = new Rect(
-            node.position.x,
-            node.position.y,
-            node.size.width,
-            node.size.height
-        );
+        return sw ? bbox.grow(sw / 2) : bbox;
+    }
 
-        strokeWidth -= 1;
+    getConnectionPointOnBorder() {
 
-        return strokeWidth ? bbox.grow(strokeWidth / 2) : bbox;
+        return null;
     }
 }
 

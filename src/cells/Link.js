@@ -1,8 +1,17 @@
 import * as utils from '../common/utils';
+import      Point from '../geometry/Point';
 import       Cell from '../cells/Cell';
 
 
 class Link extends Cell {
+
+    constructor(options) {
+
+        super(options);
+
+        this.vertices = this.metadata.vertices || [];
+    }
+
 
     // static
     // ------
@@ -20,13 +29,51 @@ class Link extends Cell {
         return true;
     }
 
-    insertVertice(points, index) {
+    getVertices() {
 
-        if (!this.vertices) {
-            this.vertices = [];
+        return this.vertices;
+    }
+
+    getVerticesCount() {
+
+        return this.vertices.length;
+    }
+
+    getVerticeAt(index) {
+
+        return this.vertices[index] || null;
+    }
+
+    indexOfVertice(point) {
+
+        if (point && Point.isPointLike(point)) {
+
+            for (let i = 0, l = this.getVerticesCount(); i < l; i++) {
+
+                let vertice = this.getVerticeAt(i);
+
+                if (point.x === vertice.x && point.y === vertice.y) {
+                    return i;
+                }
+            }
         }
 
-        let length = this.vertices.length;
+        return -1;
+    }
+
+    eachVertice(iterator, context) {
+
+        return utils.forEach(this.vertices, iterator, context);
+    }
+
+    filterVertice(iterator, context) {
+
+        return utils.filter(this.vertices, iterator, context);
+    }
+
+    insertVertice(points, index) {
+
+        let length = this.getVerticesCount();
 
         index = utils.fixIndex(index, length);
 
@@ -35,7 +82,7 @@ class Link extends Cell {
         }
 
         if (index === length) {
-            Array.prototype.push.apply(this.vertices, points);
+            this.vertices.push(...points);
         } else {
             this.vertices.splice(index, 0, points);
         }
@@ -45,20 +92,9 @@ class Link extends Cell {
 
     removeVertice(point) {
 
-        if (point) {
-
-            let index = -1;
-
-            utils.some(this.vertices, function (vertice, i) {
-                if (point.x === vertice.x && point.y === vertice.y) {
-                    index = i;
-                    return true;
-                }
-            });
-
-            if (index >= 0) {
-                this.removeVerticeAt(index);
-            }
+        let index = this.indexOfVertice(point);
+        if (index >= 0) {
+            this.removeVerticeAt(index);
         }
 
         return this;
@@ -66,16 +102,10 @@ class Link extends Cell {
 
     removeVerticeAt(index) {
 
-        let vertice;
-
-        if (this.vertices && this.vertices.length) {
-            vertice = this.vertices[index];
-
-            if (vertice) {
-                this.vertices.splice(index, 1);
-            }
+        let vertice = this.getVerticeAt(index);
+        if (vertice) {
+            this.vertices.splice(index, 1);
         }
-
         return vertice;
     }
 
@@ -90,7 +120,9 @@ class Link extends Cell {
 
         let router = this.metadata.router || {};
 
-        if (!utils.isObject(router)) {
+        if (utils.isFunction(router)) {
+            router = { parse: router };
+        } else if (!utils.isObject(router)) {
             router = { name: router };
         }
 
@@ -103,7 +135,9 @@ class Link extends Cell {
             ? this.metadata.sourceMarker
             : this.metadata.targetMarker;
 
-        if (!utils.isObject(marker)) {
+        if (utils.isFunction(marker)) {
+            marker = { parse: marker };
+        } else if (!utils.isObject(marker)) {
             marker = { name: marker };
         }
 
@@ -118,13 +152,30 @@ class Link extends Cell {
 
         let connector = this.metadata.connector || {};
 
-        if (!utils.isObject(connector)) {
+        if (utils.isFunction(connector)) {
+            connector = { parse: connector };
+        } else if (!utils.isObject(connector)) {
             connector = { name: connector };
         }
 
         connector.selector = '.connector';
 
         return connector;
+    }
+
+    clone(options, withData) {
+
+        let cloned = super.clone(options, withData);
+
+        cloned.vertices = [];
+
+        utils.forEach(this.vertices, function (point) {
+            if (Point.isPointLike(point)) {
+                cloned.vertices.push({ x: point.x, y: point.y });
+            }
+        });
+
+        return cloned;
     }
 }
 

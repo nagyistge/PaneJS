@@ -42,11 +42,7 @@ class SelectHandler extends Handler {
 
     onCellMouseDown(cell, view, e, localX, localY) {
 
-        if (this.isDisabled()) {
-            return;
-        }
-
-        if (view.isPort(e.target)) {
+        if (this.isDisabled() || view.isPort(e.target)) {
             return;
         }
 

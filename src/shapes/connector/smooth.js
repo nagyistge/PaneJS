@@ -1,5 +1,5 @@
-import       Point from '../../geometry/Point';
 import * as bezier from '../../geometry/bezier';
+import       Point from '../../geometry/Point';
 
 
 function fixMarker(view, isSource, reference) {
@@ -18,8 +18,8 @@ function fixMarker(view, isSource, reference) {
 
         // get connection point of the marker connecting to the terminal
         let position = isSource
-            ? cache.sourcePointOnTerminal || cache.fixedSourcePoint
-            : cache.targetPointOnTerminal || cache.fixedTargetPoint;
+            ? cache.sourcePointOnTerminal || cache.staticSourcePoint
+            : cache.targetPointOnTerminal || cache.staticTargetPoint;
 
         if (position) {
             markerVel.translateAndAutoOrient(position, reference, view.getPane());
@@ -36,12 +36,12 @@ function getConnectionPoint(view, isSource) {
     if (isSource) {
         return cache.sourcePointOnMarker
             || cache.sourcePointOnTerminal
-            || cache.fixedSourcePoint;
+            || cache.staticSourcePoint;
     }
 
     return cache.targetPointOnMarker ||
         cache.targetPointOnTerminal ||
-        cache.fixedTargetPoint;
+        cache.staticTargetPoint;
 
 }
 
