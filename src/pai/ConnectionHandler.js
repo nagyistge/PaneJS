@@ -125,8 +125,6 @@ class ConnectionHandler extends Handler {
             return;
         }
 
-        console.log('over');
-
         this.hasTarget  = true;
         this.targetNode = cell;
         this.targetView = view;
