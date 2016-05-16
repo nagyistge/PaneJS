@@ -21,7 +21,7 @@ function toFloat(value, percentage) {
     return percentage ? v / 100 : v;
 }
 
-function toFixed(value, precision) {
+function toFixed(value, precision = 2) {
 
     let power = Math.pow(10, precision);
 

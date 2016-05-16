@@ -210,6 +210,15 @@ function normalizeEvent(evt) {
     return evt;
 }
 
+function isLeftMouseButton(evt) {
+
+    if (detector.IS_IE) {
+        return evt.button === 1;
+    }
+
+    return evt.button === 0;
+}
+
 function hasModifierKey(evt) {
 
     return hasCtrlKey(evt) || hasMetaKey(evt) || hasShiftKey(evt);
@@ -240,6 +249,7 @@ export {
     hasMetaKey,
     hasShiftKey,
     hasModifierKey,
+    isLeftMouseButton,
     addEventListener,
     removeEventListener
 };

@@ -1,26 +1,21 @@
 import * as utils from '../common/utils';
 import     vector from '../common/vector';
+import    Handler from '../handlers/Handler';
 import       Rect from '../geometry/Rect';
 import       Link from '../cells/Link';
-import    Handler from '../handlers/Handler';
+import   LinkView from '../pai/LinkView';
+import  quadratic from '../pai/quadratic';
 
 
 class ConnectionHandler extends Handler {
 
     init() {
 
-        let paper = this.getPaper();
-        let model = this.getModel();
+        this.clean();
 
-        this.sourceView = null;
-        this.targetView = null;
-        this.sourcePort = null;
-        this.targetPort = null;
-
-        this.connecting     = false;
-        this.previewingLink = null;
-
-        paper
+        this.getPaper()
+            .on('cell:mouseOver', this.onCellMouseOver.bind(this))
+            .on('cell:mouseOut', this.onCellMouseOut.bind(this))
             .on('cell:pointerDown', this.onCellMouseDown.bind(this))
             .on('cell:pointerMove', this.onCellMouseMove.bind(this))
             .on('cell:pointerUp', this.onCellMouseUp.bind(this));
@@ -28,45 +23,56 @@ class ConnectionHandler extends Handler {
         return this;
     }
 
+    clean() {
+
+        this.sourceNode = null;
+        this.sourcePort = null;
+        this.sourceView = null;
+        this.connecting = false;
+
+        this.targetNode = null;
+        this.targetView = null;
+        this.targetPort = null;
+        this.hasTarget  = false;
+
+        return this;
+    }
+
     onCellMouseDown(cell, view, e) {
 
-        if (this.isDisabled() || !view.isOutPort(e.target)) {
+        if (this.isDisabled() || !cell.isNode() || !view.isOutPortElem(e.target)) {
             return;
         }
 
-        let portElem = view.getPortElem(e.target);
-        let portId   = utils.toInt(portElem.getAttribute('data-id'));
-
-        utils.some(cell.getOutPorts(), function (port) {
-            if (port.id === portId) {
-                this.sourcePort = port;
-            }
-        }, this);
-
         this.sourceNode = cell;
-
-        console.log(this.sourcePort);
+        this.sourceView = view;
+        this.sourcePort = view.findPortByElem(e.target);
     }
 
     onCellMouseMove(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || !this.sourceNode || !this.sourcePort) {
+        if (this.isDisabled() || !this.sourcePort) {
             return;
         }
+
+        let paper = this.getPaper();
+        let model = this.getModel();
+
+        model.beginUpdate();
 
         if (!this.connecting) {
 
             this.link = new Link({
+                view: LinkView,
                 pane: 'decoratePane',
-                connector: 'smooth',
+                connector: quadratic,
+                sourceMarker: null,
                 targetMarker: 'block',
                 attrs: null
             });
 
-            let model = this.getModel();
-
             model.addLink(this.link, {
-                node: this.sourceNode,
+                node: cell,
                 port: this.sourcePort.id
             });
 
@@ -76,84 +82,67 @@ class ConnectionHandler extends Handler {
         if (this.link) {
             this.link.setTerminal({ x: localX, y: localY }, false);
         }
+
+        model.endUpdate();
+
+        paper.trigger('cell:connecting', {
+            sourceNode: this.sourceNode,
+            sourceView: this.sourceView,
+            sourcePort: this.sourcePort
+        });
     }
 
     onCellMouseUp(cell, view, e) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || !this.connecting) {
             return;
         }
 
-        this.connecting = false;
-    }
-
-    _isOut(view, elem) {
-        return !utils.containsElement(view.elem, elem) && !utils.hasClass(elem, 'port-decorator-layer');
-    }
-
-    setSourceCellView(view) {
-
-        let that  = this;
         let paper = this.getPaper();
-        if (this.sourceCellView) {
-            utils.forEach(paper.decoratePane.querySelectorAll('.port-decorator.out'), function (decorator) {
-                vector(decorator).remove();
-            });
+        let model = this.getModel();
+
+        model.beginUpdate();
+
+        this.link.removeFromParent();
+
+        paper.trigger('cell:connected', {
+            sourceNode: this.sourceNode,
+            sourceView: this.sourceView,
+            sourcePort: this.sourcePort,
+            targetNode: this.targetNode,
+            targetView: this.targetView,
+            targetPort: this.targetPort
+        });
+
+        model.endUpdate();
+
+        this.clean();
+    }
+
+    onCellMouseOver(cell, view, e) {
+
+        if (this.isDisabled() || !cell.isNode() || cell === this.sourceCell || !this.connecting) {
+            return;
         }
 
-        that.sourceCellView = view;
+        console.log('over');
 
-        if (view) {
-            that._drawPortDecorators(view, 'out');
+        this.hasTarget  = true;
+        this.targetNode = cell;
+        this.targetView = view;
+        this.targetPort = view.findPortByElem(e.target);
+    }
+
+    onCellMouseOut(cell) {
+
+        if (this.isDisabled() || !cell.isNode() || !this.hasTarget || !this.connecting) {
+            return;
         }
 
-        return this;
-    }
-
-    _drawInPortDecorators() {
-        let that = this;
-        // let sourceView = that.sourceCellView;
-        return that;
-    }
-
-    _clearInPortDecorators() {
-        let that  = this;
-        let paper = that.paper;
-        utils.forEach(paper.decoratePane.querySelectorAll('.port-decorator.in'), function (decorator) {
-            vector(decorator).remove();
-        });
-        return that;
-    }
-
-    _drawPortDecorators(view, inOrOut) {
-
-        let decoratorMarkup = [
-            '<g class="port-decorator ${className}">',
-            '<circle class="back port-decorator-layer" r="8" cx="${x}" cy="${y}"></circle>',
-            '<circle class="front port-decorator-layer" r="3" cx="${x}" cy="${y}"></circle>',
-            '</g>'
-        ].join('');
-
-        let portBodies   = view.elem.querySelectorAll('.pane-ports.' + inOrOut + ' .pane-port .port-body');
-        let paper        = this.getPaper();
-        let decoratePane = paper.decoratePane;
-
-        utils.forEach(portBodies, function (portBody) {
-            let bbox      = Rect.fromRect(vector(portBody).getBBox(false));
-            let center    = bbox.getCenter();
-            let decorator = vector(utils.format(decoratorMarkup, utils.extend({
-                className: inOrOut
-            }, center)));
-            decoratePane.appendChild(decorator.node);
-            decorator.node.cellView = view;
-            decorator.node.portBody = portBody;
-            // TODO decorator.node.portMeta = portMeta
-        });
-    }
-
-    setTargetCellView(/* view */) {
-        let that = this;
-        return that;
+        this.hasTarget  = false;
+        this.targetNode = null;
+        this.targetView = null;
+        this.targetPort = null;
     }
 }
 

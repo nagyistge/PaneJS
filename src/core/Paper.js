@@ -1024,6 +1024,10 @@ class Paper extends Events {
 
         e = utils.normalizeEvent(e);
 
+        if (!utils.isLeftMouseButton(e)) {
+            return;
+        }
+
         let view = this.findViewByElem(e.target);
 
         if (!this.isValidEvent(e, view)) {
@@ -1053,6 +1057,7 @@ class Paper extends Events {
     }
 
     onPointerMove(e) {
+
 
         e.preventDefault();
         e = utils.normalizeEvent(e);

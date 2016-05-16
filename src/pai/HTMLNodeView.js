@@ -70,14 +70,14 @@ class HTMLNodeView extends CellView {
         if (inPorts.length) {
 
             let inPortsWrap = this.findOne('.pane-ports.in');
-            let width       = utils.toFixed(100 / inPorts.length, 4);
+            let width       = 100 / (inPorts.length + 1);
 
-            utils.forEach(inPorts, function (port) {
+            utils.forEach(inPorts, function (port, i) {
 
                 let html = this.compileMarkup(markup, port);
 
                 $(html)
-                    .css({ width: width + '%' })
+                    .css({ left: utils.toFixed(width * (i + 1), 4) + '%' })
                     .appendTo(inPortsWrap);
             }, this);
         }
@@ -85,14 +85,15 @@ class HTMLNodeView extends CellView {
         if (outPorts.length) {
 
             let outPortsWrap = this.findOne('.pane-ports.out');
-            let width        = utils.toFixed(100 / outPorts.length, 4);
+            let width        = 100 / (outPorts.length + 1);
 
-            utils.forEach(outPorts, function (port) {
+
+            utils.forEach(outPorts, function (port, i) {
 
                 let html = this.compileMarkup(markup, port);
 
                 $(html)
-                    .css({ width: width + '%' })
+                    .css({ left: utils.toFixed(width * (i + 1), 4) + '%' })
                     .appendTo(outPortsWrap);
 
             }, this);
@@ -217,6 +218,22 @@ class HTMLNodeView extends CellView {
         return this;
     }
 
+    setPortConnected(port, isOutPort, connected) {
+
+        let elem = this.getPortElem(port, isOutPort);
+        if (elem) {
+            utils.toggleClass(elem, 'is-connected', connected);
+        }
+    }
+
+    setPortConnecting(port, isOutPort, connecting) {
+
+        let elem = this.getPortElem(port, isOutPort);
+        if (elem) {
+            utils.toggleClass(elem, 'is-connecting', connecting);
+        }
+    }
+
     getBBox() {
 
         let bounds = utils.getBounds(this.elem);
@@ -240,28 +257,34 @@ class HTMLNodeView extends CellView {
 
     getPortBodyBBox(port, isOutPort) {
 
-        let node   = this.getCell();
-        let portId = utils.isObject(port) ? port.id : port;
+        let elem = this.getPortElem(port, isOutPort);
+        if (elem) {
 
-        port = node.getPortById(portId);
+            let bounds = utils.getBounds(elem);
+            let point  = this.getPaper().toLocalPoint({
+                x: bounds.left,
+                y: bounds.top
+            });
 
-        let selector = node.getPortSelector(port, !isOutPort);
-        if (selector) {
-            let elem = this.findOne(selector + '>.port-magnet');
-            if (elem) {
-
-                let bounds = utils.getBounds(elem);
-                let point  = this.getPaper().toLocalPoint({
-                    x: bounds.left,
-                    y: bounds.top
-                });
-
-                return new Rect(point.x, point.y, bounds.width, bounds.height);
-            }
+            return new Rect(point.x, point.y, bounds.width, bounds.height);
         }
     }
 
-    getPortElem(elem) {
+    getPortElem(port, isOutPort) {
+
+        let node = this.getCell();
+
+        if (!utils.isObject(port)) {
+            port = node.getPortById(port);
+        }
+
+        let selector = node.getPortSelector(port, !isOutPort);
+        if (selector) {
+            return this.findOne(selector);
+        }
+    }
+
+    findPortElem(elem) {
 
         while (elem && elem !== this.elem) {
             if (utils.hasClass(elem, 'pane-port')) {
@@ -273,14 +296,14 @@ class HTMLNodeView extends CellView {
         return null;
     }
 
-    isPort(elem) {
+    isPortElem(elem) {
 
-        return this.getPortElem(elem) ? true : false;
+        return this.findPortElem(elem) ? true : false;
     }
 
-    isOutPort(elem) {
+    isOutPortElem(elem) {
 
-        elem = this.getPortElem(elem);
+        elem = this.findPortElem(elem);
 
         while (elem && elem !== this.elem) {
             if (utils.hasClass(elem, 'pane-ports out')) {
@@ -292,8 +315,42 @@ class HTMLNodeView extends CellView {
         return false;
     }
 
+    isInPortElem(elem) {
+
+        elem = this.findPortElem(elem);
+
+        while (elem && elem !== this.elem) {
+            if (utils.hasClass(elem, 'pane-ports in')) {
+                return true;
+            }
+            elem = elem.parentNode;
+        }
+
+        return false;
+
+    }
+
     findPortByElem(elem) {
 
+        let result   = null;
+        let portElem = elem && this.findPortElem(elem);
+
+        if (portElem) {
+            let collection = this.isOutPortElem(portElem)
+                ? this.cell.getOutPorts()
+                : this.cell.getInPorts();
+
+            let portId = utils.toInt(portElem.getAttribute('data-id'));
+
+            utils.some(collection, function (port) {
+                if (port.id === portId) {
+                    result = port;
+                    return true;
+                }
+            });
+        }
+
+        return result;
     }
 }
 

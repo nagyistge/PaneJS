@@ -4,14 +4,14 @@ function blockMarker(vMarker, options) {
 
     if (vMarker) {
 
-        let rx = options.rx || 7;
-        let ry = options.ry || rx / 2;
+        let width  = options.width || 7;
+        let height = options.height || width * Math.tan(1 / 6 * Math.PI);
 
         let pathArr = [];
 
-        pathArr.push('M', rx, 0);
-        pathArr.push('L', 0, ry);
-        pathArr.push('L', rx, ry * 2);
+        pathArr.push('M', width, 0);
+        pathArr.push('L', 0, height);
+        pathArr.push('L', width, height * 2);
         pathArr.push('Z');
 
         vMarker.attr({
@@ -21,8 +21,8 @@ function blockMarker(vMarker, options) {
 
         // return the connection point on the marker
         return {
-            rad: Math.atan2(ry, rx),
-            point: new Point(rx, ry)
+            rad: Math.atan2(height, width),
+            point: new Point(width, height)
         };
     }
 }

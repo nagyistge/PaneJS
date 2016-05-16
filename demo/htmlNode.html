@@ -92,15 +92,7 @@
         }
 
         .pane-port {
-            float: left;
-            height: 1px;
-            position: relative;
-        }
-
-        .pane-port .port-magnet {
             position: absolute;
-            left: 50%;
-            top: -5px;
             margin-left: -5px;
             box-sizing: border-box;
             width: 10px;
@@ -112,12 +104,68 @@
             transition: background-color .2s;
         }
 
-        .pane-ports.out .port-magnet {
+        .pane-ports.in .pane-port {
+            top: -5px;
+            cursor: default;
+        }
+
+        .pane-ports.out .pane-port {
+            top: -6px;
             cursor: crosshair;
         }
 
-        .pane-ports.out .port-magnet:hover {
+        .pane-ports.out .pane-port:hover {
             background-color: #808080;
+        }
+
+        .pane-port .port-magnet {
+            display: none;
+        }
+
+        .pane-ports.in .pane-port.is-connected {
+            top: 1px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px 4px 0 4px;
+            border-color: #808080 transparent transparent transparent;
+            background-color: transparent;
+            border-radius: 0;
+        }
+
+        .pane-ports.out .pane-port.is-connected {
+
+        }
+
+        .pane-ports.out .pane-port.is-connecting {
+            background-color: #808080;
+        }
+
+        .pane-port .port-magnet:after {
+            position: absolute;
+            left: 50%;
+            top: -1px;
+            margin-left: -5px;
+            box-sizing: border-box;
+            width: 10px;
+            height: 10px;
+
+            border: 1px solid #39CA74;
+            border-radius: 50%;
+            background-color: #FFF;
+            content: ' ';
+        }
+
+        .pane-port .port-magnet:before {
+            position: absolute;
+            left: 50%;
+            top: -6px;
+            margin-left: -10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgba(57, 202, 116, .6);
+            content: ' ';
         }
 
         .pane-link .connector {
@@ -222,20 +270,67 @@
         ]
     });
 
-    var link1 = new panejs.Link({
-        view: panejs.pai.LinkView,
-        connector: panejs.pai.quadratic,
-        targetMarker: 'block'
-    });
+    function connect(sourceNode, sourcePort, targetNode, targetPort) {
+
+        model.beginUpdate();
+
+        var link = new panejs.Link({
+            view: panejs.pai.LinkView,
+            connector: panejs.pai.quadratic
+        });
+
+        let sourceView = paper.getView(sourceNode);
+        let targetView = paper.getView(targetNode);
+
+        sourceView.setPortConnected(sourcePort, true, true);
+        targetView.setPortConnected(targetPort, false, true);
+
+        model.addLink(link, {
+            node: sourceNode,
+            port: sourcePort
+        }, {
+            node: targetNode,
+            port: targetPort
+        });
+
+        model.endUpdate();
+    }
 
     model.beginUpdate();
 
     model.addNode(node1);
     model.addNode(node2);
     model.addNode(node3);
-    model.addLink(link1, { node: node1, port: 3 }, { node: node2, port: 2 });
 
     model.endUpdate();
+
+    connect(node1, 3, node2, 2);
+
+    paper.on('cell:connecting', function (data) {
+
+        var sourceNode = data.sourceNode;
+        var sourceView = data.sourceView;
+        var sourcePort = data.sourcePort;
+
+        sourceView.setPortConnecting(sourcePort, true, true);
+    });
+
+    paper.on('cell:connected', function (data) {
+
+        var sourceNode = data.sourceNode;
+        var sourceView = data.sourceView;
+        var sourcePort = data.sourcePort;
+        var targetNode = data.targetNode;
+        var targetView = data.targetView;
+        var targetPort = data.targetPort;
+
+        sourceView.setPortConnecting(sourcePort, true, false);
+
+        if (targetPort && targetNode.isInPort(targetPort)) {
+            connect(sourceNode, sourcePort, targetNode, targetPort);
+        }
+    });
+
 </script>
 </body>
 </html>
