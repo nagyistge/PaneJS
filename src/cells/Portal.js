@@ -20,6 +20,7 @@ class Portal extends Node {
             return ret;
 
         }, this);
+
         this.outPorts = utils.map(this.metadata.outPorts, function (port) {
 
             let ret = this.standardizePort(port);

@@ -178,17 +178,13 @@ class Paper extends Events {
 
         utils.removeElement(this.svg);
 
-        let eventName = detector.IS_TOUCH ? 'touchend' : 'mouseup';
-        utils.removeEventListener(doc, eventName, this.onMouseUpHandler);
-
         if (detector.IS_POINTER) {
             this.container.style.msTouchAction = '';
         }
 
         this.model.destroy();
-        this.trigger('paper:destroy');
-
         utils.destroy(this);
+        this.trigger('paper:destroy');
     }
 
     registerHandlers(handlers) {

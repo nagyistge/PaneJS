@@ -958,6 +958,11 @@ class Model extends Events {
             this.endingUpdate = false;
         }
     }
+
+    destroy() {
+
+        utils.destroy(this);
+    }
 }
 
 
