@@ -132,9 +132,8 @@ class ConnectionHandler extends Handler {
 
         if (this.targetPort) {
 
-            console.log(123);
-
-            this.getPaper().trigger('port:connecting', {
+            this.hasTargetPort = true;
+            this.getPaper().trigger('port:connectingMouseOver', {
                 targetNode: cell,
                 targetView: view,
                 targetPort: this.targetPort
@@ -148,10 +147,19 @@ class ConnectionHandler extends Handler {
             return;
         }
 
-        this.hasTarget  = false;
-        this.targetNode = null;
-        this.targetView = null;
-        this.targetPort = null;
+        if (this.hasTargetPort) {
+            this.getPaper().trigger('port:connectingMouseOut', {
+                targetNode: this.targetNode,
+                targetView: this.targetView,
+                targetPort: this.targetPort
+            });
+        }
+
+        this.hasTargetPort = false;
+        this.hasTarget     = false;
+        this.targetNode    = null;
+        this.targetView    = null;
+        this.targetPort    = null;
     }
 }
 

@@ -7,7 +7,7 @@ function quadratic(sourcePoint, targetPoint) {
     let sub = targetPoint.y - sourcePoint.y;
 
     if (sub > -100 && sub < 100) {
-        tolerance = Math.abs((targetPoint.y - sourcePoint.y)) / 2 || 1;
+        tolerance = Math.max(Math.abs((targetPoint.y - sourcePoint.y)) / 2, 30);
     }
 
     return [

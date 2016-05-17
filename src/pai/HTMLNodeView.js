@@ -247,6 +247,14 @@ class HTMLNodeView extends CellView {
         }
     }
 
+    setPortAdsorbed(port, isSourcePort, isAdsorbed) {
+
+        let elem = this.getPortElem(port, isSourcePort);
+
+        elem = elem && elem.querySelector('port-magnet');
+        elem && utils.toggleClass(elem, 'is-adsorbed', isAdsorbed);
+    }
+
     getBBox() {
 
         let bounds = utils.getBounds(this.elem);
