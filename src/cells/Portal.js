@@ -11,7 +11,7 @@ class Portal extends Node {
 
         this.portById = {};
 
-        this.inPorts  = utils.map(this.metadata.inPorts, function (port) {
+        this.inPorts = utils.map(this.metadata.inPorts, function (port) {
 
             let ret = this.standardizePort(port);
 
@@ -31,6 +31,14 @@ class Portal extends Node {
 
         }, this);
 
+    }
+
+    eachInPorts(iterator, context) {
+        return utils.forEach(this.inPorts, iterator, context);
+    }
+
+    eachOutPorts(iterator, context) {
+        return utils.forEach(this.outPorts, iterator, context);
     }
 
     getInPorts() {

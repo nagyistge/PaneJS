@@ -129,6 +129,17 @@ class ConnectionHandler extends Handler {
         this.targetNode = cell;
         this.targetView = view;
         this.targetPort = view.findPortByElem(e.target);
+
+        if (this.targetPort) {
+
+            console.log(123);
+
+            this.getPaper().trigger('port:connecting', {
+                targetNode: cell,
+                targetView: view,
+                targetPort: this.targetPort
+            });
+        }
     }
 
     onCellMouseOut(cell) {

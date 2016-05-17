@@ -218,19 +218,32 @@ class HTMLNodeView extends CellView {
         return this;
     }
 
-    setPortConnected(port, isOutPort, connected) {
+    setPortConnected(port, isSourcePort, isConnected) {
 
-        let elem = this.getPortElem(port, isOutPort);
+        let elem = this.getPortElem(port, isSourcePort);
         if (elem) {
-            utils.toggleClass(elem, 'is-connected', connected);
+            utils.toggleClass(elem, 'is-connected', isConnected);
         }
     }
 
-    setPortConnecting(port, isOutPort, connecting) {
+    setPortConnecting(port, isSourcePort, isConnecting) {
 
-        let elem = this.getPortElem(port, isOutPort);
+        let elem = this.getPortElem(port, isSourcePort);
         if (elem) {
-            utils.toggleClass(elem, 'is-connecting', connecting);
+            utils.toggleClass(elem, 'is-connecting', isConnecting);
+        }
+    }
+
+    setPortHighlight(port, isSourcePort, isHighlighted) {
+
+        let elem = this.getPortElem(port, isSourcePort);
+        if (elem) {
+            utils.toggleClass(elem, 'is-connectable', isHighlighted);
+        }
+
+        let container = this.findOne('.pane-node-content');
+        if (container) {
+            utils.toggleClass(container, 'is-connectable', isHighlighted);
         }
     }
 
@@ -255,9 +268,9 @@ class HTMLNodeView extends CellView {
         return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
     }
 
-    getPortBodyBBox(port, isOutPort) {
+    getPortBodyBBox(port, isSourcePort) {
 
-        let elem = this.getPortElem(port, isOutPort);
+        let elem = this.getPortElem(port, isSourcePort);
         if (elem) {
 
             let bounds = utils.getBounds(elem);
@@ -270,7 +283,7 @@ class HTMLNodeView extends CellView {
         }
     }
 
-    getPortElem(port, isOutPort) {
+    getPortElem(port, isSourcePort) {
 
         let node = this.getCell();
 
@@ -278,7 +291,7 @@ class HTMLNodeView extends CellView {
             port = node.getPortById(port);
         }
 
-        let selector = node.getPortSelector(port, !isOutPort);
+        let selector = node.getPortSelector(port, !isSourcePort);
         if (selector) {
             return this.findOne(selector);
         }
