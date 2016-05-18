@@ -38,6 +38,17 @@ class ConnectionHandler extends Handler {
         return this;
     }
 
+    getEventData() {
+        return {
+            sourceNode: this.sourceNode,
+            sourceView: this.sourceView,
+            sourcePort: this.sourcePort,
+            targetNode: this.targetNode,
+            targetView: this.targetView,
+            targetPort: this.targetPort
+        };
+    }
+
     onCellMouseDown(cell, view, e) {
 
         if (this.isDisabled() || !cell.isNode() || !view.isOutPortElem(e.target)) {
@@ -85,11 +96,7 @@ class ConnectionHandler extends Handler {
 
         model.endUpdate();
 
-        paper.trigger('cell:connecting', {
-            sourceNode: this.sourceNode,
-            sourceView: this.sourceView,
-            sourcePort: this.sourcePort
-        });
+        paper.trigger('cell:connecting', this.getEventData());
     }
 
     onCellMouseUp(cell, view, e) {
@@ -105,14 +112,7 @@ class ConnectionHandler extends Handler {
 
         this.link.removeFromParent();
 
-        paper.trigger('cell:connected', {
-            sourceNode: this.sourceNode,
-            sourceView: this.sourceView,
-            sourcePort: this.sourcePort,
-            targetNode: this.targetNode,
-            targetView: this.targetView,
-            targetPort: this.targetPort
-        });
+        paper.trigger('cell:connected', this.getEventData());
 
         model.endUpdate();
 
@@ -130,15 +130,8 @@ class ConnectionHandler extends Handler {
         this.targetView = view;
         this.targetPort = view.findPortByElem(e.target);
 
-        if (this.targetPort) {
 
-            this.hasTargetPort = true;
-            this.getPaper().trigger('port:connectingMouseOver', {
-                targetNode: cell,
-                targetView: view,
-                targetPort: this.targetPort
-            });
-        }
+        this.getPaper().trigger('cell:connectingMouseOver', this.getEventData());
     }
 
     onCellMouseOut(cell) {
@@ -147,19 +140,12 @@ class ConnectionHandler extends Handler {
             return;
         }
 
-        if (this.hasTargetPort) {
-            this.getPaper().trigger('port:connectingMouseOut', {
-                targetNode: this.targetNode,
-                targetView: this.targetView,
-                targetPort: this.targetPort
-            });
-        }
+        this.getPaper().trigger('cell:connectingMouseOut', this.getEventData());
 
-        this.hasTargetPort = false;
-        this.hasTarget     = false;
-        this.targetNode    = null;
-        this.targetView    = null;
-        this.targetPort    = null;
+        this.hasTarget  = false;
+        this.targetNode = null;
+        this.targetView = null;
+        this.targetPort = null;
     }
 }
 

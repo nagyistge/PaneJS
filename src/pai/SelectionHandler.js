@@ -50,6 +50,7 @@ class SelectHandler extends Handler {
 
         if (!cell.selected || this.selectedCells.length < 2) {
             this.selectCell(cell, view, utils.hasModifierKey(e));
+            this.notifySelectionChange();
         } else {
             this.lazyCheck = true;
         }
@@ -140,10 +141,13 @@ class SelectHandler extends Handler {
                 }, this);
 
                 model.endUpdate();
+
+                this.getPaper().trigger('cells:updatePosition', this.selectedCells);
             }
         } else {
             if (this.lazyCheck) {
                 this.selectCell(cell, view, false);
+                this.notifySelectionChange();
             }
         }
 
@@ -251,6 +255,8 @@ class SelectHandler extends Handler {
             this.hideSelectionRect();
             this.selectCellsInRect(this.bounds);
         }
+
+        this.notifySelectionChange();
 
         this.bounds = null;
         this.origin = null;
@@ -527,6 +533,11 @@ class SelectHandler extends Handler {
         this.selectedCells = [];
 
         return this;
+    }
+
+    notifySelectionChange() {
+
+        this.getPaper().trigger('cells:selectionChanged', this.selectedCells);
     }
 }
 

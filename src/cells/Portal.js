@@ -33,11 +33,11 @@ class Portal extends Node {
 
     }
 
-    eachInPorts(iterator, context) {
+    eachInPort(iterator, context) {
         return utils.forEach(this.inPorts, iterator, context);
     }
 
-    eachOutPorts(iterator, context) {
+    eachOutPort(iterator, context) {
         return utils.forEach(this.outPorts, iterator, context);
     }
 

@@ -218,6 +218,23 @@ class HTMLNodeView extends CellView {
         return this;
     }
 
+    setNodeName(name) {
+
+        let node = this.getCell();
+
+        if (node.data) {
+            node.data.name = name;
+        }
+
+        let elem = this.findOne('.name');
+        if (elem) {
+            utils.emptyElement(elem);
+            elem.appendChild(document.createTextNode(name));
+        }
+
+        return this;
+    }
+
     setPortConnected(port, isSourcePort, isConnected) {
 
         let elem = this.getPortElem(port, isSourcePort);
@@ -251,7 +268,7 @@ class HTMLNodeView extends CellView {
 
         let elem = this.getPortElem(port, isSourcePort);
 
-        elem = elem && elem.querySelector('port-magnet');
+        elem = elem && elem.querySelector('.port-magnet');
         elem && utils.toggleClass(elem, 'is-adsorbed', isAdsorbed);
     }
 
