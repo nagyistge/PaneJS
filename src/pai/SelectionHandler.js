@@ -42,17 +42,32 @@ class SelectHandler extends Handler {
 
     onCellMouseDown(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || view.isPortElem(e.target)) {
+        if (this.isDisabled()) {
             return;
         }
 
-        this.origin = { x: localX, y: localY };
+        if (cell.isLink()) {
 
-        if (!cell.selected || this.selectedCells.length < 2) {
-            this.selectCell(cell, view, utils.hasModifierKey(e));
-            this.notifySelectionChange();
-        } else {
-            this.lazyCheck = true;
+            this.clearSelection();
+            this.setCellFocused(cell, view);
+
+        } else if (!view.isPortElem(e.target)) {
+
+            this.origin = { x: localX, y: localY };
+
+            if (!cell.selected || this.selectedCells.length < 2) {
+
+                let multi = utils.hasModifierKey(e);
+
+                this.selectCell(cell, view, multi);
+                this.notifySelectionChange();
+
+                if (!multi) {
+                    this.setCellFocused(cell, view);
+                }
+            } else {
+                this.lazyCheck = true;
+            }
         }
     }
 
@@ -147,6 +162,7 @@ class SelectHandler extends Handler {
         } else {
             if (this.lazyCheck) {
                 this.selectCell(cell, view, false);
+                this.setCellFocused(cell, view);
                 this.notifySelectionChange();
             }
         }
@@ -251,9 +267,16 @@ class SelectHandler extends Handler {
         }
 
         if (this.moving && this.bounds) {
+
+            // range selection
+
             this.stopScrollTimer();
             this.hideSelectionRect();
             this.selectCellsInRect(this.bounds);
+
+        } else {
+            // unFocus all cell
+            this.setCellFocused(null);
         }
 
         this.notifySelectionChange();
@@ -535,9 +558,39 @@ class SelectHandler extends Handler {
         return this;
     }
 
+    setCellFocused(cell, view) {
+
+        if (this.focusedCell !== cell) {
+
+            if (this.focusedCell) {
+
+                let focusedView = this.getPaper().getView(this.focusedCell);
+                if (focusedView) {
+                    utils.removeClass(focusedView.elem, 'focused');
+                }
+
+                this.focusedCell = null;
+            }
+
+            if (cell && view) {
+                utils.addClass(view.elem, 'focused');
+                this.focusedCell = cell;
+            }
+
+            this.notifyFocusChange();
+        }
+
+        return this;
+    }
+
     notifySelectionChange() {
 
         this.getPaper().trigger('cells:selectionChanged', this.selectedCells);
+    }
+
+    notifyFocusChange() {
+
+        this.getPaper().trigger('cell:focusChanged', this.focusedCell);
     }
 }
 

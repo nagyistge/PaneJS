@@ -108,6 +108,7 @@ class LinkView extends VectorView {
 
                 let pathData = parser.call(this, sourcePoint, targetPoint);
 
+                this.applyAttr('.connector-wrap', { d: pathData });
                 this.applyAttr(connector.selector, { d: pathData });
             } else {
                 this.vel.empty();
@@ -117,6 +118,10 @@ class LinkView extends VectorView {
         }
 
         return this;
+    }
+
+    updateComment(comment) {
+
     }
 
     renderMarker(isSource) {
