@@ -299,7 +299,8 @@ class SelectHandler extends Handler {
     autoScrollPreview() {
 
         let container  = this.getPaper().container;
-        let scrollable = container.scrollWidth > container.clientWidth;
+        let scrollable = container.scrollWidth > container.clientWidth
+            || container.scrollHeight > container.clientHeight;
 
         if (scrollable) {
 
@@ -419,7 +420,8 @@ class SelectHandler extends Handler {
     autoScrollSelectionRect(localX, localY) {
 
         let container  = this.getPaper().container;
-        let scrollable = container.scrollWidth > container.clientWidth;
+        let scrollable = container.scrollWidth > container.clientWidth
+            || container.scrollHeight > container.clientHeight;
 
         if (scrollable) {
 

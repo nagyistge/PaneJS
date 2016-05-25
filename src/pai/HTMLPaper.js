@@ -1,4 +1,5 @@
 import * as utils from '../common/utils';
+import     vector from '../common/vector';
 import   detector from '../common/detector';
 import      Paper from '../core/Paper';
 
@@ -30,6 +31,16 @@ class HTMLPaper extends Paper {
         utils.addEventListener(drawPane, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 
         return super.setup();
+    }
+
+    scale(sx, sy) {
+
+        sy = sy || sx;
+
+        vector(this.root).scale(sx, sy);
+        vector(this.HTMLDrawPane).scale(sx, sy);
+
+        return this;
     }
 
     destroy() {
