@@ -1,22 +1,23 @@
-import      * as utils from '../common/utils';
-import          vector from '../common/vector';
-import        detector from '../common/detector';
-import          Events from '../common/Events';
-import           Point from '../geometry/Point';
+import * as utils from '../common/utils';
+import vector     from '../common/vector';
+import detector   from '../common/detector';
+import Events     from '../common/Events';
+import Rect       from '../geometry/Rect';
+import Point      from '../geometry/Point';
 
-import           Model from '../core/Model';
-import            Cell from '../cells/Cell';
-import        LinkView from '../views/LinkView';
-import        NodeView from '../views/NodeView';
+import Model    from '../core/Model';
+import Cell     from '../cells/Cell';
+import LinkView from '../views/LinkView';
+import NodeView from '../views/NodeView';
 
-import      RootChange from '../changes/RootChange';
-import     ChildChange from '../changes/ChildChange';
-import   VisibleChange from '../changes/VisibleChange';
-import      SizeChange from '../changes/SizeChange';
-import  PositionChange from '../changes/PositionChange';
-import  RotationChange from '../changes/RotationChange';
-import  TerminalChange from '../changes/TerminalChange';
-import  GeometryChange from '../changes/GeometryChange';
+import RootChange      from '../changes/RootChange';
+import ChildChange     from '../changes/ChildChange';
+import SizeChange      from '../changes/SizeChange';
+import VisibleChange   from '../changes/VisibleChange';
+import PositionChange  from '../changes/PositionChange';
+import RotationChange  from '../changes/RotationChange';
+import TerminalChange  from '../changes/TerminalChange';
+import GeometryChange  from '../changes/GeometryChange';
 import AttributeChange from '../changes/AttributeChange';
 
 
@@ -27,13 +28,13 @@ let counter = 0;
 
 // the default options for paper
 let defaultOptions = {
-    container: null,
-    model: null,
     x: 0,
     y: 0,
     width: '100%',
     height: '100%',
     gridSize: 1,
+    container: null,
+    model: null,
 
     // Allowed number of mouseMove events after which the
     // pointerClick event will be still triggered.
@@ -50,7 +51,6 @@ class Paper extends Events {
 
         // You should call `init` manually when `options` is empty.
         // That's useful when you want to listen life-cycle events.
-
         if (options) {
             this.init(options);
         }
@@ -100,31 +100,26 @@ class Paper extends Events {
 
     createPanes() {
 
-        let svg  = utils.createSvgDocument();
-        let root = utils.createSvgElement('g');
+        let root = this.root = utils.createElement('div');
+        let svg = this.svg = utils.createSvgDocument();
+        let viewport = this.viewport = utils.createSvgElement('g');
 
-        utils.setAttribute(root, 'class', 'pane-viewport');
+        utils.addClass(root, 'pane-paper')
+        utils.addClass(viewport, 'pane-viewport');
 
-        this.backgroundPane = root.appendChild(utils.createSvgElement('g'));
+        this.backgroundPane = viewport.appendChild(utils.createSvgElement('g'));
         // container of links
-        this.linkPane = root.appendChild(utils.createSvgElement('g'));
+        this.linkPane = viewport.appendChild(utils.createSvgElement('g'));
         // container of nodes
-        this.drawPane = root.appendChild(utils.createSvgElement('g'));
+        this.drawPane = viewport.appendChild(utils.createSvgElement('g'));
         // layer above the drawing pane, for controllers and handlers
-        this.controlPane = root.appendChild(utils.createSvgElement('g'));
+        this.controlPane = viewport.appendChild(utils.createSvgElement('g'));
         // layer above the drawing pane and controller pane, for decorators
-        this.decoratePane = root.appendChild(utils.createSvgElement('g'));
+        this.decoratePane = viewport.appendChild(utils.createSvgElement('g'));
 
-        svg.appendChild(root);
-
-        if (this.container.firstChild) {
-            this.container.insertBefore(svg, this.container.firstChild);
-        } else {
-            this.container.appendChild(svg);
-        }
-
-        this.svg  = svg;
-        this.root = root;
+        svg.appendChild(viewport);
+        root.appendChild(svg);
+        this.container.appendChild(root);
 
         this.trigger('paper:createPanes', this.container);
 
@@ -206,6 +201,308 @@ class Paper extends Events {
         return this;
     }
 
+
+    // transform
+    // ---------
+
+    resize(width, height, relative) {
+
+        let svg     = this.svg;
+        let options = this.options;
+        let nWidth  = options.width;
+        let nHeight = options.height;
+
+        width  = utils.isUndefined(width) ? nWidth : width;
+        height = utils.isUndefined(height) ? nHeight : height;
+
+        if (relative === true) {
+
+            let isPercent       = utils.isPercentage(width);
+            let isNativePercent = utils.isPercentage(nWidth);
+
+            if (isPercent) {
+                if (isNativePercent) {
+                    width = utils.toFloat(width, false, 0) + utils.toFloat(nWidth, false, 0) + '%';
+                } else {
+                    width = utils.toFloat(width, true, 1) * nWidth;
+                }
+            } else {
+                width += isNativePercent ? svg.offsetWidth : nWidth;
+            }
+
+
+            isPercent       = utils.isPercentage(height);
+            isNativePercent = utils.isPercentage(nHeight);
+
+            if (isPercent) {
+                if (isNativePercent) {
+                    height = utils.toFloat(height, false, 0) + utils.toFloat(nHeight, false, 0) + '%';
+                } else {
+                    height = utils.toFloat(height, true, 1) * nHeight;
+                }
+            } else {
+                height += isNativePercent ? svg.offsetHeight : nHeight;
+            }
+        }
+
+        options.width  = width;
+        options.height = height;
+
+        vector(svg).attr({
+            width,
+            height
+        });
+
+        this.trigger('paper:resize', width, height);
+
+        return this;
+    }
+
+    resizeTo(width, height) {
+        return this.resize(width, height, false);
+    }
+
+    resizeBy(width, height) {
+        return this.resize(width, height, true);
+    }
+
+    translate(x, y, relative) {
+
+        let options = this.options;
+
+        x = options.x = x || options.x;
+        y = options.y = y || options.y;
+
+        vector(this.viewport).translate(x, y, relative);
+
+        this.trigger('paper:translate', x, y, relative);
+
+        return this;
+    }
+
+    translateTo(x, y) {
+
+        return this.translate(x, y, false);
+    }
+
+    translateBy(x, y) {
+
+        return this.translate(x, y, true);
+    }
+
+    scale(sx, sy, ox = 0, oy = 0) {
+
+        sy = sy || sx;
+
+        let vViewport = vector(this.viewport);
+
+        // Remove previous transform so that the new scale is not affected
+        // by previous scales, especially the old translate() does not affect
+        // the new translate if an origin is specified.
+        vViewport.attr('transform', '');
+
+        let oldTx = this.options.x;
+        let oldTy = this.options.y;
+
+        if (ox || oy || oldTx || oldTy) {
+
+            let newTx = oldTx - ox * (sx - 1);
+            let newTy = oldTy - oy * (sy - 1);
+            this.translateTo(newTx, newTy);
+        }
+
+        vViewport.scale(sx, sy);
+
+        this.trigger('paper:scale', sx, sy, ox, oy);
+
+        return this;
+    }
+
+    getContentBBox(withoutTransformations) {
+
+        if (withoutTransformations) {
+
+            return vector(this.viewport).getBBox(true, this.svg);
+
+        } else {
+
+            var rect = this.viewport.getBoundingClientRect();
+
+            // Using Screen CTM was the only way to get the real viewport
+            // bounding box working in both Google Chrome and Firefox.
+            var screenCTM = this.viewport.getScreenCTM();
+
+            // for non-default origin we need to take the
+            // viewport translation into account
+            var viewportCTM = this.viewport.getCTM();
+
+            return Rect.fromRect({
+                x: rect.left - screenCTM.e + viewportCTM.e,
+                y: rect.top - screenCTM.f + viewportCTM.f,
+                width: rect.width,
+                height: rect.height
+            });
+        }
+    }
+
+    fitToContent(frameWidth, frameHeight, padding, options) {
+
+        // Expand/shrink the paper to fit the content. Snap the width/height to
+        // the grid defined in `gridWidth`, `gridHeight`. `padding` adds to the
+        // resulting width/height of the paper.
+
+        if (utils.isObject(frameWidth)) {
+            options     = frameWidth;
+            padding     = options.padding || 0;
+            frameWidth  = options.frameWidth || 1;
+            frameHeight = options.frameHeight || 1;
+
+        } else {
+            options     = options || {};
+            padding     = padding || 0;
+            frameWidth  = frameWidth || 1;
+            frameHeight = frameHeight || 1;
+        }
+
+        padding = utils.normalizeSides(padding);
+
+        let bbox  = this.getContentBBox(true);
+        let scale = vector(this.viewport).scale();
+
+        console.log('fitToContent:')
+        console.log(bbox);
+
+        bbox.x *= scale.sx;
+        bbox.y *= scale.sy;
+        bbox.width *= scale.sx;
+        bbox.height *= scale.sy;
+
+        let width  = Math.max(utils.snapToGrid(bbox.width + bbox.x, frameWidth, 'ceil'), frameWidth);
+        let height = Math.max(utils.snapToGrid(bbox.height + bbox.y, frameHeight, 'ceil'), frameHeight);
+
+        let tx = 0;
+        let ty = 0;
+
+        function needTranslate(val) {
+
+            return !options.allowNewOrigin
+                || options.allowNewOrigin === 'any'
+                || (options.allowNewOrigin === 'negative' && val < 0)
+                || (options.allowNewOrigin === 'positive' && val >= 0);
+        }
+
+        if (needTranslate(bbox.x)) {
+
+            tx = Math.ceil(-bbox.x / frameWidth) * frameWidth;
+            tx += padding.left;
+            width += tx;
+        }
+
+        if (needTranslate(bbox.y)) {
+
+            ty = Math.ceil(-bbox.y / frameHeight) * frameHeight;
+            ty += padding.top;
+            height += ty;
+        }
+
+        width += padding.right;
+        height += padding.bottom;
+
+        width  = utils.clamp(width, options.minWidth || 0, options.maxWidth || Number.MAX_VALUE);
+        height = utils.clamp(height, options.minHeight || 0, options.maxHeight || Number.MAX_VALUE);
+
+        options = this.options;
+
+        let sizeChanged   = width != options.width || height != options.height;
+        let originChanged = tx != options.x || ty != options.y;
+
+        if (originChanged) {
+            this.translate(tx, ty);
+        }
+
+        if (sizeChanged) {
+            this.resize(width, height);
+        }
+
+        return this;
+    }
+
+    scaleContentToFit(options = {}) {
+
+        var contentBBox = this.getContentBBox();
+
+        if (!contentBBox.width || !contentBBox.height) {
+            return;
+        }
+
+        options = utils.merge({
+            padding: 0,
+            minScale: 0,
+            maxScale: Number.MAX_VALUE,
+            scaleGrid: null,
+            preserveAspectRatio: true,
+            // minScaleX,
+            // minScaleY,
+            // maxScaleX,
+            // maxScaleY,
+            // fittingBBox
+        }, options);
+
+
+        var padding      = utils.normalizeSides(options.padding);
+        var paperOptions = this.options;
+        var fittingBBox  = options.fittingBBox || {
+                x: paperOptions.x,
+                y: paperOptions.y,
+                width: paperOptions.width,
+                height: paperOptions.height
+            };
+
+        fittingBBox = Rect.fromRect(fittingBBox).moveAndExpand({
+            x: padding.left,
+            y: padding.top,
+            width: -(padding.left + padding.right),
+            height: -(padding.top + padding.bottom)
+        });
+
+
+        var scale = vector(this.viewport).scale();
+
+        var sx = fittingBBox.width / contentBBox.width * scale.sx;
+        var sy = fittingBBox.height / contentBBox.height * scale.sy;
+
+        // snap scale to a grid
+        var scaleGrid = options.scaleGrid;
+        if (scaleGrid) {
+            sx = utils.snapToGrid(sx, scaleGrid, 'floor');
+            sy = utils.snapToGrid(sy, scaleGrid, 'floor');
+        }
+
+        // scale min/max boundaries
+        var minScaleX = options.minScaleX || options.minScale;
+        var maxScaleX = options.maxScaleX || options.maxScale;
+        var minScaleY = options.minScaleY || options.minScale;
+        var maxScaleY = options.maxScaleY || options.maxScale;
+
+        sx = utils.clamp(sx, minScaleX, maxScaleX);
+        sy = utils.clamp(sy, minScaleY, maxScaleY);
+
+        if (options.preserveAspectRatio) {
+            sx = sy = Math.min(sx, sy);
+        }
+
+        this.scale(sx, sy);
+
+
+        contentBBox = this.getContentBBox();
+
+        var tx = fittingBBox.x - contentBBox.x;
+        var ty = fittingBBox.y - contentBBox.y;
+
+        this.translateTo(tx, ty);
+
+        return this;
+    }
 
     // validate
     // --------
@@ -454,100 +751,6 @@ class Paper extends Events {
     }
 
 
-    // transform
-    // ---------
-
-    resize(width, height, relative) {
-
-        let options      = this.options;
-        let nativeWidth  = options.width;
-        let nativeHeight = options.height;
-
-        width  = utils.isUndefined(width) ? nativeWidth : width;
-        height = utils.isUndefined(height) ? nativeHeight : height;
-
-        if (relative === true) {
-
-            let svg             = this.svg;
-            let isPercent       = utils.isPercentage(width);
-            let isNativePercent = utils.isPercentage(nativeWidth);
-
-            if (isPercent) {
-                if (isNativePercent) {
-                    width = utils.toFloat(width, false, 0) + utils.toFloat(nativeWidth, false, 0) + '%';
-                } else {
-                    width = utils.toFloat(width, true, 1) * nativeWidth;
-                }
-            } else {
-                width += isNativePercent ? svg.offsetWidth : nativeWidth;
-            }
-
-
-            isPercent       = utils.isPercentage(height);
-            isNativePercent = utils.isPercentage(nativeHeight);
-
-            if (isPercent) {
-                if (isNativePercent) {
-                    height = utils.toFloat(height, false, 0) + utils.toFloat(nativeHeight, false, 0) + '%';
-                } else {
-                    height = utils.toFloat(height, true, 1) * nativeHeight;
-                }
-            } else {
-                height += isNativePercent ? svg.offsetHeight : nativeHeight;
-            }
-        }
-
-        options.width  = width;
-        options.height = height;
-
-        vector(this.svg).attr({
-            width,
-            height
-        });
-
-        this.trigger('paper:resize', width, height);
-
-        return this;
-    }
-
-    resizeTo(width, height) {
-        return this.resize(width, height, false);
-    }
-
-    resizeBy(width, height) {
-        return this.resize(width, height, true);
-    }
-
-    translate(x, y, relative) {
-
-        let options = this.options;
-
-        x = options.x = x || options.x;
-        y = options.y = y || options.y;
-
-        vector(this.root).translate(x, y, relative);
-
-        this.trigger('paper:translate', x, y, relative);
-
-        return this;
-    }
-
-    translateTo(x, y) {
-
-        return this.translate(x, y, false);
-    }
-
-    translateBy(x, y) {
-
-        return this.translate(x, y, true);
-    }
-
-    scale(/* sx, sy, ox = 0, oy = 0 */) {
-
-        return this;
-    }
-
-
     // view
     // ----
 
@@ -566,6 +769,11 @@ class Paper extends Events {
     getViewById(cellId) {
 
         return this.views ? this.views[cellId] : null;
+    }
+
+    eachView(iterator, context) {
+
+        return utils.forIn(this.views, iterator, context);
     }
 
     getTerminalView(link, isSource) {
@@ -758,8 +966,8 @@ class Paper extends Events {
 
     onRootChanged(change) {
 
-        if (change.root) {
-            this.invalidate(change.root, true, true);
+        if (change.viewport) {
+            this.invalidate(change.viewport, true, true);
         }
 
         if (change.previous) {

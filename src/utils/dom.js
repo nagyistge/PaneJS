@@ -1,5 +1,6 @@
 import {
     isNil,
+    isObject,
     isString,
     isWindow,
     isBoolean,
@@ -8,12 +9,33 @@ import {
 } from './lang';
 
 import { forEach, reduce } from './array';
-import { trim            } from './string';
+import { trim, split     } from './string';
 import { forIn           } from './object';
 
 
-const rclass    = /[\t\r\n\f]/g;
-const rnotwhite = (/\S+/g);
+// classNames
+// ----------
+
+const rclass       = /[\t\r\n\f]/g;
+const rnotwhite    = (/\S+/g);
+const transformKey = (function () {
+
+    if (isUndefined(document)) {
+        return '';
+    }
+
+    const element    = createElement('div');
+    const transforms = ['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform'];
+
+    for (let i = 0; i < transforms.length; ++i) {
+
+        const key = transforms[i];
+
+        if (element.style[key] !== undefined) {
+            return key;
+        }
+    }
+})();
 
 function getClassName(elem) {
 
@@ -137,6 +159,90 @@ function fillSpaces(str) {
     return ' ' + str + ' ';
 }
 
+
+// style
+// -----
+
+function styleStrToObject(styleStr) {
+
+    return reduce(split(styleStr, ';'), function (result, style) {
+
+        if (style) {
+            let pairs = split(style, '=');
+
+            result[trim(pairs[0])] = trim(pairs[1]);
+        }
+
+        return result;
+    }, {});
+
+}
+
+function setStyle(elem, name, value) {
+
+    if (elem) {
+
+        var pairs = {};
+
+        if (isObject(name)) {
+
+            pairs = name;
+
+        } else if (isString(name) && isUndefined(value)) {
+
+            pairs = styleStrToObject(name);
+
+        } else {
+
+            pairs[name] = value;
+        }
+
+        forIn(pairs, function (v, k) {
+            elem.style[k === 'transform' ? transformKey : k] = v;
+        });
+    }
+}
+
+function getComputedStyle(elem, name) {
+
+    // IE9+
+
+    let computed = elem.ownerDocument.defaultView.opener
+        ? elem.ownerDocument.defaultView.getComputedStyle(elem, null)
+        : window.getComputedStyle(elem, null);
+
+    if (computed && name) {
+        return computed.getPropertyValue(name) || computed[name];
+    }
+
+    return computed;
+}
+
+function normalizeSides(box) {
+
+    if (Object(box) !== box) {
+
+        box = isNil(box) || 0;
+
+        return {
+            top: box,
+            right: box,
+            bottom: box,
+            left: box
+        };
+    }
+
+    return {
+        top: isNil(box.top) ? 0 : box.top,
+        right: isNil(box.right) ? 0 : box.right,
+        bottom: isNil(box.bottom) ? 0 : box.bottom,
+        left: isNil(box.left) ? 0 : box.left,
+    };
+}
+
+
+// elem
+// ----
 
 const docElem         = document.documentElement;
 const containsElement = docElem.compareDocumentPosition || docElem.contains ?
@@ -286,13 +392,13 @@ function isHidden(elem) {
 }
 
 // xml namespaces.
-let ns = {
+const ns = {
     xml: 'http://www.w3.org/XML/1998/namespace',
     xmlns: 'http://www.w3.org/2000/svg',
     xlink: 'http://www.w3.org/1999/xlink'
 };
 // svg version.
-let svgVersion = '1.1';
+const svgVersion = '1.1';
 
 function parseXML(str, async) {
 
@@ -335,6 +441,9 @@ function createSvgElement(tagName, doc) {
     return (doc || document).createElementNS(ns.xmlns, tagName);
 }
 
+
+// attr
+// ----
 
 function setAttribute(elem, name, value) {
 
@@ -386,59 +495,6 @@ function qualifyAttributeName(name) {
 }
 
 
-function getComputedStyle(elem, name) {
-
-    // IE9+
-
-    let computed = elem.ownerDocument.defaultView.opener
-        ? elem.ownerDocument.defaultView.getComputedStyle(elem, null)
-        : window.getComputedStyle(elem, null);
-
-    if (computed && name) {
-        return computed.getPropertyValue(name) || computed[name];
-    }
-
-    return computed;
-}
-
-function getTransformToElement(source, target) {
-
-    if (source.getTransformToElement) {
-        return source.getTransformToElement(target);
-    }
-
-    // chrome 48 removed svg getTransformToElement api
-
-    let matrix;
-    try {
-        matrix = target.getScreenCTM().inverse();
-    } catch (e) {
-        throw new Error('Can not inverse source element\'s ctm.');
-    }
-
-    return matrix.multiply(source.getScreenCTM());
-}
-
-
-const transformKey = (function () {
-
-    if (isUndefined(document)) {
-        return '';
-    }
-
-    const element    = createElement('div');
-    const transforms = ['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform'];
-
-    for (let i = 0; i < transforms.length; ++i) {
-
-        const key = transforms[i];
-
-        if (element.style[key] !== undefined) {
-            return key;
-        }
-    }
-})();
-
 function setScale(elem, sx, sy) {
 
     if (elem) {
@@ -467,6 +523,24 @@ function setTranslate(elem, tx, ty) {
 
         elem.style[transformKey] = translate;
     }
+}
+
+function getTransformToElement(source, target) {
+
+    if (source.getTransformToElement) {
+        return source.getTransformToElement(target);
+    }
+
+    // chrome 48 removed svg getTransformToElement api
+
+    let matrix;
+    try {
+        matrix = target.getScreenCTM().inverse();
+    } catch (e) {
+        throw new Error('Can not inverse source element\'s ctm.');
+    }
+
+    return matrix.multiply(source.getScreenCTM());
 }
 
 function getBounds(elem) {
@@ -505,6 +579,44 @@ function getBounds(elem) {
     return result;
 }
 
+function getScrollParent(elem) {
+
+    // In firefox if the el is inside an iframe with display: none;
+    // window.getComputedStyle() will return null;
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+
+    var computed = getComputedStyle(elem) || {};
+    var position = computed.position;
+
+    if (position === 'fixed') {
+        return elem;
+    }
+
+    var parent = elem;
+
+    while (parent = parent.parentNode) {
+        var style;
+        try {
+            style = getComputedStyle(parent);
+        } catch (err) {}
+
+        if (typeof style === 'undefined' || style === null) {
+            return parent;
+        }
+
+        var overflow  = style.overflow;
+        var overflowX = style.overflowX;
+        var overflowY = style.overflowY;
+
+        if (/(auto|scroll)/.test(overflow + overflowY + overflowX)) {
+            if (position !== 'absolute' || ['relative', 'absolute', 'fixed'].indexOf(style.position) >= 0) {
+                return parent;
+            }
+        }
+    }
+
+    return document.body;
+}
 
 // exports
 // -------
@@ -532,6 +644,7 @@ export {
     getClassName,
 
 
+
     setAttribute,
     removeAttribute,
     qualifyAttributeName,
@@ -540,7 +653,11 @@ export {
     setRotation,
     setTranslate,
 
+    setStyle,
     getBounds,
+    styleStrToObject,
+    normalizeSides,
+    getScrollParent,
     getComputedStyle,
     getTransformToElement
 };

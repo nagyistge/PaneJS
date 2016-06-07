@@ -183,19 +183,13 @@ export class VElement {
         return this;
     }
 
-    css(style) {
+    css(name, value) {
 
-        if (!style) {
+        if (!name) {
             return this.node.style;
         }
 
-        if (utils.isString(style)) {
-            style = vector.styleToObject(style);
-        }
-
-        utils.forIn(style, function (value, key) {
-            this.node.style[key] = value;
-        }, this);
+        utils.setStyle(this.node, name, value);
 
         return this;
     }
@@ -1028,20 +1022,6 @@ utils.extend(vector, {
     isVElement(obj) {
 
         return obj instanceof VElement;
-    },
-
-    styleToObject(styleStr) {
-
-        return utils.reduce(utils.split(styleStr, ';'), function (result, style) {
-            if (style) {
-
-                let pairs = utils.split(style, '=');
-
-                result[utils.trim(pairs[0])] = utils.trim(pairs[1]);
-            }
-
-            return result;
-        }, {});
     },
 
     createSVGPoint(x, y) {

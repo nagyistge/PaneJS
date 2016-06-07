@@ -13,6 +13,8 @@ class SelectHandler extends Handler {
             sense: 50
         }, options);
 
+        this.scrollParent = utils.getScrollParent(this.getPaper().svg);
+
         return this;
     }
 
@@ -109,10 +111,10 @@ class SelectHandler extends Handler {
             let x = this.previewOriginX + localX - this.origin.x;
             let y = this.previewOriginY + localY - this.origin.y;
 
-            let container = this.getPaper().container;
+            let scrollParent = this.scrollParent
 
-            x = utils.clamp(x, container.scrollLeft, container.clientWidth + container.scrollLeft - this.bounds.width);
-            y = utils.clamp(y, container.scrollTop, container.clientHeight + container.scrollTop - this.bounds.height);
+            x = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+            y = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
 
             this.bounds.x = x;
             this.bounds.y = y;
@@ -206,8 +208,8 @@ class SelectHandler extends Handler {
             let width  = Math.abs(x - this.origin.x);
             let height = Math.abs(y - this.origin.y);
 
-            let container = this.getPaper().container;
-            let origin    = this.origin;
+            let scrollParent = this.scrollParent
+            let origin       = this.origin;
 
             let maxWidth;
             let maxHeight;
@@ -215,7 +217,7 @@ class SelectHandler extends Handler {
             if (x > origin.x) {
 
                 x        = origin.x;
-                maxWidth = container.scrollLeft + container.clientWidth - x;
+                maxWidth = scrollParent.scrollLeft + scrollParent.clientWidth - x;
 
                 if (maxWidth < width) {
                     width = maxWidth;
@@ -223,29 +225,29 @@ class SelectHandler extends Handler {
 
             } else {
 
-                maxWidth = this.origin.x - container.scrollLeft;
+                maxWidth = this.origin.x - scrollParent.scrollLeft;
 
                 if (width > maxWidth) {
                     width = maxWidth;
-                    x     = container.scrollLeft;
+                    x     = scrollParent.scrollLeft;
                 }
             }
 
             if (y > this.origin.y) {
 
                 y         = this.origin.y;
-                maxHeight = container.scrollTop + container.clientHeight - y;
+                maxHeight = scrollParent.scrollTop + scrollParent.clientHeight - y;
 
                 if (maxHeight < height) {
                     height = maxHeight;
                 }
             } else {
 
-                maxHeight = this.origin.y - container.scrollTop;
+                maxHeight = this.origin.y - scrollParent.scrollTop;
 
                 if (height > maxHeight) {
                     height = maxHeight;
-                    y      = container.scrollTop;
+                    y      = scrollParent.scrollTop;
                 }
             }
 
@@ -298,9 +300,9 @@ class SelectHandler extends Handler {
 
     autoScrollPreview() {
 
-        let container  = this.getPaper().container;
-        let scrollable = container.scrollWidth > container.clientWidth
-            || container.scrollHeight > container.clientHeight;
+        let scrollParent = this.scrollParent
+        let scrollable   = scrollParent.scrollWidth > scrollParent.clientWidth
+            || scrollParent.scrollHeight > scrollParent.clientHeight;
 
         if (scrollable) {
 
@@ -308,33 +310,33 @@ class SelectHandler extends Handler {
             let bounds   = this.bounds;
             let scrolled = false;
 
-            if ((container.scrollLeft - bounds.x) === 0 && container.scrollLeft > 0) {
+            if ((scrollParent.scrollLeft - bounds.x) === 0 && scrollParent.scrollLeft > 0) {
 
                 scrolled = true;
 
-                bounds.x             = Math.max(0, bounds.x - sense);
-                container.scrollLeft = Math.max(0, container.scrollLeft - sense);
+                bounds.x                = Math.max(0, bounds.x - sense);
+                scrollParent.scrollLeft = Math.max(0, scrollParent.scrollLeft - sense);
 
-            } else if (((bounds.x + bounds.width) - (container.scrollLeft + container.clientWidth)) === 0 && container.scrollLeft < container.scrollWidth - container.clientWidth) {
-
-                scrolled = true;
-
-                bounds.x             = Math.min(container.scrollWidth - bounds.width, bounds.x + sense);
-                container.scrollLeft = Math.min(container.scrollWidth - container.clientWidth, container.scrollLeft + sense);
-
-            } else if ((container.scrollTop - bounds.y) === 0 && container.scrollTop > 0) {
+            } else if (((bounds.x + bounds.width) - (scrollParent.scrollLeft + scrollParent.clientWidth)) === 0 && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
 
                 scrolled = true;
 
-                bounds.y            = Math.max(0, bounds.y - sense);
-                container.scrollTop = Math.max(0, container.scrollTop - sense);
+                bounds.x                = Math.min(scrollParent.scrollWidth - bounds.width, bounds.x + sense);
+                scrollParent.scrollLeft = Math.min(scrollParent.scrollWidth - scrollParent.clientWidth, scrollParent.scrollLeft + sense);
 
-            } else if (((bounds.y + bounds.height) - (container.scrollTop + container.clientHeight)) === 0 && container.scrollTop < container.scrollHeight - container.clientHeight) {
+            } else if ((scrollParent.scrollTop - bounds.y) === 0 && scrollParent.scrollTop > 0) {
 
                 scrolled = true;
 
-                bounds.y            = Math.min(container.scrollHeight - bounds.height, bounds.y + sense);
-                container.scrollTop = Math.min(container.scrollHeight - container.clientHeight, container.scrollTop + sense);
+                bounds.y               = Math.max(0, bounds.y - sense);
+                scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop - sense);
+
+            } else if (((bounds.y + bounds.height) - (scrollParent.scrollTop + scrollParent.clientHeight)) === 0 && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
+
+                scrolled = true;
+
+                bounds.y               = Math.min(scrollParent.scrollHeight - bounds.height, bounds.y + sense);
+                scrollParent.scrollTop = Math.min(scrollParent.scrollHeight - scrollParent.clientHeight, scrollParent.scrollTop + sense);
             }
 
             if (scrolled) {
@@ -377,8 +379,8 @@ class SelectHandler extends Handler {
     showPreview() {
 
         let paper = this.getPaper();
-        if (paper && paper.HTMLDrawPane) {
-            paper.HTMLDrawPane.appendChild(this.previewRect);
+        if (paper && paper.htmlPane) {
+            paper.htmlPane.appendChild(this.previewRect);
         }
 
         return this;
@@ -394,8 +396,8 @@ class SelectHandler extends Handler {
     showSelectionRect() {
 
         let paper = this.getPaper();
-        if (paper && paper.HTMLDrawPane) {
-            paper.HTMLDrawPane.appendChild(this.selectionRect);
+        if (paper && paper.htmlPane) {
+            paper.htmlPane.appendChild(this.selectionRect);
         }
 
         return this;
@@ -419,9 +421,9 @@ class SelectHandler extends Handler {
 
     autoScrollSelectionRect(localX, localY) {
 
-        let container  = this.getPaper().container;
-        let scrollable = container.scrollWidth > container.clientWidth
-            || container.scrollHeight > container.clientHeight;
+        let scrollParent  = this.scrollParent;
+        let scrollable = scrollParent.scrollWidth > scrollParent.clientWidth
+            || scrollParent.scrollHeight > scrollParent.clientHeight;
 
         if (scrollable) {
 
@@ -429,7 +431,7 @@ class SelectHandler extends Handler {
             let bounds   = this.bounds;
             let scrolled = false;
 
-            if (localX < container.scrollLeft && container.scrollLeft > 0) {
+            if (localX < scrollParent.scrollLeft && scrollParent.scrollLeft > 0) {
 
                 // scroll left
 
@@ -437,19 +439,19 @@ class SelectHandler extends Handler {
                 localX -= sense;
 
                 bounds.x             = Math.max(0, bounds.x - sense);
-                container.scrollLeft = Math.max(0, container.scrollLeft - sense);
+                scrollParent.scrollLeft = Math.max(0, scrollParent.scrollLeft - sense);
 
-            } else if (localX > container.scrollLeft + container.clientWidth && container.scrollLeft < container.scrollWidth - container.clientWidth) {
+            } else if (localX > scrollParent.scrollLeft + scrollParent.clientWidth && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
 
                 // scroll right
 
                 scrolled = true;
                 localX += sense;
 
-                bounds.width         = Math.min(container.scrollWidth - bounds.x, bounds.width + sense);
-                container.scrollLeft = Math.min(container.scrollWidth - container.clientWidth, container.scrollLeft + sense);
+                bounds.width         = Math.min(scrollParent.scrollWidth - bounds.x, bounds.width + sense);
+                scrollParent.scrollLeft = Math.min(scrollParent.scrollWidth - scrollParent.clientWidth, scrollParent.scrollLeft + sense);
 
-            } else if (localY < container.scrollTop && container.scrollTop > 0) {
+            } else if (localY < scrollParent.scrollTop && scrollParent.scrollTop > 0) {
 
                 // scroll top
 
@@ -457,17 +459,17 @@ class SelectHandler extends Handler {
                 localY -= sense;
 
                 bounds.y            = Math.max(0, bounds.y - sense);
-                container.scrollTop = Math.max(0, container.scrollTop - sense);
+                scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop - sense);
 
-            } else if (localY > container.scrollTop + container.clientHeight && container.scrollTop < container.scrollHeight - container.clientHeight) {
+            } else if (localY > scrollParent.scrollTop + scrollParent.clientHeight && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
 
                 // scroll bottom
 
                 scrolled = true;
                 localY += sense;
 
-                bounds.height       = Math.min(container.scrollHeight - bounds.y, bounds.height + sense);
-                container.scrollTop = Math.min(container.scrollHeight - container.clientHeight, container.scrollTop + sense);
+                bounds.height       = Math.min(scrollParent.scrollHeight - bounds.y, bounds.height + sense);
+                scrollParent.scrollTop = Math.min(scrollParent.scrollHeight - scrollParent.clientHeight, scrollParent.scrollTop + sense);
             }
 
             if (scrolled) {

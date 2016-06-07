@@ -93,6 +93,7 @@ class Cell {
     // ----
 
     isLink() {
+
         return false;
     }
 
@@ -316,6 +317,7 @@ class Cell {
     // ----
 
     isNode() {
+
         return false;
     }
 
@@ -839,10 +841,12 @@ class Cell {
     // ------
 
     getId() {
+
         return this.id;
     }
 
     setId(id) {
+
         this.id = id;
     }
 
@@ -865,6 +869,11 @@ class Cell {
         }
 
         return this;
+    }
+
+    getView(paper) {
+
+        return paper.getView(this);
     }
 
     getClassName() {
@@ -932,6 +941,18 @@ class Cell {
     }
 
     destroy() {
+
+        this.eachChild(function (child) {
+            child.destroy();
+        });
+
+        this.eachLink(function (child) {
+            child.destroy();
+        });
+
+        this.removeFromTerminal(true)
+            .removeFromTerminal(false)
+            .removeFromParent();
 
         utils.destroy(this);
     }

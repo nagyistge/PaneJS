@@ -10,9 +10,9 @@ function toRad(deg, over360) {
     return deg * Math.PI / 180;
 }
 
-function snapToGrid(val, gridSize) {
+function snapToGrid(val, gridSize, method = 'round') {
 
-    return gridSize * Math.round(val / gridSize);
+    return Math[method](val / gridSize) * gridSize;
 }
 
 function normalizeAngle(angle) {

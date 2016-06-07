@@ -59,7 +59,7 @@ class Model extends Events {
 
         if (!descendant) {
             descendant = ancestor;
-            ancestor   = this.root;
+            ancestor   = this.viewport;
         }
 
         return this.isAncestor(ancestor, descendant);
@@ -152,7 +152,7 @@ class Model extends Events {
 
     isRoot(cell) {
 
-        return cell && this.root === cell;
+        return cell && this.viewport === cell;
     }
 
     createRoot() {
@@ -166,7 +166,7 @@ class Model extends Events {
 
     getRoot(cell) {
 
-        let root = this.root;
+        let root = this.viewport;
 
         while (cell) {
             root = cell;
@@ -183,11 +183,11 @@ class Model extends Events {
 
     rootChanged(root) {
 
-        let prev = this.root;
+        let prev = this.viewport;
 
-        this.root   = root;
-        this.cells  = null;
-        this.nextId = 0;
+        this.viewport = root;
+        this.cells    = null;
+        this.nextId   = 0;
         this.cellAdded(root);
 
         return prev;
@@ -434,7 +434,7 @@ class Model extends Events {
             }
 
             if (cell &&
-                (cell.parent !== that.root || that.isAncestor(cell, link)) &&
+                (cell.parent !== that.viewport || that.isAncestor(cell, link)) &&
                 link.parent !== cell) {
 
                 let geo = link.geometry;

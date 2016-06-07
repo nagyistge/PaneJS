@@ -17,7 +17,7 @@ class HTMLNode extends Portal {
 
 HTMLNode.setDefaults({
     tagName: 'div',
-    pane: 'HTMLDrawPane',
+    pane: 'htmlPane',
     view: HTMLNodeView,
 });
 

@@ -8,44 +8,65 @@ class HTMLPaper extends Paper {
 
     createPanes() {
 
-        let drawPane = utils.createElement('div');
+        super.createPanes();
 
-        utils.addClass(drawPane, 'pane-html-pane');
+        let htmlPane = utils.createElement('div');
 
-        this.container.appendChild(drawPane);
-        this.HTMLDrawPane = drawPane;
+        utils.addClass(htmlPane, 'pane-html-pane');
 
-        return super.createPanes();
+        this.root.appendChild(htmlPane);
+        this.htmlPane = htmlPane;
+
+        return this;
     }
 
     setup() {
 
-        let drawPane = this.HTMLDrawPane;
+        let drawPane = this.htmlPane;
 
         utils.addEventListener(drawPane, 'contextmenu', this.onContextMenu.bind(this));
         utils.addEventListener(drawPane, 'dblclick', this.onDblClick.bind(this));
         utils.addEventListener(drawPane, 'click', this.onClick.bind(this));
         utils.addEventListener(drawPane, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
         utils.addEventListener(drawPane, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-
         utils.addEventListener(drawPane, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 
         return super.setup();
     }
 
-    scale(sx, sy) {
+    getContentBBox(withoutTransformations) {
+
+        let rect = super.getContentBBox(withoutTransformations);
+
+        var screenCTM   = this.viewport.getScreenCTM();
+        var viewportCTM = this.viewport.getCTM();
+
+        return rect;
+    }
+
+    translate(x, y, relative) {
+
+        super.translate(x, y, relative);
+
+        return this;
+    }
+
+    scale(sx, sy, ox = 0, oy = 0) {
 
         sy = sy || sx;
 
-        vector(this.root).scale(sx, sy);
-        vector(this.HTMLDrawPane).scale(sx, sy);
+        utils.setStyle(this.htmlPane, {
+            transform: 'scale(' + sx + ',' + sy + ')'
+        });
+
+        super.scale(sx, sy, ox, oy);
 
         return this;
     }
 
     destroy() {
 
-        utils.removeElement(this.HTMLDrawPane);
+        utils.removeElement(this.htmlPane);
         super.destroy();
     }
 }
