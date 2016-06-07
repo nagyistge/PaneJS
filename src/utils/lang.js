@@ -1,6 +1,5 @@
 let objProto = Object.prototype;
 let toString = objProto.toString;
-let hasOwn   = objProto.hasOwnProperty;
 
 
 function isNull(obj) {
@@ -80,36 +79,6 @@ function isNumeric(obj) {
     return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
 }
 
-function isPlainObject(obj) {
-
-    // Not plain objects:
-    //  - Any object or value whose internal [[Class]] property is not "[object Object]"
-    //  - DOM nodes
-    //  - window
-    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
-        return false;
-    }
-
-    if (obj.constructor && !hasOwn.call(obj.constructor.prototype, 'isPrototypeOf')) {
-        return false;
-    }
-
-    // If the function hasn't returned already, we're confident that
-    // |obj| is a plain object, created by {} or constructed with new Object
-    return true;
-}
-
-function isEmptyObject(obj) {
-
-    /* eslint guard-for-in: 0 */
-    /* eslint no-unused-vars: 0 */
-    for (let name in obj) {
-        return false;
-    }
-
-    return true;
-}
-
 
 // exports
 // -------
@@ -127,6 +96,4 @@ export {
     isFunction,
     isArrayLike,
     isUndefined,
-    isPlainObject,
-    isEmptyObject
 };

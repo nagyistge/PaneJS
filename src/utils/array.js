@@ -1,85 +1,41 @@
 import { isArray, isArrayLike } from './lang';
 
-let proto = Array.prototype;
+const proto = Array.prototype;
 
+const toArray = obj => isArray(obj)
+    ? obj : isArrayLike(obj)
+    ? proto.slice.call(obj)
+    : [obj];
 
-function toArray(obj) {
+const slice       = (arr, start, end) => arr ? proto.slice.call(arr, start, end) : [];
+const indexOf     = (arr, item) => arr ? proto.indexOf.call(arr, item) : -1;
+const lastIndexOf = (arr, item) => arr ? proto.lastIndexOf.call(arr, item) : -1;
+const contains    = (arr, item) => arr && indexOf(arr, item) >= 0;
 
-    return isArray(obj)
-        ? obj : isArrayLike(obj)
-        ? proto.slice.call(obj)
-        : [obj];
-}
+const forEach     = (arr, iterator, context) => { arr && proto.forEach.call(arr, iterator, context); }
+const map         = (arr, iterator, context) => arr ? proto.map.call(arr, iterator, context) : [];
+const some        = (arr, iterator, context) => arr ? proto.some.call(arr, iterator, context) : false;
+const every       = (arr, iterator, context) => arr ? proto.every.call(arr, iterator, context) : false;
+const filter      = (arr, iterator, context) => arr ? proto.filter.call(arr, iterator, context) : [];
+const reduce      = (arr, iterator, initialValue) => arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
+const reduceRight = (arr, iterator, initialValue) => arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
 
-function indexOf(arr, item) {
-
-    return arr ? proto.indexOf.call(arr, item) : -1;
-}
-
-function lastIndexOf(arr, item) {
-
-    return arr ? proto.lastIndexOf.call(arr, item) : -1;
-}
-
-function every(arr, iterator, context) {
-
-    return arr ? proto.every.call(arr, iterator, context) : false;
-}
-
-function some(arr, iterator, context) {
-
-    return arr ? proto.some.call(arr, iterator, context) : false;
-}
-
-function forEach(arr, iterator, context) {
-
-    arr && proto.forEach.call(arr, iterator, context);
-}
-
-function map(arr, iterator, context) {
-
-    return arr ? proto.map.call(arr, iterator, context) : [];
-}
-
-function filter(arr, iterator, context) {
-
-    return arr ? proto.filter.call(arr, iterator, context) : [];
-}
-
-function reduce(arr, iterator, initialValue) {
-
-    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
-}
-
-function reduceRight(arr, iterator, initialValue) {
-
-    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
-}
-
-function contains(arr, item) {
-
-    return arr && indexOf(arr, item) >= 0;
-}
-
-function slice(arr, start, end) {
-
-    return arr ? proto.slice.call(arr, start, end) : [];
-}
 
 // exports
 // -------
 
 export {
+    toArray,
+    slice,
+    indexOf,
+    lastIndexOf,
+    contains,
+
+    forEach,
     map,
     some,
     every,
-    slice,
     filter,
     reduce,
-    forEach,
-    toArray,
-    indexOf,
     reduceRight,
-    lastIndexOf,
-    contains,
 };

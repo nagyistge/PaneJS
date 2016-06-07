@@ -1,5 +1,5 @@
-import { forEach }                from './array';
-import { isArray, isPlainObject } from './lang';
+import { forEach }                     from './array';
+import { isArray, isObject, isWindow } from './lang';
 
 
 function hasOwn(obj, key) {
@@ -54,8 +54,8 @@ function merge(target) {
             /* eslint guard-for-in: 0 */
             for (let name in source) {
 
-                let src = target[name];
-                let copy = source[name];
+                let src         = target[name];
+                let copy        = source[name];
                 let copyIsArray = isArray(copy);
 
                 if (copyIsArray || isPlainObject(copy)) {
@@ -116,6 +116,36 @@ function destroy(obj) {
     }
 }
 
+function isPlainObject(obj) {
+
+    // Not plain objects:
+    //  - Any object or value whose internal [[Class]] property is not "[object Object]"
+    //  - DOM nodes
+    //  - window
+    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
+        return false;
+    }
+
+    if (obj.constructor && !hasOwn(obj.constructor.prototype, 'isPrototypeOf')) {
+        return false;
+    }
+
+    // If the function hasn't returned already, we're confident that
+    // |obj| is a plain object, created by {} or constructed with new Object
+    return true;
+}
+
+function isEmptyObject(obj) {
+
+    /* eslint guard-for-in: 0 */
+    /* eslint no-unused-vars: 0 */
+    for (let key in obj) {
+        return false;
+    }
+
+    return true;
+}
+
 
 // exports
 // -------
@@ -127,5 +157,7 @@ export {
     merge,
     extend,
     destroy,
-    getByPath
+    getByPath,
+    isPlainObject,
+    isEmptyObject
 };
