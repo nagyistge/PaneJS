@@ -1,5 +1,5 @@
-let ua = navigator.userAgent;
-let av = navigator.appVersion;
+const ua = navigator.userAgent;
+const av = navigator.appVersion;
 
 
 // exports

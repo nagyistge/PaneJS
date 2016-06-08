@@ -1,7 +1,7 @@
 import * as utils from '../common/utils';
 
-let format   = utils.format;
-let isFinite = utils.isFinite;
+const format   = utils.format;
+const isFinite = utils.isFinite;
 
 
 // exports

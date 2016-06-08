@@ -636,14 +636,11 @@ export {
     removeElement,
     containsElement,
 
-
     hasClass,
     addClass,
     removeClass,
     toggleClass,
     getClassName,
-
-
 
     setAttribute,
     removeAttribute,

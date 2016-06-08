@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import       Rect from '../geometry/Rect';
-import       Node from '../cells/Node';
+import Rect       from '../geometry/Rect';
+import Node       from '../cells/Node';
 import PortalView from '../views/PortalView';
 
 class Portal extends Node {
@@ -34,11 +34,13 @@ class Portal extends Node {
     }
 
     eachInPort(iterator, context) {
-        return utils.forEach(this.inPorts, iterator, context);
+
+         utils.forEach(this.inPorts, iterator, context);
     }
 
     eachOutPort(iterator, context) {
-        return utils.forEach(this.outPorts, iterator, context);
+
+         utils.forEach(this.outPorts, iterator, context);
     }
 
     getInPorts() {

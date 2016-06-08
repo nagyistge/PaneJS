@@ -1,7 +1,7 @@
-import      * as utils from '../common/utils';
-import          vector from '../common/vector';
-import        detector from '../common/detector';
-import           Point from '../geometry/Point';
+import * as utils from '../common/utils';
+import vector     from '../common/vector';
+import detector   from '../common/detector';
+import Point      from '../geometry/Point';
 
 
 const defaults = {
@@ -30,8 +30,8 @@ class PaperScroll {
         // keep scale values for a quicker access
         let scale = vector(paper.viewport).scale();
 
-        this.sx = scale.sx;
-        this.sy = scale.sy;
+        this.sx = paper.sx || paper.options.sx;
+        this.sy = paper.sy || paper.options.sy;
 
         // keep the original paper size
         this.baseWidth   = paper.options.width;
@@ -85,9 +85,9 @@ class PaperScroll {
         });
 
         this.padding = {
-            paddingTop,
-            paddingLeft
-        }
+            top: paddingTop,
+            left: paddingLeft
+        };
 
         return this;
     }
@@ -143,57 +143,47 @@ class PaperScroll {
         return this;
     }
 
-    toLocalPoint(x, y) {
-
-        var ctm = this.paper.viewport.getCTM();
-
-        x += this.elem.scrollLeft - this.padding.paddingLeft - ctm.e;
-        x /= ctm.a;
-
-        y += this.elem.scrollTop - this.padding.paddingTop - ctm.f;
-        y /= ctm.d;
-
-        return new Point(x, y);
-    }
-
     center(x, y) {
 
         // Adjust the paper position so the point [x,y] is moved to the
-        // center of scroll element. If no point given [x,y] equals
-        // to center of the paper element.
+        // center of scroll element. If no point given [x,y] equals to
+        // center of the paper element.
 
         let paper  = this.paper;
         let matrix = paper.viewport.getCTM();
+
+        console.log(matrix);
 
         // the paper rectangle
         //   x1,y1 ---------
         //   |             |
         //   ----------- x2,y2
-        var x1 = -matrix.e; // translate x
-        var y1 = -matrix.f; // translate y
-        var x2 = x1 + paper.options.width;
-        var y2 = y1 + paper.options.height;
+        var x1 = -paper.tx; // translate x
+        var y1 = -paper.ty; // translate y
+        var x2 = x1 + paper.width;
+        var y2 = y1 + paper.height;
 
         if (utils.isUndefined(x) || utils.isUndefined(y)) {
-            // find center of the paper rect
+            // get the center of the paper
             x = (x1 + x2) / 2;
             y = (y1 + y2) / 2;
         } else {
             // local coordinates to viewport coordinates
-            x *= matrix.a; // scale x
-            y *= matrix.d; // scale y
+            x *= paper.sx; // scale x
+            y *= paper.sy; // scale y
         }
 
+        console.log('center:', x, y);
 
-        var padding = this.basePadding;
-        var centerX = this.elem.clientWidth / 2;
-        var centerY = this.elem.clientHeight / 2;
+        var rootCenterX = this.elem.clientWidth / 2;
+        var rootCenterY = this.elem.clientHeight / 2;
+        var basePadding = this.basePadding;
 
         // calculate padding
-        var left   = centerX - padding.left - x + x1;
-        var right  = centerX - padding.right + x - x2;
-        var top    = centerY - padding.top - y + y1;
-        var bottom = centerY - padding.bottom + y - y2;
+        var left   = rootCenterX - basePadding.left - x + x1;
+        var right  = rootCenterX - basePadding.right + x - x2;
+        var top    = rootCenterY - basePadding.top - y + y1;
+        var bottom = rootCenterY - basePadding.bottom + y - y2;
 
         this.adjustPadding({
             top: Math.max(top, 0),
@@ -202,10 +192,24 @@ class PaperScroll {
             left: Math.max(left, 0)
         });
 
-        this.elem.scrollTop  = y - centerY + matrix.f + this.padding.paddingTop;
-        this.elem.scrollLeft = x - centerX + matrix.e + this.padding.paddingLeft;
+        this.elem.scrollTop  = y - rootCenterY + paper.ty + this.padding.top;
+        this.elem.scrollLeft = x - rootCenterX + paper.tx + this.padding.left;
 
         return this;
+    }
+
+    toLocalPoint(x, y) {
+
+        x += this.elem.scrollLeft - this.padding.left - this.paper.tx;
+        x /= this.paper.sx;
+
+        y += this.elem.scrollTop - this.padding.top - this.paper.ty;
+        y /= this.paper.sy;
+
+        return {
+            x: Math.round(x),
+            y: Math.round(y)
+        };
     }
 
     getCenter() {
@@ -256,31 +260,36 @@ class PaperScroll {
         sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
         sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
 
-
+        // the center of the container
         var center = this.getCenter();
-        var ox     = options.ox;
-        var oy     = options.oy;
+        // the scale center
+        var cx = options.cx;
+        var cy = options.cy;
 
-        // if the origin is not specified find the center
-        // of the paper's visible area.
-        if (utils.isUndefined(ox) || utils.isUndefined(oy)) {
+        console.log(center);
 
-            ox = center.x;
-            oy = center.y;
-
+        // if the scale center is not specified find
+        // the center of the paper's visible area.
+        if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
+            cx = center.x;
+            cy = center.y;
         } else {
-
             var fsx = sx / this.sx;
             var fsy = sy / this.sy;
 
-            ox = ox - ((ox - center.x) / fsx);
-            oy = oy - ((oy - center.y) / fsy);
+            cx = cx - ((cx - center.x) / fsx);
+            cy = cy - ((cy - center.y) / fsy);
         }
 
         this.beforeZoom();
 
+        var dx = this.elem.clientWidth * (this.sx - sx);
+        var dy = this.elem.clientHeight * (this.sy - sy);
+        console.log('dx:', dx, ' dy:', dy);
+
+
         this.paper.scale(sx, sy);
-        this.center(ox, oy);
+        this.center(cx, cy);
 
         this.afterZoom();
 

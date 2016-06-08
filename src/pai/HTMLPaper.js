@@ -1,7 +1,7 @@
 import * as utils from '../common/utils';
-import     vector from '../common/vector';
-import   detector from '../common/detector';
-import      Paper from '../core/Paper';
+import detector   from '../common/detector';
+import vector     from '../common/vector';
+import Paper      from '../core/Paper';
 
 
 class HTMLPaper extends Paper {
@@ -10,43 +10,85 @@ class HTMLPaper extends Paper {
 
         super.createPanes();
 
-        let htmlPane = utils.createElement('div');
+        const htmlPane = utils.createElement('div');
 
         utils.addClass(htmlPane, 'pane-html-pane');
 
-        this.root.appendChild(htmlPane);
         this.htmlPane = htmlPane;
+        this.root.appendChild(htmlPane);
 
         return this;
     }
 
     setup() {
 
-        let drawPane = this.htmlPane;
+        const htmlPane = this.htmlPane;
 
-        utils.addEventListener(drawPane, 'contextmenu', this.onContextMenu.bind(this));
-        utils.addEventListener(drawPane, 'dblclick', this.onDblClick.bind(this));
-        utils.addEventListener(drawPane, 'click', this.onClick.bind(this));
-        utils.addEventListener(drawPane, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
-        utils.addEventListener(drawPane, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-        utils.addEventListener(drawPane, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+        utils.addEventListener(htmlPane, 'contextmenu', this.onContextMenu.bind(this));
+        utils.addEventListener(htmlPane, 'dblclick', this.onDblClick.bind(this));
+        utils.addEventListener(htmlPane, 'click', this.onClick.bind(this));
+        utils.addEventListener(htmlPane, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
+        utils.addEventListener(htmlPane, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
+        utils.addEventListener(htmlPane, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 
-        return super.setup();
+        super.setup();
+
+        return this;
     }
 
     getContentBBox(withoutTransformations) {
 
-        let rect = super.getContentBBox(withoutTransformations);
+        let bbox   = super.getContentBBox(withoutTransformations);
+        let bounds = null;
 
-        var screenCTM   = this.viewport.getScreenCTM();
-        var viewportCTM = this.viewport.getCTM();
+        utils.forIn(this.getModel().cells, function (cell) {
+            if (cell.isNode()) {
+                let rect = cell.getBBox();
+                if (rect) {
+                    bounds = bounds ? bounds.union(rect) : rect;
+                }
+            }
+        });
 
-        return rect;
+        if (!withoutTransformations && bounds) {
+
+            const screenCTM   = this.viewport.getScreenCTM();
+            const viewportCTM = this.viewport.getCTM();
+
+            const dx = viewportCTM.e - screenCTM.e;
+            const dy = viewportCTM.f - screenCTM.f;
+            const sx = viewportCTM.a;
+            const sy = viewportCTM.d;
+
+            bounds.x = bounds.x * sx + dx;
+            bounds.y = bounds.y * sy + dy;
+            bounds.width *= sx;
+            bounds.height *= sy;
+        }
+
+        if (bounds) {
+            bbox = bounds.union(bbox);
+        }
+
+        return bbox;
     }
 
-    translate(x, y, relative) {
+    translate(tx, ty, relative) {
 
-        super.translate(x, y, relative);
+        if (!utils.isNil(tx) && !utils.isNil(ty)) {
+
+            if (relative) {
+                tx += utils.isNil(this.tx) || 0;
+                ty += utils.isNil(this.ty) || 0;
+            }
+
+            utils.setStyle(this.htmlPane, {
+                top: ty + 'px',
+                left: tx + 'px'
+            });
+
+            super.translate(tx, ty);
+        }
 
         return this;
     }
@@ -55,11 +97,14 @@ class HTMLPaper extends Paper {
 
         sy = sy || sx;
 
-        utils.setStyle(this.htmlPane, {
-            transform: 'scale(' + sx + ',' + sy + ')'
-        });
+        if (sx && sy) {
 
-        super.scale(sx, sy, ox, oy);
+            utils.setStyle(this.htmlPane, {
+                transform: 'scale(' + sx + ',' + sy + ')'
+            });
+
+            super.scale(sx, sy, ox, oy);
+        }
 
         return this;
     }

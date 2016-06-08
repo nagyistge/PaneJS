@@ -1,17 +1,17 @@
-import       * as utils from '../common/utils';
-import           Events from '../common/Events';
-import             Cell from '../cells/Cell';
-import         Terminal from '../cells/Terminal';
+import * as utils from '../common/utils';
+import Events     from '../common/Events';
+import Cell       from '../cells/Cell';
+import Terminal   from '../cells/Terminal';
 
-import       RootChange from '../changes/RootChange';
-import      ChildChange from '../changes/ChildChange';
-import    VisibleChange from '../changes/VisibleChange';
-import       SizeChange from '../changes/SizeChange';
-import   PositionChange from '../changes/PositionChange';
-import   RotationChange from '../changes/RotationChange';
-import   TerminalChange from '../changes/TerminalChange';
-import   GeometryChange from '../changes/GeometryChange';
-import  AttributeChange from '../changes/AttributeChange';
+import RootChange       from '../changes/RootChange';
+import SizeChange       from '../changes/SizeChange';
+import ChildChange      from '../changes/ChildChange';
+import VisibleChange    from '../changes/VisibleChange';
+import PositionChange   from '../changes/PositionChange';
+import RotationChange   from '../changes/RotationChange';
+import TerminalChange   from '../changes/TerminalChange';
+import GeometryChange   from '../changes/GeometryChange';
+import AttributeChange  from '../changes/AttributeChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
 
@@ -59,7 +59,7 @@ class Model extends Events {
 
         if (!descendant) {
             descendant = ancestor;
-            ancestor   = this.viewport;
+            ancestor   = this.root;
         }
 
         return this.isAncestor(ancestor, descendant);
@@ -108,34 +108,38 @@ class Model extends Events {
 
     findCellAtPoint(localPoint) {
 
-        let cells = [];
+        let result = [];
 
-        localPoint && this.cells && utils.forIn(this.cells, function (cell) {
-            if (cell.isNode()) {
-                let rect = cell.getBBox();
-                if (rect && rect.containsPoint(localPoint)) {
-                    cells.push(cell);
+        if (localPoint) {
+            this.eachCell(cell => {
+                if (this.isNode(cell)) {
+                    let rect = cell.getBBox();
+                    if (rect && rect.containsPoint(localPoint)) {
+                        result.push(cell);
+                    }
                 }
-            }
-        });
+            }, this);
+        }
 
-        return cells;
+        return result;
     }
 
     findCellInArea(area) {
 
-        let cells = [];
+        let result = [];
 
-        area && this.cells && utils.forIn(this.cells, function (cell) {
-            if (cell.isNode()) {
-                let rect = cell.getBBox();
-                if (rect && area.containsRect(rect)) {
-                    cells.push(cell);
+        if (area) {
+            this.eachCell(cell => {
+                if (this.isNode(cell)) {
+                    let rect = cell.getBBox();
+                    if (rect && area.containsRect(rect)) {
+                        result.push(cell);
+                    }
                 }
-            }
-        });
+            }, this);
+        }
 
-        return cells;
+        return result;
     }
 
     createCellId() {
@@ -152,21 +156,21 @@ class Model extends Events {
 
     isRoot(cell) {
 
-        return cell && this.viewport === cell;
+        return cell && this.root === cell;
     }
 
     createRoot() {
 
         let root = new Cell();
 
-        root.insertChild(this.createLayer());
+        root.insertChild(this.createLayer(), { silent: true });
 
         return root;
     }
 
     getRoot(cell) {
 
-        let root = this.viewport;
+        let root = this.root;
 
         while (cell) {
             root = cell;
@@ -183,11 +187,11 @@ class Model extends Events {
 
     rootChanged(root) {
 
-        let prev = this.viewport;
+        let prev = this.root;
 
-        this.viewport = root;
-        this.cells    = null;
-        this.nextId   = 0;
+        this.root   = root;
+        this.cells  = null;
+        this.nextId = 0;
         this.cellAdded(root);
 
         return prev;
@@ -210,6 +214,11 @@ class Model extends Events {
     createLayer() {
 
         return new Cell();
+    }
+
+    eachLayer(iterator, context) {
+
+        return utils.forEach(this.getLayers(), iterator, context);
     }
 
 
@@ -239,7 +248,7 @@ class Model extends Events {
         this.beginUpdate();
 
         try {
-            utils.forEach(cells, function (child) {
+            utils.forEach(cells, child => {
                 if (child) {
                     if (child !== parent) {
                         this.setParent(child, parent, index);
@@ -373,7 +382,7 @@ class Model extends Events {
     cellRemoved(cell) {
 
         if (cell) {
-            cell.eachChild(function (child) {
+            cell.eachChild(child => {
                 this.cellRemoved(child);
             }, this);
 
@@ -393,12 +402,12 @@ class Model extends Events {
         root = root || this.getRoot(cell);
 
         // update links on children first
-        cell.eachChild(function (child) {
+        cell.eachChild(child => {
             this.updateLinkParents(child, root);
         }, this);
 
         // update the parents of all connected links
-        cell.eachLink(function (link) {
+        cell.eachLink(link => {
             // update edge parent if edge and child have
             // a common root node (does not need to be the
             // model root node)
@@ -494,9 +503,47 @@ class Model extends Events {
         return null;
     }
 
+    eachCell(iterator, context) {
+
+        if (this.cells && iterator && utils.isFunction(iterator)) {
+            utils.forIn(this.cells, (cell, id) => {
+                iterator.call(context, cell, id);
+            });
+        }
+    }
+
+    filterCell(iterator, context) {
+
+        let result = [];
+
+        if (this.cells && iterator && utils.isFunction(iterator)) {
+            utils.forIn(this.cells, (cell, id) => {
+                if (iterator.call(context, cell, id)) {
+                    result.push(cell);
+                }
+            });
+        }
+
+        return result;
+    }
+
+    eachNode(iterator, context) {
+
+        let nodes = this.filterCell(cell => this.isNode(cell), this);
+
+        return utils.forEach(nodes, iterator, context);
+    }
+
+    eachLink(iterator, context) {
+
+        let links = this.filterCell(cell => this.isLink(cell), this);
+
+        return utils.forEach(links, iterator, context);
+    }
 
     // children
     // --------
+
 
     getChildNodes(parent) {
 
@@ -508,10 +555,20 @@ class Model extends Events {
         return this.getChildCells(parent, false, true);
     }
 
+    eachChildNode(parent, iterator, context) {
+
+        utils.forEach(this.getChildNodes(parent), iterator, context);
+    }
+
+    eachChildLink(parent, iterator, context) {
+
+        utils.forEach(this.getChildLinks(parent), iterator, context);
+    }
+
     getChildCells(parent, isNode, isLink) {
 
         if (parent) {
-            return parent.filterChild(function (child) {
+            return parent.filterChild(child => {
                 return (isNode && child.isNode()) || (isLink && child.isLink());
             });
         }
@@ -554,6 +611,7 @@ class Model extends Events {
     }
 
     indexOfLink(cell, link) {
+
         return cell ? cell.indexOfLink(link) : -1;
     }
 
@@ -896,12 +954,10 @@ class Model extends Events {
 
         let previous = cell.getGeometry(true) || {};
 
-        utils.forEach(['size', 'position', 'rotation'], function (key) {
-
+        utils.forEach(['size', 'position', 'rotation'], key => {
             if (geom[key]) {
                 this[key + 'Changed'](cell, geom[key]);
             }
-
         }, this);
 
         return previous;

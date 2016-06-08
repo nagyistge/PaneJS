@@ -1,5 +1,5 @@
 import * as utils from '../common/utils';
-import   Terminal from '../cells/Terminal';
+import Terminal   from '../cells/Terminal';
 
 
 // private
@@ -598,7 +598,7 @@ class Cell {
 
         let result = [];
 
-        this.eachChild(function (child) {
+        this.eachChild(child => {
             result.push(child);
             result = result.concat(this.getDescendants(child));
         }, this);
@@ -739,7 +739,7 @@ class Cell {
 
         if (!scheduled) {
 
-            utils.forEach(['size', 'position', 'rotation'], function (key) {
+            utils.forEach(['size', 'position', 'rotation'], key => {
 
                 let val = geom[key];
                 if (val) {
@@ -942,12 +942,12 @@ class Cell {
 
     destroy() {
 
-        this.eachChild(function (child) {
+        this.eachChild(child => {
             child.destroy();
         });
 
-        this.eachLink(function (child) {
-            child.destroy();
+        this.eachLink(link => {
+            link.destroy();
         });
 
         this.removeFromTerminal(true)
