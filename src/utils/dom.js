@@ -556,11 +556,15 @@ function getBounds(elem) {
 
     const docEle = doc.documentElement;
     const result = {};
-    // The original object returned by getBoundingClientRect is immutable, so we clone it
-    // We can't use extend because the properties are not considered part of the object by hasOwnProperty in IE9
+
+    // The original object returned by getBoundingClientRect is immutable,
+    // so we clone it.
+    // We can't use extend because the properties are not considered part
+    // of the object by hasOwnProperty in IE9.
+    // `getBoundingClientRect` returns transformed rect.
     const rect = elem.getBoundingClientRect();
 
-    for (let k in rect) {
+    for (const k in rect) {
         result[k] = rect[k];
     }
 

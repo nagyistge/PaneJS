@@ -239,9 +239,11 @@ class LinkView extends VectorView {
 
     getConnectionPoint(isSource) {
 
-        return this.fetchConnPointOnMarker(isSource)
+        var point = this.fetchConnPointOnMarker(isSource)
             || this.fetchStaticConnPoint(isSource)
             || this.fetchConnPointOnPort(isSource);
+
+        return point;
     }
 
     transformMarker(isSource) {
