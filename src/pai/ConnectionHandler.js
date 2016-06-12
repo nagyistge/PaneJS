@@ -13,9 +13,12 @@ class ConnectionHandler extends Handler {
 
         this.clean();
 
+        this.mouseOverHandler = this.onCellMouseOver.bind(this);
+        this.mouseOutHandler  = this.onCellMouseOut.bind(this);
+
         this.getPaper()
-            .on('cell:mouseOver', this.onCellMouseOver.bind(this))
-            .on('cell:mouseOut', this.onCellMouseOut.bind(this))
+            //.on('cell:mouseOver', this.onCellMouseOver.bind(this))
+            //.on('cell:mouseOut', this.onCellMouseOut.bind(this))
             .on('cell:pointerDown', this.onCellMouseDown.bind(this))
             .on('cell:pointerMove', this.onCellMouseMove.bind(this))
             .on('cell:pointerUp', this.onCellMouseUp.bind(this));
@@ -39,6 +42,7 @@ class ConnectionHandler extends Handler {
     }
 
     getEventData() {
+
         return {
             sourceNode: this.sourceNode,
             sourceView: this.sourceView,
@@ -72,6 +76,10 @@ class ConnectionHandler extends Handler {
         model.beginUpdate();
 
         if (!this.connecting) {
+
+            this.getPaper()
+                .on('cell:mouseOver', this.mouseOverHandler)
+                .on('cell:mouseOut', this.mouseOutHandler);
 
             this.link = new Link({
                 view: LinkView,
@@ -108,12 +116,15 @@ class ConnectionHandler extends Handler {
         let paper = this.getPaper();
         let model = this.getModel();
 
+        paper
+            .off('cell:mouseOver', this.mouseOverHandler)
+            .off('cell:mouseOut', this.mouseOutHandler);
+
         model.beginUpdate();
 
         this.link.removeFromParent();
 
         paper.trigger('cell:connected', this.getEventData());
-
         model.endUpdate();
 
         this.clean();

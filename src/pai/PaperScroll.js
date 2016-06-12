@@ -1,8 +1,6 @@
 import * as utils from '../common/utils';
 import vector     from '../common/vector';
 import detector   from '../common/detector';
-import Point      from '../geometry/Point';
-
 
 const defaults = {
     paper: null,
@@ -17,6 +15,14 @@ class PaperScroll {
 
         if (options) {
             this.install(options);
+        }
+    }
+
+    destroy() {
+
+        if (!this.destroyed) {
+            utils.removeElement(this.elem);
+            utils.destroy(this);
         }
     }
 
@@ -149,11 +155,7 @@ class PaperScroll {
         // center of scroll element. If no point given [x,y] equals to
         // center of the paper element.
 
-        let paper  = this.paper;
-        let matrix = paper.viewport.getCTM();
-
-        console.log(matrix);
-
+        let paper = this.paper;
         // the paper rectangle
         //   x1,y1 ---------
         //   |             |
@@ -172,8 +174,6 @@ class PaperScroll {
             x *= paper.sx; // scale x
             y *= paper.sy; // scale y
         }
-
-        console.log('center:', x, y);
 
         var rootCenterX = this.elem.clientWidth / 2;
         var rootCenterY = this.elem.clientHeight / 2;
@@ -266,8 +266,6 @@ class PaperScroll {
         var cx = options.cx;
         var cy = options.cy;
 
-        console.log(center);
-
         // if the scale center is not specified find
         // the center of the paper's visible area.
         if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
@@ -285,8 +283,6 @@ class PaperScroll {
 
         var dx = this.elem.clientWidth * (this.sx - sx);
         var dy = this.elem.clientHeight * (this.sy - sy);
-        console.log('dx:', dx, ' dy:', dy);
-
 
         this.paper.scale(sx, sy);
         this.center(cx, cy);
@@ -300,12 +296,15 @@ class PaperScroll {
 
         var paper = this.paper;
 
-        var x = paper.options.x;
-        var y = paper.options.y;
+        var x = paper.tx;
+        var y = paper.ty;
 
-        options.fittingBBox = options.fittingBBox || paper.getContentBBox();
-
-        console.log(options.fittingBBox);
+        options.fittingBBox = options.fittingBBox || {
+                x,
+                y,
+                width: this.elem.clientWidth,
+                height: this.elem.clientHeight
+            };
 
         this.beforeZoom();
 

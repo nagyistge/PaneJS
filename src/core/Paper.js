@@ -179,15 +179,20 @@ class Paper extends Events {
 
     destroy() {
 
-        utils.removeElement(this.svg);
+        this.trigger('paper:destroy');
+
+        utils.removeElement(this.root);
 
         if (detector.IS_POINTER) {
             this.container.style.msTouchAction = '';
         }
 
-        this.model.destroy();
+        let model = this.getModel();
+        if (model && !model.destroyed) {
+            model.destroy();
+        }
+
         utils.destroy(this);
-        this.trigger('paper:destroy');
     }
 
     registerHandlers(handlers) {
@@ -368,11 +373,7 @@ class Paper extends Events {
 
         padding = utils.normalizeSides(padding);
 
-        let bbox  = this.getContentBBox(true);
-        let scale = vector(this.viewport).scale();
-
-        //console.log('fitToContent:')
-        //console.log(bbox);
+        let bbox = this.getContentBBox(true);
 
         bbox.x *= this.sx;
         bbox.y *= this.sy;
@@ -454,10 +455,10 @@ class Paper extends Events {
         var padding      = utils.normalizeSides(options.padding);
         var paperOptions = this.options;
         var fittingBBox  = options.fittingBBox || {
-                x: paperOptions.x,
-                y: paperOptions.y,
-                width: paperOptions.width,
-                height: paperOptions.height
+                x: this.tx,
+                y: this.ty,
+                width: this.width,
+                height: this.height
             };
 
         fittingBBox = Rect.fromRect(fittingBBox).moveAndExpand({
@@ -468,10 +469,8 @@ class Paper extends Events {
         });
 
 
-        var scale = vector(this.viewport).scale();
-
-        var sx = fittingBBox.width / contentBBox.width * scale.sx;
-        var sy = fittingBBox.height / contentBBox.height * scale.sy;
+        var sx = fittingBBox.width / contentBBox.width;
+        var sy = fittingBBox.height / contentBBox.height;
 
         // snap scale to a grid
         var scaleGrid = options.scaleGrid;
@@ -495,8 +494,7 @@ class Paper extends Events {
 
         this.scale(sx, sy);
 
-
-        contentBBox = this.getContentBBox();
+        contentBBox = this.getContentBBox(true);
 
         var tx = fittingBBox.x - contentBBox.x;
         var ty = fittingBBox.y - contentBBox.y;
@@ -913,8 +911,6 @@ class Paper extends Events {
     // -------
 
     handleChanges(changes) {
-
-        // console.log(changes);
 
         utils.forEach(changes, function (change) {
             this.distributeChange(change);

@@ -82,11 +82,19 @@ class SelectHandler extends Handler {
         if (!this.moving) {
 
             let bounds = null;
+            let paper  = this.getPaper();
+            let sx     = paper.sx;
+            let sy     = paper.sy;
 
             utils.forEach(this.selectedCells, function (node) {
                 if (node.isNode()) {
                     let rect = node.getBBox();
                     if (rect) {
+                        //rect.x *= sx;
+                        //rect.y *= sy;
+                        //rect.width *= sx;
+                        //rect.height *= sy;
+
                         bounds = bounds ? bounds.union(rect) : rect;
                     }
                 }
@@ -100,6 +108,8 @@ class SelectHandler extends Handler {
                 this.updatePreview(true);
                 this.showPreview();
             }
+
+            console.log(bounds);
 
             this.moving = true;
         }
@@ -306,36 +316,60 @@ class SelectHandler extends Handler {
 
         if (scrollable) {
 
-            let sense    = this.options.sense;
-            let bounds   = this.bounds;
+            let sense = this.options.sense;
+            let paper = this.getPaper();
+
+            let bounds = this.bounds;
+
+            let x = bounds.x;
+            let y = bounds.y;
+
+            let width  = bounds.width;
+            let height = bounds.height;
+
+            var scrollWidth  = scrollParent.scrollWidth;
+            var scrollHeight = scrollParent.scrollHeight;
+
+            let clientWidth  = scrollParent.clientWidth;
+            let clientHeight = scrollParent.clientHeight;
+
+            var scrollTop  = scrollParent.scrollTop;
+            var scrollLeft = scrollParent.scrollLeft;
+
+            console.log('x: ' + x);
+            console.log('y: ' + y);
+            console.log('w: ' + width);
+            console.log('H: ' + height);
+
             let scrolled = false;
 
-            if ((scrollParent.scrollLeft - bounds.x) === 0 && scrollParent.scrollLeft > 0) {
+            if (scrollLeft > 0 && x - scrollLeft <= 0) {
 
                 scrolled = true;
 
-                bounds.x                = Math.max(0, bounds.x - sense);
-                scrollParent.scrollLeft = Math.max(0, scrollParent.scrollLeft - sense);
+                bounds.x                = Math.max(0, x - sense);
+                scrollParent.scrollLeft = Math.max(0, scrollLeft - sense);
 
-            } else if (((bounds.x + bounds.width) - (scrollParent.scrollLeft + scrollParent.clientWidth)) === 0 && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
+            } else if ((x + width) - (scrollParent.scrollLeft + scrollParent.clientWidth) === 0
+                && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
 
                 scrolled = true;
 
-                bounds.x                = Math.min(scrollParent.scrollWidth - bounds.width, bounds.x + sense);
+                bounds.x                = Math.min(scrollParent.scrollWidth - width, x + sense);
                 scrollParent.scrollLeft = Math.min(scrollParent.scrollWidth - scrollParent.clientWidth, scrollParent.scrollLeft + sense);
 
-            } else if ((scrollParent.scrollTop - bounds.y) === 0 && scrollParent.scrollTop > 0) {
+            } else if ((scrollParent.scrollTop - y) === 0 && scrollParent.scrollTop > 0) {
 
                 scrolled = true;
 
-                bounds.y               = Math.max(0, bounds.y - sense);
+                bounds.y               = Math.max(0, y - sense);
                 scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop - sense);
 
-            } else if (((bounds.y + bounds.height) - (scrollParent.scrollTop + scrollParent.clientHeight)) === 0 && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
+            } else if (((y + height) - (scrollParent.scrollTop + scrollParent.clientHeight)) === 0 && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
 
                 scrolled = true;
 
-                bounds.y               = Math.min(scrollParent.scrollHeight - bounds.height, bounds.y + sense);
+                bounds.y               = Math.min(scrollParent.scrollHeight - height, y + sense);
                 scrollParent.scrollTop = Math.min(scrollParent.scrollHeight - scrollParent.clientHeight, scrollParent.scrollTop + sense);
             }
 
@@ -364,7 +398,6 @@ class SelectHandler extends Handler {
                 utils.toggleClass(elem, 'single', this.getSelectedNodesCount() === 1);
             }
         }
-
 
         return this;
     }
@@ -421,8 +454,8 @@ class SelectHandler extends Handler {
 
     autoScrollSelectionRect(localX, localY) {
 
-        let scrollParent  = this.scrollParent;
-        let scrollable = scrollParent.scrollWidth > scrollParent.clientWidth
+        let scrollParent = this.scrollParent;
+        let scrollable   = scrollParent.scrollWidth > scrollParent.clientWidth
             || scrollParent.scrollHeight > scrollParent.clientHeight;
 
         if (scrollable) {
@@ -438,7 +471,7 @@ class SelectHandler extends Handler {
                 scrolled = true;
                 localX -= sense;
 
-                bounds.x             = Math.max(0, bounds.x - sense);
+                bounds.x                = Math.max(0, bounds.x - sense);
                 scrollParent.scrollLeft = Math.max(0, scrollParent.scrollLeft - sense);
 
             } else if (localX > scrollParent.scrollLeft + scrollParent.clientWidth && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
@@ -448,7 +481,7 @@ class SelectHandler extends Handler {
                 scrolled = true;
                 localX += sense;
 
-                bounds.width         = Math.min(scrollParent.scrollWidth - bounds.x, bounds.width + sense);
+                bounds.width            = Math.min(scrollParent.scrollWidth - bounds.x, bounds.width + sense);
                 scrollParent.scrollLeft = Math.min(scrollParent.scrollWidth - scrollParent.clientWidth, scrollParent.scrollLeft + sense);
 
             } else if (localY < scrollParent.scrollTop && scrollParent.scrollTop > 0) {
@@ -458,7 +491,7 @@ class SelectHandler extends Handler {
                 scrolled = true;
                 localY -= sense;
 
-                bounds.y            = Math.max(0, bounds.y - sense);
+                bounds.y               = Math.max(0, bounds.y - sense);
                 scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop - sense);
 
             } else if (localY > scrollParent.scrollTop + scrollParent.clientHeight && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
@@ -468,7 +501,7 @@ class SelectHandler extends Handler {
                 scrolled = true;
                 localY += sense;
 
-                bounds.height       = Math.min(scrollParent.scrollHeight - bounds.y, bounds.height + sense);
+                bounds.height          = Math.min(scrollParent.scrollHeight - bounds.y, bounds.height + sense);
                 scrollParent.scrollTop = Math.min(scrollParent.scrollHeight - scrollParent.clientHeight, scrollParent.scrollTop + sense);
             }
 

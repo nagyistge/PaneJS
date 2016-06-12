@@ -222,7 +222,7 @@ function normalizeSides(box) {
 
     if (Object(box) !== box) {
 
-        box = isNil(box) || 0;
+        box = isNil(box) ? 0 : box;
 
         return {
             top: box,
