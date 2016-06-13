@@ -304,14 +304,7 @@ class SelectHandler extends Handler {
 
     autoScrollPreview() {
 
-        let scrollParent = this.scrollParent
-        let scrollWidth  = scrollParent.scrollWidth;
-        let scrollHeight = scrollParent.scrollHeight;
-        let clientWidth  = scrollParent.clientWidth;
-        let clientHeight = scrollParent.clientHeight;
-
-        let scrollable = scrollWidth > clientWidth || scrollHeight > clientHeight;
-        if (scrollable) {
+        if (this.isParentScrollable()) {
 
             let sense = this.options.sense;
             let paper = this.getPaper();
@@ -324,8 +317,13 @@ class SelectHandler extends Handler {
             let width  = bounds.width;
             let height = bounds.height;
 
-            var scrollTop  = scrollParent.scrollTop;
-            var scrollLeft = scrollParent.scrollLeft;
+            let scrollParent = this.scrollParent
+            let scrollWidth  = scrollParent.scrollWidth;
+            let scrollHeight = scrollParent.scrollHeight;
+            let clientWidth  = scrollParent.clientWidth;
+            let clientHeight = scrollParent.clientHeight;
+            var scrollTop    = scrollParent.scrollTop;
+            var scrollLeft   = scrollParent.scrollLeft;
 
             let scrolled = false;
 
@@ -351,7 +349,8 @@ class SelectHandler extends Handler {
                 bounds.y  = Math.max(0, y - sense);
                 scrollTop = Math.max(0, scrollTop - sense);
 
-            } else if (((y + height) - (scrollTop + clientHeight)) === 0 && scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
+            } else if (((y + height) - (scrollTop + clientHeight)) === 0
+                && scrollTop < scrollHeight - clientHeight) {
 
                 scrolled = true;
 
@@ -444,25 +443,21 @@ class SelectHandler extends Handler {
 
     autoScrollSelectionRect(localX, localY) {
 
-        let scrollParent = this.scrollParent;
-        let scrollWidth  = scrollParent.scrollWidth;
-        let scrollHeight = scrollParent.scrollHeight;
-        let clientWidth  = scrollParent.clientWidth;
-        let clientHeight = scrollParent.clientHeight;
-
-        let scrollable = scrollWidth > clientWidth || scrollHeight > clientHeight;
-        if (scrollable) {
+        if (this.isParentScrollable()) {
 
             let sense    = this.options.sense;
             let bounds   = this.bounds;
             let scrolled = false;
 
-            let scrollTop  = scrollParent.scrollTop;
-            let scrollLeft = scrollParent.scrollLeft;
-
+            let scrollParent = this.scrollParent;
+            let scrollWidth  = scrollParent.scrollWidth;
+            let scrollHeight = scrollParent.scrollHeight;
+            let clientWidth  = scrollParent.clientWidth;
+            let clientHeight = scrollParent.clientHeight;
+            let scrollTop    = scrollParent.scrollTop;
+            let scrollLeft   = scrollParent.scrollLeft;
 
             if (localX < scrollLeft && scrollLeft > 0) {
-
                 // scroll left
 
                 scrolled = true;
@@ -473,7 +468,6 @@ class SelectHandler extends Handler {
 
             } else if (localX > scrollLeft + clientWidth
                 && scrollLeft < scrollWidth - clientWidth) {
-
                 // scroll right
 
                 scrolled = true;
@@ -483,7 +477,6 @@ class SelectHandler extends Handler {
                 scrollLeft   = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
 
             } else if (localY < scrollTop && scrollTop > 0) {
-
                 // scroll top
 
                 scrolled = true;
@@ -492,8 +485,8 @@ class SelectHandler extends Handler {
                 bounds.y  = Math.max(0, bounds.y - sense);
                 scrollTop = Math.max(0, scrollTop - sense);
 
-            } else if (localY > scrollTop + clientHeight && scrollTop < scrollHeight - clientHeight) {
-
+            } else if (localY > scrollTop + clientHeight
+                && scrollTop < scrollHeight - clientHeight) {
                 // scroll bottom
 
                 scrolled = true;
@@ -605,6 +598,14 @@ class SelectHandler extends Handler {
         }
 
         return this;
+    }
+
+    isParentScrollable() {
+
+        let scrollParent = this.scrollParent;
+
+        return scrollParent.scrollWidth > scrollParent.clientWidth
+            || scrollParent.scrollHeight > scrollParent.clientHeight;
     }
 
     notifyMoving() {

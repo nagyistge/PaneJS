@@ -297,20 +297,13 @@ class HTMLNodeView extends CellView {
 
         let elem = this.getPortElem(port, isSourcePort);
         if (elem) {
-
             let bounds = utils.getBounds(elem);
-            let paper  = this.getPaper();
-            let point  = paper.toLocalPoint({
+            return this.getPaper().toLocalRect({
                 x: bounds.left,
-                y: bounds.top
+                y: bounds.top,
+                width: bounds.width,
+                height: bounds.height
             });
-            let corner = paper.toLocalPoint({
-                x: bounds.left + bounds.width,
-                y: bounds.top + bounds.height
-            });
-
-            // return local rect
-            return new Rect(point.x, point.y, corner.x - point.x, corner.y - point.y);
         }
     }
 

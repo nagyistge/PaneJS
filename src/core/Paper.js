@@ -1359,6 +1359,20 @@ class Paper extends Events {
 
         return Point.fromPoint(result);
     }
+
+    toLocalRect(rect) {
+
+        let origin = this.toLocalPoint({
+            x: rect.x,
+            y: rect.y
+        });
+        let corner = this.toLocalPoint({
+            x: rect.x + rect.width,
+            y: rect.y + rect.height
+        });
+
+        return new Rect(origin.x, origin.y, corner.x - origin.x, corner.y - origin.y);
+    }
 }
 
 
