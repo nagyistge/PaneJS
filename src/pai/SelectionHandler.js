@@ -10,7 +10,8 @@ class SelectHandler extends Handler {
         this.options = utils.merge({
             multi: true,
             area: true,
-            sense: 50
+            delay: 30,
+            sense: 10
         }, options);
 
         this.scrollParent = utils.getScrollParent(this.getPaper().svg);
@@ -26,10 +27,12 @@ class SelectHandler extends Handler {
         utils.addClass(this.previewRect, 'pane-selection-preview');
         utils.addClass(this.selectionRect, 'pane-selection-rect');
 
-        this.origin        = null;
+        this.focusedCell   = null;
+        this.movingCells   = [];
         this.selectedCells = [];
-        this.bounds        = null;
-        this.bounds        = null;
+
+        this.origin = null;
+        this.bounds = null;
 
         this.getPaper()
             .on('cell:pointerDown', this.onCellMouseDown.bind(this))
@@ -48,28 +51,16 @@ class SelectHandler extends Handler {
             return;
         }
 
-        if (cell.isLink()) {
+        if (cell.isNode() && view.isPortElem(e.target)) {
+            return;
+        }
 
-            this.clearSelection();
-            this.setCellFocused(cell, view);
+        this.moving = false;
+        this.bounds = null;
 
-        } else if (!view.isPortElem(e.target)) {
-
-            this.origin = { x: localX, y: localY };
-
-            if (!cell.selected || this.selectedCells.length < 2) {
-
-                let multi = utils.hasModifierKey(e);
-
-                this.selectCell(cell, view, multi);
-                this.notifySelectionChange();
-
-                if (!multi) {
-                    this.setCellFocused(cell, view);
-                }
-            } else {
-                this.lazyCheck = true;
-            }
+        if (cell.isNode()) {
+            this.origin      = { x: localX, y: localY };
+            this.movingCells = cell.selected ? this.selectedCells : [cell];
         }
     }
 
@@ -81,25 +72,7 @@ class SelectHandler extends Handler {
 
         if (!this.moving) {
 
-            let bounds = null;
-            let paper  = this.getPaper();
-            let sx     = paper.sx;
-            let sy     = paper.sy;
-
-            utils.forEach(this.selectedCells, function (node) {
-                if (node.isNode()) {
-                    let rect = node.getBBox();
-                    if (rect) {
-                        //rect.x *= sx;
-                        //rect.y *= sy;
-                        //rect.width *= sx;
-                        //rect.height *= sy;
-
-                        bounds = bounds ? bounds.union(rect) : rect;
-                    }
-                }
-            });
-
+            let bounds = this.getPreviewBounds();
             if (bounds) {
                 this.bounds         = bounds;
                 this.previewOriginX = bounds.x;
@@ -108,8 +81,6 @@ class SelectHandler extends Handler {
                 this.updatePreview(true);
                 this.showPreview();
             }
-
-            console.log(bounds);
 
             this.moving = true;
         }
@@ -136,53 +107,60 @@ class SelectHandler extends Handler {
 
     onCellMouseUp(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || cell.isLink() || !this.origin) {
+        if (this.isDisabled() || !this.origin) {
             return;
         }
 
-        if (this.moving) {
+        let dx = localX - this.origin.x;
+        let dy = localY - this.origin.y;
+
+        // movement
+        if (this.moving && (dx !== 0 || dy !== 0)) {
 
             this.stopScrollTimer();
             this.hidePreview();
 
-            let dx = localX - this.origin.x;
-            let dy = localY - this.origin.y;
+            let model = this.getModel();
 
-            if (dx !== 0 || dy !== 0) {
+            model.beginUpdate();
 
-                let model = this.getModel();
+            utils.forEach(this.movingCells, function (node) {
+                if (node.isNode()) {
 
-                model.beginUpdate();
+                    let position = node.getPosition();
 
-                utils.forEach(this.selectedCells, function (node) {
-                    if (node.isNode()) {
+                    node.setPosition({
+                        x: position.x + dx,
+                        y: position.y + dy,
+                        relative: position.relative === true
+                    });
+                }
+            }, this);
 
-                        let position = node.getPosition();
+            model.endUpdate();
 
-                        node.setPosition({
-                            x: position.x + dx,
-                            y: position.y + dy,
-                            relative: position.relative === true
-                        });
-                    }
-                }, this);
+            this.getPaper().trigger('cells:updatePosition', this.movingCells);
 
-                model.endUpdate();
-
-                this.getPaper().trigger('cells:updatePosition', this.selectedCells);
-            }
         } else {
-            if (this.lazyCheck) {
-                this.selectCell(cell, view, false);
+            if (cell.isLink()) {
+                this.clearSelection();
                 this.setCellFocused(cell, view);
+            } else {
+
+                let multi = utils.hasModifierKey(e);
+                this.selectCell(cell, view, multi);
                 this.notifySelectionChange();
+
+                if (!multi) {
+                    this.setCellFocused(cell, view);
+                }
             }
         }
 
-        this.origin    = null;
-        this.bounds    = null;
-        this.moving    = false;
-        this.lazyCheck = false;
+        this.origin      = null;
+        this.bounds      = null;
+        this.moving      = false;
+        this.movingCells = null;
     }
 
     onBlankMouseDown(e, localX, localY) {
@@ -308,12 +286,31 @@ class SelectHandler extends Handler {
         return this;
     }
 
+    getPreviewBounds() {
+
+        let bounds = null;
+
+        utils.forEach(this.movingCells, function (node) {
+            if (node.isNode()) {
+                let rect = node.getBBox();
+                if (rect) {
+                    bounds = bounds ? bounds.union(rect) : rect;
+                }
+            }
+        });
+
+        return bounds;
+    }
+
     autoScrollPreview() {
 
         let scrollParent = this.scrollParent
-        let scrollable   = scrollParent.scrollWidth > scrollParent.clientWidth
-            || scrollParent.scrollHeight > scrollParent.clientHeight;
+        let scrollWidth  = scrollParent.scrollWidth;
+        let scrollHeight = scrollParent.scrollHeight;
+        let clientWidth  = scrollParent.clientWidth;
+        let clientHeight = scrollParent.clientHeight;
 
+        let scrollable = scrollWidth > clientWidth || scrollHeight > clientHeight;
         if (scrollable) {
 
             let sense = this.options.sense;
@@ -327,19 +324,8 @@ class SelectHandler extends Handler {
             let width  = bounds.width;
             let height = bounds.height;
 
-            var scrollWidth  = scrollParent.scrollWidth;
-            var scrollHeight = scrollParent.scrollHeight;
-
-            let clientWidth  = scrollParent.clientWidth;
-            let clientHeight = scrollParent.clientHeight;
-
             var scrollTop  = scrollParent.scrollTop;
             var scrollLeft = scrollParent.scrollLeft;
-
-            console.log('x: ' + x);
-            console.log('y: ' + y);
-            console.log('w: ' + width);
-            console.log('H: ' + height);
 
             let scrolled = false;
 
@@ -347,35 +333,37 @@ class SelectHandler extends Handler {
 
                 scrolled = true;
 
-                bounds.x                = Math.max(0, x - sense);
-                scrollParent.scrollLeft = Math.max(0, scrollLeft - sense);
+                bounds.x   = Math.max(0, x - sense);
+                scrollLeft = Math.max(0, scrollLeft - sense);
 
-            } else if ((x + width) - (scrollParent.scrollLeft + scrollParent.clientWidth) === 0
-                && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
-
-                scrolled = true;
-
-                bounds.x                = Math.min(scrollParent.scrollWidth - width, x + sense);
-                scrollParent.scrollLeft = Math.min(scrollParent.scrollWidth - scrollParent.clientWidth, scrollParent.scrollLeft + sense);
-
-            } else if ((scrollParent.scrollTop - y) === 0 && scrollParent.scrollTop > 0) {
+            } else if ((x + width) - (scrollLeft + clientWidth) === 0
+                && scrollLeft < scrollWidth - clientWidth) {
 
                 scrolled = true;
 
-                bounds.y               = Math.max(0, y - sense);
-                scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop - sense);
+                bounds.x   = Math.min(scrollWidth - width, x + sense);
+                scrollLeft = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
 
-            } else if (((y + height) - (scrollParent.scrollTop + scrollParent.clientHeight)) === 0 && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
+            } else if ((scrollTop - y) === 0 && scrollTop > 0) {
 
                 scrolled = true;
 
-                bounds.y               = Math.min(scrollParent.scrollHeight - height, y + sense);
-                scrollParent.scrollTop = Math.min(scrollParent.scrollHeight - scrollParent.clientHeight, scrollParent.scrollTop + sense);
+                bounds.y  = Math.max(0, y - sense);
+                scrollTop = Math.max(0, scrollTop - sense);
+
+            } else if (((y + height) - (scrollTop + clientHeight)) === 0 && scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
+
+                scrolled = true;
+
+                bounds.y  = Math.min(scrollHeight - height, y + sense);
+                scrollTop = Math.min(scrollHeight - clientHeight, scrollTop + sense);
             }
 
             if (scrolled) {
+                scrollParent.scrollTop  = scrollTop;
+                scrollParent.scrollLeft = scrollLeft;
                 this.updatePreview();
-                this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this), 30);
+                this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this), this.options.delay);
             }
         }
 
@@ -392,10 +380,12 @@ class SelectHandler extends Handler {
             utils.setTranslate(elem, bounds.x, bounds.y);
 
             if (resize) {
-                elem.style.width  = bounds.width + 'px';
-                elem.style.height = bounds.height + 'px';
+                utils.setStyle(elem, {
+                    width: bounds.width + 'px',
+                    height: bounds.height + 'px'
+                });
 
-                utils.toggleClass(elem, 'single', this.getSelectedNodesCount() === 1);
+                utils.toggleClass(elem, 'single', this.movingCells.length === 1);
             }
         }
 
@@ -442,11 +432,11 @@ class SelectHandler extends Handler {
         let bounds = this.bounds;
 
         if (bounds && elem) {
-
             utils.setTranslate(elem, bounds.x, bounds.y);
-
-            elem.style.width  = bounds.width + 'px';
-            elem.style.height = bounds.height + 'px';
+            utils.setStyle(elem, {
+                width: bounds.width + 'px',
+                height: bounds.height + 'px'
+            });
         }
 
         return this;
@@ -455,76 +445,73 @@ class SelectHandler extends Handler {
     autoScrollSelectionRect(localX, localY) {
 
         let scrollParent = this.scrollParent;
-        let scrollable   = scrollParent.scrollWidth > scrollParent.clientWidth
-            || scrollParent.scrollHeight > scrollParent.clientHeight;
+        let scrollWidth  = scrollParent.scrollWidth;
+        let scrollHeight = scrollParent.scrollHeight;
+        let clientWidth  = scrollParent.clientWidth;
+        let clientHeight = scrollParent.clientHeight;
 
+        let scrollable = scrollWidth > clientWidth || scrollHeight > clientHeight;
         if (scrollable) {
 
             let sense    = this.options.sense;
             let bounds   = this.bounds;
             let scrolled = false;
 
-            if (localX < scrollParent.scrollLeft && scrollParent.scrollLeft > 0) {
+            let scrollTop  = scrollParent.scrollTop;
+            let scrollLeft = scrollParent.scrollLeft;
+
+
+            if (localX < scrollLeft && scrollLeft > 0) {
 
                 // scroll left
 
                 scrolled = true;
                 localX -= sense;
 
-                bounds.x                = Math.max(0, bounds.x - sense);
-                scrollParent.scrollLeft = Math.max(0, scrollParent.scrollLeft - sense);
+                bounds.x   = Math.max(0, bounds.x - sense);
+                scrollLeft = Math.max(0, scrollLeft - sense);
 
-            } else if (localX > scrollParent.scrollLeft + scrollParent.clientWidth && scrollParent.scrollLeft < scrollParent.scrollWidth - scrollParent.clientWidth) {
+            } else if (localX > scrollLeft + clientWidth
+                && scrollLeft < scrollWidth - clientWidth) {
 
                 // scroll right
 
                 scrolled = true;
                 localX += sense;
 
-                bounds.width            = Math.min(scrollParent.scrollWidth - bounds.x, bounds.width + sense);
-                scrollParent.scrollLeft = Math.min(scrollParent.scrollWidth - scrollParent.clientWidth, scrollParent.scrollLeft + sense);
+                bounds.width = Math.min(scrollWidth - bounds.x, bounds.width + sense);
+                scrollLeft   = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
 
-            } else if (localY < scrollParent.scrollTop && scrollParent.scrollTop > 0) {
+            } else if (localY < scrollTop && scrollTop > 0) {
 
                 // scroll top
 
                 scrolled = true;
                 localY -= sense;
 
-                bounds.y               = Math.max(0, bounds.y - sense);
-                scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop - sense);
+                bounds.y  = Math.max(0, bounds.y - sense);
+                scrollTop = Math.max(0, scrollTop - sense);
 
-            } else if (localY > scrollParent.scrollTop + scrollParent.clientHeight && scrollParent.scrollTop < scrollParent.scrollHeight - scrollParent.clientHeight) {
+            } else if (localY > scrollTop + clientHeight && scrollTop < scrollHeight - clientHeight) {
 
                 // scroll bottom
 
                 scrolled = true;
                 localY += sense;
 
-                bounds.height          = Math.min(scrollParent.scrollHeight - bounds.y, bounds.height + sense);
-                scrollParent.scrollTop = Math.min(scrollParent.scrollHeight - scrollParent.clientHeight, scrollParent.scrollTop + sense);
+                bounds.height = Math.min(scrollHeight - bounds.y, bounds.height + sense);
+                scrollTop     = Math.min(scrollHeight - clientHeight, scrollTop + sense);
             }
 
             if (scrolled) {
+                scrollParent.scrollTop  = scrollTop;
+                scrollParent.scrollLeft = scrollLeft;
                 this.updateSelectionRect();
-                this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), 30);
+                this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), this.options.delay);
             }
         }
 
         return this;
-    }
-
-    getSelectedNodesCount() {
-
-        let count = 0;
-
-        utils.forEach(this.selectedCells, function (cell) {
-            if (cell.isNode()) {
-                count++;
-            }
-        });
-
-        return count;
     }
 
     selectCellsInRect(area) {
@@ -618,6 +605,11 @@ class SelectHandler extends Handler {
         }
 
         return this;
+    }
+
+    notifyMoving() {
+
+        this.getPaper().trigger('cells:moving', this.bounds, this.movingCells);
     }
 
     notifySelectionChange() {

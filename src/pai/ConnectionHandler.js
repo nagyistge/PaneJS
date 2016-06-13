@@ -122,7 +122,7 @@ class ConnectionHandler extends Handler {
 
         model.beginUpdate();
 
-        //this.link.removeFromParent();
+        this.link.removeFromParent();
 
         paper.trigger('cell:connected', this.getEventData());
         model.endUpdate();
