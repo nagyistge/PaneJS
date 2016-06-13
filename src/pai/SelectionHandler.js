@@ -92,7 +92,7 @@ class SelectHandler extends Handler {
             let x = this.previewOriginX + localX - this.origin.x;
             let y = this.previewOriginY + localY - this.origin.y;
 
-            let scrollParent = this.scrollParent
+            let scrollParent = this.scrollParent;
 
             x = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
             y = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
@@ -107,12 +107,17 @@ class SelectHandler extends Handler {
 
     onCellMouseUp(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || !this.origin) {
+        if (this.isDisabled()) {
             return;
         }
 
-        let dx = localX - this.origin.x;
-        let dy = localY - this.origin.y;
+        let dx = 0;
+        let dy = 0;
+
+        if (this.origin) {
+            dx = localX - this.origin.x;
+            dy = localY - this.origin.y;
+        }
 
         // movement
         if (this.moving && (dx !== 0 || dy !== 0)) {
@@ -196,7 +201,7 @@ class SelectHandler extends Handler {
             let width  = Math.abs(x - this.origin.x);
             let height = Math.abs(y - this.origin.y);
 
-            let scrollParent = this.scrollParent
+            let scrollParent = this.scrollParent;
             let origin       = this.origin;
 
             let maxWidth;
@@ -306,9 +311,7 @@ class SelectHandler extends Handler {
 
         if (this.isParentScrollable()) {
 
-            let sense = this.options.sense;
-            let paper = this.getPaper();
-
+            let sense  = this.options.sense;
             let bounds = this.bounds;
 
             let x = bounds.x;
@@ -317,13 +320,13 @@ class SelectHandler extends Handler {
             let width  = bounds.width;
             let height = bounds.height;
 
-            let scrollParent = this.scrollParent
+            let scrollParent = this.scrollParent;
             let scrollWidth  = scrollParent.scrollWidth;
             let scrollHeight = scrollParent.scrollHeight;
             let clientWidth  = scrollParent.clientWidth;
             let clientHeight = scrollParent.clientHeight;
-            var scrollTop    = scrollParent.scrollTop;
-            var scrollLeft   = scrollParent.scrollLeft;
+            let scrollTop    = scrollParent.scrollTop;
+            let scrollLeft   = scrollParent.scrollLeft;
 
             let scrolled = false;
 

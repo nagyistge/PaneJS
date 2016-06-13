@@ -1,6 +1,5 @@
 import * as utils from '../common/utils';
 import detector   from '../common/detector';
-import vector     from '../common/vector';
 import Paper      from '../core/Paper';
 
 

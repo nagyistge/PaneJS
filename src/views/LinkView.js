@@ -1,7 +1,6 @@
 import * as utils from '../common/utils';
 import     vector from '../common/vector';
 import      Point from '../geometry/Point';
-import    Ellipse from '../geometry/Ellipse';
 import VectorView from '../views/VectorView';
 
 

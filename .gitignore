@@ -2,6 +2,6 @@
 .idea
 npm-debug.log
 
-dist
+./dist
 node_modules
 test/coverage

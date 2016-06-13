@@ -88,23 +88,23 @@ function smoothConnector(sourcePoint, targetPoint, vertices) {
         // being equal to targetPointY. Handle situation were sourcePointX is
         // greater or less then targetPointX.
 
-        //let controlPointX = sourcePoint.x < targetPoint.x
+        // let controlPointX = sourcePoint.x < targetPoint.x
         //    ? targetPoint.x - (targetPoint.x - sourcePoint.x) / 2
         //    : sourcePoint.x - (sourcePoint.x - targetPoint.x) / 2;
         //
-        //sourceReference = new Point(controlPointX, sourcePoint.y);
-        //targetReference = new Point(controlPointX, targetPoint.y);
+        // sourceReference = new Point(controlPointX, sourcePoint.y);
+        // targetReference = new Point(controlPointX, targetPoint.y);
 
         let controlPointY = (sourcePoint.y + targetPoint.y) / 2;
 
-        //sourceReference = new Point(sourcePoint.x, controlPointY);
-        //targetReference = new Point(targetPoint.x, controlPointY);
+        // sourceReference = new Point(sourcePoint.x, controlPointY);
+        // targetReference = new Point(targetPoint.x, controlPointY);
         //
-        //fixMarker(view, true, sourceReference);
-        //fixMarker(view, false, targetReference);
+        // fixMarker(view, true, sourceReference);
+        // fixMarker(view, false, targetReference);
         //
-        //sourcePoint = getConnectionPoint(view, true);
-        //targetPoint = getConnectionPoint(view, false);
+        // sourcePoint = getConnectionPoint(view, true);
+        // targetPoint = getConnectionPoint(view, false);
 
         pathArr = [
             'M', sourcePoint.x, sourcePoint.y,

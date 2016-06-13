@@ -1,10 +1,7 @@
-import * as utils from '../common/utils';
-import     vector from '../common/vector';
-import    Handler from '../handlers/Handler';
-import       Rect from '../geometry/Rect';
-import       Link from '../cells/Link';
-import   LinkView from '../pai/LinkView';
-import  quadratic from '../pai/quadratic';
+import Handler   from '../handlers/Handler';
+import Link      from '../cells/Link';
+import LinkView  from '../pai/LinkView';
+import quadratic from '../pai/quadratic';
 
 
 class ConnectionHandler extends Handler {
@@ -17,8 +14,8 @@ class ConnectionHandler extends Handler {
         this.mouseOutHandler  = this.onCellMouseOut.bind(this);
 
         this.getPaper()
-            //.on('cell:mouseOver', this.onCellMouseOver.bind(this))
-            //.on('cell:mouseOut', this.onCellMouseOut.bind(this))
+            // .on('cell:mouseOver', this.onCellMouseOver.bind(this))
+            // .on('cell:mouseOut', this.onCellMouseOut.bind(this))
             .on('cell:pointerDown', this.onCellMouseDown.bind(this))
             .on('cell:pointerMove', this.onCellMouseMove.bind(this))
             .on('cell:pointerUp', this.onCellMouseUp.bind(this));
@@ -107,7 +104,7 @@ class ConnectionHandler extends Handler {
         paper.trigger('cell:connecting', this.getEventData());
     }
 
-    onCellMouseUp(cell, view, e) {
+    onCellMouseUp() {
 
         if (this.isDisabled() || !this.connecting) {
             return;

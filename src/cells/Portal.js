@@ -1,5 +1,4 @@
 import * as utils from '../common/utils';
-import Rect       from '../geometry/Rect';
 import Node       from '../cells/Node';
 import PortalView from '../views/PortalView';
 
@@ -35,12 +34,12 @@ class Portal extends Node {
 
     eachInPort(iterator, context) {
 
-         utils.forEach(this.inPorts, iterator, context);
+        utils.forEach(this.inPorts, iterator, context);
     }
 
     eachOutPort(iterator, context) {
 
-         utils.forEach(this.outPorts, iterator, context);
+        utils.forEach(this.outPorts, iterator, context);
     }
 
     getInPorts() {
@@ -90,11 +89,11 @@ class Portal extends Node {
         return this.metadata.portMarkup;
     }
 
-    getPortSelector(port, isInPort) {
+    getPortSelector(/* port, isInPort */) {
         // the method is go with the markup definition
     }
 
-    getPortsWrapSelector(isInPort) {
+    getPortsWrapSelector(/* isInPort */) {
         // the method is go with the markup definition
     }
 }

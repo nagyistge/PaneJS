@@ -182,7 +182,7 @@ function setStyle(elem, name, value) {
 
     if (elem) {
 
-        var pairs = {};
+        let pairs = {};
 
         if (isObject(name)) {
 
@@ -564,9 +564,12 @@ function getBounds(elem) {
     // `getBoundingClientRect` returns transformed rect.
     const rect = elem.getBoundingClientRect();
 
+    /* eslint-disable guard-for-in */
     for (const k in rect) {
         result[k] = rect[k];
     }
+    /* eslint-enable guard-for-in */
+
 
     if (isUndefined(result.width)) {
         result.width = document.body.scrollWidth - result.left - result.right;
@@ -589,28 +592,32 @@ function getScrollParent(elem) {
     // window.getComputedStyle() will return null;
     // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
 
-    var computed = getComputedStyle(elem) || {};
-    var position = computed.position;
+    let computed = getComputedStyle(elem) || {};
+    let position = computed.position;
 
     if (position === 'fixed') {
         return elem;
     }
 
-    var parent = elem;
+    let parent = elem;
 
     while (parent = parent.parentNode) {
-        var style;
+        let style;
+
+        /* eslint-disable no-empty */
         try {
             style = getComputedStyle(parent);
-        } catch (err) {}
+        } catch (err) { }
+        /* eslint-enable no-empty */
+
 
         if (typeof style === 'undefined' || style === null) {
             return parent;
         }
 
-        var overflow  = style.overflow;
-        var overflowX = style.overflowX;
-        var overflowY = style.overflowY;
+        let overflow  = style.overflow;
+        let overflowX = style.overflowX;
+        let overflowY = style.overflowY;
 
         if (/(auto|scroll)/.test(overflow + overflowY + overflowX)) {
             if (position !== 'absolute' || ['relative', 'absolute', 'fixed'].indexOf(style.position) >= 0) {

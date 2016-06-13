@@ -1,8 +1,6 @@
 import * as utils from '../common/utils';
-import       Rect from '../geometry/Rect';
-import      Point from '../geometry/Point';
-import    Ellipse from '../geometry/Ellipse';
-import   CellView from '../views/CellView';
+import Rect       from '../geometry/Rect';
+import CellView   from '../views/CellView';
 
 
 class HTMLNodeView extends CellView {

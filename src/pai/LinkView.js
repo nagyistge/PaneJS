@@ -120,7 +120,7 @@ class LinkView extends VectorView {
         return this;
     }
 
-    updateComment(comment) {
+    updateComment(/* comment */) {
 
     }
 
@@ -239,7 +239,7 @@ class LinkView extends VectorView {
 
     getConnectionPoint(isSource) {
 
-        var point = this.fetchConnPointOnMarker(isSource)
+        let point = this.fetchConnPointOnMarker(isSource)
             || this.fetchStaticConnPoint(isSource)
             || this.fetchConnPointOnPort(isSource);
 

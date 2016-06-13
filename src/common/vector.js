@@ -178,7 +178,7 @@ export class VElement {
 
     toggleClass(selector, stateVal) {
 
-        utils.removeClass(this.node, selector, stateVal);
+        utils.toggleClass(this.node, selector, stateVal);
 
         return this;
     }

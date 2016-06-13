@@ -112,7 +112,7 @@ class Paper extends Events {
         this.svg      = svg;
         this.viewport = viewport;
 
-        utils.addClass(root, 'pane-paper')
+        utils.addClass(root, 'pane-paper');
         utils.addClass(viewport, 'pane-viewport');
 
         this.backgroundPane = viewport.appendChild(utils.createSvgElement('g'));
@@ -330,26 +330,24 @@ class Paper extends Events {
         if (withoutTransformations) {
 
             return vector(this.viewport).getBBox(true, this.svg);
-
-        } else {
-
-            var rect = this.viewport.getBoundingClientRect();
-
-            // Using Screen CTM was the only way to get the real viewport
-            // bounding box working in both Google Chrome and Firefox.
-            var screenCTM = this.viewport.getScreenCTM();
-
-            // for non-default origin we need to take the
-            // viewport translation into account
-            var viewportCTM = this.viewport.getCTM();
-
-            return Rect.fromRect({
-                x: rect.left - screenCTM.e + viewportCTM.e,
-                y: rect.top - screenCTM.f + viewportCTM.f,
-                width: rect.width,
-                height: rect.height
-            });
         }
+
+        let rect = this.viewport.getBoundingClientRect();
+
+        // Using Screen CTM was the only way to get the real viewport
+        // bounding box working in both Google Chrome and Firefox.
+        let screenCTM = this.viewport.getScreenCTM();
+
+        // for non-default origin we need to take the
+        // viewport translation into account
+        let viewportCTM = this.viewport.getCTM();
+
+        return Rect.fromRect({
+            x: rect.left - screenCTM.e + viewportCTM.e,
+            y: rect.top - screenCTM.f + viewportCTM.f,
+            width: rect.width,
+            height: rect.height
+        });
     }
 
     fitToContent(frameWidth, frameHeight, padding, options) {
@@ -416,8 +414,8 @@ class Paper extends Events {
 
         options = this.options;
 
-        let sizeChanged   = width != this.width || height != this.height;
-        let originChanged = tx != this.tx || ty != this.ty;
+        let sizeChanged   = width !== this.width || height !== this.height;
+        let originChanged = tx !== this.tx || ty !== this.ty;
 
         if (originChanged) {
             this.translate(tx, ty);
@@ -432,10 +430,10 @@ class Paper extends Events {
 
     scaleContentToFit(options = {}) {
 
-        var contentBBox = this.getContentBBox(true);
+        let contentBBox = this.getContentBBox(true);
 
         if (!contentBBox.width || !contentBBox.height) {
-            return;
+            return this;
         }
 
         options = utils.merge({
@@ -452,14 +450,17 @@ class Paper extends Events {
         }, options);
 
 
-        var padding      = utils.normalizeSides(options.padding);
-        var paperOptions = this.options;
-        var fittingBBox  = options.fittingBBox || {
+        let padding     = utils.normalizeSides(options.padding);
+        let fittingBBox = options.fittingBBox;
+
+        if (!fittingBBox) {
+            fittingBBox = {
                 x: this.tx,
                 y: this.ty,
                 width: this.width,
                 height: this.height
             };
+        }
 
         fittingBBox = Rect.fromRect(fittingBBox).moveAndExpand({
             x: padding.left,
@@ -469,21 +470,21 @@ class Paper extends Events {
         });
 
 
-        var sx = fittingBBox.width / contentBBox.width;
-        var sy = fittingBBox.height / contentBBox.height;
+        let sx = fittingBBox.width / contentBBox.width;
+        let sy = fittingBBox.height / contentBBox.height;
 
         // snap scale to a grid
-        var scaleGrid = options.scaleGrid;
+        let scaleGrid = options.scaleGrid;
         if (scaleGrid) {
             sx = utils.snapToGrid(sx, scaleGrid, 'floor');
             sy = utils.snapToGrid(sy, scaleGrid, 'floor');
         }
 
         // scale min/max boundaries
-        var minScaleX = options.minScaleX || options.minScale;
-        var maxScaleX = options.maxScaleX || options.maxScale;
-        var minScaleY = options.minScaleY || options.minScale;
-        var maxScaleY = options.maxScaleY || options.maxScale;
+        let minScaleX = options.minScaleX || options.minScale;
+        let maxScaleX = options.maxScaleX || options.maxScale;
+        let minScaleY = options.minScaleY || options.minScale;
+        let maxScaleY = options.maxScaleY || options.maxScale;
 
         sx = utils.clamp(sx, minScaleX, maxScaleX);
         sy = utils.clamp(sy, minScaleY, maxScaleY);
@@ -496,8 +497,8 @@ class Paper extends Events {
 
         contentBBox = this.getContentBBox(true);
 
-        var tx = fittingBBox.x - contentBBox.x;
-        var ty = fittingBBox.y - contentBBox.y;
+        let tx = fittingBBox.x - contentBBox.x;
+        let ty = fittingBBox.y - contentBBox.y;
 
         this.translateTo(tx, ty);
 

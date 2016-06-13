@@ -1,5 +1,4 @@
 import * as utils from '../common/utils';
-import vector     from '../common/vector';
 import detector   from '../common/detector';
 
 const defaults = {
@@ -34,8 +33,6 @@ class PaperScroll {
         let paper = this.paper;
 
         // keep scale values for a quicker access
-        let scale = vector(paper.viewport).scale();
-
         this.sx = paper.sx || paper.options.sx;
         this.sy = paper.sy || paper.options.sy;
 
@@ -160,10 +157,10 @@ class PaperScroll {
         //   x1,y1 ---------
         //   |             |
         //   ----------- x2,y2
-        var x1 = -paper.tx; // translate x
-        var y1 = -paper.ty; // translate y
-        var x2 = x1 + paper.width;
-        var y2 = y1 + paper.height;
+        let x1 = -paper.tx; // translate x
+        let y1 = -paper.ty; // translate y
+        let x2 = x1 + paper.width;
+        let y2 = y1 + paper.height;
 
         if (utils.isUndefined(x) || utils.isUndefined(y)) {
             // get the center of the paper
@@ -175,15 +172,15 @@ class PaperScroll {
             y *= paper.sy; // scale y
         }
 
-        var rootCenterX = this.elem.clientWidth / 2;
-        var rootCenterY = this.elem.clientHeight / 2;
-        var basePadding = this.basePadding;
+        let rootCenterX = this.elem.clientWidth / 2;
+        let rootCenterY = this.elem.clientHeight / 2;
+        let basePadding = this.basePadding;
 
         // calculate padding
-        var left   = rootCenterX - basePadding.left - x + x1;
-        var right  = rootCenterX - basePadding.right + x - x2;
-        var top    = rootCenterY - basePadding.top - y + y1;
-        var bottom = rootCenterY - basePadding.bottom + y - y2;
+        let left   = rootCenterX - basePadding.left - x + x1;
+        let right  = rootCenterX - basePadding.right + x - x2;
+        let top    = rootCenterY - basePadding.top - y + y1;
+        let bottom = rootCenterY - basePadding.bottom + y - y2;
 
         this.adjustPadding({
             top: Math.max(top, 0),
@@ -239,8 +236,8 @@ class PaperScroll {
 
     zoom(value, options = {}) {
 
-        var sx = value;
-        var sy = value;
+        let sx = value;
+        let sy = value;
 
         if (!options.absolute) {
             sx += this.sx;
@@ -261,10 +258,10 @@ class PaperScroll {
         sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
 
         // the center of the container
-        var center = this.getCenter();
+        let center = this.getCenter();
         // the scale center
-        var cx = options.cx;
-        var cy = options.cy;
+        let cx = options.cx;
+        let cy = options.cy;
 
         // if the scale center is not specified find
         // the center of the paper's visible area.
@@ -272,8 +269,8 @@ class PaperScroll {
             cx = center.x;
             cy = center.y;
         } else {
-            var fsx = sx / this.sx;
-            var fsy = sy / this.sy;
+            let fsx = sx / this.sx;
+            let fsy = sy / this.sy;
 
             cx = cx - ((cx - center.x) / fsx);
             cy = cy - ((cy - center.y) / fsy);
@@ -281,8 +278,8 @@ class PaperScroll {
 
         this.beforeZoom();
 
-        var dx = this.elem.clientWidth * (this.sx - sx);
-        var dy = this.elem.clientHeight * (this.sy - sy);
+        // let dx = this.elem.clientWidth * (this.sx - sx);
+        // let dy = this.elem.clientHeight * (this.sy - sy);
 
         this.paper.scale(sx, sy);
         this.center(cx, cy);
@@ -294,17 +291,15 @@ class PaperScroll {
 
     zoomToFit(options = {}) {
 
-        var paper = this.paper;
+        let paper = this.paper;
 
-        var x = paper.tx;
-        var y = paper.ty;
+        let x = paper.tx;
+        let y = paper.ty;
 
-        options.fittingBBox = options.fittingBBox || {
-                x,
-                y,
-                width: this.elem.clientWidth,
-                height: this.elem.clientHeight
-            };
+        let width  = this.elem.clientWidth;
+        let height = this.elem.clientHeight;
+
+        options.fittingBBox = options.fittingBBox || { x, y, width, height };
 
         this.beforeZoom();
 

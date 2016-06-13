@@ -1,5 +1,4 @@
 import * as utils from '../common/utils';
-import       Rect from '../geometry/Rect';
 import VectorView from '../views/VectorView';
 
 

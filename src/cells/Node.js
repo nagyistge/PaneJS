@@ -1,4 +1,3 @@
-import * as utils from '../common/utils';
 import Rect from '../geometry/Rect';
 import Cell from '../cells/Cell';
 

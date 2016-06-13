@@ -12,7 +12,7 @@ const indexOf     = (arr, item) => arr ? proto.indexOf.call(arr, item) : -1;
 const lastIndexOf = (arr, item) => arr ? proto.lastIndexOf.call(arr, item) : -1;
 const contains    = (arr, item) => arr && indexOf(arr, item) >= 0;
 
-const forEach     = (arr, iterator, context) => { arr && proto.forEach.call(arr, iterator, context); }
+const forEach     = (arr, iterator, context) => { arr && proto.forEach.call(arr, iterator, context); };
 const map         = (arr, iterator, context) => arr ? proto.map.call(arr, iterator, context) : [];
 const some        = (arr, iterator, context) => arr ? proto.some.call(arr, iterator, context) : false;
 const every       = (arr, iterator, context) => arr ? proto.every.call(arr, iterator, context) : false;
