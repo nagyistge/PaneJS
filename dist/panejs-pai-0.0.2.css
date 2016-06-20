@@ -1,0 +1,30 @@
+.pane-paper {
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+.pane-viewport {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+      user-select: none;
+}
+.pane-node {
+  user-drag: none;
+  cursor: move;
+}
+.pane-node * {
+  /*
+     * The default behavior when scaling an element is not to scale the stroke
+     * in order to prevent the ugly effect of stroke with different proportions.
+     *
+     * `vector-effects` is part of SVG 1.2 tiny and the upcoming and
+     * as-yet-unfinished SVG 2 specifications. IE has only targeted SVG 1.1
+     * which does not have `vector-effects`. To work around it figure out how
+     * wide the stroke should be using JavaScript.
+     */
+  vector-effect: non-scaling-stroke;
+}
+
+/*# sourceMappingURL=panejs-pai-0.0.2.css.map*/

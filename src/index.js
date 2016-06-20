@@ -20,20 +20,20 @@ import Paper from './core/Paper';
 
 // models
 // ------
-import     Cell from './cells/Cell';
-import     Link from './cells/Link';
-import     Node from './cells/Node';
-import   Portal from './cells/Portal';
+import Cell     from './cells/Cell';
+import Link     from './cells/Link';
+import Node     from './cells/Node';
+import Portal   from './cells/Portal';
 import Terminal from './cells/Terminal';
 
 
 // views
 // -----
-import     CellView from './views/CellView';
-import     LinkView from './views/LinkView';
-import     NodeView from './views/NodeView';
-import   PortalView from './views/PortalView';
-import   VectorView from './views/VectorView';
+import CellView   from './views/CellView';
+import LinkView   from './views/LinkView';
+import NodeView   from './views/NodeView';
+import PortalView from './views/PortalView';
+import VectorView from './views/VectorView';
 
 
 import Handler           from './handlers/Handler';

@@ -221,28 +221,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	// models
+	// styles
+	// ------
+	
+	__webpack_require__(73);
+	
+	// common
 	// ------
 	
 	
 	// core
 	// ----
-	// common
+	
+	
+	// models
 	// ------
 	
 	
-	_Paper2.default.registerConnector('sharp', _sharp2.default).registerConnector('smooth', _smooth2.default).registerConnector('rounded', _rounded2.default);
-	
-	// markers
-	// -------
+	// views
+	// -----
 	
 	
 	// connectors
 	// ----------
 	
 	
-	// views
-	// -----
+	_Paper2.default.registerConnector('sharp', _sharp2.default).registerConnector('smooth', _smooth2.default).registerConnector('rounded', _rounded2.default);
+	
+	// markers
+	// -------
 	
 	
 	_Paper2.default.registerMarker('classic', _classic2.default).registerMarker('diamond', _diamond2.default).registerMarker('cloven', _cloven2.default).registerMarker('block', _block2.default).registerMarker('oval', _oval2.default);
@@ -11447,7 +11454,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var originChanged = tx !== this.tx || ty !== this.ty;
 	
 	            if (originChanged) {
-	                console.log(tx, ty);
 	                this.translate(tx, ty);
 	            }
 	
@@ -15113,7 +15119,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ovalMarker;
 
 /***/ },
-/* 73 */,
+/* 73 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
 /* 74 */,
 /* 75 */
 /***/ function(module, exports, __webpack_require__) {
@@ -16051,10 +16062,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'adjustPaper',
 	        value: function adjustPaper() {
 	
-	            // store the current mid point of visible paper area, so we can
-	            // center the paper to the same point after the resize.
-	            //this.centerPoint = this.getCenter();
-	
 	            var paper = this.paper;
 	
 	            var sx = paper.sx;
@@ -16980,14 +16987,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                x = utils.clamp(x, -scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
 	                y = utils.clamp(y, -scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
-	                //var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-	                //var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
+	                // var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+	                // var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
 	
 	                this.bounds.x = x;
 	                this.bounds.y = y;
 	
 	                this.updatePreview();
-	                //this.autoScrollPreview();
+	                // this.autoScrollPreview();
 	            }
 	        }
 	    }, {
@@ -17140,7 +17147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.bounds = { x: x, y: y, width: width, height: height };
 	                this.stopScrollTimer();
 	                this.updateSelectionRect();
-	                //this.autoScrollSelectionRect(localX, localY);
+	                // this.autoScrollSelectionRect(localX, localY);
 	            }
 	        }
 	    }, {

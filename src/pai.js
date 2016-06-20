@@ -1,3 +1,8 @@
+// styles
+// ------
+
+require('./style/index.less');
+
 // common
 // ------
 import * as utils           from './common/utils';

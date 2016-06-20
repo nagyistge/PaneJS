@@ -96,14 +96,14 @@ class SelectHandler extends Handler {
 
             x = utils.clamp(x, -scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
             y = utils.clamp(y, -scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
-            //var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-            //var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
+            // var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+            // var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
 
             this.bounds.x = x;
             this.bounds.y = y;
 
             this.updatePreview();
-            //this.autoScrollPreview();
+            // this.autoScrollPreview();
         }
     }
 
@@ -254,7 +254,7 @@ class SelectHandler extends Handler {
             this.bounds = { x, y, width, height };
             this.stopScrollTimer();
             this.updateSelectionRect();
-            //this.autoScrollSelectionRect(localX, localY);
+            // this.autoScrollSelectionRect(localX, localY);
         }
     }
 

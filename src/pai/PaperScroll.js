@@ -132,10 +132,6 @@ class PaperScroll {
 
     adjustPaper() {
 
-        // store the current mid point of visible paper area, so we can
-        // center the paper to the same point after the resize.
-        //this.centerPoint = this.getCenter();
-
         const paper = this.paper;
 
         let sx = paper.sx;

@@ -487,7 +487,6 @@ class Paper extends Events {
         let originChanged = tx !== this.tx || ty !== this.ty;
 
         if (originChanged) {
-            console.log(tx, ty);
             this.translate(tx, ty);
         }
 

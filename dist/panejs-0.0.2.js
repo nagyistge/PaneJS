@@ -11442,7 +11442,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var originChanged = tx !== this.tx || ty !== this.ty;
 	
 	            if (originChanged) {
-	                console.log(tx, ty);
 	                this.translate(tx, ty);
 	            }
 	
