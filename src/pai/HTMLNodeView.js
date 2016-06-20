@@ -61,8 +61,8 @@ class HTMLNodeView extends CellView {
     renderPorts() {
 
         let node     = this.getCell();
-        let inPorts  = node.getInPorts();
-        let outPorts = node.getOutPorts();
+        let inPorts  = node.getVisiblePorts(true);
+        let outPorts = node.getVisiblePorts(false);
         let markup   = node.getPortMarkup();
 
         if (inPorts.length) {

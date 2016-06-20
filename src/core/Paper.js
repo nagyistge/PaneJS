@@ -21,27 +21,42 @@ import GeometryChange  from '../changes/GeometryChange';
 import AttributeChange from '../changes/AttributeChange';
 
 
+// const
+// -----
 const win = window;
 const doc = win.document;
 
-let counter = 0;
+const classNames = {
+    wrapper: 'pane-wrapper',
+    stage: 'pane-stage',
+    svg: 'pane-svg',
+    viewport: 'pane-viewport'
+};
 
 // the default options for paper
-let defaultOptions = {
+const defaultOptions = {
+    width: '100%',
+    height: '100%',
     tx: 0,
     ty: 0,
     sx: 1,
     sy: 1,
-    width: '100%',
-    height: '100%',
     gridSize: 1,
     container: null,
     model: null,
 
-    // Allowed number of mouseMove events after which the
+    // number of mouseMove events after which the
     // pointerClick event will be still triggered.
-    clickThreshold: 0
+    clickThreshold: 0,
+    isValidEvent: null,
+    eventDelegate: null
 };
+
+let idCounter = 0;
+
+
+// Paper
+// -----
 
 class Paper extends Events {
 
@@ -49,7 +64,7 @@ class Paper extends Events {
 
         super();
 
-        this.id = 'paper-' + counter++;
+        this.id = 'paper-' + idCounter++;
 
         // You should call `init` manually when `options` is empty.
         // That's useful when you want to listen life-cycle events.
@@ -62,6 +77,7 @@ class Paper extends Events {
     // events
     // ------
     //  - paper:configure
+    //  - paper:ensureElements
     //  - paper:createPanes
     //  - paper:setup
     //  - paper:init
@@ -85,12 +101,13 @@ class Paper extends Events {
         this.container = options.container;
 
         if (!this.container) {
-            throw new Error('Invalid container');
+            throw new Error('Initialize error: invalid container');
         }
 
         options = this.options;
 
-        this.createPanes()
+        this.ensureElement()
+            .createPanes()
             .setup()
             .resize(options.width, options.height)
             .translate(options.tx, options.ty)
@@ -102,18 +119,56 @@ class Paper extends Events {
         return this;
     }
 
+    ensureElement() {
+
+        this.wrapper  = utils.createElement('div');
+        this.stage    = utils.createElement('div');
+        this.svg      = utils.createSvgDocument();
+        this.viewport = utils.createSvgElement('g');
+
+        utils.addClass(this.wrapper, classNames.wrapper);
+        utils.addClass(this.stage, classNames.stage);
+        utils.addClass(this.svg, classNames.svg);
+        utils.addClass(this.viewport, classNames.viewport);
+
+        this.svg.appendChild(this.viewport);
+        this.stage.appendChild(this.svg);
+        this.wrapper.appendChild(this.stage);
+        this.container.appendChild(this.wrapper);
+
+        this.trigger('paper:ensureElements');
+
+        return this;
+    }
+
+    getContainer() {
+
+        return this.container;
+    }
+
+    getWrapper() {
+
+        return this.wrapper;
+    }
+
+    getStage() {
+
+        return this.stage;
+    }
+
+    getSvg() {
+
+        return this.svg;
+    }
+
+    getViewport() {
+
+        return this.viewport;
+    }
+
     createPanes() {
 
-        const root     = utils.createElement('div');
-        const svg      = utils.createSvgDocument();
-        const viewport = utils.createSvgElement('g');
-
-        this.root     = root;
-        this.svg      = svg;
-        this.viewport = viewport;
-
-        utils.addClass(root, 'pane-paper');
-        utils.addClass(viewport, 'pane-viewport');
+        const viewport = this.viewport;
 
         this.backgroundPane = viewport.appendChild(utils.createSvgElement('g'));
         // container of links
@@ -125,26 +180,31 @@ class Paper extends Events {
         // layer above the drawing pane and controller pane, for decorators
         this.decoratePane = viewport.appendChild(utils.createSvgElement('g'));
 
-        svg.appendChild(viewport);
-        root.appendChild(svg);
-        this.container.appendChild(root);
-
-        this.trigger('paper:createPanes', this.container);
+        this.trigger('paper:createPanes');
 
         return this;
     }
 
     setup() {
 
-        utils.addEventListener(this.svg, 'contextmenu', this.onContextMenu.bind(this));
-        utils.addEventListener(this.svg, 'dblclick', this.onDblClick.bind(this));
-        utils.addEventListener(this.svg, 'click', this.onClick.bind(this));
-        utils.addEventListener(this.svg, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
-        utils.addEventListener(this.svg, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-        utils.addEventListener(this.svg, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
-        utils.addEventListener(this.svg, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+        let eventDelegate = this.options.eventDelegate;
+        if (utils.isFunction(eventDelegate)) {
+            eventDelegate = eventDelegate.call(this);
+        }
 
-        utils.addEventListener(this.svg, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+        eventDelegate = eventDelegate || this.wrapper;
+
+        utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
+        utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
+        utils.addEventListener(eventDelegate, 'click', this.onClick.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+
+        utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+
+        this.eventDelegate = eventDelegate;
 
         // Hold the value when mouse has been moved: when mouse moved,
         // no click event will be triggered.
@@ -181,7 +241,7 @@ class Paper extends Events {
 
         this.trigger('paper:destroy');
 
-        utils.removeElement(this.root);
+        utils.removeElement(this.wrapper);
 
         if (detector.IS_POINTER) {
             this.container.style.msTouchAction = '';
@@ -237,9 +297,17 @@ class Paper extends Events {
                 height += utils.isNil(this.height) ? 0 : this.height;
             }
 
+            width  = Math.round(width);
+            height = Math.round(height);
+
             vector(this.svg).attr({
                 width,
                 height
+            });
+
+            utils.setStyle(this.stage, {
+                width: width + 'px',
+                height: height + 'px'
             });
 
             this.width  = width;
@@ -357,12 +425,14 @@ class Paper extends Events {
         // resulting width/height of the paper.
 
         if (utils.isObject(frameWidth)) {
+
             options     = frameWidth;
             padding     = options.padding || 0;
             frameWidth  = options.frameWidth || 1;
             frameHeight = options.frameHeight || 1;
 
         } else {
+
             options     = options || {};
             padding     = padding || 0;
             frameWidth  = frameWidth || 1;
@@ -371,15 +441,16 @@ class Paper extends Events {
 
         padding = utils.normalizeSides(padding);
 
-        let bbox = this.getContentBBox(true);
+        // get the content boundary
+        let cBounds = this.getContentBBox(true);
 
-        bbox.x *= this.sx;
-        bbox.y *= this.sy;
-        bbox.width *= this.sx;
-        bbox.height *= this.sy;
+        cBounds.x *= this.sx;
+        cBounds.y *= this.sy;
+        cBounds.width *= this.sx;
+        cBounds.height *= this.sy;
 
-        let width  = Math.max(utils.snapToGrid(bbox.width + bbox.x, frameWidth, 'ceil'), frameWidth);
-        let height = Math.max(utils.snapToGrid(bbox.height + bbox.y, frameHeight, 'ceil'), frameHeight);
+        let width  = utils.snapToGrid(cBounds.width + cBounds.x || 1, frameWidth, 'ceil');
+        let height = utils.snapToGrid(cBounds.height + cBounds.y || 1, frameHeight, 'ceil');
 
         let tx = this.tx;
         let ty = this.ty;
@@ -392,16 +463,16 @@ class Paper extends Events {
                 || (options.allowNewOrigin === 'positive' && val >= 0);
         }
 
-        if (needTranslate(bbox.x)) {
+        if (needTranslate(cBounds.x)) {
 
-            tx = Math.ceil(-bbox.x / frameWidth) * frameWidth;
+            tx = Math.ceil(-cBounds.x / frameWidth) * frameWidth;
             tx += padding.left;
             width += tx;
         }
 
-        if (needTranslate(bbox.y)) {
+        if (needTranslate(cBounds.y)) {
 
-            ty = Math.ceil(-bbox.y / frameHeight) * frameHeight;
+            ty = Math.ceil(-cBounds.y / frameHeight) * frameHeight;
             ty += padding.top;
             height += ty;
         }
@@ -412,12 +483,11 @@ class Paper extends Events {
         width  = utils.clamp(width, options.minWidth || 0, options.maxWidth || Number.MAX_VALUE);
         height = utils.clamp(height, options.minHeight || 0, options.maxHeight || Number.MAX_VALUE);
 
-        options = this.options;
-
         let sizeChanged   = width !== this.width || height !== this.height;
         let originChanged = tx !== this.tx || ty !== this.ty;
 
         if (originChanged) {
+            console.log(tx, ty);
             this.translate(tx, ty);
         }
 
@@ -425,7 +495,7 @@ class Paper extends Events {
             this.resize(width, height);
         }
 
-        return this;
+        return sizeChanged || originChanged;
     }
 
     scaleContentToFit(options = {}) {
@@ -1119,10 +1189,10 @@ class Paper extends Events {
         }
 
 
-        let svg    = this.svg;
-        let target = e.target;
+        let delegate = this.eventDelegate;
+        let target   = e.target;
 
-        if (svg === target || utils.containsElement(svg, target)) {
+        if (delegate === target || utils.containsElement(delegate, target)) {
             return true;
         }
     }
@@ -1166,9 +1236,9 @@ class Paper extends Events {
         });
 
         if (view) {
-            this.trigger('cell:pointerDblClick', view.cell, view, e, localPoint.x, localPoint.y);
+            this.trigger('cell:dblClick', view.cell, view, e, localPoint.x, localPoint.y);
         } else {
-            this.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
+            this.trigger('blank:dblClick', e, localPoint.x, localPoint.y);
         }
     }
 
@@ -1190,9 +1260,9 @@ class Paper extends Events {
             });
 
             if (view) {
-                this.trigger('cell:pointerClick', view.cell, view, e, localPoint.x, localPoint.y);
+                this.trigger('cell:click', view.cell, view, e, localPoint.x, localPoint.y);
             } else {
-                this.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
+                this.trigger('blank:click', e, localPoint.x, localPoint.y);
             }
         }
     }
@@ -1204,7 +1274,6 @@ class Paper extends Events {
         let view = this.findViewByElem(e.target);
         if (view) {
             if (this.isValidEvent(e, view)) {
-                // view.onMouseOver(e);
                 this.trigger('cell:mouseOver', view.cell, view, e);
             }
         }
@@ -1217,7 +1286,6 @@ class Paper extends Events {
         let view = this.findViewByElem(e.target);
         if (view) {
             if (this.isValidEvent(e, view)) {
-                // view.onMouseOut(e);
                 this.trigger('cell:mouseOut', view.cell, view, e);
             }
         }

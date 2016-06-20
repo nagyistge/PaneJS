@@ -11,10 +11,10 @@ class HTMLPaper extends Paper {
 
         const htmlPane = utils.createElement('div');
 
-        utils.addClass(htmlPane, 'pane-html-pane');
+        utils.addClass(htmlPane, 'pane-html');
 
         this.htmlPane = htmlPane;
-        this.root.appendChild(htmlPane);
+        this.stage.appendChild(htmlPane);
 
         return this;
     }

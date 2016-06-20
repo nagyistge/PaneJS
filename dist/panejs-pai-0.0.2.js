@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ConnectionHandler = exports.SelectionHandler = exports.Handler = exports.VectorView = exports.PortalView = exports.NodeView = exports.LinkView = exports.CellView = exports.Terminal = exports.Portal = exports.Node = exports.Link = exports.Cell = exports.Paper = exports.Model = exports.Events = exports.VElement = exports.vector = exports.utils = undefined;
+	exports.ConnectionHandler = exports.SelectionHandler = exports.Handler = exports.VectorView = exports.PortalView = exports.NodeView = exports.LinkView = exports.CellView = exports.Terminal = exports.Portal = exports.Node = exports.Link = exports.Cell = exports.Paper = exports.Model = exports.Events = exports.VElement = exports.vector = exports.detector = exports.utils = undefined;
 	
 	var _index = __webpack_require__(75);
 	
@@ -109,13 +109,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	});
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
 	var _vector = __webpack_require__(27);
 	
 	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _detector = __webpack_require__(15);
+	
+	var _detector2 = _interopRequireDefault(_detector);
 	
 	var _Events = __webpack_require__(51);
 	
@@ -223,6 +227,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// core
 	// ----
+	// common
+	// ------
 	
 	
 	_Paper2.default.registerConnector('sharp', _sharp2.default).registerConnector('smooth', _smooth2.default).registerConnector('rounded', _rounded2.default);
@@ -237,8 +243,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// views
 	// -----
-	// common
-	// ------
 	
 	
 	_Paper2.default.registerMarker('classic', _classic2.default).registerMarker('diamond', _diamond2.default).registerMarker('cloven', _cloven2.default).registerMarker('block', _block2.default).registerMarker('oval', _oval2.default);
@@ -247,6 +251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.utils = utils;
+	exports.detector = _detector2.default;
 	exports.vector = _vector2.default;
 	exports.VElement = _vector.VElement;
 	exports.Events = _Events2.default;
@@ -423,7 +428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -520,10 +525,427 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Point = __webpack_require__(18);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var _Line = __webpack_require__(19);
+	
+	var _Line2 = _interopRequireDefault(_Line);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Rect = function () {
+	    function Rect() {
+	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	        var width = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	        var height = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+	
+	        _classCallCheck(this, Rect);
+	
+	        this.x = x;
+	        this.y = y;
+	        this.width = width;
+	        this.height = height;
+	    }
+	
+	    // statics
+	    // -------
+	
+	    _createClass(Rect, [{
+	        key: 'getOrigin',
+	
+	
+	        // methods
+	        // -------
+	
+	        value: function getOrigin() {
+	
+	            return new _Point2.default(this.x, this.y);
+	        }
+	    }, {
+	        key: 'getCenter',
+	        value: function getCenter() {
+	
+	            return new _Point2.default(this.x + this.width / 2, this.y + this.height / 2);
+	        }
+	    }, {
+	        key: 'getCorner',
+	        value: function getCorner() {
+	
+	            return new _Point2.default(this.x + this.width, this.y + this.height);
+	        }
+	    }, {
+	        key: 'getTopRight',
+	        value: function getTopRight() {
+	
+	            return new _Point2.default(this.x + this.width, this.y);
+	        }
+	    }, {
+	        key: 'getBottomLeft',
+	        value: function getBottomLeft() {
+	
+	            return new _Point2.default(this.x, this.y + this.height);
+	        }
+	    }, {
+	        key: 'getNearestSideToPoint',
+	        value: function getNearestSideToPoint(point) {
+	
+	            // get (left|right|top|bottom) side which is nearest to point
+	
+	            var distToLeft = point.x - this.x;
+	            var distToTop = point.y - this.y;
+	            var distToRight = this.x + this.width - point.x;
+	            var distToBottom = this.y + this.height - point.y;
+	
+	            var closest = distToLeft;
+	            var side = 'left';
+	
+	            if (distToRight < closest) {
+	
+	                closest = distToRight;
+	                side = 'right';
+	            }
+	
+	            if (distToTop < closest) {
+	
+	                closest = distToTop;
+	                side = 'top';
+	            }
+	
+	            if (distToBottom < closest) {
+	
+	                // closest = distToBottom;
+	                side = 'bottom';
+	            }
+	
+	            return side;
+	        }
+	    }, {
+	        key: 'getNearestPointToPoint',
+	        value: function getNearestPointToPoint(point) {
+	
+	            // get a point on my boundary nearest to `point`
+	
+	            if (this.containsPoint(point)) {
+	
+	                var side = this.getNearestSideToPoint(point);
+	
+	                if (side === 'right') {
+	
+	                    return new _Point2.default(this.x + this.width, point.y);
+	                } else if (side === 'left') {
+	
+	                    return new _Point2.default(this.x, point.y);
+	                } else if (side === 'bottom') {
+	
+	                    return new _Point2.default(point.x, this.y + this.height);
+	                } else if (side === 'top') {
+	
+	                    return new _Point2.default(point.x, this.y);
+	                }
+	            }
+	
+	            return point.adhereToRect(this);
+	        }
+	    }, {
+	        key: 'containsPoint',
+	        value: function containsPoint(point) {
+	            return point && point.x >= this.x && point.x <= this.x + this.width && point.y >= this.y && point.y <= this.y + this.height;
+	        }
+	    }, {
+	        key: 'containsRect',
+	        value: function containsRect(rect) {
+	
+	            this.normalize();
+	            rect.normalize();
+	
+	            var x2 = rect.x;
+	            var y2 = rect.y;
+	            var w2 = rect.width;
+	            var h2 = rect.height;
+	
+	            var x1 = this.x;
+	            var y1 = this.y;
+	            var w1 = this.width;
+	            var h1 = this.height;
+	
+	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
+	        }
+	    }, {
+	        key: 'intersect',
+	        value: function intersect(rect) {
+	
+	            var origin1 = this.getOrigin();
+	            var corner1 = this.getCorner();
+	            var origin2 = rect.getOrigin();
+	            var corner2 = rect.getCorner();
+	
+	            // no intersection found
+	            if (origin1.x >= corner2.x || origin1.y >= corner2.y || origin2.x >= corner1.x || origin2.y >= corner1.y) {
+	                return null;
+	            }
+	
+	            var x = Math.max(origin1.x, origin2.x);
+	            var y = Math.max(origin1.y, origin2.y);
+	            var w = Math.min(corner1.x, corner2.x) - x;
+	            var h = Math.min(corner1.y, corner2.y) - y;
+	
+	            return new Rect(x, y, w, h);
+	        }
+	    }, {
+	        key: 'union',
+	        value: function union(rect) {
+	
+	            var origin1 = this.getOrigin();
+	            var corner1 = this.getCorner();
+	            var origin2 = rect.getOrigin();
+	            var corner2 = rect.getCorner();
+	
+	            var originX = Math.min(origin1.x, origin2.x);
+	            var originY = Math.min(origin1.y, origin2.y);
+	            var cornerX = Math.max(corner1.x, corner2.x);
+	            var cornerY = Math.max(corner1.y, corner2.y);
+	
+	            return new Rect(originX, originY, cornerX - originX, cornerY - originY);
+	        }
+	    }, {
+	        key: 'intersectionWithLineFromCenterToPoint',
+	        value: function intersectionWithLineFromCenterToPoint(point, angle) {
+	
+	            // Find point on my boundary where line starting from my center ending
+	            // in point p intersects me. If angle is specified, intersection with
+	            // rotated rectangle is computed.
+	
+	            var result = void 0;
+	            var center = this.getCenter();
+	
+	            if (angle) {
+	                point.rotate(center, angle);
+	            }
+	
+	            // clockwise, starting from the top side
+	            var sides = [new _Line2.default(this.getOrigin(), this.getTopRight()), new _Line2.default(this.getTopRight(), this.getCorner()), new _Line2.default(this.getCorner(), this.getBottomLeft()), new _Line2.default(this.getBottomLeft(), this.getOrigin())];
+	
+	            var connector = new _Line2.default(center, point);
+	
+	            for (var i = sides.length - 1; i >= 0; --i) {
+	                var intersection = sides[i].intersection(connector);
+	                if (intersection) {
+	                    result = intersection;
+	                    break;
+	                }
+	            }
+	
+	            if (result && angle) {
+	                result.rotate(center, -angle);
+	            }
+	
+	            return result;
+	        }
+	    }, {
+	        key: 'moveAndExpand',
+	        value: function moveAndExpand(rect) {
+	
+	            this.x += rect.x || 0;
+	            this.y += rect.y || 0;
+	            this.width += rect.width || 0;
+	            this.height += rect.height || 0;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'grow',
+	        value: function grow(amount) {
+	
+	            this.x -= amount;
+	            this.y -= amount;
+	            this.width += 2 * amount;
+	            this.height += 2 * amount;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'round',
+	        value: function round(precision) {
+	
+	            this.x = precision ? utils.toFixed(this.x, precision) : Math.round(this.x);
+	            this.y = precision ? utils.toFixed(this.y, precision) : Math.round(this.y);
+	            this.width = precision ? utils.toFixed(this.width, precision) : Math.round(this.width);
+	            this.height = precision ? utils.toFixed(this.height, precision) : Math.round(this.height);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'normalize',
+	        value: function normalize() {
+	
+	            // Normalize the rectangle.
+	            // i.e., make it so that it has a non-negative width and height.
+	            // If width < 0 the function swaps the left and right corners,
+	            // and it swaps the top and bottom corners if height < 0
+	
+	            var x = this.x;
+	            var y = this.y;
+	            var w = this.width;
+	            var h = this.height;
+	
+	            if (w < 0) {
+	                x = x + w;
+	                w = -w;
+	            }
+	
+	            if (h < 0) {
+	                y = y + h;
+	                h = -h;
+	            }
+	
+	            this.x = x;
+	            this.y = y;
+	            this.width = w;
+	            this.height = h;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'getBBox',
+	        value: function getBBox(angle) {
+	
+	            var rad = utils.toRad(angle || 0);
+	            var sin = Math.abs(Math.sin(rad));
+	            var cos = Math.abs(Math.cos(rad));
+	            var w = this.width * cos + this.height * sin;
+	            var h = this.width * sin + this.height * cos;
+	
+	            return new Rect(this.x + (this.width - w) / 2, this.y + (this.height - h) / 2, w, h);
+	        }
+	    }, {
+	        key: 'snapToGrid',
+	        value: function snapToGrid(gx, gy) {
+	
+	            var that = this;
+	            var origin = that.getOrigin();
+	            var corner = that.getCorner();
+	
+	            origin = origin.snapToGrid(gx, gy);
+	            corner = corner.snapToGrid(gx, gy);
+	
+	            that.x = origin.x;
+	            that.y = origin.y;
+	            that.width = corner.x - origin.x;
+	            that.height = corner.y - origin.y;
+	
+	            return that;
+	        }
+	
+	        // common
+	        // ------
+	
+	    }, {
+	        key: 'equals',
+	        value: function equals(rect) {
+	
+	            return Rect.equals(this, rect);
+	        }
+	    }, {
+	        key: 'valueOf',
+	        value: function valueOf() {
+	
+	            return [this.x, this.y, this.width, this.height];
+	        }
+	    }, {
+	        key: 'toString',
+	        value: function toString() {
+	
+	            return this.valueOf().join(', ');
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone() {
+	
+	            return Rect.fromRect(this);
+	        }
+	    }], [{
+	        key: 'equals',
+	        value: function equals(rect1, rect2) {
+	
+	            var result = this.isRect(rect1) && this.isRect(rect2);
+	            if (result) {
+	
+	                rect1.standardizePort();
+	                rect2.standardizePort();
+	
+	                result = rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
+	            }
+	
+	            return result;
+	        }
+	    }, {
+	        key: 'fromRect',
+	        value: function fromRect(rect) {
+	
+	            return new Rect(rect.x, rect.y, rect.width, rect.height);
+	        }
+	    }, {
+	        key: 'fromVerticesAndRotation',
+	        value: function fromVerticesAndRotation(v1, v2) {
+	            var rotation = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	
+	            var cx = (v1.x + v2.x) / 2;
+	            var cy = (v1.y + v2.y) / 2;
+	            var distance = new _Point2.default(v1.x, v1.y).distance(new _Point2.default(v2.x, v2.y));
+	            var verticesAngle = Math.atan(Math.abs((v2.y - v1.y) / (v1.x - v2.x))) * 180 / Math.PI;
+	            var width = Math.abs(distance * Math.sin((90 - rotation + verticesAngle) / 180 * Math.PI));
+	            var height = Math.abs(distance * Math.cos((90 - rotation + verticesAngle) / 180 * Math.PI));
+	            var x = cx - width / 2;
+	            var y = cy - height / 2;
+	            var rect = new Rect(x, y, width, height);
+	            rect.cx = cx;
+	            rect.cy = cy;
+	            rect.rotation = rotation;
+	            return rect;
+	        }
+	    }, {
+	        key: 'isRect',
+	        value: function isRect(rect) {
+	
+	            return rect && rect instanceof Rect;
+	        }
+	    }]);
+	
+	    return Rect;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Rect;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
 	Object.keys(_lang).forEach(function (key) {
 	  if (key === "default") return;
@@ -535,7 +957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(7);
 	
 	Object.keys(_array).forEach(function (key) {
 	  if (key === "default") return;
@@ -547,7 +969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _string = __webpack_require__(7);
+	var _string = __webpack_require__(8);
 	
 	Object.keys(_string).forEach(function (key) {
 	  if (key === "default") return;
@@ -559,7 +981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _number = __webpack_require__(9);
+	var _number = __webpack_require__(10);
 	
 	Object.keys(_number).forEach(function (key) {
 	  if (key === "default") return;
@@ -571,7 +993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _object = __webpack_require__(8);
+	var _object = __webpack_require__(9);
 	
 	Object.keys(_object).forEach(function (key) {
 	  if (key === "default") return;
@@ -583,7 +1005,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _function = __webpack_require__(10);
+	var _function = __webpack_require__(11);
 	
 	Object.keys(_function).forEach(function (key) {
 	  if (key === "default") return;
@@ -595,7 +1017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _dom = __webpack_require__(11);
+	var _dom = __webpack_require__(12);
 	
 	Object.keys(_dom).forEach(function (key) {
 	  if (key === "default") return;
@@ -607,7 +1029,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _geom = __webpack_require__(12);
+	var _geom = __webpack_require__(13);
 	
 	Object.keys(_geom).forEach(function (key) {
 	  if (key === "default") return;
@@ -619,7 +1041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _event = __webpack_require__(13);
+	var _event = __webpack_require__(14);
 	
 	Object.keys(_event).forEach(function (key) {
 	  if (key === "default") return;
@@ -631,7 +1053,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _pathData = __webpack_require__(15);
+	var _pathData = __webpack_require__(16);
 	
 	Object.keys(_pathData).forEach(function (key) {
 	  if (key === "default") return;
@@ -643,7 +1065,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _transform = __webpack_require__(16);
+	var _transform = __webpack_require__(17);
 	
 	Object.keys(_transform).forEach(function (key) {
 	  if (key === "default") return;
@@ -657,7 +1079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = {};
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -764,7 +1186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isUndefined = isUndefined;
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -774,7 +1196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.reduceRight = exports.reduce = exports.filter = exports.every = exports.some = exports.map = exports.forEach = exports.contains = exports.lastIndexOf = exports.indexOf = exports.slice = exports.toArray = undefined;
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
 	var proto = Array.prototype;
 	
@@ -834,7 +1256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.reduceRight = reduceRight;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -844,9 +1266,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.padEnd = exports.padStart = exports.endWith = exports.startWith = exports.sanitizeText = exports.toString = exports.hashCode = exports.format = exports.uuid = exports.split = exports.trim = exports.lcFirst = exports.ucFirst = exports.toUpper = exports.toLower = undefined;
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
-	var _object = __webpack_require__(8);
+	var _object = __webpack_require__(9);
 	
 	var proto = String.prototype;
 	
@@ -1018,7 +1440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.padEnd = padEnd;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1028,9 +1450,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.isEmptyObject = exports.isPlainObject = exports.getByPath = exports.destroy = exports.extend = exports.merge = exports.forIn = exports.keys = exports.hasOwn = undefined;
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(7);
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
 	function hasOwn(obj, key) {
 	
@@ -1189,7 +1611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isEmptyObject = isEmptyObject;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1199,7 +1621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
 	function isFinite(value) {
 	
@@ -1269,7 +1691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.clamp = clamp;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1279,9 +1701,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.invoke = exports.bind = undefined;
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(7);
 	
 	function invoke(fn, args, context) {
 	
@@ -1329,7 +1751,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.invoke = invoke;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1337,15 +1759,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.getTransformToElement = exports.getComputedStyle = exports.getScrollParent = exports.normalizeSides = exports.styleStrToObject = exports.getBounds = exports.setStyle = exports.setTranslate = exports.setRotation = exports.setScale = exports.qualifyAttributeName = exports.removeAttribute = exports.setAttribute = exports.getClassName = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.containsElement = exports.removeElement = exports.emptyElement = exports.createSvgElement = exports.createSvgDocument = exports.createElement = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isHidden = exports.showHide = exports.isNode = undefined;
+	exports.getTransformToElement = exports.getComputedStyle = exports.getScrollBarWidth = exports.getScrollParent = exports.normalizeSides = exports.styleStrToObject = exports.getBounds = exports.setStyle = exports.setTranslate = exports.setRotation = exports.setScale = exports.qualifyAttributeName = exports.removeAttribute = exports.setAttribute = exports.getClassName = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.containsElement = exports.removeElement = exports.emptyElement = exports.createSvgElement = exports.createSvgDocument = exports.createElement = exports.getNodeName = exports.getOffset = exports.getWindow = exports.isHidden = exports.showHide = exports.isNode = undefined;
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(7);
 	
-	var _string = __webpack_require__(7);
+	var _string = __webpack_require__(8);
 	
-	var _object = __webpack_require__(8);
+	var _object = __webpack_require__(9);
 	
 	// classNames
 	// ----------
@@ -1932,6 +2354,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return document.body;
 	}
 	
+	function getScrollBarWidth() {
+	
+	    var inner = createElement('p');
+	    var outer = createElement('div');
+	
+	    setStyle(inner, {
+	        width: '100%',
+	        height: '200px'
+	    });
+	
+	    setStyle(outer, {
+	        overflow: 'hidden',
+	        visibility: 'hidden',
+	        position: 'absolute',
+	        left: 0,
+	        top: 0,
+	        width: '200px',
+	        height: '100px'
+	    });
+	
+	    outer.appendChild(inner);
+	    document.body.appendChild(outer);
+	
+	    var w1 = inner.offsetWidth;
+	
+	    outer.style.overflow = 'scroll';
+	
+	    var w2 = inner.offsetWidth;
+	    if (w1 === w2) {
+	        w2 = outer.clientWidth;
+	    }
+	
+	    document.body.removeChild(outer);
+	
+	    return w1 - w2;
+	}
+	
 	// exports
 	// -------
 	
@@ -1963,11 +2422,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.styleStrToObject = styleStrToObject;
 	exports.normalizeSides = normalizeSides;
 	exports.getScrollParent = getScrollParent;
+	exports.getScrollBarWidth = getScrollBarWidth;
 	exports.getComputedStyle = getComputedStyle;
 	exports.getTransformToElement = getTransformToElement;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1987,7 +2447,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return deg * Math.PI / 180;
 	}
 	
-	function snapToGrid(val, gridSize) {
+	function snapToGrid(val) {
+	    var gridSize = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
 	    var method = arguments.length <= 2 || arguments[2] === undefined ? 'round' : arguments[2];
 	
 	
@@ -2008,7 +2469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.normalizeAngle = normalizeAngle;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2018,11 +2479,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.removeEventListener = exports.addEventListener = exports.isLeftMouseButton = exports.hasModifierKey = exports.hasShiftKey = exports.hasMetaKey = exports.hasCtrlKey = exports.normalizeEvent = undefined;
 	
-	var _lang = __webpack_require__(5);
+	var _lang = __webpack_require__(6);
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(7);
 	
-	var _detector = __webpack_require__(14);
+	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -2271,7 +2732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.removeEventListener = removeEventListener;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2342,7 +2803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2352,7 +2813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.polylineToPathData = exports.polygonToPathData = exports.ellipseToPathData = exports.circleToPathData = exports.rectToPathData = exports.lineToPathData = undefined;
 	
-	var _array = __webpack_require__(6);
+	var _array = __webpack_require__(7);
 	
 	function lineToPathData(line) {
 	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
@@ -2450,7 +2911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polylineToPathData = polylineToPathData;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2460,9 +2921,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.clearTranslate = exports.clearRotate = exports.clearScale = exports.parseTranslate = exports.parseTransform = exports.parseRotate = exports.parseScale = undefined;
 	
-	var _string = __webpack_require__(7);
+	var _string = __webpack_require__(8);
 	
-	var _number = __webpack_require__(9);
+	var _number = __webpack_require__(10);
 	
 	function parseTranslate(transform) {
 	
@@ -2576,423 +3037,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.clearTranslate = clearTranslate;
 
 /***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _utils = __webpack_require__(4);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	var _Point = __webpack_require__(18);
-	
-	var _Point2 = _interopRequireDefault(_Point);
-	
-	var _Line = __webpack_require__(19);
-	
-	var _Line2 = _interopRequireDefault(_Line);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Rect = function () {
-	    function Rect() {
-	        var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-	        var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	        var width = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	        var height = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
-	
-	        _classCallCheck(this, Rect);
-	
-	        this.x = x;
-	        this.y = y;
-	        this.width = width;
-	        this.height = height;
-	    }
-	
-	    // statics
-	    // -------
-	
-	    _createClass(Rect, [{
-	        key: 'getOrigin',
-	
-	
-	        // methods
-	        // -------
-	
-	        value: function getOrigin() {
-	
-	            return new _Point2.default(this.x, this.y);
-	        }
-	    }, {
-	        key: 'getCenter',
-	        value: function getCenter() {
-	
-	            return new _Point2.default(this.x + this.width / 2, this.y + this.height / 2);
-	        }
-	    }, {
-	        key: 'getCorner',
-	        value: function getCorner() {
-	
-	            return new _Point2.default(this.x + this.width, this.y + this.height);
-	        }
-	    }, {
-	        key: 'getTopRight',
-	        value: function getTopRight() {
-	
-	            return new _Point2.default(this.x + this.width, this.y);
-	        }
-	    }, {
-	        key: 'getBottomLeft',
-	        value: function getBottomLeft() {
-	
-	            return new _Point2.default(this.x, this.y + this.height);
-	        }
-	    }, {
-	        key: 'getNearestSideToPoint',
-	        value: function getNearestSideToPoint(point) {
-	
-	            // get (left|right|top|bottom) side which is nearest to point
-	
-	            var distToLeft = point.x - this.x;
-	            var distToTop = point.y - this.y;
-	            var distToRight = this.x + this.width - point.x;
-	            var distToBottom = this.y + this.height - point.y;
-	
-	            var closest = distToLeft;
-	            var side = 'left';
-	
-	            if (distToRight < closest) {
-	
-	                closest = distToRight;
-	                side = 'right';
-	            }
-	
-	            if (distToTop < closest) {
-	
-	                closest = distToTop;
-	                side = 'top';
-	            }
-	
-	            if (distToBottom < closest) {
-	
-	                // closest = distToBottom;
-	                side = 'bottom';
-	            }
-	
-	            return side;
-	        }
-	    }, {
-	        key: 'getNearestPointToPoint',
-	        value: function getNearestPointToPoint(point) {
-	
-	            // get a point on my boundary nearest to `point`
-	
-	            if (this.containsPoint(point)) {
-	
-	                var side = this.getNearestSideToPoint(point);
-	
-	                if (side === 'right') {
-	
-	                    return new _Point2.default(this.x + this.width, point.y);
-	                } else if (side === 'left') {
-	
-	                    return new _Point2.default(this.x, point.y);
-	                } else if (side === 'bottom') {
-	
-	                    return new _Point2.default(point.x, this.y + this.height);
-	                } else if (side === 'top') {
-	
-	                    return new _Point2.default(point.x, this.y);
-	                }
-	            }
-	
-	            return point.adhereToRect(this);
-	        }
-	    }, {
-	        key: 'containsPoint',
-	        value: function containsPoint(point) {
-	            return point && point.x >= this.x && point.x <= this.x + this.width && point.y >= this.y && point.y <= this.y + this.height;
-	        }
-	    }, {
-	        key: 'containsRect',
-	        value: function containsRect(rect) {
-	
-	            this.normalize();
-	            rect.normalize();
-	
-	            var x2 = rect.x;
-	            var y2 = rect.y;
-	            var w2 = rect.width;
-	            var h2 = rect.height;
-	
-	            var x1 = this.x;
-	            var y1 = this.y;
-	            var w1 = this.width;
-	            var h1 = this.height;
-	
-	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
-	        }
-	    }, {
-	        key: 'intersect',
-	        value: function intersect(rect) {
-	
-	            var origin1 = this.getOrigin();
-	            var corner1 = this.getCorner();
-	            var origin2 = rect.getOrigin();
-	            var corner2 = rect.getCorner();
-	
-	            // no intersection found
-	            if (origin1.x >= corner2.x || origin1.y >= corner2.y || origin2.x >= corner1.x || origin2.y >= corner1.y) {
-	                return null;
-	            }
-	
-	            var x = Math.max(origin1.x, origin2.x);
-	            var y = Math.max(origin1.y, origin2.y);
-	            var w = Math.min(corner1.x, corner2.x) - x;
-	            var h = Math.min(corner1.y, corner2.y) - y;
-	
-	            return new Rect(x, y, w, h);
-	        }
-	    }, {
-	        key: 'union',
-	        value: function union(rect) {
-	
-	            var origin1 = this.getOrigin();
-	            var corner1 = this.getCorner();
-	            var origin2 = rect.getOrigin();
-	            var corner2 = rect.getCorner();
-	
-	            var originX = Math.min(origin1.x, origin2.x);
-	            var originY = Math.min(origin1.y, origin2.y);
-	            var cornerX = Math.max(corner1.x, corner2.x);
-	            var cornerY = Math.max(corner1.y, corner2.y);
-	
-	            return new Rect(originX, originY, cornerX - originX, cornerY - originY);
-	        }
-	    }, {
-	        key: 'intersectionWithLineFromCenterToPoint',
-	        value: function intersectionWithLineFromCenterToPoint(point, angle) {
-	
-	            // Find point on my boundary where line starting from my center ending
-	            // in point p intersects me. If angle is specified, intersection with
-	            // rotated rectangle is computed.
-	
-	            var result = void 0;
-	            var center = this.getCenter();
-	
-	            if (angle) {
-	                point.rotate(center, angle);
-	            }
-	
-	            // clockwise, starting from the top side
-	            var sides = [new _Line2.default(this.getOrigin(), this.getTopRight()), new _Line2.default(this.getTopRight(), this.getCorner()), new _Line2.default(this.getCorner(), this.getBottomLeft()), new _Line2.default(this.getBottomLeft(), this.getOrigin())];
-	
-	            var connector = new _Line2.default(center, point);
-	
-	            for (var i = sides.length - 1; i >= 0; --i) {
-	                var intersection = sides[i].intersection(connector);
-	                if (intersection) {
-	                    result = intersection;
-	                    break;
-	                }
-	            }
-	
-	            if (result && angle) {
-	                result.rotate(center, -angle);
-	            }
-	
-	            return result;
-	        }
-	    }, {
-	        key: 'moveAndExpand',
-	        value: function moveAndExpand(rect) {
-	
-	            this.x += rect.x || 0;
-	            this.y += rect.y || 0;
-	            this.width += rect.width || 0;
-	            this.height += rect.height || 0;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'grow',
-	        value: function grow(amount) {
-	
-	            this.x -= amount;
-	            this.y -= amount;
-	            this.width += 2 * amount;
-	            this.height += 2 * amount;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'round',
-	        value: function round(precision) {
-	
-	            this.x = precision ? utils.toFixed(this.x, precision) : Math.round(this.x);
-	            this.y = precision ? utils.toFixed(this.y, precision) : Math.round(this.y);
-	            this.width = precision ? utils.toFixed(this.width, precision) : Math.round(this.width);
-	            this.height = precision ? utils.toFixed(this.height, precision) : Math.round(this.height);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'normalize',
-	        value: function normalize() {
-	
-	            // Normalize the rectangle.
-	            // i.e., make it so that it has a non-negative width and height.
-	            // If width < 0 the function swaps the left and right corners,
-	            // and it swaps the top and bottom corners if height < 0
-	
-	            var x = this.x;
-	            var y = this.y;
-	            var w = this.width;
-	            var h = this.height;
-	
-	            if (w < 0) {
-	                x = x + w;
-	                w = -w;
-	            }
-	
-	            if (h < 0) {
-	                y = y + h;
-	                h = -h;
-	            }
-	
-	            this.x = x;
-	            this.y = y;
-	            this.width = w;
-	            this.height = h;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'getBBox',
-	        value: function getBBox(angle) {
-	
-	            var rad = utils.toRad(angle || 0);
-	            var sin = Math.abs(Math.sin(rad));
-	            var cos = Math.abs(Math.cos(rad));
-	            var w = this.width * cos + this.height * sin;
-	            var h = this.width * sin + this.height * cos;
-	
-	            return new Rect(this.x + (this.width - w) / 2, this.y + (this.height - h) / 2, w, h);
-	        }
-	    }, {
-	        key: 'snapToGrid',
-	        value: function snapToGrid(gx, gy) {
-	
-	            var that = this;
-	            var origin = that.getOrigin();
-	            var corner = that.getCorner();
-	
-	            origin = origin.snapToGrid(gx, gy);
-	            corner = corner.snapToGrid(gx, gy);
-	
-	            that.x = origin.x;
-	            that.y = origin.y;
-	            that.width = corner.x - origin.x;
-	            that.height = corner.y - origin.y;
-	
-	            return that;
-	        }
-	
-	        // common
-	        // ------
-	
-	    }, {
-	        key: 'equals',
-	        value: function equals(rect) {
-	
-	            return Rect.equals(this, rect);
-	        }
-	    }, {
-	        key: 'valueOf',
-	        value: function valueOf() {
-	
-	            return [this.x, this.y, this.width, this.height];
-	        }
-	    }, {
-	        key: 'toString',
-	        value: function toString() {
-	
-	            return this.valueOf().join(', ');
-	        }
-	    }, {
-	        key: 'clone',
-	        value: function clone() {
-	
-	            return Rect.fromRect(this);
-	        }
-	    }], [{
-	        key: 'equals',
-	        value: function equals(rect1, rect2) {
-	
-	            var result = this.isRect(rect1) && this.isRect(rect2);
-	            if (result) {
-	
-	                rect1.standardizePort();
-	                rect2.standardizePort();
-	
-	                result = rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
-	            }
-	
-	            return result;
-	        }
-	    }, {
-	        key: 'fromRect',
-	        value: function fromRect(rect) {
-	
-	            return new Rect(rect.x, rect.y, rect.width, rect.height);
-	        }
-	    }, {
-	        key: 'fromVerticesAndRotation',
-	        value: function fromVerticesAndRotation(v1, v2) {
-	            var rotation = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	
-	            var cx = (v1.x + v2.x) / 2;
-	            var cy = (v1.y + v2.y) / 2;
-	            var distance = new _Point2.default(v1.x, v1.y).distance(new _Point2.default(v2.x, v2.y));
-	            var verticesAngle = Math.atan(Math.abs((v2.y - v1.y) / (v1.x - v2.x))) * 180 / Math.PI;
-	            var width = Math.abs(distance * Math.sin((90 - rotation + verticesAngle) / 180 * Math.PI));
-	            var height = Math.abs(distance * Math.cos((90 - rotation + verticesAngle) / 180 * Math.PI));
-	            var x = cx - width / 2;
-	            var y = cy - height / 2;
-	            var rect = new Rect(x, y, width, height);
-	            rect.cx = cx;
-	            rect.cy = cy;
-	            rect.rotation = rotation;
-	            return rect;
-	        }
-	    }, {
-	        key: 'isRect',
-	        value: function isRect(rect) {
-	
-	            return rect && rect instanceof Rect;
-	        }
-	    }]);
-	
-	    return Rect;
-	}();
-	
-	// exports
-	// -------
-	
-	exports.default = Rect;
-
-/***/ },
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3004,7 +3048,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -3378,7 +3422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -3603,7 +3647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -3735,7 +3779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (!isSetTerminalScheduled.call(this)) {
 	
-	                terminal = new _Terminal2.default(terminal);
+	                terminal = terminal ? new _Terminal2.default(terminal) : null;
 	
 	                if (isSource) {
 	                    this.source = terminal;
@@ -4712,7 +4756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -4867,7 +4911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -5093,7 +5137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -5230,7 +5274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -5414,7 +5458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -5635,11 +5679,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -6853,7 +6897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -7023,7 +7067,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -7481,7 +7525,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -7735,7 +7779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -7938,7 +7982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -8748,15 +8792,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
 	
 	            // the new parent is null, then the child(and link) will be removed
-	            // if (!newParent) {
-	            //    this.connect(child, false);
-	            // }
+	            if (!newParent) {
+	                this.disConnect(child, false);
+	            }
 	
 	            oldParent = model.childChanged(child, newParent, newIndex);
-	
-	            // if (newParent) {
-	            //    this.connect(child, true);
-	            // }
 	
 	            this.parent = newParent;
 	            this.index = newIndex;
@@ -8765,33 +8805,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return this;
 	        }
+	    }, {
+	        key: 'disConnect',
+	        value: function disConnect(cell) {
 	
-	        // connect(cell, connected) {
-	        //
-	        //    if (cell.isLink()) {
-	        //
-	        //        let source = cell.getTerminal(true);
-	        //        let target = cell.getTerminal(false);
-	        //
-	        //        if (source) {
-	        //            this.model.linkChanged(cell, connected ? source : null, true);
-	        //        }
-	        //
-	        //        if (target) {
-	        //            this.model.linkChanged(cell, connected ? target : null, false);
-	        //        }
-	        //
-	        //        cell.setTerminal(source, true);
-	        //        cell.setTerminal(target, false);
-	        //    }
-	        //
-	        //    cell.eachChild(function (child) {
-	        //        this.connect(child, connected);
-	        //    }, this);
-	        //
-	        //    return this;
-	        // }
+	            if (cell.isLink()) {
 	
+	                var source = cell.getTerminal(true);
+	                var target = cell.getTerminal(false);
+	
+	                if (source) {
+	                    this.model.terminalChanged(cell, null, true);
+	                }
+	
+	                if (target) {
+	                    this.model.terminalChanged(cell, null, false);
+	                }
+	            }
+	
+	            cell.eachChild(function (child) {
+	                this.disConnect(child);
+	            }, this);
+	
+	            return this;
+	        }
 	    }]);
 	
 	    return ChildChange;
@@ -9067,7 +9104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Line2 = _interopRequireDefault(_Line);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -9102,7 +9139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.curveThroughPoints = exports.getCurveControlPoints = undefined;
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -9288,7 +9325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -9435,7 +9472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -10837,7 +10874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -10845,7 +10882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _detector = __webpack_require__(14);
+	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -10853,7 +10890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Events3 = _interopRequireDefault(_Events2);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -10923,27 +10960,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	// const
+	// -----
 	var win = window;
 	var doc = win.document;
 	
-	var counter = 0;
+	var classNames = {
+	    wrapper: 'pane-wrapper',
+	    stage: 'pane-stage',
+	    svg: 'pane-svg',
+	    viewport: 'pane-viewport'
+	};
 	
 	// the default options for paper
 	var defaultOptions = {
+	    width: '100%',
+	    height: '100%',
 	    tx: 0,
 	    ty: 0,
 	    sx: 1,
 	    sy: 1,
-	    width: '100%',
-	    height: '100%',
 	    gridSize: 1,
 	    container: null,
 	    model: null,
 	
-	    // Allowed number of mouseMove events after which the
+	    // number of mouseMove events after which the
 	    // pointerClick event will be still triggered.
-	    clickThreshold: 0
+	    clickThreshold: 0,
+	    isValidEvent: null,
+	    eventDelegate: null
 	};
+	
+	var idCounter = 0;
+	
+	// Paper
+	// -----
 	
 	var Paper = function (_Events) {
 	    _inherits(Paper, _Events);
@@ -10953,7 +11004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Paper).call(this));
 	
-	        _this.id = 'paper-' + counter++;
+	        _this.id = 'paper-' + idCounter++;
 	
 	        // You should call `init` manually when `options` is empty.
 	        // That's useful when you want to listen life-cycle events.
@@ -10966,6 +11017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // events
 	    // ------
 	    //  - paper:configure
+	    //  - paper:ensureElements
 	    //  - paper:createPanes
 	    //  - paper:setup
 	    //  - paper:init
@@ -10993,31 +11045,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.container = options.container;
 	
 	            if (!this.container) {
-	                throw new Error('Invalid container');
+	                throw new Error('Initialize error: invalid container');
 	            }
 	
 	            options = this.options;
 	
-	            this.createPanes().setup().resize(options.width, options.height).translate(options.tx, options.ty).scale(options.sx, options.sy).setModel(options.model);
+	            this.ensureElement().createPanes().setup().resize(options.width, options.height).translate(options.tx, options.ty).scale(options.sx, options.sy).setModel(options.model);
 	
 	            this.trigger('paper:init', this.options);
 	
 	            return this;
 	        }
 	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.wrapper = utils.createElement('div');
+	            this.stage = utils.createElement('div');
+	            this.svg = utils.createSvgDocument();
+	            this.viewport = utils.createSvgElement('g');
+	
+	            utils.addClass(this.wrapper, classNames.wrapper);
+	            utils.addClass(this.stage, classNames.stage);
+	            utils.addClass(this.svg, classNames.svg);
+	            utils.addClass(this.viewport, classNames.viewport);
+	
+	            this.svg.appendChild(this.viewport);
+	            this.stage.appendChild(this.svg);
+	            this.wrapper.appendChild(this.stage);
+	            this.container.appendChild(this.wrapper);
+	
+	            this.trigger('paper:ensureElements');
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'getContainer',
+	        value: function getContainer() {
+	
+	            return this.container;
+	        }
+	    }, {
+	        key: 'getWrapper',
+	        value: function getWrapper() {
+	
+	            return this.wrapper;
+	        }
+	    }, {
+	        key: 'getStage',
+	        value: function getStage() {
+	
+	            return this.stage;
+	        }
+	    }, {
+	        key: 'getSvg',
+	        value: function getSvg() {
+	
+	            return this.svg;
+	        }
+	    }, {
+	        key: 'getViewport',
+	        value: function getViewport() {
+	
+	            return this.viewport;
+	        }
+	    }, {
 	        key: 'createPanes',
 	        value: function createPanes() {
 	
-	            var root = utils.createElement('div');
-	            var svg = utils.createSvgDocument();
-	            var viewport = utils.createSvgElement('g');
-	
-	            this.root = root;
-	            this.svg = svg;
-	            this.viewport = viewport;
-	
-	            utils.addClass(root, 'pane-paper');
-	            utils.addClass(viewport, 'pane-viewport');
+	            var viewport = this.viewport;
 	
 	            this.backgroundPane = viewport.appendChild(utils.createSvgElement('g'));
 	            // container of links
@@ -11029,11 +11125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // layer above the drawing pane and controller pane, for decorators
 	            this.decoratePane = viewport.appendChild(utils.createSvgElement('g'));
 	
-	            svg.appendChild(viewport);
-	            root.appendChild(svg);
-	            this.container.appendChild(root);
-	
-	            this.trigger('paper:createPanes', this.container);
+	            this.trigger('paper:createPanes');
 	
 	            return this;
 	        }
@@ -11041,15 +11133,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setup',
 	        value: function setup() {
 	
-	            utils.addEventListener(this.svg, 'contextmenu', this.onContextMenu.bind(this));
-	            utils.addEventListener(this.svg, 'dblclick', this.onDblClick.bind(this));
-	            utils.addEventListener(this.svg, 'click', this.onClick.bind(this));
-	            utils.addEventListener(this.svg, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
-	            utils.addEventListener(this.svg, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-	            utils.addEventListener(this.svg, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
-	            utils.addEventListener(this.svg, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+	            var eventDelegate = this.options.eventDelegate;
+	            if (utils.isFunction(eventDelegate)) {
+	                eventDelegate = eventDelegate.call(this);
+	            }
 	
-	            utils.addEventListener(this.svg, _detector2.default.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	            eventDelegate = eventDelegate || this.wrapper;
+	
+	            utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
+	            utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
+	            utils.addEventListener(eventDelegate, 'click', this.onClick.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+	
+	            utils.addEventListener(eventDelegate, _detector2.default.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	
+	            this.eventDelegate = eventDelegate;
 	
 	            // Hold the value when mouse has been moved: when mouse moved,
 	            // no click event will be triggered.
@@ -11091,7 +11192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.trigger('paper:destroy');
 	
-	            utils.removeElement(this.root);
+	            utils.removeElement(this.wrapper);
 	
 	            if (_detector2.default.IS_POINTER) {
 	                this.container.style.msTouchAction = '';
@@ -11149,9 +11250,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    height += utils.isNil(this.height) ? 0 : this.height;
 	                }
 	
+	                width = Math.round(width);
+	                height = Math.round(height);
+	
 	                (0, _vector2.default)(this.svg).attr({
 	                    width: width,
 	                    height: height
+	                });
+	
+	                utils.setStyle(this.stage, {
+	                    width: width + 'px',
+	                    height: height + 'px'
 	                });
 	
 	                this.width = width;
@@ -11280,11 +11389,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // resulting width/height of the paper.
 	
 	            if (utils.isObject(frameWidth)) {
+	
 	                options = frameWidth;
 	                padding = options.padding || 0;
 	                frameWidth = options.frameWidth || 1;
 	                frameHeight = options.frameHeight || 1;
 	            } else {
+	
 	                options = options || {};
 	                padding = padding || 0;
 	                frameWidth = frameWidth || 1;
@@ -11293,15 +11404,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            padding = utils.normalizeSides(padding);
 	
-	            var bbox = this.getContentBBox(true);
+	            // get the content boundary
+	            var cBounds = this.getContentBBox(true);
 	
-	            bbox.x *= this.sx;
-	            bbox.y *= this.sy;
-	            bbox.width *= this.sx;
-	            bbox.height *= this.sy;
+	            cBounds.x *= this.sx;
+	            cBounds.y *= this.sy;
+	            cBounds.width *= this.sx;
+	            cBounds.height *= this.sy;
 	
-	            var width = Math.max(utils.snapToGrid(bbox.width + bbox.x, frameWidth, 'ceil'), frameWidth);
-	            var height = Math.max(utils.snapToGrid(bbox.height + bbox.y, frameHeight, 'ceil'), frameHeight);
+	            var width = utils.snapToGrid(cBounds.width + cBounds.x || 1, frameWidth, 'ceil');
+	            var height = utils.snapToGrid(cBounds.height + cBounds.y || 1, frameHeight, 'ceil');
 	
 	            var tx = this.tx;
 	            var ty = this.ty;
@@ -11311,16 +11423,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return !options.allowNewOrigin || options.allowNewOrigin === 'any' || options.allowNewOrigin === 'negative' && val < 0 || options.allowNewOrigin === 'positive' && val >= 0;
 	            }
 	
-	            if (needTranslate(bbox.x)) {
+	            if (needTranslate(cBounds.x)) {
 	
-	                tx = Math.ceil(-bbox.x / frameWidth) * frameWidth;
+	                tx = Math.ceil(-cBounds.x / frameWidth) * frameWidth;
 	                tx += padding.left;
 	                width += tx;
 	            }
 	
-	            if (needTranslate(bbox.y)) {
+	            if (needTranslate(cBounds.y)) {
 	
-	                ty = Math.ceil(-bbox.y / frameHeight) * frameHeight;
+	                ty = Math.ceil(-cBounds.y / frameHeight) * frameHeight;
 	                ty += padding.top;
 	                height += ty;
 	            }
@@ -11331,12 +11443,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            width = utils.clamp(width, options.minWidth || 0, options.maxWidth || Number.MAX_VALUE);
 	            height = utils.clamp(height, options.minHeight || 0, options.maxHeight || Number.MAX_VALUE);
 	
-	            options = this.options;
-	
 	            var sizeChanged = width !== this.width || height !== this.height;
 	            var originChanged = tx !== this.tx || ty !== this.ty;
 	
 	            if (originChanged) {
+	                console.log(tx, ty);
 	                this.translate(tx, ty);
 	            }
 	
@@ -11344,7 +11455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.resize(width, height);
 	            }
 	
-	            return this;
+	            return sizeChanged || originChanged;
 	        }
 	    }, {
 	        key: 'scaleContentToFit',
@@ -12016,10 +12127,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return true;
 	            }
 	
-	            var svg = this.svg;
+	            var delegate = this.eventDelegate;
 	            var target = e.target;
 	
-	            if (svg === target || utils.containsElement(svg, target)) {
+	            if (delegate === target || utils.containsElement(delegate, target)) {
 	                return true;
 	            }
 	        }
@@ -12065,9 +12176,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	
 	            if (view) {
-	                this.trigger('cell:pointerDblClick', view.cell, view, e, localPoint.x, localPoint.y);
+	                this.trigger('cell:dblClick', view.cell, view, e, localPoint.x, localPoint.y);
 	            } else {
-	                this.trigger('blank:pointerDblClick', e, localPoint.x, localPoint.y);
+	                this.trigger('blank:dblClick', e, localPoint.x, localPoint.y);
 	            }
 	        }
 	    }, {
@@ -12090,9 +12201,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	
 	                if (view) {
-	                    this.trigger('cell:pointerClick', view.cell, view, e, localPoint.x, localPoint.y);
+	                    this.trigger('cell:click', view.cell, view, e, localPoint.x, localPoint.y);
 	                } else {
-	                    this.trigger('blank:pointerClick', e, localPoint.x, localPoint.y);
+	                    this.trigger('blank:click', e, localPoint.x, localPoint.y);
 	                }
 	            }
 	        }
@@ -12105,7 +12216,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var view = this.findViewByElem(e.target);
 	            if (view) {
 	                if (this.isValidEvent(e, view)) {
-	                    // view.onMouseOver(e);
 	                    this.trigger('cell:mouseOver', view.cell, view, e);
 	                }
 	            }
@@ -12119,7 +12229,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var view = this.findViewByElem(e.target);
 	            if (view) {
 	                if (this.isValidEvent(e, view)) {
-	                    // view.onMouseOut(e);
 	                    this.trigger('cell:mouseOut', view.cell, view, e);
 	                }
 	            }
@@ -12357,7 +12466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -13140,7 +13249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -13408,7 +13517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -13533,7 +13642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -13803,11 +13912,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _detector = __webpack_require__(14);
+	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -13815,7 +13924,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -14349,7 +14458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -14357,7 +14466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vector2 = _interopRequireDefault(_vector);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -14576,7 +14685,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -14727,7 +14836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -15078,6 +15187,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _Portal2 = __webpack_require__(25);
 	
 	var _Portal3 = _interopRequireDefault(_Portal2);
@@ -15087,6 +15200,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -15104,6 +15219,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    _createClass(HTMLNode, [{
+	        key: 'isPortVisible',
+	        value: function isPortVisible(port) {
+	
+	            return port.displayType !== 'hide';
+	        }
+	    }, {
+	        key: 'getVisiblePorts',
+	        value: function getVisiblePorts(isInPort) {
+	
+	            var ports = isInPort ? this.getInPorts() : this.getOutPorts();
+	
+	            return utils.filter(ports, function (port) {
+	                return this.isPortVisible(port);
+	            }, this);
+	        }
+	    }, {
 	        key: 'getPortSelector',
 	        value: function getPortSelector(port, isInPort) {
 	            return this.getPortsWrapSelector(isInPort) + '>.pane-port[data-id="' + port.id + '"]';
@@ -15141,11 +15272,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -15221,8 +15352,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var _this2 = this;
 	
 	            var node = this.getCell();
-	            var inPorts = node.getInPorts();
-	            var outPorts = node.getOutPorts();
+	            var inPorts = node.getVisiblePorts(true);
+	            var outPorts = node.getVisiblePorts(false);
 	            var markup = node.getPortMarkup();
 	
 	            if (inPorts.length) {
@@ -15594,11 +15725,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _detector = __webpack_require__(14);
+	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -15633,10 +15764,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var htmlPane = utils.createElement('div');
 	
-	            utils.addClass(htmlPane, 'pane-html-pane');
+	            utils.addClass(htmlPane, 'pane-html');
 	
 	            this.htmlPane = htmlPane;
-	            this.root.appendChild(htmlPane);
+	            this.stage.appendChild(htmlPane);
 	
 	            return this;
 	        }
@@ -15765,11 +15896,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _detector = __webpack_require__(14);
+	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
@@ -15781,7 +15912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var defaults = {
 	    paper: null,
-	    padding: 0,
+	    space: 30,
 	    minWidth: 0,
 	    minHeight: 0
 	};
@@ -15800,7 +15931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function destroy() {
 	
 	            if (!this.destroyed) {
-	                utils.removeElement(this.elem);
+	                utils.removeElement(this.scrollElem);
 	                utils.destroy(this);
 	            }
 	        }
@@ -15809,73 +15940,110 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function install(options) {
 	
 	            this.options = utils.merge({}, defaults, options);
+	            this.space = utils.normalizeSides(this.options.space);
 	            this.paper = this.options.paper;
 	
 	            var paper = this.paper;
 	
 	            // keep scale values for a quicker access
-	            this.sx = paper.sx || paper.options.sx;
-	            this.sy = paper.sy || paper.options.sy;
+	            this.sx = paper.sx;
+	            this.sy = paper.sy;
 	
-	            // keep the original paper size
-	            this.baseWidth = paper.options.width;
-	            this.baseHeight = paper.options.height;
-	            this.basePadding = utils.normalizeSides(this.options.padding);
+	            // keep the original canvas size
+	            this.baseWidth = paper.width;
+	            this.baseHeight = paper.height;
+	
+	            // init for next calculating
+	            this.scrollLeft = 0;
+	            this.scrollTop = 0;
+	
+	            paper.on('paper:scale', this.doScale, this);
+	            paper.on('paper:resize', this.doResize, this);
 	
 	            this.ensureElement();
-	            this.adjustPadding();
+	            this.addScrollEvent();
 	
-	            paper.on('paper:scale', this.onScale, this);
-	            paper.on('paper:resize', this.onResize, this);
+	            var scrollBarWidth = utils.getScrollBarWidth();
+	            this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
+	            this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
+	
+	            this.doResize();
+	            this.adjustPadding();
+	            this.center();
 	        }
 	    }, {
 	        key: 'ensureElement',
 	        value: function ensureElement() {
 	
 	            var paper = this.paper;
-	            var elem = this.elem = utils.createElement('div');
+	            var scrollElem = utils.createElement('div');
 	
-	            utils.addClass(elem, 'pane-scroll');
+	            this.scrollElem = scrollElem;
+	            this.scrollParent = paper.wrapper;
 	
-	            elem.appendChild(paper.root);
-	            paper.container.appendChild(elem);
+	            utils.addClass(scrollElem, 'pane-scroll');
+	
+	            scrollElem.appendChild(paper.stage);
+	            paper.wrapper.appendChild(scrollElem);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'addScrollEvent',
+	        value: function addScrollEvent() {
+	            var _this = this;
+	
+	            if (!this.onScroll) {
+	                (function () {
+	
+	                    var that = _this;
+	
+	                    _this.onScroll = function () {
+	                        that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
+	                    };
+	                })();
+	            }
+	
+	            utils.addEventListener(this.scrollParent, 'scroll', this.onScroll);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'removeScrollEvent',
+	        value: function removeScrollEvent() {
+	
+	            utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
 	
 	            return this;
 	        }
 	    }, {
 	        key: 'adjustPadding',
-	        value: function adjustPadding() {
-	            var padding = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	        value: function adjustPadding(padding) {
 	
+	            if (padding) {
+	                padding = utils.normalizeSides(padding);
+	            } else {
 	
-	            padding = utils.normalizeSides(padding);
+	                var space = this.space;
+	                var clientWidth = this.clientWidth;
+	                var clientHeight = this.clientHeight;
 	
-	            var basePadding = this.basePadding;
-	            var paddingTop = Math.round(basePadding.top + padding.top);
-	            var paddingLeft = Math.round(basePadding.left + padding.left);
+	                padding = {
+	                    top: clientHeight - space.top,
+	                    right: clientWidth - space.right,
+	                    bottom: clientHeight - space.bottom,
+	                    left: clientWidth - space.left
+	                };
+	            }
 	
-	            // Make sure that at least a fragment of the
-	            // paper is always visible on the screen.
-	            paddingTop = Math.min(paddingTop, this.elem.clientHeight * 0.9);
-	            paddingLeft = Math.min(paddingLeft, this.elem.clientWidth * 0.9);
+	            this.padding = padding;
 	
-	            utils.setStyle(this.elem, {
-	                paddingLeft: paddingLeft + 'px',
-	                paddingTop: paddingTop + 'px'
+	            utils.setStyle(this.scrollElem, {
+	                paddingTop: padding.top + 'px',
+	                paddingRight: padding.right + 'px',
+	                paddingBottom: padding.bottom + 'px',
+	                paddingLeft: padding.left + 'px'
 	            });
-	
-	            // It is impossible to apply bottom and right padding on `this.elem`
-	            // as it would have no effect while overflow in FF and IE.
-	            // see 'https://bugzilla.mozilla.org/show_bug.cgi?id=748518'
-	            utils.setStyle(this.paper.root, {
-	                marginRight: Math.round(basePadding.right + padding.right) + 'px',
-	                marginBottom: Math.round(basePadding.bottom + padding.bottom) + 'px'
-	            });
-	
-	            this.padding = {
-	                top: paddingTop,
-	                left: paddingLeft
-	            };
 	
 	            return this;
 	        }
@@ -15885,15 +16053,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // store the current mid point of visible paper area, so we can
 	            // center the paper to the same point after the resize.
-	            this.centerPoint = this.getCenter();
+	            //this.centerPoint = this.getCenter();
 	
-	            var sx = this.sx;
-	            var sy = this.sy;
+	            var paper = this.paper;
+	
+	            var sx = paper.sx;
+	            var sy = paper.sy;
 	
 	            var options = {
 	                frameWidth: this.baseWidth * sx,
-	                frameHeight: this.baseHeight * sy,
-	                allowNewOrigin: 'negative'
+	                frameHeight: this.baseHeight * sy
 	            };
 	
 	            if (this.options.minWidth) {
@@ -15904,13 +16073,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	                options.minHeight = this.options.minHeight * sy;
 	            }
 	
-	            this.paper.fitToContent(options);
+	            var tx = paper.tx;
+	            var ty = paper.ty;
+	
+	            if (paper.fitToContent(options)) {
+	
+	                var dLeft = paper.tx - tx;
+	                var dTop = paper.ty - ty;
+	
+	                if (dLeft !== 0 || dTop !== 0) {
+	                    this.doScroll(dLeft, dTop, { relative: true });
+	                }
+	            }
 	
 	            return this;
 	        }
 	    }, {
-	        key: 'onScale',
-	        value: function onScale(sx, sy, ox, oy) {
+	        key: 'doScale',
+	        value: function doScale(sx, sy, ox, oy) {
 	
 	            this.sx = sx;
 	            this.sy = sy;
@@ -15924,12 +16104,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 	    }, {
-	        key: 'onResize',
-	        value: function onResize() {
+	        key: 'doResize',
+	        value: function doResize() {
+	            var width = arguments.length <= 0 || arguments[0] === undefined ? this.baseWidth : arguments[0];
+	            var height = arguments.length <= 1 || arguments[1] === undefined ? this.baseHeight : arguments[1];
 	
-	            if (this.centerPoint) {
-	                this.center(this.centerPoint.x, this.centerPoint.y);
+	
+	            utils.setStyle(this.scrollElem, {
+	                width: width + 'px',
+	                height: height + 'px'
+	            });
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'doScroll',
+	        value: function doScroll(scrollLeft, scrollTop) {
+	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	            this.removeScrollEvent();
+	
+	            if (options.relative) {
+	                scrollLeft += this.scrollLeft;
+	                scrollTop += this.scrollTop;
 	            }
+	
+	            this.setScroll(scrollLeft, scrollTop);
+	
+	            this.scrollParent.scrollLeft = scrollLeft;
+	            this.scrollParent.scrollTop = scrollTop;
+	
+	            this.addScrollEvent();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setScroll',
+	        value: function setScroll(scrollLeft, scrollTop) {
+	
+	            this.scrollLeft = scrollLeft;
+	            this.scrollTop = scrollTop;
 	
 	            return this;
 	        }
@@ -15937,21 +16152,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'center',
 	        value: function center(x, y) {
 	
-	            // Adjust the paper position so the point [x,y] is moved to the
+	            // adjust the paper position so the point [x,y] is moved to the
 	            // center of scroll element. If no point given [x,y] equals to
 	            // center of the paper element.
 	
 	            var paper = this.paper;
-	            // the paper rectangle
-	            //   x1,y1 ---------
-	            //   |             |
-	            //   ----------- x2,y2
-	            var x1 = -paper.tx; // translate x
-	            var y1 = -paper.ty; // translate y
-	            var x2 = x1 + paper.width;
-	            var y2 = y1 + paper.height;
+	
+	            var tx = paper.tx;
+	            var ty = paper.ty;
 	
 	            if (utils.isUndefined(x) || utils.isUndefined(y)) {
+	
+	                // the paper rectangle
+	                //   x1,y1 ---------
+	                //   |             |
+	                //   ----------- x2,y2
+	                var x1 = -tx; // translate x
+	                var y1 = -ty; // translate y
+	                var x2 = x1 + paper.width;
+	                var y2 = y1 + paper.height;
+	
 	                // get the center of the paper
 	                x = (x1 + x2) / 2;
 	                y = (y1 + y2) / 2;
@@ -15961,25 +16181,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                y *= paper.sy; // scale y
 	            }
 	
-	            var rootCenterX = this.elem.clientWidth / 2;
-	            var rootCenterY = this.elem.clientHeight / 2;
-	            var basePadding = this.basePadding;
+	            var dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
+	            var dTop = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
 	
-	            // calculate padding
-	            var left = rootCenterX - basePadding.left - x + x1;
-	            var right = rootCenterX - basePadding.right + x - x2;
-	            var top = rootCenterY - basePadding.top - y + y1;
-	            var bottom = rootCenterY - basePadding.bottom + y - y2;
+	            this.doScroll(-dLeft, -dTop, { relative: true });
 	
-	            this.adjustPadding({
-	                top: Math.max(top, 0),
-	                right: Math.max(right, 0),
-	                bottom: Math.max(bottom, 0),
-	                left: Math.max(left, 0)
-	            });
+	            return this;
+	        }
+	    }, {
+	        key: 'centerContent',
+	        value: function centerContent() {
 	
-	            this.elem.scrollTop = y - rootCenterY + paper.ty + this.padding.top;
-	            this.elem.scrollLeft = x - rootCenterX + paper.tx + this.padding.left;
+	            var bound = this.paper.getContentBBox(true);
+	            this.center(bound.x + bound.width / 2, bound.y + bound.height / 2);
 	
 	            return this;
 	        }
@@ -15987,11 +16201,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'toLocalPoint',
 	        value: function toLocalPoint(x, y) {
 	
-	            x += this.elem.scrollLeft - this.padding.left - this.paper.tx;
-	            x /= this.paper.sx;
+	            // return point that relative to the stage's left-top corner
+	            // x: x coordinate relative to the wrapper
+	            // y: y coordinate relative to the wrapper
 	
-	            y += this.elem.scrollTop - this.padding.top - this.paper.ty;
-	            y /= this.paper.sy;
+	            var paper = this.paper;
+	            var padding = this.padding;
+	
+	            x += this.scrollLeft - padding.left - paper.tx;
+	            x /= paper.sx;
+	
+	            y += this.scrollTop - padding.top - paper.ty;
+	            y /= paper.sy;
 	
 	            return {
 	                x: Math.round(x),
@@ -16002,7 +16223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getCenter',
 	        value: function getCenter() {
 	
-	            return this.toLocalPoint(this.elem.clientWidth / 2, this.elem.clientHeight / 2);
+	            return this.toLocalPoint(this.clientWidth / 2, this.clientHeight / 2);
 	        }
 	    }, {
 	        key: 'beforeZoom',
@@ -16053,8 +16274,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
 	            sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
 	
-	            // the center of the container
-	            var center = this.getCenter();
 	            // the scale center
 	            var cx = options.cx;
 	            var cy = options.cy;
@@ -16062,24 +16281,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // if the scale center is not specified find
 	            // the center of the paper's visible area.
 	            if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
+	
+	                // the center of the container
+	                var center = this.getCenter();
+	
 	                cx = center.x;
 	                cy = center.y;
 	            } else {
-	                var fsx = sx / this.sx;
-	                var fsy = sy / this.sy;
 	
-	                cx = cx - (cx - center.x) / fsx;
-	                cy = cy - (cy - center.y) / fsy;
+	                cx = 800;
+	                cy = 600;
 	            }
 	
+	            var dLeft = cx * (sx - this.sx);
+	            var dTop = cy * (sy - this.sy);
+	
 	            this.beforeZoom();
-	
-	            // let dx = this.elem.clientWidth * (this.sx - sx);
-	            // let dy = this.elem.clientHeight * (this.sy - sy);
-	
 	            this.paper.scale(sx, sy);
-	            this.center(cx, cy);
-	
+	            this.doScroll(dLeft, dTop, { relative: true });
 	            this.afterZoom();
 	
 	            return this;
@@ -16095,8 +16314,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var x = paper.tx;
 	            var y = paper.ty;
 	
-	            var width = this.elem.clientWidth;
-	            var height = this.elem.clientHeight;
+	            var width = this.scrollParent.clientWidth;
+	            var height = this.scrollParent.clientHeight;
 	
 	            options.fittingBBox = options.fittingBBox || { x: x, y: y, width: width, height: height };
 	
@@ -16111,15 +16330,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.centerContent();
 	
 	            this.afterZoom();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'centerContent',
-	        value: function centerContent() {
-	
-	            var bbox = this.paper.getContentBBox(true);
-	            this.center(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
 	
 	            return this;
 	        }
@@ -16142,7 +16352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
@@ -16649,11 +16859,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(4);
+	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Rect = __webpack_require__(17);
+	var _Rect = __webpack_require__(4);
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
@@ -16768,14 +16978,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var scrollParent = this.scrollParent;
 	
-	                x = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-	                y = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
+	                x = utils.clamp(x, -scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+	                y = utils.clamp(y, -scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
+	                //var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+	                //var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
 	
 	                this.bounds.x = x;
 	                this.bounds.y = y;
 	
 	                this.updatePreview();
-	                this.autoScrollPreview();
+	                //this.autoScrollPreview();
 	            }
 	        }
 	    }, {
@@ -16790,6 +17002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var dy = 0;
 	
 	            if (this.origin) {
+	                this.hidePreview();
 	                dx = localX - this.origin.x;
 	                dy = localY - this.origin.y;
 	            }
@@ -16797,29 +17010,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // movement
 	            if (this.moving && (dx !== 0 || dy !== 0)) {
 	
+	                dx = this.bounds.x - this.previewOriginX;
+	                dy = this.bounds.y - this.previewOriginY;
+	
 	                this.stopScrollTimer();
-	                this.hidePreview();
 	
-	                var model = this.getModel();
+	                if (dx !== 0 || dy !== 0) {
 	
-	                model.beginUpdate();
+	                    var model = this.getModel();
 	
-	                utils.forEach(this.movingCells, function (node) {
-	                    if (node.isNode()) {
+	                    model.beginUpdate();
 	
-	                        var position = node.getPosition();
+	                    utils.forEach(this.movingCells, function (node) {
+	                        if (node.isNode()) {
 	
-	                        node.setPosition({
-	                            x: position.x + dx,
-	                            y: position.y + dy,
-	                            relative: position.relative === true
-	                        });
-	                    }
-	                }, this);
+	                            var position = node.getPosition();
 	
-	                model.endUpdate();
+	                            node.setPosition({
+	                                x: position.x + dx,
+	                                y: position.y + dy,
+	                                relative: position.relative === true
+	                            });
+	                        }
+	                    }, this);
 	
-	                this.getPaper().trigger('cells:updatePosition', this.movingCells);
+	                    model.endUpdate();
+	
+	                    this.getPaper().trigger('cells:updatePosition', this.movingCells);
+	                }
 	            } else {
 	                if (cell.isLink()) {
 	                    this.clearSelection();
@@ -16872,13 +17090,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (this.moving) {
 	
+	                var origin = this.origin;
+	                var scrollParent = this.scrollParent;
+	
 	                var x = localX;
 	                var y = localY;
-	                var width = Math.abs(x - this.origin.x);
-	                var height = Math.abs(y - this.origin.y);
-	
-	                var scrollParent = this.scrollParent;
-	                var origin = this.origin;
+	                var width = Math.abs(x - origin.x);
+	                var height = Math.abs(y - origin.y);
 	
 	                var maxWidth = void 0;
 	                var maxHeight = void 0;
@@ -16922,7 +17140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.bounds = { x: x, y: y, width: width, height: height };
 	                this.stopScrollTimer();
 	                this.updateSelectionRect();
-	                this.autoScrollSelectionRect(localX, localY);
+	                //this.autoScrollSelectionRect(localX, localY);
 	            }
 	        }
 	    }, {
@@ -17275,9 +17493,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    utils.addClass(view.elem, 'focused');
 	                    this.focusedCell = cell;
 	                }
-	
-	                this.notifyFocusChange();
 	            }
+	
+	            this.notifyFocus();
 	
 	            return this;
 	        }
@@ -17296,16 +17514,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.getPaper().trigger('cells:moving', this.bounds, this.movingCells);
 	        }
 	    }, {
+	        key: 'notifyFocus',
+	        value: function notifyFocus() {
+	
+	            if (this.focusedCell) {
+	                this.getPaper().trigger('cell:focus', this.focusedCell);
+	            } else {
+	                this.getPaper().trigger('paper:focus');
+	            }
+	        }
+	    }, {
 	        key: 'notifySelectionChange',
 	        value: function notifySelectionChange() {
 	
 	            this.getPaper().trigger('cells:selectionChanged', this.selectedCells);
-	        }
-	    }, {
-	        key: 'notifyFocusChange',
-	        value: function notifyFocusChange() {
-	
-	            this.getPaper().trigger('cell:focusChanged', this.focusedCell);
 	        }
 	    }]);
 	

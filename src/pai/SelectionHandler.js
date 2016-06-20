@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import       Rect from '../geometry/Rect';
-import    Handler from '../handlers/Handler';
+import Rect       from '../geometry/Rect';
+import Handler    from '../handlers/Handler';
 
 
 class SelectHandler extends Handler {
@@ -94,14 +94,16 @@ class SelectHandler extends Handler {
 
             let scrollParent = this.scrollParent;
 
-            x = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-            y = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
+            x = utils.clamp(x, -scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+            y = utils.clamp(y, -scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
+            //var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
+            //var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
 
             this.bounds.x = x;
             this.bounds.y = y;
 
             this.updatePreview();
-            this.autoScrollPreview();
+            //this.autoScrollPreview();
         }
     }
 
@@ -115,6 +117,7 @@ class SelectHandler extends Handler {
         let dy = 0;
 
         if (this.origin) {
+            this.hidePreview();
             dx = localX - this.origin.x;
             dy = localY - this.origin.y;
         }
@@ -122,30 +125,34 @@ class SelectHandler extends Handler {
         // movement
         if (this.moving && (dx !== 0 || dy !== 0)) {
 
+            dx = this.bounds.x - this.previewOriginX;
+            dy = this.bounds.y - this.previewOriginY;
+
             this.stopScrollTimer();
-            this.hidePreview();
 
-            let model = this.getModel();
+            if (dx !== 0 || dy !== 0) {
 
-            model.beginUpdate();
+                let model = this.getModel();
 
-            utils.forEach(this.movingCells, function (node) {
-                if (node.isNode()) {
+                model.beginUpdate();
 
-                    let position = node.getPosition();
+                utils.forEach(this.movingCells, function (node) {
+                    if (node.isNode()) {
 
-                    node.setPosition({
-                        x: position.x + dx,
-                        y: position.y + dy,
-                        relative: position.relative === true
-                    });
-                }
-            }, this);
+                        let position = node.getPosition();
 
-            model.endUpdate();
+                        node.setPosition({
+                            x: position.x + dx,
+                            y: position.y + dy,
+                            relative: position.relative === true
+                        });
+                    }
+                }, this);
 
-            this.getPaper().trigger('cells:updatePosition', this.movingCells);
+                model.endUpdate();
 
+                this.getPaper().trigger('cells:updatePosition', this.movingCells);
+            }
         } else {
             if (cell.isLink()) {
                 this.clearSelection();
@@ -196,13 +203,13 @@ class SelectHandler extends Handler {
 
         if (this.moving) {
 
+            let origin       = this.origin;
+            let scrollParent = this.scrollParent;
+
             let x      = localX;
             let y      = localY;
-            let width  = Math.abs(x - this.origin.x);
-            let height = Math.abs(y - this.origin.y);
-
-            let scrollParent = this.scrollParent;
-            let origin       = this.origin;
+            let width  = Math.abs(x - origin.x);
+            let height = Math.abs(y - origin.y);
 
             let maxWidth;
             let maxHeight;
@@ -247,7 +254,7 @@ class SelectHandler extends Handler {
             this.bounds = { x, y, width, height };
             this.stopScrollTimer();
             this.updateSelectionRect();
-            this.autoScrollSelectionRect(localX, localY);
+            //this.autoScrollSelectionRect(localX, localY);
         }
     }
 
@@ -596,9 +603,9 @@ class SelectHandler extends Handler {
                 utils.addClass(view.elem, 'focused');
                 this.focusedCell = cell;
             }
-
-            this.notifyFocusChange();
         }
+
+        this.notifyFocus();
 
         return this;
     }
@@ -616,14 +623,18 @@ class SelectHandler extends Handler {
         this.getPaper().trigger('cells:moving', this.bounds, this.movingCells);
     }
 
+    notifyFocus() {
+
+        if (this.focusedCell) {
+            this.getPaper().trigger('cell:focus', this.focusedCell);
+        } else {
+            this.getPaper().trigger('paper:focus');
+        }
+    }
+
     notifySelectionChange() {
 
         this.getPaper().trigger('cells:selectionChanged', this.selectedCells);
-    }
-
-    notifyFocusChange() {
-
-        this.getPaper().trigger('cell:focusChanged', this.focusedCell);
     }
 }
 

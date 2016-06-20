@@ -2,6 +2,7 @@
 // ------
 import * as utils           from './common/utils';
 import vector, { VElement } from './common/vector';
+import detector             from './common/detector';
 import Events               from './common/Events';
 
 
@@ -67,6 +68,7 @@ Paper
 
 export {
     utils,
+    detector,
     vector,
     VElement,
     Events,

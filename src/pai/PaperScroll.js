@@ -3,7 +3,7 @@ import detector   from '../common/detector';
 
 const defaults = {
     paper: null,
-    padding: 0,
+    space: 30,
     minWidth: 0,
     minHeight: 0
 };
@@ -20,7 +20,7 @@ class PaperScroll {
     destroy() {
 
         if (!this.destroyed) {
-            utils.removeElement(this.elem);
+            utils.removeElement(this.scrollElem);
             utils.destroy(this);
         }
     }
@@ -28,69 +28,104 @@ class PaperScroll {
     install(options) {
 
         this.options = utils.merge({}, defaults, options);
+        this.space   = utils.normalizeSides(this.options.space);
         this.paper   = this.options.paper;
 
-        let paper = this.paper;
+        const paper = this.paper;
 
         // keep scale values for a quicker access
-        this.sx = paper.sx || paper.options.sx;
-        this.sy = paper.sy || paper.options.sy;
+        this.sx = paper.sx;
+        this.sy = paper.sy;
 
-        // keep the original paper size
-        this.baseWidth   = paper.options.width;
-        this.baseHeight  = paper.options.height;
-        this.basePadding = utils.normalizeSides(this.options.padding);
+        // keep the original canvas size
+        this.baseWidth  = paper.width;
+        this.baseHeight = paper.height;
+
+        // init for next calculating
+        this.scrollLeft = 0;
+        this.scrollTop  = 0;
+
+        paper.on('paper:scale', this.doScale, this);
+        paper.on('paper:resize', this.doResize, this);
 
         this.ensureElement();
-        this.adjustPadding();
+        this.addScrollEvent();
 
-        paper.on('paper:scale', this.onScale, this);
-        paper.on('paper:resize', this.onResize, this);
+        const scrollBarWidth = utils.getScrollBarWidth();
+        this.clientWidth     = this.scrollParent.clientWidth - scrollBarWidth;
+        this.clientHeight    = this.scrollParent.clientHeight - scrollBarWidth;
+
+        this.doResize();
+        this.adjustPadding();
+        this.center();
     }
 
     ensureElement() {
 
-        let paper = this.paper;
-        let elem  = this.elem = utils.createElement('div');
+        const paper      = this.paper;
+        const scrollElem = utils.createElement('div');
 
-        utils.addClass(elem, 'pane-scroll');
+        this.scrollElem   = scrollElem;
+        this.scrollParent = paper.wrapper;
 
-        elem.appendChild(paper.root);
-        paper.container.appendChild(elem);
+        utils.addClass(scrollElem, 'pane-scroll');
+
+        scrollElem.appendChild(paper.stage);
+        paper.wrapper.appendChild(scrollElem);
 
         return this;
     }
 
-    adjustPadding(padding = {}) {
+    addScrollEvent() {
 
-        padding = utils.normalizeSides(padding);
+        if (!this.onScroll) {
 
-        let basePadding = this.basePadding;
-        let paddingTop  = Math.round(basePadding.top + padding.top);
-        let paddingLeft = Math.round(basePadding.left + padding.left);
+            let that = this;
 
-        // Make sure that at least a fragment of the
-        // paper is always visible on the screen.
-        paddingTop  = Math.min(paddingTop, this.elem.clientHeight * 0.9);
-        paddingLeft = Math.min(paddingLeft, this.elem.clientWidth * 0.9);
+            this.onScroll = function () {
+                that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
+            };
+        }
 
-        utils.setStyle(this.elem, {
-            paddingLeft: paddingLeft + 'px',
-            paddingTop: paddingTop + 'px'
+        utils.addEventListener(this.scrollParent, 'scroll', this.onScroll);
+
+        return this;
+    }
+
+    removeScrollEvent() {
+
+        utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
+
+        return this;
+    }
+
+    adjustPadding(padding) {
+
+        if (padding) {
+            padding = utils.normalizeSides(padding);
+
+        } else {
+
+            const space        = this.space;
+            const clientWidth  = this.clientWidth;
+            const clientHeight = this.clientHeight;
+
+            padding = {
+                top: clientHeight - space.top,
+                right: clientWidth - space.right,
+                bottom: clientHeight - space.bottom,
+                left: clientWidth - space.left
+            };
+        }
+
+        this.padding = padding;
+
+        utils.setStyle(this.scrollElem, {
+            paddingTop: padding.top + 'px',
+            paddingRight: padding.right + 'px',
+            paddingBottom: padding.bottom + 'px',
+            paddingLeft: padding.left + 'px'
         });
-
-        // It is impossible to apply bottom and right padding on `this.elem`
-        // as it would have no effect while overflow in FF and IE.
-        // see 'https://bugzilla.mozilla.org/show_bug.cgi?id=748518'
-        utils.setStyle(this.paper.root, {
-            marginRight: Math.round(basePadding.right + padding.right) + 'px',
-            marginBottom: Math.round(basePadding.bottom + padding.bottom) + 'px'
-        });
-
-        this.padding = {
-            top: paddingTop,
-            left: paddingLeft
-        };
 
         return this;
     }
@@ -99,15 +134,16 @@ class PaperScroll {
 
         // store the current mid point of visible paper area, so we can
         // center the paper to the same point after the resize.
-        this.centerPoint = this.getCenter();
+        //this.centerPoint = this.getCenter();
 
-        let sx = this.sx;
-        let sy = this.sy;
+        const paper = this.paper;
+
+        let sx = paper.sx;
+        let sy = paper.sy;
 
         let options = {
             frameWidth: this.baseWidth * sx,
-            frameHeight: this.baseHeight * sy,
-            allowNewOrigin: 'negative'
+            frameHeight: this.baseHeight * sy
         };
 
         if (this.options.minWidth) {
@@ -118,12 +154,24 @@ class PaperScroll {
             options.minHeight = this.options.minHeight * sy;
         }
 
-        this.paper.fitToContent(options);
+
+        let tx = paper.tx;
+        let ty = paper.ty;
+
+        if (paper.fitToContent(options)) {
+
+            let dLeft = paper.tx - tx;
+            let dTop  = paper.ty - ty;
+
+            if (dLeft !== 0 || dTop !== 0) {
+                this.doScroll(dLeft, dTop, { relative: true });
+            }
+        }
 
         return this;
     }
 
-    onScale(sx, sy, ox, oy) {
+    doScale(sx, sy, ox, oy) {
 
         this.sx = sx;
         this.sy = sy;
@@ -137,32 +185,67 @@ class PaperScroll {
         return this;
     }
 
-    onResize() {
+    doResize(width = this.baseWidth, height = this.baseHeight) {
 
-        if (this.centerPoint) {
-            this.center(this.centerPoint.x, this.centerPoint.y);
+        utils.setStyle(this.scrollElem, {
+            width: width + 'px',
+            height: height + 'px'
+        });
+
+        return this;
+    }
+
+    doScroll(scrollLeft, scrollTop, options = {}) {
+
+        this.removeScrollEvent();
+
+        if (options.relative) {
+            scrollLeft += this.scrollLeft;
+            scrollTop += this.scrollTop;
         }
+
+        this.setScroll(scrollLeft, scrollTop);
+
+        this.scrollParent.scrollLeft = scrollLeft;
+        this.scrollParent.scrollTop  = scrollTop;
+
+        this.addScrollEvent();
+
+        return this;
+    }
+
+
+    setScroll(scrollLeft, scrollTop) {
+
+        this.scrollLeft = scrollLeft;
+        this.scrollTop  = scrollTop;
 
         return this;
     }
 
     center(x, y) {
 
-        // Adjust the paper position so the point [x,y] is moved to the
+        // adjust the paper position so the point [x,y] is moved to the
         // center of scroll element. If no point given [x,y] equals to
         // center of the paper element.
 
         let paper = this.paper;
-        // the paper rectangle
-        //   x1,y1 ---------
-        //   |             |
-        //   ----------- x2,y2
-        let x1 = -paper.tx; // translate x
-        let y1 = -paper.ty; // translate y
-        let x2 = x1 + paper.width;
-        let y2 = y1 + paper.height;
+
+        let tx = paper.tx;
+        let ty = paper.ty;
+
 
         if (utils.isUndefined(x) || utils.isUndefined(y)) {
+
+            // the paper rectangle
+            //   x1,y1 ---------
+            //   |             |
+            //   ----------- x2,y2
+            let x1 = -tx; // translate x
+            let y1 = -ty; // translate y
+            let x2 = x1 + paper.width;
+            let y2 = y1 + paper.height;
+
             // get the center of the paper
             x = (x1 + x2) / 2;
             y = (y1 + y2) / 2;
@@ -172,36 +255,36 @@ class PaperScroll {
             y *= paper.sy; // scale y
         }
 
-        let rootCenterX = this.elem.clientWidth / 2;
-        let rootCenterY = this.elem.clientHeight / 2;
-        let basePadding = this.basePadding;
+        let dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
+        let dTop  = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
 
-        // calculate padding
-        let left   = rootCenterX - basePadding.left - x + x1;
-        let right  = rootCenterX - basePadding.right + x - x2;
-        let top    = rootCenterY - basePadding.top - y + y1;
-        let bottom = rootCenterY - basePadding.bottom + y - y2;
+        this.doScroll(-dLeft, -dTop, { relative: true });
 
-        this.adjustPadding({
-            top: Math.max(top, 0),
-            right: Math.max(right, 0),
-            bottom: Math.max(bottom, 0),
-            left: Math.max(left, 0)
-        });
+        return this;
+    }
 
-        this.elem.scrollTop  = y - rootCenterY + paper.ty + this.padding.top;
-        this.elem.scrollLeft = x - rootCenterX + paper.tx + this.padding.left;
+    centerContent() {
+
+        let bound = this.paper.getContentBBox(true);
+        this.center(bound.x + bound.width / 2, bound.y + bound.height / 2);
 
         return this;
     }
 
     toLocalPoint(x, y) {
 
-        x += this.elem.scrollLeft - this.padding.left - this.paper.tx;
-        x /= this.paper.sx;
+        // return point that relative to the stage's left-top corner
+        // x: x coordinate relative to the wrapper
+        // y: y coordinate relative to the wrapper
 
-        y += this.elem.scrollTop - this.padding.top - this.paper.ty;
-        y /= this.paper.sy;
+        const paper   = this.paper;
+        const padding = this.padding;
+
+        x += this.scrollLeft - padding.left - paper.tx;
+        x /= paper.sx;
+
+        y += this.scrollTop - padding.top - paper.ty;
+        y /= paper.sy;
 
         return {
             x: Math.round(x),
@@ -211,7 +294,7 @@ class PaperScroll {
 
     getCenter() {
 
-        return this.toLocalPoint(this.elem.clientWidth / 2, this.elem.clientHeight / 2);
+        return this.toLocalPoint(this.clientWidth / 2, this.clientHeight / 2);
     }
 
     beforeZoom() {
@@ -257,8 +340,6 @@ class PaperScroll {
         sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
         sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
 
-        // the center of the container
-        let center = this.getCenter();
         // the scale center
         let cx = options.cx;
         let cy = options.cy;
@@ -266,24 +347,25 @@ class PaperScroll {
         // if the scale center is not specified find
         // the center of the paper's visible area.
         if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
+
+            // the center of the container
+            let center = this.getCenter();
+
             cx = center.x;
             cy = center.y;
-        } else {
-            let fsx = sx / this.sx;
-            let fsy = sy / this.sy;
 
-            cx = cx - ((cx - center.x) / fsx);
-            cy = cy - ((cy - center.y) / fsy);
+        } else {
+
+            cx = 800;
+            cy = 600;
         }
 
+        let dLeft = cx * (sx - this.sx);
+        let dTop  = cy * (sy - this.sy);
+
         this.beforeZoom();
-
-        // let dx = this.elem.clientWidth * (this.sx - sx);
-        // let dy = this.elem.clientHeight * (this.sy - sy);
-
         this.paper.scale(sx, sy);
-        this.center(cx, cy);
-
+        this.doScroll(dLeft, dTop, { relative: true });
         this.afterZoom();
 
         return this;
@@ -296,8 +378,8 @@ class PaperScroll {
         let x = paper.tx;
         let y = paper.ty;
 
-        let width  = this.elem.clientWidth;
-        let height = this.elem.clientHeight;
+        let width  = this.scrollParent.clientWidth;
+        let height = this.scrollParent.clientHeight;
 
         options.fittingBBox = options.fittingBBox || { x, y, width, height };
 
@@ -312,14 +394,6 @@ class PaperScroll {
         this.centerContent();
 
         this.afterZoom();
-
-        return this;
-    }
-
-    centerContent() {
-
-        let bbox = this.paper.getContentBBox(true);
-        this.center(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
 
         return this;
     }

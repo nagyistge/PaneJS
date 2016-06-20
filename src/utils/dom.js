@@ -629,6 +629,43 @@ function getScrollParent(elem) {
     return document.body;
 }
 
+function getScrollBarWidth() {
+
+    const inner = createElement('p');
+    const outer = createElement('div');
+
+    setStyle(inner, {
+        width: '100%',
+        height: '200px'
+    });
+
+    setStyle(outer, {
+        overflow: 'hidden',
+        visibility: 'hidden',
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: '200px',
+        height: '100px'
+    });
+
+    outer.appendChild(inner);
+    document.body.appendChild(outer);
+
+    var w1 = inner.offsetWidth;
+
+    outer.style.overflow = 'scroll';
+
+    var w2 = inner.offsetWidth;
+    if (w1 === w2) {
+        w2 = outer.clientWidth;
+    }
+
+    document.body.removeChild(outer);
+
+    return w1 - w2;
+}
+
 // exports
 // -------
 
@@ -666,6 +703,7 @@ export {
     styleStrToObject,
     normalizeSides,
     getScrollParent,
+    getScrollBarWidth,
     getComputedStyle,
     getTransformToElement
 };

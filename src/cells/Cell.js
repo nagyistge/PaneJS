@@ -118,7 +118,7 @@ class Cell {
 
         if (!isSetTerminalScheduled.call(this)) {
 
-            terminal = new Terminal(terminal);
+            terminal = terminal ? new Terminal(terminal) : null;
 
             if (isSource) {
                 this.source = terminal;
