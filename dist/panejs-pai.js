@@ -2484,7 +2484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.removeEventListener = exports.addEventListener = exports.isLeftMouseButton = exports.hasModifierKey = exports.hasShiftKey = exports.hasMetaKey = exports.hasCtrlKey = exports.normalizeEvent = undefined;
+	exports.removeEventListener = exports.addEventListener = exports.isLeftMouseButton = exports.hasModifierKey = exports.hasShiftKey = exports.hasMetaKey = exports.hasCtrlKey = exports.hasAltKey = exports.normalizeEvent = undefined;
 	
 	var _lang = __webpack_require__(6);
 	
@@ -2711,6 +2711,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return hasCtrlKey(evt) || hasMetaKey(evt) || hasShiftKey(evt);
 	}
 	
+	function hasAltKey(evt) {
+	
+	    return evt.altKey;
+	}
+	
 	function hasCtrlKey(evt) {
 	
 	    return evt.ctrlKey;
@@ -2730,6 +2735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.normalizeEvent = normalizeEvent;
+	exports.hasAltKey = hasAltKey;
 	exports.hasCtrlKey = hasCtrlKey;
 	exports.hasMetaKey = hasMetaKey;
 	exports.hasShiftKey = hasShiftKey;
@@ -11760,7 +11766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    y = utils.fixNumber(y, false, 0);
 	                }
 	
-	                node.position = { x: x, y: y };
+	                node.position = this.snapToGrid({ x: x, y: y }, true);
 	            }
 	
 	            return this;
@@ -12324,17 +12330,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'snapToGrid',
-	        value: function snapToGrid(point) {
+	        value: function snapToGrid(point, isLocal) {
 	
 	            // Convert global coordinates to the local ones of the `drawPane`.
 	            // Otherwise, improper transformation would be applied when the
 	            // drawPane gets transformed (scaled/rotated).
 	            var gridSize = this.options.gridSize || 1;
-	            var localPoint = (0, _vector2.default)(this.drawPane).toLocalPoint(point.x, point.y);
+	
+	            if (!isLocal) {
+	                point = (0, _vector2.default)(this.drawPane).toLocalPoint(point.x, point.y);
+	            }
 	
 	            return {
-	                x: utils.snapToGrid(localPoint.x, gridSize),
-	                y: utils.snapToGrid(localPoint.y, gridSize)
+	                x: utils.snapToGrid(point.x, gridSize),
+	                y: utils.snapToGrid(point.y, gridSize)
 	            };
 	        }
 	    }, {
@@ -15144,11 +15153,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLPaper2 = _interopRequireDefault(_HTMLPaper);
 	
-	var _PaperScroll = __webpack_require__(79);
+	var _Navigator = __webpack_require__(85);
+	
+	var _Navigator2 = _interopRequireDefault(_Navigator);
+	
+	var _Snaplines = __webpack_require__(79);
+	
+	var _Snaplines2 = _interopRequireDefault(_Snaplines);
+	
+	var _PaperScroll = __webpack_require__(80);
 	
 	var _PaperScroll2 = _interopRequireDefault(_PaperScroll);
 	
-	var _LinkView = __webpack_require__(80);
+	var _LinkView = __webpack_require__(81);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
@@ -15156,23 +15173,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
 	
-	var _SelectionHandler = __webpack_require__(81);
+	var _SelectionHandler = __webpack_require__(82);
 	
 	var _SelectionHandler2 = _interopRequireDefault(_SelectionHandler);
 	
-	var _ConnectionHandler = __webpack_require__(82);
+	var _ConnectionHandler = __webpack_require__(83);
 	
 	var _ConnectionHandler2 = _interopRequireDefault(_ConnectionHandler);
 	
-	var _quadratic = __webpack_require__(83);
+	var _quadratic = __webpack_require__(84);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var pai = {
+	
 	    HTMLNode: _HTMLNode2.default,
 	    HTMLPaper: _HTMLPaper2.default,
+	    Navigator: _Navigator2.default,
+	    Snaplines: _Snaplines2.default,
 	    PaperScroll: _PaperScroll2.default,
 	
 	    LinkView: _LinkView2.default,
@@ -15870,8 +15890,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (sx && sy) {
 	
 	                utils.setStyle(this.htmlPane, {
-	                    transform: 'scale(' + sx + ',' + sy + ')'
+	                    transform: 'scale3d(' + sx + ',' + sy + ', 1)'
 	                });
+	
+	                //utils.setStyle(this.htmlPane, {
+	                //    zoom: sx
+	                //});
 	
 	                _get(Object.getPrototypeOf(HTMLPaper.prototype), 'scale', this).call(this, sx, sy, ox, oy);
 	            }
@@ -15911,6 +15935,231 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
+	var _Rect = __webpack_require__(4);
+	
+	var _Rect2 = _interopRequireDefault(_Rect);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var defaults = {
+	    paper: null,
+	    distance: 0
+	};
+	
+	var Snaplines = function () {
+	    function Snaplines(options) {
+	        _classCallCheck(this, Snaplines);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(Snaplines, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                utils.removeElement(this.container);
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.paper = this.options.paper;
+	
+	            this.ensureElement();
+	            this.hide();
+	
+	            this.paper.on('cells:moving', this.onCellsMoving.bind(this));
+	            this.paper.on('cells:moveEnd', this.onCellsMoveEnd.bind(this));
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.container = utils.createElement('div');
+	            this.hLine = utils.createElement('div');
+	            this.vLine = utils.createElement('div');
+	
+	            this.container.appendChild(this.hLine);
+	            this.container.appendChild(this.vLine);
+	
+	            this.paper.stage.appendChild(this.container);
+	
+	            utils.addClass(this.container, 'pane-snaplines');
+	            utils.addClass(this.hLine, 'pane-snapline horizontal');
+	            utils.addClass(this.vLine, 'pane-snapline vertical');
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'onCellsMoving',
+	        value: function onCellsMoving(cells, bounds) {
+	
+	            var previewCenter = bounds.getCenter();
+	            var previewOrigin = bounds.getOrigin();
+	            var previewCorner = bounds.getCorner();
+	
+	            this.vertical = null;
+	            this.horizontal = null;
+	
+	            this.hide();
+	
+	            this.paper.eachView(function (view) {
+	
+	                var cell = view.cell;
+	                if (!cell || !cell.isNode()) {
+	                    return;
+	                }
+	
+	                //if (cells.length === 1 && cell === cells[0]) {
+	                //    return;
+	                //}
+	
+	                var snapBBox = cell.getBBox();
+	                var snapCenter = snapBBox.getCenter();
+	                var snapOrigin = snapBBox.getOrigin();
+	                var snapCorner = snapBBox.getCorner();
+	
+	                return this.check(previewCenter, snapCenter, bounds, snapBBox) || this.check(previewCenter, snapOrigin, bounds, snapBBox) || this.check(previewCenter, snapCorner, bounds, snapBBox) || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
+	                //|| this.check(previewOrigin, snapCenter, bounds, snapBBox)
+	                 || this.check(previewOrigin, snapCorner, bounds, snapBBox) || this.check(previewCorner, snapOrigin, bounds, snapBBox)
+	                //|| this.check(previewCorner, snapCenter, bounds, snapBBox)
+	                 || this.check(previewCorner, snapCorner, bounds, snapBBox);
+	            }, this);
+	
+	            this.show();
+	        }
+	    }, {
+	        key: 'onCellsMoveEnd',
+	        value: function onCellsMoveEnd() {
+	
+	            this.hide();
+	        }
+	    }, {
+	        key: 'check',
+	        value: function check(previewPoint, snapPoint, previewBBox, spanBBox) {
+	
+	            var distance = this.options.distance;
+	
+	            var vertical = this.vertical;
+	            var horizontal = this.horizontal;
+	
+	            // horizontal
+	            var diff = previewPoint.y - snapPoint.y;
+	            if (Math.abs(diff) <= distance) {
+	
+	                if (!horizontal) {
+	                    horizontal = this.horizontal = {
+	                        top: snapPoint.y,
+	                        left: previewBBox.x,
+	                        right: previewBBox.x + previewBBox.width
+	                    };
+	                }
+	
+	                horizontal.left = Math.min(horizontal.left, previewBBox.x, spanBBox.x);
+	                horizontal.right = Math.max(horizontal.right, previewBBox.x + previewBBox.width, spanBBox.x + spanBBox.width);
+	
+	                return true;
+	            }
+	
+	            // vertical
+	            diff = previewPoint.x - snapPoint.x;
+	            if (Math.abs(diff) <= distance) {
+	
+	                if (!vertical) {
+	                    vertical = this.vertical = {
+	                        left: snapPoint.x,
+	                        top: previewBBox.y,
+	                        bottom: previewBBox.y + previewBBox.height
+	                    };
+	                }
+	
+	                vertical.top = Math.min(vertical.top, previewBBox.y, spanBBox.y);
+	                vertical.bottom = Math.max(vertical.bottom, previewBBox.y + previewBBox.height, spanBBox.y + spanBBox.height);
+	
+	                return true;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'hide',
+	        value: function hide() {
+	
+	            utils.setStyle(this.hLine, 'display', 'none');
+	            utils.setStyle(this.vLine, 'display', 'none');
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'show',
+	        value: function show() {
+	
+	            var paper = this.paper;
+	
+	            var sx = paper.sx;
+	            var sy = paper.sy;
+	            var tx = paper.tx;
+	            var ty = paper.ty;
+	
+	            var vertical = this.vertical;
+	            var horizontal = this.horizontal;
+	
+	            if (vertical) {
+	
+	                utils.setStyle(this.vLine, {
+	                    display: 'block',
+	                    left: Math.round(vertical.left * sx + tx) + 'px',
+	                    top: Math.round(vertical.top * sy + ty) + 'px',
+	                    height: Math.round((vertical.bottom - vertical.top) * sy) + 'px'
+	                });
+	            }
+	
+	            if (horizontal) {
+	
+	                utils.setStyle(this.hLine, {
+	                    display: 'block',
+	                    left: Math.round(horizontal.left * sx + tx) + 'px',
+	                    top: Math.round(horizontal.top * sy + ty) + 'px',
+	                    width: Math.round((horizontal.right - horizontal.left) * sx) + 'px'
+	                });
+	            }
+	        }
+	    }]);
+	
+	    return Snaplines;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Snaplines;
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
 	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
@@ -15923,7 +16172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var defaults = {
 	    paper: null,
-	    space: 30,
+	    space: 50,
 	    minWidth: 0,
 	    minHeight: 0
 	};
@@ -15974,11 +16223,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.ensureElement();
 	            this.addScrollEvent();
 	
-	            var scrollBarWidth = utils.getScrollBarWidth();
-	            this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
-	            this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
-	
 	            this.doResize();
+	            this.adjustClientSize();
 	            this.adjustPadding();
 	            this.center();
 	        }
@@ -16024,6 +16270,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function removeScrollEvent() {
 	
 	            utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'adjustClientSize',
+	        value: function adjustClientSize() {
+	
+	            var scrollBarWidth = utils.getScrollBarWidth();
+	            this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
+	            this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
 	
 	            return this;
 	        }
@@ -16348,7 +16604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = PaperScroll;
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16855,7 +17111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = LinkView;
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16888,6 +17144,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var defaults = {
+	    multi: true,
+	    movement: true,
+	    areaSelect: true,
+	    areaSelectKey: 'shift',
+	    scrollDelay: 40,
+	    scrollSense: 18
+	};
+	
+	var classNames = {
+	    cursorMove: 'pane-cursor-move',
+	    cursorCross: 'pane-cursor-cross'
+	};
+	
 	var SelectHandler = function (_Handler) {
 	    _inherits(SelectHandler, _Handler);
 	
@@ -16901,12 +17171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'configure',
 	        value: function configure(options) {
 	
-	            this.options = utils.merge({
-	                multi: true,
-	                area: true,
-	                delay: 30,
-	                sense: 10
-	            }, options);
+	            this.options = utils.merge({}, defaults, options);
 	
 	            this.scrollParent = utils.getScrollParent(this.getPaper().svg);
 	
@@ -16949,6 +17214,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.bounds = null;
 	
 	            if (cell.isNode()) {
+	
+	                this.lastX = localX;
+	                this.lastY = localY;
+	
 	                this.origin = { x: localX, y: localY };
 	                this.movingCells = cell.selected ? this.selectedCells : [cell];
 	            }
@@ -16983,18 +17252,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var x = this.previewOriginX + localX - this.origin.x;
 	                var y = this.previewOriginY + localY - this.origin.y;
 	
-	                var scrollParent = this.scrollParent;
+	                var _bounds = this.getScrollBounds();
+	                var direction = this.getMoveDirection(localX, localY);
 	
-	                x = utils.clamp(x, -scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-	                y = utils.clamp(y, -scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
-	                // var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-	                // var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
-	
-	                this.bounds.x = x;
-	                this.bounds.y = y;
+	                this.bounds.x = Math.round(utils.clamp(x, _bounds.left, _bounds.right - this.bounds.width));
+	                this.bounds.y = Math.round(utils.clamp(y, _bounds.top, _bounds.bottom - this.bounds.height));
 	
 	                this.updatePreview();
-	                // this.autoScrollPreview();
+	
+	                this.paper.trigger('cells:moving', this.movingCells, this.bounds);
+	
+	                if (this.movingCells.length === 1) {
+	                    this.paper.trigger('cell:moving', this.movingCells[0], this.bounds);
+	                }
+	
+	                this.autoScrollPreview(direction);
 	            }
 	        }
 	    }, {
@@ -17046,12 +17318,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.getPaper().trigger('cells:updatePosition', this.movingCells);
 	                }
 	            } else {
+	
 	                if (cell.isLink()) {
 	                    this.clearSelection();
 	                    this.setCellFocused(cell, view);
 	                } else {
 	
-	                    var multi = utils.hasModifierKey(e);
+	                    var multi = this.options.multi && utils.hasModifierKey(e);
 	                    this.selectCell(cell, view, multi);
 	                    this.notifySelectionChange();
 	
@@ -17061,6 +17334,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
+	            if (this.moving) {
+	
+	                this.paper.trigger('cells:moveEnd', this.movingCells, this.bounds);
+	
+	                if (this.movingCells.length === 1) {
+	                    this.paper.trigger('cell:moveEnd', this.movingCells[0], this.bounds);
+	                }
+	            }
+	
+	            this.lastX = null;
+	            this.lastY = null;
 	            this.origin = null;
 	            this.bounds = null;
 	            this.moving = false;
@@ -17074,21 +17358,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	            }
 	
-	            if (!this.options.area) {
-	                if (!utils.hasModifierKey(e)) {
-	                    this.clearSelection();
+	            this.isAreaSelect = this.options.areaSelect;
+	            var areaSelectKey = this.options.areaSelectKey;
+	
+	            if (this.isAreaSelect && areaSelectKey) {
+	
+	                var method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+	                if (utils[method]) {
+	                    this.isAreaSelect = utils[method](e);
 	                }
-	            } else {
+	            }
+	
+	            this.isMovement = this.options.movement;
+	
+	            if (this.isAreaSelect) {
+	
 	                this.origin = { x: localX, y: localY };
+	
+	                utils.addClass(document.body, classNames.cursorCross);
+	            } else if (this.isMovement) {
+	
+	                this.origin = { x: e.pageX, y: e.pageY };
+	                this.originScrollLeft = this.scrollParent.scrollLeft;
+	                this.originScrollTop = this.scrollParent.scrollTop;
+	
+	                utils.addClass(document.body, classNames.cursorMove);
+	            }
+	
+	            if (!utils.hasModifierKey(e)) {
+	                this.clearSelection();
 	            }
 	        }
 	    }, {
 	        key: 'onBlankMouseMove',
 	        value: function onBlankMouseMove(e, localX, localY) {
 	
-	            if (this.isDisabled() || !this.origin) {
+	            if (this.isDisabled()) {
 	                return;
 	            }
+	
+	            if (this.isAreaSelect) {
+	                this.onAreaSelect(e, localX, localY);
+	            } else if (this.isMovement) {
+	                this.onMovement(e, localX, localY);
+	            }
+	        }
+	    }, {
+	        key: 'onAreaSelect',
+	        value: function onAreaSelect(e, localX, localY) {
 	
 	            if (!this.moving) {
 	                this.showSelectionRect();
@@ -17098,57 +17415,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.moving) {
 	
 	                var origin = this.origin;
-	                var scrollParent = this.scrollParent;
+	                var bounds = this.getScrollBounds();
 	
 	                var x = localX;
 	                var y = localY;
 	                var width = Math.abs(x - origin.x);
 	                var height = Math.abs(y - origin.y);
 	
-	                var maxWidth = void 0;
-	                var maxHeight = void 0;
+	                var max = void 0;
 	
-	                if (x > origin.x) {
+	                if (x >= origin.x) {
 	
 	                    x = origin.x;
-	                    maxWidth = scrollParent.scrollLeft + scrollParent.clientWidth - x;
+	                    max = bounds.right - x;
 	
-	                    if (maxWidth < width) {
-	                        width = maxWidth;
+	                    if (width > max) {
+	                        width = Math.round(max);
 	                    }
 	                } else {
 	
-	                    maxWidth = this.origin.x - scrollParent.scrollLeft;
+	                    max = origin.x - bounds.left;
 	
-	                    if (width > maxWidth) {
-	                        width = maxWidth;
-	                        x = scrollParent.scrollLeft;
+	                    if (width > max) {
+	                        width = Math.round(max);
+	                        x = Math.round(bounds.left);
 	                    }
 	                }
 	
-	                if (y > this.origin.y) {
+	                if (y >= origin.y) {
 	
-	                    y = this.origin.y;
-	                    maxHeight = scrollParent.scrollTop + scrollParent.clientHeight - y;
+	                    y = origin.y;
+	                    max = bounds.bottom - y;
 	
-	                    if (maxHeight < height) {
-	                        height = maxHeight;
+	                    if (max < height) {
+	                        height = Math.round(max);
 	                    }
 	                } else {
 	
-	                    maxHeight = this.origin.y - scrollParent.scrollTop;
+	                    max = origin.y - bounds.top;
 	
-	                    if (height > maxHeight) {
-	                        height = maxHeight;
-	                        y = scrollParent.scrollTop;
+	                    if (height > max) {
+	                        height = Math.round(max);
+	                        y = Math.round(bounds.top);
 	                    }
 	                }
 	
 	                this.bounds = { x: x, y: y, width: width, height: height };
+	
 	                this.stopScrollTimer();
 	                this.updateSelectionRect();
-	                // this.autoScrollSelectionRect(localX, localY);
+	                this.autoScrollSelectionRect(localX, localY);
 	            }
+	        }
+	    }, {
+	        key: 'onMovement',
+	        value: function onMovement(e) {
+	
+	            this.moving = true;
+	
+	            var dx = this.origin.x - e.pageX;
+	            var dy = this.origin.y - e.pageY;
+	
+	            this.scrollParent.scrollLeft = this.originScrollLeft + dx;
+	            this.scrollParent.scrollTop = this.originScrollTop + dy;
 	        }
 	    }, {
 	        key: 'onBlankMouseUp',
@@ -17158,27 +17487,100 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	            }
 	
-	            if (!utils.hasModifierKey(e)) {
-	                this.clearSelection();
+	            if (this.isAreaSelect) {
+	
+	                if (!utils.hasModifierKey(e)) {
+	                    this.clearSelection();
+	                }
+	
+	                if (this.moving && this.bounds) {
+	
+	                    // range selection
+	
+	                    this.stopScrollTimer();
+	                    this.hideSelectionRect();
+	                    this.selectCellsInRect(this.bounds);
+	                } else {
+	                    // unFocus all cell
+	                    this.setCellFocused(null);
+	                }
+	
+	                this.notifySelectionChange();
+	
+	                utils.removeClass(document.body, classNames.cursorCross);
+	            } else if (this.isMovement) {
+	
+	                this.originScrollLeft = 0;
+	                this.originScrollTop = 0;
+	
+	                if (!this.moving) {
+	                    this.clearSelection();
+	                    this.notifySelectionChange();
+	                    this.setCellFocused(null);
+	                }
+	
+	                utils.removeClass(document.body, classNames.cursorMove);
 	            }
-	
-	            if (this.moving && this.bounds) {
-	
-	                // range selection
-	
-	                this.stopScrollTimer();
-	                this.hideSelectionRect();
-	                this.selectCellsInRect(this.bounds);
-	            } else {
-	                // unFocus all cell
-	                this.setCellFocused(null);
-	            }
-	
-	            this.notifySelectionChange();
 	
 	            this.bounds = null;
 	            this.origin = null;
 	            this.moving = false;
+	        }
+	    }, {
+	        key: 'getScrollBounds',
+	        value: function getScrollBounds(isViewport) {
+	
+	            var paper = this.getPaper();
+	            var scrollParent = this.scrollParent;
+	            var stageParent = paper.stage.parentNode;
+	
+	            var sx = paper.sx;
+	            var sy = paper.sy;
+	
+	            var scrollTop = scrollParent.scrollTop;
+	            var scrollLeft = scrollParent.scrollLeft;
+	            var scrollWidth = scrollParent.scrollWidth;
+	            var scrollHeight = scrollParent.scrollHeight;
+	            var clientWidth = scrollParent.clientWidth;
+	            var clientHeight = scrollParent.clientHeight;
+	            var paddingLeft = utils.toInt(stageParent.style.paddingLeft);
+	            var paddingTop = utils.toInt(stageParent.style.paddingTop);
+	
+	            return isViewport ? {
+	                left: (scrollLeft - paddingLeft - paper.tx) / sx,
+	                top: (scrollTop - paddingTop - paper.ty) / sy,
+	                right: (clientWidth + scrollLeft - paddingLeft - paper.tx) / sx,
+	                bottom: (clientHeight + scrollTop - paddingTop - paper.ty) / sy
+	            } : {
+	                left: -(paddingLeft + paper.tx) / sx,
+	                top: -(paddingTop + paper.ty) / sy,
+	                right: (scrollWidth - paddingLeft - paper.tx) / sx,
+	                bottom: (scrollHeight - paddingTop - paper.ty) / sy
+	            };
+	        }
+	    }, {
+	        key: 'getMoveDirection',
+	        value: function getMoveDirection(localX, localY) {
+	
+	            var dx = localX - this.lastX;
+	            var dy = localY - this.lastY;
+	
+	            this.lastX = localX;
+	            this.lastY = localY;
+	
+	            // top   : 1
+	            // right : 2
+	            // bottom: 3
+	            // left  : 4
+	            var direction = 0;
+	
+	            if (Math.abs(dx) > Math.abs(dy)) {
+	                direction = dx > 0 ? 2 : 4;
+	            } else {
+	                direction = dy > 0 ? 3 : 1;
+	            }
+	
+	            return direction;
 	        }
 	    }, {
 	        key: 'stopScrollTimer',
@@ -17210,12 +17612,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'autoScrollPreview',
-	        value: function autoScrollPreview() {
+	        value: function autoScrollPreview(direction) {
 	
 	            if (this.isParentScrollable()) {
 	
-	                var sense = this.options.sense;
 	                var bounds = this.bounds;
+	                var paper = this.getPaper();
+	
+	                var sx = paper.sx;
+	                var sy = paper.sy;
+	
+	                var scrollParent = this.scrollParent;
+	                var scrollWidth = scrollParent.scrollWidth;
+	                var scrollHeight = scrollParent.scrollHeight;
+	                var clientWidth = scrollParent.clientWidth;
+	                var clientHeight = scrollParent.clientHeight;
+	
+	                var sense = this.options.scrollSense;
 	
 	                var x = bounds.x;
 	                var y = bounds.y;
@@ -17223,47 +17636,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var width = bounds.width;
 	                var height = bounds.height;
 	
-	                var scrollParent = this.scrollParent;
-	                var scrollWidth = scrollParent.scrollWidth;
-	                var scrollHeight = scrollParent.scrollHeight;
-	                var clientWidth = scrollParent.clientWidth;
-	                var clientHeight = scrollParent.clientHeight;
 	                var scrollTop = scrollParent.scrollTop;
 	                var scrollLeft = scrollParent.scrollLeft;
 	
+	                var sBounds = this.getScrollBounds();
+	                var vBounds = this.getScrollBounds(true);
+	
+	                var minX = vBounds.left;
+	                var minY = vBounds.top;
+	                var maxX = vBounds.right - width;
+	                var maxY = vBounds.bottom - height;
+	
 	                var scrolled = false;
 	
-	                if (scrollLeft > 0 && x - scrollLeft <= 0) {
+	                if (direction === 4 && scrollLeft > 0 && Math.round(x - minX) <= 0) {
+	                    // scroll left
+	                    scrolled = true;
+	
+	                    bounds.x = Math.round(Math.max(sBounds.left, minX - sense / sx));
+	                    scrollLeft = Math.round(Math.max(0, scrollLeft - sense));
+	                } else if (direction === 2 && scrollLeft < scrollWidth - clientWidth && Math.round(x - maxX) >= 0) {
+	
+	                    // scroll right
+	                    scrolled = true;
+	
+	                    bounds.x = Math.round(Math.min(sBounds.right - width, maxX + sense / sx));
+	                    scrollLeft = Math.round(Math.min(scrollWidth - clientWidth, scrollLeft + sense));
+	                } else if (direction === 1 && scrollTop > 0 && Math.round(y - minY) <= 0) {
+	
+	                    // scroll top
+	                    scrolled = true;
+	
+	                    bounds.y = Math.round(Math.max(sBounds.top, minY - sense / sy));
+	                    scrollTop = Math.round(Math.max(0, scrollTop - sense));
+	                } else if (direction === 3 && scrollTop < scrollHeight - clientHeight && Math.round(y - maxY) >= 0) {
 	
 	                    scrolled = true;
 	
-	                    bounds.x = Math.max(0, x - sense);
-	                    scrollLeft = Math.max(0, scrollLeft - sense);
-	                } else if (x + width - (scrollLeft + clientWidth) === 0 && scrollLeft < scrollWidth - clientWidth) {
-	
-	                    scrolled = true;
-	
-	                    bounds.x = Math.min(scrollWidth - width, x + sense);
-	                    scrollLeft = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
-	                } else if (scrollTop - y === 0 && scrollTop > 0) {
-	
-	                    scrolled = true;
-	
-	                    bounds.y = Math.max(0, y - sense);
-	                    scrollTop = Math.max(0, scrollTop - sense);
-	                } else if (y + height - (scrollTop + clientHeight) === 0 && scrollTop < scrollHeight - clientHeight) {
-	
-	                    scrolled = true;
-	
-	                    bounds.y = Math.min(scrollHeight - height, y + sense);
-	                    scrollTop = Math.min(scrollHeight - clientHeight, scrollTop + sense);
+	                    bounds.y = Math.round(Math.min(sBounds.bottom - height, maxY + sense / sy));
+	                    scrollTop = Math.round(Math.min(scrollHeight - clientHeight, scrollTop + sense));
 	                }
 	
 	                if (scrolled) {
 	                    scrollParent.scrollTop = scrollTop;
 	                    scrollParent.scrollLeft = scrollLeft;
 	                    this.updatePreview();
-	                    this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this), this.options.delay);
+	                    this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this, direction), this.options.scrollDelay);
 	                }
 	            }
 	
@@ -17353,7 +17771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (this.isParentScrollable()) {
 	
-	                var sense = this.options.sense;
+	                var sense = this.options.scrollSense;
 	                var bounds = this.bounds;
 	                var scrolled = false;
 	
@@ -17365,45 +17783,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var scrollTop = scrollParent.scrollTop;
 	                var scrollLeft = scrollParent.scrollLeft;
 	
-	                if (localX < scrollLeft && scrollLeft > 0) {
+	                var paper = this.getPaper();
+	
+	                var sx = paper.sx;
+	                var sy = paper.sy;
+	
+	                var sBounds = this.getScrollBounds();
+	                var vBounds = this.getScrollBounds(true);
+	
+	                if (scrollLeft > 0 && localX <= vBounds.left) {
+	
 	                    // scroll left
-	
 	                    scrolled = true;
-	                    localX -= sense;
+	                    localX -= sense / sx;
 	
-	                    bounds.x = Math.max(0, bounds.x - sense);
-	                    scrollLeft = Math.max(0, scrollLeft - sense);
-	                } else if (localX > scrollLeft + clientWidth && scrollLeft < scrollWidth - clientWidth) {
+	                    bounds.x = Math.round(Math.max(sBounds.left, bounds.x - sense / sx));
+	                    scrollLeft = Math.round(Math.max(0, scrollLeft - sense));
+	                } else if (scrollLeft < scrollWidth - clientWidth && localX >= vBounds.right) {
+	
 	                    // scroll right
-	
 	                    scrolled = true;
-	                    localX += sense;
+	                    localX += sense / sx;
 	
-	                    bounds.width = Math.min(scrollWidth - bounds.x, bounds.width + sense);
-	                    scrollLeft = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
-	                } else if (localY < scrollTop && scrollTop > 0) {
+	                    bounds.width = Math.round(Math.min(sBounds.right - bounds.x, bounds.width + sense / sx));
+	                    scrollLeft = Math.round(Math.min(scrollWidth - clientWidth, scrollLeft + sense));
+	                } else if (scrollTop > 0 && localY < vBounds.top) {
+	
 	                    // scroll top
-	
 	                    scrolled = true;
-	                    localY -= sense;
+	                    localY -= sense / sy;
 	
-	                    bounds.y = Math.max(0, bounds.y - sense);
-	                    scrollTop = Math.max(0, scrollTop - sense);
-	                } else if (localY > scrollTop + clientHeight && scrollTop < scrollHeight - clientHeight) {
+	                    bounds.y = Math.round(Math.max(sBounds.top, bounds.y - sense / sy));
+	                    scrollTop = Math.round(Math.max(0, scrollTop - sense));
+	                } else if (scrollTop < scrollHeight - clientHeight && localY > vBounds.bottom) {
+	
 	                    // scroll bottom
-	
 	                    scrolled = true;
-	                    localY += sense;
+	                    localY += sense / sy;
 	
-	                    bounds.height = Math.min(scrollHeight - bounds.y, bounds.height + sense);
-	                    scrollTop = Math.min(scrollHeight - clientHeight, scrollTop + sense);
+	                    bounds.height = Math.round(Math.min(sBounds.bottom - bounds.y, bounds.height + sense / sy));
+	                    scrollTop = Math.round(Math.min(scrollHeight - clientHeight, scrollTop + sense));
 	                }
 	
 	                if (scrolled) {
 	                    scrollParent.scrollTop = scrollTop;
 	                    scrollParent.scrollLeft = scrollLeft;
 	                    this.updateSelectionRect();
-	                    this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), this.options.delay);
+	                    this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), this.options.scrollDelay);
 	                }
 	            }
 	
@@ -17547,7 +17973,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = SelectHandler;
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17566,11 +17992,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Link2 = _interopRequireDefault(_Link);
 	
-	var _LinkView = __webpack_require__(80);
+	var _LinkView = __webpack_require__(81);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _quadratic = __webpack_require__(83);
+	var _quadratic = __webpack_require__(84);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -17750,7 +18176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConnectionHandler;
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17777,6 +18203,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.default = quadratic;
+
+/***/ },
+/* 85 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Navigator = function Navigator() {
+	  _classCallCheck(this, Navigator);
+	};
+	
+	// exports
+	// -------
+	
+	exports.default = Navigator;
 
 /***/ }
 /******/ ])

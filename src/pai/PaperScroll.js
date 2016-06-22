@@ -3,7 +3,7 @@ import detector   from '../common/detector';
 
 const defaults = {
     paper: null,
-    space: 30,
+    space: 50,
     minWidth: 0,
     minHeight: 0
 };
@@ -51,11 +51,8 @@ class PaperScroll {
         this.ensureElement();
         this.addScrollEvent();
 
-        const scrollBarWidth = utils.getScrollBarWidth();
-        this.clientWidth     = this.scrollParent.clientWidth - scrollBarWidth;
-        this.clientHeight    = this.scrollParent.clientHeight - scrollBarWidth;
-
         this.doResize();
+        this.adjustClientSize();
         this.adjustPadding();
         this.center();
     }
@@ -95,6 +92,15 @@ class PaperScroll {
     removeScrollEvent() {
 
         utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
+
+        return this;
+    }
+
+    adjustClientSize() {
+
+        const scrollBarWidth = utils.getScrollBarWidth();
+        this.clientWidth     = this.scrollParent.clientWidth - scrollBarWidth;
+        this.clientHeight    = this.scrollParent.clientHeight - scrollBarWidth;
 
         return this;
     }
@@ -209,7 +215,6 @@ class PaperScroll {
 
         return this;
     }
-
 
     setScroll(scrollLeft, scrollTop) {
 

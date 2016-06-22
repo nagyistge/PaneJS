@@ -3,16 +3,25 @@ import Rect       from '../geometry/Rect';
 import Handler    from '../handlers/Handler';
 
 
+const defaults = {
+    multi: true,
+    movement: true,
+    areaSelect: true,
+    areaSelectKey: 'shift',
+    scrollDelay: 40,
+    scrollSense: 18
+};
+
+const classNames = {
+    cursorMove: 'pane-cursor-move',
+    cursorCross: 'pane-cursor-cross'
+};
+
 class SelectHandler extends Handler {
 
     configure(options) {
 
-        this.options = utils.merge({
-            multi: true,
-            area: true,
-            delay: 30,
-            sense: 10
-        }, options);
+        this.options = utils.merge({}, defaults, options);
 
         this.scrollParent = utils.getScrollParent(this.getPaper().svg);
 
@@ -59,6 +68,10 @@ class SelectHandler extends Handler {
         this.bounds = null;
 
         if (cell.isNode()) {
+
+            this.lastX = localX;
+            this.lastY = localY;
+
             this.origin      = { x: localX, y: localY };
             this.movingCells = cell.selected ? this.selectedCells : [cell];
         }
@@ -92,18 +105,21 @@ class SelectHandler extends Handler {
             let x = this.previewOriginX + localX - this.origin.x;
             let y = this.previewOriginY + localY - this.origin.y;
 
-            let scrollParent = this.scrollParent;
+            const bounds    = this.getScrollBounds();
+            const direction = this.getMoveDirection(localX, localY);
 
-            x = utils.clamp(x, -scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-            y = utils.clamp(y, -scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
-            // var xx = utils.clamp(x, scrollParent.scrollLeft, scrollParent.clientWidth + scrollParent.scrollLeft - this.bounds.width);
-            // var yy = utils.clamp(y, scrollParent.scrollTop, scrollParent.clientHeight + scrollParent.scrollTop - this.bounds.height);
-
-            this.bounds.x = x;
-            this.bounds.y = y;
+            this.bounds.x = Math.round(utils.clamp(x, bounds.left, bounds.right - this.bounds.width));
+            this.bounds.y = Math.round(utils.clamp(y, bounds.top, bounds.bottom - this.bounds.height));
 
             this.updatePreview();
-            // this.autoScrollPreview();
+
+            this.paper.trigger('cells:moving', this.movingCells, this.bounds);
+
+            if (this.movingCells.length === 1) {
+                this.paper.trigger('cell:moving', this.movingCells[0], this.bounds);
+            }
+
+            this.autoScrollPreview(direction);
         }
     }
 
@@ -153,13 +169,15 @@ class SelectHandler extends Handler {
 
                 this.getPaper().trigger('cells:updatePosition', this.movingCells);
             }
+
         } else {
+
             if (cell.isLink()) {
                 this.clearSelection();
                 this.setCellFocused(cell, view);
             } else {
 
-                let multi = utils.hasModifierKey(e);
+                let multi = this.options.multi && utils.hasModifierKey(e);
                 this.selectCell(cell, view, multi);
                 this.notifySelectionChange();
 
@@ -169,6 +187,18 @@ class SelectHandler extends Handler {
             }
         }
 
+        if (this.moving) {
+
+            this.paper.trigger('cells:moveEnd', this.movingCells, this.bounds);
+
+            if (this.movingCells.length === 1) {
+                this.paper.trigger('cell:moveEnd', this.movingCells[0], this.bounds);
+            }
+
+        }
+
+        this.lastX       = null;
+        this.lastY       = null;
         this.origin      = null;
         this.bounds      = null;
         this.moving      = false;
@@ -181,20 +211,53 @@ class SelectHandler extends Handler {
             return;
         }
 
-        if (!this.options.area) {
-            if (!utils.hasModifierKey(e)) {
-                this.clearSelection();
+        this.isAreaSelect   = this.options.areaSelect;
+        const areaSelectKey = this.options.areaSelectKey;
+
+        if (this.isAreaSelect && areaSelectKey) {
+
+            let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+            if (utils[method]) {
+                this.isAreaSelect = utils[method](e);
             }
-        } else {
+        }
+
+        this.isMovement = this.options.movement;
+
+        if (this.isAreaSelect) {
+
             this.origin = { x: localX, y: localY };
+
+            utils.addClass(document.body, classNames.cursorCross);
+
+        } else if (this.isMovement) {
+
+            this.origin           = { x: e.pageX, y: e.pageY };
+            this.originScrollLeft = this.scrollParent.scrollLeft;
+            this.originScrollTop  = this.scrollParent.scrollTop;
+
+            utils.addClass(document.body, classNames.cursorMove);
+        }
+
+        if (!utils.hasModifierKey(e)) {
+            this.clearSelection();
         }
     }
 
     onBlankMouseMove(e, localX, localY) {
 
-        if (this.isDisabled() || !this.origin) {
+        if (this.isDisabled()) {
             return;
         }
+
+        if (this.isAreaSelect) {
+            this.onAreaSelect(e, localX, localY);
+        } else if (this.isMovement) {
+            this.onMovement(e, localX, localY);
+        }
+    }
+
+    onAreaSelect(e, localX, localY) {
 
         if (!this.moving) {
             this.showSelectionRect();
@@ -203,59 +266,70 @@ class SelectHandler extends Handler {
 
         if (this.moving) {
 
-            let origin       = this.origin;
-            let scrollParent = this.scrollParent;
+            const origin = this.origin;
+            const bounds = this.getScrollBounds();
 
             let x      = localX;
             let y      = localY;
             let width  = Math.abs(x - origin.x);
             let height = Math.abs(y - origin.y);
 
-            let maxWidth;
-            let maxHeight;
+            let max;
 
-            if (x > origin.x) {
+            if (x >= origin.x) {
 
-                x        = origin.x;
-                maxWidth = scrollParent.scrollLeft + scrollParent.clientWidth - x;
+                x   = origin.x;
+                max = bounds.right - x;
 
-                if (maxWidth < width) {
-                    width = maxWidth;
+                if (width > max) {
+                    width = Math.round(max);
                 }
 
             } else {
 
-                maxWidth = this.origin.x - scrollParent.scrollLeft;
+                max = origin.x - bounds.left;
 
-                if (width > maxWidth) {
-                    width = maxWidth;
-                    x     = scrollParent.scrollLeft;
+                if (width > max) {
+                    width = Math.round(max);
+                    x     = Math.round(bounds.left);
                 }
             }
 
-            if (y > this.origin.y) {
+            if (y >= origin.y) {
 
-                y         = this.origin.y;
-                maxHeight = scrollParent.scrollTop + scrollParent.clientHeight - y;
+                y   = origin.y;
+                max = bounds.bottom - y;
 
-                if (maxHeight < height) {
-                    height = maxHeight;
+                if (max < height) {
+                    height = Math.round(max);
                 }
             } else {
 
-                maxHeight = this.origin.y - scrollParent.scrollTop;
+                max = origin.y - bounds.top;
 
-                if (height > maxHeight) {
-                    height = maxHeight;
-                    y      = scrollParent.scrollTop;
+                if (height > max) {
+                    height = Math.round(max);
+                    y      = Math.round(bounds.top);
                 }
             }
 
             this.bounds = { x, y, width, height };
+
             this.stopScrollTimer();
             this.updateSelectionRect();
-            // this.autoScrollSelectionRect(localX, localY);
+            this.autoScrollSelectionRect(localX, localY);
         }
+    }
+
+    onMovement(e) {
+
+        this.moving = true;
+
+        const dx = this.origin.x - e.pageX;
+        const dy = this.origin.y - e.pageY;
+
+        this.scrollParent.scrollLeft = this.originScrollLeft + dx;
+        this.scrollParent.scrollTop  = this.originScrollTop + dy;
     }
 
     onBlankMouseUp(e) {
@@ -264,28 +338,100 @@ class SelectHandler extends Handler {
             return;
         }
 
-        if (!utils.hasModifierKey(e)) {
-            this.clearSelection();
+        if (this.isAreaSelect) {
+
+            if (!utils.hasModifierKey(e)) {
+                this.clearSelection();
+            }
+
+            if (this.moving && this.bounds) {
+
+                // range selection
+
+                this.stopScrollTimer();
+                this.hideSelectionRect();
+                this.selectCellsInRect(this.bounds);
+
+            } else {
+                // unFocus all cell
+                this.setCellFocused(null);
+            }
+
+            this.notifySelectionChange();
+
+            utils.removeClass(document.body, classNames.cursorCross);
+
+        } else if (this.isMovement) {
+
+            this.originScrollLeft = 0;
+            this.originScrollTop  = 0;
+
+            if (!this.moving) {
+                this.clearSelection();
+                this.notifySelectionChange();
+                this.setCellFocused(null);
+            }
+
+            utils.removeClass(document.body, classNames.cursorMove);
         }
-
-        if (this.moving && this.bounds) {
-
-            // range selection
-
-            this.stopScrollTimer();
-            this.hideSelectionRect();
-            this.selectCellsInRect(this.bounds);
-
-        } else {
-            // unFocus all cell
-            this.setCellFocused(null);
-        }
-
-        this.notifySelectionChange();
 
         this.bounds = null;
         this.origin = null;
         this.moving = false;
+    }
+
+    getScrollBounds(isViewport) {
+
+        const paper        = this.getPaper();
+        const scrollParent = this.scrollParent;
+        const stageParent  = paper.stage.parentNode;
+
+        const sx = paper.sx;
+        const sy = paper.sy;
+
+        const scrollTop    = scrollParent.scrollTop;
+        const scrollLeft   = scrollParent.scrollLeft;
+        const scrollWidth  = scrollParent.scrollWidth;
+        const scrollHeight = scrollParent.scrollHeight;
+        const clientWidth  = scrollParent.clientWidth;
+        const clientHeight = scrollParent.clientHeight;
+        const paddingLeft  = utils.toInt(stageParent.style.paddingLeft);
+        const paddingTop   = utils.toInt(stageParent.style.paddingTop);
+
+        return isViewport ? {
+            left: (scrollLeft - paddingLeft - paper.tx) / sx,
+            top: (scrollTop - paddingTop - paper.ty) / sy,
+            right: (clientWidth + scrollLeft - paddingLeft - paper.tx) / sx,
+            bottom: (clientHeight + scrollTop - paddingTop - paper.ty) / sy
+        } : {
+            left: -(paddingLeft + paper.tx) / sx,
+            top: -(paddingTop + paper.ty) / sy,
+            right: (scrollWidth - paddingLeft - paper.tx) / sx,
+            bottom: (scrollHeight - paddingTop - paper.ty) / sy
+        };
+    }
+
+    getMoveDirection(localX, localY) {
+
+        let dx = localX - this.lastX;
+        let dy = localY - this.lastY;
+
+        this.lastX = localX;
+        this.lastY = localY;
+
+        // top   : 1
+        // right : 2
+        // bottom: 3
+        // left  : 4
+        let direction = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            direction = dx > 0 ? 2 : 4;
+        } else {
+            direction = dy > 0 ? 3 : 1;
+        }
+
+        return direction;
     }
 
     stopScrollTimer() {
@@ -314,12 +460,23 @@ class SelectHandler extends Handler {
         return bounds;
     }
 
-    autoScrollPreview() {
+    autoScrollPreview(direction) {
 
         if (this.isParentScrollable()) {
 
-            let sense  = this.options.sense;
-            let bounds = this.bounds;
+            const bounds = this.bounds;
+            const paper  = this.getPaper();
+
+            const sx = paper.sx;
+            const sy = paper.sy;
+
+            const scrollParent = this.scrollParent;
+            const scrollWidth  = scrollParent.scrollWidth;
+            const scrollHeight = scrollParent.scrollHeight;
+            const clientWidth  = scrollParent.clientWidth;
+            const clientHeight = scrollParent.clientHeight;
+
+            let sense = this.options.scrollSense;
 
             let x = bounds.x;
             let y = bounds.y;
@@ -327,52 +484,57 @@ class SelectHandler extends Handler {
             let width  = bounds.width;
             let height = bounds.height;
 
-            let scrollParent = this.scrollParent;
-            let scrollWidth  = scrollParent.scrollWidth;
-            let scrollHeight = scrollParent.scrollHeight;
-            let clientWidth  = scrollParent.clientWidth;
-            let clientHeight = scrollParent.clientHeight;
-            let scrollTop    = scrollParent.scrollTop;
-            let scrollLeft   = scrollParent.scrollLeft;
+            let scrollTop  = scrollParent.scrollTop;
+            let scrollLeft = scrollParent.scrollLeft;
+
+            const sBounds = this.getScrollBounds();
+            const vBounds = this.getScrollBounds(true);
+
+            const minX = vBounds.left;
+            const minY = vBounds.top;
+            const maxX = vBounds.right - width;
+            const maxY = vBounds.bottom - height;
 
             let scrolled = false;
 
-            if (scrollLeft > 0 && x - scrollLeft <= 0) {
+            if (direction === 4 && scrollLeft > 0 && Math.round(x - minX) <= 0) {
+                // scroll left
+                scrolled = true;
+
+                bounds.x   = Math.round(Math.max(sBounds.left, minX - sense / sx));
+                scrollLeft = Math.round(Math.max(0, scrollLeft - sense));
+
+            } else if (direction === 2 && scrollLeft < scrollWidth - clientWidth
+                && Math.round(x - maxX) >= 0) {
+
+                // scroll right
+                scrolled = true;
+
+                bounds.x   = Math.round(Math.min(sBounds.right - width, maxX + sense / sx));
+                scrollLeft = Math.round(Math.min(scrollWidth - clientWidth, scrollLeft + sense));
+
+            } else if (direction === 1 && scrollTop > 0 && Math.round(y - minY) <= 0) {
+
+                // scroll top
+                scrolled = true;
+
+                bounds.y  = Math.round(Math.max(sBounds.top, minY - sense / sy));
+                scrollTop = Math.round(Math.max(0, scrollTop - sense));
+
+            } else if (direction === 3 && scrollTop < scrollHeight - clientHeight
+                && Math.round(y - maxY) >= 0) {
 
                 scrolled = true;
 
-                bounds.x   = Math.max(0, x - sense);
-                scrollLeft = Math.max(0, scrollLeft - sense);
-
-            } else if ((x + width) - (scrollLeft + clientWidth) === 0
-                && scrollLeft < scrollWidth - clientWidth) {
-
-                scrolled = true;
-
-                bounds.x   = Math.min(scrollWidth - width, x + sense);
-                scrollLeft = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
-
-            } else if ((scrollTop - y) === 0 && scrollTop > 0) {
-
-                scrolled = true;
-
-                bounds.y  = Math.max(0, y - sense);
-                scrollTop = Math.max(0, scrollTop - sense);
-
-            } else if (((y + height) - (scrollTop + clientHeight)) === 0
-                && scrollTop < scrollHeight - clientHeight) {
-
-                scrolled = true;
-
-                bounds.y  = Math.min(scrollHeight - height, y + sense);
-                scrollTop = Math.min(scrollHeight - clientHeight, scrollTop + sense);
+                bounds.y  = Math.round(Math.min(sBounds.bottom - height, maxY + sense / sy));
+                scrollTop = Math.round(Math.min(scrollHeight - clientHeight, scrollTop + sense));
             }
 
             if (scrolled) {
                 scrollParent.scrollTop  = scrollTop;
                 scrollParent.scrollLeft = scrollLeft;
                 this.updatePreview();
-                this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this), this.options.delay);
+                this.scrollTimer = setTimeout(this.autoScrollPreview.bind(this, direction), this.options.scrollDelay);
             }
         }
 
@@ -455,7 +617,7 @@ class SelectHandler extends Handler {
 
         if (this.isParentScrollable()) {
 
-            let sense    = this.options.sense;
+            let sense    = this.options.scrollSense;
             let bounds   = this.bounds;
             let scrolled = false;
 
@@ -467,50 +629,58 @@ class SelectHandler extends Handler {
             let scrollTop    = scrollParent.scrollTop;
             let scrollLeft   = scrollParent.scrollLeft;
 
-            if (localX < scrollLeft && scrollLeft > 0) {
+            const paper = this.getPaper();
+
+            const sx = paper.sx;
+            const sy = paper.sy;
+
+            const sBounds = this.getScrollBounds();
+            const vBounds = this.getScrollBounds(true);
+
+            if (scrollLeft > 0 && localX <= vBounds.left) {
+
                 // scroll left
-
                 scrolled = true;
-                localX -= sense;
+                localX -= sense / sx;
 
-                bounds.x   = Math.max(0, bounds.x - sense);
-                scrollLeft = Math.max(0, scrollLeft - sense);
+                bounds.x   = Math.round(Math.max(sBounds.left, bounds.x - sense / sx));
+                scrollLeft = Math.round(Math.max(0, scrollLeft - sense));
 
-            } else if (localX > scrollLeft + clientWidth
-                && scrollLeft < scrollWidth - clientWidth) {
+            } else if (scrollLeft < scrollWidth - clientWidth
+                && localX >= vBounds.right) {
+
                 // scroll right
-
                 scrolled = true;
-                localX += sense;
+                localX += sense / sx;
 
-                bounds.width = Math.min(scrollWidth - bounds.x, bounds.width + sense);
-                scrollLeft   = Math.min(scrollWidth - clientWidth, scrollLeft + sense);
+                bounds.width = Math.round(Math.min(sBounds.right - bounds.x, bounds.width + sense / sx));
+                scrollLeft   = Math.round(Math.min(scrollWidth - clientWidth, scrollLeft + sense));
 
-            } else if (localY < scrollTop && scrollTop > 0) {
+            } else if (scrollTop > 0 && localY < vBounds.top) {
+
                 // scroll top
-
                 scrolled = true;
-                localY -= sense;
+                localY -= sense / sy;
 
-                bounds.y  = Math.max(0, bounds.y - sense);
-                scrollTop = Math.max(0, scrollTop - sense);
+                bounds.y  = Math.round(Math.max(sBounds.top, bounds.y - sense / sy));
+                scrollTop = Math.round(Math.max(0, scrollTop - sense));
 
-            } else if (localY > scrollTop + clientHeight
-                && scrollTop < scrollHeight - clientHeight) {
+            } else if (scrollTop < scrollHeight - clientHeight
+                && localY > vBounds.bottom) {
+
                 // scroll bottom
-
                 scrolled = true;
-                localY += sense;
+                localY += sense / sy;
 
-                bounds.height = Math.min(scrollHeight - bounds.y, bounds.height + sense);
-                scrollTop     = Math.min(scrollHeight - clientHeight, scrollTop + sense);
+                bounds.height = Math.round(Math.min(sBounds.bottom - bounds.y, bounds.height + sense / sy));
+                scrollTop     = Math.round(Math.min(scrollHeight - clientHeight, scrollTop + sense));
             }
 
             if (scrolled) {
                 scrollParent.scrollTop  = scrollTop;
                 scrollParent.scrollLeft = scrollLeft;
                 this.updateSelectionRect();
-                this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), this.options.delay);
+                this.scrollTimer = setTimeout(this.autoScrollSelectionRect.bind(this, localX, localY), this.options.scrollDelay);
             }
         }
 

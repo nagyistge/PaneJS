@@ -224,6 +224,11 @@ function hasModifierKey(evt) {
     return hasCtrlKey(evt) || hasMetaKey(evt) || hasShiftKey(evt);
 }
 
+function hasAltKey(evt) {
+
+    return evt.altKey;
+}
+
 function hasCtrlKey(evt) {
 
     return evt.ctrlKey;
@@ -245,6 +250,7 @@ function hasMetaKey(evt) {
 
 export {
     normalizeEvent,
+    hasAltKey,
     hasCtrlKey,
     hasMetaKey,
     hasShiftKey,

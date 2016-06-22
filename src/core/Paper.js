@@ -778,7 +778,7 @@ class Paper extends Events {
                 y = utils.fixNumber(y, false, 0);
             }
 
-            node.position = { x, y };
+            node.position = this.snapToGrid({ x, y }, true);
         }
 
 
@@ -1371,17 +1371,20 @@ class Paper extends Events {
     // utils
     // -----
 
-    snapToGrid(point) {
+    snapToGrid(point, isLocal) {
 
         // Convert global coordinates to the local ones of the `drawPane`.
         // Otherwise, improper transformation would be applied when the
         // drawPane gets transformed (scaled/rotated).
-        let gridSize   = this.options.gridSize || 1;
-        let localPoint = vector(this.drawPane).toLocalPoint(point.x, point.y);
+        let gridSize = this.options.gridSize || 1;
+
+        if (!isLocal) {
+            point = vector(this.drawPane).toLocalPoint(point.x, point.y);
+        }
 
         return {
-            x: utils.snapToGrid(localPoint.x, gridSize),
-            y: utils.snapToGrid(localPoint.y, gridSize)
+            x: utils.snapToGrid(point.x, gridSize),
+            y: utils.snapToGrid(point.y, gridSize)
         };
     }
 

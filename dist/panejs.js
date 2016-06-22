@@ -2472,7 +2472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.removeEventListener = exports.addEventListener = exports.isLeftMouseButton = exports.hasModifierKey = exports.hasShiftKey = exports.hasMetaKey = exports.hasCtrlKey = exports.normalizeEvent = undefined;
+	exports.removeEventListener = exports.addEventListener = exports.isLeftMouseButton = exports.hasModifierKey = exports.hasShiftKey = exports.hasMetaKey = exports.hasCtrlKey = exports.hasAltKey = exports.normalizeEvent = undefined;
 	
 	var _lang = __webpack_require__(6);
 	
@@ -2699,6 +2699,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return hasCtrlKey(evt) || hasMetaKey(evt) || hasShiftKey(evt);
 	}
 	
+	function hasAltKey(evt) {
+	
+	    return evt.altKey;
+	}
+	
 	function hasCtrlKey(evt) {
 	
 	    return evt.ctrlKey;
@@ -2718,6 +2723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.normalizeEvent = normalizeEvent;
+	exports.hasAltKey = hasAltKey;
 	exports.hasCtrlKey = hasCtrlKey;
 	exports.hasMetaKey = hasMetaKey;
 	exports.hasShiftKey = hasShiftKey;
@@ -11748,7 +11754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    y = utils.fixNumber(y, false, 0);
 	                }
 	
-	                node.position = { x: x, y: y };
+	                node.position = this.snapToGrid({ x: x, y: y }, true);
 	            }
 	
 	            return this;
@@ -12312,17 +12318,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'snapToGrid',
-	        value: function snapToGrid(point) {
+	        value: function snapToGrid(point, isLocal) {
 	
 	            // Convert global coordinates to the local ones of the `drawPane`.
 	            // Otherwise, improper transformation would be applied when the
 	            // drawPane gets transformed (scaled/rotated).
 	            var gridSize = this.options.gridSize || 1;
-	            var localPoint = (0, _vector2.default)(this.drawPane).toLocalPoint(point.x, point.y);
+	
+	            if (!isLocal) {
+	                point = (0, _vector2.default)(this.drawPane).toLocalPoint(point.x, point.y);
+	            }
 	
 	            return {
-	                x: utils.snapToGrid(localPoint.x, gridSize),
-	                y: utils.snapToGrid(localPoint.y, gridSize)
+	                x: utils.snapToGrid(point.x, gridSize),
+	                y: utils.snapToGrid(point.y, gridSize)
 	            };
 	        }
 	    }, {
