@@ -1,5 +1,4 @@
 import * as utils from '../common/utils';
-import Rect       from '../geometry/Rect';
 
 
 const defaults = {
@@ -45,8 +44,7 @@ class Snaplines {
 
         this.container.appendChild(this.hLine);
         this.container.appendChild(this.vLine);
-
-        this.paper.stage.appendChild(this.container);
+        this.paper.getStage().appendChild(this.container);
 
         utils.addClass(this.container, 'pane-snaplines');
         utils.addClass(this.hLine, 'pane-snapline horizontal');
@@ -73,24 +71,25 @@ class Snaplines {
                 return;
             }
 
-            //if (cells.length === 1 && cell === cells[0]) {
+            // if (cells.length === 1 && cell === cells[0]) {
             //    return;
-            //}
+            // }
 
             const snapBBox   = cell.getBBox();
             const snapCenter = snapBBox.getCenter();
             const snapOrigin = snapBBox.getOrigin();
             const snapCorner = snapBBox.getCorner();
 
-            return this.check(previewCenter, snapCenter, bounds, snapBBox)
-                || this.check(previewCenter, snapOrigin, bounds, snapBBox)
-                || this.check(previewCenter, snapCorner, bounds, snapBBox)
-                || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
-                    //|| this.check(previewOrigin, snapCenter, bounds, snapBBox)
-                || this.check(previewOrigin, snapCorner, bounds, snapBBox)
-                || this.check(previewCorner, snapOrigin, bounds, snapBBox)
-                    //|| this.check(previewCorner, snapCenter, bounds, snapBBox)
-                || this.check(previewCorner, snapCorner, bounds, snapBBox)
+            this.check(previewCenter, snapCenter, bounds, snapBBox)
+            || this.check(previewCenter, snapOrigin, bounds, snapBBox)
+            || this.check(previewCenter, snapCorner, bounds, snapBBox)
+            || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
+                // || this.check(previewOrigin, snapCenter, bounds, snapBBox)
+            || this.check(previewOrigin, snapCorner, bounds, snapBBox)
+            || this.check(previewCorner, snapOrigin, bounds, snapBBox)
+                // || this.check(previewCorner, snapCenter, bounds, snapBBox)
+            || this.check(previewCorner, snapCorner, bounds, snapBBox);
+
         }, this);
 
         this.show();

@@ -27,7 +27,7 @@ const win = window;
 const doc = win.document;
 
 const classNames = {
-    wrapper: 'pane-wrapper',
+    wrap: 'pane-wrap',
     stage: 'pane-stage',
     svg: 'pane-svg',
     viewport: 'pane-viewport'
@@ -121,20 +121,20 @@ class Paper extends Events {
 
     ensureElement() {
 
-        this.wrapper  = utils.createElement('div');
+        this.wrap     = utils.createElement('div');
         this.stage    = utils.createElement('div');
         this.svg      = utils.createSvgDocument();
         this.viewport = utils.createSvgElement('g');
 
-        utils.addClass(this.wrapper, classNames.wrapper);
+        utils.addClass(this.wrap, classNames.wrap);
         utils.addClass(this.stage, classNames.stage);
         utils.addClass(this.svg, classNames.svg);
         utils.addClass(this.viewport, classNames.viewport);
 
         this.svg.appendChild(this.viewport);
         this.stage.appendChild(this.svg);
-        this.wrapper.appendChild(this.stage);
-        this.container.appendChild(this.wrapper);
+        this.wrap.appendChild(this.stage);
+        this.container.appendChild(this.wrap);
 
         this.trigger('paper:ensureElements');
 
@@ -146,9 +146,9 @@ class Paper extends Events {
         return this.container;
     }
 
-    getWrapper() {
+    getWrap() {
 
-        return this.wrapper;
+        return this.wrap;
     }
 
     getStage() {
@@ -192,7 +192,7 @@ class Paper extends Events {
             eventDelegate = eventDelegate.call(this);
         }
 
-        eventDelegate = eventDelegate || this.wrapper;
+        eventDelegate = eventDelegate || this.wrap;
 
         utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
         utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
@@ -241,7 +241,7 @@ class Paper extends Events {
 
         this.trigger('paper:destroy');
 
-        utils.removeElement(this.wrapper);
+        utils.removeElement(this.wrap);
 
         if (detector.IS_POINTER) {
             this.container.style.msTouchAction = '';
@@ -1414,7 +1414,7 @@ class Paper extends Events {
         let paperOffset = utils.getOffset(svg);
 
         if (detector.IS_FF) {
-            fakeRect.removeCell();
+            fakeRect.remove();
         }
 
         let body       = doc.body;

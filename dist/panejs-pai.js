@@ -694,6 +694,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
 	        }
 	    }, {
+	        key: 'unContainsRect',
+	        value: function unContainsRect(rect) {
+	
+	            this.normalize();
+	            rect.normalize();
+	
+	            return !(this.containPoint(rect.getOrigin()) || this.containPoint(rect.getCorner()) || this.containPoint(rect.getTopRight()) || this.containPoint(rect.getBottomLeft()));
+	        }
+	    }, {
 	        key: 'intersect',
 	        value: function intersect(rect) {
 	
@@ -1626,7 +1635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isWithin = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
 	
 	var _lang = __webpack_require__(6);
 	
@@ -1685,6 +1694,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return min < max ? value < min ? min : value > max ? max : value : value < max ? max : value > min ? min : value;
 	}
 	
+	function isWithin(value, min, max) {
+	
+	    return min < max ? value >= min && value <= max : value >= max && value <= min;
+	}
+	
 	// exports
 	// -------
 	
@@ -1693,6 +1707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toFixed = toFixed;
 	exports.isFinite = isFinite;
 	exports.isPercentage = isPercentage;
+	exports.isWithin = isWithin;
 	exports.fixIndex = fixIndex;
 	exports.fixNumber = fixNumber;
 	exports.clamp = clamp;
@@ -10979,7 +10994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var doc = win.document;
 	
 	var classNames = {
-	    wrapper: 'pane-wrapper',
+	    wrap: 'pane-wrap',
 	    stage: 'pane-stage',
 	    svg: 'pane-svg',
 	    viewport: 'pane-viewport'
@@ -11073,20 +11088,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'ensureElement',
 	        value: function ensureElement() {
 	
-	            this.wrapper = utils.createElement('div');
+	            this.wrap = utils.createElement('div');
 	            this.stage = utils.createElement('div');
 	            this.svg = utils.createSvgDocument();
 	            this.viewport = utils.createSvgElement('g');
 	
-	            utils.addClass(this.wrapper, classNames.wrapper);
+	            utils.addClass(this.wrap, classNames.wrap);
 	            utils.addClass(this.stage, classNames.stage);
 	            utils.addClass(this.svg, classNames.svg);
 	            utils.addClass(this.viewport, classNames.viewport);
 	
 	            this.svg.appendChild(this.viewport);
 	            this.stage.appendChild(this.svg);
-	            this.wrapper.appendChild(this.stage);
-	            this.container.appendChild(this.wrapper);
+	            this.wrap.appendChild(this.stage);
+	            this.container.appendChild(this.wrap);
 	
 	            this.trigger('paper:ensureElements');
 	
@@ -11099,10 +11114,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.container;
 	        }
 	    }, {
-	        key: 'getWrapper',
-	        value: function getWrapper() {
+	        key: 'getWrap',
+	        value: function getWrap() {
 	
-	            return this.wrapper;
+	            return this.wrap;
 	        }
 	    }, {
 	        key: 'getStage',
@@ -11151,7 +11166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                eventDelegate = eventDelegate.call(this);
 	            }
 	
-	            eventDelegate = eventDelegate || this.wrapper;
+	            eventDelegate = eventDelegate || this.wrap;
 	
 	            utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
 	            utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
@@ -11205,7 +11220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.trigger('paper:destroy');
 	
-	            utils.removeElement(this.wrapper);
+	            utils.removeElement(this.wrap);
 	
 	            if (_detector2.default.IS_POINTER) {
 	                this.container.style.msTouchAction = '';
@@ -12374,7 +12389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var paperOffset = utils.getOffset(svg);
 	
 	            if (_detector2.default.IS_FF) {
-	                fakeRect.removeCell();
+	                fakeRect.remove();
 	            }
 	
 	            var body = doc.body;
@@ -15153,19 +15168,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLPaper2 = _interopRequireDefault(_HTMLPaper);
 	
-	var _Navigator = __webpack_require__(85);
+	var _Navigator = __webpack_require__(79);
 	
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 	
-	var _Snaplines = __webpack_require__(79);
+	var _Snaplines = __webpack_require__(80);
 	
 	var _Snaplines2 = _interopRequireDefault(_Snaplines);
 	
-	var _PaperScroll = __webpack_require__(80);
+	var _PaperScroll = __webpack_require__(81);
 	
 	var _PaperScroll2 = _interopRequireDefault(_PaperScroll);
 	
-	var _LinkView = __webpack_require__(81);
+	var _LinkView = __webpack_require__(82);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
@@ -15173,15 +15188,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
 	
-	var _SelectionHandler = __webpack_require__(82);
+	var _SelectionHandler = __webpack_require__(83);
 	
 	var _SelectionHandler2 = _interopRequireDefault(_SelectionHandler);
 	
-	var _ConnectionHandler = __webpack_require__(83);
+	var _ConnectionHandler = __webpack_require__(84);
 	
 	var _ConnectionHandler2 = _interopRequireDefault(_ConnectionHandler);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -15893,9 +15908,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    transform: 'scale3d(' + sx + ',' + sy + ', 1)'
 	                });
 	
-	                //utils.setStyle(this.htmlPane, {
+	                // utils.setStyle(this.htmlPane, {
 	                //    zoom: sx
-	                //});
+	                // });
 	
 	                _get(Object.getPrototypeOf(HTMLPaper.prototype), 'scale', this).call(this, sx, sy, ox, oy);
 	            }
@@ -15935,11 +15950,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = _interopRequireWildcard(_utils);
 	
-	var _Rect = __webpack_require__(4);
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	var _Rect2 = _interopRequireDefault(_Rect);
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var defaults = {
+	    paperScroll: null,
+	    distance: 0
+	};
+	
+	var Navigator = function () {
+	    function Navigator(options) {
+	        _classCallCheck(this, Navigator);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(Navigator, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                utils.removeElement(this.container);
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.paperScroll = this.options.paperScroll;
+	            this.paper = this.paperScroll.paper;
+	
+	            this.ensureElement();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.container = utils.createElement('div');
+	
+	            this.paper.wrap.appendChild(this.container);
+	
+	            utils.addClass(this.container, 'pane-navigator');
+	
+	            return this;
+	        }
+	    }]);
+	
+	    return Navigator;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Navigator;
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -15991,8 +16077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.container.appendChild(this.hLine);
 	            this.container.appendChild(this.vLine);
-	
-	            this.paper.stage.appendChild(this.container);
+	            this.paper.getStage().appendChild(this.container);
 	
 	            utils.addClass(this.container, 'pane-snaplines');
 	            utils.addClass(this.hLine, 'pane-snapline horizontal');
@@ -16020,19 +16105,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return;
 	                }
 	
-	                //if (cells.length === 1 && cell === cells[0]) {
+	                // if (cells.length === 1 && cell === cells[0]) {
 	                //    return;
-	                //}
+	                // }
 	
 	                var snapBBox = cell.getBBox();
 	                var snapCenter = snapBBox.getCenter();
 	                var snapOrigin = snapBBox.getOrigin();
 	                var snapCorner = snapBBox.getCorner();
 	
-	                return this.check(previewCenter, snapCenter, bounds, snapBBox) || this.check(previewCenter, snapOrigin, bounds, snapBBox) || this.check(previewCenter, snapCorner, bounds, snapBBox) || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
-	                //|| this.check(previewOrigin, snapCenter, bounds, snapBBox)
+	                this.check(previewCenter, snapCenter, bounds, snapBBox) || this.check(previewCenter, snapOrigin, bounds, snapBBox) || this.check(previewCenter, snapCorner, bounds, snapBBox) || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
+	                // || this.check(previewOrigin, snapCenter, bounds, snapBBox)
 	                 || this.check(previewOrigin, snapCorner, bounds, snapBBox) || this.check(previewCorner, snapOrigin, bounds, snapBBox)
-	                //|| this.check(previewCorner, snapCenter, bounds, snapBBox)
+	                // || this.check(previewCorner, snapCenter, bounds, snapBBox)
 	                 || this.check(previewCorner, snapCorner, bounds, snapBBox);
 	            }, this);
 	
@@ -16145,7 +16230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Snaplines;
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16236,12 +16321,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var scrollElem = utils.createElement('div');
 	
 	            this.scrollElem = scrollElem;
-	            this.scrollParent = paper.wrapper;
+	            this.scrollParent = paper.getWrap();
 	
 	            utils.addClass(scrollElem, 'pane-scroll');
 	
-	            scrollElem.appendChild(paper.stage);
-	            paper.wrapper.appendChild(scrollElem);
+	            this.scrollElem.appendChild(paper.getStage());
+	            this.scrollParent.appendChild(scrollElem);
 	
 	            return this;
 	        }
@@ -16465,8 +16550,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function toLocalPoint(x, y) {
 	
 	            // return point that relative to the stage's left-top corner
-	            // x: x coordinate relative to the wrapper
-	            // y: y coordinate relative to the wrapper
+	            // x: x coordinate relative to the wrap
+	            // y: y coordinate relative to the wrap
 	
 	            var paper = this.paper;
 	            var padding = this.padding;
@@ -16604,7 +16689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = PaperScroll;
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17111,7 +17196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = LinkView;
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17155,8 +17240,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var classNames = {
 	    cursorMove: 'pane-cursor-move',
+	    cursorMoving: 'pane-cursor-moving',
 	    cursorCross: 'pane-cursor-cross'
 	};
+	
+	var scrollBarWidth = utils.getScrollBarWidth();
 	
 	var SelectHandler = function (_Handler) {
 	    _inherits(SelectHandler, _Handler);
@@ -17196,7 +17284,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.getPaper().on('cell:pointerDown', this.onCellMouseDown.bind(this)).on('cell:pointerMove', this.onCellMouseMove.bind(this)).on('cell:pointerUp', this.onCellMouseUp.bind(this)).on('blank:pointerDown', this.onBlankMouseDown.bind(this)).on('blank:pointerMove', this.onBlankMouseMove.bind(this)).on('blank:pointerUp', this.onBlankMouseUp.bind(this));
 	
+	            this.keyDownHandler = this.onKeyDown.bind(this);
+	            this.keyUpHandler = this.onKeyUp.bind(this);
+	
+	            utils.addEventListener(document.body, 'keydown', this.keyDownHandler);
+	            utils.addEventListener(document.body, 'keyup', this.keyUpHandler);
+	
+	            this.switchMode(false);
+	
 	            return this;
+	        }
+	    }, {
+	        key: 'switchMode',
+	        value: function switchMode(isSelectMode) {
+	
+	            this.isSelectMode = isSelectMode === true;
+	            this.switchModeClass(this.isSelectMode);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'switchModeClass',
+	        value: function switchModeClass(isSelectMode) {
+	
+	            var wrap = this.getPaper().getWrap();
+	
+	            this.setCursorStyle(wrap, isSelectMode);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setCursorStyle',
+	        value: function setCursorStyle(dom, isSelectMode) {
+	
+	            utils.removeClass(dom, classNames.cursorMove);
+	            utils.removeClass(dom, classNames.cursorCross);
+	
+	            if (isSelectMode === true) {
+	                utils.addClass(dom, classNames.cursorCross);
+	            } else if (isSelectMode === false) {
+	                utils.addClass(dom, classNames.cursorMove);
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'onKeyDown',
+	        value: function onKeyDown(e) {
+	
+	            var areaSelectKey = this.options.areaSelectKey;
+	
+	            if (this.options.areaSelect && areaSelectKey) {
+	                var method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+	                if (utils[method]) {
+	                    this.hasAreaSelectKey = utils[method](e);
+	                }
+	            }
+	
+	            if (this.hasAreaSelectKey && !this.isSelectMode) {
+	                this.switchModeClass(true);
+	            }
+	        }
+	    }, {
+	        key: 'onKeyUp',
+	        value: function onKeyUp() {
+	
+	            if (this.hasAreaSelectKey && !this.isSelectMode) {
+	                this.switchModeClass(false);
+	                this.hasAreaSelectKey = false;
+	            }
 	        }
 	    }, {
 	        key: 'onCellMouseDown',
@@ -17354,35 +17510,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onBlankMouseDown',
 	        value: function onBlankMouseDown(e, localX, localY) {
 	
-	            if (this.isDisabled()) {
+	            if (this.isDisabled() || this.isOnScrollBar(e)) {
 	                return;
 	            }
 	
-	            this.isAreaSelect = this.options.areaSelect;
-	            var areaSelectKey = this.options.areaSelectKey;
+	            this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
 	
-	            if (this.isAreaSelect && areaSelectKey) {
+	            //if (!this.isAreaSelect) {
+	            //    const areaSelectKey = this.options.areaSelectKey;
+	            //    if (this.options.areaSelect && areaSelectKey) {
+	            //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+	            //        if (utils[method]) {
+	            //            this.isAreaSelect = utils[method](e);
+	            //        }
+	            //    }
+	            //
+	            //    if (this.isAreaSelect) {
+	            //        this.switchModeClass(true);
+	            //        this.switchModeClass(true);
+	            //    }
+	            //}
 	
-	                var method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
-	                if (utils[method]) {
-	                    this.isAreaSelect = utils[method](e);
-	                }
-	            }
-	
-	            this.isMovement = this.options.movement;
+	            this.isMovement = !this.isAreaSelect && this.options.movement;
 	
 	            if (this.isAreaSelect) {
 	
 	                this.origin = { x: localX, y: localY };
+	            }
 	
-	                utils.addClass(document.body, classNames.cursorCross);
-	            } else if (this.isMovement) {
+	            if (this.isMovement) {
 	
 	                this.origin = { x: e.pageX, y: e.pageY };
 	                this.originScrollLeft = this.scrollParent.scrollLeft;
 	                this.originScrollTop = this.scrollParent.scrollTop;
 	
-	                utils.addClass(document.body, classNames.cursorMove);
+	                var wrap = this.getPaper().getWrap();
+	
+	                utils.removeClass(wrap, classNames.cursorMove);
+	                utils.addClass(wrap, classNames.cursorMoving);
+	                utils.addClass(document.body, classNames.cursorMoving);
 	            }
 	
 	            if (!utils.hasModifierKey(e)) {
@@ -17408,6 +17574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function onAreaSelect(e, localX, localY) {
 	
 	            if (!this.moving) {
+	                this.setCursorStyle(document.body, true);
 	                this.showSelectionRect();
 	                this.moving = true;
 	            }
@@ -17471,7 +17638,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onMovement',
 	        value: function onMovement(e) {
 	
-	            this.moving = true;
+	            if (!this.moving) {
+	                this.moving = true;
+	            }
 	
 	            var dx = this.origin.x - e.pageX;
 	            var dy = this.origin.y - e.pageY;
@@ -17494,20 +17663,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	
 	                if (this.moving && this.bounds) {
-	
 	                    // range selection
-	
 	                    this.stopScrollTimer();
 	                    this.hideSelectionRect();
 	                    this.selectCellsInRect(this.bounds);
-	                } else {
-	                    // unFocus all cell
-	                    this.setCellFocused(null);
 	                }
 	
 	                this.notifySelectionChange();
-	
-	                utils.removeClass(document.body, classNames.cursorCross);
+	                this.setCellFocused(null);
 	            } else if (this.isMovement) {
 	
 	                this.originScrollLeft = 0;
@@ -17519,12 +17682,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.setCellFocused(null);
 	                }
 	
-	                utils.removeClass(document.body, classNames.cursorMove);
+	                var wrap = this.getPaper().getWrap();
+	
+	                utils.addClass(wrap, classNames.cursorMove);
+	                utils.removeClass(wrap, classNames.cursorMoving);
+	                utils.removeClass(document.body, classNames.cursorMoving);
 	            }
+	
+	            if (this.isAreaSelect || this.isMovement) {
+	                this.setCursorStyle(document.body);
+	            }
+	
+	            this.switchModeClass(!!this.isSelectMode);
 	
 	            this.bounds = null;
 	            this.origin = null;
 	            this.moving = false;
+	
+	            this.isMovement = false;
+	            this.isAreaSelect = false;
 	        }
 	    }, {
 	        key: 'getScrollBounds',
@@ -17839,13 +18015,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'selectCellsInRect',
 	        value: function selectCellsInRect(area) {
 	
-	            var paper = this.getPaper();
 	            var model = this.getModel();
 	            var cells = model && model.findCellInArea(_Rect2.default.fromRect(area));
 	
-	            utils.forEach(cells, function (cell) {
-	                this.setSelected(cell, paper.getView(cell), true);
-	            }, this);
+	            this.selectCells(cells);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'selectCells',
+	        value: function selectCells(cells) {
+	
+	            if (cells && cells.length) {
+	                utils.forEach(cells, function (cell) {
+	                    this.setSelected(cell, this.paper.getView(cell), true);
+	                }, this);
+	            }
 	
 	            return this;
 	        }
@@ -17941,6 +18126,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return scrollParent.scrollWidth > scrollParent.clientWidth || scrollParent.scrollHeight > scrollParent.clientHeight;
 	        }
 	    }, {
+	        key: 'isOnScrollBar',
+	        value: function isOnScrollBar(e) {
+	
+	            var paper = this.getPaper();
+	            var bounds = utils.getBounds(paper.getWrap());
+	
+	            var maxX = bounds.left + bounds.width;
+	            var minX = maxX - scrollBarWidth;
+	
+	            var maxY = bounds.top + bounds.height;
+	            var minY = maxY - scrollBarWidth;
+	
+	            return utils.isWithin(e.pageX, minX, maxX) || utils.isWithin(e.pageY, minY, maxY);
+	        }
+	    }, {
 	        key: 'notifyMoving',
 	        value: function notifyMoving() {
 	
@@ -17973,7 +18173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = SelectHandler;
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17992,11 +18192,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Link2 = _interopRequireDefault(_Link);
 	
-	var _LinkView = __webpack_require__(81);
+	var _LinkView = __webpack_require__(82);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -18176,7 +18376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConnectionHandler;
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18203,27 +18403,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.default = quadratic;
-
-/***/ },
-/* 85 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Navigator = function Navigator() {
-	  _classCallCheck(this, Navigator);
-	};
-	
-	// exports
-	// -------
-	
-	exports.default = Navigator;
 
 /***/ }
 /******/ ])

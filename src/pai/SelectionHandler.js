@@ -14,8 +14,11 @@ const defaults = {
 
 const classNames = {
     cursorMove: 'pane-cursor-move',
+    cursorMoving: 'pane-cursor-moving',
     cursorCross: 'pane-cursor-cross'
 };
+
+const scrollBarWidth = utils.getScrollBarWidth();
 
 class SelectHandler extends Handler {
 
@@ -51,7 +54,70 @@ class SelectHandler extends Handler {
             .on('blank:pointerMove', this.onBlankMouseMove.bind(this))
             .on('blank:pointerUp', this.onBlankMouseUp.bind(this));
 
+        this.keyDownHandler = this.onKeyDown.bind(this);
+        this.keyUpHandler   = this.onKeyUp.bind(this);
+
+        utils.addEventListener(document.body, 'keydown', this.keyDownHandler);
+        utils.addEventListener(document.body, 'keyup', this.keyUpHandler);
+
+        this.switchMode(false);
+
         return this;
+    }
+
+    switchMode(isSelectMode) {
+
+        this.isSelectMode = isSelectMode === true;
+        this.switchModeClass(this.isSelectMode);
+
+        return this;
+    }
+
+    switchModeClass(isSelectMode) {
+
+        const wrap = this.getPaper().getWrap();
+
+        this.setCursorStyle(wrap, isSelectMode);
+
+        return this;
+    }
+
+    setCursorStyle(dom, isSelectMode) {
+
+        utils.removeClass(dom, classNames.cursorMove);
+        utils.removeClass(dom, classNames.cursorCross);
+
+        if (isSelectMode === true) {
+            utils.addClass(dom, classNames.cursorCross);
+        } else if (isSelectMode === false) {
+            utils.addClass(dom, classNames.cursorMove);
+        }
+
+        return this;
+    }
+
+    onKeyDown(e) {
+
+        const areaSelectKey = this.options.areaSelectKey;
+
+        if (this.options.areaSelect && areaSelectKey) {
+            let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+            if (utils[method]) {
+                this.hasAreaSelectKey = utils[method](e);
+            }
+        }
+
+        if (this.hasAreaSelectKey && !this.isSelectMode) {
+            this.switchModeClass(true);
+        }
+    }
+
+    onKeyUp() {
+
+        if (this.hasAreaSelectKey && !this.isSelectMode) {
+            this.switchModeClass(false);
+            this.hasAreaSelectKey = false;
+        }
     }
 
     onCellMouseDown(cell, view, e, localX, localY) {
@@ -207,36 +273,45 @@ class SelectHandler extends Handler {
 
     onBlankMouseDown(e, localX, localY) {
 
-        if (this.isDisabled()) {
+        if (this.isDisabled() || this.isOnScrollBar(e)) {
             return;
         }
 
-        this.isAreaSelect   = this.options.areaSelect;
-        const areaSelectKey = this.options.areaSelectKey;
+        this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
 
-        if (this.isAreaSelect && areaSelectKey) {
+        //if (!this.isAreaSelect) {
+        //    const areaSelectKey = this.options.areaSelectKey;
+        //    if (this.options.areaSelect && areaSelectKey) {
+        //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+        //        if (utils[method]) {
+        //            this.isAreaSelect = utils[method](e);
+        //        }
+        //    }
+        //
+        //    if (this.isAreaSelect) {
+        //        this.switchModeClass(true);
+        //        this.switchModeClass(true);
+        //    }
+        //}
 
-            let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
-            if (utils[method]) {
-                this.isAreaSelect = utils[method](e);
-            }
-        }
-
-        this.isMovement = this.options.movement;
+        this.isMovement = !this.isAreaSelect && this.options.movement;
 
         if (this.isAreaSelect) {
 
             this.origin = { x: localX, y: localY };
+        }
 
-            utils.addClass(document.body, classNames.cursorCross);
-
-        } else if (this.isMovement) {
+        if (this.isMovement) {
 
             this.origin           = { x: e.pageX, y: e.pageY };
             this.originScrollLeft = this.scrollParent.scrollLeft;
             this.originScrollTop  = this.scrollParent.scrollTop;
 
-            utils.addClass(document.body, classNames.cursorMove);
+            const wrap = this.getPaper().getWrap();
+
+            utils.removeClass(wrap, classNames.cursorMove);
+            utils.addClass(wrap, classNames.cursorMoving);
+            utils.addClass(document.body, classNames.cursorMoving);
         }
 
         if (!utils.hasModifierKey(e)) {
@@ -260,6 +335,7 @@ class SelectHandler extends Handler {
     onAreaSelect(e, localX, localY) {
 
         if (!this.moving) {
+            this.setCursorStyle(document.body, true);
             this.showSelectionRect();
             this.moving = true;
         }
@@ -323,7 +399,9 @@ class SelectHandler extends Handler {
 
     onMovement(e) {
 
-        this.moving = true;
+        if (!this.moving) {
+            this.moving = true;
+        }
 
         const dx = this.origin.x - e.pageX;
         const dy = this.origin.y - e.pageY;
@@ -345,21 +423,14 @@ class SelectHandler extends Handler {
             }
 
             if (this.moving && this.bounds) {
-
                 // range selection
-
                 this.stopScrollTimer();
                 this.hideSelectionRect();
                 this.selectCellsInRect(this.bounds);
-
-            } else {
-                // unFocus all cell
-                this.setCellFocused(null);
             }
 
             this.notifySelectionChange();
-
-            utils.removeClass(document.body, classNames.cursorCross);
+            this.setCellFocused(null);
 
         } else if (this.isMovement) {
 
@@ -372,12 +443,26 @@ class SelectHandler extends Handler {
                 this.setCellFocused(null);
             }
 
-            utils.removeClass(document.body, classNames.cursorMove);
+            const wrap = this.getPaper().getWrap();
+
+            utils.addClass(wrap, classNames.cursorMove);
+            utils.removeClass(wrap, classNames.cursorMoving);
+            utils.removeClass(document.body, classNames.cursorMoving);
         }
+
+
+        if (this.isAreaSelect || this.isMovement) {
+            this.setCursorStyle(document.body);
+        }
+
+        this.switchModeClass(!!this.isSelectMode);
 
         this.bounds = null;
         this.origin = null;
         this.moving = false;
+
+        this.isMovement   = false;
+        this.isAreaSelect = false;
     }
 
     getScrollBounds(isViewport) {
@@ -689,13 +774,21 @@ class SelectHandler extends Handler {
 
     selectCellsInRect(area) {
 
-        let paper = this.getPaper();
         let model = this.getModel();
         let cells = model && model.findCellInArea(Rect.fromRect(area));
 
-        utils.forEach(cells, function (cell) {
-            this.setSelected(cell, paper.getView(cell), true);
-        }, this);
+        this.selectCells(cells);
+
+        return this;
+    }
+
+    selectCells(cells) {
+
+        if (cells && cells.length) {
+            utils.forEach(cells, function (cell) {
+                this.setSelected(cell, this.paper.getView(cell), true);
+            }, this);
+        }
 
         return this;
     }
@@ -786,6 +879,21 @@ class SelectHandler extends Handler {
 
         return scrollParent.scrollWidth > scrollParent.clientWidth
             || scrollParent.scrollHeight > scrollParent.clientHeight;
+    }
+
+    isOnScrollBar(e) {
+
+        const paper  = this.getPaper();
+        const bounds = utils.getBounds(paper.getWrap());
+
+        const maxX = bounds.left + bounds.width;
+        const minX = maxX - scrollBarWidth;
+
+        const maxY = bounds.top + bounds.height;
+        const minY = maxY - scrollBarWidth;
+
+        return utils.isWithin(e.pageX, minX, maxX)
+            || utils.isWithin(e.pageY, minY, maxY);
     }
 
     notifyMoving() {

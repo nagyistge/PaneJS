@@ -63,12 +63,12 @@ class PaperScroll {
         const scrollElem = utils.createElement('div');
 
         this.scrollElem   = scrollElem;
-        this.scrollParent = paper.wrapper;
+        this.scrollParent = paper.getWrap();
 
         utils.addClass(scrollElem, 'pane-scroll');
 
-        scrollElem.appendChild(paper.stage);
-        paper.wrapper.appendChild(scrollElem);
+        this.scrollElem.appendChild(paper.getStage());
+        this.scrollParent.appendChild(scrollElem);
 
         return this;
     }
@@ -275,8 +275,8 @@ class PaperScroll {
     toLocalPoint(x, y) {
 
         // return point that relative to the stage's left-top corner
-        // x: x coordinate relative to the wrapper
-        // y: y coordinate relative to the wrapper
+        // x: x coordinate relative to the wrap
+        // y: y coordinate relative to the wrap
 
         const paper   = this.paper;
         const padding = this.padding;

@@ -102,9 +102,9 @@ class HTMLPaper extends Paper {
                 transform: 'scale3d(' + sx + ',' + sy + ', 1)'
             });
 
-            //utils.setStyle(this.htmlPane, {
+            // utils.setStyle(this.htmlPane, {
             //    zoom: sx
-            //});
+            // });
 
             super.scale(sx, sy, ox, oy);
         }

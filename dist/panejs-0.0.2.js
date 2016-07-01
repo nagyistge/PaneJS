@@ -682,6 +682,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
 	        }
 	    }, {
+	        key: 'unContainsRect',
+	        value: function unContainsRect(rect) {
+	
+	            this.normalize();
+	            rect.normalize();
+	
+	            return !(this.containPoint(rect.getOrigin()) || this.containPoint(rect.getCorner()) || this.containPoint(rect.getTopRight()) || this.containPoint(rect.getBottomLeft()));
+	        }
+	    }, {
 	        key: 'intersect',
 	        value: function intersect(rect) {
 	
@@ -1614,7 +1623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isWithin = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
 	
 	var _lang = __webpack_require__(6);
 	
@@ -1673,6 +1682,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return min < max ? value < min ? min : value > max ? max : value : value < max ? max : value > min ? min : value;
 	}
 	
+	function isWithin(value, min, max) {
+	
+	    return min < max ? value >= min && value <= max : value >= max && value <= min;
+	}
+	
 	// exports
 	// -------
 	
@@ -1681,6 +1695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toFixed = toFixed;
 	exports.isFinite = isFinite;
 	exports.isPercentage = isPercentage;
+	exports.isWithin = isWithin;
 	exports.fixIndex = fixIndex;
 	exports.fixNumber = fixNumber;
 	exports.clamp = clamp;
@@ -10967,7 +10982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var doc = win.document;
 	
 	var classNames = {
-	    wrapper: 'pane-wrapper',
+	    wrap: 'pane-wrap',
 	    stage: 'pane-stage',
 	    svg: 'pane-svg',
 	    viewport: 'pane-viewport'
@@ -11061,20 +11076,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'ensureElement',
 	        value: function ensureElement() {
 	
-	            this.wrapper = utils.createElement('div');
+	            this.wrap = utils.createElement('div');
 	            this.stage = utils.createElement('div');
 	            this.svg = utils.createSvgDocument();
 	            this.viewport = utils.createSvgElement('g');
 	
-	            utils.addClass(this.wrapper, classNames.wrapper);
+	            utils.addClass(this.wrap, classNames.wrap);
 	            utils.addClass(this.stage, classNames.stage);
 	            utils.addClass(this.svg, classNames.svg);
 	            utils.addClass(this.viewport, classNames.viewport);
 	
 	            this.svg.appendChild(this.viewport);
 	            this.stage.appendChild(this.svg);
-	            this.wrapper.appendChild(this.stage);
-	            this.container.appendChild(this.wrapper);
+	            this.wrap.appendChild(this.stage);
+	            this.container.appendChild(this.wrap);
 	
 	            this.trigger('paper:ensureElements');
 	
@@ -11087,10 +11102,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.container;
 	        }
 	    }, {
-	        key: 'getWrapper',
-	        value: function getWrapper() {
+	        key: 'getWrap',
+	        value: function getWrap() {
 	
-	            return this.wrapper;
+	            return this.wrap;
 	        }
 	    }, {
 	        key: 'getStage',
@@ -11139,7 +11154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                eventDelegate = eventDelegate.call(this);
 	            }
 	
-	            eventDelegate = eventDelegate || this.wrapper;
+	            eventDelegate = eventDelegate || this.wrap;
 	
 	            utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
 	            utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
@@ -11193,7 +11208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.trigger('paper:destroy');
 	
-	            utils.removeElement(this.wrapper);
+	            utils.removeElement(this.wrap);
 	
 	            if (_detector2.default.IS_POINTER) {
 	                this.container.style.msTouchAction = '';
@@ -12362,7 +12377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var paperOffset = utils.getOffset(svg);
 	
 	            if (_detector2.default.IS_FF) {
-	                fakeRect.removeCell();
+	                fakeRect.remove();
 	            }
 	
 	            var body = doc.body;

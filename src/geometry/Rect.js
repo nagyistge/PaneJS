@@ -179,6 +179,17 @@ class Rect {
             && (y2 + h2) <= (y1 + h1);
     }
 
+    unContainsRect(rect) {
+
+        this.normalize();
+        rect.normalize();
+
+        return !(this.containPoint(rect.getOrigin())
+        || this.containPoint(rect.getCorner())
+        || this.containPoint(rect.getTopRight())
+        || this.containPoint(rect.getBottomLeft()));
+    }
+
     intersect(rect) {
 
         let origin1 = this.getOrigin();

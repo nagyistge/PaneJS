@@ -694,6 +694,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
 	        }
 	    }, {
+	        key: 'unContainsRect',
+	        value: function unContainsRect(rect) {
+	
+	            this.normalize();
+	            rect.normalize();
+	
+	            return !(this.containPoint(rect.getOrigin()) || this.containPoint(rect.getCorner()) || this.containPoint(rect.getTopRight()) || this.containPoint(rect.getBottomLeft()));
+	        }
+	    }, {
 	        key: 'intersect',
 	        value: function intersect(rect) {
 	
@@ -15159,19 +15168,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLPaper2 = _interopRequireDefault(_HTMLPaper);
 	
-	var _Navigator = __webpack_require__(85);
+	var _Navigator = __webpack_require__(79);
 	
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 	
-	var _Snaplines = __webpack_require__(79);
+	var _Snaplines = __webpack_require__(80);
 	
 	var _Snaplines2 = _interopRequireDefault(_Snaplines);
 	
-	var _PaperScroll = __webpack_require__(80);
+	var _PaperScroll = __webpack_require__(81);
 	
 	var _PaperScroll2 = _interopRequireDefault(_PaperScroll);
 	
-	var _LinkView = __webpack_require__(81);
+	var _LinkView = __webpack_require__(82);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
@@ -15179,15 +15188,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
 	
-	var _SelectionHandler = __webpack_require__(82);
+	var _SelectionHandler = __webpack_require__(83);
 	
 	var _SelectionHandler2 = _interopRequireDefault(_SelectionHandler);
 	
-	var _ConnectionHandler = __webpack_require__(83);
+	var _ConnectionHandler = __webpack_require__(84);
 	
 	var _ConnectionHandler2 = _interopRequireDefault(_ConnectionHandler);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -15946,6 +15955,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = {
+	    paperScroll: null,
+	    distance: 0
+	};
+	
+	var Navigator = function () {
+	    function Navigator(options) {
+	        _classCallCheck(this, Navigator);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(Navigator, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                utils.removeElement(this.container);
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.paperScroll = this.options.paperScroll;
+	            this.paper = this.paperScroll.paper;
+	
+	            this.ensureElement();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.container = utils.createElement('div');
+	
+	            this.paper.wrap.appendChild(this.container);
+	
+	            utils.addClass(this.container, 'pane-navigator');
+	
+	            return this;
+	        }
+	    }]);
+	
+	    return Navigator;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Navigator;
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var defaults = {
 	    paper: null,
 	    distance: 0
 	};
@@ -16144,7 +16230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Snaplines;
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16603,7 +16689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = PaperScroll;
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17110,7 +17196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = LinkView;
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17618,10 +17704,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.isParentScrollable()) {
 	
 	                var bounds = this.bounds;
-	                var _paper = this.getPaper();
+	                var paper = this.getPaper();
 	
-	                var sx = _paper.sx;
-	                var sy = _paper.sy;
+	                var sx = paper.sx;
+	                var sy = paper.sy;
 	
 	                var scrollParent = this.scrollParent;
 	                var scrollWidth = scrollParent.scrollWidth;
@@ -17784,10 +17870,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var scrollTop = scrollParent.scrollTop;
 	                var scrollLeft = scrollParent.scrollLeft;
 	
-	                var _paper2 = this.getPaper();
+	                var paper = this.getPaper();
 	
-	                var sx = _paper2.sx;
-	                var sy = _paper2.sy;
+	                var sx = paper.sx;
+	                var sy = paper.sy;
 	
 	                var sBounds = this.getScrollBounds();
 	                var vBounds = this.getScrollBounds(true);
@@ -17853,7 +17939,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (cells && cells.length) {
 	                utils.forEach(cells, function (cell) {
-	                    this.setSelected(cell, paper.getView(cell), true);
+	                    this.setSelected(cell, this.paper.getView(cell), true);
 	                }, this);
 	            }
 	
@@ -17998,7 +18084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = SelectHandler;
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18017,11 +18103,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Link2 = _interopRequireDefault(_Link);
 	
-	var _LinkView = __webpack_require__(81);
+	var _LinkView = __webpack_require__(82);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -18201,7 +18287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConnectionHandler;
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18229,85 +18315,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = quadratic;
 
-/***/ },
-/* 85 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _utils = __webpack_require__(5);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var defaults = {
-	    paperScroll: null,
-	    distance: 0
-	};
-	
-	var Navigator = function () {
-	    function Navigator(options) {
-	        _classCallCheck(this, Navigator);
-	
-	        if (options) {
-	            this.install(options);
-	        }
-	    }
-	
-	    _createClass(Navigator, [{
-	        key: 'destroy',
-	        value: function destroy() {
-	
-	            if (!this.destroyed) {
-	                utils.removeElement(this.container);
-	                utils.destroy(this);
-	            }
-	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
-	
-	            this.options = utils.merge({}, defaults, options);
-	            this.paperScroll = this.options.paperScroll;
-	            this.paper = this.paperScroll.paper;
-	
-	            this.ensureElement();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            this.container = utils.createElement('div');
-	
-	            this.paper.wrap.appendChild(this.container);
-	
-	            utils.addClass(this.container, 'pane-navigator');
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return Navigator;
-	}();
-	
-	// exports
-	// -------
-	
-	exports.default = Navigator;
-
 /***/ }
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs-pai-0.0.2.js.map
+//# sourceMappingURL=panejs-pai-0.1.1.js.map

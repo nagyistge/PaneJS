@@ -55,6 +55,13 @@ function clamp(value, min, max) {
         : (value < max ? max : value > min ? min : value);
 }
 
+function isWithin(value, min, max) {
+
+    return min < max
+        ? (value >= min && value <= max)
+        : (value >= max && value <= min);
+}
+
 
 // exports
 // -------
@@ -66,6 +73,7 @@ export {
 
     isFinite,
     isPercentage,
+    isWithin,
 
     fixIndex,
     fixNumber,

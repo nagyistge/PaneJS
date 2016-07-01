@@ -694,6 +694,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return x2 >= x1 && y2 >= y1 && x2 + w2 <= x1 + w1 && y2 + h2 <= y1 + h1;
 	        }
 	    }, {
+	        key: 'unContainsRect',
+	        value: function unContainsRect(rect) {
+	
+	            this.normalize();
+	            rect.normalize();
+	
+	            return !(this.containPoint(rect.getOrigin()) || this.containPoint(rect.getCorner()) || this.containPoint(rect.getTopRight()) || this.containPoint(rect.getBottomLeft()));
+	        }
+	    }, {
 	        key: 'intersect',
 	        value: function intersect(rect) {
 	
@@ -12380,7 +12389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var paperOffset = utils.getOffset(svg);
 	
 	            if (_detector2.default.IS_FF) {
-	                fakeRect.removeCell();
+	                fakeRect.remove();
 	            }
 	
 	            var body = doc.body;
@@ -15159,19 +15168,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLPaper2 = _interopRequireDefault(_HTMLPaper);
 	
-	var _Navigator = __webpack_require__(85);
+	var _Navigator = __webpack_require__(79);
 	
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 	
-	var _Snaplines = __webpack_require__(79);
+	var _Snaplines = __webpack_require__(80);
 	
 	var _Snaplines2 = _interopRequireDefault(_Snaplines);
 	
-	var _PaperScroll = __webpack_require__(80);
+	var _PaperScroll = __webpack_require__(81);
 	
 	var _PaperScroll2 = _interopRequireDefault(_PaperScroll);
 	
-	var _LinkView = __webpack_require__(81);
+	var _LinkView = __webpack_require__(82);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
@@ -15179,15 +15188,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
 	
-	var _SelectionHandler = __webpack_require__(82);
+	var _SelectionHandler = __webpack_require__(83);
 	
 	var _SelectionHandler2 = _interopRequireDefault(_SelectionHandler);
 	
-	var _ConnectionHandler = __webpack_require__(83);
+	var _ConnectionHandler = __webpack_require__(84);
 	
 	var _ConnectionHandler2 = _interopRequireDefault(_ConnectionHandler);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -15946,6 +15955,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = {
+	    paperScroll: null,
+	    distance: 0
+	};
+	
+	var Navigator = function () {
+	    function Navigator(options) {
+	        _classCallCheck(this, Navigator);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(Navigator, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                utils.removeElement(this.container);
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.paperScroll = this.options.paperScroll;
+	            this.paper = this.paperScroll.paper;
+	
+	            this.ensureElement();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.container = utils.createElement('div');
+	
+	            this.paper.wrap.appendChild(this.container);
+	
+	            utils.addClass(this.container, 'pane-navigator');
+	
+	            return this;
+	        }
+	    }]);
+	
+	    return Navigator;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Navigator;
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var defaults = {
 	    paper: null,
 	    distance: 0
 	};
@@ -16144,7 +16230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Snaplines;
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16603,7 +16689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = PaperScroll;
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17110,7 +17196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = LinkView;
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17154,6 +17240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var classNames = {
 	    cursorMove: 'pane-cursor-move',
+	    cursorMoving: 'pane-cursor-moving',
 	    cursorCross: 'pane-cursor-cross'
 	};
 	
@@ -17197,7 +17284,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.getPaper().on('cell:pointerDown', this.onCellMouseDown.bind(this)).on('cell:pointerMove', this.onCellMouseMove.bind(this)).on('cell:pointerUp', this.onCellMouseUp.bind(this)).on('blank:pointerDown', this.onBlankMouseDown.bind(this)).on('blank:pointerMove', this.onBlankMouseMove.bind(this)).on('blank:pointerUp', this.onBlankMouseUp.bind(this));
 	
+	            this.keyDownHandler = this.onKeyDown.bind(this);
+	            this.keyUpHandler = this.onKeyUp.bind(this);
+	
+	            utils.addEventListener(document.body, 'keydown', this.keyDownHandler);
+	            utils.addEventListener(document.body, 'keyup', this.keyUpHandler);
+	
+	            this.switchMode(false);
+	
 	            return this;
+	        }
+	    }, {
+	        key: 'switchMode',
+	        value: function switchMode(isSelectMode) {
+	
+	            this.isSelectMode = isSelectMode === true;
+	            this.switchModeClass(this.isSelectMode);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'switchModeClass',
+	        value: function switchModeClass(isSelectMode) {
+	
+	            var wrap = this.getPaper().getWrap();
+	
+	            this.setCursorStyle(wrap, isSelectMode);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setCursorStyle',
+	        value: function setCursorStyle(dom, isSelectMode) {
+	
+	            utils.removeClass(dom, classNames.cursorMove);
+	            utils.removeClass(dom, classNames.cursorCross);
+	
+	            if (isSelectMode === true) {
+	                utils.addClass(dom, classNames.cursorCross);
+	            } else if (isSelectMode === false) {
+	                utils.addClass(dom, classNames.cursorMove);
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'onKeyDown',
+	        value: function onKeyDown(e) {
+	
+	            var areaSelectKey = this.options.areaSelectKey;
+	
+	            if (this.options.areaSelect && areaSelectKey) {
+	                var method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+	                if (utils[method]) {
+	                    this.hasAreaSelectKey = utils[method](e);
+	                }
+	            }
+	
+	            if (this.hasAreaSelectKey && !this.isSelectMode) {
+	                this.switchModeClass(true);
+	            }
+	        }
+	    }, {
+	        key: 'onKeyUp',
+	        value: function onKeyUp() {
+	
+	            if (this.hasAreaSelectKey && !this.isSelectMode) {
+	                this.switchModeClass(false);
+	                this.hasAreaSelectKey = false;
+	            }
 	        }
 	    }, {
 	        key: 'onCellMouseDown',
@@ -17359,31 +17514,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	            }
 	
-	            this.isAreaSelect = this.options.areaSelect;
-	            var areaSelectKey = this.options.areaSelectKey;
+	            this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
 	
-	            if (this.isAreaSelect && areaSelectKey) {
+	            //if (!this.isAreaSelect) {
+	            //    const areaSelectKey = this.options.areaSelectKey;
+	            //    if (this.options.areaSelect && areaSelectKey) {
+	            //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
+	            //        if (utils[method]) {
+	            //            this.isAreaSelect = utils[method](e);
+	            //        }
+	            //    }
+	            //
+	            //    if (this.isAreaSelect) {
+	            //        this.switchModeClass(true);
+	            //        this.switchModeClass(true);
+	            //    }
+	            //}
 	
-	                var method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
-	                if (utils[method]) {
-	                    this.isAreaSelect = utils[method](e);
-	                }
-	            }
-	
-	            this.isMovement = this.options.movement;
+	            this.isMovement = !this.isAreaSelect && this.options.movement;
 	
 	            if (this.isAreaSelect) {
 	
 	                this.origin = { x: localX, y: localY };
+	            }
 	
-	                utils.addClass(document.body, classNames.cursorCross);
-	            } else if (this.isMovement) {
+	            if (this.isMovement) {
 	
 	                this.origin = { x: e.pageX, y: e.pageY };
 	                this.originScrollLeft = this.scrollParent.scrollLeft;
 	                this.originScrollTop = this.scrollParent.scrollTop;
 	
-	                utils.addClass(document.body, classNames.cursorMove);
+	                var wrap = this.getPaper().getWrap();
+	
+	                utils.removeClass(wrap, classNames.cursorMove);
+	                utils.addClass(wrap, classNames.cursorMoving);
+	                utils.addClass(document.body, classNames.cursorMoving);
 	            }
 	
 	            if (!utils.hasModifierKey(e)) {
@@ -17409,6 +17574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function onAreaSelect(e, localX, localY) {
 	
 	            if (!this.moving) {
+	                this.setCursorStyle(document.body, true);
 	                this.showSelectionRect();
 	                this.moving = true;
 	            }
@@ -17472,7 +17638,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onMovement',
 	        value: function onMovement(e) {
 	
-	            this.moving = true;
+	            if (!this.moving) {
+	                this.moving = true;
+	            }
 	
 	            var dx = this.origin.x - e.pageX;
 	            var dy = this.origin.y - e.pageY;
@@ -17495,20 +17663,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	
 	                if (this.moving && this.bounds) {
-	
 	                    // range selection
-	
 	                    this.stopScrollTimer();
 	                    this.hideSelectionRect();
 	                    this.selectCellsInRect(this.bounds);
-	                } else {
-	                    // unFocus all cell
-	                    this.setCellFocused(null);
 	                }
 	
 	                this.notifySelectionChange();
-	
-	                utils.removeClass(document.body, classNames.cursorCross);
+	                this.setCellFocused(null);
 	            } else if (this.isMovement) {
 	
 	                this.originScrollLeft = 0;
@@ -17520,12 +17682,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.setCellFocused(null);
 	                }
 	
-	                utils.removeClass(document.body, classNames.cursorMove);
+	                var wrap = this.getPaper().getWrap();
+	
+	                utils.addClass(wrap, classNames.cursorMove);
+	                utils.removeClass(wrap, classNames.cursorMoving);
+	                utils.removeClass(document.body, classNames.cursorMoving);
 	            }
+	
+	            if (this.isAreaSelect || this.isMovement) {
+	                this.setCursorStyle(document.body);
+	            }
+	
+	            this.switchModeClass(!!this.isSelectMode);
 	
 	            this.bounds = null;
 	            this.origin = null;
 	            this.moving = false;
+	
+	            this.isMovement = false;
+	            this.isAreaSelect = false;
 	        }
 	    }, {
 	        key: 'getScrollBounds',
@@ -17618,10 +17793,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.isParentScrollable()) {
 	
 	                var bounds = this.bounds;
-	                var _paper = this.getPaper();
+	                var paper = this.getPaper();
 	
-	                var sx = _paper.sx;
-	                var sy = _paper.sy;
+	                var sx = paper.sx;
+	                var sy = paper.sy;
 	
 	                var scrollParent = this.scrollParent;
 	                var scrollWidth = scrollParent.scrollWidth;
@@ -17784,10 +17959,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var scrollTop = scrollParent.scrollTop;
 	                var scrollLeft = scrollParent.scrollLeft;
 	
-	                var _paper2 = this.getPaper();
+	                var paper = this.getPaper();
 	
-	                var sx = _paper2.sx;
-	                var sy = _paper2.sy;
+	                var sx = paper.sx;
+	                var sy = paper.sy;
 	
 	                var sBounds = this.getScrollBounds();
 	                var vBounds = this.getScrollBounds(true);
@@ -17853,7 +18028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (cells && cells.length) {
 	                utils.forEach(cells, function (cell) {
-	                    this.setSelected(cell, paper.getView(cell), true);
+	                    this.setSelected(cell, this.paper.getView(cell), true);
 	                }, this);
 	            }
 	
@@ -17998,7 +18173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = SelectHandler;
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18017,11 +18192,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Link2 = _interopRequireDefault(_Link);
 	
-	var _LinkView = __webpack_require__(81);
+	var _LinkView = __webpack_require__(82);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -18201,7 +18376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConnectionHandler;
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18229,85 +18404,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = quadratic;
 
-/***/ },
-/* 85 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _utils = __webpack_require__(5);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var defaults = {
-	    paperScroll: null,
-	    distance: 0
-	};
-	
-	var Navigator = function () {
-	    function Navigator(options) {
-	        _classCallCheck(this, Navigator);
-	
-	        if (options) {
-	            this.install(options);
-	        }
-	    }
-	
-	    _createClass(Navigator, [{
-	        key: 'destroy',
-	        value: function destroy() {
-	
-	            if (!this.destroyed) {
-	                utils.removeElement(this.container);
-	                utils.destroy(this);
-	            }
-	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
-	
-	            this.options = utils.merge({}, defaults, options);
-	            this.paperScroll = this.options.paperScroll;
-	            this.paper = this.paperScroll.paper;
-	
-	            this.ensureElement();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            this.container = utils.createElement('div');
-	
-	            this.paper.wrap.appendChild(this.container);
-	
-	            utils.addClass(this.container, 'pane-navigator');
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return Navigator;
-	}();
-	
-	// exports
-	// -------
-	
-	exports.default = Navigator;
-
 /***/ }
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs-pai-0.0.2.js.map
+//# sourceMappingURL=panejs-pai-0.1.2.js.map
