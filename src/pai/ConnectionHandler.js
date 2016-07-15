@@ -151,7 +151,7 @@ class ConnectionHandler extends Handler {
         this.targetPort = view.findPortByElem(e.target);
     }
 
-    onCellMouseLeave(cell, view, e) {
+    onCellMouseLeave(cell) {
 
         if (this.isDisabled()
             || !cell.isNode()

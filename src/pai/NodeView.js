@@ -1,5 +1,4 @@
 import * as utils from '../common/utils';
-import detector   from '../common/detector';
 import Rect       from '../geometry/Rect';
 import BaseView   from '../views/NodeView';
 
@@ -124,7 +123,6 @@ class NodeView extends BaseView {
             if (isAdsorbed) {
 
                 let selector  = this.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
-                let adsorbVel = this.find(selector);
 
                 utils.forEach(this.find(selector), function (item) {
                     if (!magnet || item.node !== magnet.node) {
@@ -171,7 +169,7 @@ class NodeView extends BaseView {
 
     getPortSelector(isInPort, port) {
 
-        var selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
+        let selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
 
         if (port) {
             selector += '[data-id="' + port.id + '"]';

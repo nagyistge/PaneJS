@@ -13,7 +13,6 @@ const hooks = {
         type: 'mouseover',
         wrap: mouseEnterLeaveWrap
     },
-
     mouseleave: {
         type: 'mouseout',
         wrap: mouseEnterLeaveWrap
@@ -25,7 +24,7 @@ function mouseEnterLeaveWrap(elem, handler) {
         if (!isHover(e.delegateTarget || elem, e)) {
             handler.call(this, e);
         }
-    }
+    };
 }
 
 function isHover(elem, e) {
@@ -39,7 +38,7 @@ function isHover(elem, e) {
 
 let isMatchSelector = function () {
 
-    let testDiv = DOC.createElement('div');
+    let testDiv         = DOC.createElement('div');
     // match selector
     let matchesSelector = testDiv.matches ||
         testDiv.webkitMatchesSelector ||
@@ -149,7 +148,7 @@ function addEvent(elem, type, handler) {
         // store the event handler in the hash table
         handlers[handler.$$guid] = handler;
         // assign a global event handler to do all the work
-        elem[fixedName] = handleEvent;
+        elem[fixedName]          = handleEvent;
     }
 }
 
@@ -214,7 +213,7 @@ function addEventListener(elem, type, selector, handler, once) {
             e.delegateTarget = delegateTarget;
 
             if (hook) {
-                handler = hook.wrap(elem, handler)
+                handler = hook.wrap(elem, handler);
             }
 
             if (once === true) {

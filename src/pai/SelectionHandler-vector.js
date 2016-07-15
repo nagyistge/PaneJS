@@ -623,7 +623,7 @@ class SelectHandler extends Handler {
         let bounds = this.bounds;
         if (bounds) {
 
-            this.previewVel.translate(bounds.x, bounds.y)
+            this.previewVel.translate(bounds.x, bounds.y);
 
             if (resize) {
                 this.previewVel.attr({
@@ -649,7 +649,7 @@ class SelectHandler extends Handler {
 
         let paper = this.getPaper();
         if (paper && paper.decoratePane) {
-            this.previewVel.appendTo(paper.decoratePane)
+            this.previewVel.appendTo(paper.decoratePane);
         }
 
         return this;
@@ -666,7 +666,7 @@ class SelectHandler extends Handler {
 
         let paper = this.getPaper();
         if (paper && paper.decoratePane) {
-            this.selectionVel.appendTo(paper.decoratePane)
+            this.selectionVel.appendTo(paper.decoratePane);
         }
 
         return this;

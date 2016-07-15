@@ -1,5 +1,4 @@
 import * as utils from '../common/utils';
-import detector   from '../common/detector';
 import Portal     from '../cells/Portal';
 import NodeView   from './NodeView';
 

@@ -1,4 +1,3 @@
-import * as utils        from '../common/utils';
 import Node              from '../cells/Node';
 import HTMLSuperNodeView from './HTMLSuperNodeView';
 

@@ -277,7 +277,7 @@ class SelectHandler extends Handler {
 
         this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
 
-        //if (!this.isAreaSelect) {
+        // if (!this.isAreaSelect) {
         //    const areaSelectKey = this.options.areaSelectKey;
         //    if (this.options.areaSelect && areaSelectKey) {
         //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
@@ -290,7 +290,7 @@ class SelectHandler extends Handler {
         //        this.switchModeClass(true);
         //        this.switchModeClass(true);
         //    }
-        //}
+        // }
 
         this.isMovement = !this.isAreaSelect && this.options.movement;
 

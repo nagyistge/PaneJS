@@ -23,7 +23,7 @@ function toFloat(value, percentage) {
 
 function toPercentage(value, precision = 2) {
 
-    return toFixed(value * 100, 2) + '%';
+    return toFixed(value * 100, precision) + '%';
 }
 
 function toFixed(value, precision = 2) {

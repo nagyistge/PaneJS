@@ -1660,7 +1660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var precision = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
 	
 	
-	    return toFixed(value * 100, 2) + '%';
+	    return toFixed(value * 100, precision) + '%';
 	}
 	
 	function toFixed(value) {
@@ -2526,7 +2526,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        type: 'mouseover',
 	        wrap: mouseEnterLeaveWrap
 	    },
-	
 	    mouseleave: {
 	        type: 'mouseout',
 	        wrap: mouseEnterLeaveWrap
@@ -7499,13 +7498,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function translate() {
 	
 	            var position = this.cell.getPosition();
-	            var bodyVel = this.findOne('body');
-	
 	            this.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
-	
-	            //if (bodyVel && bodyVel.node) {
-	            //    utils.setTranslate(bodyVel.node, position.x, position.y);
-	            //}
 	
 	            return this;
 	        }
