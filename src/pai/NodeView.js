@@ -122,7 +122,7 @@ class NodeView extends BaseView {
 
             if (isAdsorbed) {
 
-                let selector  = this.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
+                let selector = this.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
 
                 utils.forEach(this.find(selector), function (item) {
                     if (!magnet || item.node !== magnet.node) {
@@ -268,10 +268,10 @@ class NodeView extends BaseView {
                 ? this.cell.getOutPorts()
                 : this.cell.getInPorts();
 
-            let portId = utils.toInt(portElem.getAttribute('data-id'));
+            let portId = portElem.getAttribute('data-id');
 
             utils.some(collection, function (port) {
-                if (port.id === portId) {
+                if (utils.toString(port.id) === portId) {
                     result = port;
                     return true;
                 }

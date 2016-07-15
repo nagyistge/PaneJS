@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import Point from '../geometry/Point';
-import Cell  from '../cells/Cell';
+import Point      from '../geometry/Point';
+import Cell       from '../cells/Cell';
 
 
 class Link extends Cell {

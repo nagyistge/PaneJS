@@ -221,35 +221,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	// styles
-	// ------
-	
-	__webpack_require__(73);
-	
-	// common
+	// models
 	// ------
 	
 	
 	// core
 	// ----
-	
-	
-	// models
+	// common
 	// ------
-	
-	
-	// views
-	// -----
-	
-	
-	// connectors
-	// ----------
 	
 	
 	_Paper2.default.registerConnector('sharp', _sharp2.default).registerConnector('smooth', _smooth2.default).registerConnector('rounded', _rounded2.default);
 	
 	// markers
 	// -------
+	
+	
+	// connectors
+	// ----------
+	
+	
+	// views
+	// -----
 	
 	
 	_Paper2.default.registerMarker('classic', _classic2.default).registerMarker('diamond', _diamond2.default).registerMarker('cloven', _cloven2.default).registerMarker('block', _block2.default).registerMarker('oval', _oval2.default);
@@ -15210,12 +15203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ovalMarker;
 
 /***/ },
-/* 73 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
+/* 73 */,
 /* 74 */,
 /* 75 */
 /***/ function(module, exports, __webpack_require__) {
@@ -16461,10 +16449,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (function () {
 	                    var collection = _this4.isOutPortElem(portElem) ? _this4.cell.getOutPorts() : _this4.cell.getInPorts();
 	
-	                    var portId = utils.toInt(portElem.getAttribute('data-id'));
+	                    var portId = portElem.getAttribute('data-id');
 	
 	                    utils.some(collection, function (port) {
-	                        if (port.id === portId) {
+	                        if (utils.toString(port.id) === portId) {
 	                            result = port;
 	                            return true;
 	                        }
@@ -18150,11 +18138,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        height: height + 'px'
 	                    });
 	
-	                    var borderRadius = this.movingCells.length === 1 ? Math.floor(height / 2) + 'px' : '';
-	
-	                    utils.setStyle(elem, {
-	                        'border-radius': borderRadius
-	                    });
+	                    // const borderRadius = this.movingCells.length === 1
+	                    //     ? Math.floor(height / 2) + 'px'
+	                    //     : '';
+	                    //
+	                    // utils.setStyle(elem, {
+	                    //     'border-radius': borderRadius
+	                    // });
 	                }
 	            }
 	

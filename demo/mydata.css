@@ -1,0 +1,482 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#toolbar {
+  margin: 20px;
+}
+
+#container {
+  margin: 20px;
+  width: 800px;
+  height: 600px;
+  border: 1px solid #DDD;
+  overflow: hidden;
+}
+
+/*
+ * 节点样式
+*/
+.pane-cursor-move {
+  cursor: hand;
+  cursor: -webkit-grab;
+}
+
+.pane-cursor-moving {
+  cursor: hand;
+  cursor: -webkit-grabbing;
+}
+
+.pane-cursor-cross {
+  cursor: crosshair;
+}
+
+.pane-wrap {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #fff;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.pane-scroll {
+  position: relative;
+  box-sizing: content-box;
+}
+
+.pane-navigator {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 400px;
+  height: 300px;
+  background-color: #EEE;
+  border: 1px solid #DDD;
+}
+
+.pane-stage {
+  position: relative;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
+  background-color: #FFF;
+}
+
+svg.pane-svg {
+  overflow: visible;
+}
+
+.pane-html,
+.pane-raw {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.pane-snapline {
+  position: absolute;
+  -webkit-box-shadow: 0 0 0 1px rgba(251, 167, 49, 0.5) inset;
+  box-shadow: 0 0 0 1px rgba(251, 167, 49, 0.5) inset;
+}
+
+.pane-snapline.horizontal {
+  height: 1px;
+}
+
+.pane-snapline.vertical {
+  width: 1px;
+}
+
+.pane-node {
+  user-drag: none;
+  cursor: hand;
+  cursor: -webkit-grab;
+}
+
+.pane-node * {
+  /*
+     * The default behavior when scaling an element is not to scale the stroke
+     * in order to prevent the ugly effect of stroke with different proportions.
+     *
+     * `vector-effects` is part of SVG 1.2 tiny and the upcoming and
+     * as-yet-unfinished SVG 2 specifications. IE has only targeted SVG 1.1
+     * which does not have `vector-effects`. To work around it figure out how
+     * wide the stroke should be using JavaScript.
+     */
+  vector-effect: non-scaling-stroke;
+}
+
+.pane-node body {
+  background-color: transparent;
+  overflow: visible;
+}
+
+.pane-node-content {
+  width: 180px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #289DE9;
+  border-radius: 15px;
+  font-size: 12px;
+  -webkit-transition: background-color 0.2s;
+  transition: background-color 0.2s;
+}
+
+.pane-node-content .icon,
+.pane-node-content .status {
+  width: 26px;
+  height: 26px;
+  margin: 1px;
+  border-radius: 100%;
+}
+
+.pane-node-content .icon {
+  float: left;
+  color: #FFF;
+  font-size: 16px;
+  background-color: #289DE9;
+}
+
+.pane-node-content .icon:before {
+  float: left;
+  margin: 5px;
+}
+
+.pane-node-content .status {
+  display: none;
+  float: right;
+  font-size: 18px;
+}
+
+.pane-node-content .status:before {
+  float: left;
+  margin: 4px;
+}
+
+.pane-node-content .status.icon-close-o,
+.pane-node-content .status.icon-warning-o {
+  color: #F15E5E;
+}
+
+.pane-node-content .status.icon-ok-o {
+  color: #2ECC71;
+}
+
+.pane-node-content .name {
+  float: left;
+  margin-left: 2px;
+  width: 135px;
+  height: 28px;
+  line-height: 28px;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pane-node-content.has-status .name {
+  width: 120px;
+}
+
+.pane-node-content.has-status .status {
+  display: block;
+}
+
+.pane-node.focused .pane-node-content {
+  background-color: #FFFAE4;
+}
+
+.pane-node-content:hover,
+.pane-node.selected .pane-node-content {
+  background-color: rgba(227, 244, 255, 0.9);
+}
+
+.pane-port-list {
+  float: left;
+  width: 180px;
+  margin-top: -5px;
+}
+
+.pane-port-list.in {
+  clear: both;
+  margin-top: -34px;
+}
+
+.pane-port-list.out {
+  margin-top: -5px;
+  clear: both;
+}
+
+.pane-port-wrap {
+  height: 1px;
+  float: left;
+}
+
+.pane-port {
+  width: 10px;
+  height: 10px;
+  float: right;
+  margin-right: -5px;
+  border: 1px solid #808080;
+  border-radius: 50%;
+  background-color: #FFF;
+  -webkit-transition: background-color 0.2s;
+  transition: background-color 0.2s;
+}
+
+.pane-port .port-magnet {
+  float: left;
+  width: 20px;
+  height: 20px;
+  margin-top: -6px;
+  margin-left: -6px;
+  background-color: transparent;
+  border-radius: 50%;
+}
+
+.pane-port-list.in .pane-port {
+  cursor: default;
+}
+
+.pane-port-list.out .pane-port {
+  cursor: crosshair;
+}
+
+.pane-port-list.in .pane-port.is-connected {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 4px 0 4px;
+  border-color: #808080 transparent transparent transparent;
+  background-color: transparent;
+  border-radius: 0;
+  margin-top: 6px;
+}
+
+.pane-port-list.in .pane-port.is-connected .port-magnet {
+  display: none;
+}
+
+.pane-port-list.in .pane-port.is-connectable .port-magnet {
+  float: left;
+  width: 40px;
+  height: 40px;
+  margin-top: -16px;
+  margin-left: -16px;
+  background-color: transparent;
+  border-radius: 50%;
+}
+
+.pane-port-list.in .pane-port.is-connectable .port-magnet:before {
+  float: left;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  margin-top: 10px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  background-color: rgba(57, 202, 116, 0.6);
+  content: ' ';
+}
+
+.pane-port-list.in .pane-port.is-connectable .port-magnet:after {
+  float: left;
+  clear: both;
+  width: 10px;
+  height: 10px;
+  margin-top: -15px;
+  margin-left: 15px;
+  box-sizing: border-box;
+  border: 1px solid #39CA74;
+  border-radius: 50%;
+  background-color: #FFF;
+  content: ' ';
+}
+
+.pane-port-list.in .pane-port.is-connectable .port-magnet.is-adsorbed:before {
+  width: 28px;
+  height: 28px;
+  margin-top: 6px;
+  margin-left: 6px;
+}
+
+.pane-port-list.in .pane-port.is-connectable .port-magnet.is-adsorbed:after {
+  margin-top: -19px;
+}
+
+.pane-node-content.is-connectable {
+  border-color: #39CA74;
+}
+
+.pane-port-list.out .pane-port:hover {
+  background-color: #808080;
+}
+
+.pane-port-list.out .pane-port.is-connecting {
+  background-color: #808080;
+}
+
+@-webkit-keyframes ant-line {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes ant-line {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.pane-link,
+.pane-link-connecting {
+  cursor: default;
+}
+
+.pane-link .connector,
+.pane-link-connecting .connector {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 1px;
+}
+
+.pane-link .connector-wrap,
+.pane-link-connecting .connector-wrap {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0);
+  stroke-width: 15px;
+}
+
+.pane-link .target-marker,
+.pane-link-connecting .target-marker {
+  fill: #808080;
+  stroke: #808080;
+  stroke-width: 1px;
+}
+
+.pane-link.focused .connector,
+.pane-link-connecting.focused .connector,
+.pane-link:hover .connector,
+.pane-link-connecting:hover .connector {
+  stroke: rgba(128, 128, 128, 0.6);
+  stroke-width: 4px;
+}
+
+.pane-link.pane-link-flow .connector,
+.pane-link-connecting.pane-link-flow .connector {
+  stroke: rgba(57, 202, 116, 0.8);
+  stroke-width: 2px;
+  stroke-dasharray: 5;
+  -webkit-animation: ant-line 30s infinite linear;
+  -o-animation: ant-line 30s infinite linear;
+  animation: ant-line 30s infinite linear;
+}
+
+.pane-selection-preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  cursor: move;
+}
+
+.pane-selection-preview {
+  position: absolute;
+  border: 1px dashed #333;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selection-rect {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 1px solid #00D;
+  background-color: #9CF;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  opacity: .3;
+}
+
+/* 开始节点 */
+.pane-node-content.start-node {
+  width: 80px;
+  text-align: center;
+}
+
+.pane-node-content.start-node .name {
+  float: none;
+  width: auto;
+}
+
+.pane-node-content.start-node .pane-port-list {
+  width: 80px;
+}
+
+/* 结束节点 */
+.pane-node-content.end-node {
+  width: 80px;
+  text-align: center;
+}
+
+.pane-node-content.end-node .name {
+  float: none;
+  width: auto;
+}
+
+.pane-node-content.end-node .pane-port-list {
+  width: 80px;
+}
+
+/* 判定节点 */
+.pane-node-content.judge-node {
+  width: 80px;
+  height: 40px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  text-align: center;
+}
+
+.pane-node-content.judge-node .name {
+  float: none;
+  width: auto;
+  margin: 0;
+  display: inline-block;
+  height: 40px;
+  line-height: 40px;
+}
+
+.pane-node-content.end-node .pane-port-list {
+  width: 80px;
+}
+
+/* 子流程 */
+.pane-node-content.sub-flow-node {
+  width: 80px;
+  border-radius: 0;
+  text-align: center;
+}
+
+.pane-node-content.sub-flow-node .name {
+  float: none;
+  width: 60px;
+  display: inline-block;
+  margin: 0 auto;
+  border-left: 1px solid #289DE9;
+  border-right: 1px solid #289DE9;
+}
+
+.pane-node-content.sub-flow-node .pane-port-list {
+  width: 80px;
+}
