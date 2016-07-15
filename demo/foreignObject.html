@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Basic shapes</title>
+    <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
+    <style>
+        #container {
+            width: 800px;
+            height: 600px;
+            border: 1px solid #DDD;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../dist/panejs.js"></script>
+<script>
+
+    var container = document.getElementById('container');
+    var model = new panejs.Model();
+    var paper = new panejs.Paper({
+        container: container,
+        model: model
+    });
+
+    var rect = new panejs.Node({
+        markup: '<g class="pane-rotatable"><g class="pane-scalable"><foreignObject width="100" height="50"><body xmlns="http://www.w3.org/1999/xhtml"><div style="width:100px; height:50px;">DEMO FOR FOREIGNOBJECT</div></body></foreignObject></g></g>',
+        size: { width: 100, height: 50 },
+        position: { x: 50, y: 50 }
+    });
+
+    model.addCell(rect);
+</script>
+</body>
+</html>

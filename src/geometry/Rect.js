@@ -40,18 +40,25 @@ class Rect {
     }
 
     static fromVerticesAndRotation(v1, v2, rotation = 0) {
-        let cx            = (v1.x + v2.x) / 2;
-        let cy            = (v1.y + v2.y) / 2;
+
+        let cx = (v1.x + v2.x) / 2;
+        let cy = (v1.y + v2.y) / 2;
+
         let distance      = new Point(v1.x, v1.y).distance(new Point(v2.x, v2.y));
         let verticesAngle = Math.atan(Math.abs((v2.y - v1.y) / (v1.x - v2.x))) * 180 / Math.PI;
-        let width         = Math.abs(distance * Math.sin((90 - rotation + verticesAngle) / 180 * Math.PI));
-        let height        = Math.abs(distance * Math.cos((90 - rotation + verticesAngle) / 180 * Math.PI));
-        let x             = cx - width / 2;
-        let y             = cy - height / 2;
-        let rect          = new Rect(x, y, width, height);
-        rect.cx           = cx;
-        rect.cy           = cy;
-        rect.rotation     = rotation;
+
+        let width  = Math.abs(distance * Math.sin((90 - rotation + verticesAngle) / 180 * Math.PI));
+        let height = Math.abs(distance * Math.cos((90 - rotation + verticesAngle) / 180 * Math.PI));
+
+        let x = cx - width / 2;
+        let y = cy - height / 2;
+
+        let rect = new Rect(x, y, width, height);
+
+        rect.cx       = cx;
+        rect.cy       = cy;
+        rect.rotation = rotation;
+
         return rect;
     }
 

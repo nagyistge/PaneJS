@@ -1,10 +1,41 @@
-import { isFunction } from '../utils/lang';
-import { some       } from '../utils/array';
-import detector       from '../common/detector';
+import { isFunction      } from '../utils/lang';
+import { some            } from '../utils/array';
+import { containsElement } from '../utils/dom';
+import detector            from '../common/detector';
+
 
 const WIN      = window;
 const DOC      = window.document;
 const IS_TOUCH = detector.IS_TOUCH;
+
+const hooks = {
+    mouseenter: {
+        type: 'mouseover',
+        wrap: mouseEnterLeaveWrap
+    },
+
+    mouseleave: {
+        type: 'mouseout',
+        wrap: mouseEnterLeaveWrap
+    }
+};
+
+function mouseEnterLeaveWrap(elem, handler) {
+    return function (e) {
+        if (!isHover(e.delegateTarget || elem, e)) {
+            handler.call(this, e);
+        }
+    }
+}
+
+function isHover(elem, e) {
+
+    const target = e.type === 'mouseover'
+        ? e.relatedTarget || e.fromElement
+        : e.relatedTarget || e.toElement;
+
+    return containsElement(elem, target) || elem === target;
+}
 
 let isMatchSelector = function () {
 
@@ -141,6 +172,9 @@ function getDelegateTarget(elem, target, selector) {
 function removeEventListener(elem, type, handler) {
 
     let wrapper = handler._delegateWrapper;
+    let hook    = hooks[type];
+
+    type = hook ? hook.type : type;
 
     if (elem.removeEventListener) {
         elem.removeEventListener(type, handler, false);
@@ -159,8 +193,14 @@ function removeEventListener(elem, type, handler) {
 
 function addEventListener(elem, type, selector, handler, once) {
 
+    let hook = hooks[type];
+
+    type = hook ? hook.type : type;
+
     if (isFunction(selector)) {
-        return addEvent(elem, type, selector);
+        return hook
+            ? addEvent(elem, type, hook.wrap(elem, selector))
+            : addEvent(elem, type, selector);
     }
 
     function wrapper(e) {
@@ -168,12 +208,14 @@ function addEventListener(elem, type, selector, handler, once) {
         // if this event has a delegateTarget, then we add it to the event
         // object (so that handlers may have a reference to the delegator
         // element) and fire the callback
-
         let delegateTarget = getDelegateTarget(elem, e.target, selector);
-
         if (delegateTarget) {
 
             e.delegateTarget = delegateTarget;
+
+            if (hook) {
+                handler = hook.wrap(elem, handler)
+            }
 
             if (once === true) {
                 removeEventListener(elem, type, wrapper);

@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
-import     vector from '../common/vector';
-import      Point from '../geometry/Point';
+import vector     from '../common/vector';
+import Point      from '../geometry/Point';
 import VectorView from '../views/VectorView';
 
 
@@ -224,7 +224,7 @@ class LinkView extends VectorView {
             if (view && port) {
 
                 if (view.getPortBodyBBox) {
-                    bbox = view.getPortBodyBBox(port, isSource);
+                    bbox = view.getPortBodyBBox(port, !isSource);
                 }
 
                 if (bbox) {

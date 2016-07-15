@@ -8,6 +8,7 @@ class Node extends Cell {
     // ------
 
     static isNode(node) {
+
         return node && node instanceof Node;
     }
 
@@ -33,7 +34,7 @@ class Node extends Cell {
 Node.setDefaults({
     tagName: 'g',
     markup: '',
-    classNames: 'pane-node',
+    classNames: 'pane-cell pane-node', // pane-cell for event handler
     pane: null,   // specify the drawPane of the view
     view: null,   // specify the constructor of the view
     data: null,   // cached data(for business logic)

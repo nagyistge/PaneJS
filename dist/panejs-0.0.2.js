@@ -476,6 +476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // ------
 	
 	        value: function isNode(node) {
+	
 	            return node && node instanceof Node;
 	        }
 	    }]);
@@ -486,7 +487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Node.setDefaults({
 	    tagName: 'g',
 	    markup: '',
-	    classNames: 'pane-node',
+	    classNames: 'pane-cell pane-node', // pane-cell for event handler
 	    pane: null, // specify the drawPane of the view
 	    view: null, // specify the constructor of the view
 	    data: null, // cached data(for business logic)
@@ -909,18 +910,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function fromVerticesAndRotation(v1, v2) {
 	            var rotation = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 	
+	
 	            var cx = (v1.x + v2.x) / 2;
 	            var cy = (v1.y + v2.y) / 2;
+	
 	            var distance = new _Point2.default(v1.x, v1.y).distance(new _Point2.default(v2.x, v2.y));
 	            var verticesAngle = Math.atan(Math.abs((v2.y - v1.y) / (v1.x - v2.x))) * 180 / Math.PI;
+	
 	            var width = Math.abs(distance * Math.sin((90 - rotation + verticesAngle) / 180 * Math.PI));
 	            var height = Math.abs(distance * Math.cos((90 - rotation + verticesAngle) / 180 * Math.PI));
+	
 	            var x = cx - width / 2;
 	            var y = cy - height / 2;
+	
 	            var rect = new Rect(x, y, width, height);
+	
 	            rect.cx = cx;
 	            rect.cy = cy;
 	            rect.rotation = rotation;
+	
 	            return rect;
 	        }
 	    }, {
@@ -1623,7 +1631,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isWithin = exports.isPercentage = exports.isFinite = exports.toFixed = exports.toFloat = exports.toInt = undefined;
+	exports.clamp = exports.fixNumber = exports.fixIndex = exports.isWithin = exports.isPercentage = exports.isFinite = exports.toPercentage = exports.toFixed = exports.toFloat = exports.toInt = undefined;
 	
 	var _lang = __webpack_require__(6);
 	
@@ -1646,6 +1654,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var v = parseFloat(value);
 	    return percentage ? v / 100 : v;
+	}
+	
+	function toPercentage(value) {
+	    var precision = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
+	
+	
+	    return toFixed(value * 100, 2) + '%';
 	}
 	
 	function toFixed(value) {
@@ -1693,6 +1708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toInt = toInt;
 	exports.toFloat = toFloat;
 	exports.toFixed = toFixed;
+	exports.toPercentage = toPercentage;
 	exports.isFinite = isFinite;
 	exports.isPercentage = isPercentage;
 	exports.isWithin = isWithin;
@@ -2171,7 +2187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // If `content` is passed, it will be used as the SVG content of
 	    // the `<svg>` root element.
 	
-	    var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xmlns + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
+	    var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xlink + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
 	    var xml = parseXML(svg, false);
 	    return xml.documentElement;
 	}
@@ -2493,6 +2509,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _array = __webpack_require__(7);
 	
+	var _dom = __webpack_require__(12);
+	
 	var _detector = __webpack_require__(15);
 	
 	var _detector2 = _interopRequireDefault(_detector);
@@ -2502,6 +2520,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	var WIN = window;
 	var DOC = window.document;
 	var IS_TOUCH = _detector2.default.IS_TOUCH;
+	
+	var hooks = {
+	    mouseenter: {
+	        type: 'mouseover',
+	        wrap: mouseEnterLeaveWrap
+	    },
+	
+	    mouseleave: {
+	        type: 'mouseout',
+	        wrap: mouseEnterLeaveWrap
+	    }
+	};
+	
+	function mouseEnterLeaveWrap(elem, handler) {
+	    return function (e) {
+	        if (!isHover(e.delegateTarget || elem, e)) {
+	            handler.call(this, e);
+	        }
+	    };
+	}
+	
+	function isHover(elem, e) {
+	
+	    var target = e.type === 'mouseover' ? e.relatedTarget || e.fromElement : e.relatedTarget || e.toElement;
+	
+	    return (0, _dom.containsElement)(elem, target) || elem === target;
+	}
 	
 	var isMatchSelector = function () {
 	
@@ -2634,6 +2679,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function removeEventListener(elem, type, handler) {
 	
 	    var wrapper = handler._delegateWrapper;
+	    var hook = hooks[type];
+	
+	    type = hook ? hook.type : type;
 	
 	    if (elem.removeEventListener) {
 	        elem.removeEventListener(type, handler, false);
@@ -2652,8 +2700,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function addEventListener(elem, type, selector, handler, once) {
 	
+	    var hook = hooks[type];
+	
+	    type = hook ? hook.type : type;
+	
 	    if ((0, _lang.isFunction)(selector)) {
-	        return addEvent(elem, type, selector);
+	        return hook ? addEvent(elem, type, hook.wrap(elem, selector)) : addEvent(elem, type, selector);
 	    }
 	
 	    function wrapper(e) {
@@ -2661,12 +2713,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // if this event has a delegateTarget, then we add it to the event
 	        // object (so that handlers may have a reference to the delegator
 	        // element) and fire the callback
-	
 	        var delegateTarget = getDelegateTarget(elem, e.target, selector);
-	
 	        if (delegateTarget) {
 	
 	            e.delegateTarget = delegateTarget;
+	
+	            if (hook) {
+	                handler = hook.wrap(elem, handler);
+	            }
 	
 	            if (once === true) {
 	                removeEventListener(elem, type, wrapper);
@@ -4747,7 +4801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setDefaults',
 	        value: function setDefaults(options) {
 	
-	            // update global options
+	            // update default options
 	            this.defaults = utils.merge({}, this.defaults, options);
 	        }
 	    }]);
@@ -5330,7 +5384,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return ret;
 	        }, _this);
-	
 	        _this.outPorts = utils.map(_this.metadata.outPorts, function (port) {
 	
 	            var ret = this.standardizePort(port);
@@ -5339,7 +5392,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return ret;
 	        }, _this);
-	
 	        return _this;
 	    }
 	
@@ -5409,48 +5461,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return this.metadata.portMarkup;
 	        }
-	    }, {
-	        key: 'getPortSelector',
-	        value: function getPortSelector() /* port, isInPort */{
-	            // the method is go with the markup definition
-	        }
-	    }, {
-	        key: 'getPortsWrapSelector',
-	        value: function getPortsWrapSelector() /* isInPort */{
-	            // the method is go with the markup definition
-	        }
 	    }]);
 	
 	    return Portal;
 	}(_Node3.default);
 	
 	Portal.setDefaults({
-	    tagName: 'g',
-	    markup: '',
 	    portMarkup: '',
-	    classNames: 'pane-node',
-	    pane: null,
 	    view: _PortalView2.default,
-	    data: null,
-	    attrs: null,
 	
 	    inPorts: [],
-	    outPorts: [],
-	
-	    size: {
-	        width: 1,
-	        height: 1,
-	        relative: false
-	    },
-	    position: {
-	        x: 0,
-	        y: 0,
-	        relative: false
-	    },
-	    rotation: {
-	        angle: 0,
-	        inherited: true
-	    }
+	    outPorts: []
 	});
 	
 	// exports
@@ -6093,6 +6114,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                offset += line.length + 1; // + 1 = newline character.
 	            }, this);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'html',
+	        value: function html(content) {
+	
+	            this.node.innerHTML = content;
 	
 	            return this;
 	        }
@@ -7410,12 +7439,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return this;
 	        }
-	
-	        // Scale the whole `<g>` group.
-	
 	    }, {
 	        key: 'scale',
 	        value: function scale(sx, sy) {
+	            // Scale the whole `<g>` group.
 	
 	            this.vel.scale(sx, sy);
 	
@@ -7472,8 +7499,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function translate() {
 	
 	            var position = this.cell.getPosition();
+	            var bodyVel = this.findOne('body');
 	
 	            this.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+	
+	            //if (bodyVel && bodyVel.node) {
+	            //    utils.setTranslate(bodyVel.node, position.x, position.y);
+	            //}
 	
 	            return this;
 	        }
@@ -10985,7 +11017,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    wrap: 'pane-wrap',
 	    stage: 'pane-stage',
 	    svg: 'pane-svg',
-	    viewport: 'pane-viewport'
+	    viewport: 'pane-viewport',
+	    htmlPane: 'pane-html',
+	    rawPane: 'pane-raw'
 	};
 	
 	// the default options for paper
@@ -11130,16 +11164,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function createPanes() {
 	
 	            var viewport = this.viewport;
+	            var stage = this.stage;
 	
 	            this.backgroundPane = viewport.appendChild(utils.createSvgElement('g'));
+	
 	            // container of links
 	            this.linkPane = viewport.appendChild(utils.createSvgElement('g'));
+	
 	            // container of nodes
 	            this.drawPane = viewport.appendChild(utils.createSvgElement('g'));
+	
 	            // layer above the drawing pane, for controllers and handlers
 	            this.controlPane = viewport.appendChild(utils.createSvgElement('g'));
+	
 	            // layer above the drawing pane and controller pane, for decorators
 	            this.decoratePane = viewport.appendChild(utils.createSvgElement('g'));
+	
+	            // html pane for hold html element, with scale and translation
+	            this.htmlPane = stage.appendChild(utils.createElement('div'));
+	
+	            utils.addClass(this.htmlPane, classNames.htmlPane);
+	
+	            // whithout scale and translation
+	            this.rawPane = stage.appendChild(utils.createElement('div'));
+	
+	            utils.addClass(this.rawPane, classNames.rawPane);
 	
 	            this.trigger('paper:createPanes');
 	
@@ -11159,10 +11208,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
 	            utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
 	            utils.addEventListener(eventDelegate, 'click', this.onClick.bind(this));
-	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
-	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
-	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseenter', '.pane-cell', this.onCellMouseEnter.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseleave', '.pane-cell', this.onCellMouseLeave.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-cell', this.onCellMouseOver.bind(this));
+	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-cell', this.onCellMouseOut.bind(this));
 	
 	            utils.addEventListener(eventDelegate, _detector2.default.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 	
@@ -12191,9 +12240,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	
 	            if (view) {
-	                this.trigger('cell:dblClick', view.cell, view, e, localPoint.x, localPoint.y);
+	                this.trigger('cell:dblclick', view.cell, view, e, localPoint.x, localPoint.y);
 	            } else {
-	                this.trigger('blank:dblClick', e, localPoint.x, localPoint.y);
+	                this.trigger('blank:dblclick', e, localPoint.x, localPoint.y);
 	            }
 	        }
 	    }, {
@@ -12226,27 +12275,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'onCellMouseOver',
 	        value: function onCellMouseOver(e) {
 	
-	            e = utils.normalizeEvent(e);
-	
-	            var view = this.findViewByElem(e.target);
-	            if (view) {
-	                if (this.isValidEvent(e, view)) {
-	                    this.trigger('cell:mouseOver', view.cell, view, e);
-	                }
-	            }
+	            this.onCellHover(e, 'mouseover');
 	        }
 	    }, {
 	        key: 'onCellMouseOut',
 	        value: function onCellMouseOut(e) {
 	
+	            this.onCellHover(e, 'mouseout');
+	        }
+	    }, {
+	        key: 'onCellMouseEnter',
+	        value: function onCellMouseEnter(e) {
+	
+	            this.onCellHover(e, 'mouseenter');
+	        }
+	    }, {
+	        key: 'onCellMouseLeave',
+	        value: function onCellMouseLeave(e) {
+	
+	            this.onCellHover(e, 'mouseleave');
+	        }
+	    }, {
+	        key: 'onCellHover',
+	        value: function onCellHover(e, eventName) {
+	
 	            e = utils.normalizeEvent(e);
 	
 	            var view = this.findViewByElem(e.target);
-	            if (view) {
-	                if (this.isValidEvent(e, view)) {
-	                    this.trigger('cell:mouseOut', view.cell, view, e);
-	                }
+	
+	            if (!this.isValidEvent(e, view)) {
+	                return;
 	            }
+	
+	            var localPoint = this.snapToGrid({
+	                x: e.clientX,
+	                y: e.clientY
+	            });
+	
+	            this.trigger('cell:' + eventName, view.cell, view, e, localPoint.x, localPoint.y);
 	        }
 	    }, {
 	        key: 'onPointerDown',
@@ -13318,6 +13384,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return true;
 	        }
 	    }, {
+	        key: 'getRouter',
+	        value: function getRouter() {
+	
+	            var router = this.metadata.router || {};
+	
+	            if (utils.isFunction(router)) {
+	                router = { parse: router };
+	            } else if (!utils.isObject(router)) {
+	                router = { name: router };
+	            }
+	
+	            return router;
+	        }
+	    }, {
+	        key: 'getMarker',
+	        value: function getMarker(isSource) {
+	
+	            var marker = isSource ? this.metadata.sourceMarker : this.metadata.targetMarker;
+	
+	            if (utils.isFunction(marker)) {
+	                marker = { parse: marker };
+	            } else if (!utils.isObject(marker)) {
+	                marker = { name: marker };
+	            }
+	
+	            marker.selector = isSource ? '.source-marker' : '.target-marker';
+	
+	            return marker;
+	        }
+	    }, {
+	        key: 'getConnector',
+	        value: function getConnector() {
+	
+	            var connector = this.metadata.connector || {};
+	
+	            if (utils.isFunction(connector)) {
+	                connector = { parse: connector };
+	            } else if (!utils.isObject(connector)) {
+	                connector = { name: connector };
+	            }
+	
+	            connector.selector = '.connector';
+	
+	            return connector;
+	        }
+	
+	        // vertices
+	        // --------
+	
+	    }, {
 	        key: 'getVertices',
 	        value: function getVertices() {
 	
@@ -13327,13 +13443,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getVerticesCount',
 	        value: function getVerticesCount() {
 	
-	            return this.vertices.length;
+	            return this.vertices ? this.vertices.length : 0;
 	        }
 	    }, {
 	        key: 'getVerticeAt',
 	        value: function getVerticeAt(index) {
 	
-	            return this.vertices[index] || null;
+	            return this.vertices ? this.vertices[index] : null;
 	        }
 	    }, {
 	        key: 'indexOfVertice',
@@ -13416,52 +13532,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return this;
 	        }
-	    }, {
-	        key: 'getRouter',
-	        value: function getRouter() {
 	
-	            var router = this.metadata.router || {};
+	        // common
+	        // ------
 	
-	            if (utils.isFunction(router)) {
-	                router = { parse: router };
-	            } else if (!utils.isObject(router)) {
-	                router = { name: router };
-	            }
-	
-	            return router;
-	        }
-	    }, {
-	        key: 'getMarker',
-	        value: function getMarker(isSource) {
-	
-	            var marker = isSource ? this.metadata.sourceMarker : this.metadata.targetMarker;
-	
-	            if (utils.isFunction(marker)) {
-	                marker = { parse: marker };
-	            } else if (!utils.isObject(marker)) {
-	                marker = { name: marker };
-	            }
-	
-	            marker.selector = isSource ? '.source-marker' : '.target-marker';
-	
-	            return marker;
-	        }
-	    }, {
-	        key: 'getConnector',
-	        value: function getConnector() {
-	
-	            var connector = this.metadata.connector || {};
-	
-	            if (utils.isFunction(connector)) {
-	                connector = { parse: connector };
-	            } else if (!utils.isObject(connector)) {
-	                connector = { name: connector };
-	            }
-	
-	            connector.selector = '.connector';
-	
-	            return connector;
-	        }
 	    }, {
 	        key: 'clone',
 	        value: function clone(options, withData) {
@@ -13491,10 +13565,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	Link.setDefaults({
 	    tagName: 'g',
 	    markup: '' + '<path class="connector"/>' + '<path class="source-marker"/>' + '<path class="target-marker"/>',
-	    classNames: 'pane-link',
+	    classNames: 'pane-cell pane-link', // pane-cell for event handler
 	    pane: 'linkPane',
+	    data: null, // related data(for business logic)
 	    view: null, // specify the constructor of the view
-	    data: null, // cached data(for business logic)
 	    router: null,
 	    connector: 'sharp',
 	    sourceMarker: null,

@@ -10,7 +10,7 @@ class Portal extends Node {
 
         this.portById = {};
 
-        this.inPorts = utils.map(this.metadata.inPorts, function (port) {
+        this.inPorts  = utils.map(this.metadata.inPorts, function (port) {
 
             let ret = this.standardizePort(port);
 
@@ -19,7 +19,6 @@ class Portal extends Node {
             return ret;
 
         }, this);
-
         this.outPorts = utils.map(this.metadata.outPorts, function (port) {
 
             let ret = this.standardizePort(port);
@@ -29,7 +28,6 @@ class Portal extends Node {
             return ret;
 
         }, this);
-
     }
 
     eachInPort(iterator, context) {
@@ -88,44 +86,15 @@ class Portal extends Node {
 
         return this.metadata.portMarkup;
     }
-
-    getPortSelector(/* port, isInPort */) {
-        // the method is go with the markup definition
-    }
-
-    getPortsWrapSelector(/* isInPort */) {
-        // the method is go with the markup definition
-    }
 }
 
 
 Portal.setDefaults({
-    tagName: 'g',
-    markup: '',
     portMarkup: '',
-    classNames: 'pane-node',
-    pane: null,
     view: PortalView,
-    data: null,
-    attrs: null,
 
     inPorts: [],
-    outPorts: [],
-
-    size: {
-        width: 1,
-        height: 1,
-        relative: false
-    },
-    position: {
-        x: 0,
-        y: 0,
-        relative: false
-    },
-    rotation: {
-        angle: 0,
-        inherited: true
-    }
+    outPorts: []
 });
 
 

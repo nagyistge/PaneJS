@@ -30,7 +30,9 @@ const classNames = {
     wrap: 'pane-wrap',
     stage: 'pane-stage',
     svg: 'pane-svg',
-    viewport: 'pane-viewport'
+    viewport: 'pane-viewport',
+    htmlPane: 'pane-html',
+    rawPane: 'pane-raw'
 };
 
 // the default options for paper
@@ -169,16 +171,31 @@ class Paper extends Events {
     createPanes() {
 
         const viewport = this.viewport;
+        const stage    = this.stage;
 
         this.backgroundPane = viewport.appendChild(utils.createSvgElement('g'));
+
         // container of links
         this.linkPane = viewport.appendChild(utils.createSvgElement('g'));
+
         // container of nodes
         this.drawPane = viewport.appendChild(utils.createSvgElement('g'));
+
         // layer above the drawing pane, for controllers and handlers
         this.controlPane = viewport.appendChild(utils.createSvgElement('g'));
+
         // layer above the drawing pane and controller pane, for decorators
         this.decoratePane = viewport.appendChild(utils.createSvgElement('g'));
+
+        // html pane for hold html element, with scale and translation
+        this.htmlPane = stage.appendChild(utils.createElement('div'));
+
+        utils.addClass(this.htmlPane, classNames.htmlPane);
+
+        // whithout scale and translation
+        this.rawPane = stage.appendChild(utils.createElement('div'));
+
+        utils.addClass(this.rawPane, classNames.rawPane);
 
         this.trigger('paper:createPanes');
 
@@ -197,10 +214,10 @@ class Paper extends Events {
         utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
         utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
         utils.addEventListener(eventDelegate, 'click', this.onClick.bind(this));
-        utils.addEventListener(eventDelegate, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
-        utils.addEventListener(eventDelegate, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
-        utils.addEventListener(eventDelegate, 'mouseover', '.pane-link', this.onCellMouseOver.bind(this));
-        utils.addEventListener(eventDelegate, 'mouseout', '.pane-link', this.onCellMouseOut.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseenter', '.pane-cell', this.onCellMouseEnter.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseleave', '.pane-cell', this.onCellMouseLeave.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseover', '.pane-cell', this.onCellMouseOver.bind(this));
+        utils.addEventListener(eventDelegate, 'mouseout', '.pane-cell', this.onCellMouseOut.bind(this));
 
         utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 
@@ -1235,9 +1252,9 @@ class Paper extends Events {
         });
 
         if (view) {
-            this.trigger('cell:dblClick', view.cell, view, e, localPoint.x, localPoint.y);
+            this.trigger('cell:dblclick', view.cell, view, e, localPoint.x, localPoint.y);
         } else {
-            this.trigger('blank:dblClick', e, localPoint.x, localPoint.y);
+            this.trigger('blank:dblclick', e, localPoint.x, localPoint.y);
         }
     }
 
@@ -1268,26 +1285,40 @@ class Paper extends Events {
 
     onCellMouseOver(e) {
 
-        e = utils.normalizeEvent(e);
-
-        let view = this.findViewByElem(e.target);
-        if (view) {
-            if (this.isValidEvent(e, view)) {
-                this.trigger('cell:mouseOver', view.cell, view, e);
-            }
-        }
+        this.onCellHover(e, 'mouseover');
     }
 
     onCellMouseOut(e) {
 
+        this.onCellHover(e, 'mouseout');
+    }
+
+    onCellMouseEnter(e) {
+
+        this.onCellHover(e, 'mouseenter');
+    }
+
+    onCellMouseLeave(e) {
+
+        this.onCellHover(e, 'mouseleave');
+    }
+
+    onCellHover(e, eventName) {
+
         e = utils.normalizeEvent(e);
 
         let view = this.findViewByElem(e.target);
-        if (view) {
-            if (this.isValidEvent(e, view)) {
-                this.trigger('cell:mouseOut', view.cell, view, e);
-            }
+
+        if (!this.isValidEvent(e, view)) {
+            return;
         }
+
+        let localPoint = this.snapToGrid({
+            x: e.clientX,
+            y: e.clientY
+        });
+
+        this.trigger('cell:' + eventName, view.cell, view, e, localPoint.x, localPoint.y);
     }
 
     onPointerDown(e) {
@@ -1327,7 +1358,6 @@ class Paper extends Events {
     }
 
     onPointerMove(e) {
-
 
         e.preventDefault();
         e = utils.normalizeEvent(e);

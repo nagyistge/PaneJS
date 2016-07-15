@@ -377,6 +377,13 @@ export class VElement {
         return this;
     }
 
+    html(content) {
+
+        this.node.innerHTML = content;
+
+        return this;
+    }
+
     remove() {
 
         utils.removeElement(this.node);

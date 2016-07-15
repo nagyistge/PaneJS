@@ -10,12 +10,10 @@ class ConnectionHandler extends Handler {
 
         this.clean();
 
-        this.mouseOverHandler = this.onCellMouseOver.bind(this);
-        this.mouseOutHandler  = this.onCellMouseOut.bind(this);
+        this.mouseEnterHandler = this.onCellMouseEnter.bind(this);
+        this.mouseLeaveHandler = this.onCellMouseLeave.bind(this);
 
         this.getPaper()
-            // .on('cell:mouseOver', this.onCellMouseOver.bind(this))
-            // .on('cell:mouseOut', this.onCellMouseOut.bind(this))
             .on('cell:pointerDown', this.onCellMouseDown.bind(this))
             .on('cell:pointerMove', this.onCellMouseMove.bind(this))
             .on('cell:pointerUp', this.onCellMouseUp.bind(this));
@@ -61,26 +59,28 @@ class ConnectionHandler extends Handler {
         this.sourcePort = view.findPortByElem(e.target);
     }
 
-    onCellMouseMove(cell, view, e, localX, localY) {
+    onCellMouseMove(cell, view, e) {
 
         if (this.isDisabled() || !this.sourcePort) {
             return;
         }
 
-        let paper = this.getPaper();
-        let model = this.getModel();
+        const paper = this.getPaper();
+        const model = this.getModel();
 
         model.beginUpdate();
 
         if (!this.connecting) {
 
             this.getPaper()
-                .on('cell:mouseOver', this.mouseOverHandler)
-                .on('cell:mouseOut', this.mouseOutHandler);
+                .on('cell:mouseenter', this.mouseEnterHandler)
+                .on('cell:mouseleave', this.mouseLeaveHandler);
 
             this.link = new Link({
                 view: LinkView,
-                pane: 'decoratePane',
+                pane: 'linkPane',
+                // special className for ignore default event handler
+                classNames: 'pane-link pane-link-connecting',
                 connector: quadratic,
                 sourceMarker: null,
                 targetMarker: 'block',
@@ -96,10 +96,18 @@ class ConnectionHandler extends Handler {
         }
 
         if (this.link) {
-            this.link.setTerminal({ x: localX, y: localY }, false);
+            // for smooth connecting, do not use the snapped local-point.
+            this.link.setTerminal(paper.toLocalPoint({
+                x: e.pageX,
+                y: e.pageY
+            }), false);
         }
 
         model.endUpdate();
+
+        if (this.targetView) {
+            this.targetPort = this.targetView.findPortByElem(e.target);
+        }
 
         paper.trigger('cell:connecting', this.getEventData());
     }
@@ -110,12 +118,12 @@ class ConnectionHandler extends Handler {
             return;
         }
 
-        let paper = this.getPaper();
-        let model = this.getModel();
+        const paper = this.getPaper();
+        const model = this.getModel();
 
         paper
-            .off('cell:mouseOver', this.mouseOverHandler)
-            .off('cell:mouseOut', this.mouseOutHandler);
+            .off('cell:mouseenter', this.mouseEnterHandler)
+            .off('cell:mouseleave', this.mouseLeaveHandler);
 
         model.beginUpdate();
 
@@ -127,9 +135,13 @@ class ConnectionHandler extends Handler {
         this.clean();
     }
 
-    onCellMouseOver(cell, view, e) {
+    onCellMouseEnter(cell, view, e) {
 
-        if (this.isDisabled() || !cell.isNode() || cell === this.sourceCell || !this.connecting) {
+        if (this.isDisabled()
+            || !cell.isNode()
+            || cell === this.sourceCell
+            || !this.connecting) {
+
             return;
         }
 
@@ -137,18 +149,17 @@ class ConnectionHandler extends Handler {
         this.targetNode = cell;
         this.targetView = view;
         this.targetPort = view.findPortByElem(e.target);
-
-
-        this.getPaper().trigger('cell:connectingMouseOver', this.getEventData());
     }
 
-    onCellMouseOut(cell) {
+    onCellMouseLeave(cell, view, e) {
 
-        if (this.isDisabled() || !cell.isNode() || !this.hasTarget || !this.connecting) {
+        if (this.isDisabled()
+            || !cell.isNode()
+            || !this.hasTarget
+            || !this.connecting) {
+
             return;
         }
-
-        this.getPaper().trigger('cell:connectingMouseOut', this.getEventData());
 
         this.hasTarget  = false;
         this.targetNode = null;
@@ -156,5 +167,9 @@ class ConnectionHandler extends Handler {
         this.targetPort = null;
     }
 }
+
+
+// exports
+// -------
 
 export default ConnectionHandler;

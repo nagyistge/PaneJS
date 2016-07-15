@@ -19,7 +19,7 @@ class Snaplines {
     destroy() {
 
         if (!this.destroyed) {
-            utils.removeElement(this.container);
+            this.hide();
             utils.destroy(this);
         }
     }
@@ -30,7 +30,6 @@ class Snaplines {
         this.paper   = this.options.paper;
 
         this.ensureElement();
-        this.hide();
 
         this.paper.on('cells:moving', this.onCellsMoving.bind(this));
         this.paper.on('cells:moveEnd', this.onCellsMoveEnd.bind(this));
@@ -38,15 +37,9 @@ class Snaplines {
 
     ensureElement() {
 
-        this.container = utils.createElement('div');
-        this.hLine     = utils.createElement('div');
-        this.vLine     = utils.createElement('div');
+        this.hLine = utils.createElement('div');
+        this.vLine = utils.createElement('div');
 
-        this.container.appendChild(this.hLine);
-        this.container.appendChild(this.vLine);
-        this.paper.getStage().appendChild(this.container);
-
-        utils.addClass(this.container, 'pane-snaplines');
         utils.addClass(this.hLine, 'pane-snapline horizontal');
         utils.addClass(this.vLine, 'pane-snapline vertical');
 
@@ -149,15 +142,16 @@ class Snaplines {
 
     hide() {
 
-        utils.setStyle(this.hLine, 'display', 'none');
-        utils.setStyle(this.vLine, 'display', 'none');
+        utils.removeElement(this.hLine);
+        utils.removeElement(this.vLine);
 
         return this;
     }
 
     show() {
 
-        const paper = this.paper;
+        const paper   = this.paper;
+        const rawPane = paper.rawPane;
 
         const sx = paper.sx;
         const sy = paper.sy;
@@ -170,21 +164,23 @@ class Snaplines {
         if (vertical) {
 
             utils.setStyle(this.vLine, {
-                display: 'block',
                 left: Math.round(vertical.left * sx + tx) + 'px',
                 top: Math.round(vertical.top * sy + ty) + 'px',
                 height: Math.round((vertical.bottom - vertical.top) * sy) + 'px'
             });
+
+            rawPane.appendChild(this.vLine);
         }
 
         if (horizontal) {
 
             utils.setStyle(this.hLine, {
-                display: 'block',
                 left: Math.round(horizontal.left * sx + tx) + 'px',
                 top: Math.round(horizontal.top * sy + ty) + 'px',
                 width: Math.round((horizontal.right - horizontal.left) * sx) + 'px'
             });
+
+            rawPane.appendChild(this.hLine);
         }
     }
 }

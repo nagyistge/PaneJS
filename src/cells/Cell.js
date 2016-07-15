@@ -70,7 +70,7 @@ class Cell {
 
     constructor(options) {
 
-        let metadata = utils.merge({}, this.constructor.defaults, options);
+        const metadata = utils.merge({}, this.constructor.defaults, options);
 
         this.data     = metadata.data;
         this.attrs    = metadata.attrs || {};
@@ -84,7 +84,7 @@ class Cell {
 
     static setDefaults(options) {
 
-        // update global options
+        // update default options
         this.defaults = utils.merge({}, this.defaults, options);
     }
 

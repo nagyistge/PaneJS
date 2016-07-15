@@ -29,6 +29,57 @@ class Link extends Cell {
         return true;
     }
 
+    getRouter() {
+
+        let router = this.metadata.router || {};
+
+        if (utils.isFunction(router)) {
+            router = { parse: router };
+        } else if (!utils.isObject(router)) {
+            router = { name: router };
+        }
+
+        return router;
+    }
+
+    getMarker(isSource) {
+
+        let marker = isSource
+            ? this.metadata.sourceMarker
+            : this.metadata.targetMarker;
+
+        if (utils.isFunction(marker)) {
+            marker = { parse: marker };
+        } else if (!utils.isObject(marker)) {
+            marker = { name: marker };
+        }
+
+        marker.selector = isSource
+            ? '.source-marker'
+            : '.target-marker';
+
+        return marker;
+    }
+
+    getConnector() {
+
+        let connector = this.metadata.connector || {};
+
+        if (utils.isFunction(connector)) {
+            connector = { parse: connector };
+        } else if (!utils.isObject(connector)) {
+            connector = { name: connector };
+        }
+
+        connector.selector = '.connector';
+
+        return connector;
+    }
+
+
+    // vertices
+    // --------
+
     getVertices() {
 
         return this.vertices;
@@ -36,12 +87,12 @@ class Link extends Cell {
 
     getVerticesCount() {
 
-        return this.vertices.length;
+        return this.vertices ? this.vertices.length : 0;
     }
 
     getVerticeAt(index) {
 
-        return this.vertices[index] || null;
+        return this.vertices ? this.vertices[index] : null;
     }
 
     indexOfVertice(point) {
@@ -116,52 +167,9 @@ class Link extends Cell {
         return this;
     }
 
-    getRouter() {
 
-        let router = this.metadata.router || {};
-
-        if (utils.isFunction(router)) {
-            router = { parse: router };
-        } else if (!utils.isObject(router)) {
-            router = { name: router };
-        }
-
-        return router;
-    }
-
-    getMarker(isSource) {
-
-        let marker = isSource
-            ? this.metadata.sourceMarker
-            : this.metadata.targetMarker;
-
-        if (utils.isFunction(marker)) {
-            marker = { parse: marker };
-        } else if (!utils.isObject(marker)) {
-            marker = { name: marker };
-        }
-
-        marker.selector = isSource
-            ? '.source-marker'
-            : '.target-marker';
-
-        return marker;
-    }
-
-    getConnector() {
-
-        let connector = this.metadata.connector || {};
-
-        if (utils.isFunction(connector)) {
-            connector = { parse: connector };
-        } else if (!utils.isObject(connector)) {
-            connector = { name: connector };
-        }
-
-        connector.selector = '.connector';
-
-        return connector;
-    }
+    // common
+    // ------
 
     clone(options, withData) {
 
@@ -186,10 +194,10 @@ Link.setDefaults({
     + '<path class="connector"/>'
     + '<path class="source-marker"/>'
     + '<path class="target-marker"/>',
-    classNames: 'pane-link',
+    classNames: 'pane-cell pane-link', // pane-cell for event handler
     pane: 'linkPane',
+    data: null,   // related data(for business logic)
     view: null,   // specify the constructor of the view
-    data: null,   // cached data(for business logic)
     router: null,
     connector: 'sharp',
     sourceMarker: null,

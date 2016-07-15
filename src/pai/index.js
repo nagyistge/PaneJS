@@ -1,11 +1,13 @@
-import HTMLNode    from './HTMLNode';
-import HTMLPaper   from './HTMLPaper';
 import Navigator   from './Navigator';
 import Snaplines   from './Snaplines';
 import PaperScroll from './PaperScroll';
 
+import Node     from './Node';
+import NodeView from './NodeView';
 import LinkView     from './LinkView';
-import HTMLNodeView from './HTMLNodeView';
+
+import HTMLSuperNode     from './HTMLSuperNode';
+import HTMLSuperNodeView from './HTMLSuperNodeView';
 
 import SelectionHandler  from './SelectionHandler';
 import ConnectionHandler from './ConnectionHandler';
@@ -15,14 +17,16 @@ import quadratic from './quadratic';
 
 let pai = {
 
-    HTMLNode,
-    HTMLPaper,
+    Node,
+    NodeView,
+    LinkView,
+
     Navigator,
     Snaplines,
     PaperScroll,
 
-    LinkView,
-    HTMLNodeView,
+    HTMLSuperNode,
+    HTMLSuperNodeView,
 
     SelectionHandler,
     ConnectionHandler,

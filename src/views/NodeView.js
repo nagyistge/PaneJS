@@ -336,8 +336,8 @@ class NodeView extends VectorView {
         return this;
     }
 
-    // Scale the whole `<g>` group.
     scale(sx, sy) {
+        // Scale the whole `<g>` group.
 
         this.vel.scale(sx, sy);
 
@@ -391,8 +391,13 @@ class NodeView extends VectorView {
     translate() {
 
         let position = this.cell.getPosition();
+        let bodyVel  = this.findOne('body');
 
         this.vel.attr('transform', 'translate(' + position.x + ',' + position.y + ')');
+
+        //if (bodyVel && bodyVel.node) {
+        //    utils.setTranslate(bodyVel.node, position.x, position.y);
+        //}
 
         return this;
     }

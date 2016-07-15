@@ -431,7 +431,7 @@ function createSvgDocument(content) {
     // If `content` is passed, it will be used as the SVG content of
     // the `<svg>` root element.
 
-    let svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xmlns + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
+    let svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xlink + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
     let xml = parseXML(svg, false);
     return xml.documentElement;
 }

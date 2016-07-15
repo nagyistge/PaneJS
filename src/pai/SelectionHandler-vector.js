@@ -1,4 +1,5 @@
 import * as utils from '../common/utils';
+import vector     from '../common/vector';
 import Rect       from '../geometry/Rect';
 import Handler    from '../handlers/Handler';
 
@@ -32,11 +33,11 @@ class SelectHandler extends Handler {
 
     init() {
 
-        this.previewRect   = utils.createElement('div');
-        this.selectionRect = utils.createElement('div');
+        this.previewVel   = vector('rect');
+        this.selectionVel = vector('rect');
 
-        utils.addClass(this.previewRect, 'pane-selection-preview');
-        utils.addClass(this.selectionRect, 'pane-selection-rect');
+        this.previewVel.addClass('pane-selection-preview');
+        this.selectionVel.addClass('pane-selection-rect');
 
         this.focusedCell   = null;
         this.movingCells   = [];
@@ -64,6 +65,14 @@ class SelectHandler extends Handler {
         return this;
     }
 
+    destroy() {
+
+        utils.removeEventListener(document.body, 'keydown', this.keyDownHandler);
+        utils.removeEventListener(document.body, 'keyup', this.keyUpHandler);
+
+        super.destroy();
+    }
+
     switchMode(isSelectMode) {
 
         this.isSelectMode = isSelectMode === true;
@@ -75,6 +84,7 @@ class SelectHandler extends Handler {
     switchModeClass(isSelectMode) {
 
         const wrap = this.getPaper().getWrap();
+
         this.setCursorStyle(wrap, isSelectMode);
 
         return this;
@@ -276,23 +286,7 @@ class SelectHandler extends Handler {
         }
 
         this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
-
-        //if (!this.isAreaSelect) {
-        //    const areaSelectKey = this.options.areaSelectKey;
-        //    if (this.options.areaSelect && areaSelectKey) {
-        //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
-        //        if (utils[method]) {
-        //            this.isAreaSelect = utils[method](e);
-        //        }
-        //    }
-        //
-        //    if (this.isAreaSelect) {
-        //        this.switchModeClass(true);
-        //        this.switchModeClass(true);
-        //    }
-        //}
-
-        this.isMovement = !this.isAreaSelect && this.options.movement;
+        this.isMovement   = !this.isAreaSelect && this.options.movement;
 
         if (this.isAreaSelect) {
 
@@ -629,32 +623,15 @@ class SelectHandler extends Handler {
         let bounds = this.bounds;
         if (bounds) {
 
-            const paper = this.getPaper();
-            const elem  = this.previewRect;
+            this.previewVel.translate(bounds.x, bounds.y)
 
-            const x = Math.round(bounds.x * paper.sx + paper.tx);
-            const y = Math.round(bounds.y * paper.sy + paper.ty);
-
-            utils.setTranslate(elem, x, y);
-
-            // update size
             if (resize) {
-
-                const width  = Math.round(bounds.width * paper.sx);
-                const height = Math.round(bounds.height * paper.sy);
-
-                utils.setStyle(elem, {
-                    width: width + 'px',
-                    height: height + 'px'
+                this.previewVel.attr({
+                    width: bounds.width,
+                    height: bounds.height
                 });
 
-                const borderRadius = this.movingCells.length === 1
-                    ? Math.floor(height / 2) + 'px'
-                    : '';
-
-                utils.setStyle(elem, {
-                    'border-radius': borderRadius
-                });
+                this.previewVel.toggleClass('single', this.movingCells.length === 1);
             }
         }
 
@@ -663,7 +640,7 @@ class SelectHandler extends Handler {
 
     hidePreview() {
 
-        utils.removeElement(this.previewRect);
+        this.previewVel.remove();
 
         return this;
     }
@@ -671,8 +648,8 @@ class SelectHandler extends Handler {
     showPreview() {
 
         let paper = this.getPaper();
-        if (paper && paper.rawPane) {
-            paper.rawPane.appendChild(this.previewRect);
+        if (paper && paper.decoratePane) {
+            this.previewVel.appendTo(paper.decoratePane)
         }
 
         return this;
@@ -680,7 +657,7 @@ class SelectHandler extends Handler {
 
     hideSelectionRect() {
 
-        utils.removeElement(this.selectionRect);
+        this.selectionVel.remove();
 
         return this;
     }
@@ -688,8 +665,8 @@ class SelectHandler extends Handler {
     showSelectionRect() {
 
         let paper = this.getPaper();
-        if (paper && paper.rawPane) {
-            paper.rawPane.appendChild(this.selectionRect);
+        if (paper && paper.decoratePane) {
+            this.selectionVel.appendTo(paper.decoratePane)
         }
 
         return this;
@@ -698,20 +675,12 @@ class SelectHandler extends Handler {
     updateSelectionRect() {
 
         let bounds = this.bounds;
-        if (bounds) {
+        if (bounds && this.selectionVel) {
 
-            const paper = this.getPaper();
-            const elem  = this.selectionRect;
-
-            const x      = Math.round(bounds.x * paper.sx + paper.tx);
-            const y      = Math.round(bounds.y * paper.sy + paper.ty);
-            const width  = Math.round(bounds.width * paper.sx);
-            const height = Math.round(bounds.height * paper.sy);
-
-            utils.setTranslate(elem, x, y);
-            utils.setStyle(elem, {
-                width: width + 'px',
-                height: height + 'px'
+            this.selectionVel.translate(bounds.x, bounds.y);
+            this.selectionVel.attr({
+                width: bounds.width,
+                height: bounds.height
             });
         }
 
