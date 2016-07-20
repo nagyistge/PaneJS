@@ -647,14 +647,6 @@ class SelectHandler extends Handler {
                     width: width + 'px',
                     height: height + 'px'
                 });
-
-                const borderRadius = this.movingCells.length === 1
-                    ? Math.floor(height / 2) + 'px'
-                    : '';
-
-                utils.setStyle(elem, {
-                    'border-radius': borderRadius
-                });
             }
         }
 

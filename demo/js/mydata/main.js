@@ -29,6 +29,12 @@ var endNode = panejs.utils.merge({
 var judgeNode = panejs.utils.merge({
     id: panejs.utils.uuid(),
     name: '判定',
+    inPorts: [{
+        id: panejs.utils.uuid()
+    }],
+    outPorts: [{
+        id: panejs.utils.uuid()
+    }],
     position: {
         x: 320,
         y: 180
@@ -39,6 +45,12 @@ var judgeNode = panejs.utils.merge({
 var subFlowNode = panejs.utils.merge({
     id: panejs.utils.uuid(),
     name: '子流程',
+    inPorts: [{
+        id: panejs.utils.uuid()
+    }],
+    outPorts: [{
+        id: panejs.utils.uuid()
+    }],
     position: {
         x: 320,
         y: 380
@@ -50,14 +62,8 @@ var commonNode = panejs.utils.merge({
     name: '通用节点',
     inPorts: [{
         id: panejs.utils.uuid()
-    }, {
-        id: panejs.utils.uuid()
     }],
     outPorts: [{
-        id: panejs.utils.uuid()
-    }, {
-        id: panejs.utils.uuid()
-    }, {
         id: panejs.utils.uuid()
     }],
     position: {

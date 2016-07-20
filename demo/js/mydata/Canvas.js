@@ -21,17 +21,17 @@ function Canvas(container) {
 
 Canvas.prototype.setup = function () {
 
-    this.snapLines = new panejs.pai.Snaplines({
+    this.snapLines = new panejs.myData.Snaplines({
         paper: this.paper
     });
 
-    this.paperScroll = new panejs.pai.PaperScroll({
+    this.paperScroll = new panejs.myData.PaperScroll({
         paper: this.paper
     });
 
     // handlers
-    this.connectionHandler = new panejs.pai.ConnectionHandler(this.paper);
-    this.selectionHandler  = new panejs.pai.SelectionHandler(this.paper);
+    this.connectionHandler = new panejs.myData.ConnectionHandler(this.paper);
+    this.selectionHandler  = new panejs.myData.SelectionHandler(this.paper);
 
     this.paper
         .on('cell:connecting', this.onConnecting.bind(this))
@@ -233,7 +233,7 @@ Canvas.prototype.addNodes = function (nodes) {
 
 Canvas.prototype.addNode = function (node) {
 
-    var nodeInstance = new panejs.pai.Node({
+    var nodeInstance = new panejs.myData.Node({
         markup: node.markup,
         portMarkup: node.portMarkup,
         inPorts: node.inPorts,
@@ -435,7 +435,6 @@ Canvas.prototype.updateLinkStream = function () {
     return this;
 };
 
-
 Canvas.prototype.updateLinkStreamByNode = function (node) {
 
     if (node) {
@@ -491,8 +490,8 @@ Canvas.prototype.addLink = function (link) {
         var linkInstance = new panejs.Link({
             attrs: null,
             data: link,
-            view: panejs.pai.LinkView,
-            connector: panejs.pai.quadratic
+            view: panejs.myData.LinkView,
+            connector: panejs.myData.quadratic
         });
 
         this.model.addLink(linkInstance, {
@@ -567,7 +566,6 @@ Canvas.prototype.removeLink = function (link) {
 
     return linkInstance;
 };
-
 
 Canvas.prototype.getNodeId = function (node) {
 
@@ -670,9 +668,11 @@ Canvas.prototype.isAncestor = function (sourcePort, targetPort) {
 
 Canvas.prototype.canConnect = function (sourcePort, targetPort) {
 
-    return sourcePort.type === targetPort.type
-        && !(!targetPort.isMultiIn && targetPort.parents.length)
-        && !this.isAncestor(sourcePort, targetPort);
+    return true;
+
+    // return sourcePort.type === targetPort.type
+    //     && !(!targetPort.isMultiIn && targetPort.parents.length)
+    //     && !this.isAncestor(sourcePort, targetPort);
 };
 
 Canvas.prototype.getFirstConnectablePort = function (sourcePort, targetNode) {

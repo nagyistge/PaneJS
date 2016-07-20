@@ -6,8 +6,8 @@ var autoprefixer = require('autoprefixer');
 
 
 var paths = {
-  src: path.resolve(__dirname, 'src'),
-  dist: path.resolve(__dirname, 'dist')
+    src: path.resolve(__dirname, 'src'),
+    dist: path.resolve(__dirname, 'dist')
 };
 
 var entry = {};
@@ -15,76 +15,77 @@ var entry = {};
 entry[pkg.name]                     = './src/index.js';
 entry[pkg.name + '-' + pkg.version] = './src/index.js';
 
-entry[pkg.name + '-pai']                     = './src/pai.js';
-entry[pkg.name + '-pai-0.1.3'] = './src/pai.js';
+entry[pkg.name + '-pai']          = './src/pai.js';
+entry[pkg.name + '-pai-0.1.4']    = './src/pai.js';
+entry[pkg.name + '-myData-0.1.0'] = './src/myData.js';
 
 module.exports = {
 
-  entry: entry,
+    entry: entry,
 
-  resolve: {
-    extensions: ['', '.js']
-  },
+    resolve: {
+        extensions: ['', '.js']
+    },
 
-  output: {
-    path: paths.dist,
-    publicPath: '/dist/',
-    filename: '[name].js',
-    library: pkg.name,
-    libraryTarget: 'umd'
-  },
+    output: {
+        path: paths.dist,
+        publicPath: '/dist/',
+        filename: '[name].js',
+        library: pkg.name,
+        libraryTarget: 'umd'
+    },
 
-  externals: {},
+    externals: {},
 
-  module: {
-    loaders: [
-      {
-        test: /\.js?$/,
-        include: paths.src,
-        loader: 'babel',
-        query: {
-          babelrc: false,
-          cacheDirectory: true,
-          presets: ['es2015'],
-          plugins: [
+    module: {
+        loaders: [
+            {
+                test: /\.js?$/,
+                include: paths.src,
+                loader: 'babel',
+                query: {
+                    babelrc: false,
+                    cacheDirectory: true,
+                    presets: ['es2015'],
+                    plugins: [
 
-            // Syntax
-            //'syntax-class-properties',
-            //'syntax-export-extensions',
+                        // Syntax
+                        //'syntax-class-properties',
+                        //'syntax-export-extensions',
 
-            // Experimental
-            //'transform-class-properties',
-            //'transform-export-extensions',
+                        // Experimental
+                        //'transform-class-properties',
+                        //'transform-export-extensions',
 
-            // Minification
-            //'transform-member-expression-literals',
-            //'transform-merge-sibling-variables',
-            //'transform-minify-booleans',
-            //'transform-property-literals',
-            //'transform-remove-console',
-            //'transform-remove-debugger',
-            //'transform-simplify-comparison-operators'
-          ]
-        }
-      }, {
-        test: /\.less?$/,
-        include: paths.src,
-        loader: ExtractText.extract(
-          'css-loader?sourceMap&-minimize!' +
-          'postcss-loader!' +
-          'less-loader?sourceMap'
-        )
-      }
-    ]
-  },
+                        // Minification
+                        //'transform-member-expression-literals',
+                        //'transform-merge-sibling-variables',
+                        //'transform-minify-booleans',
+                        //'transform-property-literals',
+                        //'transform-remove-console',
+                        //'transform-remove-debugger',
+                        //'transform-simplify-comparison-operators'
+                    ]
+                }
+            }, {
+                test: /\.less?$/,
+                include: paths.src,
+                loader: ExtractText.extract(
+                    'css-loader?sourceMap&-minimize!' +
+                    'postcss-loader!' +
+                    'less-loader?sourceMap'
+                )
+            }
+        ]
+    },
 
-  plugins: [
-    new ExtractText('[name].css')
-  ],
+    plugins: [
+        new ExtractText('[name].css')
+    ],
 
-  postcss: function () {
-    return [autoprefixer({ browsers: ['last 2 versions'] })];
-  },
+    postcss: function () {
+        return [autoprefixer({ browsers: ['last 2 versions'] })];
+    },
 
-  devtool: 'source-map'
+    devtool: 'source-map'
 };
