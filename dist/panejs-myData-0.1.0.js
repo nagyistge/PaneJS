@@ -5944,13 +5944,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'text',
-	        value: function text(content, options) {
+	        value: function text(content) {
+	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
 	
 	            // replace all spaces with the Unicode No-break space
 	            // (http://www.fileformat.info/info/unicode/char/a0/index.htm).
 	            // IE would otherwise collapse all spaces into one.
 	            content = utils.sanitizeText(content);
-	            options = options || {};
 	
 	            // `alignment-baseline` does not work in Firefox.
 	            // Setting `dominant-baseline` on the `<text>` element doesn't work in IE9.
@@ -16451,7 +16452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.cache = {};
 	
-	            return this.parseConnector().parseTerminal(true).parseTerminal(false).updateMarker().updateConnector();
+	            return this.parseConnector().parseTerminal(true).parseTerminal(false).updateMarker().updateConnector().updateComment();
 	        }
 	    }, {
 	        key: 'parseConnector',
@@ -16541,7 +16542,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'updateComment',
-	        value: function updateComment() /* comment */{}
+	        value: function updateComment() {
+	            var comment = arguments.length <= 0 || arguments[0] === undefined ? this.cell.metadata.comment : arguments[0];
+	
+	
+	            var link = this.cell;
+	            var bbox = this.vel.getBBox(true);
+	            var attrs = link.attrs.text;
+	
+	            var vBg = this.vel.findOne('.comment-bg');
+	            var vText = this.vel.findOne('.comment');
+	
+	            this.cell.metadata.comment = comment;
+	
+	            vText.text(comment);
+	
+	            // Remove the previous translate() from the transform attribute
+	            // and translate the element relative to the bounding box following
+	            // the `ref-x` and `ref-y` attributes.
+	            var transformAttr = vText.attr('transform');
+	            if (transformAttr) {
+	                vText.attr('transform', utils.clearTranslate(transformAttr));
+	            }
+	
+	            var velBBox = vText.getBBox(true);
+	
+	            var tx = bbox.x + bbox.width * 0.5;
+	            var ty = bbox.y + bbox.height * 0.5;
+	
+	            tx -= velBBox.width / 2;
+	            ty -= velBBox.height / 2;
+	
+	            tx = utils.toFixed(tx, 2);
+	            ty = utils.toFixed(ty, 2);
+	
+	            vBg.attr({
+	                width: velBBox.width + 10,
+	                height: velBBox.height + 10
+	            });
+	
+	            vBg.translate(tx - 5, ty - 5);
+	
+	            vText.translate(tx, ty);
+	
+	            return this;
+	        }
 	    }, {
 	        key: 'renderMarker',
 	        value: function renderMarker(isSource) {

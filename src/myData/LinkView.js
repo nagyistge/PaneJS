@@ -25,7 +25,8 @@ class LinkView extends VectorView {
             .parseTerminal(true)
             .parseTerminal(false)
             .updateMarker()
-            .updateConnector();
+            .updateConnector()
+            .updateComment();
     }
 
     parseConnector() {
@@ -120,8 +121,49 @@ class LinkView extends VectorView {
         return this;
     }
 
-    updateComment(/* comment */) {
+    updateComment(comment = this.cell.metadata.comment) {
 
+        let link  = this.cell;
+        let bbox  = this.vel.getBBox(true);
+        let attrs = link.attrs.text;
+
+        let vBg   = this.vel.findOne('.comment-bg');
+        let vText = this.vel.findOne('.comment');
+
+        this.cell.metadata.comment = comment;
+
+        vText.text(comment);
+
+
+        // Remove the previous translate() from the transform attribute
+        // and translate the element relative to the bounding box following
+        // the `ref-x` and `ref-y` attributes.
+        let transformAttr = vText.attr('transform');
+        if (transformAttr) {
+            vText.attr('transform', utils.clearTranslate(transformAttr));
+        }
+
+        let velBBox = vText.getBBox(true);
+
+        let tx = bbox.x + bbox.width * 0.5;
+        let ty = bbox.y + bbox.height * 0.5;
+
+        tx -= velBBox.width / 2;
+        ty -= velBBox.height / 2;
+
+        tx = utils.toFixed(tx, 2);
+        ty = utils.toFixed(ty, 2);
+
+        vBg.attr({
+            width: velBBox.width + 10,
+            height: velBBox.height + 10
+        });
+
+        vBg.translate(tx - 5, ty - 5);
+
+        vText.translate(tx, ty);
+
+        return this;
     }
 
     renderMarker(isSource) {

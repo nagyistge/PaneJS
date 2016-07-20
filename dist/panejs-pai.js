@@ -5944,13 +5944,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'text',
-	        value: function text(content, options) {
+	        value: function text(content) {
+	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
 	
 	            // replace all spaces with the Unicode No-break space
 	            // (http://www.fileformat.info/info/unicode/char/a0/index.htm).
 	            // IE would otherwise collapse all spaces into one.
 	            content = utils.sanitizeText(content);
-	            options = options || {};
 	
 	            // `alignment-baseline` does not work in Firefox.
 	            // Setting `dominant-baseline` on the `<text>` element doesn't work in IE9.

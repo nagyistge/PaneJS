@@ -488,7 +488,13 @@ Canvas.prototype.addLink = function (link) {
         this.setPortConnected(targetNode, targetPort.id, false, true);
 
         var linkInstance = new panejs.Link({
-            attrs: null,
+            comment: 'test',
+            markup: ''
+            + '<path class="connector"/>'
+            + '<path class="source-marker"/>'
+            + '<path class="target-marker"/>'
+            + '<rect class="comment-bg"/>'
+            + '<text class="comment"/>',
             data: link,
             view: panejs.myData.LinkView,
             connector: panejs.myData.quadratic

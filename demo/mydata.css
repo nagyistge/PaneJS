@@ -392,6 +392,16 @@ svg.pane-svg {
   animation: ant-line 30s infinite linear;
 }
 
+.pane-link .comment {
+  font-size: 12px;
+}
+
+.pane-link .comment-bg {
+  fill: #F1F9FD;
+  stroke: #CCC;
+  stroke-dasharray: 3;
+}
+
 .pane-selection-preview {
   position: absolute;
   left: 0;

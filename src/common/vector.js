@@ -194,13 +194,12 @@ export class VElement {
         return this;
     }
 
-    text(content, options) {
+    text(content, options = {}) {
 
         // replace all spaces with the Unicode No-break space
         // (http://www.fileformat.info/info/unicode/char/a0/index.htm).
         // IE would otherwise collapse all spaces into one.
         content = utils.sanitizeText(content);
-        options = options || {};
 
         // `alignment-baseline` does not work in Firefox.
         // Setting `dominant-baseline` on the `<text>` element doesn't work in IE9.
@@ -243,7 +242,7 @@ export class VElement {
             // then this is our path.
             let isTextPathObject = Object(textPathOptions) === textPathOptions;
             // d attr
-            let d = isTextPathObject ? textPathOptions.d : textPathOptions;
+            let d                = isTextPathObject ? textPathOptions.d : textPathOptions;
 
             let vPath;
 
@@ -879,14 +878,14 @@ export class VElement {
         // a transformed geometrical rectangle.
         if (tagName === 'RECT') {
 
-            let gRect = new Rect(
+            let gRect                = new Rect(
                 parseFloat(this.attr('x') || 0),
                 parseFloat(this.attr('y') || 0),
                 parseFloat(this.attr('width')),
                 parseFloat(this.attr('height'))
             );
             // Get the rect transformation matrix with regards to the SVG document.
-            let rectMatrix = that.getTransformToElement(target);
+            let rectMatrix           = that.getTransformToElement(target);
             // Decompose the matrix to find the rotation angle.
             let rectMatrixComponents = vector.decomposeMatrix(rectMatrix);
             // Now we want to rotate the rectangle back so that we
@@ -910,7 +909,7 @@ export class VElement {
 
             for (let i = 0, len = samples.length; i < len; i++) {
 
-                let sample = samples[i];
+                let sample         = samples[i];
                 // Convert the sample point in the local coordinate system to the global coordinate system.
                 let gp             = vector.createSVGPoint(sample.x, sample.y);
                 gp                 = gp.matrixTransform(that.getTransformToElement(target));
