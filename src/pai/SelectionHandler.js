@@ -64,6 +64,14 @@ class SelectHandler extends Handler {
         return this;
     }
 
+    destroy() {
+
+        utils.removeEventListener(document.body, 'keydown', this.keyDownHandler);
+        utils.removeEventListener(document.body, 'keyup', this.keyUpHandler);
+
+        super.destroy();
+    }
+
     switchMode(isSelectMode) {
 
         this.isSelectMode = isSelectMode === true;

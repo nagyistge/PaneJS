@@ -82,7 +82,7 @@ class HTMLPaper extends Paper {
             }
 
             utils.setStyle(this.htmlPane, {
-                top: ty + 'px',
+                top : ty + 'px',
                 left: tx + 'px'
             });
 
@@ -99,11 +99,11 @@ class HTMLPaper extends Paper {
         if (sx && sy) {
 
             utils.setStyle(this.htmlPane, {
-                transform: 'scale3d(' + sx + ',' + sy + ', 1)'
+                transform: 'translate3d(0, 0, 0) scale3d(' + sx + ',' + sy + ', 1)'
             });
 
             // utils.setStyle(this.htmlPane, {
-            //    zoom: sx
+            //     zoom: sx
             // });
 
             super.scale(sx, sy, ox, oy);

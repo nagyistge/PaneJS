@@ -219,7 +219,8 @@ class Paper extends Events {
         utils.addEventListener(eventDelegate, 'mouseover', '.pane-cell', this.onCellMouseOver.bind(this));
         utils.addEventListener(eventDelegate, 'mouseout', '.pane-cell', this.onCellMouseOut.bind(this));
 
-        utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+        // utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+        utils.addEventListener(eventDelegate, 'mousedown', this.onPointerDown.bind(this));
 
         this.eventDelegate = eventDelegate;
 
@@ -1353,8 +1354,11 @@ class Paper extends Events {
         this.onMouseMoveHandler = this.onMouseMoveHandler || this.onPointerMove.bind(this);
         this.onMouseUpHandler   = this.onMouseUpHandler || this.onPointerUp.bind(this);
 
-        utils.addEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
-        utils.addEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+        // utils.addEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+        // utils.addEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+
+        utils.addEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+        utils.addEventListener(doc, 'mouseup', this.onMouseUpHandler);
     }
 
     onPointerMove(e) {
@@ -1393,8 +1397,12 @@ class Paper extends Events {
             this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
         }
 
-        utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
-        utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+        // Chrome in windows8: `'ontouchstart' in document.documentElement` return `true`
+        // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+        // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+
+        utils.removeEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+        utils.removeEventListener(doc, 'mouseup', this.onMouseUpHandler);
     }
 
 

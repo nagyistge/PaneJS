@@ -25,7 +25,8 @@ class LinkView extends VectorView {
             .parseTerminal(true)
             .parseTerminal(false)
             .updateMarker()
-            .updateConnector();
+            .updateConnector()
+            .updateComment();
     }
 
     parseConnector() {
@@ -122,6 +123,7 @@ class LinkView extends VectorView {
 
     updateComment(/* comment */) {
 
+        return this;
     }
 
     renderMarker(isSource) {

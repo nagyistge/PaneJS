@@ -2273,11 +2273,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
 	
-	        if (transformKey !== 'msTransform') {
-	            // The Z transform will keep this in the GPU (faster, and prevents artifacts),
-	            // but IE9 doesn't support 3d transforms and will choke.
-	            translate += ' translateZ(0)';
-	        }
+	        // if (transformKey !== 'msTransform') {
+	        //     // The Z transform will keep this in the GPU (faster, and prevents artifacts),
+	        //     // but IE9 doesn't support 3d transforms and will choke.
+	        //     translate += ' translateZ(0)';
+	        // }
 	
 	        elem.style[transformKey] = translate;
 	    }
@@ -2857,9 +2857,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    IS_MAC: av.indexOf('Mac') > 0,
 	
-	    IS_TOUCH: 'ontouchstart' in document.documentElement,
-	
 	    IS_POINTER: window.navigator.msPointerEnabled || false,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement || navigator.MaxTouchPoints > 0 || navigator.msMaxTouchPoints > 0,
 	
 	    SUPPORT_FOREIGN_OBJECT: function () {
 	
@@ -11212,7 +11212,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-cell', this.onCellMouseOver.bind(this));
 	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-cell', this.onCellMouseOut.bind(this));
 	
-	            utils.addEventListener(eventDelegate, _detector2.default.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	            // utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	            utils.addEventListener(eventDelegate, 'mousedown', this.onPointerDown.bind(this));
 	
 	            this.eventDelegate = eventDelegate;
 	
@@ -12347,8 +12348,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.onMouseMoveHandler = this.onMouseMoveHandler || this.onPointerMove.bind(this);
 	            this.onMouseUpHandler = this.onMouseUpHandler || this.onPointerUp.bind(this);
 	
-	            utils.addEventListener(doc, _detector2.default.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
-	            utils.addEventListener(doc, _detector2.default.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	            // utils.addEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+	            // utils.addEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	
+	            utils.addEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+	            utils.addEventListener(doc, 'mouseup', this.onMouseUpHandler);
 	        }
 	    }, {
 	        key: 'onPointerMove',
@@ -12389,8 +12393,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
 	            }
 	
-	            utils.removeEventListener(doc, _detector2.default.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
-	            utils.removeEventListener(doc, _detector2.default.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	
+	            utils.removeEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+	            utils.removeEventListener(doc, 'mouseup', this.onMouseUpHandler);
 	        }
 	
 	        // utils
@@ -15276,7 +15283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.cache = {};
 	
-	            return this.parseConnector().parseTerminal(true).parseTerminal(false).updateMarker().updateConnector();
+	            return this.parseConnector().parseTerminal(true).parseTerminal(false).updateMarker().updateConnector().updateComment();
 	        }
 	    }, {
 	        key: 'parseConnector',
@@ -15366,7 +15373,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'updateComment',
-	        value: function updateComment() /* comment */{}
+	        value: function updateComment() /* comment */{
+	
+	            return this;
+	        }
 	    }, {
 	        key: 'renderMarker',
 	        value: function renderMarker(isSource) {
@@ -15761,23 +15771,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.pai = undefined;
 	
-	var _Navigator = __webpack_require__(87);
+	var _HTMLPaper = __webpack_require__(87);
+	
+	var _HTMLPaper2 = _interopRequireDefault(_HTMLPaper);
+	
+	var _HTMLNode = __webpack_require__(88);
+	
+	var _HTMLNode2 = _interopRequireDefault(_HTMLNode);
+	
+	var _HTMLNodeView = __webpack_require__(89);
+	
+	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
+	
+	var _HTMLSuperNode = __webpack_require__(90);
+	
+	var _HTMLSuperNode2 = _interopRequireDefault(_HTMLSuperNode);
+	
+	var _HTMLSuperNodeView = __webpack_require__(91);
+	
+	var _HTMLSuperNodeView2 = _interopRequireDefault(_HTMLSuperNodeView);
+	
+	var _Navigator = __webpack_require__(92);
 	
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 	
-	var _Snaplines = __webpack_require__(88);
+	var _Snaplines = __webpack_require__(93);
 	
 	var _Snaplines2 = _interopRequireDefault(_Snaplines);
 	
-	var _PaperScroll = __webpack_require__(89);
+	var _PaperScroll = __webpack_require__(94);
 	
 	var _PaperScroll2 = _interopRequireDefault(_PaperScroll);
 	
-	var _Node = __webpack_require__(90);
+	var _Node = __webpack_require__(95);
 	
 	var _Node2 = _interopRequireDefault(_Node);
 	
-	var _NodeView = __webpack_require__(91);
+	var _NodeView = __webpack_require__(96);
 	
 	var _NodeView2 = _interopRequireDefault(_NodeView);
 	
@@ -15785,19 +15815,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _HTMLSuperNode = __webpack_require__(92);
+	var _SuperNode = __webpack_require__(97);
 	
-	var _HTMLSuperNode2 = _interopRequireDefault(_HTMLSuperNode);
+	var _SuperNode2 = _interopRequireDefault(_SuperNode);
 	
-	var _HTMLSuperNodeView = __webpack_require__(93);
+	var _SuperNodeView = __webpack_require__(98);
 	
-	var _HTMLSuperNodeView2 = _interopRequireDefault(_HTMLSuperNodeView);
+	var _SuperNodeView2 = _interopRequireDefault(_SuperNodeView);
 	
-	var _SelectionHandler = __webpack_require__(94);
+	var _SelectionHandler = __webpack_require__(99);
 	
 	var _SelectionHandler2 = _interopRequireDefault(_SelectionHandler);
 	
-	var _ConnectionHandler = __webpack_require__(95);
+	var _ConnectionHandler = __webpack_require__(100);
 	
 	var _ConnectionHandler2 = _interopRequireDefault(_ConnectionHandler);
 	
@@ -15809,22 +15839,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var pai = {
 	
-	    Node: _Node2.default,
-	    NodeView: _NodeView2.default,
-	    LinkView: _LinkView2.default,
+	    HTMLPaper: _HTMLPaper2.default,
+	    HTMLNode: _HTMLNode2.default,
+	    HTMLNodeView: _HTMLNodeView2.default,
+	
+	    HTMLSuperNode: _HTMLSuperNode2.default,
+	    HTMLSuperNodeView: _HTMLSuperNodeView2.default,
 	
 	    Navigator: _Navigator2.default,
 	    Snaplines: _Snaplines2.default,
 	    PaperScroll: _PaperScroll2.default,
 	
-	    HTMLSuperNode: _HTMLSuperNode2.default,
-	    HTMLSuperNodeView: _HTMLSuperNodeView2.default,
+	    Node: _Node2.default,
+	    NodeView: _NodeView2.default,
+	    LinkView: _LinkView2.default,
+	    SuperNode: _SuperNode2.default,
+	    SuperNodeView: _SuperNodeView2.default,
 	
 	    SelectionHandler: _SelectionHandler2.default,
 	    ConnectionHandler: _ConnectionHandler2.default,
 	
 	    quadratic: _quadratic2.default
 	};
+	
+	// handlers
+	
 	
 	exports.pai = pai;
 
@@ -15840,296 +15879,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _utils = __webpack_require__(5);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var defaults = {
-	    paperScroll: null,
-	    distance: 0
-	};
-	
-	var Navigator = function () {
-	    function Navigator(options) {
-	        _classCallCheck(this, Navigator);
-	
-	        if (options) {
-	            this.install(options);
-	        }
-	    }
-	
-	    _createClass(Navigator, [{
-	        key: 'destroy',
-	        value: function destroy() {
-	
-	            if (!this.destroyed) {
-	                utils.removeElement(this.container);
-	                utils.destroy(this);
-	            }
-	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
-	
-	            this.options = utils.merge({}, defaults, options);
-	            this.paperScroll = this.options.paperScroll;
-	            this.paper = this.paperScroll.paper;
-	
-	            this.ensureElement();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            this.container = utils.createElement('div');
-	
-	            this.paper.wrap.appendChild(this.container);
-	
-	            utils.addClass(this.container, 'pane-navigator');
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return Navigator;
-	}();
-	
-	// exports
-	// -------
-	
-	exports.default = Navigator;
-
-/***/ },
-/* 88 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _utils = __webpack_require__(5);
-	
-	var utils = _interopRequireWildcard(_utils);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var defaults = {
-	    paper: null,
-	    distance: 0
-	};
-	
-	var Snaplines = function () {
-	    function Snaplines(options) {
-	        _classCallCheck(this, Snaplines);
-	
-	        if (options) {
-	            this.install(options);
-	        }
-	    }
-	
-	    _createClass(Snaplines, [{
-	        key: 'destroy',
-	        value: function destroy() {
-	
-	            if (!this.destroyed) {
-	                this.hide();
-	                utils.destroy(this);
-	            }
-	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
-	
-	            this.options = utils.merge({}, defaults, options);
-	            this.paper = this.options.paper;
-	
-	            this.ensureElement();
-	
-	            this.paper.on('cells:moving', this.onCellsMoving.bind(this));
-	            this.paper.on('cells:moveEnd', this.onCellsMoveEnd.bind(this));
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            this.hLine = utils.createElement('div');
-	            this.vLine = utils.createElement('div');
-	
-	            utils.addClass(this.hLine, 'pane-snapline horizontal');
-	            utils.addClass(this.vLine, 'pane-snapline vertical');
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'onCellsMoving',
-	        value: function onCellsMoving(cells, bounds) {
-	
-	            var previewCenter = bounds.getCenter();
-	            var previewOrigin = bounds.getOrigin();
-	            var previewCorner = bounds.getCorner();
-	
-	            this.vertical = null;
-	            this.horizontal = null;
-	
-	            this.hide();
-	
-	            this.paper.eachView(function (view) {
-	
-	                var cell = view.cell;
-	                if (!cell || !cell.isNode()) {
-	                    return;
-	                }
-	
-	                // if (cells.length === 1 && cell === cells[0]) {
-	                //    return;
-	                // }
-	
-	                var snapBBox = cell.getBBox();
-	                var snapCenter = snapBBox.getCenter();
-	                var snapOrigin = snapBBox.getOrigin();
-	                var snapCorner = snapBBox.getCorner();
-	
-	                this.check(previewCenter, snapCenter, bounds, snapBBox) || this.check(previewCenter, snapOrigin, bounds, snapBBox) || this.check(previewCenter, snapCorner, bounds, snapBBox) || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
-	                // || this.check(previewOrigin, snapCenter, bounds, snapBBox)
-	                 || this.check(previewOrigin, snapCorner, bounds, snapBBox) || this.check(previewCorner, snapOrigin, bounds, snapBBox)
-	                // || this.check(previewCorner, snapCenter, bounds, snapBBox)
-	                 || this.check(previewCorner, snapCorner, bounds, snapBBox);
-	            }, this);
-	
-	            this.show();
-	        }
-	    }, {
-	        key: 'onCellsMoveEnd',
-	        value: function onCellsMoveEnd() {
-	
-	            this.hide();
-	        }
-	    }, {
-	        key: 'check',
-	        value: function check(previewPoint, snapPoint, previewBBox, spanBBox) {
-	
-	            var distance = this.options.distance;
-	
-	            var vertical = this.vertical;
-	            var horizontal = this.horizontal;
-	
-	            // horizontal
-	            var diff = previewPoint.y - snapPoint.y;
-	            if (Math.abs(diff) <= distance) {
-	
-	                if (!horizontal) {
-	                    horizontal = this.horizontal = {
-	                        top: snapPoint.y,
-	                        left: previewBBox.x,
-	                        right: previewBBox.x + previewBBox.width
-	                    };
-	                }
-	
-	                horizontal.left = Math.min(horizontal.left, previewBBox.x, spanBBox.x);
-	                horizontal.right = Math.max(horizontal.right, previewBBox.x + previewBBox.width, spanBBox.x + spanBBox.width);
-	
-	                return true;
-	            }
-	
-	            // vertical
-	            diff = previewPoint.x - snapPoint.x;
-	            if (Math.abs(diff) <= distance) {
-	
-	                if (!vertical) {
-	                    vertical = this.vertical = {
-	                        left: snapPoint.x,
-	                        top: previewBBox.y,
-	                        bottom: previewBBox.y + previewBBox.height
-	                    };
-	                }
-	
-	                vertical.top = Math.min(vertical.top, previewBBox.y, spanBBox.y);
-	                vertical.bottom = Math.max(vertical.bottom, previewBBox.y + previewBBox.height, spanBBox.y + spanBBox.height);
-	
-	                return true;
-	            }
-	
-	            return false;
-	        }
-	    }, {
-	        key: 'hide',
-	        value: function hide() {
-	
-	            utils.removeElement(this.hLine);
-	            utils.removeElement(this.vLine);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'show',
-	        value: function show() {
-	
-	            var paper = this.paper;
-	            var rawPane = paper.rawPane;
-	
-	            var sx = paper.sx;
-	            var sy = paper.sy;
-	            var tx = paper.tx;
-	            var ty = paper.ty;
-	
-	            var vertical = this.vertical;
-	            var horizontal = this.horizontal;
-	
-	            if (vertical) {
-	
-	                utils.setStyle(this.vLine, {
-	                    left: Math.round(vertical.left * sx + tx) + 'px',
-	                    top: Math.round(vertical.top * sy + ty) + 'px',
-	                    height: Math.round((vertical.bottom - vertical.top) * sy) + 'px'
-	                });
-	
-	                rawPane.appendChild(this.vLine);
-	            }
-	
-	            if (horizontal) {
-	
-	                utils.setStyle(this.hLine, {
-	                    left: Math.round(horizontal.left * sx + tx) + 'px',
-	                    top: Math.round(horizontal.top * sy + ty) + 'px',
-	                    width: Math.round((horizontal.right - horizontal.left) * sx) + 'px'
-	                });
-	
-	                rawPane.appendChild(this.hLine);
-	            }
-	        }
-	    }]);
-	
-	    return Snaplines;
-	}();
-	
-	// exports
-	// -------
-	
-	exports.default = Snaplines;
-
-/***/ },
-/* 89 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
 	var _utils = __webpack_require__(5);
 	
@@ -16139,447 +15889,163 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _detector2 = _interopRequireDefault(_detector);
 	
+	var _Paper2 = __webpack_require__(57);
+	
+	var _Paper3 = _interopRequireDefault(_Paper2);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var defaults = {
-	    paper: null,
-	    space: 50,
-	    minWidth: 0,
-	    minHeight: 0
-	};
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	var PaperScroll = function () {
-	    function PaperScroll(options) {
-	        _classCallCheck(this, PaperScroll);
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	        if (options) {
-	            this.install(options);
-	        }
+	var HTMLPaper = function (_Paper) {
+	    _inherits(HTMLPaper, _Paper);
+	
+	    function HTMLPaper() {
+	        _classCallCheck(this, HTMLPaper);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(HTMLPaper).apply(this, arguments));
 	    }
 	
-	    _createClass(PaperScroll, [{
+	    _createClass(HTMLPaper, [{
+	        key: 'createPanes',
+	        value: function createPanes() {
+	
+	            _get(Object.getPrototypeOf(HTMLPaper.prototype), 'createPanes', this).call(this);
+	
+	            var htmlPane = utils.createElement('div');
+	
+	            utils.addClass(htmlPane, 'pane-html');
+	
+	            this.htmlPane = htmlPane;
+	            this.stage.appendChild(htmlPane);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setup',
+	        value: function setup() {
+	
+	            var htmlPane = this.htmlPane;
+	
+	            utils.addEventListener(htmlPane, 'contextmenu', this.onContextMenu.bind(this));
+	            utils.addEventListener(htmlPane, 'dblclick', this.onDblClick.bind(this));
+	            utils.addEventListener(htmlPane, 'click', this.onClick.bind(this));
+	            utils.addEventListener(htmlPane, 'mouseover', '.pane-node', this.onCellMouseOver.bind(this));
+	            utils.addEventListener(htmlPane, 'mouseout', '.pane-node', this.onCellMouseOut.bind(this));
+	            utils.addEventListener(htmlPane, _detector2.default.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	
+	            _get(Object.getPrototypeOf(HTMLPaper.prototype), 'setup', this).call(this);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'getContentBBox',
+	        value: function getContentBBox(withoutTransformations) {
+	
+	            var bbox = _get(Object.getPrototypeOf(HTMLPaper.prototype), 'getContentBBox', this).call(this, withoutTransformations);
+	            var bounds = null;
+	
+	            utils.forIn(this.getModel().cells, function (cell) {
+	                if (cell.isNode()) {
+	                    var rect = cell.getBBox();
+	                    if (rect) {
+	                        bounds = bounds ? bounds.union(rect) : rect;
+	                    }
+	                }
+	            });
+	
+	            if (!withoutTransformations && bounds) {
+	
+	                var screenCTM = this.viewport.getScreenCTM();
+	                var viewportCTM = this.viewport.getCTM();
+	
+	                var dx = viewportCTM.e - screenCTM.e;
+	                var dy = viewportCTM.f - screenCTM.f;
+	                var sx = viewportCTM.a;
+	                var sy = viewportCTM.d;
+	
+	                bounds.x = bounds.x * sx + dx;
+	                bounds.y = bounds.y * sy + dy;
+	                bounds.width *= sx;
+	                bounds.height *= sy;
+	            }
+	
+	            if (bounds) {
+	                bbox = bounds.union(bbox);
+	            }
+	
+	            return bbox;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate(tx, ty, relative) {
+	
+	            if (!utils.isNil(tx) && !utils.isNil(ty)) {
+	
+	                if (relative) {
+	                    tx += utils.isNil(this.tx) || 0;
+	                    ty += utils.isNil(this.ty) || 0;
+	                }
+	
+	                utils.setStyle(this.htmlPane, {
+	                    top: ty + 'px',
+	                    left: tx + 'px'
+	                });
+	
+	                _get(Object.getPrototypeOf(HTMLPaper.prototype), 'translate', this).call(this, tx, ty);
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'scale',
+	        value: function scale(sx, sy) {
+	            var ox = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	            var oy = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+	
+	
+	            sy = sy || sx;
+	
+	            if (sx && sy) {
+	
+	                utils.setStyle(this.htmlPane, {
+	                    transform: 'translate3d(0, 0, 0) scale3d(' + sx + ',' + sy + ', 1)'
+	                });
+	
+	                // utils.setStyle(this.htmlPane, {
+	                //     zoom: sx
+	                // });
+	
+	                _get(Object.getPrototypeOf(HTMLPaper.prototype), 'scale', this).call(this, sx, sy, ox, oy);
+	            }
+	
+	            return this;
+	        }
+	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
 	
-	            if (!this.destroyed) {
-	                utils.removeElement(this.scrollElem);
-	                utils.destroy(this);
-	            }
-	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
-	
-	            this.options = utils.merge({}, defaults, options);
-	            this.space = utils.normalizeSides(this.options.space);
-	            this.paper = this.options.paper;
-	
-	            var paper = this.paper;
-	
-	            // keep scale values for a quicker access
-	            this.sx = paper.sx;
-	            this.sy = paper.sy;
-	
-	            // keep the original canvas size
-	            this.baseWidth = paper.width;
-	            this.baseHeight = paper.height;
-	
-	            // init for next calculating
-	            this.scrollLeft = 0;
-	            this.scrollTop = 0;
-	
-	            paper.on('paper:scale', this.doScale, this);
-	            paper.on('paper:resize', this.doResize, this);
-	
-	            this.ensureElement();
-	            this.addScrollEvent();
-	
-	            this.doResize();
-	            this.adjustClientSize();
-	            this.adjustPadding();
-	            this.center();
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            var paper = this.paper;
-	            var scrollElem = utils.createElement('div');
-	
-	            this.scrollElem = scrollElem;
-	            this.scrollParent = paper.getWrap();
-	
-	            utils.addClass(scrollElem, 'pane-scroll');
-	
-	            this.scrollElem.appendChild(paper.getStage());
-	            this.scrollParent.appendChild(scrollElem);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'addScrollEvent',
-	        value: function addScrollEvent() {
-	            var _this = this;
-	
-	            if (!this.onScroll) {
-	                (function () {
-	
-	                    var that = _this;
-	
-	                    _this.onScroll = function () {
-	                        that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
-	                    };
-	                })();
-	            }
-	
-	            utils.addEventListener(this.scrollParent, 'scroll', this.onScroll);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeScrollEvent',
-	        value: function removeScrollEvent() {
-	
-	            utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'adjustClientSize',
-	        value: function adjustClientSize() {
-	
-	            var scrollBarWidth = utils.getScrollBarWidth();
-	            this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
-	            this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'adjustPadding',
-	        value: function adjustPadding(padding) {
-	
-	            if (padding) {
-	                padding = utils.normalizeSides(padding);
-	            } else {
-	
-	                var space = this.space;
-	                var clientWidth = this.clientWidth;
-	                var clientHeight = this.clientHeight;
-	
-	                padding = {
-	                    top: clientHeight - space.top,
-	                    right: clientWidth - space.right,
-	                    bottom: clientHeight - space.bottom,
-	                    left: clientWidth - space.left
-	                };
-	            }
-	
-	            this.padding = padding;
-	
-	            utils.setStyle(this.scrollElem, {
-	                paddingTop: padding.top + 'px',
-	                paddingRight: padding.right + 'px',
-	                paddingBottom: padding.bottom + 'px',
-	                paddingLeft: padding.left + 'px'
-	            });
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'adjustPaper',
-	        value: function adjustPaper() {
-	
-	            var paper = this.paper;
-	
-	            var sx = paper.sx;
-	            var sy = paper.sy;
-	
-	            var options = {
-	                frameWidth: this.baseWidth * sx,
-	                frameHeight: this.baseHeight * sy
-	            };
-	
-	            if (this.options.minWidth) {
-	                options.minWidth = this.options.minWidth * sx;
-	            }
-	
-	            if (this.options.minHeight) {
-	                options.minHeight = this.options.minHeight * sy;
-	            }
-	
-	            var tx = paper.tx;
-	            var ty = paper.ty;
-	
-	            if (paper.fitToContent(options)) {
-	
-	                var dLeft = paper.tx - tx;
-	                var dTop = paper.ty - ty;
-	
-	                if (dLeft !== 0 || dTop !== 0) {
-	                    this.doScroll(dLeft, dTop, { relative: true });
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'doScale',
-	        value: function doScale(sx, sy, ox, oy) {
-	
-	            this.sx = sx;
-	            this.sy = sy;
-	
-	            this.adjustPaper();
-	
-	            if (ox || oy) {
-	                this.center(ox, oy);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'doResize',
-	        value: function doResize() {
-	            var width = arguments.length <= 0 || arguments[0] === undefined ? this.baseWidth : arguments[0];
-	            var height = arguments.length <= 1 || arguments[1] === undefined ? this.baseHeight : arguments[1];
-	
-	
-	            utils.setStyle(this.scrollElem, {
-	                width: width + 'px',
-	                height: height + 'px'
-	            });
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'doScroll',
-	        value: function doScroll(scrollLeft, scrollTop) {
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            this.removeScrollEvent();
-	
-	            if (options.relative) {
-	                scrollLeft += this.scrollLeft;
-	                scrollTop += this.scrollTop;
-	            }
-	
-	            this.setScroll(scrollLeft, scrollTop);
-	
-	            this.scrollParent.scrollLeft = scrollLeft;
-	            this.scrollParent.scrollTop = scrollTop;
-	
-	            this.addScrollEvent();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'setScroll',
-	        value: function setScroll(scrollLeft, scrollTop) {
-	
-	            this.scrollLeft = scrollLeft;
-	            this.scrollTop = scrollTop;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'center',
-	        value: function center(x, y) {
-	
-	            // adjust the paper position so the point [x,y] is moved to the
-	            // center of scroll element. If no point given [x,y] equals to
-	            // center of the paper element.
-	
-	            var paper = this.paper;
-	
-	            var tx = paper.tx;
-	            var ty = paper.ty;
-	
-	            if (utils.isUndefined(x) || utils.isUndefined(y)) {
-	
-	                // the paper rectangle
-	                //   x1,y1 ---------
-	                //   |             |
-	                //   ----------- x2,y2
-	                var x1 = -tx; // translate x
-	                var y1 = -ty; // translate y
-	                var x2 = x1 + paper.width;
-	                var y2 = y1 + paper.height;
-	
-	                // get the center of the paper
-	                x = (x1 + x2) / 2;
-	                y = (y1 + y2) / 2;
-	            } else {
-	                // local coordinates to viewport coordinates
-	                x *= paper.sx; // scale x
-	                y *= paper.sy; // scale y
-	            }
-	
-	            var dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
-	            var dTop = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
-	
-	            this.doScroll(-dLeft, -dTop, { relative: true });
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'centerContent',
-	        value: function centerContent() {
-	
-	            var bound = this.paper.getContentBBox(true);
-	            this.center(bound.x + bound.width / 2, bound.y + bound.height / 2);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'toLocalPoint',
-	        value: function toLocalPoint(x, y) {
-	
-	            // return point that relative to the stage's left-top corner
-	            // x: x coordinate relative to the wrap
-	            // y: y coordinate relative to the wrap
-	
-	            var paper = this.paper;
-	            var padding = this.padding;
-	
-	            x += this.scrollLeft - padding.left - paper.tx;
-	            x /= paper.sx;
-	
-	            y += this.scrollTop - padding.top - paper.ty;
-	            y /= paper.sy;
-	
-	            return {
-	                x: Math.round(x),
-	                y: Math.round(y)
-	            };
-	        }
-	    }, {
-	        key: 'getCenter',
-	        value: function getCenter() {
-	
-	            return this.toLocalPoint(this.clientWidth / 2, this.clientHeight / 2);
-	        }
-	    }, {
-	        key: 'beforeZoom',
-	        value: function beforeZoom() {
-	
-	            if (_detector2.default.IS_IE) {
-	                // IE is trying to show every frame while we manipulate the paper.
-	                // That makes the viewport kind of jumping while zooming.
-	                utils.setStyle(this.elem, 'visibility', 'hidden');
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'afterZoom',
-	        value: function afterZoom() {
-	
-	            if (_detector2.default.IS_IE) {
-	                utils.setStyle(this.elem, 'visibility', '');
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'zoom',
-	        value: function zoom(value) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var sx = value;
-	            var sy = value;
-	
-	            if (!options.absolute) {
-	                sx += this.sx;
-	                sy += this.sy;
-	            }
-	
-	            var scaleGrid = options.scaleGrid;
-	            if (scaleGrid) {
-	                sx = utils.snapToGrid(sx, scaleGrid);
-	                sy = utils.snapToGrid(sy, scaleGrid);
-	            }
-	
-	            // check if the new scale won't exceed the given boundaries
-	            var minScale = options.minScale;
-	            var maxScale = options.maxScale;
-	
-	            sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
-	            sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
-	
-	            // the scale center
-	            var cx = options.cx;
-	            var cy = options.cy;
-	
-	            // if the scale center is not specified find
-	            // the center of the paper's visible area.
-	            if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
-	
-	                // the center of the container
-	                var center = this.getCenter();
-	
-	                cx = center.x;
-	                cy = center.y;
-	            } else {
-	
-	                cx = 800;
-	                cy = 600;
-	            }
-	
-	            var dLeft = cx * (sx - this.sx);
-	            var dTop = cy * (sy - this.sy);
-	
-	            this.beforeZoom();
-	            this.paper.scale(sx, sy);
-	            this.doScroll(dLeft, dTop, { relative: true });
-	            this.afterZoom();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'zoomToFit',
-	        value: function zoomToFit() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-	
-	            var paper = this.paper;
-	
-	            var x = paper.tx;
-	            var y = paper.ty;
-	
-	            var width = this.scrollParent.clientWidth;
-	            var height = this.scrollParent.clientHeight;
-	
-	            options.fittingBBox = options.fittingBBox || { x: x, y: y, width: width, height: height };
-	
-	            this.beforeZoom();
-	
-	            // scale the viewport
-	            paper.scaleContentToFit(options);
-	            // restore original origin
-	            paper.translate(x, y);
-	
-	            this.adjustPaper();
-	            this.centerContent();
-	
-	            this.afterZoom();
-	
-	            return this;
+	            utils.removeElement(this.htmlPane);
+	            _get(Object.getPrototypeOf(HTMLPaper.prototype), 'destroy', this).call(this);
 	        }
 	    }]);
 	
-	    return PaperScroll;
-	}();
+	    return HTMLPaper;
+	}(_Paper3.default);
 	
-	exports.default = PaperScroll;
+	// exports
+	// -------
+	
+	exports.default = HTMLPaper;
 
 /***/ },
-/* 90 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16598,9 +16064,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Portal3 = _interopRequireDefault(_Portal2);
 	
-	var _NodeView = __webpack_require__(91);
+	var _HTMLNodeView = __webpack_require__(89);
 	
-	var _NodeView2 = _interopRequireDefault(_NodeView);
+	var _HTMLNodeView2 = _interopRequireDefault(_HTMLNodeView);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -16612,16 +16078,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Node = function (_Portal) {
-	    _inherits(Node, _Portal);
+	var HTMLNode = function (_Portal) {
+	    _inherits(HTMLNode, _Portal);
 	
-	    function Node() {
-	        _classCallCheck(this, Node);
+	    function HTMLNode() {
+	        _classCallCheck(this, HTMLNode);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(HTMLNode).apply(this, arguments));
 	    }
 	
-	    _createClass(Node, [{
+	    _createClass(HTMLNode, [{
 	        key: 'isPortVisible',
 	        value: function isPortVisible(port) {
 	
@@ -16637,28 +16103,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return this.isPortVisible(port);
 	            }, this);
 	        }
+	    }, {
+	        key: 'getPortSelector',
+	        value: function getPortSelector(port, isInPort) {
+	            return this.getPortsWrapSelector(isInPort) + '>.pane-port[data-id="' + port.id + '"]';
+	        }
+	    }, {
+	        key: 'getPortsWrapSelector',
+	        value: function getPortsWrapSelector(isInPort) {
+	            return '.pane-ports.' + (isInPort ? 'in' : 'out');
+	        }
 	    }]);
 	
-	    return Node;
+	    return HTMLNode;
 	}(_Portal3.default);
 	
-	Node.setDefaults({
-	    tagName: 'g',
-	    pane: 'drawPane',
-	    view: _NodeView2.default,
-	    size: {
-	        width: 180,
-	        height: 30
-	    }
+	HTMLNode.setDefaults({
+	    tagName: 'div',
+	    pane: 'htmlPane',
+	    view: _HTMLNodeView2.default
 	});
 	
 	// exports
 	// -------
 	
-	exports.default = Node;
+	exports.default = HTMLNode;
 
 /***/ },
-/* 91 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16669,8 +16141,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-	
 	var _utils = __webpack_require__(5);
 	
 	var utils = _interopRequireWildcard(_utils);
@@ -16679,9 +16149,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Rect2 = _interopRequireDefault(_Rect);
 	
-	var _NodeView = __webpack_require__(29);
+	var _CellView2 = __webpack_require__(32);
 	
-	var _NodeView2 = _interopRequireDefault(_NodeView);
+	var _CellView3 = _interopRequireDefault(_CellView2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -16694,6 +16164,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var selectors = {
+	    scalable: '.pane-scalable',
+	    rotatable: '.pane-rotatable',
 	    content: '.pane-node-content',
 	    name: '.name',
 	    portList: '.pane-port-list',
@@ -16715,53 +16187,219 @@ return /******/ (function(modules) { // webpackBootstrap
 	    adsorbed: 'is-adsorbed'
 	};
 	
-	var NodeView = function (_BaseView) {
-	    _inherits(NodeView, _BaseView);
+	var HTMLNodeView = function (_CellView) {
+	    _inherits(HTMLNodeView, _CellView);
 	
-	    function NodeView() {
-	        _classCallCheck(this, NodeView);
+	    function HTMLNodeView() {
+	        _classCallCheck(this, HTMLNodeView);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(NodeView).apply(this, arguments));
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(HTMLNodeView).apply(this, arguments));
 	    }
 	
-	    _createClass(NodeView, [{
+	    _createClass(HTMLNodeView, [{
+	        key: 'render',
+	        value: function render() {
+	
+	            this.renderMarkup().renderPorts();
+	
+	            this.scalableNode = this.findOne(selectors.scalable);
+	            this.rotatableNode = this.findOne(selectors.rotatable);
+	
+	            this.update().resize().rotate().translate();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.elem = utils.createElement(this.cell.getTagName());
+	
+	            // attach cell's id to elem
+	            this.elem.cellId = this.cell.id;
+	
+	            var className = this.cell.getClassName();
+	            if (className) {
+	                utils.addClass(this.elem, className);
+	            }
+	
+	            var pane = this.getPane();
+	            if (pane) {
+	                pane.appendChild(this.elem);
+	            }
+	
+	            return this;
+	        }
+	    }, {
 	        key: 'renderMarkup',
 	        value: function renderMarkup() {
 	
-	            _get(Object.getPrototypeOf(NodeView.prototype), 'renderMarkup', this).call(this);
-	            this.renderPorts(true);
-	            this.renderPorts(false);
+	            var markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
+	
+	            this.elem.innerHTML = markup;
 	
 	            return this;
 	        }
 	    }, {
 	        key: 'renderPorts',
-	        value: function renderPorts(isInPort) {
+	        value: function renderPorts() {
 	            var _this2 = this;
 	
 	            var node = this.getCell();
-	            var ports = node.getVisiblePorts(isInPort);
-	            var count = ports.length;
+	            var inPorts = node.getVisiblePorts(true);
+	            var outPorts = node.getVisiblePorts(false);
+	            var markup = node.getPortMarkup();
 	
-	            if (count) {
+	            if (inPorts.length) {
+	                (function () {
 	
-	                var portListVel = this.getPortListVel(isInPort);
-	                if (portListVel) {
-	                    (function () {
+	                    var inPortsWrap = _this2.findOne(selectors.inPortList);
+	                    var width = 100 / (inPorts.length + 1);
 	
-	                        var markup = node.getPortMarkup();
-	                        var content = utils.map(ports, function (port) {
-	                            return this.compileMarkup(markup, port);
-	                        }, _this2).join('');
+	                    utils.forEach(inPorts, function (port, i) {
 	
-	                        portListVel.html(content);
+	                        var html = this.compileMarkup(markup, port);
 	
-	                        utils.forEach(portListVel.find(selectors.portWrap), function (vel) {
-	                            vel.css({ 'width': utils.toPercentage(1 / (count + 1), 2) });
-	                        });
-	                    })();
-	                }
+	                        $(html).css({ left: utils.toFixed(width * (i + 1), 4) + '%' }).appendTo(inPortsWrap);
+	                    }, _this2);
+	                })();
 	            }
+	
+	            if (outPorts.length) {
+	                (function () {
+	
+	                    var outPortsWrap = _this2.findOne(selectors.outPortList);
+	                    var width = 100 / (outPorts.length + 1);
+	
+	                    utils.forEach(outPorts, function (port, i) {
+	
+	                        var html = this.compileMarkup(markup, port);
+	
+	                        $(html).css({ left: utils.toFixed(width * (i + 1), 4) + '%' }).appendTo(outPortsWrap);
+	                    }, _this2);
+	                })();
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'find',
+	        value: function find(selector) {
+	
+	            return selector === '.' ? [this.elem] : this.elem.querySelectorAll(selector);
+	        }
+	    }, {
+	        key: 'findOne',
+	        value: function findOne(selector) {
+	
+	            return selector === '.' ? this.elem : this.elem.querySelector(selector);
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update(specifiedAttrs) {
+	
+	            utils.forIn(specifiedAttrs || this.cell.attrs, function (attrs, selector) {
+	
+	                var nodes = this.find(selector);
+	                if (!nodes.length) {
+	                    return;
+	                }
+	
+	                var specials = HTMLNodeView.specialAttributes.slice();
+	                var normal = {};
+	
+	                utils.forIn(attrs, function (value, key) {
+	                    if (!utils.contains(specials, key)) {
+	                        normal[key] = value;
+	                    }
+	                });
+	
+	                // set regular attributes
+	                if (!utils.isEmptyObject(normal)) {
+	                    utils.forEach(nodes, function (node) {
+	                        utils.forIn(normal, function (attrVal, attrName) {
+	                            utils.setAttribute(node, attrName, attrVal);
+	                        });
+	                    });
+	                }
+	
+	                if (!utils.isUndefined(attrs.style)) {
+	
+	                    if (utils.isString(attrs.style)) {
+	                        utils.forEach(nodes, function (node) {
+	                            utils.setAttribute(node, 'style', attrs.style);
+	                        });
+	                    } else if (utils.isObject(attrs.style)) {
+	                        utils.forEach(nodes, function (node) {
+	                            utils.forIn(attrs.style, function (val, name) {
+	                                node.style[name] = val;
+	                            });
+	                        });
+	                    }
+	                }
+	
+	                if (!utils.isUndefined(attrs.html)) {
+	                    utils.forEach(nodes, function (node) {
+	                        node.innerHTML = attrs.html || '';
+	                    });
+	                }
+	
+	                if (!utils.isUndefined(attrs.text)) {
+	                    utils.forEach(nodes, function (node) {
+	                        utils.emptyElement(node);
+	                        node.appendChild(document.createTextNode(attrs.text || ''));
+	                    });
+	                }
+	            }, this);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'resize',
+	        value: function resize() {
+	
+	            var scalable = this.scalableNode;
+	            if (!scalable) {
+	                return this;
+	            }
+	
+	            var width = scalable.clientWidth || scalable.offsetWidth || 1;
+	            var height = scalable.clientHeight || scalable.offsetHeight || 1;
+	
+	            var size = this.cell.getSize();
+	
+	            var sx = size.width / width;
+	            var sy = size.height / height;
+	
+	            sx = utils.toFixed(sx, 2);
+	            sy = utils.toFixed(sy, 2);
+	
+	            utils.setScale(scalable, sx, sy);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'rotate',
+	        value: function rotate() {
+	
+	            if (this.rotatableNode) {
+	
+	                var size = this.cell.getSize();
+	                var ox = size.width / 2;
+	                var oy = size.height / 2;
+	
+	                utils.setRotation(this.rotatableNode, this.cell.getRotation(), ox, oy);
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate() {
+	
+	            var position = this.cell.getPosition();
+	
+	            utils.setTranslate(this.elem, position.x, position.y);
 	
 	            return this;
 	        }
@@ -16787,60 +16425,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setPortConnected',
 	        value: function setPortConnected(port, isInPort, isConnected) {
 	
-	            var vel = this.getPortVel(port, isInPort);
-	            if (vel) {
-	                vel.toggleClass(classNames.connected, isConnected);
+	            var elem = this.getPortElem(port, isInPort);
+	            if (elem) {
+	                utils.toggleClass(elem, classNames.connected, isConnected);
 	            }
 	        }
 	    }, {
 	        key: 'setPortConnecting',
 	        value: function setPortConnecting(port, isInPort, isConnecting) {
 	
-	            var vel = this.getPortVel(port, isInPort);
-	            if (vel) {
-	                vel.toggleClass(classNames.connecting, isConnecting);
+	            var elem = this.getPortElem(port, isInPort);
+	            if (elem) {
+	                utils.toggleClass(elem, classNames.connecting, isConnecting);
 	            }
 	        }
 	    }, {
 	        key: 'setPortHighlight',
 	        value: function setPortHighlight(port, isInPort, isHighlighted) {
 	
-	            var vel = this.getPortVel(port, isInPort);
-	            if (vel) {
-	                vel.toggleClass(classNames.connectable, isHighlighted);
+	            var elem = this.getPortElem(port, isInPort);
+	            if (elem) {
+	                utils.toggleClass(elem, classNames.connectable, isHighlighted);
 	            }
 	
-	            var containerVel = this.findOne(selectors.content);
-	            if (containerVel) {
-	                containerVel.toggleClass(classNames.connectable, isHighlighted);
+	            var container = this.findOne(selectors.content);
+	            if (container) {
+	                utils.toggleClass(container, classNames.connectable, isHighlighted);
 	            }
 	        }
 	    }, {
 	        key: 'setPortAdsorbed',
 	        value: function setPortAdsorbed(port, isInPort, isAdsorbed) {
-	            var _this3 = this;
 	
-	            var vel = this.getPortVel(port, isInPort);
-	            if (vel) {
-	                (function () {
+	            var elem = this.getPortElem(port, isInPort);
 	
-	                    var magnet = vel.findOne(selectors.portMagnet);
-	                    if (magnet) {
-	                        magnet.toggleClass(classNames.adsorbed, isAdsorbed);
-	                    }
-	
-	                    if (isAdsorbed) {
-	
-	                        var selector = _this3.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
-	
-	                        utils.forEach(_this3.find(selector), function (item) {
-	                            if (!magnet || item.node !== magnet.node) {
-	                                item.removeClass(classNames.adsorbed);
-	                            }
-	                        });
-	                    }
-	                })();
-	            }
+	            elem = elem && elem.querySelector(selectors.portMagnet);
+	            elem && utils.toggleClass(elem, classNames.adsorbed, isAdsorbed);
 	        }
 	    }, {
 	        key: 'getBBox',
@@ -16857,9 +16477,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var bbox = this.cell.getBBox();
 	            var borderWidth = 0;
-	            var contentVel = this.findOne(selectors.content);
-	            if (contentVel) {
-	                borderWidth = utils.getComputedStyle(contentVel.node, 'border-width') - 1;
+	            var contentElem = this.findOne(selectors.content);
+	
+	            if (contentElem) {
+	                borderWidth = utils.getComputedStyle(contentElem, 'border-width') - 1;
 	            }
 	
 	            return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
@@ -16898,20 +16519,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return isInPort ? selectors.inPortList : selectors.outPortList;
 	        }
 	    }, {
-	        key: 'getPortListVel',
-	        value: function getPortListVel(isInPort) {
-	
-	            return this.findOne(this.getPortListSelector(isInPort));
-	        }
-	    }, {
-	        key: 'getPortsVel',
-	        value: function getPortsVel(isInPort) {
-	
-	            return this.find(this.getPortSelector(isInPort));
-	        }
-	    }, {
-	        key: 'getPortVel',
-	        value: function getPortVel(port, isInPort) {
+	        key: 'getPortElem',
+	        value: function getPortElem(port, isInPort) {
 	
 	            var node = this.getCell();
 	
@@ -16919,17 +16528,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                port = node.getPortById(port);
 	            }
 	
-	            var selector = this.getPortSelector(isInPort, port);
+	            var selector = this.getPortSelector(port, isInPort);
 	            if (selector) {
 	                return this.findOne(selector);
 	            }
-	        }
-	    }, {
-	        key: 'getPortElem',
-	        value: function getPortElem(port, isInPort) {
-	
-	            var portVel = this.getPortVel(port, isInPort);
-	            return portVel ? portVel.node : null;
 	        }
 	    }, {
 	        key: 'findPortElem',
@@ -16983,19 +16585,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'findPortByElem',
 	        value: function findPortByElem(elem) {
-	            var _this4 = this;
+	            var _this3 = this;
 	
 	            var result = null;
 	            var portElem = elem && this.findPortElem(elem);
 	
 	            if (portElem) {
 	                (function () {
-	                    var collection = _this4.isOutPortElem(portElem) ? _this4.cell.getOutPorts() : _this4.cell.getInPorts();
+	                    var collection = _this3.isOutPortElem(portElem) ? _this3.cell.getOutPorts() : _this3.cell.getInPorts();
 	
-	                    var portId = portElem.getAttribute('data-id');
+	                    var portId = utils.toInt(portElem.getAttribute('data-id'));
 	
 	                    utils.some(collection, function (port) {
-	                        if (utils.toString(port.id) === portId) {
+	                        if (port.id === portId) {
 	                            result = port;
 	                            return true;
 	                        }
@@ -17005,18 +16607,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return result;
 	        }
+	    }], [{
+	        key: 'specialAttributes',
+	        get: function get() {
+	
+	            return ['text', 'html', 'style'];
+	        }
 	    }]);
 	
-	    return NodeView;
-	}(_NodeView2.default);
+	    return HTMLNodeView;
+	}(_CellView3.default);
 	
 	// exports
 	// -------
 	
-	exports.default = NodeView;
+	exports.default = HTMLNodeView;
 
 /***/ },
-/* 92 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17031,7 +16639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Node3 = _interopRequireDefault(_Node2);
 	
-	var _HTMLSuperNodeView = __webpack_require__(93);
+	var _HTMLSuperNodeView = __webpack_require__(91);
 	
 	var _HTMLSuperNodeView2 = _interopRequireDefault(_HTMLSuperNodeView);
 	
@@ -17074,7 +16682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = HTMLSuperNode;
 
 /***/ },
-/* 93 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17483,6 +17091,297 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = HTMLNodeView;
 
 /***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var defaults = {
+	    paperScroll: null,
+	    distance: 0
+	};
+	
+	var Navigator = function () {
+	    function Navigator(options) {
+	        _classCallCheck(this, Navigator);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(Navigator, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                utils.removeElement(this.container);
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.paperScroll = this.options.paperScroll;
+	            this.paper = this.paperScroll.paper;
+	
+	            this.ensureElement();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.container = utils.createElement('div');
+	
+	            this.paper.wrap.appendChild(this.container);
+	
+	            utils.addClass(this.container, 'pane-navigator');
+	
+	            return this;
+	        }
+	    }]);
+	
+	    return Navigator;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Navigator;
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var defaults = {
+	    paper: null,
+	    distance: 0
+	};
+	
+	var Snaplines = function () {
+	    function Snaplines(options) {
+	        _classCallCheck(this, Snaplines);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(Snaplines, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                this.hide();
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.paper = this.options.paper;
+	
+	            this.ensureElement();
+	
+	            this.paper.on('cells:moving', this.onCellsMoving.bind(this));
+	            this.paper.on('cells:moveEnd', this.onCellsMoveEnd.bind(this));
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.hLine = utils.createElement('div');
+	            this.vLine = utils.createElement('div');
+	
+	            utils.addClass(this.hLine, 'pane-snapline horizontal');
+	            utils.addClass(this.vLine, 'pane-snapline vertical');
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'onCellsMoving',
+	        value: function onCellsMoving(cells, bounds) {
+	
+	            var previewCenter = bounds.getCenter();
+	            var previewOrigin = bounds.getOrigin();
+	            var previewCorner = bounds.getCorner();
+	
+	            this.vertical = null;
+	            this.horizontal = null;
+	
+	            this.hide();
+	
+	            this.paper.eachView(function (view) {
+	
+	                var cell = view.cell;
+	                if (!cell || !cell.isNode()) {
+	                    return;
+	                }
+	
+	                // if (cells.length === 1 && cell === cells[0]) {
+	                //    return;
+	                // }
+	
+	                var snapBBox = cell.getBBox();
+	                var snapCenter = snapBBox.getCenter();
+	                var snapOrigin = snapBBox.getOrigin();
+	                var snapCorner = snapBBox.getCorner();
+	
+	                this.check(previewCenter, snapCenter, bounds, snapBBox) || this.check(previewCenter, snapOrigin, bounds, snapBBox) || this.check(previewCenter, snapCorner, bounds, snapBBox) || this.check(previewOrigin, snapOrigin, bounds, snapBBox)
+	                // || this.check(previewOrigin, snapCenter, bounds, snapBBox)
+	                 || this.check(previewOrigin, snapCorner, bounds, snapBBox) || this.check(previewCorner, snapOrigin, bounds, snapBBox)
+	                // || this.check(previewCorner, snapCenter, bounds, snapBBox)
+	                 || this.check(previewCorner, snapCorner, bounds, snapBBox);
+	            }, this);
+	
+	            this.show();
+	        }
+	    }, {
+	        key: 'onCellsMoveEnd',
+	        value: function onCellsMoveEnd() {
+	
+	            this.hide();
+	        }
+	    }, {
+	        key: 'check',
+	        value: function check(previewPoint, snapPoint, previewBBox, spanBBox) {
+	
+	            var distance = this.options.distance;
+	
+	            var vertical = this.vertical;
+	            var horizontal = this.horizontal;
+	
+	            // horizontal
+	            var diff = previewPoint.y - snapPoint.y;
+	            if (Math.abs(diff) <= distance) {
+	
+	                if (!horizontal) {
+	                    horizontal = this.horizontal = {
+	                        top: snapPoint.y,
+	                        left: previewBBox.x,
+	                        right: previewBBox.x + previewBBox.width
+	                    };
+	                }
+	
+	                horizontal.left = Math.min(horizontal.left, previewBBox.x, spanBBox.x);
+	                horizontal.right = Math.max(horizontal.right, previewBBox.x + previewBBox.width, spanBBox.x + spanBBox.width);
+	
+	                return true;
+	            }
+	
+	            // vertical
+	            diff = previewPoint.x - snapPoint.x;
+	            if (Math.abs(diff) <= distance) {
+	
+	                if (!vertical) {
+	                    vertical = this.vertical = {
+	                        left: snapPoint.x,
+	                        top: previewBBox.y,
+	                        bottom: previewBBox.y + previewBBox.height
+	                    };
+	                }
+	
+	                vertical.top = Math.min(vertical.top, previewBBox.y, spanBBox.y);
+	                vertical.bottom = Math.max(vertical.bottom, previewBBox.y + previewBBox.height, spanBBox.y + spanBBox.height);
+	
+	                return true;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'hide',
+	        value: function hide() {
+	
+	            utils.removeElement(this.hLine);
+	            utils.removeElement(this.vLine);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'show',
+	        value: function show() {
+	
+	            var paper = this.paper;
+	            var rawPane = paper.rawPane;
+	
+	            var sx = paper.sx;
+	            var sy = paper.sy;
+	            var tx = paper.tx;
+	            var ty = paper.ty;
+	
+	            var vertical = this.vertical;
+	            var horizontal = this.horizontal;
+	
+	            if (vertical) {
+	
+	                utils.setStyle(this.vLine, {
+	                    left: Math.round(vertical.left * sx + tx) + 'px',
+	                    top: Math.round(vertical.top * sy + ty) + 'px',
+	                    height: Math.round((vertical.bottom - vertical.top) * sy) + 'px'
+	                });
+	
+	                rawPane.appendChild(this.vLine);
+	            }
+	
+	            if (horizontal) {
+	
+	                utils.setStyle(this.hLine, {
+	                    left: Math.round(horizontal.left * sx + tx) + 'px',
+	                    top: Math.round(horizontal.top * sy + ty) + 'px',
+	                    width: Math.round((horizontal.right - horizontal.left) * sx) + 'px'
+	                });
+	
+	                rawPane.appendChild(this.hLine);
+	            }
+	        }
+	    }]);
+	
+	    return Snaplines;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = Snaplines;
+
+/***/ },
 /* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -17493,6 +17392,1325 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _detector = __webpack_require__(15);
+	
+	var _detector2 = _interopRequireDefault(_detector);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var defaults = {
+	    paper: null,
+	    space: 50,
+	    minWidth: 0,
+	    minHeight: 0
+	};
+	
+	var PaperScroll = function () {
+	    function PaperScroll(options) {
+	        _classCallCheck(this, PaperScroll);
+	
+	        if (options) {
+	            this.install(options);
+	        }
+	    }
+	
+	    _createClass(PaperScroll, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            if (!this.destroyed) {
+	                utils.removeElement(this.scrollElem);
+	                utils.destroy(this);
+	            }
+	        }
+	    }, {
+	        key: 'install',
+	        value: function install(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	            this.space = utils.normalizeSides(this.options.space);
+	            this.paper = this.options.paper;
+	
+	            var paper = this.paper;
+	
+	            // save scale for quick accessing
+	            this.sx = paper.sx;
+	            this.sy = paper.sy;
+	
+	            // save the original canvas size
+	            this.baseWidth = paper.width;
+	            this.baseHeight = paper.height;
+	
+	            // init for next calculating
+	            this.scrollLeft = 0;
+	            this.scrollTop = 0;
+	            this.stageLevel = 0;
+	            this.stageScrollLeft = 0;
+	            this.stageScrollTop = 0;
+	
+	            paper.on('paper:scale', this.doScale, this);
+	            paper.on('paper:resize', this.doResize, this);
+	
+	            this.ensureElement();
+	            this.addScrollEvent();
+	
+	            this.doResize();
+	            this.adjustClientSize();
+	            this.adjustPadding();
+	            this.center();
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            var paper = this.paper;
+	            var scrollElem = utils.createElement('div');
+	
+	            this.scrollElem = scrollElem;
+	            this.scrollParent = paper.getWrap();
+	
+	            utils.addClass(scrollElem, 'pane-scroll');
+	
+	            this.scrollElem.appendChild(paper.getStage());
+	            this.scrollParent.appendChild(scrollElem);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'addScrollEvent',
+	        value: function addScrollEvent() {
+	            var _this = this;
+	
+	            if (!this.onScroll) {
+	                (function () {
+	
+	                    var that = _this;
+	
+	                    that.onScroll = function () {
+	                        that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
+	                    };
+	                })();
+	            }
+	
+	            utils.addEventListener(this.scrollParent, 'scroll', this.onScroll);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'removeScrollEvent',
+	        value: function removeScrollEvent() {
+	
+	            utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'adjustClientSize',
+	        value: function adjustClientSize() {
+	
+	            var scrollBarWidth = utils.getScrollBarWidth();
+	            this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
+	            this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'adjustPadding',
+	        value: function adjustPadding(padding) {
+	
+	            if (padding) {
+	                padding = utils.normalizeSides(padding);
+	            } else {
+	
+	                var space = this.space;
+	                var clientWidth = this.clientWidth;
+	                var clientHeight = this.clientHeight;
+	
+	                padding = {
+	                    top: clientHeight - space.top,
+	                    right: clientWidth - space.right,
+	                    bottom: clientHeight - space.bottom,
+	                    left: clientWidth - space.left
+	                };
+	            }
+	
+	            this.padding = padding;
+	
+	            utils.setStyle(this.scrollElem, {
+	                paddingTop: padding.top + 'px',
+	                paddingRight: padding.right + 'px',
+	                paddingBottom: padding.bottom + 'px',
+	                paddingLeft: padding.left + 'px'
+	            });
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'adjustPaper',
+	        value: function adjustPaper() {
+	
+	            var paper = this.paper;
+	
+	            var sx = paper.sx;
+	            var sy = paper.sy;
+	
+	            var options = {
+	                frameWidth: this.baseWidth * sx,
+	                frameHeight: this.baseHeight * sy
+	            };
+	
+	            if (this.options.minWidth) {
+	                options.minWidth = this.options.minWidth * sx;
+	            }
+	
+	            if (this.options.minHeight) {
+	                options.minHeight = this.options.minHeight * sy;
+	            }
+	
+	            var tx = paper.tx;
+	            var ty = paper.ty;
+	
+	            if (paper.fitToContent(options)) {
+	
+	                var dLeft = paper.tx - tx;
+	                var dTop = paper.ty - ty;
+	
+	                if (dLeft !== 0 || dTop !== 0) {
+	
+	                    this.increaseStage();
+	                    this.stageScroll(dLeft, dTop, { relative: true });
+	                    this.decreaseStage();
+	                }
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'doScale',
+	        value: function doScale(sx, sy, ox, oy) {
+	
+	            this.sx = sx;
+	            this.sy = sy;
+	
+	            this.adjustPaper();
+	
+	            if (ox || oy) {
+	                this.center(ox, oy);
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'doResize',
+	        value: function doResize() {
+	            var width = arguments.length <= 0 || arguments[0] === undefined ? this.baseWidth : arguments[0];
+	            var height = arguments.length <= 1 || arguments[1] === undefined ? this.baseHeight : arguments[1];
+	
+	
+	            utils.setStyle(this.scrollElem, {
+	                width: width + 'px',
+	                height: height + 'px'
+	            });
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'applyScroll',
+	        value: function applyScroll() {
+	            var scrollLeft = arguments.length <= 0 || arguments[0] === undefined ? this.stageScrollLeft : arguments[0];
+	            var scrollTop = arguments.length <= 1 || arguments[1] === undefined ? this.stageScrollTop : arguments[1];
+	
+	
+	            this.removeScrollEvent();
+	
+	            this.scrollParent.scrollLeft = scrollLeft;
+	            this.scrollParent.scrollTop = scrollTop;
+	
+	            this.setScroll(this.stageScrollLeft, this.stageScrollTop);
+	            this.addScrollEvent();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setScroll',
+	        value: function setScroll(scrollLeft, scrollTop) {
+	
+	            // save current scroll
+	            this.scrollLeft = scrollLeft;
+	            this.scrollTop = scrollTop;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'stageScroll',
+	        value: function stageScroll(scrollLeft, scrollTop) {
+	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	            if (options.relative) {
+	                this.stageScrollLeft += scrollLeft;
+	                this.stageScrollTop += scrollTop;
+	            } else {
+	                this.stageScrollLeft = scrollLeft;
+	                this.stageScrollTop = scrollTop;
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'increaseStage',
+	        value: function increaseStage() {
+	
+	            this.stageLevel += 1;
+	
+	            if (this.stageLevel === 1) {
+	                this.stageScrollLeft = this.scrollLeft;
+	                this.stageScrollTop = this.scrollTop;
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'decreaseStage',
+	        value: function decreaseStage() {
+	
+	            this.stageLevel -= 1;
+	
+	            if (this.stageLevel === 0) {
+	
+	                this.applyScroll();
+	
+	                this.stageScrollLeft = 0;
+	                this.stageScrollTop = 0;
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'center',
+	        value: function center(x, y) {
+	
+	            // adjust the paper position so the point [x,y] is moved to the
+	            // center of scroll element. If no point given [x,y] equals to
+	            // center of the paper element.
+	
+	            var paper = this.paper;
+	
+	            var tx = paper.tx;
+	            var ty = paper.ty;
+	
+	            if (utils.isUndefined(x) || utils.isUndefined(y)) {
+	
+	                // the paper rectangle
+	                //   x1,y1 ---------
+	                //   |             |
+	                //   ----------- x2,y2
+	                var x1 = -tx; // translate x
+	                var y1 = -ty; // translate y
+	                var x2 = x1 + paper.width;
+	                var y2 = y1 + paper.height;
+	
+	                // get the center of the paper
+	                x = (x1 + x2) / 2;
+	                y = (y1 + y2) / 2;
+	            } else {
+	                // local coordinates to viewport coordinates
+	                x *= paper.sx; // scale x
+	                y *= paper.sy; // scale y
+	            }
+	
+	            var dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
+	            var dTop = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
+	
+	            this.increaseStage();
+	            this.stageScroll(-dLeft, -dTop, { relative: true });
+	            this.decreaseStage();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'centerContent',
+	        value: function centerContent() {
+	
+	            var bound = this.paper.getContentBBox(true);
+	            this.center(bound.x + bound.width / 2, bound.y + bound.height / 2);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'toLocalPoint',
+	        value: function toLocalPoint(x, y) {
+	
+	            // return point that relative to the stage's left-top corner
+	            // x: x coordinate relative to the wrap
+	            // y: y coordinate relative to the wrap
+	
+	            var paper = this.paper;
+	            var padding = this.padding;
+	
+	            x += this.scrollLeft - padding.left - paper.tx;
+	            x /= paper.sx;
+	
+	            y += this.scrollTop - padding.top - paper.ty;
+	            y /= paper.sy;
+	
+	            return {
+	                x: Math.round(x),
+	                y: Math.round(y)
+	            };
+	        }
+	    }, {
+	        key: 'getCenter',
+	        value: function getCenter() {
+	
+	            return this.toLocalPoint(this.clientWidth / 2, this.clientHeight / 2);
+	        }
+	    }, {
+	        key: 'beforeZoom',
+	        value: function beforeZoom() {
+	
+	            if (_detector2.default.IS_IE) {
+	                // IE is trying to show every frame while we manipulate the paper.
+	                // That makes the viewport kind of jumping while zooming.
+	                utils.setStyle(this.elem, 'visibility', 'hidden');
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'afterZoom',
+	        value: function afterZoom() {
+	
+	            if (_detector2.default.IS_IE) {
+	                utils.setStyle(this.elem, 'visibility', '');
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'zoom',
+	        value: function zoom(value) {
+	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	            var sx = value;
+	            var sy = value;
+	
+	            if (!options.absolute) {
+	                sx += this.sx;
+	                sy += this.sy;
+	            }
+	
+	            var scaleGrid = options.scaleGrid;
+	            if (scaleGrid) {
+	                sx = utils.snapToGrid(sx, scaleGrid);
+	                sy = utils.snapToGrid(sy, scaleGrid);
+	            }
+	
+	            // check if the new scale won't exceed the given boundaries
+	            var minScale = options.minScale;
+	            var maxScale = options.maxScale;
+	
+	            sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
+	            sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
+	
+	            // the scale center
+	            var cx = options.cx;
+	            var cy = options.cy;
+	
+	            // if the scale center is not specified find
+	            // the center of the paper's visible area.
+	            if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
+	
+	                // the center of the container
+	                var center = this.getCenter();
+	
+	                cx = center.x;
+	                cy = center.y;
+	            }
+	
+	            var dLeft = cx * (sx - this.sx);
+	            var dTop = cy * (sy - this.sy);
+	
+	            this.beforeZoom();
+	            this.increaseStage();
+	
+	            this.paper.scale(sx, sy);
+	            this.stageScroll(dLeft, dTop, { relative: true });
+	
+	            this.decreaseStage();
+	            this.afterZoom();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'zoomToFit',
+	        value: function zoomToFit() {
+	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	            var paper = this.paper;
+	
+	            var x = paper.tx;
+	            var y = paper.ty;
+	
+	            var width = this.scrollParent.clientWidth;
+	            var height = this.scrollParent.clientHeight;
+	
+	            options.fittingBBox = options.fittingBBox || { x: x, y: y, width: width, height: height };
+	
+	            this.beforeZoom();
+	
+	            // scale the viewport
+	            paper.scaleContentToFit(options);
+	            // restore original origin
+	            paper.translate(x, y);
+	
+	            this.adjustPaper();
+	            this.centerContent();
+	
+	            this.afterZoom();
+	
+	            return this;
+	        }
+	    }]);
+	
+	    return PaperScroll;
+	}();
+	
+	// exports
+	// -------
+	
+	exports.default = PaperScroll;
+
+/***/ },
+/* 95 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Portal2 = __webpack_require__(25);
+	
+	var _Portal3 = _interopRequireDefault(_Portal2);
+	
+	var _NodeView = __webpack_require__(96);
+	
+	var _NodeView2 = _interopRequireDefault(_NodeView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Node = function (_Portal) {
+	    _inherits(Node, _Portal);
+	
+	    function Node() {
+	        _classCallCheck(this, Node);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
+	    }
+	
+	    _createClass(Node, [{
+	        key: 'isPortVisible',
+	        value: function isPortVisible(port) {
+	
+	            return port.displayType !== 'hide';
+	        }
+	    }, {
+	        key: 'getVisiblePorts',
+	        value: function getVisiblePorts(isInPort) {
+	
+	            var ports = isInPort ? this.getInPorts() : this.getOutPorts();
+	
+	            return utils.filter(ports, function (port) {
+	                return this.isPortVisible(port);
+	            }, this);
+	        }
+	    }]);
+	
+	    return Node;
+	}(_Portal3.default);
+	
+	Node.setDefaults({
+	    tagName: 'g',
+	    pane: 'drawPane',
+	    view: _NodeView2.default,
+	    size: {
+	        width: 180,
+	        height: 30
+	    }
+	});
+	
+	// exports
+	// -------
+	
+	exports.default = Node;
+
+/***/ },
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Rect = __webpack_require__(4);
+	
+	var _Rect2 = _interopRequireDefault(_Rect);
+	
+	var _NodeView = __webpack_require__(29);
+	
+	var _NodeView2 = _interopRequireDefault(_NodeView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var selectors = {
+	    content: '.pane-node-content',
+	    name: '.name',
+	    portList: '.pane-port-list',
+	    inPortList: '.pane-port-list.in',
+	    outPortList: '.pane-port-list.out',
+	    portWrap: '.pane-port-wrap',
+	    portItem: '.pane-port',
+	    portMagnet: '.port-magnet',
+	    portAdsorb: '.is-adsorbed'
+	};
+	
+	var classNames = {
+	    portItem: 'pane-port',
+	    inPortList: 'pane-port-list in',
+	    outPortList: 'pane-port-list out',
+	    connected: 'is-connected',
+	    connecting: 'is-connecting',
+	    connectable: 'is-connectable',
+	    adsorbed: 'is-adsorbed'
+	};
+	
+	var NodeView = function (_BaseView) {
+	    _inherits(NodeView, _BaseView);
+	
+	    function NodeView() {
+	        _classCallCheck(this, NodeView);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(NodeView).apply(this, arguments));
+	    }
+	
+	    _createClass(NodeView, [{
+	        key: 'renderMarkup',
+	        value: function renderMarkup() {
+	
+	            _get(Object.getPrototypeOf(NodeView.prototype), 'renderMarkup', this).call(this);
+	            this.renderPorts(true);
+	            this.renderPorts(false);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'renderPorts',
+	        value: function renderPorts(isInPort) {
+	            var _this2 = this;
+	
+	            var node = this.getCell();
+	            var ports = node.getVisiblePorts(isInPort);
+	            var count = ports.length;
+	
+	            if (count) {
+	
+	                var portListVel = this.getPortListVel(isInPort);
+	                if (portListVel) {
+	                    (function () {
+	
+	                        var markup = node.getPortMarkup();
+	                        var content = utils.map(ports, function (port) {
+	                            return this.compileMarkup(markup, port);
+	                        }, _this2).join('');
+	
+	                        portListVel.html(content);
+	
+	                        utils.forEach(portListVel.find(selectors.portWrap), function (vel) {
+	                            vel.css({ 'width': utils.toPercentage(1 / (count + 1), 2) });
+	                        });
+	                    })();
+	                }
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setNodeName',
+	        value: function setNodeName(name) {
+	
+	            var node = this.getCell();
+	
+	            if (node.data) {
+	                node.data.name = name;
+	            }
+	
+	            var vName = this.findOne(selectors.name);
+	            if (vName) {
+	                vName.empty();
+	                vName.append(document.createTextNode(name));
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setPortConnected',
+	        value: function setPortConnected(port, isInPort, isConnected) {
+	
+	            var vel = this.getPortVel(port, isInPort);
+	            if (vel) {
+	                vel.toggleClass(classNames.connected, isConnected);
+	            }
+	        }
+	    }, {
+	        key: 'setPortConnecting',
+	        value: function setPortConnecting(port, isInPort, isConnecting) {
+	
+	            var vel = this.getPortVel(port, isInPort);
+	            if (vel) {
+	                vel.toggleClass(classNames.connecting, isConnecting);
+	            }
+	        }
+	    }, {
+	        key: 'setPortHighlight',
+	        value: function setPortHighlight(port, isInPort, isHighlighted) {
+	
+	            var vel = this.getPortVel(port, isInPort);
+	            if (vel) {
+	                vel.toggleClass(classNames.connectable, isHighlighted);
+	            }
+	
+	            var containerVel = this.findOne(selectors.content);
+	            if (containerVel) {
+	                containerVel.toggleClass(classNames.connectable, isHighlighted);
+	            }
+	        }
+	    }, {
+	        key: 'setPortAdsorbed',
+	        value: function setPortAdsorbed(port, isInPort, isAdsorbed) {
+	            var _this3 = this;
+	
+	            var vel = this.getPortVel(port, isInPort);
+	            if (vel) {
+	                (function () {
+	
+	                    var magnet = vel.findOne(selectors.portMagnet);
+	                    if (magnet) {
+	                        magnet.toggleClass(classNames.adsorbed, isAdsorbed);
+	                    }
+	
+	                    if (isAdsorbed) {
+	
+	                        var selector = _this3.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
+	
+	                        utils.forEach(_this3.find(selector), function (item) {
+	                            if (!magnet || item.node !== magnet.node) {
+	                                item.removeClass(classNames.adsorbed);
+	                            }
+	                        });
+	                    }
+	                })();
+	            }
+	        }
+	    }, {
+	        key: 'getBBox',
+	        value: function getBBox() {
+	
+	            var bounds = utils.getBounds(this.elem);
+	            if (bounds) {
+	                return new _Rect2.default(bounds.left, bounds.top, bounds.width, bounds.height);
+	            }
+	        }
+	    }, {
+	        key: 'getStrokedBBox',
+	        value: function getStrokedBBox() {
+	
+	            var bbox = this.cell.getBBox();
+	            var borderWidth = 0;
+	            var contentVel = this.findOne(selectors.content);
+	            if (contentVel) {
+	                borderWidth = utils.getComputedStyle(contentVel.node, 'border-width') - 1;
+	            }
+	
+	            return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+	        }
+	    }, {
+	        key: 'getPortBodyBBox',
+	        value: function getPortBodyBBox(port, isInPort) {
+	
+	            var elem = this.getPortElem(port, isInPort);
+	            if (elem) {
+	                var bounds = utils.getBounds(elem);
+	                return this.getPaper().toLocalRect({
+	                    x: bounds.left,
+	                    y: bounds.top,
+	                    width: bounds.width,
+	                    height: bounds.height
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'getPortSelector',
+	        value: function getPortSelector(isInPort, port) {
+	
+	            var selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
+	
+	            if (port) {
+	                selector += '[data-id="' + port.id + '"]';
+	            }
+	
+	            return selector;
+	        }
+	    }, {
+	        key: 'getPortListSelector',
+	        value: function getPortListSelector(isInPort) {
+	
+	            return isInPort ? selectors.inPortList : selectors.outPortList;
+	        }
+	    }, {
+	        key: 'getPortListVel',
+	        value: function getPortListVel(isInPort) {
+	
+	            return this.findOne(this.getPortListSelector(isInPort));
+	        }
+	    }, {
+	        key: 'getPortsVel',
+	        value: function getPortsVel(isInPort) {
+	
+	            return this.find(this.getPortSelector(isInPort));
+	        }
+	    }, {
+	        key: 'getPortVel',
+	        value: function getPortVel(port, isInPort) {
+	
+	            var node = this.getCell();
+	
+	            if (!utils.isObject(port)) {
+	                port = node.getPortById(port);
+	            }
+	
+	            var selector = this.getPortSelector(isInPort, port);
+	            if (selector) {
+	                return this.findOne(selector);
+	            }
+	        }
+	    }, {
+	        key: 'getPortElem',
+	        value: function getPortElem(port, isInPort) {
+	
+	            var portVel = this.getPortVel(port, isInPort);
+	            return portVel ? portVel.node : null;
+	        }
+	    }, {
+	        key: 'findPortElem',
+	        value: function findPortElem(elem) {
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, classNames.portItem)) {
+	                    return elem;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return null;
+	        }
+	    }, {
+	        key: 'isPortElem',
+	        value: function isPortElem(elem) {
+	
+	            return this.findPortElem(elem) ? true : false;
+	        }
+	    }, {
+	        key: 'isOutPortElem',
+	        value: function isOutPortElem(elem) {
+	
+	            elem = this.findPortElem(elem);
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, classNames.outPortList)) {
+	                    return true;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'isInPortElem',
+	        value: function isInPortElem(elem) {
+	
+	            elem = this.findPortElem(elem);
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, classNames.inPortList)) {
+	                    return true;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'findPortByElem',
+	        value: function findPortByElem(elem) {
+	            var _this4 = this;
+	
+	            var result = null;
+	            var portElem = elem && this.findPortElem(elem);
+	
+	            if (portElem) {
+	                (function () {
+	                    var collection = _this4.isOutPortElem(portElem) ? _this4.cell.getOutPorts() : _this4.cell.getInPorts();
+	
+	                    var portId = portElem.getAttribute('data-id');
+	
+	                    utils.some(collection, function (port) {
+	                        if (utils.toString(port.id) === portId) {
+	                            result = port;
+	                            return true;
+	                        }
+	                    });
+	                })();
+	            }
+	
+	            return result;
+	        }
+	    }]);
+	
+	    return NodeView;
+	}(_NodeView2.default);
+	
+	// exports
+	// -------
+	
+	exports.default = NodeView;
+
+/***/ },
+/* 97 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Node2 = __webpack_require__(3);
+	
+	var _Node3 = _interopRequireDefault(_Node2);
+	
+	var _SuperNodeView = __webpack_require__(98);
+	
+	var _SuperNodeView2 = _interopRequireDefault(_SuperNodeView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var HTMLSuperNode = function (_Node) {
+	    _inherits(HTMLSuperNode, _Node);
+	
+	    function HTMLSuperNode() {
+	        _classCallCheck(this, HTMLSuperNode);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(HTMLSuperNode).apply(this, arguments));
+	    }
+	
+	    _createClass(HTMLSuperNode, [{
+	        key: 'isSuperNode',
+	        value: function isSuperNode() {
+	            return true;
+	        }
+	    }]);
+	
+	    return HTMLSuperNode;
+	}(_Node3.default);
+	
+	HTMLSuperNode.setDefaults({
+	    tagName: 'g',
+	    pane: 'backgroundPane',
+	    view: _SuperNodeView2.default
+	});
+	
+	// exports
+	// -------
+	
+	exports.default = HTMLSuperNode;
+
+/***/ },
+/* 98 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _vector = __webpack_require__(27);
+	
+	var _vector2 = _interopRequireDefault(_vector);
+	
+	var _Rect = __webpack_require__(4);
+	
+	var _Rect2 = _interopRequireDefault(_Rect);
+	
+	var _CellView2 = __webpack_require__(32);
+	
+	var _CellView3 = _interopRequireDefault(_CellView2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var HTMLNodeView = function (_CellView) {
+	    _inherits(HTMLNodeView, _CellView);
+	
+	    function HTMLNodeView() {
+	        _classCallCheck(this, HTMLNodeView);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(HTMLNodeView).apply(this, arguments));
+	    }
+	
+	    _createClass(HTMLNodeView, [{
+	        key: 'render',
+	        value: function render() {
+	
+	            this.renderMarkup();
+	
+	            this.scalableNode = this.findOne('.pane-scalable');
+	
+	            this.resize().translate();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'ensureElement',
+	        value: function ensureElement() {
+	
+	            this.vel = (0, _vector2.default)(this.cell.getTagName(), {
+	                'class': this.cell.getClassName()
+	            });
+	            this.elem = this.vel.node;
+	
+	            // attach cell's id to elem
+	            this.elem.cellId = this.cell.id;
+	
+	            var pane = this.getPane();
+	            if (pane) {
+	                pane.appendChild(this.elem);
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'renderMarkup',
+	        value: function renderMarkup() {
+	
+	            var markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
+	
+	            this.elem.innerHTML = markup;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'find',
+	        value: function find(selector) {
+	
+	            return selector === '.' ? [this.vel] : this.vel.find(selector);
+	        }
+	    }, {
+	        key: 'findOne',
+	        value: function findOne(selector) {
+	
+	            return selector === '.' ? this.vel : this.vel.findOne(selector);
+	        }
+	    }, {
+	        key: 'resize',
+	        value: function resize() {
+	
+	            var scalableNode = this.scalableNode;
+	            if (!scalableNode) {
+	                return this;
+	            }
+	
+	            // get bbox without transform
+	            var bbox = scalableNode.getBBox(true);
+	            var size = this.cell.getSize();
+	
+	            var sx = size.width / (bbox.width || 1);
+	            var sy = size.height / (bbox.height || 1);
+	
+	            sx = utils.toFixed(sx, 2);
+	            sy = utils.toFixed(sy, 2);
+	
+	            scalableNode.scale(sx, sy);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'translate',
+	        value: function translate() {
+	
+	            var position = this.cell.getPosition();
+	
+	            this.vel.translate(position.x, position.y);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setPortConnected',
+	        value: function setPortConnected(port, isSourcePort, isConnected) {
+	
+	            var elem = this.getPortElem(port, isSourcePort);
+	            if (elem) {
+	                utils.toggleClass(elem, 'is-connected', isConnected);
+	            }
+	        }
+	    }, {
+	        key: 'setPortConnecting',
+	        value: function setPortConnecting(port, isSourcePort, isConnecting) {
+	
+	            var elem = this.getPortElem(port, isSourcePort);
+	            if (elem) {
+	                utils.toggleClass(elem, 'is-connecting', isConnecting);
+	            }
+	        }
+	    }, {
+	        key: 'setPortHighlight',
+	        value: function setPortHighlight(port, isSourcePort, isHighlighted) {
+	
+	            var elem = this.getPortElem(port, isSourcePort);
+	            if (elem) {
+	                utils.toggleClass(elem, 'is-connectable', isHighlighted);
+	            }
+	
+	            var container = this.findOne('.pane-node-content');
+	            if (container) {
+	                utils.toggleClass(container, 'is-connectable', isHighlighted);
+	            }
+	        }
+	    }, {
+	        key: 'setPortAdsorbed',
+	        value: function setPortAdsorbed(port, isSourcePort, isAdsorbed) {
+	
+	            var elem = this.getPortElem(port, isSourcePort);
+	
+	            elem = elem && elem.querySelector('.port-magnet');
+	            elem && utils.toggleClass(elem, 'is-adsorbed', isAdsorbed);
+	        }
+	    }, {
+	        key: 'getBBox',
+	        value: function getBBox() {
+	
+	            var bounds = utils.getBounds(this.elem);
+	            if (bounds) {
+	                return new _Rect2.default(bounds.left, bounds.top, bounds.width, bounds.height);
+	            }
+	        }
+	    }, {
+	        key: 'getStrokedBBox',
+	        value: function getStrokedBBox() {
+	
+	            var bbox = this.cell.getBBox();
+	            var borderWidth = 0;
+	            var contentElem = this.findOne('.pane-node-content');
+	
+	            if (contentElem) {
+	                borderWidth = utils.getComputedStyle(contentElem, 'border-width') - 1;
+	            }
+	
+	            return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+	        }
+	    }, {
+	        key: 'getPortBodyBBox',
+	        value: function getPortBodyBBox(port, isSourcePort) {
+	
+	            var elem = this.getPortElem(port, isSourcePort);
+	            if (elem) {
+	                var bounds = utils.getBounds(elem);
+	                return this.getPaper().toLocalRect({
+	                    x: bounds.left,
+	                    y: bounds.top,
+	                    width: bounds.width,
+	                    height: bounds.height
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'getPortElem',
+	        value: function getPortElem(port, isSourcePort) {
+	
+	            var node = this.getCell();
+	
+	            if (!utils.isObject(port)) {
+	                port = node.getPortById(port);
+	            }
+	
+	            var selector = node.getPortSelector(port, !isSourcePort);
+	            if (selector) {
+	                return this.findOne(selector);
+	            }
+	        }
+	    }, {
+	        key: 'findPortElem',
+	        value: function findPortElem(elem) {
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, 'pane-port')) {
+	                    return elem;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return null;
+	        }
+	    }, {
+	        key: 'isPortElem',
+	        value: function isPortElem(elem) {
+	
+	            return this.findPortElem(elem) ? true : false;
+	        }
+	    }, {
+	        key: 'isOutPortElem',
+	        value: function isOutPortElem(elem) {
+	
+	            elem = this.findPortElem(elem);
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, 'pane-ports out')) {
+	                    return true;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'isInPortElem',
+	        value: function isInPortElem(elem) {
+	
+	            elem = this.findPortElem(elem);
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, 'pane-ports in')) {
+	                    return true;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'findPortByElem',
+	        value: function findPortByElem(elem) {
+	            var _this2 = this;
+	
+	            var result = null;
+	            var portElem = elem && this.findPortElem(elem);
+	            if (portElem) {
+	                (function () {
+	
+	                    var collection = _this2.isOutPortElem(portElem) ? _this2.cell.getOutPorts() : _this2.cell.getInPorts();
+	
+	                    var portId = utils.toInt(portElem.getAttribute('data-id'));
+	
+	                    utils.some(collection, function (port) {
+	                        if (port.id === portId) {
+	                            result = port;
+	                            return true;
+	                        }
+	                    });
+	                })();
+	            }
+	
+	            return result;
+	        }
+	    }]);
+	
+	    return HTMLNodeView;
+	}(_CellView3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = HTMLNodeView;
+
+/***/ },
+/* 99 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
 	var _utils = __webpack_require__(5);
 	
@@ -17579,6 +18797,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.switchMode(false);
 	
 	            return this;
+	        }
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	
+	            utils.removeEventListener(document.body, 'keydown', this.keyDownHandler);
+	            utils.removeEventListener(document.body, 'keyup', this.keyUpHandler);
+	
+	            _get(Object.getPrototypeOf(SelectHandler.prototype), 'destroy', this).call(this);
 	        }
 	    }, {
 	        key: 'switchMode',
@@ -18478,7 +19705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = SelectHandler;
 
 /***/ },
-/* 95 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

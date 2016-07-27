@@ -50,16 +50,19 @@ export default {
 
     IS_MAC: av.indexOf('Mac') > 0,
 
-    IS_TOUCH: 'ontouchstart' in document.documentElement,
-
     IS_POINTER: window.navigator.msPointerEnabled || false,
+
+    IS_TOUCH: 'ontouchstart' in document.documentElement
+    || navigator.MaxTouchPoints > 0
+    || navigator.msMaxTouchPoints > 0,
+
 
     SUPPORT_FOREIGN_OBJECT: (function () {
 
         if (document.createElementNS) {
 
             let toString = Object.prototype.toString;
-            let foreign = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+            let foreign  = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
 
             return /SVGForeignObject/.test(toString.call(foreign));
         }

@@ -123,10 +123,7 @@ class LinkView extends VectorView {
 
     updateComment(comment = this.cell.metadata.comment) {
 
-        let link  = this.cell;
         let bbox  = this.vel.getBBox(true);
-        let attrs = link.attrs.text;
-
         let vBg   = this.vel.findOne('.comment-bg');
         let vText = this.vel.findOne('.comment');
 

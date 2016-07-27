@@ -515,11 +515,11 @@ function setTranslate(elem, tx, ty) {
 
         let translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
 
-        if (transformKey !== 'msTransform') {
-            // The Z transform will keep this in the GPU (faster, and prevents artifacts),
-            // but IE9 doesn't support 3d transforms and will choke.
-            translate += ' translateZ(0)';
-        }
+        // if (transformKey !== 'msTransform') {
+        //     // The Z transform will keep this in the GPU (faster, and prevents artifacts),
+        //     // but IE9 doesn't support 3d transforms and will choke.
+        //     translate += ' translateZ(0)';
+        // }
 
         elem.style[transformKey] = translate;
     }

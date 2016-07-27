@@ -2273,11 +2273,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
 	
-	        if (transformKey !== 'msTransform') {
-	            // The Z transform will keep this in the GPU (faster, and prevents artifacts),
-	            // but IE9 doesn't support 3d transforms and will choke.
-	            translate += ' translateZ(0)';
-	        }
+	        // if (transformKey !== 'msTransform') {
+	        //     // The Z transform will keep this in the GPU (faster, and prevents artifacts),
+	        //     // but IE9 doesn't support 3d transforms and will choke.
+	        //     translate += ' translateZ(0)';
+	        // }
 	
 	        elem.style[transformKey] = translate;
 	    }
@@ -2857,9 +2857,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    IS_MAC: av.indexOf('Mac') > 0,
 	
-	    IS_TOUCH: 'ontouchstart' in document.documentElement,
-	
 	    IS_POINTER: window.navigator.msPointerEnabled || false,
+	
+	    IS_TOUCH: 'ontouchstart' in document.documentElement || navigator.MaxTouchPoints > 0 || navigator.msMaxTouchPoints > 0,
 	
 	    SUPPORT_FOREIGN_OBJECT: function () {
 	
@@ -11212,7 +11212,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            utils.addEventListener(eventDelegate, 'mouseover', '.pane-cell', this.onCellMouseOver.bind(this));
 	            utils.addEventListener(eventDelegate, 'mouseout', '.pane-cell', this.onCellMouseOut.bind(this));
 	
-	            utils.addEventListener(eventDelegate, _detector2.default.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	            // utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
+	            utils.addEventListener(eventDelegate, 'mousedown', this.onPointerDown.bind(this));
 	
 	            this.eventDelegate = eventDelegate;
 	
@@ -12347,8 +12348,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.onMouseMoveHandler = this.onMouseMoveHandler || this.onPointerMove.bind(this);
 	            this.onMouseUpHandler = this.onMouseUpHandler || this.onPointerUp.bind(this);
 	
-	            utils.addEventListener(doc, _detector2.default.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
-	            utils.addEventListener(doc, _detector2.default.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	            // utils.addEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+	            // utils.addEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	
+	            utils.addEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+	            utils.addEventListener(doc, 'mouseup', this.onMouseUpHandler);
 	        }
 	    }, {
 	        key: 'onPointerMove',
@@ -12389,8 +12393,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
 	            }
 	
-	            utils.removeEventListener(doc, _detector2.default.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
-	            utils.removeEventListener(doc, _detector2.default.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
+	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
+	
+	            utils.removeEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+	            utils.removeEventListener(doc, 'mouseup', this.onMouseUpHandler);
 	        }
 	
 	        // utils
@@ -16546,10 +16553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var comment = arguments.length <= 0 || arguments[0] === undefined ? this.cell.metadata.comment : arguments[0];
 	
 	
-	            var link = this.cell;
 	            var bbox = this.vel.getBBox(true);
-	            var attrs = link.attrs.text;
-	
 	            var vBg = this.vel.findOne('.comment-bg');
 	            var vText = this.vel.findOne('.comment');
 	
@@ -18203,7 +18207,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.cache = {};
 	
-	            return this.parseConnector().parseTerminal(true).parseTerminal(false).updateMarker().updateConnector();
+	            return this.parseConnector().parseTerminal(true).parseTerminal(false).updateMarker().updateConnector().updateComment();
 	        }
 	    }, {
 	        key: 'parseConnector',
@@ -18293,7 +18297,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'updateComment',
-	        value: function updateComment() /* comment */{}
+	        value: function updateComment() /* comment */{
+	
+	            return this;
+	        }
 	    }, {
 	        key: 'renderMarker',
 	        value: function renderMarker(isSource) {

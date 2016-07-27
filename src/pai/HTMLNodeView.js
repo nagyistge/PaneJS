@@ -3,6 +3,30 @@ import Rect       from '../geometry/Rect';
 import CellView   from '../views/CellView';
 
 
+const selectors = {
+    scalable: '.pane-scalable',
+    rotatable: '.pane-rotatable',
+    content: '.pane-node-content',
+    name: '.name',
+    portList: '.pane-port-list',
+    inPortList: '.pane-port-list.in',
+    outPortList: '.pane-port-list.out',
+    portWrap: '.pane-port-wrap',
+    portItem: '.pane-port',
+    portMagnet: '.port-magnet',
+    portAdsorb: '.is-adsorbed'
+};
+
+const classNames = {
+    portItem: 'pane-port',
+    inPortList: 'pane-port-list in',
+    outPortList: 'pane-port-list out',
+    connected: 'is-connected',
+    connecting: 'is-connecting',
+    connectable: 'is-connectable',
+    adsorbed: 'is-adsorbed',
+};
+
 class HTMLNodeView extends CellView {
 
     static get specialAttributes() {
@@ -19,8 +43,8 @@ class HTMLNodeView extends CellView {
         this.renderMarkup()
             .renderPorts();
 
-        this.scalableNode  = this.findOne('.pane-scalable');
-        this.rotatableNode = this.findOne('.pane-rotatable');
+        this.scalableNode  = this.findOne(selectors.scalable);
+        this.rotatableNode = this.findOne(selectors.rotatable);
 
         this.update()
             .resize()
@@ -33,6 +57,7 @@ class HTMLNodeView extends CellView {
     ensureElement() {
 
         this.elem = utils.createElement(this.cell.getTagName());
+
         // attach cell's id to elem
         this.elem.cellId = this.cell.id;
 
@@ -67,7 +92,7 @@ class HTMLNodeView extends CellView {
 
         if (inPorts.length) {
 
-            let inPortsWrap = this.findOne('.pane-ports.in');
+            let inPortsWrap = this.findOne(selectors.inPortList);
             let width       = 100 / (inPorts.length + 1);
 
             utils.forEach(inPorts, function (port, i) {
@@ -82,7 +107,7 @@ class HTMLNodeView extends CellView {
 
         if (outPorts.length) {
 
-            let outPortsWrap = this.findOne('.pane-ports.out');
+            let outPortsWrap = this.findOne(selectors.outPortList);
             let width        = 100 / (outPorts.length + 1);
 
 
@@ -224,7 +249,7 @@ class HTMLNodeView extends CellView {
             node.data.name = name;
         }
 
-        let elem = this.findOne('.name');
+        let elem = this.findOne(selectors.name);
         if (elem) {
             utils.emptyElement(elem);
             elem.appendChild(document.createTextNode(name));
@@ -233,41 +258,41 @@ class HTMLNodeView extends CellView {
         return this;
     }
 
-    setPortConnected(port, isSourcePort, isConnected) {
+    setPortConnected(port, isInPort, isConnected) {
 
-        let elem = this.getPortElem(port, isSourcePort);
+        let elem = this.getPortElem(port, isInPort);
         if (elem) {
-            utils.toggleClass(elem, 'is-connected', isConnected);
+            utils.toggleClass(elem, classNames.connected, isConnected);
         }
     }
 
-    setPortConnecting(port, isSourcePort, isConnecting) {
+    setPortConnecting(port, isInPort, isConnecting) {
 
-        let elem = this.getPortElem(port, isSourcePort);
+        let elem = this.getPortElem(port, isInPort);
         if (elem) {
-            utils.toggleClass(elem, 'is-connecting', isConnecting);
+            utils.toggleClass(elem, classNames.connecting, isConnecting);
         }
     }
 
-    setPortHighlight(port, isSourcePort, isHighlighted) {
+    setPortHighlight(port, isInPort, isHighlighted) {
 
-        let elem = this.getPortElem(port, isSourcePort);
+        let elem = this.getPortElem(port, isInPort);
         if (elem) {
-            utils.toggleClass(elem, 'is-connectable', isHighlighted);
+            utils.toggleClass(elem, classNames.connectable, isHighlighted);
         }
 
-        let container = this.findOne('.pane-node-content');
+        let container = this.findOne(selectors.content);
         if (container) {
-            utils.toggleClass(container, 'is-connectable', isHighlighted);
+            utils.toggleClass(container, classNames.connectable, isHighlighted);
         }
     }
 
-    setPortAdsorbed(port, isSourcePort, isAdsorbed) {
+    setPortAdsorbed(port, isInPort, isAdsorbed) {
 
-        let elem = this.getPortElem(port, isSourcePort);
+        let elem = this.getPortElem(port, isInPort);
 
-        elem = elem && elem.querySelector('.port-magnet');
-        elem && utils.toggleClass(elem, 'is-adsorbed', isAdsorbed);
+        elem = elem && elem.querySelector(selectors.portMagnet);
+        elem && utils.toggleClass(elem, classNames.adsorbed, isAdsorbed);
     }
 
     getBBox() {
@@ -282,7 +307,7 @@ class HTMLNodeView extends CellView {
 
         let bbox        = this.cell.getBBox();
         let borderWidth = 0;
-        let contentElem = this.findOne('.pane-node-content');
+        let contentElem = this.findOne(selectors.content);
 
         if (contentElem) {
             borderWidth = utils.getComputedStyle(contentElem, 'border-width') - 1;
@@ -291,9 +316,9 @@ class HTMLNodeView extends CellView {
         return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
     }
 
-    getPortBodyBBox(port, isSourcePort) {
+    getPortBodyBBox(port, isInPort) {
 
-        let elem = this.getPortElem(port, isSourcePort);
+        let elem = this.getPortElem(port, isInPort);
         if (elem) {
             let bounds = utils.getBounds(elem);
             return this.getPaper().toLocalRect({
@@ -305,7 +330,23 @@ class HTMLNodeView extends CellView {
         }
     }
 
-    getPortElem(port, isSourcePort) {
+    getPortSelector(isInPort, port) {
+
+        let selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
+
+        if (port) {
+            selector += '[data-id="' + port.id + '"]';
+        }
+
+        return selector;
+    }
+
+    getPortListSelector(isInPort) {
+
+        return isInPort ? selectors.inPortList : selectors.outPortList;
+    }
+
+    getPortElem(port, isInPort) {
 
         let node = this.getCell();
 
@@ -313,7 +354,7 @@ class HTMLNodeView extends CellView {
             port = node.getPortById(port);
         }
 
-        let selector = node.getPortSelector(port, !isSourcePort);
+        let selector = this.getPortSelector(port, isInPort);
         if (selector) {
             return this.findOne(selector);
         }
@@ -322,7 +363,7 @@ class HTMLNodeView extends CellView {
     findPortElem(elem) {
 
         while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, 'pane-port')) {
+            if (utils.hasClass(elem, classNames.portItem)) {
                 return elem;
             }
             elem = elem.parentNode;
@@ -341,7 +382,7 @@ class HTMLNodeView extends CellView {
         elem = this.findPortElem(elem);
 
         while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, 'pane-ports out')) {
+            if (utils.hasClass(elem, classNames.outPortList)) {
                 return true;
             }
             elem = elem.parentNode;
@@ -355,7 +396,7 @@ class HTMLNodeView extends CellView {
         elem = this.findPortElem(elem);
 
         while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, 'pane-ports in')) {
+            if (utils.hasClass(elem, classNames.inPortList)) {
                 return true;
             }
             elem = elem.parentNode;

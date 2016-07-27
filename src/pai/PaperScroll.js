@@ -1,12 +1,14 @@
 import * as utils from '../common/utils';
 import detector   from '../common/detector';
 
+
 const defaults = {
-    paper: null,
-    space: 50,
-    minWidth: 0,
+    paper    : null,
+    space    : 50,
+    minWidth : 0,
     minHeight: 0
 };
+
 
 class PaperScroll {
 
@@ -33,17 +35,20 @@ class PaperScroll {
 
         const paper = this.paper;
 
-        // keep scale values for a quicker access
+        // save scale for quick accessing
         this.sx = paper.sx;
         this.sy = paper.sy;
 
-        // keep the original canvas size
+        // save the original canvas size
         this.baseWidth  = paper.width;
         this.baseHeight = paper.height;
 
         // init for next calculating
-        this.scrollLeft = 0;
-        this.scrollTop  = 0;
+        this.scrollLeft      = 0;
+        this.scrollTop       = 0;
+        this.stageLevel      = 0;
+        this.stageScrollLeft = 0;
+        this.stageScrollTop  = 0;
 
         paper.on('paper:scale', this.doScale, this);
         paper.on('paper:resize', this.doResize, this);
@@ -79,7 +84,7 @@ class PaperScroll {
 
             let that = this;
 
-            this.onScroll = function () {
+            that.onScroll = function () {
                 that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
             };
         }
@@ -98,9 +103,9 @@ class PaperScroll {
 
     adjustClientSize() {
 
-        const scrollBarWidth = utils.getScrollBarWidth();
-        this.clientWidth     = this.scrollParent.clientWidth - scrollBarWidth;
-        this.clientHeight    = this.scrollParent.clientHeight - scrollBarWidth;
+        let scrollBarWidth = utils.getScrollBarWidth();
+        this.clientWidth   = this.scrollParent.clientWidth - scrollBarWidth;
+        this.clientHeight  = this.scrollParent.clientHeight - scrollBarWidth;
 
         return this;
     }
@@ -112,25 +117,25 @@ class PaperScroll {
 
         } else {
 
-            const space        = this.space;
-            const clientWidth  = this.clientWidth;
-            const clientHeight = this.clientHeight;
+            let space        = this.space;
+            let clientWidth  = this.clientWidth;
+            let clientHeight = this.clientHeight;
 
             padding = {
-                top: clientHeight - space.top,
-                right: clientWidth - space.right,
+                top   : clientHeight - space.top,
+                right : clientWidth - space.right,
                 bottom: clientHeight - space.bottom,
-                left: clientWidth - space.left
+                left  : clientWidth - space.left
             };
         }
 
         this.padding = padding;
 
         utils.setStyle(this.scrollElem, {
-            paddingTop: padding.top + 'px',
-            paddingRight: padding.right + 'px',
+            paddingTop   : padding.top + 'px',
+            paddingRight : padding.right + 'px',
             paddingBottom: padding.bottom + 'px',
-            paddingLeft: padding.left + 'px'
+            paddingLeft  : padding.left + 'px'
         });
 
         return this;
@@ -140,11 +145,11 @@ class PaperScroll {
 
         const paper = this.paper;
 
-        let sx = paper.sx;
-        let sy = paper.sy;
+        const sx = paper.sx;
+        const sy = paper.sy;
 
         let options = {
-            frameWidth: this.baseWidth * sx,
+            frameWidth : this.baseWidth * sx,
             frameHeight: this.baseHeight * sy
         };
 
@@ -166,7 +171,10 @@ class PaperScroll {
             let dTop  = paper.ty - ty;
 
             if (dLeft !== 0 || dTop !== 0) {
-                this.doScroll(dLeft, dTop, { relative: true });
+
+                this.increaseStage();
+                this.stageScroll(dLeft, dTop, { relative: true });
+                this.decreaseStage();
             }
         }
 
@@ -190,27 +198,21 @@ class PaperScroll {
     doResize(width = this.baseWidth, height = this.baseHeight) {
 
         utils.setStyle(this.scrollElem, {
-            width: width + 'px',
+            width : width + 'px',
             height: height + 'px'
         });
 
         return this;
     }
 
-    doScroll(scrollLeft, scrollTop, options = {}) {
+    applyScroll(scrollLeft = this.stageScrollLeft, scrollTop = this.stageScrollTop) {
 
         this.removeScrollEvent();
-
-        if (options.relative) {
-            scrollLeft += this.scrollLeft;
-            scrollTop += this.scrollTop;
-        }
-
-        this.setScroll(scrollLeft, scrollTop);
 
         this.scrollParent.scrollLeft = scrollLeft;
         this.scrollParent.scrollTop  = scrollTop;
 
+        this.setScroll(this.stageScrollLeft, this.stageScrollTop);
         this.addScrollEvent();
 
         return this;
@@ -218,8 +220,49 @@ class PaperScroll {
 
     setScroll(scrollLeft, scrollTop) {
 
+        // save current scroll
         this.scrollLeft = scrollLeft;
         this.scrollTop  = scrollTop;
+
+        return this;
+    }
+
+    stageScroll(scrollLeft, scrollTop, options = {}) {
+
+        if (options.relative) {
+            this.stageScrollLeft += scrollLeft;
+            this.stageScrollTop += scrollTop;
+        } else {
+            this.stageScrollLeft = scrollLeft;
+            this.stageScrollTop  = scrollTop;
+        }
+
+        return this;
+    }
+
+    increaseStage() {
+
+        this.stageLevel += 1;
+
+        if (this.stageLevel === 1) {
+            this.stageScrollLeft = this.scrollLeft;
+            this.stageScrollTop  = this.scrollTop;
+        }
+
+        return this;
+    }
+
+    decreaseStage() {
+
+        this.stageLevel -= 1;
+
+        if (this.stageLevel === 0) {
+
+            this.applyScroll();
+
+            this.stageScrollLeft = 0;
+            this.stageScrollTop  = 0;
+        }
 
         return this;
     }
@@ -259,7 +302,9 @@ class PaperScroll {
         let dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
         let dTop  = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
 
-        this.doScroll(-dLeft, -dTop, { relative: true });
+        this.increaseStage();
+        this.stageScroll(-dLeft, -dTop, { relative: true });
+        this.decreaseStage();
 
         return this;
     }
@@ -354,19 +399,18 @@ class PaperScroll {
 
             cx = center.x;
             cy = center.y;
-
-        } else {
-
-            cx = 800;
-            cy = 600;
         }
 
         let dLeft = cx * (sx - this.sx);
         let dTop  = cy * (sy - this.sy);
 
         this.beforeZoom();
+        this.increaseStage();
+
         this.paper.scale(sx, sy);
-        this.doScroll(dLeft, dTop, { relative: true });
+        this.stageScroll(dLeft, dTop, { relative: true });
+
+        this.decreaseStage();
         this.afterZoom();
 
         return this;
@@ -400,5 +444,8 @@ class PaperScroll {
     }
 }
 
+
+// exports
+// -------
 
 export default PaperScroll;
