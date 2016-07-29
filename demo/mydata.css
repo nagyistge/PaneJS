@@ -192,7 +192,7 @@ svg.pane-svg {
 }
 
 .pane-node.focused .pane-node-content {
-  background-color: #FFFAE4;
+  /*background-color: #FFFAE4;*/
 }
 
 .pane-node-content:hover,
@@ -429,6 +429,12 @@ svg.pane-svg {
   opacity: .3;
 }
 
+/* 通用节点 */
+.pane-node-content.common-node {
+  width: auto;
+  display: block;
+}
+
 /* 开始节点 */
 .pane-node-content.start-node {
   width: 80px;
@@ -570,4 +576,60 @@ svg.pane-svg {
 
 .pane-node-content.sub-flow-node .pane-port-list.out {
   margin-top: -9px;
+}
+
+/* resize */
+.pane-resize {
+  border: 1px dashed #333;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.pane-resize-w,
+.pane-resize-e {
+  position: absolute;
+  height: 100%;
+  width: 10px;
+
+}
+
+.pane-resize-w {
+  cursor: w-resize;
+  left: -5px;
+}
+
+.pane-resize-e {
+  cursor: e-resize;
+  right: -5px;
+}
+
+.pane-resize-dot {
+  position: absolute;
+  border: 2px solid #333;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  top: 50%;
+  margin-top: -5px;
+}
+
+.pane-resize-w .pane-resize-dot {
+  border-radius: 0px 5px 5px 0px;
+  left: 4px;
+}
+
+.pane-resize-e .pane-resize-dot {
+  border-radius: 5px 0px 0px 5px;
+  right: 4px;
+}
+
+.pane-resize-w:hover .pane-resize-dot,
+.pane-resize-w.hovered .pane-resize-dot,
+.pane-resize-e:hover .pane-resize-dot,
+.pane-resize-e.hovered .pane-resize-dot {
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
 }

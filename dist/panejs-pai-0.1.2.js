@@ -15503,7 +15503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return;
 	                }
 	
-	                var specials = HTMLNodeView.specialAttributes.slice();
+	                var specials = GroupView.specialAttributes.slice();
 	                var normal = {};
 	
 	                utils.forIn(attrs, function (value, key) {

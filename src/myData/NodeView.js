@@ -68,6 +68,33 @@ class NodeView extends BaseView {
         return this;
     }
 
+    resize() {
+
+        if (!this.scalableNode) {
+            return this;
+        }
+
+
+        let cell   = this.cell;
+        let width  = cell.size.width;
+        let height = cell.size.height;
+
+        this.scalableNode
+            .findOne('foreignobject')
+            .attr({
+                width,
+                height
+            });
+
+        utils.forEach(this.scalableNode.find('.pane-port-list'), function (vel) {
+            vel.css({
+                width: width + 'px'
+            });
+        });
+
+        return super.resize();
+    }
+
     setNodeName(name) {
 
         let node = this.getCell();

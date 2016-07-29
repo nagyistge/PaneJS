@@ -32,6 +32,7 @@ Canvas.prototype.setup = function () {
     // handlers
     this.connectionHandler = new panejs.myData.ConnectionHandler(this.paper);
     this.selectionHandler  = new panejs.myData.SelectionHandler(this.paper);
+    this.sizeHandler       = new panejs.myData.SizeHandler(this.paper);
 
     this.paper
         .on('cell:connecting', this.onConnecting.bind(this))
@@ -47,7 +48,6 @@ Canvas.prototype.setup = function () {
 
     return this;
 };
-
 
 Canvas.prototype.onSelectionChanged = function (nodes) {
 
@@ -711,6 +711,7 @@ Canvas.prototype.destroy = function () {
 
     this.selectionHandler.destroy();
     this.connectionHandler.destroy();
+    this.sizeHandler.destroy();
 
     this.paperScroll.destroy();
     this.snapLines.destroy();

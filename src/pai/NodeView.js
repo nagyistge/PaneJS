@@ -4,25 +4,25 @@ import BaseView   from '../views/NodeView';
 
 
 const selectors = {
-    content    : '.pane-node-content',
-    name       : '.name',
-    portList   : '.pane-port-list',
-    inPortList : '.pane-port-list.in',
+    content: '.pane-node-content',
+    name: '.name',
+    portList: '.pane-port-list',
+    inPortList: '.pane-port-list.in',
     outPortList: '.pane-port-list.out',
-    portWrap   : '.pane-port-wrap',
-    portItem   : '.pane-port',
-    portMagnet : '.port-magnet',
-    portAdsorb : '.is-adsorbed'
+    portWrap: '.pane-port-wrap',
+    portItem: '.pane-port',
+    portMagnet: '.port-magnet',
+    portAdsorb: '.is-adsorbed'
 };
 
 const classNames = {
-    portItem   : 'pane-port',
-    inPortList : 'pane-port-list in',
+    portItem: 'pane-port',
+    inPortList: 'pane-port-list in',
     outPortList: 'pane-port-list out',
-    connected  : 'is-connected',
-    connecting : 'is-connecting',
+    connected: 'is-connected',
+    connecting: 'is-connecting',
     connectable: 'is-connectable',
-    adsorbed   : 'is-adsorbed',
+    adsorbed: 'is-adsorbed',
 };
 
 
@@ -159,9 +159,9 @@ class NodeView extends BaseView {
         if (elem) {
             let bounds = utils.getBounds(elem);
             return this.getPaper().toLocalRect({
-                x     : bounds.left,
-                y     : bounds.top,
-                width : bounds.width,
+                x: bounds.left,
+                y: bounds.top,
+                width: bounds.width,
                 height: bounds.height
             });
         }

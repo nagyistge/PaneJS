@@ -1,12 +1,12 @@
 var commonMarkup = ''
     + '<g class="pane-scalable">'
-    + '  <foreignObject width="180" height="30">'
+    + '  <foreignObject width="${size.width}" height="${size.height}">'
     + '    <body xmlns="http://www.w3.org/1999/xhtml">'
-    + '      <div class="pane-node-content">'
+    + '      <div class="pane-node-content common-node">'
     + '        <span class="icon"></span>'
     + '        <span class="name">${name}</span>'
-    + '        <div class="pane-port-list in"></div>'
-    + '        <div class="pane-port-list out"></div>'
+    + '        <div class="pane-port-list in" style="width: ${size.width}px"></div>'
+    + '        <div class="pane-port-list out" style="width: ${size.width}px"></div>'
     + '      </div>'
     + '    </body>'
     + '  </foreignObject>'
@@ -21,7 +21,7 @@ var portMarkup = ''
 
 var startMarkup = ''
     + '<g class="pane-scalable">'
-    + '  <foreignObject width="80" height="30">'
+    + '  <foreignObject width="${size.width}" height="${size.height}">'
     + '    <body xmlns="http://www.w3.org/1999/xhtml">'
     + '      <div class="pane-node-content end-node">'
     + '        <span class="name">${name}</span>'
@@ -36,7 +36,7 @@ var endMarkup = startMarkup;
 
 var judgeMarkup = ''
     + '<g class="pane-scalable">'
-    + '  <foreignObject width="40" height="30">'
+    + '  <foreignObject width="${size.width}" height="${size.height}">'
     + '    <body xmlns="http://www.w3.org/1999/xhtml">'
     + '      <div class="pane-node-content judge-node">'
     + '        <span class="diamond-top"></span>'
@@ -50,7 +50,7 @@ var judgeMarkup = ''
 
 var subFlowMarkup = ''
     + '<g class="pane-scalable">'
-    + '  <foreignObject width="80" height="30">'
+    + '  <foreignObject width="${size.width}" height="${size.height}">'
     + '    <body xmlns="http://www.w3.org/1999/xhtml">'
     + '      <div class="pane-node-content sub-flow-node">'
     + '        <span class="name">${name}</span>'
@@ -66,6 +66,7 @@ var nodesMapping = {
     common: {
         markup: commonMarkup,
         portMarkup: portMarkup,
+        canResize: true,
         size: {
             width: 180,
             height: 30

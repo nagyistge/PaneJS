@@ -82,7 +82,7 @@ class HTMLPaper extends Paper {
             }
 
             utils.setStyle(this.htmlPane, {
-                top : ty + 'px',
+                top: ty + 'px',
                 left: tx + 'px'
             });
 

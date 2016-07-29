@@ -1356,7 +1356,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function format(tpl, data) {
 	
 	    if (tpl && data) {
-	        return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
+	        return ('' + tpl).replace(/\$\{(.*?)\}/g, function (input, key) {
 	            var val = (0, _object.getByPath)(data, key);
 	            return val !== undefined ? val : input;
 	        });
@@ -11154,6 +11154,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.viewport;
 	        }
 	    }, {
+	        key: 'getEventDelegate',
+	        value: function getEventDelegate() {
+	
+	            var eventDelegate = this.eventDelegate;
+	
+	            if (!eventDelegate) {
+	
+	                eventDelegate = this.options.eventDelegate;
+	
+	                if (utils.isFunction(eventDelegate)) {
+	                    eventDelegate = eventDelegate.call(this);
+	                }
+	
+	                this.eventDelegate = eventDelegate || this.getWrap();
+	            }
+	
+	            return this.eventDelegate;
+	        }
+	    }, {
 	        key: 'createPanes',
 	        value: function createPanes() {
 	
@@ -11192,12 +11211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setup',
 	        value: function setup() {
 	
-	            var eventDelegate = this.options.eventDelegate;
-	            if (utils.isFunction(eventDelegate)) {
-	                eventDelegate = eventDelegate.call(this);
-	            }
-	
-	            eventDelegate = eventDelegate || this.wrap;
+	            var eventDelegate = this.getEventDelegate();
 	
 	            utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
 	            utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
@@ -11209,8 +11223,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 	            utils.addEventListener(eventDelegate, 'mousedown', this.onPointerDown.bind(this));
-	
-	            this.eventDelegate = eventDelegate;
 	
 	            // Hold the value when mouse has been moved: when mouse moved,
 	            // no click event will be triggered.
@@ -12320,12 +12332,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            var view = this.findViewByElem(e.target);
+	            var cell = view && view.cell;
 	
 	            if (!this.isValidEvent(e, view)) {
 	                return;
 	            }
 	
+	            this.triggerPointDown(e, cell, view);
+	        }
+	    }, {
+	        key: 'triggerPointDown',
+	        value: function triggerPointDown(e, cell, view) {
+	
 	            e.preventDefault();
+	
 	            this.mouseMoved = 0;
 	
 	            var localPoint = this.snapToGrid({
@@ -12335,7 +12355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (view) {
 	                this.sourceView = view;
-	                this.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
+	                this.trigger('cell:pointerDown', cell, view, e, localPoint.x, localPoint.y);
 	            } else {
 	                this.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
 	            }
@@ -12388,6 +12408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
 	            }
 	
+	            // Chrome in windows8: `'ontouchstart' in document.documentElement` return `true`
 	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
 	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
 	

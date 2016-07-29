@@ -1361,7 +1361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function format(tpl, data) {
 	
 	    if (tpl && data) {
-	        return ('' + tpl).replace(/\$\{(\w+)\}/g, function (input, key) {
+	        return ('' + tpl).replace(/\$\{(.*?)\}/g, function (input, key) {
 	            var val = (0, _object.getByPath)(data, key);
 	            return val !== undefined ? val : input;
 	        });
@@ -11159,6 +11159,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.viewport;
 	        }
 	    }, {
+	        key: 'getEventDelegate',
+	        value: function getEventDelegate() {
+	
+	            var eventDelegate = this.eventDelegate;
+	
+	            if (!eventDelegate) {
+	
+	                eventDelegate = this.options.eventDelegate;
+	
+	                if (utils.isFunction(eventDelegate)) {
+	                    eventDelegate = eventDelegate.call(this);
+	                }
+	
+	                this.eventDelegate = eventDelegate || this.getWrap();
+	            }
+	
+	            return this.eventDelegate;
+	        }
+	    }, {
 	        key: 'createPanes',
 	        value: function createPanes() {
 	
@@ -11197,12 +11216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'setup',
 	        value: function setup() {
 	
-	            var eventDelegate = this.options.eventDelegate;
-	            if (utils.isFunction(eventDelegate)) {
-	                eventDelegate = eventDelegate.call(this);
-	            }
-	
-	            eventDelegate = eventDelegate || this.wrap;
+	            var eventDelegate = this.getEventDelegate();
 	
 	            utils.addEventListener(eventDelegate, 'contextmenu', this.onContextMenu.bind(this));
 	            utils.addEventListener(eventDelegate, 'dblclick', this.onDblClick.bind(this));
@@ -11214,8 +11228,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // utils.addEventListener(eventDelegate, detector.IS_TOUCH ? 'touchstart' : 'mousedown', this.onPointerDown.bind(this));
 	            utils.addEventListener(eventDelegate, 'mousedown', this.onPointerDown.bind(this));
-	
-	            this.eventDelegate = eventDelegate;
 	
 	            // Hold the value when mouse has been moved: when mouse moved,
 	            // no click event will be triggered.
@@ -12325,12 +12337,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            var view = this.findViewByElem(e.target);
+	            var cell = view && view.cell;
 	
 	            if (!this.isValidEvent(e, view)) {
 	                return;
 	            }
 	
+	            this.triggerPointDown(e, cell, view);
+	        }
+	    }, {
+	        key: 'triggerPointDown',
+	        value: function triggerPointDown(e, cell, view) {
+	
 	            e.preventDefault();
+	
 	            this.mouseMoved = 0;
 	
 	            var localPoint = this.snapToGrid({
@@ -12340,7 +12360,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (view) {
 	                this.sourceView = view;
-	                this.trigger('cell:pointerDown', view.cell, view, e, localPoint.x, localPoint.y);
+	                this.trigger('cell:pointerDown', cell, view, e, localPoint.x, localPoint.y);
 	            } else {
 	                this.trigger('blank:pointerDown', e, localPoint.x, localPoint.y);
 	            }
@@ -12393,6 +12413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.trigger('blank:pointerUp', e, localPoint.x, localPoint.y);
 	            }
 	
+	            // Chrome in windows8: `'ontouchstart' in document.documentElement` return `true`
 	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchmove' : 'mousemove', this.onMouseMoveHandler);
 	            // utils.removeEventListener(doc, detector.IS_TOUCH ? 'touchend' : 'mouseup', this.onMouseUpHandler);
 	
@@ -15243,15 +15264,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _SelectionHandler = __webpack_require__(81);
+	var _SizeHandler = __webpack_require__(81);
+	
+	var _SizeHandler2 = _interopRequireDefault(_SizeHandler);
+	
+	var _SelectionHandler = __webpack_require__(82);
 	
 	var _SelectionHandler2 = _interopRequireDefault(_SelectionHandler);
 	
-	var _ConnectionHandler = __webpack_require__(82);
+	var _ConnectionHandler = __webpack_require__(83);
 	
 	var _ConnectionHandler2 = _interopRequireDefault(_ConnectionHandler);
 	
-	var _quadratic = __webpack_require__(85);
+	var _quadratic = __webpack_require__(86);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -15266,6 +15291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Snaplines: _Snaplines2.default,
 	    PaperScroll: _PaperScroll2.default,
 	
+	    SizeHandler: _SizeHandler2.default,
 	    SelectionHandler: _SelectionHandler2.default,
 	    ConnectionHandler: _ConnectionHandler2.default,
 	
@@ -16139,6 +16165,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 	    }, {
+	        key: 'resize',
+	        value: function resize() {
+	
+	            if (!this.scalableNode) {
+	                return this;
+	            }
+	
+	            var cell = this.cell;
+	            var width = cell.size.width;
+	            var height = cell.size.height;
+	
+	            this.scalableNode.findOne('foreignobject').attr({
+	                width: width,
+	                height: height
+	            });
+	
+	            utils.forEach(this.scalableNode.find('.pane-port-list'), function (vel) {
+	                vel.css({
+	                    width: width + 'px'
+	                });
+	            });
+	
+	            return _get(Object.getPrototypeOf(NodeView.prototype), 'resize', this).call(this);
+	        }
+	    }, {
 	        key: 'setNodeName',
 	        value: function setNodeName(name) {
 	
@@ -16946,6 +16997,341 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _utils = __webpack_require__(5);
+	
+	var utils = _interopRequireWildcard(_utils);
+	
+	var _Handler2 = __webpack_require__(60);
+	
+	var _Handler3 = _interopRequireDefault(_Handler2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	// const
+	// -----
+	var win = window;
+	var doc = win.document;
+	
+	var defaults = {
+	    minWidth: 120,
+	    maxWidth: 300
+	};
+	
+	var SizeHandler = function (_Handler) {
+	    _inherits(SizeHandler, _Handler);
+	
+	    function SizeHandler() {
+	        _classCallCheck(this, SizeHandler);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(SizeHandler).apply(this, arguments));
+	    }
+	
+	    _createClass(SizeHandler, [{
+	        key: 'configure',
+	        value: function configure(options) {
+	
+	            this.options = utils.merge({}, defaults, options);
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'init',
+	        value: function init() {
+	
+	            var temp = utils.createElement('div');
+	
+	            temp.innerHTML = '' + '<div class="pane-resize">' + '  <div class="pane-resize-w">' + '    <div class="pane-resize-dot"></div>' + '  </div>' + '  <div class="pane-resize-e">' + '    <div class="pane-resize-dot"></div>' + '  </div>' + '</div>';
+	
+	            this.handleBar = temp.querySelector('.pane-resize');
+	
+	            this.setup();
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'setup',
+	        value: function setup() {
+	
+	            var that = this;
+	
+	            this.getPaper().on('paper:focus', this.onFocusChanged.bind(this)).on('cell:focus', this.onFocusChanged.bind(this)).on('cells:updatePosition', this.onNodesPositionChanged.bind(this));
+	
+	            utils.addEventListener(this.handleBar, 'mousedown', '.pane-resize-w', function (e) {
+	
+	                that.onMousedown(e, 'w');
+	
+	                e.stopPropagation();
+	            });
+	
+	            utils.addEventListener(this.handleBar, 'mousedown', '.pane-resize-e', function (e) {
+	
+	                that.onMousedown(e, 'e');
+	
+	                e.stopPropagation();
+	            });
+	
+	            utils.addEventListener(this.handleBar, 'mousedown', function (e) {
+	
+	                e.stopPropagation();
+	
+	                if (that.direction) {
+	                    return;
+	                }
+	
+	                that.getPaper().triggerPointDown(e, that.getCurrentCell(), that.getCurrentView());
+	            });
+	        }
+	    }, {
+	        key: 'onMousedown',
+	        value: function onMousedown(e, direction) {
+	
+	            var local = this.getLocalPoint(e);
+	
+	            this.startX = local.x;
+	            this.startY = local.y;
+	
+	            this.direction = direction;
+	            this.directionElem = this.handleBar.querySelector('.pane-resize-' + direction);
+	
+	            this.originBounds = {
+	                x: this.bounds.x,
+	                y: this.bounds.y,
+	                width: this.bounds.width,
+	                height: this.bounds.height
+	            };
+	
+	            utils.addClass(this.directionElem, 'hovered');
+	
+	            this.onMouseMoveHandler = this.onMouseMoveHandler || this.onMousemove.bind(this);
+	            this.onMouseUpHandler = this.onMouseUpHandler || this.onMouseup.bind(this);
+	
+	            utils.addEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+	            utils.addEventListener(doc, 'mouseup', this.onMouseUpHandler);
+	        }
+	    }, {
+	        key: 'onMousemove',
+	        value: function onMousemove(e) {
+	
+	            var local = this.getLocalPoint(e);
+	
+	            var dx = local.x - this.startX;
+	            // let dy = local.y - this.startY;
+	
+	            var originBounds = this.originBounds;
+	            var currentBounds = this.bounds;
+	
+	            var minWidth = this.options.minWidth;
+	            var maxWidth = this.options.maxWidth;
+	
+	            if (dx !== 0) {
+	
+	                if (this.direction === 'w') {
+	
+	                    var width = utils.clamp(originBounds.width - dx, minWidth, maxWidth);
+	
+	                    dx = originBounds.width - width;
+	
+	                    currentBounds.x = originBounds.x + dx;
+	                    currentBounds.width = width;
+	
+	                    this.updateHandleBar();
+	                } else if (this.direction === 'e') {
+	
+	                    currentBounds.width = utils.clamp(originBounds.width + dx, minWidth, maxWidth);
+	
+	                    this.updateHandleBar();
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'onMouseup',
+	        value: function onMouseup() {
+	
+	            utils.removeClass(this.directionElem, 'hovered');
+	
+	            var paper = this.getPaper();
+	            var model = this.getModel();
+	            var cell = this.currentCell;
+	            var bounds = this.bounds;
+	
+	            model.beginUpdate();
+	
+	            cell.setPosition({
+	                x: bounds.x,
+	                y: bounds.y,
+	                relative: false
+	            });
+	
+	            cell.setSize({
+	                width: bounds.width,
+	                height: bounds.height,
+	                relative: false
+	            });
+	
+	            model.endUpdate();
+	
+	            if (bounds.x !== this.originBounds.x || bounds.y !== this.originBounds.y) {
+	                paper.trigger('cells:updatePosition', [cell]);
+	            }
+	
+	            paper.trigger('cell:sizeChanged', cell);
+	
+	            this.direction = null;
+	            this.directionElem = null;
+	            this.originBounds = null;
+	
+	            utils.removeEventListener(doc, 'mousemove', this.onMouseMoveHandler);
+	            utils.removeEventListener(doc, 'mouseup', this.onMouseUpHandler);
+	        }
+	    }, {
+	        key: 'onFocusChanged',
+	        value: function onFocusChanged(cell) {
+	
+	            if (this.canResize(cell)) {
+	                this.currentCell = cell;
+	                this.showHandleBar();
+	                this.resetHandleBar();
+	            } else {
+	                this.currentCell = null;
+	                this.hideHandleBar();
+	            }
+	        }
+	    }, {
+	        key: 'onNodesPositionChanged',
+	        value: function onNodesPositionChanged(nodes) {
+	
+	            var cell = this.getCurrentCell();
+	
+	            utils.some(nodes, function (node) {
+	
+	                if (cell === node) {
+	                    this.resetHandleBar();
+	                    return true;
+	                }
+	            }, this);
+	        }
+	    }, {
+	        key: 'getCurrentCell',
+	        value: function getCurrentCell() {
+	
+	            return this.currentCell;
+	        }
+	    }, {
+	        key: 'getCurrentView',
+	        value: function getCurrentView() {
+	
+	            var paper = this.getPaper();
+	            var cell = this.getCurrentCell();
+	
+	            return paper.getView(cell);
+	        }
+	    }, {
+	        key: 'getLocalPoint',
+	        value: function getLocalPoint(e) {
+	
+	            return this.getPaper().snapToGrid({
+	                x: e.clientX,
+	                y: e.clientY
+	            });
+	        }
+	    }, {
+	        key: 'canResize',
+	        value: function canResize(cell) {
+	
+	            return cell && cell.data.canResize;
+	        }
+	    }, {
+	        key: 'showHandleBar',
+	        value: function showHandleBar() {
+	
+	            var cell = this.getCurrentCell();
+	            if (cell) {
+	                if (this.canResize(cell)) {
+	
+	                    var paper = this.getPaper();
+	
+	                    if (paper && paper.rawPane) {
+	                        paper.rawPane.appendChild(this.handleBar);
+	                    }
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'hideHandleBar',
+	        value: function hideHandleBar() {
+	
+	            this.bounds = null;
+	
+	            utils.removeElement(this.handleBar);
+	            utils.setStyle(this.handleBar, {
+	                width: 0,
+	                height: 0
+	            });
+	        }
+	    }, {
+	        key: 'resetHandleBar',
+	        value: function resetHandleBar() {
+	
+	            var cell = this.getCurrentCell();
+	            if (cell) {
+	                this.bounds = cell.getBBox();
+	                this.updateHandleBar();
+	            }
+	        }
+	    }, {
+	        key: 'updateHandleBar',
+	        value: function updateHandleBar() {
+	
+	            var bounds = this.bounds;
+	            if (bounds) {
+	
+	                var paper = this.getPaper();
+	                var elem = this.handleBar;
+	
+	                var x = Math.round(bounds.x * paper.sx + paper.tx);
+	                var y = Math.round(bounds.y * paper.sy + paper.ty);
+	
+	                utils.setTranslate(elem, x, y);
+	
+	                var width = Math.round(bounds.width * paper.sx);
+	                var height = Math.round(bounds.height * paper.sy);
+	
+	                utils.setStyle(elem, {
+	                    width: width + 'px',
+	                    height: height + 'px'
+	                });
+	            }
+	        }
+	    }]);
+	
+	    return SizeHandler;
+	}(_Handler3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = SizeHandler;
+
+/***/ },
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17934,7 +18320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = SelectHandler;
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17953,11 +18339,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Link2 = _interopRequireDefault(_Link);
 	
-	var _LinkView = __webpack_require__(83);
+	var _LinkView = __webpack_require__(84);
 	
 	var _LinkView2 = _interopRequireDefault(_LinkView);
 	
-	var _quadratic = __webpack_require__(84);
+	var _quadratic = __webpack_require__(85);
 	
 	var _quadratic2 = _interopRequireDefault(_quadratic);
 	
@@ -18145,7 +18531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConnectionHandler;
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18655,7 +19041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = LinkView;
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18684,7 +19070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = quadratic;
 
 /***/ },
-/* 85 */
+/* 86 */
 /***/ function(module, exports) {
 
 	'use strict';

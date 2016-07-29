@@ -5,6 +5,7 @@ import Node     from './Node';
 import NodeView from './NodeView';
 import LinkView     from './LinkView';
 
+import SizeHandler       from './SizeHandler';
 import SelectionHandler  from './SelectionHandler';
 import ConnectionHandler from './ConnectionHandler';
 
@@ -20,8 +21,10 @@ let myData = {
     Snaplines,
     PaperScroll,
 
+    SizeHandler,
     SelectionHandler,
     ConnectionHandler,
+
 
     quadratic
 };

@@ -82,7 +82,7 @@ class SelectHandler extends Handler {
 
     switchModeClass(isSelectMode) {
 
-        const wrap = this.getPaper().getWrap();
+        let wrap = this.getPaper().getWrap();
         this.setCursorStyle(wrap, isSelectMode);
 
         return this;
@@ -104,7 +104,7 @@ class SelectHandler extends Handler {
 
     onKeyDown(e) {
 
-        const areaSelectKey = this.options.areaSelectKey;
+        let areaSelectKey = this.options.areaSelectKey;
 
         if (this.options.areaSelect && areaSelectKey) {
             let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
@@ -177,8 +177,8 @@ class SelectHandler extends Handler {
             let x = this.previewOriginX + localX - this.origin.x;
             let y = this.previewOriginY + localY - this.origin.y;
 
-            const bounds    = this.getScrollBounds();
-            const direction = this.getMoveDirection(localX, localY);
+            let bounds    = this.getScrollBounds();
+            let direction = this.getMoveDirection(localX, localY);
 
             this.bounds.x = Math.round(utils.clamp(x, bounds.left, bounds.right - this.bounds.width));
             this.bounds.y = Math.round(utils.clamp(y, bounds.top, bounds.bottom - this.bounds.height));
@@ -286,7 +286,7 @@ class SelectHandler extends Handler {
         this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
 
         // if (!this.isAreaSelect) {
-        //    const areaSelectKey = this.options.areaSelectKey;
+        //    let areaSelectKey = this.options.areaSelectKey;
         //    if (this.options.areaSelect && areaSelectKey) {
         //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
         //        if (utils[method]) {
@@ -313,7 +313,7 @@ class SelectHandler extends Handler {
             this.originScrollLeft = this.scrollParent.scrollLeft;
             this.originScrollTop  = this.scrollParent.scrollTop;
 
-            const wrap = this.getPaper().getWrap();
+            let wrap = this.getPaper().getWrap();
 
             utils.removeClass(wrap, classNames.cursorMove);
             utils.addClass(wrap, classNames.cursorMoving);
@@ -348,8 +348,8 @@ class SelectHandler extends Handler {
 
         if (this.moving) {
 
-            const origin = this.origin;
-            const bounds = this.getScrollBounds();
+            let origin = this.origin;
+            let bounds = this.getScrollBounds();
 
             let x      = localX;
             let y      = localY;
@@ -409,8 +409,8 @@ class SelectHandler extends Handler {
             this.moving = true;
         }
 
-        const dx = this.origin.x - e.pageX;
-        const dy = this.origin.y - e.pageY;
+        let dx = this.origin.x - e.pageX;
+        let dy = this.origin.y - e.pageY;
 
         this.scrollParent.scrollLeft = this.originScrollLeft + dx;
         this.scrollParent.scrollTop  = this.originScrollTop + dy;
@@ -449,7 +449,7 @@ class SelectHandler extends Handler {
                 this.setCellFocused(null);
             }
 
-            const wrap = this.getPaper().getWrap();
+            let wrap = this.getPaper().getWrap();
 
             utils.addClass(wrap, classNames.cursorMove);
             utils.removeClass(wrap, classNames.cursorMoving);
@@ -473,21 +473,21 @@ class SelectHandler extends Handler {
 
     getScrollBounds(isViewport) {
 
-        const paper        = this.getPaper();
-        const scrollParent = this.scrollParent;
-        const stageParent  = paper.stage.parentNode;
+        let paper        = this.getPaper();
+        let scrollParent = this.scrollParent;
+        let stageParent  = paper.stage.parentNode;
 
-        const sx = paper.sx;
-        const sy = paper.sy;
+        let sx = paper.sx;
+        let sy = paper.sy;
 
-        const scrollTop    = scrollParent.scrollTop;
-        const scrollLeft   = scrollParent.scrollLeft;
-        const scrollWidth  = scrollParent.scrollWidth;
-        const scrollHeight = scrollParent.scrollHeight;
-        const clientWidth  = scrollParent.clientWidth;
-        const clientHeight = scrollParent.clientHeight;
-        const paddingLeft  = utils.toInt(stageParent.style.paddingLeft);
-        const paddingTop   = utils.toInt(stageParent.style.paddingTop);
+        let scrollTop    = scrollParent.scrollTop;
+        let scrollLeft   = scrollParent.scrollLeft;
+        let scrollWidth  = scrollParent.scrollWidth;
+        let scrollHeight = scrollParent.scrollHeight;
+        let clientWidth  = scrollParent.clientWidth;
+        let clientHeight = scrollParent.clientHeight;
+        let paddingLeft  = utils.toInt(stageParent.style.paddingLeft);
+        let paddingTop   = utils.toInt(stageParent.style.paddingTop);
 
         return isViewport ? {
             left: (scrollLeft - paddingLeft - paper.tx) / sx,
@@ -555,17 +555,17 @@ class SelectHandler extends Handler {
 
         if (this.isParentScrollable()) {
 
-            const bounds = this.bounds;
-            const paper  = this.getPaper();
+            let bounds = this.bounds;
+            let paper  = this.getPaper();
 
-            const sx = paper.sx;
-            const sy = paper.sy;
+            let sx = paper.sx;
+            let sy = paper.sy;
 
-            const scrollParent = this.scrollParent;
-            const scrollWidth  = scrollParent.scrollWidth;
-            const scrollHeight = scrollParent.scrollHeight;
-            const clientWidth  = scrollParent.clientWidth;
-            const clientHeight = scrollParent.clientHeight;
+            let scrollParent = this.scrollParent;
+            let scrollWidth  = scrollParent.scrollWidth;
+            let scrollHeight = scrollParent.scrollHeight;
+            let clientWidth  = scrollParent.clientWidth;
+            let clientHeight = scrollParent.clientHeight;
 
             let sense = this.options.scrollSense;
 
@@ -578,13 +578,13 @@ class SelectHandler extends Handler {
             let scrollTop  = scrollParent.scrollTop;
             let scrollLeft = scrollParent.scrollLeft;
 
-            const sBounds = this.getScrollBounds();
-            const vBounds = this.getScrollBounds(true);
+            let sBounds = this.getScrollBounds();
+            let vBounds = this.getScrollBounds(true);
 
-            const minX = vBounds.left;
-            const minY = vBounds.top;
-            const maxX = vBounds.right - width;
-            const maxY = vBounds.bottom - height;
+            let minX = vBounds.left;
+            let minY = vBounds.top;
+            let maxX = vBounds.right - width;
+            let maxY = vBounds.bottom - height;
 
             let scrolled = false;
 
@@ -637,28 +637,31 @@ class SelectHandler extends Handler {
         let bounds = this.bounds;
         if (bounds) {
 
-            const paper = this.getPaper();
-            const elem  = this.previewRect;
+            let paper = this.getPaper();
+            let elem  = this.previewRect;
 
-            const x = Math.round(bounds.x * paper.sx + paper.tx);
-            const y = Math.round(bounds.y * paper.sy + paper.ty);
+            let x = Math.round(bounds.x * paper.sx + paper.tx);
+            let y = Math.round(bounds.y * paper.sy + paper.ty);
 
             utils.setTranslate(elem, x, y);
 
             // update size
             if (resize) {
 
-                const width  = Math.round(bounds.width * paper.sx);
-                const height = Math.round(bounds.height * paper.sy);
+                let width  = Math.round(bounds.width * paper.sx);
+                let height = Math.round(bounds.height * paper.sy);
 
                 utils.setStyle(elem, {
                     width: width + 'px',
                     height: height + 'px'
                 });
 
-                const borderRadius = this.movingCells.length === 1
-                    ? Math.floor(height / 2) + 'px'
-                    : '';
+
+                let borderRadius = '';
+
+                if (this.movingCells.length === 1) {
+                    borderRadius = Math.floor(height / 2) + 'px';
+                }
 
                 utils.setStyle(elem, {
                     'border-radius': borderRadius
@@ -708,13 +711,13 @@ class SelectHandler extends Handler {
         let bounds = this.bounds;
         if (bounds) {
 
-            const paper = this.getPaper();
-            const elem  = this.selectionRect;
+            let paper = this.getPaper();
+            let elem  = this.selectionRect;
 
-            const x      = Math.round(bounds.x * paper.sx + paper.tx);
-            const y      = Math.round(bounds.y * paper.sy + paper.ty);
-            const width  = Math.round(bounds.width * paper.sx);
-            const height = Math.round(bounds.height * paper.sy);
+            let x      = Math.round(bounds.x * paper.sx + paper.tx);
+            let y      = Math.round(bounds.y * paper.sy + paper.ty);
+            let width  = Math.round(bounds.width * paper.sx);
+            let height = Math.round(bounds.height * paper.sy);
 
             utils.setTranslate(elem, x, y);
             utils.setStyle(elem, {
@@ -742,13 +745,13 @@ class SelectHandler extends Handler {
             let scrollTop    = scrollParent.scrollTop;
             let scrollLeft   = scrollParent.scrollLeft;
 
-            const paper = this.getPaper();
+            let paper = this.getPaper();
 
-            const sx = paper.sx;
-            const sy = paper.sy;
+            let sx = paper.sx;
+            let sy = paper.sy;
 
-            const sBounds = this.getScrollBounds();
-            const vBounds = this.getScrollBounds(true);
+            let sBounds = this.getScrollBounds();
+            let vBounds = this.getScrollBounds(true);
 
             if (scrollLeft > 0 && localX <= vBounds.left) {
 
@@ -911,14 +914,14 @@ class SelectHandler extends Handler {
 
     isOnScrollBar(e) {
 
-        const paper  = this.getPaper();
-        const bounds = utils.getBounds(paper.getWrap());
+        let paper  = this.getPaper();
+        let bounds = utils.getBounds(paper.getWrap());
 
-        const maxX = bounds.left + bounds.width;
-        const minX = maxX - scrollBarWidth;
+        let maxX = bounds.left + bounds.width;
+        let minX = maxX - scrollBarWidth;
 
-        const maxY = bounds.top + bounds.height;
-        const minY = maxY - scrollBarWidth;
+        let maxY = bounds.top + bounds.height;
+        let minY = maxY - scrollBarWidth;
 
         return utils.isWithin(e.pageX, minX, maxX)
             || utils.isWithin(e.pageY, minY, maxY);

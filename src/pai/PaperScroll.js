@@ -3,9 +3,9 @@ import detector   from '../common/detector';
 
 
 const defaults = {
-    paper    : null,
-    space    : 50,
-    minWidth : 0,
+    paper: null,
+    space: 50,
+    minWidth: 0,
     minHeight: 0
 };
 
@@ -122,20 +122,20 @@ class PaperScroll {
             let clientHeight = this.clientHeight;
 
             padding = {
-                top   : clientHeight - space.top,
-                right : clientWidth - space.right,
+                top: clientHeight - space.top,
+                right: clientWidth - space.right,
                 bottom: clientHeight - space.bottom,
-                left  : clientWidth - space.left
+                left: clientWidth - space.left
             };
         }
 
         this.padding = padding;
 
         utils.setStyle(this.scrollElem, {
-            paddingTop   : padding.top + 'px',
-            paddingRight : padding.right + 'px',
+            paddingTop: padding.top + 'px',
+            paddingRight: padding.right + 'px',
             paddingBottom: padding.bottom + 'px',
-            paddingLeft  : padding.left + 'px'
+            paddingLeft: padding.left + 'px'
         });
 
         return this;
@@ -149,7 +149,7 @@ class PaperScroll {
         const sy = paper.sy;
 
         let options = {
-            frameWidth : this.baseWidth * sx,
+            frameWidth: this.baseWidth * sx,
             frameHeight: this.baseHeight * sy
         };
 
@@ -198,7 +198,7 @@ class PaperScroll {
     doResize(width = this.baseWidth, height = this.baseHeight) {
 
         utils.setStyle(this.scrollElem, {
-            width : width + 'px',
+            width: width + 'px',
             height: height + 'px'
         });
 
