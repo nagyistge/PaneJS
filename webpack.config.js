@@ -17,7 +17,7 @@ entry[pkg.name + '-' + pkg.version] = './src/index.js';
 
 entry[pkg.name + '-pai']          = './src/pai.js';
 entry[pkg.name + '-pai-0.1.5']    = './src/pai.js';
-entry[pkg.name + '-myData-0.1.0'] = './src/myData.js';
+entry[pkg.name + '-myData-0.1.1'] = './src/myData.js';
 
 module.exports = {
 
