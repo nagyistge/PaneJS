@@ -56,7 +56,7 @@ class RemarkView extends CellView {
 
     setup() {
 
-        var that = this;
+        let that = this;
 
         utils.addEventListener(this.elem, 'dblclick', selectors.content, function (e) {
             e.stopPropagation();
@@ -107,7 +107,7 @@ class RemarkView extends CellView {
 
     editRemark() {
 
-        var that = this;
+        let that = this;
 
         if (!this.editing) {
 
@@ -205,7 +205,7 @@ class RemarkView extends CellView {
                             this.cell.position = {
                                 x: pos.x,
                                 y: pos.y
-                            }
+                            };
 
                             this.translate();
                             if (paper) {
@@ -220,7 +220,7 @@ class RemarkView extends CellView {
 
     detectContentSize() {
 
-        let max  = this.cell.getMaxSize()
+        let max  = this.cell.getMaxSize();
         let size = this.cell.getSize();
 
 

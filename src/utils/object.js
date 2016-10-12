@@ -1,5 +1,5 @@
-import { forEach }                     from './array';
-import { isArray, isObject, isWindow } from './lang';
+import { forEach } from './array';
+import { isNil, isArray, isObject, isWindow } from './lang';
 
 
 function hasOwn(obj, key) {
@@ -122,7 +122,7 @@ function isPlainObject(obj) {
     //  - Any object or value whose internal [[Class]] property is not "[object Object]"
     //  - DOM nodes
     //  - window
-    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
+    if (isNil(obj) || !isObject(obj) || obj.nodeType || isWindow(obj)) {
         return false;
     }
 

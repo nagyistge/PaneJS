@@ -1,5 +1,5 @@
-import {isNil} from './lang';
-import {getByPath} from './object';
+import { isNil } from './lang';
+import { getByPath } from './object';
 
 let proto = String.prototype;
 

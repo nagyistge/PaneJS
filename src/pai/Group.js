@@ -99,7 +99,7 @@ class Group extends Node {
                 y: bounds.y
             }
         }, {
-            silent: silent
+            silent
         });
 
         return this;
@@ -165,10 +165,10 @@ class Group extends Node {
 
             let index = 0;
 
-            utils.some(parentNode.getChildren(), function (node, index) {
+            utils.some(parentNode.getChildren(), function (node, idx) {
 
                 if (node.isGroup && node.isGroup()) {
-                    index = index;
+                    index = idx;
                 } else if (node.isNode()) {
                     index += 1;
                     return true;
@@ -205,7 +205,7 @@ class Group extends Node {
 
     getRenderData() {
 
-        var data = super.getRenderData();
+        const data = super.getRenderData();
 
         return utils.merge({}, data, {
             size: this.metadata.size,

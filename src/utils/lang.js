@@ -1,99 +1,44 @@
-let objProto = Object.prototype;
-let toString = objProto.toString;
+const toString = Object.prototype.toString;
 
 
-function isNull(obj) {
+export const isNull      = val => val === null;
+export const isString    = val => typeof val === 'string';
+export const isBoolean   = val => typeof val === 'boolean';
+export const isUndefined = val => typeof val === 'undefined';
 
-    return obj === null;
-}
+// is null or undefined
+export const isNil = val => isUndefined(val) || isNull(val);
 
-function isUndefined(obj) {
+// function and object are truly
+export const isObject = val => {
 
-    return typeof obj === 'undefined';
-}
-
-function isNil(obj) {
-
-    return isUndefined(obj) || isNull(obj);
-}
-
-function isString(obj) {
-
-    return typeof obj === 'string';
-}
-
-function isBoolean(obj) {
-
-    return typeof obj === 'boolean';
-}
-
-function isType(obj, type) {
-
-    return toString.call(obj) === '[object ' + type + ']';
-}
-
-function isObject(obj) {
-
-    if (!obj) {
+    if (!val) {
         return false;
     }
 
-    let type = typeof obj;
+    return typeof val === 'function' || typeof val === 'object';
+};
 
-    return type === 'function' || type === 'object';
-}
+export const isType = (val, type) => {
+    return toString.call(val) === '[object ' + type + ']';
+};
 
-function isWindow(obj) {
+export const isArray    = val => Array.isArray(val);
+export const isWindow   = val => val && val === val.window;
+export const isNumeric  = val => !isArray(val) && (val - parseFloat(val) + 1) >= 0;
+export const isFunction = val => isType(val, 'Function');
 
-    return obj && obj === obj.window;
-}
+export const isArrayLike = val => {
 
-function isFunction(obj) {
-
-    return isType(obj, 'Function');
-}
-
-function isArray(obj) {
-
-    return Array.isArray(obj);
-}
-
-function isArrayLike(obj) {
-
-    if (isArray(obj)) {
+    if (isArray(val)) {
         return true;
     }
 
-    if (isFunction(obj) || isWindow(obj)) {
+    if (isFunction(val) || isWindow(val)) {
         return false;
     }
 
-    let length = !!obj && 'length' in obj && obj.length;
+    let len = !!val && 'length' in val && val.length;
 
-    return length === 0 ||
-        typeof length === 'number' && length > 0 && (length - 1) in obj;
-}
-
-function isNumeric(obj) {
-
-    return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-}
-
-
-// exports
-// -------
-
-export {
-    isNil,
-    isNull,
-    isType,
-    isArray,
-    isWindow,
-    isObject,
-    isString,
-    isBoolean,
-    isNumeric,
-    isFunction,
-    isArrayLike,
-    isUndefined,
+    return len === 0 || typeof len === 'number' && len > 0 && (len - 1) in val;
 };

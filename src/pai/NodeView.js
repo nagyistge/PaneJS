@@ -24,7 +24,7 @@ const classNames = {
     connectable: 'is-connectable',
     adsorbed: 'is-adsorbed',
     bulb: 'pane-node-bulb',
-    recommending:'recommending',
+    recommending: 'recommending',
     recommendable: 'recommendable',
 };
 
@@ -141,7 +141,7 @@ class NodeView extends BaseView {
         this.vel.toggleClass(classNames.recommendable, recommendable);
     }
 
-    setRecommending(recommending){
+    setRecommending(recommending) {
 
         this.vel.toggleClass(classNames.recommending, recommending);
     }

@@ -8,7 +8,7 @@ class Handler extends Base {
         return cell && cell.isGroup && cell.isGroup();
     }
 
-    isRemark(cell){
+    isRemark(cell) {
 
         return cell && cell.isRemark && cell.isRemark();
     }

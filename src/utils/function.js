@@ -1,5 +1,5 @@
 import { isFunction } from './lang';
-import { slice      } from './array';
+import { slice } from './array';
 
 
 function invoke(fn, args, context) {
@@ -44,17 +44,19 @@ function bind(fn /* [, context, arg1[,arg2[,argN]]] */) {
 
 const deferred = [];
 
-const defer = (fn) => {
+function defer(fn) {
+
     deferred.push(fn);
-};
+}
 
-const flush = () => {
+function flush() {
 
-    let fn;
-    while (fn = deferred.pop()) {
+    let fn = deferred.pop();
+    while (fn) {
         fn();
+        fn = deferred.pop();
     }
-};
+}
 
 
 // exports

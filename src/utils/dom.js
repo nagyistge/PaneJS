@@ -8,10 +8,9 @@ import {
     isUndefined,
 } from './lang';
 
-import {forEach, reduce} from './array';
-import {trim, split, uuid} from './string';
-import {forIn} from './object';
-import {defer, flush} from './function';
+import { forEach, reduce } from './array';
+import { trim, split } from './string';
+import { forIn } from './object';
 
 
 // classNames

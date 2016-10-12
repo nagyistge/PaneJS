@@ -914,17 +914,17 @@ class SelectHandler extends Handler {
 
     divGroupsAndNodes(cells = []) {
 
-        var nodes    = [];
-        var groups   = [];
-        var nodeById = {};
+        let nodes    = [];
+        let groups   = [];
+        let nodeById = {};
 
-        utils.forEach(cells, function (node) {
+        utils.forEach(cells, function (cell) {
 
-            if (this.isGroup(node)) {
+            if (this.isGroup(cell)) {
 
-                groups.push(node);
+                groups.push(cell);
 
-                let ret = this.divGroupsAndNodes(node.getChildren());
+                let ret = this.divGroupsAndNodes(cell.getChildren());
 
                 utils.forEach(ret.nodes, function (node) {
                     if (!nodeById[node.id]) {
@@ -937,9 +937,9 @@ class SelectHandler extends Handler {
 
             } else {
 
-                if (!nodeById[node.id]) {
-                    nodes.push(node);
-                    nodeById[node.id] = true;
+                if (!nodeById[cell.id]) {
+                    nodes.push(cell);
+                    nodeById[cell.id] = true;
                 }
             }
 
@@ -984,17 +984,17 @@ class SelectHandler extends Handler {
 
         model.endUpdate();
 
+        const shouldUpdate = parentNode => {
+            return this.isGroup(parentNode)
+                && !utils.some(groups, group => parentNode === group);
+        };
+
         utils.forEach(nodes, function (node) {
 
             let parentNode = node.getParent();
             while (parentNode) {
 
-                let shouldUpdate = this.isGroup(parentNode)
-                    && !utils.some(groups, function (group) {
-                        return parentNode === group;
-                    });
-
-                if (shouldUpdate) {
+                if (shouldUpdate(parentNode)) {
                     parentNode.updateGeometry();
                 }
 

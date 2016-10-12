@@ -54,9 +54,7 @@ class Link extends Cell {
             marker = { name: marker };
         }
 
-        marker.selector = isSource
-            ? '.source-marker'
-            : '.target-marker';
+        marker.selector = isSource ? '.source-marker' : '.target-marker';
 
         return marker;
     }

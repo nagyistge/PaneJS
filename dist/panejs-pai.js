@@ -601,100 +601,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
-	var objProto = Object.prototype;
-	var toString = objProto.toString;
+	var toString = Object.prototype.toString;
 	
-	function isNull(obj) {
+	var isNull = exports.isNull = function isNull(val) {
+	    return val === null;
+	};
+	var isString = exports.isString = function isString(val) {
+	    return typeof val === 'string';
+	};
+	var isBoolean = exports.isBoolean = function isBoolean(val) {
+	    return typeof val === 'boolean';
+	};
+	var isUndefined = exports.isUndefined = function isUndefined(val) {
+	    return typeof val === 'undefined';
+	};
 	
-	    return obj === null;
-	}
+	// is null or undefined
+	var isNil = exports.isNil = function isNil(val) {
+	    return isUndefined(val) || isNull(val);
+	};
 	
-	function isUndefined(obj) {
+	// function and object are truly
+	var isObject = exports.isObject = function isObject(val) {
 	
-	    return typeof obj === 'undefined';
-	}
-	
-	function isNil(obj) {
-	
-	    return isUndefined(obj) || isNull(obj);
-	}
-	
-	function isString(obj) {
-	
-	    return typeof obj === 'string';
-	}
-	
-	function isBoolean(obj) {
-	
-	    return typeof obj === 'boolean';
-	}
-	
-	function isType(obj, type) {
-	
-	    return toString.call(obj) === '[object ' + type + ']';
-	}
-	
-	function isObject(obj) {
-	
-	    if (!obj) {
+	    if (!val) {
 	        return false;
 	    }
 	
-	    var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
+	    return typeof val === 'function' || (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
+	};
 	
-	    return type === 'function' || type === 'object';
-	}
+	var isType = exports.isType = function isType(val, type) {
+	    return toString.call(val) === '[object ' + type + ']';
+	};
 	
-	function isWindow(obj) {
+	var isArray = exports.isArray = function isArray(val) {
+	    return Array.isArray(val);
+	};
+	var isWindow = exports.isWindow = function isWindow(val) {
+	    return val && val === val.window;
+	};
+	var isNumeric = exports.isNumeric = function isNumeric(val) {
+	    return !isArray(val) && val - parseFloat(val) + 1 >= 0;
+	};
+	var isFunction = exports.isFunction = function isFunction(val) {
+	    return isType(val, 'Function');
+	};
 	
-	    return obj && obj === obj.window;
-	}
+	var isArrayLike = exports.isArrayLike = function isArrayLike(val) {
 	
-	function isFunction(obj) {
-	
-	    return isType(obj, 'Function');
-	}
-	
-	function isArray(obj) {
-	
-	    return Array.isArray(obj);
-	}
-	
-	function isArrayLike(obj) {
-	
-	    if (isArray(obj)) {
+	    if (isArray(val)) {
 	        return true;
 	    }
 	
-	    if (isFunction(obj) || isWindow(obj)) {
+	    if (isFunction(val) || isWindow(val)) {
 	        return false;
 	    }
 	
-	    var length = !!obj && 'length' in obj && obj.length;
+	    var len = !!val && 'length' in val && val.length;
 	
-	    return length === 0 || typeof length === 'number' && length > 0 && length - 1 in obj;
-	}
-	
-	function isNumeric(obj) {
-	
-	    return !isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
-	}
-	
-	// exports
-	// -------
-	
-	exports.isNil = isNil;
-	exports.isNull = isNull;
-	exports.isType = isType;
-	exports.isArray = isArray;
-	exports.isWindow = isWindow;
-	exports.isObject = isObject;
-	exports.isString = isString;
-	exports.isBoolean = isBoolean;
-	exports.isNumeric = isNumeric;
-	exports.isFunction = isFunction;
-	exports.isArrayLike = isArrayLike;
-	exports.isUndefined = isUndefined;
+	    return len === 0 || typeof len === 'number' && len > 0 && len - 1 in val;
+	};
 
 /***/ },
 /* 5 */
@@ -703,69 +670,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
-	exports.reduceRight = exports.reduce = exports.filter = exports.every = exports.some = exports.map = exports.forEach = exports.contains = exports.lastIndexOf = exports.indexOf = exports.slice = exports.toArray = undefined;
+	exports.reduceRight = exports.reduce = exports.forEach = exports.filter = exports.every = exports.some = exports.map = exports.contains = exports.lastIndexOf = exports.indexOf = exports.slice = exports.toArray = undefined;
 	
 	var _lang = __webpack_require__(4);
 	
 	var proto = Array.prototype;
 	
-	var toArray = function toArray(obj) {
-	    return (0, _lang.isArray)(obj) ? obj : (0, _lang.isArrayLike)(obj) ? proto.slice.call(obj) : [obj];
+	var toArray = exports.toArray = function toArray(arr) {
+	  return (0, _lang.isArrayLike)(arr) ? proto.slice.call(arr) : [arr];
 	};
 	
-	var slice = function slice(arr, start, end) {
-	    return arr ? proto.slice.call(arr, start, end) : [];
+	var slice = exports.slice = function slice(arr, start, end) {
+	  return arr ? proto.slice.call(arr, start, end) : [];
 	};
-	var indexOf = function indexOf(arr, item) {
-	    return arr ? proto.indexOf.call(arr, item) : -1;
+	var indexOf = exports.indexOf = function indexOf(arr, item) {
+	  return arr ? proto.indexOf.call(arr, item) : -1;
 	};
-	var lastIndexOf = function lastIndexOf(arr, item) {
-	    return arr ? proto.lastIndexOf.call(arr, item) : -1;
+	var lastIndexOf = exports.lastIndexOf = function lastIndexOf(arr, item) {
+	  return arr ? proto.lastIndexOf.call(arr, item) : -1;
 	};
-	var contains = function contains(arr, item) {
-	    return arr && indexOf(arr, item) >= 0;
-	};
-	
-	var forEach = function forEach(arr, iterator, context) {
-	    arr && proto.forEach.call(arr, iterator, context);
-	};
-	var map = function map(arr, iterator, context) {
-	    return arr ? proto.map.call(arr, iterator, context) : [];
-	};
-	var some = function some(arr, iterator, context) {
-	    return arr ? proto.some.call(arr, iterator, context) : false;
-	};
-	var every = function every(arr, iterator, context) {
-	    return arr ? proto.every.call(arr, iterator, context) : false;
-	};
-	var filter = function filter(arr, iterator, context) {
-	    return arr ? proto.filter.call(arr, iterator, context) : [];
+	var contains = exports.contains = function contains(arr, item) {
+	  return arr && indexOf(arr, item) >= 0;
 	};
 	
-	var reduce = function reduce(arr, iterator, initialValue) {
-	    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
+	var map = exports.map = function map(arr, iterator, context) {
+	  return arr ? proto.map.call(arr, iterator, context) : [];
 	};
-	var reduceRight = function reduceRight(arr, iterator, initialValue) {
-	    return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
+	var some = exports.some = function some(arr, iterator, context) {
+	  return arr ? proto.some.call(arr, iterator, context) : false;
+	};
+	var every = exports.every = function every(arr, iterator, context) {
+	  return arr ? proto.every.call(arr, iterator, context) : false;
+	};
+	var filter = exports.filter = function filter(arr, iterator, context) {
+	  return arr ? proto.filter.call(arr, iterator, context) : [];
+	};
+	var forEach = exports.forEach = function forEach(arr, iterator, context) {
+	  arr && proto.forEach.call(arr, iterator, context);
 	};
 	
-	// exports
-	// -------
-	
-	exports.toArray = toArray;
-	exports.slice = slice;
-	exports.indexOf = indexOf;
-	exports.lastIndexOf = lastIndexOf;
-	exports.contains = contains;
-	exports.forEach = forEach;
-	exports.map = map;
-	exports.some = some;
-	exports.every = every;
-	exports.filter = filter;
-	exports.reduce = reduce;
-	exports.reduceRight = reduceRight;
+	var reduce = exports.reduce = function reduce(arr, iterator, initialValue) {
+	  return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
+	};
+	var reduceRight = exports.reduceRight = function reduceRight(arr, iterator, initialValue) {
+	  return arr ? proto.reduceRight.call(arr, iterator, initialValue) : initialValue;
+	};
 
 /***/ },
 /* 6 */
@@ -1109,7 +1060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //  - Any object or value whose internal [[Class]] property is not "[object Object]"
 	    //  - DOM nodes
 	    //  - window
-	    if (!(0, _lang.isObject)(obj) || obj.nodeType || (0, _lang.isWindow)(obj)) {
+	    if ((0, _lang.isNil)(obj) || !(0, _lang.isObject)(obj) || obj.nodeType || (0, _lang.isWindow)(obj)) {
 	        return false;
 	    }
 	
@@ -1296,17 +1247,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var deferred = [];
 	
-	var defer = function defer(fn) {
+	function defer(fn) {
+	
 	    deferred.push(fn);
-	};
+	}
 	
-	var flush = function flush() {
+	function flush() {
 	
-	    var fn = void 0;
-	    while (fn = deferred.pop()) {
+	    var fn = deferred.pop();
+	    while (fn) {
 	        fn();
+	        fn = deferred.pop();
 	    }
-	};
+	}
 	
 	// exports
 	// -------
@@ -1334,8 +1287,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _string = __webpack_require__(6);
 	
 	var _object = __webpack_require__(7);
-	
-	var _function = __webpack_require__(9);
 	
 	// classNames
 	// ----------
@@ -9267,10 +9218,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    var index = 0;
 	
-	                    utils.some(parentNode.getChildren(), function (node, index) {
+	                    utils.some(parentNode.getChildren(), function (node, idx) {
 	
 	                        if (node.isGroup && node.isGroup()) {
-	                            index = index;
+	                            index = idx;
 	                        } else if (node.isNode()) {
 	                            index += 1;
 	                            return true;
@@ -12126,13 +12077,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var groups = [];
 	            var nodeById = {};
 	
-	            utils.forEach(cells, function (node) {
+	            utils.forEach(cells, function (cell) {
 	
-	                if (this.isGroup(node)) {
+	                if (this.isGroup(cell)) {
 	
-	                    groups.push(node);
+	                    groups.push(cell);
 	
-	                    var ret = this.divGroupsAndNodes(node.getChildren());
+	                    var ret = this.divGroupsAndNodes(cell.getChildren());
 	
 	                    utils.forEach(ret.nodes, function (node) {
 	                        if (!nodeById[node.id]) {
@@ -12144,9 +12095,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    groups.push.apply(groups, ret.groups);
 	                } else {
 	
-	                    if (!nodeById[node.id]) {
-	                        nodes.push(node);
-	                        nodeById[node.id] = true;
+	                    if (!nodeById[cell.id]) {
+	                        nodes.push(cell);
+	                        nodeById[cell.id] = true;
 	                    }
 	                }
 	            }, this);
@@ -12160,6 +12111,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'updateNodesPosition',
 	        value: function updateNodesPosition() {
 	            var cells = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+	
+	            var _this2 = this;
+	
 	            var dx = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 	            var dy = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 	
@@ -12198,16 +12152,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            model.endUpdate();
 	
+	            var shouldUpdate = function shouldUpdate(parentNode) {
+	                return _this2.isGroup(parentNode) && !utils.some(groups, function (group) {
+	                    return parentNode === group;
+	                });
+	            };
+	
 	            utils.forEach(nodes, function (node) {
 	
 	                var parentNode = node.getParent();
 	                while (parentNode) {
 	
-	                    var shouldUpdate = this.isGroup(parentNode) && !utils.some(groups, function (group) {
-	                        return parentNode === group;
-	                    });
-	
-	                    if (shouldUpdate) {
+	                    if (shouldUpdate(parentNode)) {
 	                        parentNode.updateGeometry();
 	                    }
 	
