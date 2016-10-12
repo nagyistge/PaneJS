@@ -35,9 +35,31 @@ class GroupView extends CellView {
         return this;
     }
 
+    setup() {
+
+        const that = this;
+
+        utils.addEventListener(this.elem, 'mousedown', '.btn-toggle', function (e) {
+            e.stopPropagation();
+        });
+
+        utils.addEventListener(this.elem, 'click', '.btn-toggle', function (e) {
+            e.stopPropagation();
+            that.cell.toggleCollapse();
+
+            let paper = that.getPaper();
+            if (paper) {
+                paper.trigger('group:collapseChanged', that.cell);
+            }
+        });
+
+        return this;
+    }
+
     renderMarkup() {
 
-        let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
+        const group  = this.cell;
+        const markup = this.compileMarkup(group.getMarkup(), group.getRenderData());
 
         this.elem.innerHTML = markup;
 
@@ -83,6 +105,36 @@ class GroupView extends CellView {
         this.vel.translate(position.x, position.y);
 
         return this;
+    }
+
+    setNodeName(name) {
+
+        let group = this.getCell();
+
+        if (group.data) {
+            group.data.name = name;
+        }
+
+        let vName = this.findOne('.name');
+        if (vName) {
+            vName.empty();
+            vName.append(document.createTextNode(name));
+        }
+
+        return this;
+    }
+
+    getStrokeWidth() {
+
+        return 1;
+    }
+
+    getStrokedBBox() {
+
+        let sw   = this.getStrokeWidth() - 1;
+        let bbox = this.getCell().getBBox();
+
+        return sw ? bbox.grow(sw / 2) : bbox;
     }
 }
 

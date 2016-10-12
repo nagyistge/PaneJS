@@ -7452,7 +7452,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.vel = (0, _vector2.default)(this.cell.getTagName(), {
 	                'class': this.cell.getClassName()
 	            });
+	
 	            this.elem = this.vel.node;
+	
 	            // attach cell's id to elem
 	            this.elem.cellId = this.cell.id;
 	
@@ -8020,7 +8022,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    connected: 'is-connected',
 	    connecting: 'is-connecting',
 	    connectable: 'is-connectable',
-	    adsorbed: 'is-adsorbed'
+	    adsorbed: 'is-adsorbed',
+	    bulb: 'pane-node-bulb',
+	    recommending: 'recommending',
+	    recommendable: 'recommendable'
 	};
 	
 	var NodeView = function (_BaseView) {
@@ -8149,6 +8154,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                })();
 	            }
+	        }
+	    }, {
+	        key: 'setRecommendable',
+	        value: function setRecommendable(recommendable) {
+	
+	            this.vel.toggleClass(classNames.recommendable, recommendable);
+	        }
+	    }, {
+	        key: 'setRecommending',
+	        value: function setRecommending(recommending) {
+	
+	            this.vel.toggleClass(classNames.recommending, recommending);
 	        }
 	    }, {
 	        key: 'getBBox',
@@ -8282,6 +8299,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            while (elem && elem !== this.elem) {
 	                if (utils.hasClass(elem, classNames.inPortList)) {
+	                    return true;
+	                }
+	                elem = elem.parentNode;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'isBulbElem',
+	        value: function isBulbElem(elem) {
+	
+	            while (elem && elem !== this.elem) {
+	                if (utils.hasClass(elem, classNames.bulb)) {
 	                    return true;
 	                }
 	                elem = elem.parentNode;
@@ -9126,10 +9156,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    bounds.height = minSize.height;
 	                } else {
 	
-	                    bounds.x -= 20;
+	                    bounds.x -= 35;
 	                    bounds.y -= 35;
-	                    bounds.width += 40;
-	                    bounds.height += 50;
+	                    bounds.width += 70;
+	                    bounds.height += 55;
 	                }
 	            } else {
 	                bounds = {
@@ -9883,7 +9913,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        } else {
 	                            if (newVal) {
 	
-	                                newVal = newVal.substr(0, 30);
 	                                newVal = utils.escape(newVal);
 	
 	                                this.cell.data.name = newVal;
@@ -11219,7 +11248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.origin = null;
 	            this.bounds = null;
 	
-	            this.getPaper().on('cell:pointerDown', this.onCellMouseDown.bind(this)).on('blank:pointerDown', this.onBlankMouseDown.bind(this)).on('blank:pointerMove', this.onBlankMouseMove.bind(this)).on('blank:pointerUp', this.onBlankMouseUp.bind(this));
+	            this.getPaper().on('cell:pointerDown', this.onCellMouseDown.bind(this)).on('cell:contextmenu', this.onCellContextMenu.bind(this)).on('blank:pointerDown', this.onBlankMouseDown.bind(this)).on('blank:pointerMove', this.onBlankMouseMove.bind(this)).on('blank:pointerUp', this.onBlankMouseUp.bind(this));
 	
 	            this.nodeMouseUpHandler = this.onCellMouseUp.bind(this);
 	            this.nodeMouseMoveHandler = this.onCellMouseMove.bind(this);
@@ -11310,6 +11339,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (this.isNode(cell) && !this.isGroup(cell) && !this.isRemark(cell) && view.isPortElem(e.target)) {
+	                return;
+	            }
+	
+	            if (view.isBulbElem && view.isBulbElem(e.target)) {
 	                return;
 	            }
 	
@@ -11442,6 +11475,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.bounds = null;
 	            this.moving = false;
 	            this.movingCells = null;
+	        }
+	    }, {
+	        key: 'onCellContextMenu',
+	        value: function onCellContextMenu(cell, view) {
+	
+	            // select cell when context menu
+	            if (this.isNode(cell) && !this.isGroup(cell) && !this.isRemark(cell)) {
+	                this.selectCell(cell, view);
+	                this.setCellFocused(cell, view);
+	            }
 	        }
 	    }, {
 	        key: 'onBlankMouseDown',
@@ -15787,6 +15830,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
+	        key: 'isUpdated',
+	        value: function isUpdated() {
+	
+	            return this.updateLevel === 0;
+	        }
+	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
 	
@@ -16972,7 +17021,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    y = utils.fixNumber(y, false, 0);
 	                }
 	
-	                node.position = this.snapToGrid({ x: x, y: y }, true);
+	                node.position = this.snapToGrid({
+	                    x: x,
+	                    y: y
+	                }, true);
 	            }
 	
 	            return this;
@@ -17343,19 +17395,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'isValidEvent',
 	        value: function isValidEvent(e, view) {
 	
-	            // If the event is interesting, guard returns `true`.
+	            // If the event is interesting, returns `true`.
 	            // Otherwise, return `false`.
 	
-	            if (this.options.isValidEvent && !this.options.isValidEvent(e, view)) {
+	            var cell = view && view.cell;
+	
+	            if (this.options.isValidEvent && !this.options.isValidEvent(e, cell, view)) {
 	                return false;
 	            }
 	
-	            if (view && view.cell && view.cell instanceof _Cell2.default) {
+	            if (cell && cell instanceof _Cell2.default) {
 	                return true;
 	            }
 	
-	            var delegate = this.eventDelegate;
 	            var target = e.target;
+	            var delegate = this.eventDelegate;
 	
 	            if (delegate === target || utils.containsElement(delegate, target)) {
 	                return true;
@@ -17597,17 +17651,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'toLocalPoint',
 	        value: function toLocalPoint(point) {
 	
-	            var svg = this.svg;
-	            var svgPoint = svg.createSVGPoint();
+	            var offset = this.getRootOffset();
+	            var svgPoint = this.svg.createSVGPoint();
+	
+	            svgPoint.x = point.x + offset.left;
+	            svgPoint.y = point.y + offset.top;
+	
+	            var result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
+	
+	            return _Point2.default.fromPoint(result);
+	        }
+	    }, {
+	        key: 'toClientPoint',
+	        value: function toClientPoint(point) {
+	
+	            var offset = this.getRootOffset();
+	            var svgPoint = this.svg.createSVGPoint();
 	
 	            svgPoint.x = point.x;
 	            svgPoint.y = point.y;
+	
+	            var result = svgPoint.matrixTransform(this.drawPane.getCTM());
+	
+	            result.x -= offset.left;
+	            result.y -= offset.top;
+	
+	            return _Point2.default.fromPoint(result);
+	        }
+	    }, {
+	        key: 'getRootOffset',
+	        value: function getRootOffset() {
 	
 	            // This is a hack for Firefox! If there wasn't a fake (non-visible)
 	            // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
 	            // used below won't work.
 	            var fakeRect = void 0;
 	            if (_detector2.default.IS_FF) {
+	
 	                fakeRect = (0, _vector2.default)('rect', {
 	                    width: this.options.width,
 	                    height: this.options.height,
@@ -17615,10 +17695,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    y: 0,
 	                    opacity: 0
 	                });
-	                svg.appendChild(fakeRect.node);
+	
+	                this.svg.appendChild(fakeRect.node);
 	            }
 	
-	            var paperOffset = utils.getOffset(svg);
+	            var paperOffset = utils.getOffset(this.svg);
 	
 	            if (_detector2.default.IS_FF) {
 	                fakeRect.remove();
@@ -17629,13 +17710,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var scrollTop = body.scrollTop || docElem.scrollTop;
 	            var scrollLeft = body.scrollLeft || docElem.scrollLeft;
 	
-	            svgPoint.x += scrollLeft - paperOffset.left;
-	            svgPoint.y += scrollTop - paperOffset.top;
-	
-	            // Transform point into the viewport coordinate system.
-	            var result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
-	
-	            return _Point2.default.fromPoint(result);
+	            return {
+	                left: scrollLeft - paperOffset.left,
+	                top: scrollTop - paperOffset.top
+	            };
 	        }
 	    }, {
 	        key: 'toLocalRect',
@@ -19983,4 +20061,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs-pai-0.1.5.js.map
+//# sourceMappingURL=panejs-pai-0.1.9.js.map

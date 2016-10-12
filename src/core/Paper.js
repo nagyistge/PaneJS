@@ -18,6 +18,7 @@ import PositionChange  from '../changes/PositionChange';
 import RotationChange  from '../changes/RotationChange';
 import TerminalChange  from '../changes/TerminalChange';
 import GeometryChange  from '../changes/GeometryChange';
+import CollapseChange  from '../changes/CollapseChange';
 import AttributeChange from '../changes/AttributeChange';
 
 
@@ -250,7 +251,6 @@ class Paper extends Events {
         return this;
     }
 
-
     getModel() {
 
         return this.model;
@@ -371,6 +371,12 @@ class Paper extends Events {
 
             vector(this.viewport).translate(tx, ty);
 
+            // translate htmlPane
+            utils.setStyle(this.htmlPane, {
+                top: ty + 'px',
+                left: tx + 'px'
+            });
+
             this.tx = tx;
             this.ty = ty;
 
@@ -414,6 +420,11 @@ class Paper extends Events {
             }
 
             vViewport.scale(sx, sy);
+            // scale htmlPane
+            utils.setStyle(this.htmlPane, {
+                transform: 'translate3d(0, 0, 0) scale3d(' + sx + ',' + sy + ', 1)'
+            });
+
 
             this.sx = sx;
             this.sy = sy;
@@ -605,6 +616,7 @@ class Paper extends Events {
         return this;
     }
 
+
     // validate
     // --------
 
@@ -689,9 +701,12 @@ class Paper extends Events {
     validateView(cell, recurse = true) {
 
         if (cell) {
+
             let view = this.getView(cell);
             if (view) {
                 if (view.invalid) {
+                    // geometry shoule be updated after the parent be validated
+                    // for child node may has relative geometry
                     this.validateView(cell.getParent(), false)
                         .updateNodeGeometry(cell)
                         .renderView(cell);
@@ -809,7 +824,10 @@ class Paper extends Events {
                 y = utils.fixNumber(y, false, 0);
             }
 
-            node.position = this.snapToGrid({ x, y }, true);
+            node.position = this.snapToGrid({
+                x,
+                y
+            }, true);
         }
 
 
@@ -1055,9 +1073,14 @@ class Paper extends Events {
         } else if (change instanceof AttributeChange) {
 
             this.onAttributeChange(change);
+
         } else if (change instanceof GeometryChange) {
 
             this.onGeometryChange(change);
+
+        } else if (change instanceof CollapseChange) {
+
+            this.onCollapseChange(change);
         }
 
         return this;
@@ -1122,6 +1145,11 @@ class Paper extends Events {
     }
 
     onGeometryChange(change) {
+
+        this.invalidate(change.cell, true, true);
+    }
+
+    onCollapseChange(change) {
 
         this.invalidate(change.cell, true, true);
     }
@@ -1207,20 +1235,22 @@ class Paper extends Events {
 
     isValidEvent(e, view) {
 
-        // If the event is interesting, guard returns `true`.
+        // If the event is interesting, returns `true`.
         // Otherwise, return `false`.
 
-        if (this.options.isValidEvent && !this.options.isValidEvent(e, view)) {
+        const cell = view && view.cell;
+
+        if (this.options.isValidEvent && !this.options.isValidEvent(e, cell, view)) {
             return false;
         }
 
-        if (view && view.cell && view.cell instanceof Cell) {
+        if (cell && cell instanceof Cell) {
             return true;
         }
 
 
-        let delegate = this.eventDelegate;
         let target   = e.target;
+        let delegate = this.eventDelegate;
 
         if (delegate === target || utils.containsElement(delegate, target)) {
             return true;
@@ -1448,17 +1478,41 @@ class Paper extends Events {
 
     toLocalPoint(point) {
 
-        let svg      = this.svg;
-        let svgPoint = svg.createSVGPoint();
+        let offset   = this.getRootOffset();
+        let svgPoint = this.svg.createSVGPoint();
+
+        svgPoint.x = point.x + offset.left;
+        svgPoint.y = point.y + offset.top;
+
+        let result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
+
+        return Point.fromPoint(result);
+    }
+
+    toClientPoint(point) {
+
+        let offset   = this.getRootOffset();
+        let svgPoint = this.svg.createSVGPoint();
 
         svgPoint.x = point.x;
         svgPoint.y = point.y;
+
+        let result = svgPoint.matrixTransform(this.drawPane.getCTM());
+
+        result.x -= offset.left;
+        result.y -= offset.top;
+
+        return Point.fromPoint(result);
+    }
+
+    getRootOffset() {
 
         // This is a hack for Firefox! If there wasn't a fake (non-visible)
         // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
         // used below won't work.
         let fakeRect;
         if (detector.IS_FF) {
+
             fakeRect = vector('rect', {
                 width: this.options.width,
                 height: this.options.height,
@@ -1466,10 +1520,11 @@ class Paper extends Events {
                 y: 0,
                 opacity: 0
             });
-            svg.appendChild(fakeRect.node);
+
+            this.svg.appendChild(fakeRect.node);
         }
 
-        let paperOffset = utils.getOffset(svg);
+        let paperOffset = utils.getOffset(this.svg);
 
         if (detector.IS_FF) {
             fakeRect.remove();
@@ -1480,13 +1535,10 @@ class Paper extends Events {
         let scrollTop  = body.scrollTop || docElem.scrollTop;
         let scrollLeft = body.scrollLeft || docElem.scrollLeft;
 
-        svgPoint.x += scrollLeft - paperOffset.left;
-        svgPoint.y += scrollTop - paperOffset.top;
-
-        // Transform point into the viewport coordinate system.
-        let result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
-
-        return Point.fromPoint(result);
+        return {
+            left: scrollLeft - paperOffset.left,
+            top: scrollTop - paperOffset.top
+        };
     }
 
     toLocalRect(rect) {

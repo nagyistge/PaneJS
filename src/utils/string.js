@@ -1,5 +1,5 @@
-import { isNil     } from './lang';
-import { getByPath } from './object';
+import {isNil} from './lang';
+import {getByPath} from './object';
 
 let proto = String.prototype;
 
@@ -155,6 +155,28 @@ function padEnd(str, max, pad) {
     return padStr(str, max, pad, false);
 }
 
+function escape(str) {
+
+    let mapping = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '`': '&#x60;'
+    };
+
+    let badChars     = /[&<>"'`]/g;
+    let shouldEscape = /[&<>"'`]/;
+
+    if (shouldEscape.test(str)) {
+        return str.replace(badChars, function (chr) {
+            return mapping[chr];
+        });
+    }
+
+    return str;
+}
 
 // exports
 // -------
@@ -174,5 +196,6 @@ export {
     startWith,
     endWith,
     padStart,
-    padEnd
+    padEnd,
+    escape
 };

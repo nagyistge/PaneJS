@@ -8,10 +8,12 @@ class VectorView extends CellView {
 
     ensureElement() {
 
-        this.vel  = vector(this.cell.getTagName(), {
+        this.vel = vector(this.cell.getTagName(), {
             'class': this.cell.getClassName()
         });
+
         this.elem = this.vel.node;
+
         // attach cell's id to elem
         this.elem.cellId = this.cell.id;
 
@@ -28,7 +30,7 @@ class VectorView extends CellView {
         // `markup` is rendered by default. Set the `markup` on model
         // if the default markup is not desirable.
 
-        let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
+        let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.getRenderData());
         if (markup) {
             this.vel.append(vector(markup));
         } else {

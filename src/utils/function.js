@@ -42,10 +42,27 @@ function bind(fn /* [, context, arg1[,arg2[,argN]]] */) {
 }
 
 
+const deferred = [];
+
+const defer = (fn) => {
+    deferred.push(fn);
+};
+
+const flush = () => {
+
+    let fn;
+    while (fn = deferred.pop()) {
+        fn();
+    }
+};
+
+
 // exports
 // -------
 
 export {
+    defer,
+    flush,
     bind,
     invoke
 };

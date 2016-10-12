@@ -1,6 +1,6 @@
 import * as utils from '../common/utils';
 import Rect       from '../geometry/Rect';
-import Handler    from '../handlers/Handler';
+import Handler    from './Handler';
 
 
 const defaults = {
@@ -13,6 +13,8 @@ const defaults = {
 };
 
 const classNames = {
+    previewRect: 'pane-selection-preview',
+    selectionRect: 'pane-selection-rect',
     cursorMove: 'pane-cursor-move',
     cursorMoving: 'pane-cursor-moving',
     cursorCross: 'pane-cursor-cross'
@@ -35,8 +37,8 @@ class SelectHandler extends Handler {
         this.previewRect   = utils.createElement('div');
         this.selectionRect = utils.createElement('div');
 
-        utils.addClass(this.previewRect, 'pane-selection-preview');
-        utils.addClass(this.selectionRect, 'pane-selection-rect');
+        utils.addClass(this.previewRect, classNames.previewRect);
+        utils.addClass(this.selectionRect, classNames.selectionRect);
 
         this.focusedCell   = null;
         this.movingCells   = [];
@@ -47,14 +49,15 @@ class SelectHandler extends Handler {
 
         this.getPaper()
             .on('cell:pointerDown', this.onCellMouseDown.bind(this))
-            .on('cell:pointerMove', this.onCellMouseMove.bind(this))
-            .on('cell:pointerUp', this.onCellMouseUp.bind(this))
+            .on('cell:contextmenu', this.onCellContextMenu.bind(this))
             .on('blank:pointerDown', this.onBlankMouseDown.bind(this))
             .on('blank:pointerMove', this.onBlankMouseMove.bind(this))
             .on('blank:pointerUp', this.onBlankMouseUp.bind(this));
 
-        this.keyDownHandler = this.onKeyDown.bind(this);
-        this.keyUpHandler   = this.onKeyUp.bind(this);
+        this.nodeMouseUpHandler   = this.onCellMouseUp.bind(this);
+        this.nodeMouseMoveHandler = this.onCellMouseMove.bind(this);
+        this.keyUpHandler         = this.onKeyUp.bind(this);
+        this.keyDownHandler       = this.onKeyDown.bind(this);
 
         utils.addEventListener(document.body, 'keydown', this.keyDownHandler);
         utils.addEventListener(document.body, 'keyup', this.keyUpHandler);
@@ -132,26 +135,38 @@ class SelectHandler extends Handler {
             return;
         }
 
-        if (cell.isNode() && view.isPortElem(e.target)) {
+        if (this.isNode(cell) && !this.isGroup(cell) && !this.isRemark(cell) && view.isPortElem(e.target)) {
             return;
         }
+
+        if (view.isBulbElem && view.isBulbElem(e.target)) {
+            return;
+        }
+
 
         this.moving = false;
         this.bounds = null;
 
-        if (cell.isNode()) {
+        if (this.isNode(cell)) {
 
             this.lastX = localX;
             this.lastY = localY;
 
-            this.origin      = { x: localX, y: localY };
+            this.origin      = {
+                x: localX,
+                y: localY
+            };
             this.movingCells = cell.selected ? this.selectedCells : [cell];
         }
+
+        this.getPaper()
+            .on('cell:pointerMove', this.nodeMouseMoveHandler)
+            .on('cell:pointerUp', this.nodeMouseUpHandler);
     }
 
     onCellMouseMove(cell, view, e, localX, localY) {
 
-        if (this.isDisabled() || cell.isLink() || !this.origin) {
+        if (this.isLink(cell) || !this.origin) {
             return;
         }
 
@@ -197,18 +212,18 @@ class SelectHandler extends Handler {
 
     onCellMouseUp(cell, view, e, localX, localY) {
 
-        if (this.isDisabled()) {
-            return;
-        }
-
         let dx = 0;
         let dy = 0;
 
         if (this.origin) {
+
             this.hidePreview();
+
             dx = localX - this.origin.x;
             dy = localY - this.origin.y;
         }
+
+        let paper = this.getPaper();
 
         // movement
         if (this.moving && (dx !== 0 || dy !== 0)) {
@@ -219,27 +234,7 @@ class SelectHandler extends Handler {
             this.stopScrollTimer();
 
             if (dx !== 0 || dy !== 0) {
-
-                let model = this.getModel();
-
-                model.beginUpdate();
-
-                utils.forEach(this.movingCells, function (node) {
-                    if (node.isNode()) {
-
-                        let position = node.getPosition();
-
-                        node.setPosition({
-                            x: position.x + dx,
-                            y: position.y + dy,
-                            relative: position.relative === true
-                        });
-                    }
-                }, this);
-
-                model.endUpdate();
-
-                this.getPaper().trigger('cells:updatePosition', this.movingCells);
+                this.updateNodesPosition(this.movingCells, dx, dy);
             }
 
         } else {
@@ -259,14 +254,22 @@ class SelectHandler extends Handler {
             }
         }
 
+
         if (this.moving) {
 
-            this.paper.trigger('cells:moveEnd', this.movingCells, this.bounds);
+            paper.trigger('cells:moveEnd', this.movingCells, this.bounds);
 
             if (this.movingCells.length === 1) {
-                this.paper.trigger('cell:moveEnd', this.movingCells[0], this.bounds);
+                paper.trigger('cell:moveEnd', this.movingCells[0], this.bounds);
             }
+        }
 
+
+        if (this.origin) {
+
+            paper
+                .off('cell:pointerMove', this.nodeMouseMoveHandler)
+                .off('cell:pointerUp', this.nodeMouseUpHandler);
         }
 
         this.lastX       = null;
@@ -277,6 +280,15 @@ class SelectHandler extends Handler {
         this.movingCells = null;
     }
 
+    onCellContextMenu(cell, view) {
+
+        // select cell when context menu
+        if (this.isNode(cell) && !this.isGroup(cell) && !this.isRemark(cell)) {
+            this.selectCell(cell, view);
+            this.setCellFocused(cell, view);
+        }
+    }
+
     onBlankMouseDown(e, localX, localY) {
 
         if (this.isDisabled() || this.isOnScrollBar(e)) {
@@ -284,32 +296,23 @@ class SelectHandler extends Handler {
         }
 
         this.isAreaSelect = this.isSelectMode || this.hasAreaSelectKey;
+        this.isMovement   = !this.isAreaSelect && this.options.movement;
 
-        // if (!this.isAreaSelect) {
-        //    let areaSelectKey = this.options.areaSelectKey;
-        //    if (this.options.areaSelect && areaSelectKey) {
-        //        let method = 'has' + utils.ucFirst(areaSelectKey) + 'Key';
-        //        if (utils[method]) {
-        //            this.isAreaSelect = utils[method](e);
-        //        }
-        //    }
-        //
-        //    if (this.isAreaSelect) {
-        //        this.switchModeClass(true);
-        //        this.switchModeClass(true);
-        //    }
-        // }
-
-        this.isMovement = !this.isAreaSelect && this.options.movement;
 
         if (this.isAreaSelect) {
 
-            this.origin = { x: localX, y: localY };
+            this.origin = {
+                x: localX,
+                y: localY
+            };
         }
 
         if (this.isMovement) {
 
-            this.origin           = { x: e.pageX, y: e.pageY };
+            this.origin           = {
+                x: e.pageX,
+                y: e.pageY
+            };
             this.originScrollLeft = this.scrollParent.scrollLeft;
             this.originScrollTop  = this.scrollParent.scrollTop;
 
@@ -395,7 +398,12 @@ class SelectHandler extends Handler {
                 }
             }
 
-            this.bounds = { x, y, width, height };
+            this.bounds = {
+                x,
+                y,
+                width,
+                height
+            };
 
             this.stopScrollTimer();
             this.updateSelectionRect();
@@ -659,7 +667,7 @@ class SelectHandler extends Handler {
 
                 let borderRadius = '';
 
-                if (this.movingCells.length === 1) {
+                if (this.movingCells.length === 1 && !this.isGroup(this.movingCells[0]) && !this.isRemark(this.movingCells[0])) {
                     borderRadius = Math.floor(height / 2) + 'px';
                 }
 
@@ -904,6 +912,108 @@ class SelectHandler extends Handler {
         return this;
     }
 
+    divGroupsAndNodes(cells = []) {
+
+        var nodes    = [];
+        var groups   = [];
+        var nodeById = {};
+
+        utils.forEach(cells, function (node) {
+
+            if (this.isGroup(node)) {
+
+                groups.push(node);
+
+                let ret = this.divGroupsAndNodes(node.getChildren());
+
+                utils.forEach(ret.nodes, function (node) {
+                    if (!nodeById[node.id]) {
+                        nodes.push(node);
+                        nodeById[node.id] = true;
+                    }
+                });
+
+                groups.push.apply(groups, ret.groups);
+
+            } else {
+
+                if (!nodeById[node.id]) {
+                    nodes.push(node);
+                    nodeById[node.id] = true;
+                }
+            }
+
+        }, this);
+
+        return {
+            nodes,
+            groups
+        };
+    }
+
+    updateNodesPosition(cells = [], dx = 0, dy = 0) {
+
+        const { nodes, groups } = this.divGroupsAndNodes(cells);
+
+        const paper = this.getPaper();
+        const model = this.getModel();
+
+        model.beginUpdate();
+
+        utils.forEach(nodes, function (node) {
+
+            let position = node.getPosition();
+
+            node.setPosition({
+                x: position.x + dx,
+                y: position.y + dy,
+                relative: position.relative === true
+            });
+        });
+
+        utils.forEach(groups, function (group) {
+
+            let position = group.getPosition();
+
+            group.setPosition({
+                x: position.x + dx,
+                y: position.y + dy,
+                relative: position.relative === true
+            });
+        });
+
+        model.endUpdate();
+
+        utils.forEach(nodes, function (node) {
+
+            let parentNode = node.getParent();
+            while (parentNode) {
+
+                let shouldUpdate = this.isGroup(parentNode)
+                    && !utils.some(groups, function (group) {
+                        return parentNode === group;
+                    });
+
+                if (shouldUpdate) {
+                    parentNode.updateGeometry();
+                }
+
+                parentNode = parentNode.getParent();
+            }
+
+        }, this);
+
+        utils.forEach(nodes, function (node) {
+            // invisible node should be updated geometry manually,
+            // otherwise the node position would not be saved to server
+            if (!node.isVisible()) {
+                paper.updateNodeGeometry(node);
+            }
+        });
+
+        this.notifyPositionChange(nodes);
+    }
+
     isParentScrollable() {
 
         let scrollParent = this.scrollParent;
@@ -944,6 +1054,11 @@ class SelectHandler extends Handler {
     notifySelectionChange() {
 
         this.getPaper().trigger('cells:selectionChanged', this.selectedCells);
+    }
+
+    notifyPositionChange(nodes) {
+
+        this.getPaper().trigger('cells:updatePosition', nodes);
     }
 }
 

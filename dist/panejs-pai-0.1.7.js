@@ -16972,7 +16972,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    y = utils.fixNumber(y, false, 0);
 	                }
 	
-	                node.position = this.snapToGrid({ x: x, y: y }, true);
+	                node.position = this.snapToGrid({
+	                    x: x,
+	                    y: y
+	                }, true);
 	            }
 	
 	            return this;
@@ -17597,17 +17600,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'toLocalPoint',
 	        value: function toLocalPoint(point) {
 	
-	            var svg = this.svg;
-	            var svgPoint = svg.createSVGPoint();
+	            var offset = this.getRootOffset();
+	            var svgPoint = this.svg.createSVGPoint();
+	
+	            svgPoint.x = point.x + offset.left;
+	            svgPoint.y = point.y + offset.top;
+	
+	            var result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
+	
+	            return _Point2.default.fromPoint(result);
+	        }
+	    }, {
+	        key: 'toClientPoint',
+	        value: function toClientPoint(point) {
+	
+	            var offset = this.getRootOffset();
+	            var svgPoint = this.svg.createSVGPoint();
 	
 	            svgPoint.x = point.x;
 	            svgPoint.y = point.y;
+	
+	            var result = svgPoint.matrixTransform(this.drawPane.getCTM());
+	
+	            result.x -= offset.left;
+	            result.y -= offset.top;
+	
+	            return _Point2.default.fromPoint(result);
+	        }
+	    }, {
+	        key: 'getRootOffset',
+	        value: function getRootOffset() {
 	
 	            // This is a hack for Firefox! If there wasn't a fake (non-visible)
 	            // rectangle covering the whole SVG area, the `$(paper.svg).offset()`
 	            // used below won't work.
 	            var fakeRect = void 0;
 	            if (_detector2.default.IS_FF) {
+	
 	                fakeRect = (0, _vector2.default)('rect', {
 	                    width: this.options.width,
 	                    height: this.options.height,
@@ -17615,10 +17644,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    y: 0,
 	                    opacity: 0
 	                });
-	                svg.appendChild(fakeRect.node);
+	
+	                this.svg.appendChild(fakeRect.node);
 	            }
 	
-	            var paperOffset = utils.getOffset(svg);
+	            var paperOffset = utils.getOffset(this.svg);
 	
 	            if (_detector2.default.IS_FF) {
 	                fakeRect.remove();
@@ -17629,13 +17659,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var scrollTop = body.scrollTop || docElem.scrollTop;
 	            var scrollLeft = body.scrollLeft || docElem.scrollLeft;
 	
-	            svgPoint.x += scrollLeft - paperOffset.left;
-	            svgPoint.y += scrollTop - paperOffset.top;
-	
-	            // Transform point into the viewport coordinate system.
-	            var result = svgPoint.matrixTransform(this.drawPane.getCTM().inverse());
-	
-	            return _Point2.default.fromPoint(result);
+	            return {
+	                left: scrollLeft - paperOffset.left,
+	                top: scrollTop - paperOffset.top
+	            };
 	        }
 	    }, {
 	        key: 'toLocalRect',
@@ -19983,4 +20010,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs-pai-0.1.5.js.map
+//# sourceMappingURL=panejs-pai-0.1.7.js.map

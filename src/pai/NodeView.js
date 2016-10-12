@@ -23,6 +23,9 @@ const classNames = {
     connecting: 'is-connecting',
     connectable: 'is-connectable',
     adsorbed: 'is-adsorbed',
+    bulb: 'pane-node-bulb',
+    recommending:'recommending',
+    recommendable: 'recommendable',
 };
 
 
@@ -133,6 +136,16 @@ class NodeView extends BaseView {
         }
     }
 
+    setRecommendable(recommendable) {
+
+        this.vel.toggleClass(classNames.recommendable, recommendable);
+    }
+
+    setRecommending(recommending){
+
+        this.vel.toggleClass(classNames.recommending, recommending);
+    }
+
     getBBox() {
 
         let bounds = utils.getBounds(this.elem);
@@ -158,6 +171,7 @@ class NodeView extends BaseView {
         let elem = this.getPortElem(port, isInPort);
         if (elem) {
             let bounds = utils.getBounds(elem);
+
             return this.getPaper().toLocalRect({
                 x: bounds.left,
                 y: bounds.top,
@@ -250,6 +264,18 @@ class NodeView extends BaseView {
 
         while (elem && elem !== this.elem) {
             if (utils.hasClass(elem, classNames.inPortList)) {
+                return true;
+            }
+            elem = elem.parentNode;
+        }
+
+        return false;
+    }
+
+    isBulbElem(elem) {
+
+        while (elem && elem !== this.elem) {
+            if (utils.hasClass(elem, classNames.bulb)) {
                 return true;
             }
             elem = elem.parentNode;

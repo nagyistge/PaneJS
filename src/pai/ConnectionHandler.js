@@ -1,4 +1,4 @@
-import Handler   from '../handlers/Handler';
+import Handler   from './Handler';
 import Link      from '../cells/Link';
 import LinkView  from '../pai/LinkView';
 import quadratic from '../pai/quadratic';
@@ -10,13 +10,12 @@ class ConnectionHandler extends Handler {
 
         this.clean();
 
+        this.getPaper().on('cell:pointerDown', this.onCellMouseDown.bind(this));
+
+        this.mouseUpHandler    = this.onCellMouseUp.bind(this);
+        this.mouseMoveHandler  = this.onCellMouseMove.bind(this);
         this.mouseEnterHandler = this.onCellMouseEnter.bind(this);
         this.mouseLeaveHandler = this.onCellMouseLeave.bind(this);
-
-        this.getPaper()
-            .on('cell:pointerDown', this.onCellMouseDown.bind(this))
-            .on('cell:pointerMove', this.onCellMouseMove.bind(this))
-            .on('cell:pointerUp', this.onCellMouseUp.bind(this));
 
         return this;
     }
@@ -33,6 +32,9 @@ class ConnectionHandler extends Handler {
         this.targetPort = null;
         this.hasTarget  = false;
 
+        this.localX = null;
+        this.localY = null;
+
         return this;
     }
 
@@ -44,26 +46,34 @@ class ConnectionHandler extends Handler {
             sourcePort: this.sourcePort,
             targetNode: this.targetNode,
             targetView: this.targetView,
-            targetPort: this.targetPort
+            targetPort: this.targetPort,
+            localX: this.localX,
+            localY: this.localY
         };
     }
 
     onCellMouseDown(cell, view, e) {
 
-        if (this.isDisabled() || !cell.isNode() || !view.isOutPortElem(e.target)) {
+        if (this.isDisabled() || this.isGroup(cell) || this.isRemark(cell) || !this.isNode(cell)) {
+            return;
+        }
+
+        if (!view.isOutPortElem(e.target)) {
             return;
         }
 
         this.sourceNode = cell;
         this.sourceView = view;
         this.sourcePort = view.findPortByElem(e.target);
+
+        if (this.sourcePort) {
+            this.getPaper()
+                .on('cell:pointerMove', this.mouseMoveHandler)
+                .on('cell:pointerUp', this.mouseUpHandler);
+        }
     }
 
-    onCellMouseMove(cell, view, e) {
-
-        if (this.isDisabled() || !this.sourcePort) {
-            return;
-        }
+    onCellMouseMove(cell, view, e, localX, localY) {
 
         const paper = this.getPaper();
         const model = this.getModel();
@@ -106,7 +116,13 @@ class ConnectionHandler extends Handler {
         model.endUpdate();
 
         if (this.targetView) {
+            this.localX     = localX;
+            this.localY     = localY;
             this.targetPort = this.targetView.findPortByElem(e.target);
+        } else {
+            this.localX     = null;
+            this.localY     = null;
+            this.targetPort = null;
         }
 
         paper.trigger('cell:connecting', this.getEventData());
@@ -114,34 +130,35 @@ class ConnectionHandler extends Handler {
 
     onCellMouseUp() {
 
-        if (this.isDisabled() || !this.connecting) {
-            return;
+        if (this.connecting) {
+
+            const paper = this.getPaper();
+            const model = this.getModel();
+
+            paper
+                .off('cell:pointerMove', this.mouseMoveHandler)
+                .off('cell:pointerUp', this.mouseUpHandler)
+                .off('cell:mouseenter', this.mouseEnterHandler)
+                .off('cell:mouseleave', this.mouseLeaveHandler);
+
+            model.beginUpdate();
+
+            this.link.removeFromParent();
+
+            paper.trigger('cell:connected', this.getEventData());
+            model.endUpdate();
+
+            this.clean();
         }
-
-        const paper = this.getPaper();
-        const model = this.getModel();
-
-        paper
-            .off('cell:mouseenter', this.mouseEnterHandler)
-            .off('cell:mouseleave', this.mouseLeaveHandler);
-
-        model.beginUpdate();
-
-        this.link.removeFromParent();
-
-        paper.trigger('cell:connected', this.getEventData());
-        model.endUpdate();
-
-        this.clean();
     }
 
     onCellMouseEnter(cell, view, e) {
 
-        if (this.isDisabled()
-            || !cell.isNode()
-            || cell === this.sourceCell
-            || !this.connecting) {
+        if (this.isGroup(cell) || !this.isNode(cell)) {
+            return;
+        }
 
+        if (cell === this.sourceCell || !this.connecting) {
             return;
         }
 
@@ -153,11 +170,11 @@ class ConnectionHandler extends Handler {
 
     onCellMouseLeave(cell) {
 
-        if (this.isDisabled()
-            || !cell.isNode()
-            || !this.hasTarget
-            || !this.connecting) {
+        if (this.isGroup(cell) || !this.isNode(cell)) {
+            return;
+        }
 
+        if (!this.hasTarget || !this.connecting) {
             return;
         }
 

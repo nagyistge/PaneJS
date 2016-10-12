@@ -121,7 +121,70 @@ class LinkView extends VectorView {
         return this;
     }
 
-    updateComment(/* comment */) {
+    updateComment(comment) {
+
+        let data  = this.cell.data;
+        let bbox  = this.vel.getBBox(true);
+        let vBg   = this.vel.findOne('.comment-bg');
+        let vText = this.vel.findOne('.comment');
+
+
+        if (utils.isUndefined(comment)) {
+            comment = data ? data.comment : '';
+        } else {
+            if (data) {
+                data.comment = comment;
+            }
+        }
+
+        if (vBg && vText) {
+
+            if (comment) {
+
+                vText.text(comment);
+
+                // Remove the previous translate() from the transform attribute
+                // and translate the element relative to the bounding box following
+                // the `ref-x` and `ref-y` attributes.
+                let transformAttr = vText.attr('transform');
+                if (transformAttr) {
+                    vText.attr('transform', utils.clearTranslate(transformAttr));
+                }
+
+                let velBBox = vText.getBBox(true);
+
+                let tx = bbox.x + bbox.width * 0.5;
+                let ty = bbox.y + bbox.height * 0.5;
+
+                tx -= velBBox.width / 2;
+                ty -= velBBox.height / 2;
+
+                tx = utils.toFixed(tx, 2);
+                ty = utils.toFixed(ty, 2);
+
+                vText.translate(tx, ty);
+                vBg.attr({
+                    width: velBBox.width + 10,
+                    height: velBBox.height + 10
+                });
+
+                vBg.translate(tx - 5, ty - 5);
+
+            } else {
+                vBg.attr({
+                    width: '',
+                    height: '',
+                    transform: ''
+                });
+
+                vText.attr({
+                    y: '',
+                    transform: ''
+                });
+
+                vText.empty();
+            }
+        }
 
         return this;
     }
@@ -167,15 +230,43 @@ class LinkView extends VectorView {
 
     updateConnectionPoint(isSource) {
 
-        if (!this.fetchStaticConnPoint(isSource)) {
-            let rect = this.getPortBodyBBox(isSource);
-            if (rect) {
-                let point = new Point(rect.getCenter().x, isSource ? rect.y + rect.height : rect.y);
-                this.cacheConnPointOnPort(point, isSource);
-            }
+        let staticPoint = this.fetchStaticConnPoint(isSource);
+        if (!staticPoint) {
+            this.updateConnPointOnPort(isSource) ||
+            this.updateConnPointOnNode(isSource);
         }
 
         return this;
+    }
+
+    updateConnPointOnPort(isSource) {
+
+        let rect = this.getPortBodyBBox(isSource);
+        if (rect) {
+            let point = new Point(rect.getCenter().x, isSource ? rect.y + rect.height : rect.y);
+            this.cacheConnPointOnPort(point, isSource);
+        }
+
+        return this.fetchConnPointOnPort(isSource);
+    }
+
+    updateConnPointOnNode(isSource) {
+
+        let point = null;
+        let bbox  = this.getTerminalBBox(isSource);
+        if (bbox) {
+
+            let reference = this.getReferencePoint(bbox, isSource);
+            if (reference) {
+                point = bbox.intersectionWithLineFromCenterToPoint(reference);
+            }
+
+            point = point || bbox.getCenter();
+
+            this.cacheConnPointOnNode(point, isSource);
+        }
+
+        return this.fetchConnPointOnNode(isSource);
     }
 
     getStrokeWidth(selector) {
@@ -189,6 +280,24 @@ class LinkView extends VectorView {
         }
 
         return 0;
+    }
+
+    getTerminalBBox(isSource) {
+
+        let bbox = this.fetchTerminalBBox(isSource);
+        if (!bbox) {
+
+            let view = this.fetchTerminalView(isSource);
+            if (view) {
+                bbox = view.getStrokedBBox();
+                bbox = this.fixStrokedBBox(bbox, isSource);
+            }
+
+            // cache
+            this.cacheTerminalBBox(bbox, isSource);
+        }
+
+        return bbox;
     }
 
     fixStrokedBBox(bbox, isSource) {
@@ -214,6 +323,35 @@ class LinkView extends VectorView {
         }
 
         return bbox;
+    }
+
+    getReferencePoint(bbox, isSource) {
+
+        // static point
+        let reference = this.fetchStaticConnPoint(isSource);
+
+        // port
+        if (!reference) {
+
+            let portBBox = this.getPortBodyBBox(!isSource);
+            if (portBBox) {
+                reference = portBBox.intersectionWithLineFromCenterToPoint(bbox.getCenter());
+                reference = reference || portBBox.getCenter();
+            }
+        }
+
+        // terminal
+        if (!reference) {
+
+            let terminalBBox = this.getTerminalBBox(!isSource);
+            if (terminalBBox) {
+                reference = terminalBBox.intersectionWithLineFromCenterToPoint(bbox.getCenter());
+                reference = reference || terminalBBox.getCenter();
+            }
+
+        }
+
+        return reference;
     }
 
     getPortBodyBBox(isSource) {
@@ -243,7 +381,8 @@ class LinkView extends VectorView {
 
         let point = this.fetchConnPointOnMarker(isSource)
             || this.fetchStaticConnPoint(isSource)
-            || this.fetchConnPointOnPort(isSource);
+            || this.fetchConnPointOnPort(isSource)
+            || this.fetchConnPointOnNode(isSource);
 
         return point;
     }
@@ -255,9 +394,9 @@ class LinkView extends VectorView {
 
             let pane = this.getPane();
 
-            let position  = this.fetchStaticConnPoint(isSource) || this.fetchConnPointOnPort(isSource);
-            let reference = new Point(position.x, position.y + (isSource ? 50 : -50));
             let markerVel = this.fetchMarkerVel(isSource);
+            let position  = this.getConnectionPoint(isSource);
+            let reference = new Point(position.x, position.y + (isSource ? 50 : -50));
 
             if (position && reference && markerVel) {
                 markerVel.translateAndAutoOrient(position, reference, pane);
@@ -427,6 +566,38 @@ class LinkView extends VectorView {
     fetchConnPointOnPort(isSource) {
 
         return isSource ? this.cache.sourcePointOnPort : this.cache.targetPointOnPort;
+    }
+
+    cacheConnPointOnNode(point, isSource) {
+
+        if (point) {
+            if (isSource) {
+                this.cache.sourcePointOnTerminal = point;
+            } else {
+                this.cache.targetPointOnTerminal = point;
+            }
+        }
+    }
+
+    fetchConnPointOnNode(isSource) {
+
+        return isSource ? this.cache.sourcePointOnTerminal : this.cache.targetPointOnTerminal;
+    }
+
+    cacheTerminalBBox(bbox, isSource) {
+
+        if (bbox) {
+            if (isSource) {
+                this.cache.sourceTerminalBBox = bbox;
+            } else {
+                this.cache.targetTerminalBBox = bbox;
+            }
+        }
+    }
+
+    fetchTerminalBBox(isSource) {
+
+        return isSource ? this.cache.sourceTerminalBBox : this.cache.targetTerminalBBox;
     }
 
     cachePortBodyBBox(bbox, isSource) {

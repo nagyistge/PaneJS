@@ -72,6 +72,7 @@ class Cell {
 
         const metadata = utils.merge({}, this.constructor.defaults, options);
 
+        // bind some common props
         this.data     = metadata.data;
         this.attrs    = metadata.attrs || {};
         this.visible  = metadata.visible !== false;
@@ -321,9 +322,14 @@ class Cell {
         return false;
     }
 
+    getLinks() {
+
+        return this.links || [];
+    }
+
     getLinkCount() {
 
-        return this.links ? this.links.length : 0;
+        return this.getLinks().length;
     }
 
     indexOfLink(link) {
@@ -424,9 +430,14 @@ class Cell {
     // children
     // --------
 
+    getChildren() {
+
+        return this.children || [];
+    }
+
     getChildCount() {
 
-        return this.children ? this.children.length : 0;
+        return this.getChildren().length;
     }
 
     indexOfChild(child) {
@@ -615,6 +626,11 @@ class Cell {
         return raw ? this.metadata.size : this.size;
     }
 
+    _setSize(size) {
+
+        this.metadata.size = size;
+    }
+
     setSize(size, options = {}) {
 
         let scheduled = false;
@@ -633,12 +649,11 @@ class Cell {
             }
         }
 
-        if (!scheduled && this.metadata) {
-            this.metadata.size = size;
+        if (!scheduled) {
+            this._setSize(size);
         }
 
         return this;
-
     }
 
     resize(width, height, options = {}) {
@@ -649,6 +664,11 @@ class Cell {
     getPosition(raw) {
 
         return raw ? this.metadata.position : this.position;
+    }
+
+    _setPosition(position) {
+
+        this.metadata.position = position;
     }
 
     setPosition(position, options = {}) {
@@ -669,8 +689,8 @@ class Cell {
             }
         }
 
-        if (!scheduled && this.metadata) {
-            this.metadata.position = position;
+        if (!scheduled) {
+            this._setPosition(position);
         }
 
         return this;
@@ -684,6 +704,11 @@ class Cell {
     getRotation(raw) {
 
         return raw ? this.metadata.rotation : this.rotation;
+    }
+
+    _setRotation(rotation) {
+
+        this.metadata.rotation = rotation;
     }
 
     setRotation(rotation, options = {}) {
@@ -703,8 +728,8 @@ class Cell {
             }
         }
 
-        if (!scheduled && this.metadata) {
-            this.metadata.rotation = rotation;
+        if (!scheduled) {
+            this._setRotation(rotation);
         }
 
         return this;
@@ -724,6 +749,18 @@ class Cell {
         };
     }
 
+    _setGeometry(geom) {
+
+        utils.forEach(['size', 'position', 'rotation'], key => {
+
+            let val = geom[key];
+            if (val) {
+                this['_set' + utils.ucFirst(key)](val);
+            }
+
+        }, this);
+    }
+
     setGeometry(geom, options = {}) {
 
         let scheduled = false;
@@ -738,18 +775,61 @@ class Cell {
         }
 
         if (!scheduled) {
-
-            utils.forEach(['size', 'position', 'rotation'], key => {
-
-                let val = geom[key];
-                if (val) {
-                    this['set' + utils.ucFirst(key)](val, { silent: true });
-                }
-
-            }, this);
+            this._setGeometry(geom);
         }
 
         return this;
+    }
+
+
+    // collapse
+    // --------
+
+    isCollapsed() {
+
+        return this.metadata.collapsed === true;
+    }
+
+    _setCollapsed(collapsed) {
+
+        this.metadata.collapsed = collapsed;
+    }
+
+    setCollapsed(collapsed, options = {}) {
+
+        let scheduled = false;
+
+        if (!options.silent) {
+
+            let model = getModel(this);
+            if (model) {
+                model.setCollapsed(this, collapsed);
+                scheduled = true;
+            }
+        }
+
+        if (!scheduled) {
+            this._setCollapsed(collapsed);
+        }
+
+        return this;
+    }
+
+    collapse(options = {}) {
+
+        return this.setCollapsed(true, options);
+    }
+
+    expand(options = {}) {
+
+        return this.setCollapsed(false, options);
+    }
+
+    toggleCollapse(options = {}) {
+
+        return this.isCollapsed()
+            ? this.expand(options)
+            : this.collapse(options);
     }
 
 
@@ -759,6 +839,13 @@ class Cell {
     isVisible() {
 
         return this.visible !== false;
+    }
+
+    _setVisible(visible) {
+
+        this.visible
+            = this.metadata.visible
+            = visible ? true : false;
     }
 
     setVisible(visible, options = {}) {
@@ -775,10 +862,7 @@ class Cell {
         }
 
         if (!scheduled) {
-
-            this.visible = visible ? true : false;
-
-            this.metadata.visible = this.visible;
+            this._setVisible(visible);
         }
 
         return this;
@@ -786,25 +870,19 @@ class Cell {
 
     show(options = {}) {
 
-        this.setVisible(true, options);
-
-        return this;
+        return this.setVisible(true, options);
     }
 
     hide(options = {}) {
 
-        this.setVisible(false, options);
-
-        return this;
+        return this.setVisible(false, options);
     }
 
-    toggle(options = {}) {
+    toggleVisible(options = {}) {
 
-        this.isVisible()
+        return this.isVisible()
             ? this.hide(options)
             : this.show(options);
-
-        return this;
     }
 
 
@@ -814,6 +892,11 @@ class Cell {
     getAttribute() {
 
         return this.metadata.attrs;
+    }
+
+    _setAttribute(attrs) {
+
+        this.metadata.attrs = utils.merge({}, this.getAttribute(), attrs);
     }
 
     setAttribute(attrs, options = {}) {
@@ -830,7 +913,7 @@ class Cell {
         }
 
         if (!scheduled && this.metadata) {
-            this.metadata.attrs = utils.merge({}, this.getAttribute(), attrs);
+            this._setAttribute(attrs);
         }
 
         return this;
@@ -893,6 +976,12 @@ class Cell {
     getMarkup() {
 
         return this.metadata.markup;
+    }
+
+    getRenderData() {
+
+        // get the data for render markup
+        return this.data;
     }
 
 

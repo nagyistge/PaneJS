@@ -10,9 +10,12 @@ class CellView {
         this.invalid = true;  // default need to be repainted
 
         this.ensureElement();
+        this.setup();
     }
 
     ensureElement() { return this; }
+
+    setup() { return this; }
 
     render() { return this; }
 

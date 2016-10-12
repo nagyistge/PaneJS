@@ -4,8 +4,8 @@ function blockMarker(vMarker, options) {
 
     if (vMarker) {
 
-        let width  = options.width || 7;
-        let height = options.height || width * Math.tan(1 / 6 * Math.PI);
+        let width  = options.width || 5;
+        let height = options.height || width * Math.tan(1 / 5 * Math.PI);
 
         let pathArr = [];
 

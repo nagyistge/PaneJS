@@ -232,8 +232,8 @@ class LinkView extends VectorView {
 
         let staticPoint = this.fetchStaticConnPoint(isSource);
         if (!staticPoint) {
-            this.updateConnPointOnPort(isSource)
-            || this.updateConnPointOnNode(isSource);
+            this.updateConnPointOnPort(isSource) ||
+            this.updateConnPointOnNode(isSource);
         }
 
         return this;
@@ -468,7 +468,7 @@ class LinkView extends VectorView {
             let sourcePoint = this.getConnectionPoint(true);
             let targetPoint = this.getConnectionPoint(false);
 
-            let position = isSource ? sourcePoint : targetPoint;
+            let position  = isSource ? sourcePoint : targetPoint;
             let reference = ref || isSource
                 ? (vertices[0] || targetPoint)
                 : (vertices[vertices.length - 1] || sourcePoint);

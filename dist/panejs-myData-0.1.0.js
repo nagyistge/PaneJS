@@ -1249,6 +1249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var filter = function filter(arr, iterator, context) {
 	    return arr ? proto.filter.call(arr, iterator, context) : [];
 	};
+	
 	var reduce = function reduce(arr, iterator, initialValue) {
 	    return arr ? proto.reduce.call(arr, iterator, initialValue) : initialValue;
 	};
@@ -3804,6 +3805,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var metadata = utils.merge({}, this.constructor.defaults, options);
 	
+	        // bind some common props
 	        this.data = metadata.data;
 	        this.attrs = metadata.attrs || {};
 	        this.visible = metadata.visible !== false;
@@ -4190,10 +4192,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // --------
 	
 	    }, {
+	        key: 'getChildren',
+	        value: function getChildren() {
+	
+	            return this.children || [];
+	        }
+	    }, {
 	        key: 'getChildCount',
 	        value: function getChildCount() {
 	
-	            return this.children ? this.children.length : 0;
+	            return this.getChildren().length;
 	        }
 	    }, {
 	        key: 'indexOfChild',
@@ -4570,6 +4578,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 	
+	        // collapse
+	        // --------
+	
+	    }, {
+	        key: 'isCollapsed',
+	        value: function isCollapsed() {
+	
+	            return this.metadata.collapsed === true;
+	        }
+	    }, {
+	        key: 'setCollapsed',
+	        value: function setCollapsed(collapsed) {
+	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	            var scheduled = false;
+	
+	            if (!options.silent) {
+	
+	                var model = getModel(this);
+	                if (model) {
+	                    model.setCollapsed(this, collapsed);
+	                    scheduled = true;
+	                }
+	            }
+	
+	            if (!scheduled) {
+	                this.metadata.collapsed = collapsed;
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'collapse',
+	        value: function collapse() {
+	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	            return this.setCollapsed(true, options);
+	        }
+	    }, {
+	        key: 'expand',
+	        value: function expand() {
+	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	            return this.setCollapsed(false, options);
+	        }
+	    }, {
+	        key: 'toggleCollapse',
+	        value: function toggleCollapse() {
+	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	            return this.isCollapsed() ? this.expand(options) : this.collapse(options);
+	        }
+	
 	        // visible
 	        // -------
 	
@@ -4611,9 +4676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
 	
-	            this.setVisible(true, options);
-	
-	            return this;
+	            return this.setVisible(true, options);
 	        }
 	    }, {
 	        key: 'hide',
@@ -4621,19 +4684,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
 	
-	            this.setVisible(false, options);
-	
-	            return this;
+	            return this.setVisible(false, options);
 	        }
 	    }, {
-	        key: 'toggle',
-	        value: function toggle() {
+	        key: 'toggleVisible',
+	        value: function toggleVisible() {
 	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
 	
-	            this.isVisible() ? this.hide(options) : this.show(options);
-	
-	            return this;
+	            return this.isVisible() ? this.hide(options) : this.show(options);
 	        }
 	
 	        // attribute
@@ -4735,6 +4794,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function getMarkup() {
 	
 	            return this.metadata.markup;
+	        }
+	    }, {
+	        key: 'getRenderData',
+	        value: function getRenderData() {
+	
+	            // get the data for render markup
+	            return this.data;
 	        }
 	
 	        // lang
@@ -7632,7 +7698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // `markup` is rendered by default. Set the `markup` on model
 	            // if the default markup is not desirable.
 	
-	            var markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
+	            var markup = this.compileMarkup(this.cell.getMarkup(), this.cell.getRenderData());
 	            if (markup) {
 	                this.vel.append((0, _vector2.default)(markup));
 	            } else {
@@ -8046,11 +8112,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.invalid = true; // default need to be repainted
 	
 	        this.ensureElement();
+	        this.setup();
 	    }
 	
 	    _createClass(CellView, [{
 	        key: 'ensureElement',
 	        value: function ensureElement() {
+	            return this;
+	        }
+	    }, {
+	        key: 'setup',
+	        value: function setup() {
 	            return this;
 	        }
 	    }, {
@@ -9567,6 +9639,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _GeometryChange2 = _interopRequireDefault(_GeometryChange);
 	
+	var _CollapseChange = __webpack_require__(106);
+	
+	var _CollapseChange2 = _interopRequireDefault(_CollapseChange);
+	
 	var _AttributeChange = __webpack_require__(56);
 	
 	var _AttributeChange2 = _interopRequireDefault(_AttributeChange);
@@ -10367,6 +10443,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return prev;
 	        }
 	
+	        // collapse
+	        // --------
+	
+	    }, {
+	        key: 'isCollapsed',
+	        value: function isCollapsed(cell) {
+	
+	            return cell ? cell.isCollapsed() : false;
+	        }
+	    }, {
+	        key: 'setCollapsed',
+	        value: function setCollapsed(cell, collapsed) {
+	
+	            if (cell && collapsed !== this.isCollapsed(cell)) {
+	                try {
+	                    this.beginUpdate();
+	                    this.digest(new _CollapseChange2.default(this, cell, collapsed));
+	                } finally {
+	                    this.endUpdate();
+	                }
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'collapseChanged',
+	        value: function collapseChanged(cell, collapsed) {
+	
+	            var previous = this.isCollapsed(cell);
+	
+	            cell.setCollapsed(collapsed, { silent: true });
+	
+	            return previous;
+	        }
+	
 	        // visible
 	        // -------
 	
@@ -10992,6 +11103,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _GeometryChange = __webpack_require__(47);
 	
 	var _GeometryChange2 = _interopRequireDefault(_GeometryChange);
+	
+	var _CollapseChange = __webpack_require__(106);
+	
+	var _CollapseChange2 = _interopRequireDefault(_CollapseChange);
 	
 	var _AttributeChange = __webpack_require__(56);
 	
@@ -12078,6 +12193,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            } else if (change instanceof _GeometryChange2.default) {
 	
 	                this.onGeometryChange(change);
+	            } else if (change instanceof _CollapseChange2.default) {
+	
+	                this.onCollapseChange(change);
 	            }
 	
 	            return this;
@@ -12151,6 +12269,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'onGeometryChange',
 	        value: function onGeometryChange(change) {
+	
+	            this.invalidate(change.cell, true, true);
+	        }
+	    }, {
+	        key: 'onCollapseChange',
+	        value: function onCollapseChange(change) {
 	
 	            this.invalidate(change.cell, true, true);
 	        }
@@ -19097,6 +19221,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	// -------
 	
 	exports.default = quadratic;
+
+/***/ },
+/* 87 */,
+/* 88 */,
+/* 89 */,
+/* 90 */,
+/* 91 */,
+/* 92 */,
+/* 93 */,
+/* 94 */,
+/* 95 */,
+/* 96 */,
+/* 97 */,
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Change2 = __webpack_require__(42);
+	
+	var _Change3 = _interopRequireDefault(_Change2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var CollapseChange = function (_Change) {
+	    _inherits(CollapseChange, _Change);
+	
+	    function CollapseChange(model, cell, collapsed) {
+	        _classCallCheck(this, CollapseChange);
+	
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CollapseChange).call(this));
+	
+	        _this.model = model;
+	        _this.cell = cell;
+	        _this.collapsed = collapsed;
+	        _this.previous = collapsed;
+	        return _this;
+	    }
+	
+	    _createClass(CollapseChange, [{
+	        key: 'digest',
+	        value: function digest() {
+	
+	            this.collapsed = this.previous;
+	            this.previous = this.model.collapseChanged(this.cell, this.previous);
+	
+	            return this;
+	        }
+	    }]);
+	
+	    return CollapseChange;
+	}(_Change3.default);
+	
+	// exports
+	// -------
+	
+	exports.default = CollapseChange;
 
 /***/ }
 /******/ ])

@@ -5,12 +5,13 @@ import {
     isWindow,
     isBoolean,
     isFunction,
-    isUndefined
+    isUndefined,
 } from './lang';
 
-import { forEach, reduce } from './array';
-import { trim, split     } from './string';
-import { forIn           } from './object';
+import {forEach, reduce} from './array';
+import {trim, split, uuid} from './string';
+import {forIn} from './object';
+import {defer, flush} from './function';
 
 
 // classNames
@@ -392,7 +393,7 @@ function isHidden(elem) {
 }
 
 // xml namespaces.
-const ns = {
+const ns         = {
     xml: 'http://www.w3.org/XML/1998/namespace',
     xmlns: 'http://www.w3.org/2000/svg',
     xlink: 'http://www.w3.org/1999/xlink'
@@ -543,6 +544,41 @@ function getTransformToElement(source, target) {
     return matrix.multiply(source.getScreenCTM());
 }
 
+
+function getActualBoundingClientRect(node) {
+    // same as native getBoundingClientRect, except it takes into
+    // account  parent <frame> offsets if the element lies within
+    // a nested document (<frame> or <iframe>-like).
+
+
+    let boundingRect = node.getBoundingClientRect();
+
+    // The original object returned by getBoundingClientRect is immutable,
+    // so we clone it We can't use extend because the properties are not
+    // considered part of the object by hasOwnProperty in IE9
+
+    let rect = {};
+
+    /* eslint-disable guard-for-in */
+    for (let k in boundingRect) {
+        rect[k] = boundingRect[k];
+    }
+    /* eslint-enable guard-for-in */
+
+    if (node.ownerDocument !== document) {
+        let frameElement = node.ownerDocument.defaultView.frameElement;
+        if (frameElement) {
+            let frameRect = getActualBoundingClientRect(frameElement);
+            rect.top += frameRect.top;
+            rect.bottom += frameRect.top;
+            rect.left += frameRect.left;
+            rect.right += frameRect.left;
+        }
+    }
+
+    return rect;
+}
+
 function getBounds(elem) {
 
     let doc;
@@ -555,35 +591,21 @@ function getBounds(elem) {
     }
 
     const docEle = doc.documentElement;
-    const result = {};
+    const box    = getActualBoundingClientRect(elem);
 
-    // The original object returned by getBoundingClientRect is immutable,
-    // so we clone it.
-    // We can't use extend because the properties are not considered part
-    // of the object by hasOwnProperty in IE9.
-    // `getBoundingClientRect` returns transformed rect.
-    const rect = elem.getBoundingClientRect();
-
-    /* eslint-disable guard-for-in */
-    for (const k in rect) {
-        result[k] = rect[k];
+    if (isUndefined(box.width)) {
+        box.width = document.body.scrollWidth - box.left - box.right;
     }
-    /* eslint-enable guard-for-in */
-
-
-    if (isUndefined(result.width)) {
-        result.width = document.body.scrollWidth - result.left - result.right;
-    }
-    if (isUndefined(result.height)) {
-        result.height = document.body.scrollHeight - result.top - result.bottom;
+    if (isUndefined(box.height)) {
+        box.height = document.body.scrollHeight - box.top - box.bottom;
     }
 
-    result.top    = result.top - docEle.clientTop;
-    result.left   = result.left - docEle.clientLeft;
-    result.right  = doc.body.clientWidth - result.width - result.left;
-    result.bottom = doc.body.clientHeight - result.height - result.top;
+    box.top    = box.top - docEle.clientTop;
+    box.left   = box.left - docEle.clientLeft;
+    box.right  = doc.body.clientWidth - box.width - box.left;
+    box.bottom = doc.body.clientHeight - box.height - box.top;
 
-    return result;
+    return box;
 }
 
 function getScrollParent(elem) {

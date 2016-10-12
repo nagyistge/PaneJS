@@ -11,6 +11,7 @@ import PositionChange   from '../changes/PositionChange';
 import RotationChange   from '../changes/RotationChange';
 import TerminalChange   from '../changes/TerminalChange';
 import GeometryChange   from '../changes/GeometryChange';
+import CollapseChange   from '../changes/CollapseChange';
 import AttributeChange  from '../changes/AttributeChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
@@ -541,9 +542,9 @@ class Model extends Events {
         return utils.forEach(links, iterator, context);
     }
 
+
     // children
     // --------
-
 
     getChildNodes(parent) {
 
@@ -734,6 +735,38 @@ class Model extends Events {
         }
 
         return prev;
+    }
+
+
+    // collapse
+    // --------
+
+    isCollapsed(cell) {
+
+        return cell ? cell.isCollapsed() : false;
+    }
+
+    setCollapsed(cell, collapsed) {
+
+        if (cell && collapsed !== this.isCollapsed(cell)) {
+            try {
+                this.beginUpdate();
+                this.digest(new CollapseChange(this, cell, collapsed));
+            } finally {
+                this.endUpdate();
+            }
+        }
+
+        return this;
+    }
+
+    collapseChanged(cell, collapsed) {
+
+        let previous = this.isCollapsed(cell);
+
+        cell.setCollapsed(collapsed, { silent: true });
+
+        return previous;
     }
 
 
@@ -963,6 +996,7 @@ class Model extends Events {
         return previous;
     }
 
+
     // update
     // ------
 
@@ -1013,6 +1047,11 @@ class Model extends Events {
 
             this.endingUpdate = false;
         }
+    }
+
+    isUpdated() {
+
+        return this.updateLevel === 0;
     }
 
     destroy() {
