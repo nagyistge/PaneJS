@@ -1,109 +1,22 @@
 import { isNil } from './lang';
 import { getByPath } from './object';
 
-let proto = String.prototype;
+const proto = String.prototype;
 
-function toString(str) {
+export const toString = str => '' + str;
 
-    return '' + str;
-}
+export const toUpper = str => toString(str).toUpperCase();
+export const toLower = str => toString(str).toLowerCase();
 
-function toUpper(str) {
+export const ucFirst = str => str.charAt(0).toUpperCase() + str.substring(1);
+export const lcFirst = str => str.charAt(0).toLowerCase() + str.substring(1);
 
-    return toString(str).toUpperCase();
-}
+export const startWith = (str, prefix) => toString(str).indexOf(prefix) === 0;
+export const endWith   = (str, suffix) => toString(str).indexOf(suffix, toString(str).length - suffix.length) !== -1;
 
-function toLower(str) {
+export const split = (str, divider = /\s+/) => toString(str).split(divider);
+export const trim  = str => str ? proto.trim.call('' + str) : '';
 
-    return toString(str).toLowerCase();
-}
-
-function ucFirst(str) {
-
-    return str.charAt(0).toUpperCase() + str.substring(1);
-}
-
-function lcFirst(str) {
-
-    return str.charAt(0).toLowerCase() + str.substring(1);
-}
-
-function split(str, divider = /\s+/) {
-
-    return toString(str).split(divider);
-}
-
-function trim(str) {
-
-    return str ? proto.trim.call('' + str) : '';
-}
-
-function uuid() {
-
-    // credit: http://stackoverflow.com/posts/2117523/revisions
-
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        let r = Math.random() * 16 | 0;
-        let v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
-function hashCode(str) {
-
-    // Return a simple hash code from a string.
-    // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
-
-    let hash   = 0;
-    let length = str.length;
-
-    if (length === 0) {
-        return hash;
-    }
-
-    for (let i = 0; i < length; i++) {
-        let c = str.charCodeAt(i);
-        hash  = ((hash << 5) - hash) + c;
-        hash  = hash & hash; // Convert to 32bit integer
-    }
-
-    return hash;
-}
-
-function format(tpl, data) {
-
-    if (tpl && data) {
-        return ('' + tpl).replace(/\$\{(.*?)\}/g, function (input, key) {
-            let val = getByPath(data, key);
-            return val !== undefined ? val : input;
-        });
-    }
-
-    return tpl;
-}
-
-function sanitizeText(text) {
-
-    // Replace all spaces with the Unicode No-break space.
-    // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
-    // IE would otherwise collapse all spaces into one. This is useful
-    // e.g. in tests when you want to compare the actual DOM text content
-    // without having to add the unicode character in the place of all spaces.
-
-    return (text || '').replace(/ /g, '\u00A0');
-}
-
-function startWith(str, prefix) {
-
-    return ('' + str).indexOf(prefix) === 0;
-}
-
-function endWith(str, suffix) {
-
-    str = '' + str;
-
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-}
 
 function padStr(str, max, pad, isStart) {
 
@@ -145,17 +58,58 @@ function padStr(str, max, pad, isStart) {
         : result + truncated;
 }
 
-function padStart(str, max, pad) {
+export const padStart = (str, max, pad) => padStr(str, max, pad, true);
+export const padEnd   = (str, max, pad) => padStr(str, max, pad, false);
 
-    return padStr(str, max, pad, true);
+
+export function uuid() {
+
+    // credit: http://stackoverflow.com/posts/2117523/revisions
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+
+        let r = Math.random() * 16 | 0;
+        let v = c === 'x' ? r : (r & 0x3 | 0x8);
+
+        return v.toString(16);
+    });
 }
 
-function padEnd(str, max, pad) {
+export function hashCode(str) {
 
-    return padStr(str, max, pad, false);
+    // Return a simple hash code from a string.
+    // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
+
+    let hash   = 0;
+    let length = str.length;
+
+    if (length === 0) {
+        return hash;
+    }
+
+    for (let i = 0; i < length; i++) {
+
+        let c = str.charCodeAt(i);
+
+        hash = ((hash << 5) - hash) + c;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+
+    return hash;
 }
 
-function escape(str) {
+export function format(tpl, data) {
+
+    if (tpl && data) {
+        return toString(tpl).replace(/\$\{(.*?)\}/g, (input, key) => {
+            let val = getByPath(data, key);
+            return !isNil(val) ? val : input;
+        });
+    }
+
+    return tpl;
+}
+
+export function escape(str) {
 
     let mapping = {
         '&': '&amp;',
@@ -170,32 +124,19 @@ function escape(str) {
     let shouldEscape = /[&<>"'`]/;
 
     if (shouldEscape.test(str)) {
-        return str.replace(badChars, function (chr) {
-            return mapping[chr];
-        });
+        return str.replace(badChars, chr => mapping[chr]);
     }
 
     return str;
 }
 
-// exports
-// -------
+export function sanitizeText(text) {
 
-export {
-    toLower,
-    toUpper,
-    ucFirst,
-    lcFirst,
-    trim,
-    split,
-    uuid,
-    format,
-    hashCode,
-    toString,
-    sanitizeText,
-    startWith,
-    endWith,
-    padStart,
-    padEnd,
-    escape
-};
+    // Replace all spaces with the Unicode No-break space.
+    // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
+    // IE would otherwise collapse all spaces into one. This is useful
+    // e.g. in tests when you want to compare the actual DOM text content
+    // without having to add the unicode character in the place of all spaces.
+
+    return toString(text).replace(/ /g, '\u00A0');
+}

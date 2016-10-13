@@ -1,17 +1,18 @@
 import { forEach } from './array';
 
-function lineToPathData(line) {
+export function lineToPathData(line) {
+
     return [
         'M', line.getAttribute('x1'), line.getAttribute('y1'),
         'L', line.getAttribute('x2'), line.getAttribute('y2')
     ].join(' ');
 }
 
-function polygonToPathData(polygon) {
+export function polygonToPathData(polygon) {
 
     let d = [];
 
-    forEach(polygon.points, function (p, i) {
+    forEach(polygon.points, (p, i) => {
         d.push(i === 0 ? 'M' : 'L', p.x, p.y);
     });
 
@@ -20,27 +21,27 @@ function polygonToPathData(polygon) {
     return d.join(' ');
 }
 
-function polylineToPathData(polyline) {
+export function polylineToPathData(polyline) {
 
     let d = [];
 
-    forEach(polyline.points, function (p, i) {
+    forEach(polyline.points, (p, i) => {
         d.push(i === 0 ? 'M' : 'L', p.x, p.y);
     });
 
     return d.join(' ');
 }
 
-function rectToPathData(rect) {
+export function rectToPathData(rect) {
 
-    let x = parseFloat(rect.getAttribute('x')) || 0;
-    let y = parseFloat(rect.getAttribute('y')) || 0;
-    let w = parseFloat(rect.getAttribute('width')) || 0;
-    let h = parseFloat(rect.getAttribute('height')) || 0;
+    let x  = parseFloat(rect.getAttribute('x')) || 0;
+    let y  = parseFloat(rect.getAttribute('y')) || 0;
+    let w  = parseFloat(rect.getAttribute('width')) || 0;
+    let h  = parseFloat(rect.getAttribute('height')) || 0;
     let rx = parseFloat(rect.getAttribute('rx')) || 0;
     let ry = parseFloat(rect.getAttribute('ry')) || 0;
-    let r = x + w;
-    let b = y + h;
+    let r  = x + w;
+    let b  = y + h;
 
     let d;
 
@@ -75,11 +76,11 @@ function rectToPathData(rect) {
 
 let KAPPA = 0.5522847498307935;
 
-function circleToPathData(circle) {
+export function circleToPathData(circle) {
 
     let cx = parseFloat(circle.getAttribute('cx')) || 0;
     let cy = parseFloat(circle.getAttribute('cy')) || 0;
-    let r = parseFloat(circle.getAttribute('r'));
+    let r  = parseFloat(circle.getAttribute('r'));
     let cd = r * KAPPA; // Control distance.
 
     return [
@@ -92,12 +93,12 @@ function circleToPathData(circle) {
     ].join(' ');
 }
 
-function ellipseToPathData(ellipse) {
+export function ellipseToPathData(ellipse) {
 
-    let cx = parseFloat(ellipse.getAttribute('cx')) || 0;
-    let cy = parseFloat(ellipse.getAttribute('cy')) || 0;
-    let rx = parseFloat(ellipse.getAttribute('rx'));
-    let ry = parseFloat(ellipse.getAttribute('ry')) || rx;
+    let cx  = parseFloat(ellipse.getAttribute('cx')) || 0;
+    let cy  = parseFloat(ellipse.getAttribute('cy')) || 0;
+    let rx  = parseFloat(ellipse.getAttribute('rx'));
+    let ry  = parseFloat(ellipse.getAttribute('ry')) || rx;
     let cdx = rx * KAPPA; // Control distance x.
     let cdy = ry * KAPPA; // Control distance y.
 
@@ -110,16 +111,3 @@ function ellipseToPathData(ellipse) {
         'Z'
     ].join(' ');
 }
-
-
-// exports
-// -------
-
-export {
-    lineToPathData,
-    rectToPathData,
-    circleToPathData,
-    ellipseToPathData,
-    polygonToPathData,
-    polylineToPathData,
-};

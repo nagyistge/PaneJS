@@ -7,7 +7,6 @@ import {
     isFunction,
     isUndefined,
 } from './lang';
-
 import { forEach, reduce } from './array';
 import { trim, split } from './string';
 import { forIn } from './object';
@@ -25,9 +24,15 @@ const transformKey = (function () {
     }
 
     const element    = createElement('div');
-    const transforms = ['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform'];
+    const transforms = [
+        'transform',
+        'webkitTransform',
+        'OTransform',
+        'MozTransform',
+        'msTransform'
+    ];
 
-    for (let i = 0; i < transforms.length; ++i) {
+    for (let i = 0, l = transforms.length; i < l; ++i) {
 
         const key = transforms[i];
 
@@ -37,12 +42,14 @@ const transformKey = (function () {
     }
 })();
 
-function getClassName(elem) {
+const fillSpaces = str => ' ' + str + ' ';
+
+export function getClassName(elem) {
 
     return elem.getAttribute && elem.getAttribute('class') || '';
 }
 
-function hasClass(node, selector) {
+export function hasClass(node, selector) {
 
     if (isNil(node) || isNil(selector)) {
         return false;
@@ -56,22 +63,21 @@ function hasClass(node, selector) {
         : false;
 }
 
-function addClass(node, selector) {
+export function addClass(node, selector) {
 
     if (isNil(node) || isNil(selector)) {
         return;
     }
 
     if (isFunction(selector)) {
-        addClass(node, selector.call(node, getClassName(node)));
-        return;
+        return addClass(node, selector.call(node, getClassName(node)));
     }
 
     if (isString(selector) && node.nodeType === 1) {
 
         let classes  = selector.match(rnotwhite) || [];
         let oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
-        let newValue = reduce(classes, function (ret, cls) {
+        let newValue = reduce(classes, (ret, cls) => {
 
             if (ret.indexOf(fillSpaces(cls)) < 0) {
                 ret += cls + ' ';
@@ -89,22 +95,21 @@ function addClass(node, selector) {
     }
 }
 
-function removeClass(node, selector) {
+export function removeClass(node, selector) {
 
     if (isNil(node)) {
         return;
     }
 
     if (isFunction(selector)) {
-        removeClass(node, selector.call(node, getClassName(node)));
-        return;
+        return removeClass(node, selector.call(node, getClassName(node)));
     }
 
     if ((!selector || isString(selector)) && node.nodeType === 1) {
 
         let classes  = (selector || '').match(rnotwhite) || [];
         let oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
-        let newValue = reduce(classes, function (ret, cls) {
+        let newValue = reduce(classes, (ret, cls) => {
 
             let className = fillSpaces(cls);
 
@@ -124,7 +129,7 @@ function removeClass(node, selector) {
     }
 }
 
-function toggleClass(node, selector, stateVal) {
+export function toggleClass(node, selector, stateVal) {
 
     if (isNil(node) || isNil(selector)) {
         return;
@@ -155,15 +160,11 @@ function toggleClass(node, selector, stateVal) {
     }
 }
 
-function fillSpaces(str) {
-    return ' ' + str + ' ';
-}
-
 
 // style
 // -----
 
-function styleStrToObject(styleStr) {
+export function styleStrToObject(styleStr) {
 
     return reduce(split(styleStr, ';'), function (result, style) {
 
@@ -178,7 +179,7 @@ function styleStrToObject(styleStr) {
 
 }
 
-function setStyle(elem, name, value) {
+export function setStyle(elem, name, value) {
 
     if (elem) {
 
@@ -203,7 +204,7 @@ function setStyle(elem, name, value) {
     }
 }
 
-function getComputedStyle(elem, name) {
+export function getComputedStyle(elem, name) {
 
     // IE9+
 
@@ -218,7 +219,7 @@ function getComputedStyle(elem, name) {
     return computed;
 }
 
-function normalizeSides(box) {
+export function normalizeSides(box) {
 
     if (Object(box) !== box) {
 
@@ -244,8 +245,9 @@ function normalizeSides(box) {
 // elem
 // ----
 
-const docElem         = document.documentElement;
-const containsElement = docElem.compareDocumentPosition || docElem.contains ?
+const docElem = document.documentElement;
+
+export const containsElement = docElem.compareDocumentPosition || docElem.contains ?
     function (context, elem) {
 
         let aDown = context.nodeType === 9 ? context.documentElement : context;
@@ -272,19 +274,19 @@ const containsElement = docElem.compareDocumentPosition || docElem.contains ?
         return false;
     };
 
-function createElement(tagName, doc) {
+export function createElement(tagName, doc) {
 
     return (doc || document).createElement(tagName);
 }
 
-function removeElement(elem) {
+export function removeElement(elem) {
 
     if (elem && elem.parentNode) {
         elem.parentNode.removeChild(elem);
     }
 }
 
-function emptyElement(elem) {
+export function emptyElement(elem) {
 
     if (elem) {
         while (elem.firstChild) {
@@ -293,12 +295,12 @@ function emptyElement(elem) {
     }
 }
 
-function getNodeName(elem) {
+export function getNodeName(elem) {
 
     return elem.nodeName ? elem.nodeName.toLowerCase() : '';
 }
 
-function isNode(elem, nodeName, attrName, attrValue) {
+export function isNode(elem, nodeName, attrName, attrValue) {
 
     let ret = elem && !isNaN(elem.nodeType);
 
@@ -313,7 +315,7 @@ function isNode(elem, nodeName, attrName, attrValue) {
     return ret;
 }
 
-function getWindow(elem) {
+export function getWindow(elem) {
 
     return isWindow(elem)
         ? elem : elem.nodeType === 9
@@ -321,7 +323,43 @@ function getWindow(elem) {
         : false;
 }
 
-function getOffset(elem) {
+export function showHide(elem, show) {
+
+    if (elem && elem.style) {
+
+        let display = elem.style.display;
+
+        if (show) {
+            if (display === 'none') {
+
+                if (!isUndefined(elem.__display)) {
+                    display = elem.__display;
+                    delete elem.__display;
+                } else {
+                    display = '';
+                }
+
+                elem.style.display = display || '';
+            }
+        } else {
+            if (display !== 'none') {
+
+                if (display) {
+                    elem.__display = display;
+                }
+
+                elem.style.display = 'none';
+            }
+        }
+    }
+}
+
+export function isHidden(elem) {
+
+    return elem && (elem.style.display === 'none' || !containsElement(elem.ownerDocument, elem));
+}
+
+export function getOffset(elem) {
 
     let box = {
         top: 0,
@@ -355,48 +393,14 @@ function getOffset(elem) {
     };
 }
 
-function showHide(elem, show) {
-
-    if (elem && elem.style) {
-
-        let display = elem.style.display;
-
-        if (show) {
-            if (display === 'none') {
-
-                if (!isUndefined(elem.__display)) {
-                    display = elem.__display;
-                    delete elem.__display;
-                } else {
-                    display = '';
-                }
-
-                elem.style.display = display || '';
-            }
-        } else {
-            if (display !== 'none') {
-
-                if (display) {
-                    elem.__display = display;
-                }
-
-                elem.style.display = 'none';
-            }
-        }
-    }
-}
-
-function isHidden(elem) {
-
-    return elem && (elem.style.display === 'none' || !containsElement(elem.ownerDocument, elem));
-}
 
 // xml namespaces.
-const ns         = {
+const ns = {
     xml: 'http://www.w3.org/XML/1998/namespace',
     xmlns: 'http://www.w3.org/2000/svg',
     xlink: 'http://www.w3.org/1999/xlink'
 };
+
 // svg version.
 const svgVersion = '1.1';
 
@@ -425,27 +429,45 @@ function parseXML(str, async) {
     return xml;
 }
 
-function createSvgDocument(content) {
+export function createSvgDocument(content) {
 
     // Create an SVG document element.
     // If `content` is passed, it will be used as the SVG content of
     // the `<svg>` root element.
 
-    let svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xlink + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
+    let svg = `<svg xmlns="${ns.xmlns}" xmlns:xlink="${ns.xlink}" version="${svgVersion}">${content || ''}</svg>`;
     let xml = parseXML(svg, false);
     return xml.documentElement;
 }
 
-function createSvgElement(tagName, doc) {
+export function createSvgElement(tagName, doc) {
 
     return (doc || document).createElementNS(ns.xmlns, tagName);
 }
 
 
-// attr
-// ----
+// attribute
+// ---------
 
-function setAttribute(elem, name, value) {
+function qualifyAttributeName(name) {
+
+    if (name.indexOf(':') !== -1) {
+
+        let combined = name.split(':');
+
+        return {
+            ns: ns[combined[0]],
+            local: combined[1]
+        };
+    }
+
+    return {
+        ns: null,
+        local: name
+    };
+}
+
+export function setAttribute(elem, name, value) {
 
     if (isNil(value)) {
         return removeAttribute(elem, name);
@@ -465,10 +487,9 @@ function setAttribute(elem, name, value) {
     }
 }
 
-function removeAttribute(elem, name) {
+export function removeAttribute(elem, name) {
 
     let qualified = qualifyAttributeName(name);
-
     if (qualified.ns) {
         if (elem.hasAttributeNS(qualified.ns, qualified.local)) {
             elem.removeAttributeNS(qualified.ns, qualified.local);
@@ -478,42 +499,29 @@ function removeAttribute(elem, name) {
     }
 }
 
-function qualifyAttributeName(name) {
 
-    if (name.indexOf(':') !== -1) {
-        let combined = name.split(':');
-        return {
-            ns: ns[combined[0]],
-            local: combined[1]
-        };
-    }
+// transform
+// ---------
 
-    return {
-        ns: null,
-        local: name
-    };
-}
-
-
-function setScale(elem, sx, sy) {
+export function setScale(elem, sx, sy) {
 
     if (elem) {
-        elem.style[transformKey] = 'scale(' + sx + ',' + sy + ')';
+        elem.style[transformKey] = `scale(${sx}, ${sy})`;
     }
 }
 
-function setRotation(elem, angle, ox, oy) {
+export function setRotation(elem, angle, ox, oy) {
 
     if (elem) {
-        elem.style[transformKey] = 'rotate(' + angle + ',' + ox + ',' + oy + ')';
+        elem.style[transformKey] = `rotate(${angle}, ${ox}, ${oy})`;
     }
 }
 
-function setTranslate(elem, tx, ty) {
+export function setTranslate(elem, tx, ty) {
 
     if (elem) {
 
-        let translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
+        let translate = `translateX(${tx}px) translateY(${ty}px)`;
 
         // if (transformKey !== 'msTransform') {
         //     // The Z transform will keep this in the GPU (faster, and prevents artifacts),
@@ -525,7 +533,7 @@ function setTranslate(elem, tx, ty) {
     }
 }
 
-function getTransformToElement(source, target) {
+export function getTransformToElement(source, target) {
 
     if (source.getTransformToElement) {
         return source.getTransformToElement(target);
@@ -578,7 +586,7 @@ function getActualBoundingClientRect(node) {
     return rect;
 }
 
-function getBounds(elem) {
+export function getBounds(elem) {
 
     let doc;
 
@@ -590,24 +598,24 @@ function getBounds(elem) {
     }
 
     const docEle = doc.documentElement;
-    const box    = getActualBoundingClientRect(elem);
+    const bounds = getActualBoundingClientRect(elem);
 
-    if (isUndefined(box.width)) {
-        box.width = document.body.scrollWidth - box.left - box.right;
+    if (isUndefined(bounds.width)) {
+        bounds.width = document.body.scrollWidth - bounds.left - bounds.right;
     }
-    if (isUndefined(box.height)) {
-        box.height = document.body.scrollHeight - box.top - box.bottom;
+    if (isUndefined(bounds.height)) {
+        bounds.height = document.body.scrollHeight - bounds.top - bounds.bottom;
     }
 
-    box.top    = box.top - docEle.clientTop;
-    box.left   = box.left - docEle.clientLeft;
-    box.right  = doc.body.clientWidth - box.width - box.left;
-    box.bottom = doc.body.clientHeight - box.height - box.top;
+    bounds.top    = bounds.top - docEle.clientTop;
+    bounds.left   = bounds.left - docEle.clientLeft;
+    bounds.right  = doc.body.clientWidth - bounds.width - bounds.left;
+    bounds.bottom = doc.body.clientHeight - bounds.height - bounds.top;
 
-    return box;
+    return bounds;
 }
 
-function getScrollParent(elem) {
+export function getScrollParent(elem) {
 
     // In firefox if the el is inside an iframe with display: none;
     // window.getComputedStyle() will return null;
@@ -650,7 +658,7 @@ function getScrollParent(elem) {
     return document.body;
 }
 
-function getScrollBarWidth() {
+export function getScrollBarWidth() {
 
     const inner = createElement('p');
     const outer = createElement('div');
@@ -686,45 +694,3 @@ function getScrollBarWidth() {
 
     return w1 - w2;
 }
-
-// exports
-// -------
-
-export {
-    isNode,
-    showHide,
-    isHidden,
-    getWindow,
-    getOffset,
-    getNodeName,
-
-    createElement,
-    createSvgDocument,
-    createSvgElement,
-    emptyElement,
-    removeElement,
-    containsElement,
-
-    hasClass,
-    addClass,
-    removeClass,
-    toggleClass,
-    getClassName,
-
-    setAttribute,
-    removeAttribute,
-    qualifyAttributeName,
-
-    setScale,
-    setRotation,
-    setTranslate,
-
-    setStyle,
-    getBounds,
-    styleStrToObject,
-    normalizeSides,
-    getScrollParent,
-    getScrollBarWidth,
-    getComputedStyle,
-    getTransformToElement
-};

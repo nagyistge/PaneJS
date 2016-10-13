@@ -1,5 +1,5 @@
-import { isFunction      } from '../utils/lang';
-import { some            } from '../utils/array';
+import { isFunction } from '../utils/lang';
+import { some } from '../utils/array';
 import { containsElement } from '../utils/dom';
 import detector            from '../common/detector';
 
@@ -19,34 +19,18 @@ const hooks = {
     }
 };
 
-function mouseEnterLeaveWrap(elem, handler) {
-    return function (e) {
-        if (!isHover(e.delegateTarget || elem, e)) {
-            handler.call(this, e);
-        }
-    };
-}
+const isMatchSelector = function () {
 
-function isHover(elem, e) {
+    const testDiv = DOC.createElement('div');
 
-    const target = e.type === 'mouseover'
-        ? e.relatedTarget || e.fromElement
-        : e.relatedTarget || e.toElement;
-
-    return containsElement(elem, target) || elem === target;
-}
-
-let isMatchSelector = function () {
-
-    let testDiv         = DOC.createElement('div');
     // match selector
-    let matchesSelector = testDiv.matches ||
+    const matchesSelector = testDiv.matches ||
         testDiv.webkitMatchesSelector ||
         testDiv.mozMatchesSelector ||
         testDiv.msMatchesSelector ||
         testDiv.oMatchesSelector;
 
-    let hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
+    const hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
 
     return function (elem, selector) {
 
@@ -66,19 +50,34 @@ let isMatchSelector = function () {
         // from the parent element's context, get all nodes that match the selector
         let nodes = parent.querySelectorAll(selector);
 
-        return some(nodes, function (node) {
-            return node === elem;
-        });
+        return some(nodes, node => node === elem);
     };
 }();
 
-function fixEvent(event) {
+function mouseEnterLeaveWrap(elem, handler) {
+    return function (e) {
+        if (!isHover(e.delegateTarget || elem, e)) {
+            handler.call(this, e);
+        }
+    };
+}
+
+function isHover(elem, e) {
+
+    const target = e.type === 'mouseover'
+        ? e.relatedTarget || e.fromElement
+        : e.relatedTarget || e.toElement;
+
+    return containsElement(elem, target) || elem === target;
+}
+
+function fixEvent(e) {
 
     // add W3C standard event methods
-    event.preventDefault  = fixEvent.preventDefault;
-    event.stopPropagation = fixEvent.stopPropagation;
+    e.preventDefault  = fixEvent.preventDefault;
+    e.stopPropagation = fixEvent.stopPropagation;
 
-    return event;
+    return e;
 }
 
 fixEvent.preventDefault = function () {
@@ -168,10 +167,11 @@ function getDelegateTarget(elem, target, selector) {
     return null;
 }
 
-function removeEventListener(elem, type, handler) {
 
-    let wrapper = handler._delegateWrapper;
+export function removeEventListener(elem, type, handler) {
+
     let hook    = hooks[type];
+    let wrapper = handler._delegateWrapper;
 
     type = hook ? hook.type : type;
 
@@ -190,7 +190,7 @@ function removeEventListener(elem, type, handler) {
     }
 }
 
-function addEventListener(elem, type, selector, handler, once) {
+export function addEventListener(elem, type, selector, handler, once) {
 
     let hook = hooks[type];
 
@@ -230,73 +230,40 @@ function addEventListener(elem, type, selector, handler, once) {
     return handler;
 }
 
-function normalizeEvent(evt) {
+export function normalizeEvent(e) {
 
-    let touchEvt = IS_TOUCH
-        && evt.originalEvent
-        && evt.originalEvent.changedTouches
-        && evt.originalEvent.changedTouches[0];
+    let touchEvent = IS_TOUCH
+        && e.originalEvent
+        && e.originalEvent.changedTouches
+        && e.originalEvent.changedTouches[0];
 
-    if (touchEvt) {
-        for (let property in evt) {
+    if (touchEvent) {
+        for (let prop in e) {
             // copy all the properties from the input event that are not
             // defined on the touch event (functions included).
-            if (touchEvt[property] === undefined) {
-                touchEvt[property] = evt[property];
+            if (touchEvent[prop] === undefined) {
+                touchEvent[prop] = e[prop];
             }
         }
-        return touchEvt;
+        return touchEvent;
     }
 
-    return evt;
+    return e;
 }
 
-function isLeftMouseButton(evt) {
+export const hasAltKey   = e => e.altKey;
+export const hasCtrlKey  = e => e.ctrlKey;
+export const hasMetaKey  = e => e.metaKey;
+export const hasShiftKey = e => e.shiftKey;
 
-    if (detector.IS_IE) {
-        return evt.button === 1;
-    }
+export const hasModifierKey = (e) => {
 
-    return evt.button === 0;
+    return hasCtrlKey(e) || hasMetaKey(e) || hasShiftKey(e);
 }
 
-function hasModifierKey(evt) {
+export const isLeftMouseButton = (e) => {
 
-    return hasCtrlKey(evt) || hasMetaKey(evt) || hasShiftKey(evt);
+    return detector.IS_IE
+        ? e.button === 1
+        : e.button === 0;
 }
-
-function hasAltKey(evt) {
-
-    return evt.altKey;
-}
-
-function hasCtrlKey(evt) {
-
-    return evt.ctrlKey;
-}
-
-function hasShiftKey(evt) {
-
-    return evt.shiftKey;
-}
-
-function hasMetaKey(evt) {
-
-    return evt.metaKey;
-}
-
-
-// exports
-// -------
-
-export {
-    normalizeEvent,
-    hasAltKey,
-    hasCtrlKey,
-    hasMetaKey,
-    hasShiftKey,
-    hasModifierKey,
-    isLeftMouseButton,
-    addEventListener,
-    removeEventListener
-};

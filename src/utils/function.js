@@ -1,17 +1,13 @@
 import { isFunction } from './lang';
-import { slice } from './array';
 
-
-function invoke(fn, args, context) {
+export function invoke(fn, args, context) {
 
     let ret;
 
     if (isFunction(fn)) {
 
         let len = args.length;
-        let a1  = args[0];
-        let a2  = args[1];
-        let a3  = args[2];
+        let [a1, a2, a3] = args;
 
         if (len === 0) {
             ret = fn.call(context);
@@ -29,27 +25,22 @@ function invoke(fn, args, context) {
     return ret;
 }
 
-function bind(fn /* [, context, arg1[,arg2[,argN]]] */) {
+export function bind(fn, ...args) {
 
-    if (isFunction(fn)) {
-
-        let args = slice(arguments, 1);
-
-        return invoke(Function.prototype.bind, args, fn);
-    }
-
-    return fn;
+    return isFunction(fn)
+        ? invoke(Function.prototype.bind, args, fn)
+        : fn;
 }
 
 
 const deferred = [];
 
-function defer(fn) {
+export function defer(fn) {
 
     deferred.push(fn);
 }
 
-function flush() {
+export function flush() {
 
     let fn = deferred.pop();
     while (fn) {
@@ -57,14 +48,3 @@ function flush() {
         fn = deferred.pop();
     }
 }
-
-
-// exports
-// -------
-
-export {
-    defer,
-    flush,
-    bind,
-    invoke
-};

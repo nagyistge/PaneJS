@@ -1,56 +1,43 @@
+import { split } from './string';
 import { forEach } from './array';
-import { isNil, isArray, isObject, isWindow } from './lang';
+import { isArray, isObject, isWindow } from './lang';
 
 
-function hasOwn(obj, key) {
+export function hasOwn(obj, key) {
 
-    return obj !== null && Object.prototype.hasOwnProperty.call(obj, key);
+    return obj && Object.prototype.hasOwnProperty.call(obj, key);
 }
 
-function keys(obj) {
+export function keys(obj) {
 
     return obj ? Object.keys(obj) : [];
 }
 
-function forIn(obj, iterator, context) {
+export function forIn(obj, iterator, context) {
 
     forEach(keys(obj), function (key) {
         iterator.call(context, obj[key], key);
     });
 }
 
-function extend(target) {
+export function extend(target = {}, ...sources) {
 
-    if (!target) {
-        target = {};
-    }
-
-    for (let i = 1, l = arguments.length; i < l; i++) {
-        let source = arguments[i];
-
+    forEach(sources, source => {
         if (source) {
-
             /* eslint guard-for-in: 0 */
             for (let key in source) {
                 target[key] = source[key];
             }
         }
-    }
+    });
 
     return target;
 }
 
-function merge(target) {
+export function merge(target = {}, ...sources) {
 
-    if (!target) {
-        target = {};
-    }
-
-    for (let i = 1, l = arguments.length; i < l; i++) {
-
-        let source = arguments[i];
+    forEach(sources, source => {
         if (source) {
-
             /* eslint guard-for-in: 0 */
             for (let name in source) {
 
@@ -74,17 +61,14 @@ function merge(target) {
                 }
             }
         }
-    }
+    });
 
     return target;
 }
 
-function getByPath(obj, path, delimiter) {
+export function getByPath(obj, path, delimiter = '.') {
 
-    delimiter = delimiter || '.';
-
-    let paths = path.split(delimiter);
-
+    const paths = split(path, delimiter);
     while (paths.length) {
 
         let key = paths.shift();
@@ -99,7 +83,7 @@ function getByPath(obj, path, delimiter) {
     return obj;
 }
 
-function destroy(obj) {
+export function destroy(obj) {
 
     if (obj) {
         for (let prop in obj) {
@@ -116,13 +100,24 @@ function destroy(obj) {
     }
 }
 
-function isPlainObject(obj) {
+export function isEmptyObject(obj) {
+
+    /* eslint guard-for-in: 0 */
+    /* eslint no-unused-vars: 0 */
+    for (let key in obj) {
+        return false;
+    }
+
+    return true;
+}
+
+export function isPlainObject(obj) {
 
     // Not plain objects:
     //  - Any object or value whose internal [[Class]] property is not "[object Object]"
     //  - DOM nodes
     //  - window
-    if (isNil(obj) || !isObject(obj) || obj.nodeType || isWindow(obj)) {
+    if (!isObject(obj) || obj.nodeType || isWindow(obj)) {
         return false;
     }
 
@@ -135,29 +130,3 @@ function isPlainObject(obj) {
     return true;
 }
 
-function isEmptyObject(obj) {
-
-    /* eslint guard-for-in: 0 */
-    /* eslint no-unused-vars: 0 */
-    for (let key in obj) {
-        return false;
-    }
-
-    return true;
-}
-
-
-// exports
-// -------
-
-export {
-    hasOwn,
-    keys,
-    forIn,
-    merge,
-    extend,
-    destroy,
-    getByPath,
-    isPlainObject,
-    isEmptyObject
-};

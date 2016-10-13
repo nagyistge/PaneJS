@@ -1,19 +1,17 @@
-import { trim    } from './string';
 import { toFloat } from './number';
+import { trim, split } from './string';
 
 
-function parseTranslate(transform) {
+export function parseTranslate(transform) {
 
     let translate = { tx: 0, ty: 0 };
 
     if (transform) {
 
-        let separator = /[ ,]+/;
-
         let match = transform.match(/translate\((.*)\)/);
         if (match) {
-            let arr = match[1].split(separator);
-
+            
+            let arr = split(match[1], /[ ,]+/);
             if (arr[0]) {
                 translate.tx += toFloat(arr[0]);
             }
@@ -27,18 +25,16 @@ function parseTranslate(transform) {
     return translate;
 }
 
-function parseScale(transform) {
+export function parseScale(transform) {
 
     let scale = { sx: 1, sy: 1 };
 
     if (transform) {
 
-        let separator = /[ ,]+/;
-
         let match = transform.match(/scale\((.*)\)/);
         if (match) {
-            let arr = match[1].split(separator);
 
+            let arr = split(match[1], /[ ,]+/);
             if (arr[0]) {
                 scale.sx *= toFloat(arr[0]);
             }
@@ -52,18 +48,16 @@ function parseScale(transform) {
     return scale;
 }
 
-function parseRotate(transform) {
+export function parseRotate(transform) {
 
     let rotate = { angle: 0 };
 
     if (transform) {
 
-        let separator = /[ ,]+/;
-
         let match = transform.match(/rotate\((.*)\)/);
         if (match) {
-            let arr = match[1].split(separator);
 
+            let arr = split(match[1], /[ ,]+/);
             if (arr[0]) {
                 rotate.angle += toFloat(arr[0]);
             }
@@ -78,7 +72,7 @@ function parseRotate(transform) {
     return rotate;
 }
 
-function parseTransform(transform) {
+export function parseTransform(transform) {
 
     return {
         translate: parseTranslate(transform),
@@ -87,31 +81,17 @@ function parseTransform(transform) {
     };
 }
 
-function clearTranslate(transform) {
+export function clearTranslate(transform) {
 
     return transform && trim(transform.replace(/translate\([^)]*\)/g, '')) || '';
 }
 
-function clearScale(transform) {
+export function clearScale(transform) {
 
     return transform && trim(transform.replace(/scale\([^)]*\)/g, '')) || '';
 }
 
-function clearRotate(transform) {
+export function clearRotate(transform) {
 
     return transform && trim(transform.replace(/rotate\([^)]*\)/g, '')) || '';
 }
-
-
-// exports
-// -------
-
-export {
-    parseScale,
-    parseRotate,
-    parseTransform,
-    parseTranslate,
-    clearScale,
-    clearRotate,
-    clearTranslate
-};
