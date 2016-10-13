@@ -129,4 +129,3 @@ export function isPlainObject(obj) {
     // |obj| is a plain object, created by {} or constructed with new Object
     return true;
 }
-

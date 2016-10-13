@@ -10,7 +10,7 @@ export function parseTranslate(transform) {
 
         let match = transform.match(/translate\((.*)\)/);
         if (match) {
-            
+
             let arr = split(match[1], /[ ,]+/);
             if (arr[0]) {
                 translate.tx += toFloat(arr[0]);

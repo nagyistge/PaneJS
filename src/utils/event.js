@@ -256,14 +256,13 @@ export const hasCtrlKey  = e => e.ctrlKey;
 export const hasMetaKey  = e => e.metaKey;
 export const hasShiftKey = e => e.shiftKey;
 
-export const hasModifierKey = (e) => {
+export const hasModifierKey    = (e) => {
 
     return hasCtrlKey(e) || hasMetaKey(e) || hasShiftKey(e);
-}
-
+};
 export const isLeftMouseButton = (e) => {
 
     return detector.IS_IE
         ? e.button === 1
         : e.button === 0;
-}
+};

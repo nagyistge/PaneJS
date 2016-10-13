@@ -1321,7 +1321,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    if ((0, _lang.isFunction)(selector)) {
-	        return addClass(node, selector.call(node, getClassName(node)));
+	        addClass(node, selector.call(node, getClassName(node)));
+	        return;
 	    }
 	
 	    if ((0, _lang.isString)(selector) && node.nodeType === 1) {
@@ -1352,7 +1353,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    if ((0, _lang.isFunction)(selector)) {
-	        return removeClass(node, selector.call(node, getClassName(node)));
+	        removeClass(node, selector.call(node, getClassName(node)));
+	        return;
 	    }
 	
 	    if ((!selector || (0, _lang.isString)(selector)) && node.nodeType === 1) {
@@ -2233,7 +2235,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return hasCtrlKey(e) || hasMetaKey(e) || hasShiftKey(e);
 	};
-	
 	var isLeftMouseButton = exports.isLeftMouseButton = function isLeftMouseButton(e) {
 	
 	    return _detector2.default.IS_IE ? e.button === 1 : e.button === 0;

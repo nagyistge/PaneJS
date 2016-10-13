@@ -70,7 +70,8 @@ export function addClass(node, selector) {
     }
 
     if (isFunction(selector)) {
-        return addClass(node, selector.call(node, getClassName(node)));
+        addClass(node, selector.call(node, getClassName(node)));
+        return;
     }
 
     if (isString(selector) && node.nodeType === 1) {
@@ -102,7 +103,8 @@ export function removeClass(node, selector) {
     }
 
     if (isFunction(selector)) {
-        return removeClass(node, selector.call(node, getClassName(node)));
+        removeClass(node, selector.call(node, getClassName(node)));
+        return;
     }
 
     if ((!selector || isString(selector)) && node.nodeType === 1) {
