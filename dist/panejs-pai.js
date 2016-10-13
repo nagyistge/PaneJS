@@ -386,20 +386,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}(_Node3.default);
 	
 	Rect.setDefaults({
-	    markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',
+	    markup: '<g class="pane-rotatable">\n               <g class="pane-scalable"><rect/></g>\n               <text/>\n             </g>',
+	
 	    attrs: {
 	        '.': {
 	            'fill': '#fff',
 	            'stroke': 'none'
 	        },
-	        'rect': {
+	        rect: {
 	            'fill': '#fff',
 	            'stroke': '#000',
 	            'stroke-width': '1',
 	            'width': 80,
 	            'height': 30
 	        },
-	        'text': {
+	        text: {
 	            'fill': '#000',
 	            'font-size': 12,
 	            'ref-x': .5,
