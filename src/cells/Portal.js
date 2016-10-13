@@ -1,4 +1,6 @@
-import * as utils from '../common/utils';
+import { uuid } from '../utils/string';
+import { isObject } from '../utils/lang';
+import { map, some, forEach } from '../utils/array';
 import Node       from '../cells/Node';
 import PortalView from '../views/PortalView';
 
@@ -8,36 +10,27 @@ class Portal extends Node {
 
         super(options);
 
+        this.inPorts  = map(this.metadata.inPorts, port => this.standardizePort(port));
+        this.outPorts = map(this.metadata.outPorts, port => this.standardizePort(port));
         this.portById = {};
 
-        this.inPorts  = utils.map(this.metadata.inPorts, function (port) {
+        forEach(this.inPorts, port => {
+            this.portById[port.id] = port;
+        });
 
-            let ret = this.standardizePort(port);
-
-            this.portById[ret.id] = ret;
-
-            return ret;
-
-        }, this);
-        this.outPorts = utils.map(this.metadata.outPorts, function (port) {
-
-            let ret = this.standardizePort(port);
-
-            this.portById[ret.id] = ret;
-
-            return ret;
-
-        }, this);
+        forEach(this.outPorts, port => {
+            this.portById[port.id] = port;
+        });
     }
 
     eachInPort(iterator, context) {
 
-        utils.forEach(this.inPorts, iterator, context);
+        forEach(this.inPorts, iterator, context);
     }
 
     eachOutPort(iterator, context) {
 
-        utils.forEach(this.outPorts, iterator, context);
+        forEach(this.outPorts, iterator, context);
     }
 
     getInPorts() {
@@ -57,26 +50,22 @@ class Portal extends Node {
 
     isInPort(port) {
 
-        return utils.some(this.inPorts, function (item) {
-            return item.id === port.id;
-        });
+        return some(this.inPorts, item => item.id === port.id);
     }
 
     isOutPort(port) {
 
-        return utils.some(this.outPorts, function (item) {
-            return item.id === port.id;
-        });
+        return some(this.outPorts, item => item.id === port.id);
     }
 
     standardizePort(port) {
 
-        if (!utils.isObject(port)) {
+        if (!isObject(port)) {
             port = { id: port };
         }
 
         if (!port.id) {
-            port.id = utils.uuid();
+            port.id = uuid();
         }
 
         return port;
@@ -91,10 +80,9 @@ class Portal extends Node {
 
 Portal.setDefaults({
     portMarkup: '',
-    view: PortalView,
-
     inPorts: [],
-    outPorts: []
+    outPorts: [],
+    view: PortalView
 });
 
 

@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="utf8"/>
-
     <title>Links</title>
     <link rel="stylesheet" type="text/css" href="../dist/panejs.css">
     <style>
@@ -19,11 +18,12 @@
 <script>
 
     var container = document.getElementById('container');
-    var model = new panejs.Model();
+
     var paper = new panejs.Paper({
-        container: container,
-        model: model
+        container: container
     });
+    var model = paper.getModel();
+
 
     var link1 = new panejs.Link({
         sourceMarker: 'classic',
@@ -40,6 +40,7 @@
 
 
     var link2 = link1.clone();
+    link2.clearVertices();
     link2.insertVertice([
         { x: 40, y: 250 },
         { x: 140, y: 200 },
@@ -62,6 +63,7 @@
     model.addLink(link3, { x: 300, y: 30 }, { x: 500, y: 30 });
 
     var link4 = link3.clone();
+    link4.clearVertices();
     link4.insertVertice([
         { x: 300, y: 250 },
         { x: 400, y: 200 },
@@ -87,7 +89,7 @@
 
 
     var link6 = link5.clone();
-
+    link6.clearVertices();
     link6.insertVertice([
         { x: 590, y: 240 },
         { x: 660, y: 160 },
@@ -133,6 +135,7 @@
     });
 
     var link7 = link5.clone();
+    link7.clearVertices();
     link7.insertVertice([
         { x: 150, y: 480 },
         { x: 400, y: 320 },

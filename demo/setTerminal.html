@@ -49,8 +49,8 @@
 <script src="../dist/panejs.js"></script>
 <script>
     var container = document.getElementById('container');
-    var model = new panejs.Model();
-    var paper = new panejs.Paper({
+    var model     = new panejs.Model();
+    var paper     = new panejs.Paper({
         container: container,
         model: model
     });
@@ -58,31 +58,33 @@
     var ports1 = new panejs.shapes.basic.Ports({
 
         position: { x: 100, y: 80 },
-        inPorts: [{
-            name: 'in-1'
-        }, {
-            name: 'in-2'
-        }],
-        outPorts: [{
-            name: 'out-1'
-        }, {
-            name: 'out-2'
-        }]
+        inPorts: [
+            {
+                id: 'in-1'
+            }, {
+                id: 'in-2'
+            }
+        ],
+        outPorts: ['out-1', 'out-2']
     });
+
     var ports2 = new panejs.shapes.basic.Ports({
 
         position: { x: 350, y: 150 },
-        inPorts: [{
-            name: 'in-1'
-        }, {
-            name: 'in-2'
-        }],
-
-        outPorts: [{
-            name: 'out-1'
-        }, {
-            name: 'out-2'
-        }]
+        inPorts: [
+            {
+                id: 'in-1'
+            }, {
+                id: 'in-2'
+            }
+        ],
+        outPorts: [
+            {
+                id: 'out-1'
+            }, {
+                id: 'out-2'
+            }
+        ]
     });
 
     var link1 = new panejs.Link({
@@ -93,10 +95,10 @@
     model.addCells([ports1, ports2]);
     model.addLink(link1, {
         node: ports1,
-        port: { name: 'out-2' }
+        port: 'out-2'
     }, {
         node: ports2,
-        port: { name: 'in-2' }
+        port: { id: 'in-2' }
     });
 
     var link2 = new panejs.Link({
@@ -104,11 +106,16 @@
         targetMarker: 'classic'
     });
 
-    model.addCell(link2);
-    model.setTerminals(link2, ports1, { node: ports2, port: { name: 'in-1' } });
+    model.addLink(link2, {
+        node: ports1
+    }, {
+        node: ports2,
+        port: { id: 'in-1' }
+    });
 
 
     setTimeout(function () {
+
         link2.setTerminal({
             point: { x: 200, y: 20 }
         }, true);
@@ -119,11 +126,11 @@
             setTimeout(function () {
                 link2.setTerminal({
                     node: ports1,
-                    port: { name: 'out-1' }
+                    port: { id: 'out-1' }
                 }, true);
 
                 setTimeout(function () {
-                    link2.setTerminalPort({ name: 'out-2' }, true);
+                    link2.setTerminalPort({ id: 'out-2' }, true);
 
                     setTimeout(function () {
                         link2.setTerminalNode(ports2, false);
@@ -138,15 +145,10 @@
                             }, false);
 
                         }, 1000);
-
                     }, 1000);
-
                 }, 1000);
-
             }, 1000);
-
         }, 1000);
-
     }, 3000);
 
 </script>

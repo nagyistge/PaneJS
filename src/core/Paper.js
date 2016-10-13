@@ -38,6 +38,8 @@ const classNames = {
 
 // the default options for paper
 const defaultOptions = {
+    // container: null,
+    // model: null,
     width: '100%',
     height: '100%',
     tx: 0,
@@ -45,8 +47,6 @@ const defaultOptions = {
     sx: 1,
     sy: 1,
     gridSize: 1,
-    container: null,
-    model: null,
 
     // number of mouseMove events after which the
     // pointerClick event will be still triggered.

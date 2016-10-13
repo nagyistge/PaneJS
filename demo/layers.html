@@ -23,13 +23,14 @@
 <script>
 
     var container = document.getElementById('container');
+
     var model = new panejs.Model();
     var paper = new panejs.Paper({
         container: container,
         model: model
     });
 
-    var root = model.getRoot();
+    var root   = model.getRoot();
     var layer1 = model.createLayer();
     var layer2 = model.createLayer();
 
@@ -117,19 +118,17 @@
     model.endUpdate();
 
     document.getElementById('btnLayer1').addEventListener('click', function () {
-        layer1.toggle();
+        layer1.toggleVisible();
     }, false);
 
     document.getElementById('btnLayer2').addEventListener('click', function () {
 
-        if(layer2.isVisible()){
+        if (layer2.isVisible()) {
             layer2.hide();
-        }else{
+        } else {
             layer2.show();
         }
     }, false);
-
-    console.log(root);
 </script>
 </body>
 </html>
