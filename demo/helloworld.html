@@ -25,9 +25,6 @@
         model: model
     });
 
-
-    model.beginUpdate();
-
     var node1 = new panejs.shapes.basic.Rect({
         position: {
             x: 70,
@@ -46,7 +43,6 @@
             }
         }
     });
-
     var node2 = new panejs.shapes.basic.Rect({
         position: {
             x: 200,
@@ -63,17 +59,21 @@
             }
         }
     });
-
     var link1 = new panejs.Link({
 //        connector: 'smooth',
         targetMarker: 'classic'
     });
 
+    // 画布局部刷新 - 开始
+    model.beginUpdate();
+
     model.addNode(node1);
     model.addNode(node2);
     model.addLink(link1, node1, node2);
 
+    // 画布局部刷新 - 结束
     model.endUpdate();
+
 </script>
 </body>
 </html>
