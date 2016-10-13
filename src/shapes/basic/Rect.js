@@ -1,3 +1,4 @@
+
 import Node from '../../cells/Node';
 
 class Rect extends Node {}
@@ -27,9 +28,5 @@ Rect.setDefaults({
         }
     }
 });
-
-
-// exports
-// -------
 
 export default Rect;

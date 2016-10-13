@@ -406,9 +406,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	});
 	
-	// exports
-	// -------
-	
 	exports.default = Rect;
 
 /***/ },
