@@ -1,6 +1,6 @@
 # PaneJS <sup>[![Version Badge](http://versionbadg.es/panejs/panejs.svg)](https://npmjs.org/package/panejs)</sup>
 
-> Awesome JavaScript diagramming library
+> JavaScript diagramming library
 
 [![MIT License](https://img.shields.io/badge/license-MIT_License-green.svg?style=flat-square)](https://github.com/panejs/panejs/blob/master/LICENSE)
 [![Package Quality](http://npm.packagequality.com/shield/panejs.svg)](http://packagequality.com/#?package=panejs)

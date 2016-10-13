@@ -1,7 +1,7 @@
 {
   "name": "panejs",
   "version": "0.1.9",
-  "description": "Awesome JavaScript diagramming library",
+  "description": "JavaScript diagramming library",
   "main": "index.js",
   "keywords": [
     "diagramming",
