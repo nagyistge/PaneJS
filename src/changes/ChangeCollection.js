@@ -1,47 +1,41 @@
-class ChangeCollection {
+export default class ChangeCollection {
 
-    constructor(model) {
+  constructor(model) {
 
-        this.model   = model;
-        this.changes = [];
+    this.model   = model;
+    this.changes = [];
+  }
+
+  hasChange() {
+
+    return !!this.changes.length;
+  }
+
+  getChanges() {
+
+    return this.changes;
+  }
+
+  add(change) {
+
+    if (change) {
+      this.changes.push(change);
     }
 
-    hasChange() {
+    return this;
+  }
 
-        return !!this.changes.length;
-    }
+  clear() {
 
-    getChanges() {
+    this.changes = [];
 
-        return this.changes;
-    }
+    return this;
+  }
 
-    add(change) {
+  notify() {
 
-        if (change) {
-            this.changes.push(change);
-        }
+    this.model.trigger('change', this.changes);
 
-        return this;
-    }
-
-    clear() {
-
-        this.changes = [];
-
-        return this;
-    }
-
-    notify() {
-
-        this.model.trigger('change', this.changes);
-
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default ChangeCollection;

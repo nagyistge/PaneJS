@@ -1,28 +1,22 @@
 import Change from './Change';
 
-class VisibleChange extends Change {
+export default class VisibleChange extends Change {
 
-    constructor(model, cell, visible) {
+  constructor(model, cell, visible) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.cell     = cell;
-        this.visible  = visible;
-        this.previous = visible;
-    }
+    this.model    = model;
+    this.cell     = cell;
+    this.visible  = visible;
+    this.previous = visible;
+  }
 
-    digest() {
+  digest() {
 
-        this.visible  = this.previous;
-        this.previous = this.model.visibleChanged(this.cell, this.previous);
+    this.visible  = this.previous;
+    this.previous = this.model.visibleChanged(this.cell, this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default VisibleChange;

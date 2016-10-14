@@ -1,28 +1,22 @@
 import Change from './Change';
 
-class RotationChange extends Change {
+export default class RotationChange extends Change {
 
-    constructor(model, cell, rotation) {
+  constructor(model, cell, rotation) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.cell     = cell;
-        this.rotation = rotation;
-        this.previous = rotation;
-    }
+    this.model    = model;
+    this.cell     = cell;
+    this.rotation = rotation;
+    this.previous = rotation;
+  }
 
-    digest() {
+  digest() {
 
-        this.position = this.previous;
-        this.previous = this.model.rotationChanged(this.cell, this.previous);
+    this.position = this.previous;
+    this.previous = this.model.rotationChanged(this.cell, this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default RotationChange;

@@ -5,218 +5,218 @@ import Cell       from '../cells/Cell';
 
 class Link extends Cell {
 
-    constructor(options) {
+  constructor(options) {
 
-        super(options);
+    super(options);
 
-        this.vertices = this.metadata.vertices || [];
+    this.vertices = this.metadata.vertices || [];
+  }
+
+
+  // static
+  // ------
+
+  static isLink(link) {
+    return link && link instanceof Link;
+  }
+
+
+  // methods
+  // -------
+
+  isLink() {
+
+    return true;
+  }
+
+  getRouter() {
+
+    let router = this.metadata.router || {};
+
+    if (utils.isFunction(router)) {
+      router = { parse: router };
+    } else if (!utils.isObject(router)) {
+      router = { name: router };
     }
 
+    return router;
+  }
 
-    // static
-    // ------
+  getMarker(isSource) {
 
-    static isLink(link) {
-        return link && link instanceof Link;
+    let marker = isSource
+      ? this.metadata.sourceMarker
+      : this.metadata.targetMarker;
+
+    if (utils.isFunction(marker)) {
+      marker = { parse: marker };
+    } else if (!utils.isObject(marker)) {
+      marker = { name: marker };
     }
 
+    marker.selector = isSource ? '.source-marker' : '.target-marker';
 
-    // methods
-    // -------
+    return marker;
+  }
 
-    isLink() {
+  getConnector() {
 
-        return true;
+    let connector = this.metadata.connector || {};
+
+    if (utils.isFunction(connector)) {
+      connector = { parse: connector };
+    } else if (!utils.isObject(connector)) {
+      connector = { name: connector };
     }
 
-    getRouter() {
+    connector.selector = '.connector';
 
-        let router = this.metadata.router || {};
+    return connector;
+  }
 
-        if (utils.isFunction(router)) {
-            router = { parse: router };
-        } else if (!utils.isObject(router)) {
-            router = { name: router };
+
+  // vertices
+  // --------
+
+  getVertices() {
+
+    return this.vertices;
+  }
+
+  getVerticesCount() {
+
+    return this.vertices ? this.vertices.length : 0;
+  }
+
+  getVerticeAt(index) {
+
+    return this.vertices ? this.vertices[index] : null;
+  }
+
+  indexOfVertice(point) {
+
+    if (point && Point.isPointLike(point)) {
+
+      for (let i = 0, l = this.getVerticesCount(); i < l; i++) {
+
+        let vertice = this.getVerticeAt(i);
+
+        if (point.x === vertice.x && point.y === vertice.y) {
+          return i;
         }
-
-        return router;
+      }
     }
 
-    getMarker(isSource) {
+    return -1;
+  }
 
-        let marker = isSource
-            ? this.metadata.sourceMarker
-            : this.metadata.targetMarker;
+  eachVertice(iterator, context) {
 
-        if (utils.isFunction(marker)) {
-            marker = { parse: marker };
-        } else if (!utils.isObject(marker)) {
-            marker = { name: marker };
-        }
+    return utils.forEach(this.vertices, iterator, context);
+  }
 
-        marker.selector = isSource ? '.source-marker' : '.target-marker';
+  filterVertice(iterator, context) {
 
-        return marker;
+    return utils.filter(this.vertices, iterator, context);
+  }
+
+  insertVertice(points, index) {
+
+    let length = this.getVerticesCount();
+
+    index = utils.fixIndex(index, length);
+
+    if (!utils.isArray(points)) {
+      points = [points];
     }
 
-    getConnector() {
-
-        let connector = this.metadata.connector || {};
-
-        if (utils.isFunction(connector)) {
-            connector = { parse: connector };
-        } else if (!utils.isObject(connector)) {
-            connector = { name: connector };
-        }
-
-        connector.selector = '.connector';
-
-        return connector;
+    if (index === length) {
+      this.vertices.push(...points);
+    } else {
+      this.vertices.splice(index, 0, points);
     }
 
+    return this;
+  }
 
-    // vertices
-    // --------
+  removeVertice(point) {
 
-    getVertices() {
-
-        return this.vertices;
+    let index = this.indexOfVertice(point);
+    if (index >= 0) {
+      this.removeVerticeAt(index);
     }
 
-    getVerticesCount() {
+    return this;
+  }
 
-        return this.vertices ? this.vertices.length : 0;
+  removeVerticeAt(index) {
+
+    let vertice = this.getVerticeAt(index);
+    if (vertice) {
+      this.vertices.splice(index, 1);
     }
+    return vertice;
+  }
 
-    getVerticeAt(index) {
+  clearVertices() {
 
-        return this.vertices ? this.vertices[index] : null;
-    }
+    this.vertices = [];
 
-    indexOfVertice(point) {
-
-        if (point && Point.isPointLike(point)) {
-
-            for (let i = 0, l = this.getVerticesCount(); i < l; i++) {
-
-                let vertice = this.getVerticeAt(i);
-
-                if (point.x === vertice.x && point.y === vertice.y) {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
-    }
-
-    eachVertice(iterator, context) {
-
-        return utils.forEach(this.vertices, iterator, context);
-    }
-
-    filterVertice(iterator, context) {
-
-        return utils.filter(this.vertices, iterator, context);
-    }
-
-    insertVertice(points, index) {
-
-        let length = this.getVerticesCount();
-
-        index = utils.fixIndex(index, length);
-
-        if (!utils.isArray(points)) {
-            points = [points];
-        }
-
-        if (index === length) {
-            this.vertices.push(...points);
-        } else {
-            this.vertices.splice(index, 0, points);
-        }
-
-        return this;
-    }
-
-    removeVertice(point) {
-
-        let index = this.indexOfVertice(point);
-        if (index >= 0) {
-            this.removeVerticeAt(index);
-        }
-
-        return this;
-    }
-
-    removeVerticeAt(index) {
-
-        let vertice = this.getVerticeAt(index);
-        if (vertice) {
-            this.vertices.splice(index, 1);
-        }
-        return vertice;
-    }
-
-    clearVertices() {
-
-        this.vertices = [];
-
-        return this;
-    }
+    return this;
+  }
 
 
-    // common
-    // ------
+  // common
+  // ------
 
-    clone(options, withData) {
+  clone(options, withData) {
 
-        let cloned = super.clone(options, withData);
+    let cloned = super.clone(options, withData);
 
-        cloned.vertices = [];
+    cloned.vertices = [];
 
-        utils.forEach(this.vertices, function (point) {
-            if (Point.isPointLike(point)) {
-                cloned.vertices.push({ x: point.x, y: point.y });
-            }
-        });
+    utils.forEach(this.vertices, function (point) {
+      if (Point.isPointLike(point)) {
+        cloned.vertices.push({ x: point.x, y: point.y });
+      }
+    });
 
-        return cloned;
-    }
+    return cloned;
+  }
 }
 
 
 Link.setDefaults({
-    tagName: 'g',
-    markup: ''
-    + '<path class="connector"/>'
-    + '<path class="source-marker"/>'
-    + '<path class="target-marker"/>',
-    classNames: 'pane-cell pane-link', // pane-cell for event handler
-    pane: 'linkPane',
-    data: null,   // related data(for business logic)
-    view: null,   // specify the constructor of the view
-    router: null,
-    connector: 'sharp',
-    sourceMarker: null,
-    targetMarker: null,
-    attrs: {
-        '.connector': {
-            'fill': 'none',
-            'stroke': '#000',
-            'stroke-width': 1
-        },
-        '.source-marker': {
-            'fill': '#000',
-            'stroke': '#000',
-            'stroke-width': 1
-        },
-        '.target-marker': {
-            'fill': '#000',
-            'stroke': '#000',
-            'stroke-width': 1
-        }
+  tagName: 'g',
+  markup: ''
+  + '<path class="connector"/>'
+  + '<path class="source-marker"/>'
+  + '<path class="target-marker"/>',
+  classNames: 'pane-cell pane-link', // pane-cell for event handler
+  pane: 'linkPane',
+  data: null,   // related data(for business logic)
+  view: null,   // specify the constructor of the view
+  router: null,
+  connector: 'sharp',
+  sourceMarker: null,
+  targetMarker: null,
+  attrs: {
+    '.connector': {
+      'fill': 'none',
+      'stroke': '#000',
+      'stroke-width': 1
+    },
+    '.source-marker': {
+      'fill': '#000',
+      'stroke': '#000',
+      'stroke-width': 1
+    },
+    '.target-marker': {
+      'fill': '#000',
+      'stroke': '#000',
+      'stroke-width': 1
     }
+  }
 });
 
 

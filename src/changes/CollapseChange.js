@@ -1,28 +1,22 @@
 import Change from './Change';
 
-class CollapseChange extends Change {
+export default class CollapseChange extends Change {
 
-    constructor(model, cell, collapsed) {
+  constructor(model, cell, collapsed) {
 
-        super();
+    super();
 
-        this.model     = model;
-        this.cell      = cell;
-        this.collapsed = collapsed;
-        this.previous  = collapsed;
-    }
+    this.model     = model;
+    this.cell      = cell;
+    this.collapsed = collapsed;
+    this.previous  = collapsed;
+  }
 
-    digest() {
+  digest() {
 
-        this.collapsed = this.previous;
-        this.previous  = this.model.collapseChanged(this.cell, this.previous);
+    this.collapsed = this.previous;
+    this.previous  = this.model.collapseChanged(this.cell, this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default CollapseChange;

@@ -1,28 +1,22 @@
 import Change from './Change';
 
-class SizeChange extends Change {
+export default class SizeChange extends Change {
 
-    constructor(model, cell, size) {
+  constructor(model, cell, size) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.cell     = cell;
-        this.size     = size;
-        this.previous = size;
-    }
+    this.model    = model;
+    this.cell     = cell;
+    this.size     = size;
+    this.previous = size;
+  }
 
-    digest() {
+  digest() {
 
-        this.size     = this.previous;
-        this.previous = this.model.sizeChanged(this.cell, this.previous);
+    this.size     = this.previous;
+    this.previous = this.model.sizeChanged(this.cell, this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default SizeChange;

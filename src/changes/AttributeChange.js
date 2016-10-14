@@ -1,29 +1,23 @@
 import Change from './Change';
 
 
-class AttributeChange extends Change {
+export default class AttributeChange extends Change {
 
-    constructor(model, cell, attrs) {
+  constructor(model, cell, attrs) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.cell     = cell;
-        this.attrs    = attrs;
-        this.previous = attrs;
-    }
+    this.model    = model;
+    this.cell     = cell;
+    this.attrs    = attrs;
+    this.previous = attrs;
+  }
 
-    digest() {
+  digest() {
 
-        this.attrs    = this.previous;
-        this.previous = this.model.attributeChanged(this.cell, this.previous);
+    this.attrs    = this.previous;
+    this.previous = this.model.attributeChanged(this.cell, this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default AttributeChange;

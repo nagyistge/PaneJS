@@ -358,7 +358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _Node2 = __webpack_require__(3);
@@ -374,42 +374,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var Rect = function (_Node) {
-	    _inherits(Rect, _Node);
+	  _inherits(Rect, _Node);
 	
-	    function Rect() {
-	        _classCallCheck(this, Rect);
+	  function Rect() {
+	    _classCallCheck(this, Rect);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rect).apply(this, arguments));
-	    }
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Rect).apply(this, arguments));
+	  }
 	
-	    return Rect;
+	  return Rect;
 	}(_Node3.default);
 	
 	Rect.setDefaults({
-	    markup: '<g class="pane-rotatable">\n               <g class="pane-scalable"><rect/></g>\n               <text/>\n             </g>',
+	  markup: '<g class="pane-rotatable"><g class="pane-scalable"><rect/></g><text/></g>',
 	
-	    attrs: {
-	        '.': {
-	            'fill': '#fff',
-	            'stroke': 'none'
-	        },
-	        rect: {
-	            'fill': '#fff',
-	            'stroke': '#000',
-	            'stroke-width': '1',
-	            'width': 80,
-	            'height': 30
-	        },
-	        text: {
-	            'fill': '#000',
-	            'font-size': 12,
-	            'ref-x': .5,
-	            'ref-y': .5,
-	            'text-anchor': 'middle',
-	            'y-alignment': 'middle',
-	            'font-family': 'Arial, helvetica, sans-serif'
-	        }
+	  attrs: {
+	    '.': {
+	      'fill': '#fff',
+	      'stroke': 'none'
+	    },
+	    rect: {
+	      'fill': '#fff',
+	      'stroke': '#000',
+	      'stroke-width': '1',
+	      'width': 80,
+	      'height': 30
+	    },
+	    text: {
+	      'fill': '#000',
+	      'font-size': 12,
+	      'ref-x': .5,
+	      'ref-y': .5,
+	      'text-anchor': 'middle',
+	      'y-alignment': 'middle',
+	      'font-family': 'Arial, helvetica, sans-serif'
 	    }
+	  }
 	});
 	
 	exports.default = Rect;
@@ -421,7 +421,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -443,73 +443,73 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var Node = function (_Cell) {
-	    _inherits(Node, _Cell);
+	  _inherits(Node, _Cell);
 	
-	    function Node() {
-	        _classCallCheck(this, Node);
+	  function Node() {
+	    _classCallCheck(this, Node);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Node).apply(this, arguments));
+	  }
+	
+	  _createClass(Node, [{
+	    key: 'isNode',
+	
+	
+	    // methods
+	    // -------
+	
+	    value: function isNode() {
+	
+	      return true;
 	    }
+	  }, {
+	    key: 'getBBox',
+	    value: function getBBox() {
 	
-	    _createClass(Node, [{
-	        key: 'isNode',
+	      var pos = this.getPosition();
+	      var size = this.getSize();
 	
-	
-	        // methods
-	        // -------
-	
-	        value: function isNode() {
-	
-	            return true;
-	        }
-	    }, {
-	        key: 'getBBox',
-	        value: function getBBox() {
-	
-	            var pos = this.getPosition();
-	            var size = this.getSize();
-	
-	            return new _Rect2.default(pos.x, pos.y, size.width, size.height);
-	        }
-	    }], [{
-	        key: 'isNode',
+	      return new _Rect2.default(pos.x, pos.y, size.width, size.height);
+	    }
+	  }], [{
+	    key: 'isNode',
 	
 	
-	        // static
-	        // ------
+	    // static
+	    // ------
 	
-	        value: function isNode(node) {
+	    value: function isNode(node) {
 	
-	            return node && node instanceof Node;
-	        }
-	    }]);
+	      return node && node instanceof Node;
+	    }
+	  }]);
 	
-	    return Node;
+	  return Node;
 	}(_Cell3.default);
 	
 	Node.setDefaults({
-	    tagName: 'g',
-	    markup: '',
-	    classNames: 'pane-cell pane-node', // pane-cell for event handler
-	    pane: null, // specify the drawPane of the view
-	    view: null, // specify the constructor of the view
-	    data: null, // cached data(for business logic)
-	    attrs: null, // styles
+	  tagName: 'g',
+	  markup: '',
+	  classNames: 'pane-cell pane-node', // pane-cell for event handler
+	  pane: null, // specify the drawPane of the view
+	  view: null, // specify the constructor of the view
+	  data: null, // cached data(for business logic)
+	  attrs: null, // styles
 	
-	    size: {
-	        width: 1,
-	        height: 1,
-	        relative: false
-	    },
-	    position: {
-	        x: 0,
-	        y: 0,
-	        relative: false
-	    },
-	    rotation: {
-	        angle: 0,
-	        inherited: true // inherit the parent's rotation
-	    }
+	  size: {
+	    width: 1,
+	    height: 1,
+	    relative: false
+	  },
+	  position: {
+	    x: 0,
+	    y: 0,
+	    relative: false
+	  },
+	  rotation: {
+	    angle: 0,
+	    inherited: true // inherit the parent's rotation
+	  }
 	});
 	
 	// exports
@@ -1100,7 +1100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -1108,63 +1108,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	var toString = Object.prototype.toString;
 	
 	var isNull = exports.isNull = function isNull(val) {
-	    return val === null;
+	  return val === null;
 	};
 	var isString = exports.isString = function isString(val) {
-	    return typeof val === 'string';
+	  return typeof val === 'string';
 	};
 	var isBoolean = exports.isBoolean = function isBoolean(val) {
-	    return typeof val === 'boolean';
+	  return typeof val === 'boolean';
 	};
 	var isUndefined = exports.isUndefined = function isUndefined(val) {
-	    return typeof val === 'undefined';
+	  return typeof val === 'undefined';
 	};
 	
 	// is null or undefined
 	var isNil = exports.isNil = function isNil(val) {
-	    return isUndefined(val) || isNull(val);
+	  return isUndefined(val) || isNull(val);
 	};
 	
 	// function and object are truly
 	var isObject = exports.isObject = function isObject(val) {
 	
-	    if (!val) {
-	        return false;
-	    }
+	  if (!val) {
+	    return false;
+	  }
 	
-	    return typeof val === 'function' || (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
+	  return typeof val === 'function' || (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
 	};
 	
 	var isType = exports.isType = function isType(val, type) {
-	    return toString.call(val) === '[object ' + type + ']';
+	  return toString.call(val) === '[object ' + type + ']';
 	};
 	
 	var isArray = exports.isArray = function isArray(val) {
-	    return Array.isArray(val);
+	  return Array.isArray(val);
 	};
 	var isWindow = exports.isWindow = function isWindow(val) {
-	    return val && val === val.window;
+	  return val && val === val.window;
 	};
 	var isNumeric = exports.isNumeric = function isNumeric(val) {
-	    return !isArray(val) && val - parseFloat(val) + 1 >= 0;
+	  return !isArray(val) && val - parseFloat(val) + 1 >= 0;
 	};
 	var isFunction = exports.isFunction = function isFunction(val) {
-	    return isType(val, 'Function');
+	  return isType(val, 'Function');
 	};
 	
 	var isArrayLike = exports.isArrayLike = function isArrayLike(val) {
 	
-	    if (isArray(val)) {
-	        return true;
-	    }
+	  if (isArray(val)) {
+	    return true;
+	  }
 	
-	    if (isFunction(val) || isWindow(val)) {
-	        return false;
-	    }
+	  if (isFunction(val) || isWindow(val)) {
+	    return false;
+	  }
 	
-	    var len = !!val && 'length' in val && val.length;
+	  var len = !!val && 'length' in val && val.length;
 	
-	    return len === 0 || typeof len === 'number' && len > 0 && len - 1 in val;
+	  return len === 0 || typeof len === 'number' && len > 0 && len - 1 in val;
 	};
 
 /***/ },
@@ -1229,7 +1229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.padEnd = exports.padStart = exports.trim = exports.split = exports.endWith = exports.startWith = exports.lcFirst = exports.ucFirst = exports.toLower = exports.toUpper = exports.toString = undefined;
 	exports.uuid = uuid;
@@ -1245,158 +1245,158 @@ return /******/ (function(modules) { // webpackBootstrap
 	var proto = String.prototype;
 	
 	var toString = exports.toString = function toString(str) {
-	    return '' + str;
+	  return '' + str;
 	};
 	
 	var toUpper = exports.toUpper = function toUpper(str) {
-	    return toString(str).toUpperCase();
+	  return toString(str).toUpperCase();
 	};
 	var toLower = exports.toLower = function toLower(str) {
-	    return toString(str).toLowerCase();
+	  return toString(str).toLowerCase();
 	};
 	
 	var ucFirst = exports.ucFirst = function ucFirst(str) {
-	    return str.charAt(0).toUpperCase() + str.substring(1);
+	  return str.charAt(0).toUpperCase() + str.substring(1);
 	};
 	var lcFirst = exports.lcFirst = function lcFirst(str) {
-	    return str.charAt(0).toLowerCase() + str.substring(1);
+	  return str.charAt(0).toLowerCase() + str.substring(1);
 	};
 	
 	var startWith = exports.startWith = function startWith(str, prefix) {
-	    return toString(str).indexOf(prefix) === 0;
+	  return toString(str).indexOf(prefix) === 0;
 	};
 	var endWith = exports.endWith = function endWith(str, suffix) {
-	    return toString(str).indexOf(suffix, toString(str).length - suffix.length) !== -1;
+	  return toString(str).indexOf(suffix, toString(str).length - suffix.length) !== -1;
 	};
 	
 	var split = exports.split = function split(str) {
-	    var divider = arguments.length <= 1 || arguments[1] === undefined ? /\s+/ : arguments[1];
-	    return toString(str).split(divider);
+	  var divider = arguments.length <= 1 || arguments[1] === undefined ? /\s+/ : arguments[1];
+	  return toString(str).split(divider);
 	};
 	var trim = exports.trim = function trim(str) {
-	    return str ? proto.trim.call('' + str) : '';
+	  return str ? proto.trim.call('' + str) : '';
 	};
 	
 	function padStr(str, max, pad, isStart) {
 	
-	    if ((0, _lang.isNil)(str) || (0, _lang.isNil)(max)) {
-	        return str;
-	    }
+	  if ((0, _lang.isNil)(str) || (0, _lang.isNil)(max)) {
+	    return str;
+	  }
 	
-	    var result = String(str);
-	    var targetLen = typeof max === 'number' ? max : parseInt(max, 10);
+	  var result = String(str);
+	  var targetLen = typeof max === 'number' ? max : parseInt(max, 10);
 	
-	    if (isNaN(targetLen) || !isFinite(targetLen)) {
-	        return result;
-	    }
+	  if (isNaN(targetLen) || !isFinite(targetLen)) {
+	    return result;
+	  }
 	
-	    var length = result.length;
-	    if (length >= targetLen) {
-	        return result;
-	    }
+	  var length = result.length;
+	  if (length >= targetLen) {
+	    return result;
+	  }
 	
-	    var fill = (0, _lang.isNil)(pad) ? '' : String(pad);
-	    if (fill === '') {
-	        fill = ' ';
-	    }
+	  var fill = (0, _lang.isNil)(pad) ? '' : String(pad);
+	  if (fill === '') {
+	    fill = ' ';
+	  }
 	
-	    var fillLen = targetLen - length;
+	  var fillLen = targetLen - length;
 	
-	    while (fill.length < fillLen) {
-	        fill += fill;
-	    }
+	  while (fill.length < fillLen) {
+	    fill += fill;
+	  }
 	
-	    var truncated = fill.length > fillLen ? fill.substr(0, fillLen) : fill;
+	  var truncated = fill.length > fillLen ? fill.substr(0, fillLen) : fill;
 	
-	    return isStart ? truncated + result : result + truncated;
+	  return isStart ? truncated + result : result + truncated;
 	}
 	
 	var padStart = exports.padStart = function padStart(str, max, pad) {
-	    return padStr(str, max, pad, true);
+	  return padStr(str, max, pad, true);
 	};
 	var padEnd = exports.padEnd = function padEnd(str, max, pad) {
-	    return padStr(str, max, pad, false);
+	  return padStr(str, max, pad, false);
 	};
 	
 	function uuid() {
 	
-	    // credit: http://stackoverflow.com/posts/2117523/revisions
-	    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+	  // credit: http://stackoverflow.com/posts/2117523/revisions
+	  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
 	
-	        var r = Math.random() * 16 | 0;
-	        var v = c === 'x' ? r : r & 0x3 | 0x8;
+	    var r = Math.random() * 16 | 0;
+	    var v = c === 'x' ? r : r & 0x3 | 0x8;
 	
-	        return v.toString(16);
-	    });
+	    return v.toString(16);
+	  });
 	}
 	
 	function hashCode(str) {
 	
-	    // Return a simple hash code from a string.
-	    // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
+	  // Return a simple hash code from a string.
+	  // See http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/.
 	
-	    var hash = 0;
-	    var length = str.length;
+	  var hash = 0;
+	  var length = str.length;
 	
-	    if (length === 0) {
-	        return hash;
-	    }
-	
-	    for (var i = 0; i < length; i++) {
-	
-	        var c = str.charCodeAt(i);
-	
-	        hash = (hash << 5) - hash + c;
-	        hash = hash & hash; // Convert to 32bit integer
-	    }
-	
+	  if (length === 0) {
 	    return hash;
+	  }
+	
+	  for (var i = 0; i < length; i++) {
+	
+	    var c = str.charCodeAt(i);
+	
+	    hash = (hash << 5) - hash + c;
+	    hash = hash & hash; // Convert to 32bit integer
+	  }
+	
+	  return hash;
 	}
 	
 	function format(tpl, data) {
 	
-	    if (tpl && data) {
-	        return toString(tpl).replace(/\$\{(.*?)\}/g, function (input, key) {
-	            var val = (0, _object.getByPath)(data, key);
-	            return !(0, _lang.isNil)(val) ? val : input;
-	        });
-	    }
+	  if (tpl && data) {
+	    return toString(tpl).replace(/\$\{(.*?)\}/g, function (input, key) {
+	      var val = (0, _object.getByPath)(data, key);
+	      return !(0, _lang.isNil)(val) ? val : input;
+	    });
+	  }
 	
-	    return tpl;
+	  return tpl;
 	}
 	
 	function escape(str) {
 	
-	    var mapping = {
-	        '&': '&amp;',
-	        '<': '&lt;',
-	        '>': '&gt;',
-	        '"': '&quot;',
-	        "'": '&#x27;',
-	        '`': '&#x60;'
-	    };
+	  var mapping = {
+	    '&': '&amp;',
+	    '<': '&lt;',
+	    '>': '&gt;',
+	    '"': '&quot;',
+	    "'": '&#x27;',
+	    '`': '&#x60;'
+	  };
 	
-	    var badChars = /[&<>"'`]/g;
-	    var shouldEscape = /[&<>"'`]/;
+	  var badChars = /[&<>"'`]/g;
+	  var shouldEscape = /[&<>"'`]/;
 	
-	    if (shouldEscape.test(str)) {
-	        return str.replace(badChars, function (chr) {
-	            return mapping[chr];
-	        });
-	    }
+	  if (shouldEscape.test(str)) {
+	    return str.replace(badChars, function (chr) {
+	      return mapping[chr];
+	    });
+	  }
 	
-	    return str;
+	  return str;
 	}
 	
 	function sanitizeText(text) {
 	
-	    // Replace all spaces with the Unicode No-break space.
-	    // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
-	    // IE would otherwise collapse all spaces into one. This is useful
-	    // e.g. in tests when you want to compare the actual DOM text content
-	    // without having to add the unicode character in the place of all spaces.
+	  // Replace all spaces with the Unicode No-break space.
+	  // ref: http://www.fileformat.info/info/unicode/char/a0/index.htm
+	  // IE would otherwise collapse all spaces into one. This is useful
+	  // e.g. in tests when you want to compare the actual DOM text content
+	  // without having to add the unicode character in the place of all spaces.
 	
-	    return toString(text).replace(/ /g, ' ');
+	  return toString(text).replace(/ /g, ' ');
 	}
 
 /***/ },
@@ -1406,7 +1406,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.hasOwn = hasOwn;
 	exports.keys = keys;
@@ -1426,140 +1426,140 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function hasOwn(obj, key) {
 	
-	    return obj && Object.prototype.hasOwnProperty.call(obj, key);
+	  return obj && Object.prototype.hasOwnProperty.call(obj, key);
 	}
 	
 	function keys(obj) {
 	
-	    return obj ? Object.keys(obj) : [];
+	  return obj ? Object.keys(obj) : [];
 	}
 	
 	function forIn(obj, iterator, context) {
 	
-	    (0, _array.forEach)(keys(obj), function (key) {
-	        iterator.call(context, obj[key], key);
-	    });
+	  (0, _array.forEach)(keys(obj), function (key) {
+	    iterator.call(context, obj[key], key);
+	  });
 	}
 	
 	function extend() {
-	    var target = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var target = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-	    for (var _len = arguments.length, sources = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        sources[_key - 1] = arguments[_key];
+	  for (var _len = arguments.length, sources = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    sources[_key - 1] = arguments[_key];
+	  }
+	
+	  (0, _array.forEach)(sources, function (source) {
+	    if (source) {
+	      /* eslint guard-for-in: 0 */
+	      for (var key in source) {
+	        target[key] = source[key];
+	      }
 	    }
+	  });
 	
-	    (0, _array.forEach)(sources, function (source) {
-	        if (source) {
-	            /* eslint guard-for-in: 0 */
-	            for (var key in source) {
-	                target[key] = source[key];
-	            }
-	        }
-	    });
-	
-	    return target;
+	  return target;
 	}
 	
 	function merge() {
-	    var target = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var target = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-	    for (var _len2 = arguments.length, sources = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-	        sources[_key2 - 1] = arguments[_key2];
-	    }
+	  for (var _len2 = arguments.length, sources = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+	    sources[_key2 - 1] = arguments[_key2];
+	  }
 	
-	    (0, _array.forEach)(sources, function (source) {
-	        if (source) {
-	            /* eslint guard-for-in: 0 */
-	            for (var name in source) {
+	  (0, _array.forEach)(sources, function (source) {
+	    if (source) {
+	      /* eslint guard-for-in: 0 */
+	      for (var name in source) {
 	
-	                var src = target[name];
-	                var copy = source[name];
-	                var copyIsArray = (0, _lang.isArray)(copy);
+	        var src = target[name];
+	        var copy = source[name];
+	        var copyIsArray = (0, _lang.isArray)(copy);
 	
-	                if (copyIsArray || isPlainObject(copy)) {
+	        if (copyIsArray || isPlainObject(copy)) {
 	
-	                    var clone = void 0;
-	                    if (copyIsArray) {
-	                        clone = src && (0, _lang.isArray)(src) ? src : [];
-	                    } else {
-	                        clone = src && isPlainObject(src) ? src : {};
-	                    }
+	          var clone = void 0;
+	          if (copyIsArray) {
+	            clone = src && (0, _lang.isArray)(src) ? src : [];
+	          } else {
+	            clone = src && isPlainObject(src) ? src : {};
+	          }
 	
-	                    target[name] = merge(clone, copy);
-	                } else {
-	                    target[name] = copy;
-	                }
-	            }
+	          target[name] = merge(clone, copy);
+	        } else {
+	          target[name] = copy;
 	        }
-	    });
+	      }
+	    }
+	  });
 	
-	    return target;
+	  return target;
 	}
 	
 	function getByPath(obj, path) {
-	    var delimiter = arguments.length <= 2 || arguments[2] === undefined ? '.' : arguments[2];
+	  var delimiter = arguments.length <= 2 || arguments[2] === undefined ? '.' : arguments[2];
 	
 	
-	    var paths = (0, _string.split)(path, delimiter);
-	    while (paths.length) {
+	  var paths = (0, _string.split)(path, delimiter);
+	  while (paths.length) {
 	
-	        var key = paths.shift();
+	    var key = paths.shift();
 	
-	        if (Object(obj) === obj && key in obj) {
-	            obj = obj[key];
-	        } else {
-	            return undefined;
-	        }
+	    if (Object(obj) === obj && key in obj) {
+	      obj = obj[key];
+	    } else {
+	      return undefined;
 	    }
+	  }
 	
-	    return obj;
+	  return obj;
 	}
 	
 	function destroy(obj) {
 	
-	    if (obj) {
-	        for (var prop in obj) {
-	            if (obj.hasOwnProperty(prop)) {
-	                delete obj[prop];
-	            }
-	        }
-	        if (obj) {
-	
-	            /* eslint no-proto: 0 */
-	            obj.prototype = obj.__proto__ = null;
-	        }
-	        obj.destroyed = true;
+	  if (obj) {
+	    for (var prop in obj) {
+	      if (obj.hasOwnProperty(prop)) {
+	        delete obj[prop];
+	      }
 	    }
+	    if (obj) {
+	
+	      /* eslint no-proto: 0 */
+	      obj.prototype = obj.__proto__ = null;
+	    }
+	    obj.destroyed = true;
+	  }
 	}
 	
 	function isEmptyObject(obj) {
 	
-	    /* eslint guard-for-in: 0 */
-	    /* eslint no-unused-vars: 0 */
-	    for (var key in obj) {
-	        return false;
-	    }
+	  /* eslint guard-for-in: 0 */
+	  /* eslint no-unused-vars: 0 */
+	  for (var key in obj) {
+	    return false;
+	  }
 	
-	    return true;
+	  return true;
 	}
 	
 	function isPlainObject(obj) {
 	
-	    // Not plain objects:
-	    //  - Any object or value whose internal [[Class]] property is not "[object Object]"
-	    //  - DOM nodes
-	    //  - window
-	    if (!(0, _lang.isObject)(obj) || obj.nodeType || (0, _lang.isWindow)(obj)) {
-	        return false;
-	    }
+	  // Not plain objects:
+	  //  - Any object or value whose internal [[Class]] property is not "[object Object]"
+	  //  - DOM nodes
+	  //  - window
+	  if (!(0, _lang.isObject)(obj) || obj.nodeType || (0, _lang.isWindow)(obj)) {
+	    return false;
+	  }
 	
-	    if (obj.constructor && !hasOwn(obj.constructor.prototype, 'isPrototypeOf')) {
-	        return false;
-	    }
+	  if (obj.constructor && !hasOwn(obj.constructor.prototype, 'isPrototypeOf')) {
+	    return false;
+	  }
 	
-	    // If the function hasn't returned already, we're confident that
-	    // |obj| is a plain object, created by {} or constructed with new Object
-	    return true;
+	  // If the function hasn't returned already, we're confident that
+	  // |obj| is a plain object, created by {} or constructed with new Object
+	  return true;
 	}
 
 /***/ },
@@ -1569,7 +1569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.isFinite = isFinite;
 	exports.isPercentage = isPercentage;
@@ -1586,69 +1586,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function isFinite(value) {
 	
-	    return window.isFinite(value) && !window.isNaN(parseFloat(value));
+	  return window.isFinite(value) && !window.isNaN(parseFloat(value));
 	}
 	
 	function isPercentage(str) {
 	
-	    return (0, _lang.isString)(str) && str.slice(-1) === '%';
+	  return (0, _lang.isString)(str) && str.slice(-1) === '%';
 	}
 	
 	function toInt(value) {
 	
-	    return parseInt(value, 10);
+	  return parseInt(value, 10);
 	}
 	
 	function toFloat(value, percentage) {
 	
-	    var v = parseFloat(value);
-	    return percentage ? v / 100 : v;
+	  var v = parseFloat(value);
+	  return percentage ? v / 100 : v;
 	}
 	
 	function toPercentage(value) {
-	    var precision = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
+	  var precision = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
 	
 	
-	    return toFixed(value * 100, precision) + '%';
+	  return toFixed(value * 100, precision) + '%';
 	}
 	
 	function toFixed(value) {
-	    var precision = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
+	  var precision = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
 	
 	
-	    var power = Math.pow(10, precision);
+	  var power = Math.pow(10, precision);
 	
-	    return toFloat((Math.round(value * power) / power).toFixed(precision));
+	  return toFloat((Math.round(value * power) / power).toFixed(precision));
 	}
 	
 	function fixNumber(num, percentage, defaultValue) {
 	
-	    var ret = toFloat(num, percentage);
+	  var ret = toFloat(num, percentage);
 	
-	    return isNaN(ret) ? defaultValue : ret;
+	  return isNaN(ret) ? defaultValue : ret;
 	}
 	
 	function fixIndex(index, max) {
 	
-	    if ((0, _lang.isNil)(index)) {
-	        return max;
-	    }
+	  if ((0, _lang.isNil)(index)) {
+	    return max;
+	  }
 	
-	    while (index < 0) {
-	        index += max;
-	    }
+	  while (index < 0) {
+	    index += max;
+	  }
 	
-	    return Math.min(index, max);
+	  return Math.min(index, max);
 	}
 	
 	function clamp(value, min, max) {
 	
-	    return min < max ? value < min ? min : value > max ? max : value : value < max ? max : value > min ? min : value;
+	  return min < max ? value < min ? min : value > max ? max : value : value < max ? max : value > min ? min : value;
 	}
 	
 	function isWithin(value, min, max) {
 	
-	    return min < max ? value >= min && value <= max : value >= max && value <= min;
+	  return min < max ? value >= min && value <= max : value >= max && value <= min;
 	}
 
 /***/ },
@@ -1658,7 +1658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -1672,57 +1672,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function invoke(fn, args, context) {
 	
-	    var ret = void 0;
+	  var ret = void 0;
 	
-	    if ((0, _lang.isFunction)(fn)) {
+	  if ((0, _lang.isFunction)(fn)) {
 	
-	        var len = args.length;
+	    var len = args.length;
 	
-	        var _args = _slicedToArray(args, 3);
+	    var _args = _slicedToArray(args, 3);
 	
-	        var a1 = _args[0];
-	        var a2 = _args[1];
-	        var a3 = _args[2];
+	    var a1 = _args[0];
+	    var a2 = _args[1];
+	    var a3 = _args[2];
 	
 	
-	        if (len === 0) {
-	            ret = fn.call(context);
-	        } else if (len === 1) {
-	            ret = fn.call(context, a1);
-	        } else if (len === 2) {
-	            ret = fn.call(context, a1, a2);
-	        } else if (len === 3) {
-	            ret = fn.call(context, a1, a2, a3);
-	        } else {
-	            ret = fn.apply(context, args);
-	        }
+	    if (len === 0) {
+	      ret = fn.call(context);
+	    } else if (len === 1) {
+	      ret = fn.call(context, a1);
+	    } else if (len === 2) {
+	      ret = fn.call(context, a1, a2);
+	    } else if (len === 3) {
+	      ret = fn.call(context, a1, a2, a3);
+	    } else {
+	      ret = fn.apply(context, args);
 	    }
+	  }
 	
-	    return ret;
+	  return ret;
 	}
 	
 	function bind(fn) {
-	    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        args[_key - 1] = arguments[_key];
-	    }
+	  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    args[_key - 1] = arguments[_key];
+	  }
 	
-	    return (0, _lang.isFunction)(fn) ? invoke(Function.prototype.bind, args, fn) : fn;
+	  return (0, _lang.isFunction)(fn) ? invoke(Function.prototype.bind, args, fn) : fn;
 	}
 	
 	var deferred = [];
 	
 	function defer(fn) {
 	
-	    deferred.push(fn);
+	  deferred.push(fn);
 	}
 	
 	function flush() {
 	
-	    var fn = deferred.pop();
-	    while (fn) {
-	        fn();
-	        fn = deferred.pop();
-	    }
+	  var fn = deferred.pop();
+	  while (fn) {
+	    fn();
+	    fn = deferred.pop();
+	  }
 	}
 
 /***/ },
@@ -1732,7 +1732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.containsElement = undefined;
 	exports.getClassName = getClassName;
@@ -1780,134 +1780,134 @@ return /******/ (function(modules) { // webpackBootstrap
 	var rnotwhite = /\S+/g;
 	var transformKey = function () {
 	
-	    if ((0, _lang.isUndefined)(document)) {
-	        return '';
+	  if ((0, _lang.isUndefined)(document)) {
+	    return '';
+	  }
+	
+	  var element = createElement('div');
+	  var transforms = ['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform'];
+	
+	  for (var i = 0, l = transforms.length; i < l; ++i) {
+	
+	    var key = transforms[i];
+	
+	    if (element.style[key] !== undefined) {
+	      return key;
 	    }
-	
-	    var element = createElement('div');
-	    var transforms = ['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform'];
-	
-	    for (var i = 0, l = transforms.length; i < l; ++i) {
-	
-	        var key = transforms[i];
-	
-	        if (element.style[key] !== undefined) {
-	            return key;
-	        }
-	    }
+	  }
 	}();
 	
 	var fillSpaces = function fillSpaces(str) {
-	    return ' ' + str + ' ';
+	  return ' ' + str + ' ';
 	};
 	
 	function getClassName(elem) {
 	
-	    return elem.getAttribute && elem.getAttribute('class') || '';
+	  return elem.getAttribute && elem.getAttribute('class') || '';
 	}
 	
 	function hasClass(node, selector) {
 	
-	    if ((0, _lang.isNil)(node) || (0, _lang.isNil)(selector)) {
-	        return false;
-	    }
+	  if ((0, _lang.isNil)(node) || (0, _lang.isNil)(selector)) {
+	    return false;
+	  }
 	
-	    var classNames = fillSpaces(getClassName(node));
-	    var className = fillSpaces(selector);
+	  var classNames = fillSpaces(getClassName(node));
+	  var className = fillSpaces(selector);
 	
-	    return node.nodeType === 1 ? classNames.replace(rclass, ' ').indexOf(className) > -1 : false;
+	  return node.nodeType === 1 ? classNames.replace(rclass, ' ').indexOf(className) > -1 : false;
 	}
 	
 	function addClass(node, selector) {
 	
-	    if ((0, _lang.isNil)(node) || (0, _lang.isNil)(selector)) {
-	        return;
+	  if ((0, _lang.isNil)(node) || (0, _lang.isNil)(selector)) {
+	    return;
+	  }
+	
+	  if ((0, _lang.isFunction)(selector)) {
+	    addClass(node, selector.call(node, getClassName(node)));
+	    return;
+	  }
+	
+	  if ((0, _lang.isString)(selector) && node.nodeType === 1) {
+	
+	    var classes = selector.match(rnotwhite) || [];
+	    var oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
+	    var newValue = (0, _array.reduce)(classes, function (ret, cls) {
+	
+	      if (ret.indexOf(fillSpaces(cls)) < 0) {
+	        ret += cls + ' ';
+	      }
+	
+	      return ret;
+	    }, oldValue);
+	
+	    newValue = (0, _string.trim)(newValue);
+	
+	    if (oldValue !== newValue) {
+	      node.setAttribute('class', newValue);
 	    }
-	
-	    if ((0, _lang.isFunction)(selector)) {
-	        addClass(node, selector.call(node, getClassName(node)));
-	        return;
-	    }
-	
-	    if ((0, _lang.isString)(selector) && node.nodeType === 1) {
-	
-	        var classes = selector.match(rnotwhite) || [];
-	        var oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
-	        var newValue = (0, _array.reduce)(classes, function (ret, cls) {
-	
-	            if (ret.indexOf(fillSpaces(cls)) < 0) {
-	                ret += cls + ' ';
-	            }
-	
-	            return ret;
-	        }, oldValue);
-	
-	        newValue = (0, _string.trim)(newValue);
-	
-	        if (oldValue !== newValue) {
-	            node.setAttribute('class', newValue);
-	        }
-	    }
+	  }
 	}
 	
 	function removeClass(node, selector) {
 	
-	    if ((0, _lang.isNil)(node)) {
-	        return;
+	  if ((0, _lang.isNil)(node)) {
+	    return;
+	  }
+	
+	  if ((0, _lang.isFunction)(selector)) {
+	    removeClass(node, selector.call(node, getClassName(node)));
+	    return;
+	  }
+	
+	  if ((!selector || (0, _lang.isString)(selector)) && node.nodeType === 1) {
+	
+	    var classes = (selector || '').match(rnotwhite) || [];
+	    var oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
+	    var newValue = (0, _array.reduce)(classes, function (ret, cls) {
+	
+	      var className = fillSpaces(cls);
+	
+	      if (ret.indexOf(className) > -1) {
+	        ret = ret.replace(className, ' ');
+	      }
+	
+	      return ret;
+	    }, oldValue);
+	
+	    newValue = selector ? (0, _string.trim)(newValue) : '';
+	
+	    if (oldValue !== newValue) {
+	      node.setAttribute('class', newValue);
 	    }
-	
-	    if ((0, _lang.isFunction)(selector)) {
-	        removeClass(node, selector.call(node, getClassName(node)));
-	        return;
-	    }
-	
-	    if ((!selector || (0, _lang.isString)(selector)) && node.nodeType === 1) {
-	
-	        var classes = (selector || '').match(rnotwhite) || [];
-	        var oldValue = fillSpaces(getClassName(node)).replace(rclass, ' ');
-	        var newValue = (0, _array.reduce)(classes, function (ret, cls) {
-	
-	            var className = fillSpaces(cls);
-	
-	            if (ret.indexOf(className) > -1) {
-	                ret = ret.replace(className, ' ');
-	            }
-	
-	            return ret;
-	        }, oldValue);
-	
-	        newValue = selector ? (0, _string.trim)(newValue) : '';
-	
-	        if (oldValue !== newValue) {
-	            node.setAttribute('class', newValue);
-	        }
-	    }
+	  }
 	}
 	
 	function toggleClass(node, selector, stateVal) {
 	
-	    if ((0, _lang.isNil)(node) || (0, _lang.isNil)(selector)) {
-	        return;
-	    }
+	  if ((0, _lang.isNil)(node) || (0, _lang.isNil)(selector)) {
+	    return;
+	  }
 	
-	    if ((0, _lang.isBoolean)(stateVal) && (0, _lang.isString)(selector)) {
-	        stateVal ? addClass(node, selector) : removeClass(node, selector);
+	  if ((0, _lang.isBoolean)(stateVal) && (0, _lang.isString)(selector)) {
+	    stateVal ? addClass(node, selector) : removeClass(node, selector);
 	
-	        return;
-	    }
+	    return;
+	  }
 	
-	    if ((0, _lang.isFunction)(selector)) {
-	        toggleClass(node, selector.call(node, getClassName(node), stateVal), stateVal);
+	  if ((0, _lang.isFunction)(selector)) {
+	    toggleClass(node, selector.call(node, getClassName(node), stateVal), stateVal);
 	
-	        return;
-	    }
+	    return;
+	  }
 	
-	    if ((0, _lang.isString)(selector)) {
-	        (0, _array.forEach)(selector.match(rnotwhite) || [], function (cls) {
+	  if ((0, _lang.isString)(selector)) {
+	    (0, _array.forEach)(selector.match(rnotwhite) || [], function (cls) {
 	
-	            hasClass(node, cls) ? removeClass(node, cls) : addClass(node, cls);
-	        });
-	    }
+	      hasClass(node, cls) ? removeClass(node, cls) : addClass(node, cls);
+	    });
+	  }
 	}
 	
 	// style
@@ -1915,74 +1915,74 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function styleStrToObject(styleStr) {
 	
-	    return (0, _array.reduce)((0, _string.split)(styleStr, ';'), function (result, style) {
+	  return (0, _array.reduce)((0, _string.split)(styleStr, ';'), function (result, style) {
 	
-	        if (style) {
-	            var pairs = (0, _string.split)(style, '=');
+	    if (style) {
+	      var pairs = (0, _string.split)(style, '=');
 	
-	            result[(0, _string.trim)(pairs[0])] = (0, _string.trim)(pairs[1]);
-	        }
+	      result[(0, _string.trim)(pairs[0])] = (0, _string.trim)(pairs[1]);
+	    }
 	
-	        return result;
-	    }, {});
+	    return result;
+	  }, {});
 	}
 	
 	function setStyle(elem, name, value) {
 	
-	    if (elem) {
+	  if (elem) {
 	
-	        var pairs = {};
+	    var pairs = {};
 	
-	        if ((0, _lang.isObject)(name)) {
+	    if ((0, _lang.isObject)(name)) {
 	
-	            pairs = name;
-	        } else if ((0, _lang.isString)(name) && (0, _lang.isUndefined)(value)) {
+	      pairs = name;
+	    } else if ((0, _lang.isString)(name) && (0, _lang.isUndefined)(value)) {
 	
-	            pairs = styleStrToObject(name);
-	        } else {
+	      pairs = styleStrToObject(name);
+	    } else {
 	
-	            pairs[name] = value;
-	        }
-	
-	        (0, _object.forIn)(pairs, function (v, k) {
-	            elem.style[k === 'transform' ? transformKey : k] = v;
-	        });
+	      pairs[name] = value;
 	    }
+	
+	    (0, _object.forIn)(pairs, function (v, k) {
+	      elem.style[k === 'transform' ? transformKey : k] = v;
+	    });
+	  }
 	}
 	
 	function getComputedStyle(elem, name) {
 	
-	    // IE9+
+	  // IE9+
 	
-	    var computed = elem.ownerDocument.defaultView.opener ? elem.ownerDocument.defaultView.getComputedStyle(elem, null) : window.getComputedStyle(elem, null);
+	  var computed = elem.ownerDocument.defaultView.opener ? elem.ownerDocument.defaultView.getComputedStyle(elem, null) : window.getComputedStyle(elem, null);
 	
-	    if (computed && name) {
-	        return computed.getPropertyValue(name) || computed[name];
-	    }
+	  if (computed && name) {
+	    return computed.getPropertyValue(name) || computed[name];
+	  }
 	
-	    return computed;
+	  return computed;
 	}
 	
 	function normalizeSides(box) {
 	
-	    if (Object(box) !== box) {
+	  if (Object(box) !== box) {
 	
-	        box = (0, _lang.isNil)(box) ? 0 : box;
-	
-	        return {
-	            top: box,
-	            right: box,
-	            bottom: box,
-	            left: box
-	        };
-	    }
+	    box = (0, _lang.isNil)(box) ? 0 : box;
 	
 	    return {
-	        top: (0, _lang.isNil)(box.top) ? 0 : box.top,
-	        right: (0, _lang.isNil)(box.right) ? 0 : box.right,
-	        bottom: (0, _lang.isNil)(box.bottom) ? 0 : box.bottom,
-	        left: (0, _lang.isNil)(box.left) ? 0 : box.left
+	      top: box,
+	      right: box,
+	      bottom: box,
+	      left: box
 	    };
+	  }
+	
+	  return {
+	    top: (0, _lang.isNil)(box.top) ? 0 : box.top,
+	    right: (0, _lang.isNil)(box.right) ? 0 : box.right,
+	    bottom: (0, _lang.isNil)(box.bottom) ? 0 : box.bottom,
+	    left: (0, _lang.isNil)(box.left) ? 0 : box.left
+	  };
 	}
 	
 	// elem
@@ -1992,146 +1992,146 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var containsElement = exports.containsElement = docElem.compareDocumentPosition || docElem.contains ? function (context, elem) {
 	
-	    var aDown = context.nodeType === 9 ? context.documentElement : context;
-	    var bUp = elem && elem.parentNode;
+	  var aDown = context.nodeType === 9 ? context.documentElement : context;
+	  var bUp = elem && elem.parentNode;
 	
-	    return context === bUp || !!(bUp && bUp.nodeType === 1 && (aDown.contains ? aDown.contains(bUp) : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16));
+	  return context === bUp || !!(bUp && bUp.nodeType === 1 && (aDown.contains ? aDown.contains(bUp) : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16));
 	} : function (context, elem) {
 	
-	    if (elem) {
+	  if (elem) {
 	
-	        /* eslint no-cond-assign: 0 */
-	        while (elem = elem.parentNode) {
-	            if (elem === context) {
-	                return true;
-	            }
-	        }
+	    /* eslint no-cond-assign: 0 */
+	    while (elem = elem.parentNode) {
+	      if (elem === context) {
+	        return true;
+	      }
 	    }
+	  }
 	
-	    return false;
+	  return false;
 	};
 	
 	function createElement(tagName, doc) {
 	
-	    return (doc || document).createElement(tagName);
+	  return (doc || document).createElement(tagName);
 	}
 	
 	function removeElement(elem) {
 	
-	    if (elem && elem.parentNode) {
-	        elem.parentNode.removeChild(elem);
-	    }
+	  if (elem && elem.parentNode) {
+	    elem.parentNode.removeChild(elem);
+	  }
 	}
 	
 	function emptyElement(elem) {
 	
-	    if (elem) {
-	        while (elem.firstChild) {
-	            elem.removeChild(elem.firstChild);
-	        }
+	  if (elem) {
+	    while (elem.firstChild) {
+	      elem.removeChild(elem.firstChild);
 	    }
+	  }
 	}
 	
 	function getNodeName(elem) {
 	
-	    return elem.nodeName ? elem.nodeName.toLowerCase() : '';
+	  return elem.nodeName ? elem.nodeName.toLowerCase() : '';
 	}
 	
 	function isNode(elem, nodeName, attrName, attrValue) {
 	
-	    var ret = elem && !isNaN(elem.nodeType);
+	  var ret = elem && !isNaN(elem.nodeType);
 	
-	    if (ret) {
-	        ret = (0, _lang.isNil)(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
-	    }
+	  if (ret) {
+	    ret = (0, _lang.isNil)(nodeName) || getNodeName(elem) === nodeName.toLowerCase();
+	  }
 	
-	    if (ret) {
-	        ret = (0, _lang.isNil)(attrName) || elem.getAttribute(attrName) === attrValue;
-	    }
+	  if (ret) {
+	    ret = (0, _lang.isNil)(attrName) || elem.getAttribute(attrName) === attrValue;
+	  }
 	
-	    return ret;
+	  return ret;
 	}
 	
 	function getWindow(elem) {
 	
-	    return (0, _lang.isWindow)(elem) ? elem : elem.nodeType === 9 ? elem.defaultView || elem.parentWindow : false;
+	  return (0, _lang.isWindow)(elem) ? elem : elem.nodeType === 9 ? elem.defaultView || elem.parentWindow : false;
 	}
 	
 	function showHide(elem, show) {
 	
-	    if (elem && elem.style) {
+	  if (elem && elem.style) {
 	
-	        var display = elem.style.display;
+	    var display = elem.style.display;
 	
-	        if (show) {
-	            if (display === 'none') {
+	    if (show) {
+	      if (display === 'none') {
 	
-	                if (!(0, _lang.isUndefined)(elem.__display)) {
-	                    display = elem.__display;
-	                    delete elem.__display;
-	                } else {
-	                    display = '';
-	                }
-	
-	                elem.style.display = display || '';
-	            }
+	        if (!(0, _lang.isUndefined)(elem.__display)) {
+	          display = elem.__display;
+	          delete elem.__display;
 	        } else {
-	            if (display !== 'none') {
-	
-	                if (display) {
-	                    elem.__display = display;
-	                }
-	
-	                elem.style.display = 'none';
-	            }
+	          display = '';
 	        }
+	
+	        elem.style.display = display || '';
+	      }
+	    } else {
+	      if (display !== 'none') {
+	
+	        if (display) {
+	          elem.__display = display;
+	        }
+	
+	        elem.style.display = 'none';
+	      }
 	    }
+	  }
 	}
 	
 	function isHidden(elem) {
 	
-	    return elem && (elem.style.display === 'none' || !containsElement(elem.ownerDocument, elem));
+	  return elem && (elem.style.display === 'none' || !containsElement(elem.ownerDocument, elem));
 	}
 	
 	function getOffset(elem) {
 	
-	    var box = {
-	        top: 0,
-	        left: 0
-	    };
+	  var box = {
+	    top: 0,
+	    left: 0
+	  };
 	
-	    var doc = elem && elem.ownerDocument;
+	  var doc = elem && elem.ownerDocument;
 	
-	    if (!doc) {
-	        return box;
-	    }
+	  if (!doc) {
+	    return box;
+	  }
 	
-	    var docElement = doc.documentElement;
+	  var docElement = doc.documentElement;
 	
-	    // Make sure it's not a disconnected DOM node
-	    if (!containsElement(docElement, elem)) {
-	        return box;
-	    }
+	  // Make sure it's not a disconnected DOM node
+	  if (!containsElement(docElement, elem)) {
+	    return box;
+	  }
 	
-	    // If we don't have gBCR, just use 0,0 rather than error
-	    // BlackBerry 5, iOS 3 (original iPhone)
-	    if (elem.getBoundingClientRect) {
-	        box = elem.getBoundingClientRect();
-	    }
+	  // If we don't have gBCR, just use 0,0 rather than error
+	  // BlackBerry 5, iOS 3 (original iPhone)
+	  if (elem.getBoundingClientRect) {
+	    box = elem.getBoundingClientRect();
+	  }
 	
-	    var win = getWindow(doc);
+	  var win = getWindow(doc);
 	
-	    return {
-	        top: box.top + (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0),
-	        left: box.left + (win.pageXOffset || docElement.scrollLeft) - (docElement.clientLeft || 0)
-	    };
+	  return {
+	    top: box.top + (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0),
+	    left: box.left + (win.pageXOffset || docElement.scrollLeft) - (docElement.clientLeft || 0)
+	  };
 	}
 	
 	// xml namespaces.
 	var ns = {
-	    xml: 'http://www.w3.org/XML/1998/namespace',
-	    xmlns: 'http://www.w3.org/2000/svg',
-	    xlink: 'http://www.w3.org/1999/xlink'
+	  xml: 'http://www.w3.org/XML/1998/namespace',
+	  xmlns: 'http://www.w3.org/2000/svg',
+	  xlink: 'http://www.w3.org/1999/xlink'
 	};
 	
 	// svg version.
@@ -2139,42 +2139,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function parseXML(str, async) {
 	
-	    var xml = void 0;
+	  var xml = void 0;
 	
-	    try {
+	  try {
 	
-	        var parser = new DOMParser();
+	    var parser = new DOMParser();
 	
-	        if (!(0, _lang.isUndefined)(async)) {
-	            parser.async = async;
-	        }
-	
-	        xml = parser.parseFromString(str, 'text/xml');
-	    } catch (error) {
-	        xml = null;
+	    if (!(0, _lang.isUndefined)(async)) {
+	      parser.async = async;
 	    }
 	
-	    if (!xml || xml.getElementsByTagName('parsererror').length) {
-	        throw new Error('Invalid XML: ' + str);
-	    }
+	    xml = parser.parseFromString(str, 'text/xml');
+	  } catch (error) {
+	    xml = null;
+	  }
 	
-	    return xml;
+	  if (!xml || xml.getElementsByTagName('parsererror').length) {
+	    throw new Error('Invalid XML: ' + str);
+	  }
+	
+	  return xml;
 	}
 	
 	function createSvgDocument(content) {
 	
-	    // Create an SVG document element.
-	    // If `content` is passed, it will be used as the SVG content of
-	    // the `<svg>` root element.
+	  // Create an SVG document element.
+	  // If `content` is passed, it will be used as the SVG content of
+	  // the `<svg>` root element.
 	
-	    var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xlink + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
-	    var xml = parseXML(svg, false);
-	    return xml.documentElement;
+	  var svg = '<svg xmlns="' + ns.xmlns + '" xmlns:xlink="' + ns.xlink + '" version="' + svgVersion + '">' + (content || '') + '</svg>';
+	  var xml = parseXML(svg, false);
+	  return xml.documentElement;
 	}
 	
 	function createSvgElement(tagName, doc) {
 	
-	    return (doc || document).createElementNS(ns.xmlns, tagName);
+	  return (doc || document).createElementNS(ns.xmlns, tagName);
 	}
 	
 	// attribute
@@ -2182,51 +2182,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function qualifyAttributeName(name) {
 	
-	    if (name.indexOf(':') !== -1) {
+	  if (name.indexOf(':') !== -1) {
 	
-	        var combined = name.split(':');
-	
-	        return {
-	            ns: ns[combined[0]],
-	            local: combined[1]
-	        };
-	    }
+	    var combined = name.split(':');
 	
 	    return {
-	        ns: null,
-	        local: name
+	      ns: ns[combined[0]],
+	      local: combined[1]
 	    };
+	  }
+	
+	  return {
+	    ns: null,
+	    local: name
+	  };
 	}
 	
 	function setAttribute(elem, name, value) {
 	
-	    if ((0, _lang.isNil)(value)) {
-	        return removeAttribute(elem, name);
-	    }
+	  if ((0, _lang.isNil)(value)) {
+	    return removeAttribute(elem, name);
+	  }
 	
-	    if (name === 'id') {
-	        elem.id = value;
-	    } else {
+	  if (name === 'id') {
+	    elem.id = value;
+	  } else {
 	
-	        var qualified = qualifyAttributeName(name);
+	    var qualified = qualifyAttributeName(name);
 	
-	        qualified.ns
-	        // attribute names can be namespaced. E.g. `image` elements
-	        // have a `xlink:href` attribute to set the source of the image.
-	        ? elem.setAttributeNS(qualified.ns, name, value) : elem.setAttribute(name, value);
-	    }
+	    qualified.ns
+	    // attribute names can be namespaced. E.g. `image` elements
+	    // have a `xlink:href` attribute to set the source of the image.
+	    ? elem.setAttributeNS(qualified.ns, name, value) : elem.setAttribute(name, value);
+	  }
 	}
 	
 	function removeAttribute(elem, name) {
 	
-	    var qualified = qualifyAttributeName(name);
-	    if (qualified.ns) {
-	        if (elem.hasAttributeNS(qualified.ns, qualified.local)) {
-	            elem.removeAttributeNS(qualified.ns, qualified.local);
-	        }
-	    } else if (elem.hasAttribute(name)) {
-	        elem.removeAttribute(name);
+	  var qualified = qualifyAttributeName(name);
+	  if (qualified.ns) {
+	    if (elem.hasAttributeNS(qualified.ns, qualified.local)) {
+	      elem.removeAttributeNS(qualified.ns, qualified.local);
 	    }
+	  } else if (elem.hasAttribute(name)) {
+	    elem.removeAttribute(name);
+	  }
 	}
 	
 	// transform
@@ -2234,191 +2234,191 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function setScale(elem, sx, sy) {
 	
-	    if (elem) {
-	        elem.style[transformKey] = 'scale(' + sx + ', ' + sy + ')';
-	    }
+	  if (elem) {
+	    elem.style[transformKey] = 'scale(' + sx + ', ' + sy + ')';
+	  }
 	}
 	
 	function setRotation(elem, angle, ox, oy) {
 	
-	    if (elem) {
-	        elem.style[transformKey] = 'rotate(' + angle + ', ' + ox + ', ' + oy + ')';
-	    }
+	  if (elem) {
+	    elem.style[transformKey] = 'rotate(' + angle + ', ' + ox + ', ' + oy + ')';
+	  }
 	}
 	
 	function setTranslate(elem, tx, ty) {
 	
-	    if (elem) {
+	  if (elem) {
 	
-	        var translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
+	    var translate = 'translateX(' + tx + 'px) translateY(' + ty + 'px)';
 	
-	        // if (transformKey !== 'msTransform') {
-	        //     // The Z transform will keep this in the GPU (faster, and prevents artifacts),
-	        //     // but IE9 doesn't support 3d transforms and will choke.
-	        //     translate += ' translateZ(0)';
-	        // }
+	    // if (transformKey !== 'msTransform') {
+	    //     // The Z transform will keep this in the GPU (faster, and prevents artifacts),
+	    //     // but IE9 doesn't support 3d transforms and will choke.
+	    //     translate += ' translateZ(0)';
+	    // }
 	
-	        elem.style[transformKey] = translate;
-	    }
+	    elem.style[transformKey] = translate;
+	  }
 	}
 	
 	function getTransformToElement(source, target) {
 	
-	    if (source.getTransformToElement) {
-	        return source.getTransformToElement(target);
-	    }
+	  if (source.getTransformToElement) {
+	    return source.getTransformToElement(target);
+	  }
 	
-	    // chrome 48 removed svg getTransformToElement api
+	  // chrome 48 removed svg getTransformToElement api
 	
-	    var matrix = void 0;
-	    try {
-	        matrix = target.getScreenCTM().inverse();
-	    } catch (e) {
-	        throw new Error('Can not inverse source element\'s ctm.');
-	    }
+	  var matrix = void 0;
+	  try {
+	    matrix = target.getScreenCTM().inverse();
+	  } catch (e) {
+	    throw new Error('Can not inverse source element\'s ctm.');
+	  }
 	
-	    return matrix.multiply(source.getScreenCTM());
+	  return matrix.multiply(source.getScreenCTM());
 	}
 	
 	function getActualBoundingClientRect(node) {
-	    // same as native getBoundingClientRect, except it takes into
-	    // account  parent <frame> offsets if the element lies within
-	    // a nested document (<frame> or <iframe>-like).
+	  // same as native getBoundingClientRect, except it takes into
+	  // account  parent <frame> offsets if the element lies within
+	  // a nested document (<frame> or <iframe>-like).
 	
-	    var boundingRect = node.getBoundingClientRect();
+	  var boundingRect = node.getBoundingClientRect();
 	
-	    // The original object returned by getBoundingClientRect is immutable,
-	    // so we clone it We can't use extend because the properties are not
-	    // considered part of the object by hasOwnProperty in IE9
+	  // The original object returned by getBoundingClientRect is immutable,
+	  // so we clone it We can't use extend because the properties are not
+	  // considered part of the object by hasOwnProperty in IE9
 	
-	    var rect = {};
+	  var rect = {};
 	
-	    /* eslint-disable guard-for-in */
-	    for (var k in boundingRect) {
-	        rect[k] = boundingRect[k];
+	  /* eslint-disable guard-for-in */
+	  for (var k in boundingRect) {
+	    rect[k] = boundingRect[k];
+	  }
+	  /* eslint-enable guard-for-in */
+	
+	  if (node.ownerDocument !== document) {
+	    var frameElement = node.ownerDocument.defaultView.frameElement;
+	    if (frameElement) {
+	      var frameRect = getActualBoundingClientRect(frameElement);
+	      rect.top += frameRect.top;
+	      rect.bottom += frameRect.top;
+	      rect.left += frameRect.left;
+	      rect.right += frameRect.left;
 	    }
-	    /* eslint-enable guard-for-in */
+	  }
 	
-	    if (node.ownerDocument !== document) {
-	        var frameElement = node.ownerDocument.defaultView.frameElement;
-	        if (frameElement) {
-	            var frameRect = getActualBoundingClientRect(frameElement);
-	            rect.top += frameRect.top;
-	            rect.bottom += frameRect.top;
-	            rect.left += frameRect.left;
-	            rect.right += frameRect.left;
-	        }
-	    }
-	
-	    return rect;
+	  return rect;
 	}
 	
 	function getBounds(elem) {
 	
-	    var doc = void 0;
+	  var doc = void 0;
 	
-	    if (elem === document) {
-	        doc = document;
-	        elem = document.documentElement;
-	    } else {
-	        doc = elem.ownerDocument;
-	    }
+	  if (elem === document) {
+	    doc = document;
+	    elem = document.documentElement;
+	  } else {
+	    doc = elem.ownerDocument;
+	  }
 	
-	    var docEle = doc.documentElement;
-	    var bounds = getActualBoundingClientRect(elem);
+	  var docEle = doc.documentElement;
+	  var bounds = getActualBoundingClientRect(elem);
 	
-	    if ((0, _lang.isUndefined)(bounds.width)) {
-	        bounds.width = document.body.scrollWidth - bounds.left - bounds.right;
-	    }
-	    if ((0, _lang.isUndefined)(bounds.height)) {
-	        bounds.height = document.body.scrollHeight - bounds.top - bounds.bottom;
-	    }
+	  if ((0, _lang.isUndefined)(bounds.width)) {
+	    bounds.width = document.body.scrollWidth - bounds.left - bounds.right;
+	  }
+	  if ((0, _lang.isUndefined)(bounds.height)) {
+	    bounds.height = document.body.scrollHeight - bounds.top - bounds.bottom;
+	  }
 	
-	    bounds.top = bounds.top - docEle.clientTop;
-	    bounds.left = bounds.left - docEle.clientLeft;
-	    bounds.right = doc.body.clientWidth - bounds.width - bounds.left;
-	    bounds.bottom = doc.body.clientHeight - bounds.height - bounds.top;
+	  bounds.top = bounds.top - docEle.clientTop;
+	  bounds.left = bounds.left - docEle.clientLeft;
+	  bounds.right = doc.body.clientWidth - bounds.width - bounds.left;
+	  bounds.bottom = doc.body.clientHeight - bounds.height - bounds.top;
 	
-	    return bounds;
+	  return bounds;
 	}
 	
 	function getScrollParent(elem) {
 	
-	    // In firefox if the el is inside an iframe with display: none;
-	    // window.getComputedStyle() will return null;
-	    // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+	  // In firefox if the el is inside an iframe with display: none;
+	  // window.getComputedStyle() will return null;
+	  // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
 	
-	    var computed = getComputedStyle(elem) || {};
-	    var position = computed.position;
+	  var computed = getComputedStyle(elem) || {};
+	  var position = computed.position;
 	
-	    if (position === 'fixed') {
-	        return elem;
+	  if (position === 'fixed') {
+	    return elem;
+	  }
+	
+	  var parent = elem;
+	
+	  while (parent = parent.parentNode) {
+	    var style = void 0;
+	
+	    /* eslint-disable no-empty */
+	    try {
+	      style = getComputedStyle(parent);
+	    } catch (err) {}
+	    /* eslint-enable no-empty */
+	
+	    if (typeof style === 'undefined' || style === null) {
+	      return parent;
 	    }
 	
-	    var parent = elem;
+	    var overflow = style.overflow;
+	    var overflowX = style.overflowX;
+	    var overflowY = style.overflowY;
 	
-	    while (parent = parent.parentNode) {
-	        var style = void 0;
-	
-	        /* eslint-disable no-empty */
-	        try {
-	            style = getComputedStyle(parent);
-	        } catch (err) {}
-	        /* eslint-enable no-empty */
-	
-	        if (typeof style === 'undefined' || style === null) {
-	            return parent;
-	        }
-	
-	        var overflow = style.overflow;
-	        var overflowX = style.overflowX;
-	        var overflowY = style.overflowY;
-	
-	        if (/(auto|scroll)/.test(overflow + overflowY + overflowX)) {
-	            if (position !== 'absolute' || ['relative', 'absolute', 'fixed'].indexOf(style.position) >= 0) {
-	                return parent;
-	            }
-	        }
+	    if (/(auto|scroll)/.test(overflow + overflowY + overflowX)) {
+	      if (position !== 'absolute' || ['relative', 'absolute', 'fixed'].indexOf(style.position) >= 0) {
+	        return parent;
+	      }
 	    }
+	  }
 	
-	    return document.body;
+	  return document.body;
 	}
 	
 	function getScrollBarWidth() {
 	
-	    var inner = createElement('p');
-	    var outer = createElement('div');
+	  var inner = createElement('p');
+	  var outer = createElement('div');
 	
-	    setStyle(inner, {
-	        width: '100%',
-	        height: '200px'
-	    });
+	  setStyle(inner, {
+	    width: '100%',
+	    height: '200px'
+	  });
 	
-	    setStyle(outer, {
-	        overflow: 'hidden',
-	        visibility: 'hidden',
-	        position: 'absolute',
-	        left: 0,
-	        top: 0,
-	        width: '200px',
-	        height: '100px'
-	    });
+	  setStyle(outer, {
+	    overflow: 'hidden',
+	    visibility: 'hidden',
+	    position: 'absolute',
+	    left: 0,
+	    top: 0,
+	    width: '200px',
+	    height: '100px'
+	  });
 	
-	    outer.appendChild(inner);
-	    document.body.appendChild(outer);
+	  outer.appendChild(inner);
+	  document.body.appendChild(outer);
 	
-	    var w1 = inner.offsetWidth;
+	  var w1 = inner.offsetWidth;
 	
-	    outer.style.overflow = 'scroll';
+	  outer.style.overflow = 'scroll';
 	
-	    var w2 = inner.offsetWidth;
-	    if (w1 === w2) {
-	        w2 = outer.clientWidth;
-	    }
+	  var w2 = inner.offsetWidth;
+	  if (w1 === w2) {
+	    w2 = outer.clientWidth;
+	  }
 	
-	    document.body.removeChild(outer);
+	  document.body.removeChild(outer);
 	
-	    return w1 - w2;
+	  return w1 - w2;
 	}
 
 /***/ },
@@ -2428,7 +2428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.toDeg = toDeg;
 	exports.toRad = toRad;
@@ -2436,27 +2436,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.normalizeAngle = normalizeAngle;
 	function toDeg(rad) {
 	
-	    return 180 * rad / Math.PI % 360;
+	  return 180 * rad / Math.PI % 360;
 	}
 	
 	function toRad(deg, over360) {
 	
-	    deg = over360 ? deg : deg % 360;
+	  deg = over360 ? deg : deg % 360;
 	
-	    return deg * Math.PI / 180;
+	  return deg * Math.PI / 180;
 	}
 	
 	function snapToGrid(val) {
-	    var gridSize = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
-	    var method = arguments.length <= 2 || arguments[2] === undefined ? 'round' : arguments[2];
+	  var gridSize = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+	  var method = arguments.length <= 2 || arguments[2] === undefined ? 'round' : arguments[2];
 	
 	
-	    return Math[method](val / gridSize) * gridSize;
+	  return Math[method](val / gridSize) * gridSize;
 	}
 	
 	function normalizeAngle(angle) {
 	
-	    return angle % 360 + (angle < 0 ? 360 : 0);
+	  return angle % 360 + (angle < 0 ? 360 : 0);
 	}
 
 /***/ },
@@ -2466,7 +2466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.isLeftMouseButton = exports.hasModifierKey = exports.hasShiftKey = exports.hasMetaKey = exports.hasCtrlKey = exports.hasAltKey = undefined;
 	exports.removeEventListener = removeEventListener;
@@ -2490,258 +2490,258 @@ return /******/ (function(modules) { // webpackBootstrap
 	var IS_TOUCH = _detector2.default.IS_TOUCH;
 	
 	var hooks = {
-	    mouseenter: {
-	        type: 'mouseover',
-	        wrap: mouseEnterLeaveWrap
-	    },
-	    mouseleave: {
-	        type: 'mouseout',
-	        wrap: mouseEnterLeaveWrap
-	    }
+	  mouseenter: {
+	    type: 'mouseover',
+	    wrap: mouseEnterLeaveWrap
+	  },
+	  mouseleave: {
+	    type: 'mouseout',
+	    wrap: mouseEnterLeaveWrap
+	  }
 	};
 	
 	var isMatchSelector = function () {
 	
-	    var testDiv = DOC.createElement('div');
+	  var testDiv = DOC.createElement('div');
 	
-	    // match selector
-	    var matchesSelector = testDiv.matches || testDiv.webkitMatchesSelector || testDiv.mozMatchesSelector || testDiv.msMatchesSelector || testDiv.oMatchesSelector;
+	  // match selector
+	  var matchesSelector = testDiv.matches || testDiv.webkitMatchesSelector || testDiv.mozMatchesSelector || testDiv.msMatchesSelector || testDiv.oMatchesSelector;
 	
-	    var hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
+	  var hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
 	
-	    return function (elem, selector) {
+	  return function (elem, selector) {
 	
-	        if (hasMatchesSelector) {
-	            return matchesSelector.call(elem, selector);
-	        }
+	    if (hasMatchesSelector) {
+	      return matchesSelector.call(elem, selector);
+	    }
 	
-	        var parent = elem.parentNode;
+	    var parent = elem.parentNode;
 	
-	        // if the element is an orphan, and the browser doesn't support matching
-	        // orphans, append it to a documentFragment
-	        if (!parent && !hasMatchesSelector) {
-	            parent = DOC.createDocumentFragment();
-	            parent.appendChild(elem);
-	        }
+	    // if the element is an orphan, and the browser doesn't support matching
+	    // orphans, append it to a documentFragment
+	    if (!parent && !hasMatchesSelector) {
+	      parent = DOC.createDocumentFragment();
+	      parent.appendChild(elem);
+	    }
 	
-	        // from the parent element's context, get all nodes that match the selector
-	        var nodes = parent.querySelectorAll(selector);
+	    // from the parent element's context, get all nodes that match the selector
+	    var nodes = parent.querySelectorAll(selector);
 	
-	        return (0, _array.some)(nodes, function (node) {
-	            return node === elem;
-	        });
-	    };
+	    return (0, _array.some)(nodes, function (node) {
+	      return node === elem;
+	    });
+	  };
 	}();
 	
 	function mouseEnterLeaveWrap(elem, handler) {
-	    return function (e) {
-	        if (!isHover(e.delegateTarget || elem, e)) {
-	            handler.call(this, e);
-	        }
-	    };
+	  return function (e) {
+	    if (!isHover(e.delegateTarget || elem, e)) {
+	      handler.call(this, e);
+	    }
+	  };
 	}
 	
 	function isHover(elem, e) {
 	
-	    var target = e.type === 'mouseover' ? e.relatedTarget || e.fromElement : e.relatedTarget || e.toElement;
+	  var target = e.type === 'mouseover' ? e.relatedTarget || e.fromElement : e.relatedTarget || e.toElement;
 	
-	    return (0, _dom.containsElement)(elem, target) || elem === target;
+	  return (0, _dom.containsElement)(elem, target) || elem === target;
 	}
 	
 	function fixEvent(e) {
 	
-	    // add W3C standard event methods
-	    e.preventDefault = fixEvent.preventDefault;
-	    e.stopPropagation = fixEvent.stopPropagation;
+	  // add W3C standard event methods
+	  e.preventDefault = fixEvent.preventDefault;
+	  e.stopPropagation = fixEvent.stopPropagation;
 	
-	    return e;
+	  return e;
 	}
 	
 	fixEvent.preventDefault = function () {
 	
-	    this.returnValue = false;
+	  this.returnValue = false;
 	};
 	
 	fixEvent.stopPropagation = function () {
 	
-	    this.cancelBubble = true;
+	  this.cancelBubble = true;
 	};
 	
 	function handleEvent(event) {
 	
-	    var result = true;
-	    var element = this;
+	  var result = true;
+	  var element = this;
 	
-	    // grab the event object (IE uses a global event object)
-	    event = event || fixEvent((DOC.parentWindow || WIN).event);
+	  // grab the event object (IE uses a global event object)
+	  event = event || fixEvent((DOC.parentWindow || WIN).event);
 	
-	    // get a reference to the hash table of event handlers
-	    var handlers = element.events[event.type];
+	  // get a reference to the hash table of event handlers
+	  var handlers = element.events[event.type];
 	
-	    // execute each event handler
-	    for (var key in handlers) {
+	  // execute each event handler
+	  for (var key in handlers) {
 	
-	        if (handlers.hasOwnProperty(key)) {
+	    if (handlers.hasOwnProperty(key)) {
 	
-	            element.$$handleEvent = handlers[key];
+	      element.$$handleEvent = handlers[key];
 	
-	            if (element.$$handleEvent(event) === false) {
-	                result = false;
-	            }
-	        }
+	      if (element.$$handleEvent(event) === false) {
+	        result = false;
+	      }
 	    }
+	  }
 	
-	    return result;
+	  return result;
 	}
 	
 	function addEvent(elem, type, handler) {
 	
-	    if (elem.addEventListener) {
-	        elem.addEventListener(type, handler, false);
-	    } else {
+	  if (elem.addEventListener) {
+	    elem.addEventListener(type, handler, false);
+	  } else {
 	
-	        // assign each event handler a unique ID
-	        if (!handler.$$guid) {
-	            handler.$$guid = ++addEvent.guid;
-	        }
-	
-	        // create a hash table of event types for the element
-	        if (!elem.events) {
-	            elem.events = {};
-	        }
-	
-	        var fixedName = 'on' + type;
-	
-	        // create a hash table of event handlers for each element/event pair
-	        var handlers = elem.events[type];
-	        if (!handlers) {
-	            handlers = elem.events[type] = {};
-	            // store the existing event handler (if there is one)
-	            if (elem[fixedName]) {
-	                handlers[0] = elem[fixedName];
-	            }
-	        }
-	        // store the event handler in the hash table
-	        handlers[handler.$$guid] = handler;
-	        // assign a global event handler to do all the work
-	        elem[fixedName] = handleEvent;
+	    // assign each event handler a unique ID
+	    if (!handler.$$guid) {
+	      handler.$$guid = ++addEvent.guid;
 	    }
+	
+	    // create a hash table of event types for the element
+	    if (!elem.events) {
+	      elem.events = {};
+	    }
+	
+	    var fixedName = 'on' + type;
+	
+	    // create a hash table of event handlers for each element/event pair
+	    var handlers = elem.events[type];
+	    if (!handlers) {
+	      handlers = elem.events[type] = {};
+	      // store the existing event handler (if there is one)
+	      if (elem[fixedName]) {
+	        handlers[0] = elem[fixedName];
+	      }
+	    }
+	    // store the event handler in the hash table
+	    handlers[handler.$$guid] = handler;
+	    // assign a global event handler to do all the work
+	    elem[fixedName] = handleEvent;
+	  }
 	}
 	
 	addEvent.guid = 0;
 	
 	function getDelegateTarget(elem, target, selector) {
 	
-	    while (target && target !== elem) {
+	  while (target && target !== elem) {
 	
-	        if (isMatchSelector(target, selector)) {
-	            return target;
-	        }
-	
-	        target = target.parentElement;
+	    if (isMatchSelector(target, selector)) {
+	      return target;
 	    }
 	
-	    return null;
+	    target = target.parentElement;
+	  }
+	
+	  return null;
 	}
 	
 	function removeEventListener(elem, type, handler) {
 	
-	    var hook = hooks[type];
-	    var wrapper = handler._delegateWrapper;
+	  var hook = hooks[type];
+	  var wrapper = handler._delegateWrapper;
 	
-	    type = hook ? hook.type : type;
+	  type = hook ? hook.type : type;
 	
-	    if (elem.removeEventListener) {
-	        elem.removeEventListener(type, handler, false);
-	        wrapper && elem.removeEventListener(type, wrapper, false);
-	    } else {
-	        // delete the event handler from the hash table
-	        if (elem.events && elem.events[type]) {
-	            delete elem.events[type][handler.$$guid];
+	  if (elem.removeEventListener) {
+	    elem.removeEventListener(type, handler, false);
+	    wrapper && elem.removeEventListener(type, wrapper, false);
+	  } else {
+	    // delete the event handler from the hash table
+	    if (elem.events && elem.events[type]) {
+	      delete elem.events[type][handler.$$guid];
 	
-	            if (wrapper) {
-	                delete elem.events[type][wrapper.$$guid];
-	            }
-	        }
+	      if (wrapper) {
+	        delete elem.events[type][wrapper.$$guid];
+	      }
 	    }
+	  }
 	}
 	
 	function addEventListener(elem, type, selector, handler, once) {
 	
-	    var hook = hooks[type];
+	  var hook = hooks[type];
 	
-	    type = hook ? hook.type : type;
+	  type = hook ? hook.type : type;
 	
-	    if ((0, _lang.isFunction)(selector)) {
-	        return hook ? addEvent(elem, type, hook.wrap(elem, selector)) : addEvent(elem, type, selector);
+	  if ((0, _lang.isFunction)(selector)) {
+	    return hook ? addEvent(elem, type, hook.wrap(elem, selector)) : addEvent(elem, type, selector);
+	  }
+	
+	  function wrapper(e) {
+	
+	    // if this event has a delegateTarget, then we add it to the event
+	    // object (so that handlers may have a reference to the delegator
+	    // element) and fire the callback
+	    var delegateTarget = getDelegateTarget(elem, e.target, selector);
+	    if (delegateTarget) {
+	
+	      e.delegateTarget = delegateTarget;
+	
+	      if (hook) {
+	        handler = hook.wrap(elem, handler);
+	      }
+	
+	      if (once === true) {
+	        removeEventListener(elem, type, wrapper);
+	      }
+	
+	      handler.call(elem, e);
 	    }
+	  }
 	
-	    function wrapper(e) {
+	  handler._delegateWrapper = wrapper;
+	  addEvent(elem, type, wrapper);
 	
-	        // if this event has a delegateTarget, then we add it to the event
-	        // object (so that handlers may have a reference to the delegator
-	        // element) and fire the callback
-	        var delegateTarget = getDelegateTarget(elem, e.target, selector);
-	        if (delegateTarget) {
-	
-	            e.delegateTarget = delegateTarget;
-	
-	            if (hook) {
-	                handler = hook.wrap(elem, handler);
-	            }
-	
-	            if (once === true) {
-	                removeEventListener(elem, type, wrapper);
-	            }
-	
-	            handler.call(elem, e);
-	        }
-	    }
-	
-	    handler._delegateWrapper = wrapper;
-	    addEvent(elem, type, wrapper);
-	
-	    return handler;
+	  return handler;
 	}
 	
 	function normalizeEvent(e) {
 	
-	    var touchEvent = IS_TOUCH && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0];
+	  var touchEvent = IS_TOUCH && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0];
 	
-	    if (touchEvent) {
-	        for (var prop in e) {
-	            // copy all the properties from the input event that are not
-	            // defined on the touch event (functions included).
-	            if (touchEvent[prop] === undefined) {
-	                touchEvent[prop] = e[prop];
-	            }
-	        }
-	        return touchEvent;
+	  if (touchEvent) {
+	    for (var prop in e) {
+	      // copy all the properties from the input event that are not
+	      // defined on the touch event (functions included).
+	      if (touchEvent[prop] === undefined) {
+	        touchEvent[prop] = e[prop];
+	      }
 	    }
+	    return touchEvent;
+	  }
 	
-	    return e;
+	  return e;
 	}
 	
 	var hasAltKey = exports.hasAltKey = function hasAltKey(e) {
-	    return e.altKey;
+	  return e.altKey;
 	};
 	var hasCtrlKey = exports.hasCtrlKey = function hasCtrlKey(e) {
-	    return e.ctrlKey;
+	  return e.ctrlKey;
 	};
 	var hasMetaKey = exports.hasMetaKey = function hasMetaKey(e) {
-	    return e.metaKey;
+	  return e.metaKey;
 	};
 	var hasShiftKey = exports.hasShiftKey = function hasShiftKey(e) {
-	    return e.shiftKey;
+	  return e.shiftKey;
 	};
 	
 	var hasModifierKey = exports.hasModifierKey = function hasModifierKey(e) {
 	
-	    return hasCtrlKey(e) || hasMetaKey(e) || hasShiftKey(e);
+	  return hasCtrlKey(e) || hasMetaKey(e) || hasShiftKey(e);
 	};
 	var isLeftMouseButton = exports.isLeftMouseButton = function isLeftMouseButton(e) {
 	
-	    return _detector2.default.IS_IE ? e.button === 1 : e.button === 0;
+	  return _detector2.default.IS_IE ? e.button === 1 : e.button === 0;
 	};
 
 /***/ },
@@ -2822,7 +2822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.lineToPathData = lineToPathData;
 	exports.polygonToPathData = polygonToPathData;
@@ -2835,88 +2835,88 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function lineToPathData(line) {
 	
-	    return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
+	  return ['M', line.getAttribute('x1'), line.getAttribute('y1'), 'L', line.getAttribute('x2'), line.getAttribute('y2')].join(' ');
 	}
 	
 	function polygonToPathData(polygon) {
 	
-	    var d = [];
+	  var d = [];
 	
-	    (0, _array.forEach)(polygon.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
+	  (0, _array.forEach)(polygon.points, function (p, i) {
+	    d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	  });
 	
-	    d.push('Z');
+	  d.push('Z');
 	
-	    return d.join(' ');
+	  return d.join(' ');
 	}
 	
 	function polylineToPathData(polyline) {
 	
-	    var d = [];
+	  var d = [];
 	
-	    (0, _array.forEach)(polyline.points, function (p, i) {
-	        d.push(i === 0 ? 'M' : 'L', p.x, p.y);
-	    });
+	  (0, _array.forEach)(polyline.points, function (p, i) {
+	    d.push(i === 0 ? 'M' : 'L', p.x, p.y);
+	  });
 	
-	    return d.join(' ');
+	  return d.join(' ');
 	}
 	
 	function rectToPathData(rect) {
 	
-	    var x = parseFloat(rect.getAttribute('x')) || 0;
-	    var y = parseFloat(rect.getAttribute('y')) || 0;
-	    var w = parseFloat(rect.getAttribute('width')) || 0;
-	    var h = parseFloat(rect.getAttribute('height')) || 0;
-	    var rx = parseFloat(rect.getAttribute('rx')) || 0;
-	    var ry = parseFloat(rect.getAttribute('ry')) || 0;
-	    var r = x + w;
-	    var b = y + h;
+	  var x = parseFloat(rect.getAttribute('x')) || 0;
+	  var y = parseFloat(rect.getAttribute('y')) || 0;
+	  var w = parseFloat(rect.getAttribute('width')) || 0;
+	  var h = parseFloat(rect.getAttribute('height')) || 0;
+	  var rx = parseFloat(rect.getAttribute('rx')) || 0;
+	  var ry = parseFloat(rect.getAttribute('ry')) || 0;
+	  var r = x + w;
+	  var b = y + h;
 	
-	    var d = void 0;
+	  var d = void 0;
 	
-	    if (!rx && !ry) {
+	  if (!rx && !ry) {
 	
-	        d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
-	    } else {
+	    d = ['M', x, y, 'H', r, 'V', b, 'H', x, 'V', y, 'Z'];
+	  } else {
 	
-	        d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
-	    }
-	    return d.join(' ');
+	    d = ['M', x + rx, y, 'L', r - rx, y, 'Q', r, y, r, y + ry, 'L', r, y + h - ry, 'Q', r, b, r - rx, b, 'L', x + rx, b, 'Q', x, b, x, b - rx, 'L', x, y + ry, 'Q', x, y, x + rx, y, 'Z'];
+	  }
+	  return d.join(' ');
 	}
 	
 	var KAPPA = 0.5522847498307935;
 	
 	function circleToPathData(circle) {
 	
-	    var cx = parseFloat(circle.getAttribute('cx')) || 0;
-	    var cy = parseFloat(circle.getAttribute('cy')) || 0;
-	    var r = parseFloat(circle.getAttribute('r'));
-	    var cd = r * KAPPA; // Control distance.
+	  var cx = parseFloat(circle.getAttribute('cx')) || 0;
+	  var cy = parseFloat(circle.getAttribute('cy')) || 0;
+	  var r = parseFloat(circle.getAttribute('r'));
+	  var cd = r * KAPPA; // Control distance.
 	
-	    return ['M', cx, cy - r, // Move to the first point.
-	    'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
-	    'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
-	    'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
-	    'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
-	    'Z'].join(' ');
+	  return ['M', cx, cy - r, // Move to the first point.
+	  'C', cx + cd, cy - r, cx + r, cy - cd, cx + r, cy, // I. Quadrant.
+	  'C', cx + r, cy + cd, cx + cd, cy + r, cx, cy + r, // II. Quadrant.
+	  'C', cx - cd, cy + r, cx - r, cy + cd, cx - r, cy, // III. Quadrant.
+	  'C', cx - r, cy - cd, cx - cd, cy - r, cx, cy - r, // IV. Quadrant.
+	  'Z'].join(' ');
 	}
 	
 	function ellipseToPathData(ellipse) {
 	
-	    var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
-	    var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
-	    var rx = parseFloat(ellipse.getAttribute('rx'));
-	    var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
-	    var cdx = rx * KAPPA; // Control distance x.
-	    var cdy = ry * KAPPA; // Control distance y.
+	  var cx = parseFloat(ellipse.getAttribute('cx')) || 0;
+	  var cy = parseFloat(ellipse.getAttribute('cy')) || 0;
+	  var rx = parseFloat(ellipse.getAttribute('rx'));
+	  var ry = parseFloat(ellipse.getAttribute('ry')) || rx;
+	  var cdx = rx * KAPPA; // Control distance x.
+	  var cdy = ry * KAPPA; // Control distance y.
 	
-	    return ['M', cx, cy - ry, // Move to the first point.
-	    'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
-	    'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
-	    'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
-	    'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
-	    'Z'].join(' ');
+	  return ['M', cx, cy - ry, // Move to the first point.
+	  'C', cx + cdx, cy - ry, cx + rx, cy - cdy, cx + rx, cy, // I. Quadrant.
+	  'C', cx + rx, cy + cdy, cx + cdx, cy + ry, cx, cy + ry, // II. Quadrant.
+	  'C', cx - cdx, cy + ry, cx - rx, cy + cdy, cx - rx, cy, // III. Quadrant.
+	  'C', cx - rx, cy - cdy, cx - cdx, cy - ry, cx, cy - ry, // IV. Quadrant.
+	  'Z'].join(' ');
 	}
 
 /***/ },
@@ -2926,7 +2926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.parseTranslate = parseTranslate;
 	exports.parseScale = parseScale;
@@ -2942,96 +2942,96 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function parseTranslate(transform) {
 	
-	    var translate = { tx: 0, ty: 0 };
+	  var translate = { tx: 0, ty: 0 };
 	
-	    if (transform) {
+	  if (transform) {
 	
-	        var match = transform.match(/translate\((.*)\)/);
-	        if (match) {
+	    var match = transform.match(/translate\((.*)\)/);
+	    if (match) {
 	
-	            var arr = (0, _string.split)(match[1], /[ ,]+/);
-	            if (arr[0]) {
-	                translate.tx += (0, _number.toFloat)(arr[0]);
-	            }
+	      var arr = (0, _string.split)(match[1], /[ ,]+/);
+	      if (arr[0]) {
+	        translate.tx += (0, _number.toFloat)(arr[0]);
+	      }
 	
-	            if (arr[1]) {
-	                translate.ty += (0, _number.toFloat)(arr[1]);
-	            }
-	        }
+	      if (arr[1]) {
+	        translate.ty += (0, _number.toFloat)(arr[1]);
+	      }
 	    }
+	  }
 	
-	    return translate;
+	  return translate;
 	}
 	
 	function parseScale(transform) {
 	
-	    var scale = { sx: 1, sy: 1 };
+	  var scale = { sx: 1, sy: 1 };
 	
-	    if (transform) {
+	  if (transform) {
 	
-	        var match = transform.match(/scale\((.*)\)/);
-	        if (match) {
+	    var match = transform.match(/scale\((.*)\)/);
+	    if (match) {
 	
-	            var arr = (0, _string.split)(match[1], /[ ,]+/);
-	            if (arr[0]) {
-	                scale.sx *= (0, _number.toFloat)(arr[0]);
-	            }
+	      var arr = (0, _string.split)(match[1], /[ ,]+/);
+	      if (arr[0]) {
+	        scale.sx *= (0, _number.toFloat)(arr[0]);
+	      }
 	
-	            if (arr[1] || arr[0]) {
-	                scale.sy *= (0, _number.toFloat)(arr[1] || arr[0]);
-	            }
-	        }
+	      if (arr[1] || arr[0]) {
+	        scale.sy *= (0, _number.toFloat)(arr[1] || arr[0]);
+	      }
 	    }
+	  }
 	
-	    return scale;
+	  return scale;
 	}
 	
 	function parseRotate(transform) {
 	
-	    var rotate = { angle: 0 };
+	  var rotate = { angle: 0 };
 	
-	    if (transform) {
+	  if (transform) {
 	
-	        var match = transform.match(/rotate\((.*)\)/);
-	        if (match) {
+	    var match = transform.match(/rotate\((.*)\)/);
+	    if (match) {
 	
-	            var arr = (0, _string.split)(match[1], /[ ,]+/);
-	            if (arr[0]) {
-	                rotate.angle += (0, _number.toFloat)(arr[0]);
-	            }
+	      var arr = (0, _string.split)(match[1], /[ ,]+/);
+	      if (arr[0]) {
+	        rotate.angle += (0, _number.toFloat)(arr[0]);
+	      }
 	
-	            if (arr[1] && arr[2]) {
-	                rotate.cx = (0, _number.toFloat)(arr[1]);
-	                rotate.cy = (0, _number.toFloat)(arr[2]);
-	            }
-	        }
+	      if (arr[1] && arr[2]) {
+	        rotate.cx = (0, _number.toFloat)(arr[1]);
+	        rotate.cy = (0, _number.toFloat)(arr[2]);
+	      }
 	    }
+	  }
 	
-	    return rotate;
+	  return rotate;
 	}
 	
 	function parseTransform(transform) {
 	
-	    return {
-	        translate: parseTranslate(transform),
-	        rotate: parseRotate(transform),
-	        scale: parseScale(transform)
-	    };
+	  return {
+	    translate: parseTranslate(transform),
+	    rotate: parseRotate(transform),
+	    scale: parseScale(transform)
+	  };
 	}
 	
 	function clearTranslate(transform) {
 	
-	    return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
+	  return transform && (0, _string.trim)(transform.replace(/translate\([^)]*\)/g, '')) || '';
 	}
 	
 	function clearScale(transform) {
 	
-	    return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
+	  return transform && (0, _string.trim)(transform.replace(/scale\([^)]*\)/g, '')) || '';
 	}
 	
 	function clearRotate(transform) {
 	
-	    return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+	  return transform && (0, _string.trim)(transform.replace(/rotate\([^)]*\)/g, '')) || '';
 	}
 
 /***/ },
@@ -3640,7 +3640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3664,1185 +3664,1185 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _insertChild(child, index) {
 	
-	    var childCount = this.getChildCount();
+	  var childCount = this.getChildCount();
 	
-	    index = utils.fixIndex(index, childCount);
+	  index = utils.fixIndex(index, childCount);
 	
-	    if (child.parent === this && index === childCount) {
-	        index--;
-	    }
+	  if (child.parent === this && index === childCount) {
+	    index--;
+	  }
 	
-	    // update parent
-	    child.removeFromParent({ silent: true });
-	    child.parent = this;
+	  // update parent
+	  child.removeFromParent({ silent: true });
+	  child.parent = this;
 	
-	    if (this.children && this.children.length) {
-	        this.children.splice(index, 0, child);
-	    } else {
-	        // speed up
-	        this.children = [];
-	        this.children.push(child);
-	    }
+	  if (this.children && this.children.length) {
+	    this.children.splice(index, 0, child);
+	  } else {
+	    // speed up
+	    this.children = [];
+	    this.children.push(child);
+	  }
 	
-	    return this;
+	  return this;
 	}
 	
 	function getModel(primary, backup) {
 	
-	    var model = primary && primary.getModel();
+	  var model = primary && primary.getModel();
 	
-	    if (!model && backup && backup.getModel) {
-	        model = backup.getModel();
-	    }
+	  if (!model && backup && backup.getModel) {
+	    model = backup.getModel();
+	  }
 	
-	    return model;
+	  return model;
 	}
 	
 	function scheduleSetParent(scheduled) {
 	
-	    this.setParent.scheduled = scheduled;
+	  this.setParent.scheduled = scheduled;
 	
-	    return this;
+	  return this;
 	}
 	
 	function isSetParentScheduled() {
 	
-	    return this.setParent.scheduled === true;
+	  return this.setParent.scheduled === true;
 	}
 	
 	function scheduleSetTerminal(scheduled) {
 	
-	    this.setTerminal.scheduled = scheduled;
+	  this.setTerminal.scheduled = scheduled;
 	
-	    return this;
+	  return this;
 	}
 	
 	function isSetTerminalScheduled() {
 	
-	    return this.setTerminal.scheduled === true;
+	  return this.setTerminal.scheduled === true;
 	}
 	
 	var Cell = function () {
-	    function Cell(options) {
-	        _classCallCheck(this, Cell);
+	  function Cell(options) {
+	    _classCallCheck(this, Cell);
 	
-	        var metadata = utils.merge({}, this.constructor.defaults, options);
+	    var metadata = utils.merge({}, this.constructor.defaults, options);
 	
-	        // bind some common props
-	        this.data = metadata.data;
-	        this.attrs = metadata.attrs || {};
-	        this.visible = metadata.visible !== false;
-	        this.metadata = metadata;
+	    // bind some common props
+	    this.data = metadata.data;
+	    this.attrs = metadata.attrs || {};
+	    this.visible = metadata.visible !== false;
+	    this.metadata = metadata;
+	  }
+	
+	  // static
+	  // ------
+	
+	  _createClass(Cell, [{
+	    key: 'isLink',
+	
+	
+	    // link
+	    // ----
+	
+	    value: function isLink() {
+	
+	      return false;
+	    }
+	  }, {
+	    key: 'getTerminal',
+	    value: function getTerminal() {
+	      var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	
+	
+	      return isSource ? this.source : this.target;
+	    }
+	  }, {
+	    key: 'setTerminal',
+	    value: function setTerminal(terminal) {
+	      var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      scheduleSetTerminal.call(this, false);
+	
+	      if (!options.silent) {
+	
+	        var model = getModel(this, terminal);
+	        if (model) {
+	          // fully replace the previous terminal
+	          model.setTerminal(this, terminal, isSource);
+	          scheduleSetTerminal.call(this, true);
+	        }
+	      }
+	
+	      if (!isSetTerminalScheduled.call(this)) {
+	
+	        terminal = terminal ? new _Terminal2.default(terminal) : null;
+	
+	        if (isSource) {
+	          this.source = terminal;
+	
+	          if (terminal) {
+	            this.sourceNode = terminal.node;
+	            this.sourcePort = terminal.port;
+	            this.sourcePoint = terminal.point;
+	          } else {
+	            this.sourceNode = null;
+	            this.sourcePort = null;
+	            this.sourcePoint = null;
+	          }
+	        } else {
+	          this.target = terminal;
+	
+	          if (terminal) {
+	            this.targetNode = terminal.node;
+	            this.targetPort = terminal.port;
+	            this.targetPoint = terminal.point;
+	          } else {
+	            this.targetNode = null;
+	            this.targetPort = null;
+	            this.targetPoint = null;
+	          }
+	        }
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'getTerminalNode',
+	    value: function getTerminalNode() {
+	      var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	
+	
+	      var node = isSource ? this.sourceNode : this.targetNode;
+	
+	      if (!node) {
+	
+	        var terminal = this.getTerminal(isSource);
+	
+	        node = terminal && terminal.node || null;
+	      }
+	
+	      return node;
+	    }
+	  }, {
+	    key: 'setTerminalNode',
+	    value: function setTerminalNode(node) {
+	      var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      scheduleSetTerminal.call(this, false);
+	
+	      if (!options.silent) {
+	        var model = getModel(this, node);
+	        if (model) {
+	          model.setTerminalNode(this, node, isSource);
+	          scheduleSetTerminal.call(this, true);
+	        }
+	      }
+	
+	      if (!isSetTerminalScheduled.call(this)) {
+	
+	        if (isSource) {
+	          this.sourceNode = node;
+	        } else {
+	          this.targetNode = node;
+	        }
+	
+	        var terminal = this.getTerminal(isSource);
+	        if (terminal) {
+	          terminal.node = node;
+	        }
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'getTerminalPort',
+	    value: function getTerminalPort() {
+	      var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	
+	
+	      var port = isSource ? this.sourcePort : this.targetPort;
+	
+	      if (!port) {
+	
+	        var terminal = this.getTerminal(isSource);
+	
+	        port = terminal && terminal.port || null;
+	      }
+	
+	      return port;
+	    }
+	  }, {
+	    key: 'setTerminalPort',
+	    value: function setTerminalPort(port) {
+	      var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      // partial replace the terminal port
+	
+	      scheduleSetTerminal.call(this, false);
+	
+	      if (!options.silent) {
+	        var model = getModel(this);
+	        if (model) {
+	          model.setTerminalPort(this, port, isSource);
+	          scheduleSetTerminal.call(this, true);
+	        }
+	      }
+	
+	      if (!isSetTerminalScheduled.call(this)) {
+	
+	        if (isSource) {
+	          this.sourcePort = port;
+	        } else {
+	          this.targetPort = port;
+	        }
+	
+	        var terminal = this.getTerminal(isSource);
+	        if (terminal) {
+	          terminal.port = port;
+	        }
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'getTerminalPoint',
+	    value: function getTerminalPoint() {
+	      var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	
+	
+	      var point = isSource ? this.sourcePoint : this.targetPoint;
+	
+	      if (!point) {
+	
+	        var terminal = this.getTerminal(isSource);
+	
+	        point = terminal && terminal.point || null;
+	      }
+	
+	      return point;
+	    }
+	  }, {
+	    key: 'setTerminalPoint',
+	    value: function setTerminalPoint(point) {
+	      var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      scheduleSetTerminal.call(this, false);
+	
+	      if (!options.silent) {
+	        var model = getModel(this);
+	        if (model) {
+	          model.setTerminalPoint(this, point, isSource);
+	          scheduleSetTerminal.call(this, true);
+	        }
+	      }
+	
+	      if (!isSetTerminalScheduled.call(this)) {
+	
+	        if (isSource) {
+	          this.sourcePoint = point;
+	        } else {
+	          this.targetPoint = point;
+	        }
+	
+	        var terminal = this.getTerminal(isSource);
+	        if (terminal) {
+	          terminal.point = point;
+	        }
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeFromTerminal',
+	    value: function removeFromTerminal() {
+	      var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      // remove link from terminal
+	      var terminal = this.getTerminal(isSource);
+	      if (terminal) {
+	
+	        scheduleSetTerminal.call(this, false);
+	
+	        if (!options.silent) {
+	          var model = getModel(this, terminal);
+	          if (model) {
+	            model.removeFromTerminal(this, isSource);
+	            scheduleSetTerminal.call(this, true);
+	          }
+	        }
+	
+	        if (!isSetTerminalScheduled.call(this)) {
+	          terminal.removeLink(this, isSource, { silent: true });
+	        }
+	      }
+	
+	      return this;
 	    }
 	
-	    // static
+	    // node
+	    // ----
+	
+	  }, {
+	    key: 'isNode',
+	    value: function isNode() {
+	
+	      return false;
+	    }
+	  }, {
+	    key: 'getLinks',
+	    value: function getLinks() {
+	
+	      return this.links || [];
+	    }
+	  }, {
+	    key: 'getLinkCount',
+	    value: function getLinkCount() {
+	
+	      return this.getLinks().length;
+	    }
+	  }, {
+	    key: 'indexOfLink',
+	    value: function indexOfLink(link) {
+	
+	      return utils.indexOf(this.links, link);
+	    }
+	  }, {
+	    key: 'getLinkAt',
+	    value: function getLinkAt(index) {
+	
+	      return this.links ? this.links[index] : null;
+	    }
+	  }, {
+	    key: 'eachLink',
+	    value: function eachLink(iterator, context) {
+	
+	      return utils.forEach(this.links, iterator, context);
+	    }
+	  }, {
+	    key: 'filterLink',
+	    value: function filterLink(iterator, context) {
+	
+	      return utils.filter(this.links, iterator, context);
+	    }
+	  }, {
+	    key: 'addLink',
+	    value: function addLink(link) {
+	      var outgoing = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      if (!link) {
+	        return this;
+	      }
+	
+	      scheduleSetTerminal.call(link, false);
+	
+	      if (!options.silent) {
+	        var model = getModel(link, this);
+	        if (model) {
+	          // fully replace the previous terminal
+	          model.setTerminal(link, this, outgoing);
+	          scheduleSetTerminal.call(link, true);
+	        }
+	      }
+	
+	      if (!isSetTerminalScheduled.call(link)) {
+	
+	        link.removeFromTerminal(outgoing, { silent: true });
+	
+	        // when source and target are the same node, these's
+	        // no need to relate link with node once more.
+	        if (!this.links || this.indexOfLink(link) < 0 || link.getTerminalNode(!outgoing) !== this) {
+	
+	          if (!this.links) {
+	            this.links = [];
+	          }
+	
+	          // links are unordered, push it to the array directly.
+	          this.links.push(link);
+	        }
+	
+	        link.setTerminal(this, outgoing, { silent: true });
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeLink',
+	    value: function removeLink(link) {
+	      var outgoing = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      if (!link) {
+	        return this;
+	      }
+	
+	      scheduleSetTerminal.call(link, false);
+	
+	      if (!options.silent) {
+	        var model = getModel(link, this);
+	        if (model) {
+	          // fully remove the previous terminal
+	          model.setTerminal(link, null, outgoing);
+	          scheduleSetTerminal.call(link, true);
+	        }
+	      }
+	
+	      if (!isSetTerminalScheduled.call(link)) {
+	
+	        // when the source and target are the same, do not remove it
+	        if (this.links && link.getTerminalNode(!outgoing) !== this) {
+	
+	          var index = this.indexOfLink(link);
+	          if (index >= 0) {
+	            this.links.splice(index, 1);
+	          }
+	        }
+	
+	        link.setTerminal(null, outgoing, { silent: true });
+	      }
+	
+	      return this;
+	    }
+	
+	    // children
+	    // --------
+	
+	  }, {
+	    key: 'getChildren',
+	    value: function getChildren() {
+	
+	      return this.children || [];
+	    }
+	  }, {
+	    key: 'getChildCount',
+	    value: function getChildCount() {
+	
+	      return this.getChildren().length;
+	    }
+	  }, {
+	    key: 'indexOfChild',
+	    value: function indexOfChild(child) {
+	
+	      return utils.indexOf(this.children, child);
+	    }
+	  }, {
+	    key: 'getChildAt',
+	    value: function getChildAt(index) {
+	
+	      return this.children ? this.children[index] : null;
+	    }
+	  }, {
+	    key: 'eachChild',
+	    value: function eachChild(iterator, context) {
+	
+	      return utils.forEach(this.children, iterator, context);
+	    }
+	  }, {
+	    key: 'filterChild',
+	    value: function filterChild(iterator, context) {
+	
+	      return utils.filter(this.children, iterator, context);
+	    }
+	  }, {
+	    key: 'insertChild',
+	    value: function insertChild(child, index) {
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      if (!child) {
+	        return this;
+	      }
+	
+	      if (utils.isObject(index)) {
+	        options = index;
+	      }
+	
+	      scheduleSetParent.call(child, false);
+	
+	      if (!options.silent) {
+	        child.setParent(this, index);
+	      }
+	
+	      if (!isSetParentScheduled.call(child)) {
+	        // if unscheduled, insert it directly
+	        _insertChild.call(this, child, index);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeChild',
+	    value: function removeChild(child) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      return this.removeChildAt(this.indexOfChild(child), options);
+	    }
+	  }, {
+	    key: 'removeChildAt',
+	    value: function removeChildAt(index) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var child = this.getChildAt(index);
+	      if (child) {
+	
+	        scheduleSetParent.call(child, false);
+	
+	        if (!options.silent) {
+	          child.setParent(null);
+	        }
+	
+	        if (!isSetParentScheduled.call(child)) {
+	          this.children.splice(index, 1);
+	          child.parent = null;
+	        }
+	      }
+	
+	      // return the removed child
+	      return child;
+	    }
+	
+	    // parent
 	    // ------
 	
-	    _createClass(Cell, [{
-	        key: 'isLink',
+	  }, {
+	    key: 'getParent',
+	    value: function getParent() {
+	
+	      return this.parent;
+	    }
+	  }, {
+	    key: 'setParent',
+	    value: function setParent(parent, index) {
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      scheduleSetParent.call(this, false);
+	
+	      // try to schedule a change
+	      if (!options.silent) {
+	
+	        // this cell maybe not in a model, try get parent's model
+	        var model = getModel(this, parent);
+	        // schedule a change
+	        if (model) {
+	          model.setParent(this, parent, index);
+	          scheduleSetParent.call(this, true);
+	        }
+	      }
+	
+	      if (!isSetParentScheduled.call(this)) {
+	        if (parent) {
+	          _insertChild.call(parent, this, index);
+	        } else {
+	          this.removeFromParent({ silent: true });
+	        }
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeFromParent',
+	    value: function removeFromParent() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-	
-	        // link
-	        // ----
-	
-	        value: function isLink() {
-	
-	            return false;
-	        }
-	    }, {
-	        key: 'getTerminal',
-	        value: function getTerminal() {
-	            var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-	
-	
-	            return isSource ? this.source : this.target;
-	        }
-	    }, {
-	        key: 'setTerminal',
-	        value: function setTerminal(terminal) {
-	            var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            scheduleSetTerminal.call(this, false);
-	
-	            if (!options.silent) {
-	
-	                var model = getModel(this, terminal);
-	                if (model) {
-	                    // fully replace the previous terminal
-	                    model.setTerminal(this, terminal, isSource);
-	                    scheduleSetTerminal.call(this, true);
-	                }
-	            }
-	
-	            if (!isSetTerminalScheduled.call(this)) {
-	
-	                terminal = terminal ? new _Terminal2.default(terminal) : null;
-	
-	                if (isSource) {
-	                    this.source = terminal;
-	
-	                    if (terminal) {
-	                        this.sourceNode = terminal.node;
-	                        this.sourcePort = terminal.port;
-	                        this.sourcePoint = terminal.point;
-	                    } else {
-	                        this.sourceNode = null;
-	                        this.sourcePort = null;
-	                        this.sourcePoint = null;
-	                    }
-	                } else {
-	                    this.target = terminal;
-	
-	                    if (terminal) {
-	                        this.targetNode = terminal.node;
-	                        this.targetPort = terminal.port;
-	                        this.targetPoint = terminal.point;
-	                    } else {
-	                        this.targetNode = null;
-	                        this.targetPort = null;
-	                        this.targetPoint = null;
-	                    }
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'getTerminalNode',
-	        value: function getTerminalNode() {
-	            var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-	
-	
-	            var node = isSource ? this.sourceNode : this.targetNode;
-	
-	            if (!node) {
-	
-	                var terminal = this.getTerminal(isSource);
-	
-	                node = terminal && terminal.node || null;
-	            }
-	
-	            return node;
-	        }
-	    }, {
-	        key: 'setTerminalNode',
-	        value: function setTerminalNode(node) {
-	            var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            scheduleSetTerminal.call(this, false);
-	
-	            if (!options.silent) {
-	                var model = getModel(this, node);
-	                if (model) {
-	                    model.setTerminalNode(this, node, isSource);
-	                    scheduleSetTerminal.call(this, true);
-	                }
-	            }
-	
-	            if (!isSetTerminalScheduled.call(this)) {
-	
-	                if (isSource) {
-	                    this.sourceNode = node;
-	                } else {
-	                    this.targetNode = node;
-	                }
-	
-	                var terminal = this.getTerminal(isSource);
-	                if (terminal) {
-	                    terminal.node = node;
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'getTerminalPort',
-	        value: function getTerminalPort() {
-	            var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-	
-	
-	            var port = isSource ? this.sourcePort : this.targetPort;
-	
-	            if (!port) {
-	
-	                var terminal = this.getTerminal(isSource);
-	
-	                port = terminal && terminal.port || null;
-	            }
-	
-	            return port;
-	        }
-	    }, {
-	        key: 'setTerminalPort',
-	        value: function setTerminalPort(port) {
-	            var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            // partial replace the terminal port
-	
-	            scheduleSetTerminal.call(this, false);
-	
-	            if (!options.silent) {
-	                var model = getModel(this);
-	                if (model) {
-	                    model.setTerminalPort(this, port, isSource);
-	                    scheduleSetTerminal.call(this, true);
-	                }
-	            }
-	
-	            if (!isSetTerminalScheduled.call(this)) {
-	
-	                if (isSource) {
-	                    this.sourcePort = port;
-	                } else {
-	                    this.targetPort = port;
-	                }
-	
-	                var terminal = this.getTerminal(isSource);
-	                if (terminal) {
-	                    terminal.port = port;
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'getTerminalPoint',
-	        value: function getTerminalPoint() {
-	            var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-	
-	
-	            var point = isSource ? this.sourcePoint : this.targetPoint;
-	
-	            if (!point) {
-	
-	                var terminal = this.getTerminal(isSource);
-	
-	                point = terminal && terminal.point || null;
-	            }
-	
-	            return point;
-	        }
-	    }, {
-	        key: 'setTerminalPoint',
-	        value: function setTerminalPoint(point) {
-	            var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            scheduleSetTerminal.call(this, false);
-	
-	            if (!options.silent) {
-	                var model = getModel(this);
-	                if (model) {
-	                    model.setTerminalPoint(this, point, isSource);
-	                    scheduleSetTerminal.call(this, true);
-	                }
-	            }
-	
-	            if (!isSetTerminalScheduled.call(this)) {
-	
-	                if (isSource) {
-	                    this.sourcePoint = point;
-	                } else {
-	                    this.targetPoint = point;
-	                }
-	
-	                var terminal = this.getTerminal(isSource);
-	                if (terminal) {
-	                    terminal.point = point;
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeFromTerminal',
-	        value: function removeFromTerminal() {
-	            var isSource = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            // remove link from terminal
-	            var terminal = this.getTerminal(isSource);
-	            if (terminal) {
-	
-	                scheduleSetTerminal.call(this, false);
-	
-	                if (!options.silent) {
-	                    var model = getModel(this, terminal);
-	                    if (model) {
-	                        model.removeFromTerminal(this, isSource);
-	                        scheduleSetTerminal.call(this, true);
-	                    }
-	                }
-	
-	                if (!isSetTerminalScheduled.call(this)) {
-	                    terminal.removeLink(this, isSource, { silent: true });
-	                }
-	            }
-	
-	            return this;
-	        }
-	
-	        // node
-	        // ----
-	
-	    }, {
-	        key: 'isNode',
-	        value: function isNode() {
-	
-	            return false;
-	        }
-	    }, {
-	        key: 'getLinks',
-	        value: function getLinks() {
-	
-	            return this.links || [];
-	        }
-	    }, {
-	        key: 'getLinkCount',
-	        value: function getLinkCount() {
-	
-	            return this.getLinks().length;
-	        }
-	    }, {
-	        key: 'indexOfLink',
-	        value: function indexOfLink(link) {
-	
-	            return utils.indexOf(this.links, link);
-	        }
-	    }, {
-	        key: 'getLinkAt',
-	        value: function getLinkAt(index) {
-	
-	            return this.links ? this.links[index] : null;
-	        }
-	    }, {
-	        key: 'eachLink',
-	        value: function eachLink(iterator, context) {
-	
-	            return utils.forEach(this.links, iterator, context);
-	        }
-	    }, {
-	        key: 'filterLink',
-	        value: function filterLink(iterator, context) {
-	
-	            return utils.filter(this.links, iterator, context);
-	        }
-	    }, {
-	        key: 'addLink',
-	        value: function addLink(link) {
-	            var outgoing = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            if (!link) {
-	                return this;
-	            }
-	
-	            scheduleSetTerminal.call(link, false);
-	
-	            if (!options.silent) {
-	                var model = getModel(link, this);
-	                if (model) {
-	                    // fully replace the previous terminal
-	                    model.setTerminal(link, this, outgoing);
-	                    scheduleSetTerminal.call(link, true);
-	                }
-	            }
-	
-	            if (!isSetTerminalScheduled.call(link)) {
-	
-	                link.removeFromTerminal(outgoing, { silent: true });
-	
-	                // when source and target are the same node, these's
-	                // no need to relate link with node once more.
-	                if (!this.links || this.indexOfLink(link) < 0 || link.getTerminalNode(!outgoing) !== this) {
-	
-	                    if (!this.links) {
-	                        this.links = [];
-	                    }
-	
-	                    // links are unordered, push it to the array directly.
-	                    this.links.push(link);
-	                }
-	
-	                link.setTerminal(this, outgoing, { silent: true });
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeLink',
-	        value: function removeLink(link) {
-	            var outgoing = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            if (!link) {
-	                return this;
-	            }
-	
-	            scheduleSetTerminal.call(link, false);
-	
-	            if (!options.silent) {
-	                var model = getModel(link, this);
-	                if (model) {
-	                    // fully remove the previous terminal
-	                    model.setTerminal(link, null, outgoing);
-	                    scheduleSetTerminal.call(link, true);
-	                }
-	            }
-	
-	            if (!isSetTerminalScheduled.call(link)) {
-	
-	                // when the source and target are the same, do not remove it
-	                if (this.links && link.getTerminalNode(!outgoing) !== this) {
-	
-	                    var index = this.indexOfLink(link);
-	                    if (index >= 0) {
-	                        this.links.splice(index, 1);
-	                    }
-	                }
-	
-	                link.setTerminal(null, outgoing, { silent: true });
-	            }
-	
-	            return this;
-	        }
-	
-	        // children
-	        // --------
-	
-	    }, {
-	        key: 'getChildren',
-	        value: function getChildren() {
-	
-	            return this.children || [];
-	        }
-	    }, {
-	        key: 'getChildCount',
-	        value: function getChildCount() {
-	
-	            return this.getChildren().length;
-	        }
-	    }, {
-	        key: 'indexOfChild',
-	        value: function indexOfChild(child) {
-	
-	            return utils.indexOf(this.children, child);
-	        }
-	    }, {
-	        key: 'getChildAt',
-	        value: function getChildAt(index) {
-	
-	            return this.children ? this.children[index] : null;
-	        }
-	    }, {
-	        key: 'eachChild',
-	        value: function eachChild(iterator, context) {
-	
-	            return utils.forEach(this.children, iterator, context);
-	        }
-	    }, {
-	        key: 'filterChild',
-	        value: function filterChild(iterator, context) {
-	
-	            return utils.filter(this.children, iterator, context);
-	        }
-	    }, {
-	        key: 'insertChild',
-	        value: function insertChild(child, index) {
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            if (!child) {
-	                return this;
-	            }
-	
-	            if (utils.isObject(index)) {
-	                options = index;
-	            }
-	
-	            scheduleSetParent.call(child, false);
-	
-	            if (!options.silent) {
-	                child.setParent(this, index);
-	            }
-	
-	            if (!isSetParentScheduled.call(child)) {
-	                // if unscheduled, insert it directly
-	                _insertChild.call(this, child, index);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeChild',
-	        value: function removeChild(child) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            return this.removeChildAt(this.indexOfChild(child), options);
-	        }
-	    }, {
-	        key: 'removeChildAt',
-	        value: function removeChildAt(index) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var child = this.getChildAt(index);
-	            if (child) {
-	
-	                scheduleSetParent.call(child, false);
-	
-	                if (!options.silent) {
-	                    child.setParent(null);
-	                }
-	
-	                if (!isSetParentScheduled.call(child)) {
-	                    this.children.splice(index, 1);
-	                    child.parent = null;
-	                }
-	            }
-	
-	            // return the removed child
-	            return child;
-	        }
-	
-	        // parent
-	        // ------
-	
-	    }, {
-	        key: 'getParent',
-	        value: function getParent() {
-	
-	            return this.parent;
-	        }
-	    }, {
-	        key: 'setParent',
-	        value: function setParent(parent, index) {
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            scheduleSetParent.call(this, false);
-	
-	            // try to schedule a change
-	            if (!options.silent) {
-	
-	                // this cell maybe not in a model, try get parent's model
-	                var model = getModel(this, parent);
-	                // schedule a change
-	                if (model) {
-	                    model.setParent(this, parent, index);
-	                    scheduleSetParent.call(this, true);
-	                }
-	            }
-	
-	            if (!isSetParentScheduled.call(this)) {
-	                if (parent) {
-	                    _insertChild.call(parent, this, index);
-	                } else {
-	                    this.removeFromParent({ silent: true });
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeFromParent',
-	        value: function removeFromParent() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-	
-	            if (this.parent) {
-	
-	                var scheduled = false;
-	
-	                // try to schedule a change
-	                if (!options.silent) {
-	                    var model = getModel(this, this.parent);
-	                    if (model) {
-	                        model.removeCell(this);
-	                        scheduled = true;
-	                    }
-	                }
-	
-	                if (!scheduled) {
-	                    this.parent.removeChild(this, { silent: true });
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'isOrphan',
-	        value: function isOrphan() {
-	
-	            return utils.isNil(this.parent);
-	        }
-	    }, {
-	        key: 'isAncestor',
-	        value: function isAncestor(descendant) {
-	
-	            if (!descendant) {
-	                return false;
-	            }
-	
-	            while (descendant && descendant !== this) {
-	                descendant = descendant.parent;
-	            }
-	
-	            return descendant === this;
-	        }
-	    }, {
-	        key: 'contains',
-	        value: function contains(descendant) {
-	
-	            return this.isAncestor(this, descendant);
-	        }
-	    }, {
-	        key: 'getAncestors',
-	        value: function getAncestors() {
-	
-	            var result = [];
-	            var parent = this.parent;
-	
-	            while (parent) {
-	                result.push(parent);
-	                parent = parent.parent;
-	            }
-	
-	            return result;
-	        }
-	    }, {
-	        key: 'getDescendants',
-	        value: function getDescendants() {
-	            var _this = this;
-	
-	            var result = [];
-	
-	            this.eachChild(function (child) {
-	                result.push(child);
-	                result = result.concat(_this.getDescendants(child));
-	            }, this);
-	
-	            return result;
-	        }
-	
-	        // geometry
-	        // --------
-	
-	    }, {
-	        key: 'getSize',
-	        value: function getSize(raw) {
-	
-	            return raw ? this.metadata.size : this.size;
-	        }
-	    }, {
-	        key: '_setSize',
-	        value: function _setSize(size) {
-	
-	            this.metadata.size = size;
-	        }
-	    }, {
-	        key: 'setSize',
-	        value: function setSize(size) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var scheduled = false;
-	
-	            size = {
-	                width: size.width,
-	                height: size.height,
-	                relative: size.relative === true
-	            };
-	
-	            if (!options.silent) {
-	                var model = this.getModel();
-	                if (model) {
-	                    model.setSize(this, size);
-	                    scheduled = true;
-	                }
-	            }
-	
-	            if (!scheduled) {
-	                this._setSize(size);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'resize',
-	        value: function resize(width, height) {
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            return this.setSize({ width: width, height: height }, options);
-	        }
-	    }, {
-	        key: 'getPosition',
-	        value: function getPosition(raw) {
-	
-	            return raw ? this.metadata.position : this.position;
-	        }
-	    }, {
-	        key: '_setPosition',
-	        value: function _setPosition(position) {
-	
-	            this.metadata.position = position;
-	        }
-	    }, {
-	        key: 'setPosition',
-	        value: function setPosition(position) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var scheduled = false;
-	
-	            position = {
-	                x: position.x,
-	                y: position.y,
-	                relative: position.relative === true
-	            };
-	
-	            if (!options.silent) {
-	                var model = this.getModel();
-	                if (model) {
-	                    model.setPosition(this, position);
-	                    scheduled = true;
-	                }
-	            }
-	
-	            if (!scheduled) {
-	                this._setPosition(position);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'translate',
-	        value: function translate(x, y) {
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            return this.setPosition({ x: x, y: y }, options);
-	        }
-	    }, {
-	        key: 'getRotation',
-	        value: function getRotation(raw) {
-	
-	            return raw ? this.metadata.rotation : this.rotation;
-	        }
-	    }, {
-	        key: '_setRotation',
-	        value: function _setRotation(rotation) {
-	
-	            this.metadata.rotation = rotation;
-	        }
-	    }, {
-	        key: 'setRotation',
-	        value: function setRotation(rotation) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var scheduled = false;
-	
-	            rotation = {
-	                angle: rotation.angle,
-	                relative: rotation.relative === true
-	            };
-	
-	            if (!options.silent) {
-	                var model = this.getModel();
-	                if (model) {
-	                    model.setRotation(this, rotation);
-	                    scheduled = true;
-	                }
-	            }
-	
-	            if (!scheduled) {
-	                this._setRotation(rotation);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'rotate',
-	        value: function rotate(angle) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            return this.setRotation({ angle: angle }, options);
-	        }
-	    }, {
-	        key: 'getGeometry',
-	        value: function getGeometry(raw) {
-	
-	            return {
-	                size: this.getSize(raw),
-	                position: this.getPosition(raw),
-	                rotation: this.getRotation(raw)
-	            };
-	        }
-	    }, {
-	        key: '_setGeometry',
-	        value: function _setGeometry(geom) {
-	            var _this2 = this;
-	
-	            utils.forEach(['size', 'position', 'rotation'], function (key) {
-	
-	                var val = geom[key];
-	                if (val) {
-	                    _this2['_set' + utils.ucFirst(key)](val);
-	                }
-	            }, this);
-	        }
-	    }, {
-	        key: 'setGeometry',
-	        value: function setGeometry(geom) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var scheduled = false;
-	
-	            if (!options.silent) {
-	
-	                var model = this.getModel();
-	                if (model) {
-	                    model.setGeometry(this, geom);
-	                    scheduled = true;
-	                }
-	            }
-	
-	            if (!scheduled) {
-	                this._setGeometry(geom);
-	            }
-	
-	            return this;
-	        }
-	
-	        // collapse
-	        // --------
-	
-	    }, {
-	        key: 'isCollapsed',
-	        value: function isCollapsed() {
-	
-	            return this.metadata.collapsed === true;
-	        }
-	    }, {
-	        key: '_setCollapsed',
-	        value: function _setCollapsed(collapsed) {
-	
-	            this.metadata.collapsed = collapsed;
-	        }
-	    }, {
-	        key: 'setCollapsed',
-	        value: function setCollapsed(collapsed) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var scheduled = false;
-	
-	            if (!options.silent) {
-	
-	                var model = getModel(this);
-	                if (model) {
-	                    model.setCollapsed(this, collapsed);
-	                    scheduled = true;
-	                }
-	            }
-	
-	            if (!scheduled) {
-	                this._setCollapsed(collapsed);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'collapse',
-	        value: function collapse() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-	
-	            return this.setCollapsed(true, options);
-	        }
-	    }, {
-	        key: 'expand',
-	        value: function expand() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-	
-	            return this.setCollapsed(false, options);
+	
+	      if (this.parent) {
+	
+	        var scheduled = false;
+	
+	        // try to schedule a change
+	        if (!options.silent) {
+	          var model = getModel(this, this.parent);
+	          if (model) {
+	            model.removeCell(this);
+	            scheduled = true;
+	          }
+	        }
+	
+	        if (!scheduled) {
+	          this.parent.removeChild(this, { silent: true });
+	        }
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'isOrphan',
+	    value: function isOrphan() {
+	
+	      return utils.isNil(this.parent);
+	    }
+	  }, {
+	    key: 'isAncestor',
+	    value: function isAncestor(descendant) {
+	
+	      if (!descendant) {
+	        return false;
+	      }
+	
+	      while (descendant && descendant !== this) {
+	        descendant = descendant.parent;
+	      }
+	
+	      return descendant === this;
+	    }
+	  }, {
+	    key: 'contains',
+	    value: function contains(descendant) {
+	
+	      return this.isAncestor(this, descendant);
+	    }
+	  }, {
+	    key: 'getAncestors',
+	    value: function getAncestors() {
+	
+	      var result = [];
+	      var parent = this.parent;
+	
+	      while (parent) {
+	        result.push(parent);
+	        parent = parent.parent;
+	      }
+	
+	      return result;
+	    }
+	  }, {
+	    key: 'getDescendants',
+	    value: function getDescendants() {
+	      var _this = this;
+	
+	      var result = [];
+	
+	      this.eachChild(function (child) {
+	        result.push(child);
+	        result = result.concat(_this.getDescendants(child));
+	      }, this);
+	
+	      return result;
+	    }
+	
+	    // geometry
+	    // --------
+	
+	  }, {
+	    key: 'getSize',
+	    value: function getSize(raw) {
+	
+	      return raw ? this.metadata.size : this.size;
+	    }
+	  }, {
+	    key: '_setSize',
+	    value: function _setSize(size) {
+	
+	      this.metadata.size = size;
+	    }
+	  }, {
+	    key: 'setSize',
+	    value: function setSize(size) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var scheduled = false;
+	
+	      size = {
+	        width: size.width,
+	        height: size.height,
+	        relative: size.relative === true
+	      };
+	
+	      if (!options.silent) {
+	        var model = this.getModel();
+	        if (model) {
+	          model.setSize(this, size);
+	          scheduled = true;
+	        }
+	      }
+	
+	      if (!scheduled) {
+	        this._setSize(size);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'resize',
+	    value: function resize(width, height) {
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      return this.setSize({ width: width, height: height }, options);
+	    }
+	  }, {
+	    key: 'getPosition',
+	    value: function getPosition(raw) {
+	
+	      return raw ? this.metadata.position : this.position;
+	    }
+	  }, {
+	    key: '_setPosition',
+	    value: function _setPosition(position) {
+	
+	      this.metadata.position = position;
+	    }
+	  }, {
+	    key: 'setPosition',
+	    value: function setPosition(position) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var scheduled = false;
+	
+	      position = {
+	        x: position.x,
+	        y: position.y,
+	        relative: position.relative === true
+	      };
+	
+	      if (!options.silent) {
+	        var model = this.getModel();
+	        if (model) {
+	          model.setPosition(this, position);
+	          scheduled = true;
+	        }
+	      }
+	
+	      if (!scheduled) {
+	        this._setPosition(position);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'translate',
+	    value: function translate(x, y) {
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      return this.setPosition({ x: x, y: y }, options);
+	    }
+	  }, {
+	    key: 'getRotation',
+	    value: function getRotation(raw) {
+	
+	      return raw ? this.metadata.rotation : this.rotation;
+	    }
+	  }, {
+	    key: '_setRotation',
+	    value: function _setRotation(rotation) {
+	
+	      this.metadata.rotation = rotation;
+	    }
+	  }, {
+	    key: 'setRotation',
+	    value: function setRotation(rotation) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var scheduled = false;
+	
+	      rotation = {
+	        angle: rotation.angle,
+	        relative: rotation.relative === true
+	      };
+	
+	      if (!options.silent) {
+	        var model = this.getModel();
+	        if (model) {
+	          model.setRotation(this, rotation);
+	          scheduled = true;
+	        }
+	      }
+	
+	      if (!scheduled) {
+	        this._setRotation(rotation);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'rotate',
+	    value: function rotate(angle) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      return this.setRotation({ angle: angle }, options);
+	    }
+	  }, {
+	    key: 'getGeometry',
+	    value: function getGeometry(raw) {
+	
+	      return {
+	        size: this.getSize(raw),
+	        position: this.getPosition(raw),
+	        rotation: this.getRotation(raw)
+	      };
+	    }
+	  }, {
+	    key: '_setGeometry',
+	    value: function _setGeometry(geom) {
+	      var _this2 = this;
+	
+	      utils.forEach(['size', 'position', 'rotation'], function (key) {
+	
+	        var val = geom[key];
+	        if (val) {
+	          _this2['_set' + utils.ucFirst(key)](val);
+	        }
+	      }, this);
+	    }
+	  }, {
+	    key: 'setGeometry',
+	    value: function setGeometry(geom) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var scheduled = false;
+	
+	      if (!options.silent) {
+	
+	        var model = this.getModel();
+	        if (model) {
+	          model.setGeometry(this, geom);
+	          scheduled = true;
+	        }
+	      }
+	
+	      if (!scheduled) {
+	        this._setGeometry(geom);
+	      }
+	
+	      return this;
+	    }
+	
+	    // collapse
+	    // --------
+	
+	  }, {
+	    key: 'isCollapsed',
+	    value: function isCollapsed() {
+	
+	      return this.metadata.collapsed === true;
+	    }
+	  }, {
+	    key: '_setCollapsed',
+	    value: function _setCollapsed(collapsed) {
+	
+	      this.metadata.collapsed = collapsed;
+	    }
+	  }, {
+	    key: 'setCollapsed',
+	    value: function setCollapsed(collapsed) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var scheduled = false;
+	
+	      if (!options.silent) {
+	
+	        var model = getModel(this);
+	        if (model) {
+	          model.setCollapsed(this, collapsed);
+	          scheduled = true;
 	        }
-	    }, {
-	        key: 'toggleCollapse',
-	        value: function toggleCollapse() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      }
+	
+	      if (!scheduled) {
+	        this._setCollapsed(collapsed);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'collapse',
+	    value: function collapse() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	      return this.setCollapsed(true, options);
+	    }
+	  }, {
+	    key: 'expand',
+	    value: function expand() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
 	
-	            return this.isCollapsed() ? this.expand(options) : this.collapse(options);
-	        }
+	      return this.setCollapsed(false, options);
+	    }
+	  }, {
+	    key: 'toggleCollapse',
+	    value: function toggleCollapse() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-	        // visible
-	        // -------
 	
-	    }, {
-	        key: 'isVisible',
-	        value: function isVisible() {
-	
-	            return this.visible !== false;
-	        }
-	    }, {
-	        key: '_setVisible',
-	        value: function _setVisible(visible) {
-	
-	            this.visible = this.metadata.visible = visible ? true : false;
-	        }
-	    }, {
-	        key: 'setVisible',
-	        value: function setVisible(visible) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	      return this.isCollapsed() ? this.expand(options) : this.collapse(options);
+	    }
 	
+	    // visible
+	    // -------
 	
-	            var scheduled = false;
+	  }, {
+	    key: 'isVisible',
+	    value: function isVisible() {
 	
-	            if (!options.silent) {
+	      return this.visible !== false;
+	    }
+	  }, {
+	    key: '_setVisible',
+	    value: function _setVisible(visible) {
 	
-	                var model = getModel(this);
-	                if (model) {
-	                    model.setVisible(this, visible);
-	                    scheduled = true;
-	                }
-	            }
+	      this.visible = this.metadata.visible = visible ? true : false;
+	    }
+	  }, {
+	    key: 'setVisible',
+	    value: function setVisible(visible) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
-	            if (!scheduled) {
-	                this._setVisible(visible);
-	            }
+	
+	      var scheduled = false;
 	
-	            return this;
+	      if (!options.silent) {
+	
+	        var model = getModel(this);
+	        if (model) {
+	          model.setVisible(this, visible);
+	          scheduled = true;
 	        }
-	    }, {
-	        key: 'show',
-	        value: function show() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      }
 	
+	      if (!scheduled) {
+	        this._setVisible(visible);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'show',
+	    value: function show() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-	            return this.setVisible(true, options);
-	        }
-	    }, {
-	        key: 'hide',
-	        value: function hide() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
+	      return this.setVisible(true, options);
+	    }
+	  }, {
+	    key: 'hide',
+	    value: function hide() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	      return this.setVisible(false, options);
+	    }
+	  }, {
+	    key: 'toggleVisible',
+	    value: function toggleVisible() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	      return this.isVisible() ? this.hide(options) : this.show(options);
+	    }
+	
+	    // attribute
+	    // ---------
+	
+	  }, {
+	    key: 'getAttribute',
+	    value: function getAttribute() {
+	
+	      return this.metadata.attrs;
+	    }
+	  }, {
+	    key: '_setAttribute',
+	    value: function _setAttribute(attrs) {
+	
+	      this.metadata.attrs = utils.merge({}, this.getAttribute(), attrs);
+	    }
+	  }, {
+	    key: 'setAttribute',
+	    value: function setAttribute(attrs) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var scheduled = false;
+	
+	      if (!options.silent) {
+	
+	        var model = this.getModel();
+	        if (model) {
+	          model.setAttribute(this, attrs);
+	          scheduled = true;
+	        }
+	      }
+	
+	      if (!scheduled && this.metadata) {
+	        this._setAttribute(attrs);
+	      }
+	
+	      return this;
+	    }
+	
+	    // access
+	    // ------
+	
+	  }, {
+	    key: 'getId',
+	    value: function getId() {
+	
+	      return this.id;
+	    }
+	  }, {
+	    key: 'setId',
+	    value: function setId(id) {
 	
-	            return this.setVisible(false, options);
-	        }
-	    }, {
-	        key: 'toggleVisible',
-	        value: function toggleVisible() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	      this.id = id;
+	    }
+	  }, {
+	    key: 'getModel',
+	    value: function getModel() {
 	
+	      return this.model;
+	    }
+	  }, {
+	    key: 'setModel',
+	    value: function setModel(model) {
 	
-	            return this.isVisible() ? this.hide(options) : this.show(options);
-	        }
+	      this.model = model || null;
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'addTo',
+	    value: function addTo(parent, index) {
+	      var model = arguments.length <= 2 || arguments[2] === undefined ? this.getModel() : arguments[2];
 	
-	        // attribute
-	        // ---------
+	
+	      if (model) {
+	        model.addCell(this, parent, index);
+	      }
 	
-	    }, {
-	        key: 'getAttribute',
-	        value: function getAttribute() {
+	      return this;
+	    }
+	  }, {
+	    key: 'getView',
+	    value: function getView(paper) {
 	
-	            return this.metadata.attrs;
-	        }
-	    }, {
-	        key: '_setAttribute',
-	        value: function _setAttribute(attrs) {
-	
-	            this.metadata.attrs = utils.merge({}, this.getAttribute(), attrs);
-	        }
-	    }, {
-	        key: 'setAttribute',
-	        value: function setAttribute(attrs) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	      return paper.getView(this);
+	    }
+	  }, {
+	    key: 'getClassName',
+	    value: function getClassName() {
 	
+	      var classNames = this.metadata.classNames;
 	
-	            var scheduled = false;
+	      return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
+	    }
+	  }, {
+	    key: 'getTagName',
+	    value: function getTagName() {
 	
-	            if (!options.silent) {
+	      return this.metadata.tagName || 'g';
+	    }
+	  }, {
+	    key: 'getMarkup',
+	    value: function getMarkup() {
 	
-	                var model = this.getModel();
-	                if (model) {
-	                    model.setAttribute(this, attrs);
-	                    scheduled = true;
-	                }
-	            }
+	      return this.metadata.markup;
+	    }
+	  }, {
+	    key: 'getRenderData',
+	    value: function getRenderData() {
 	
-	            if (!scheduled && this.metadata) {
-	                this._setAttribute(attrs);
-	            }
+	      // get the data for render markup
+	      return this.data;
+	    }
 	
-	            return this;
-	        }
+	    // lang
+	    // ----
 	
-	        // access
-	        // ------
+	  }, {
+	    key: 'valueOf',
+	    value: function valueOf() {
 	
-	    }, {
-	        key: 'getId',
-	        value: function getId() {
+	      return this.data;
+	    }
+	  }, {
+	    key: 'toString',
+	    value: function toString() {
 	
-	            return this.id;
-	        }
-	    }, {
-	        key: 'setId',
-	        value: function setId(id) {
-	
-	            this.id = id;
-	        }
-	    }, {
-	        key: 'getModel',
-	        value: function getModel() {
-	
-	            return this.model;
-	        }
-	    }, {
-	        key: 'setModel',
-	        value: function setModel(model) {
+	      return this.getId() || Object.toString.call(this);
+	    }
+	  }, {
+	    key: 'cloneData',
+	    value: function cloneData() {
 	
-	            this.model = model || null;
+	      var data = this.data;
+	      if (data) {
 	
-	            return this;
+	        if (data.clone && utils.isFunction(data.clone)) {
+	          return data.clone();
 	        }
-	    }, {
-	        key: 'addTo',
-	        value: function addTo(parent, index) {
-	            var model = arguments.length <= 2 || arguments[2] === undefined ? this.getModel() : arguments[2];
 	
-	
-	            if (model) {
-	                model.addCell(this, parent, index);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'getView',
-	        value: function getView(paper) {
-	
-	            return paper.getView(this);
+	        if (utils.isNode(data)) {
+	          return data.cloneNode(true);
 	        }
-	    }, {
-	        key: 'getClassName',
-	        value: function getClassName() {
 	
-	            var classNames = this.metadata.classNames;
-	
-	            return utils.isArray(classNames) ? classNames.join(' ') : classNames || '';
-	        }
-	    }, {
-	        key: 'getTagName',
-	        value: function getTagName() {
-	
-	            return this.metadata.tagName || 'g';
+	        if (utils.isObject(data)) {
+	          return utils.merge({}, data);
 	        }
-	    }, {
-	        key: 'getMarkup',
-	        value: function getMarkup() {
-	
-	            return this.metadata.markup;
-	        }
-	    }, {
-	        key: 'getRenderData',
-	        value: function getRenderData() {
-	
-	            // get the data for render markup
-	            return this.data;
-	        }
-	
-	        // lang
-	        // ----
+	      }
 	
-	    }, {
-	        key: 'valueOf',
-	        value: function valueOf() {
+	      return data;
+	    }
+	  }, {
+	    key: 'clone',
+	    value: function clone(options, withData) {
 	
-	            return this.data;
-	        }
-	    }, {
-	        key: 'toString',
-	        value: function toString() {
-	
-	            return this.getId() || Object.toString.call(this);
-	        }
-	    }, {
-	        key: 'cloneData',
-	        value: function cloneData() {
-	
-	            var data = this.data;
-	            if (data) {
-	
-	                if (data.clone && utils.isFunction(data.clone)) {
-	                    return data.clone();
-	                }
-	
-	                if (utils.isNode(data)) {
-	                    return data.cloneNode(true);
-	                }
-	
-	                if (utils.isObject(data)) {
-	                    return utils.merge({}, data);
-	                }
-	            }
-	
-	            return data;
-	        }
-	    }, {
-	        key: 'clone',
-	        value: function clone(options, withData) {
+	      var metadata = utils.merge({}, this.metadata, options);
 	
-	            var metadata = utils.merge({}, this.metadata, options);
+	      metadata.data = withData === true ? this.cloneData() : this.data;
+	      metadata.visible = this.visible;
 	
-	            metadata.data = withData === true ? this.cloneData() : this.data;
-	            metadata.visible = this.visible;
+	      return new this.constructor(metadata);
+	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
 	
-	            return new this.constructor(metadata);
-	        }
-	    }, {
-	        key: 'destroy',
-	        value: function destroy() {
+	      this.eachChild(function (child) {
+	        child.destroy();
+	      });
 	
-	            this.eachChild(function (child) {
-	                child.destroy();
-	            });
+	      this.eachLink(function (link) {
+	        link.destroy();
+	      });
 	
-	            this.eachLink(function (link) {
-	                link.destroy();
-	            });
+	      this.removeFromTerminal(true).removeFromTerminal(false).removeFromParent();
 	
-	            this.removeFromTerminal(true).removeFromTerminal(false).removeFromParent();
+	      utils.destroy(this);
+	    }
+	  }], [{
+	    key: 'setDefaults',
+	    value: function setDefaults(options) {
 	
-	            utils.destroy(this);
-	        }
-	    }], [{
-	        key: 'setDefaults',
-	        value: function setDefaults(options) {
-	
-	            // update default options
-	            this.defaults = utils.merge({}, this.defaults, options);
-	        }
-	    }]);
+	      // update default options
+	      this.defaults = utils.merge({}, this.defaults, options);
+	    }
+	  }]);
 	
-	    return Cell;
+	  return Cell;
 	}();
 	
 	// exports
@@ -4857,7 +4857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4878,126 +4878,127 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function scheduleSetTerminal(scheduled) {
 	
-	    this.setTerminal.scheduled = scheduled;
+	  this.setTerminal.scheduled = scheduled;
 	
-	    return this;
+	  return this;
 	}
 	
 	function isSetTerminalScheduled() {
 	
-	    return this.setTerminal.scheduled === true;
+	  return this.setTerminal.scheduled === true;
 	}
 	
 	var Terminal = function () {
-	    function Terminal(terminal) {
-	        _classCallCheck(this, Terminal);
+	  function Terminal(terminal) {
+	    _classCallCheck(this, Terminal);
 	
-	        if (terminal instanceof Terminal) {
-	            return terminal;
-	        }
-	
-	        if (terminal) {
-	
-	            if (terminal.isNode && terminal.isNode()) {
-	
-	                this.node = terminal;
-	            } else if (_Point2.default.isPointLike(terminal)) {
-	
-	                this.point = _Point2.default.fromPoint(terminal);
-	            } else if (utils.isObject(terminal)) {
-	                this.node = terminal.node;
-	                this.port = terminal.port;
-	                this.point = _Point2.default.isPointLike(terminal.point) ? _Point2.default.fromPoint(terminal.point) : null;
-	            }
-	        }
+	    if (terminal instanceof Terminal) {
+	      return terminal;
 	    }
 	
-	    _createClass(Terminal, [{
-	        key: 'addLink',
-	        value: function addLink(link) {
-	            var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	    if (terminal) {
+	
+	      if (terminal.isNode && terminal.isNode()) {
+	
+	        this.node = terminal;
+	      } else if (_Point2.default.isPointLike(terminal)) {
+	
+	        this.point = _Point2.default.fromPoint(terminal);
+	      } else if (utils.isObject(terminal)) {
+	
+	        this.node = terminal.node;
+	        this.port = terminal.port;
+	        this.point = _Point2.default.isPointLike(terminal.point) ? _Point2.default.fromPoint(terminal.point) : null;
+	      }
+	    }
+	  }
+	
+	  _createClass(Terminal, [{
+	    key: 'addLink',
+	    value: function addLink(link) {
+	      var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 	
 	
-	            if (link) {
+	      if (link) {
 	
-	                scheduleSetTerminal.call(link, false);
+	        scheduleSetTerminal.call(link, false);
 	
-	                if (!options.silent) {
-	                    var model = link.getModel() || this.getModel();
-	                    if (model) {
-	                        model.setTerminal(link, this, isSource);
-	                        scheduleSetTerminal.call(link, true);
-	                    }
-	                }
-	
-	                if (!isSetTerminalScheduled.call(link)) {
-	
-	                    if (this.node) {
-	                        this.node.addLink(link, isSource, { silent: true });
-	                    }
-	
-	                    link.setTerminal(this, isSource, { silent: true });
-	                }
-	            }
-	
-	            return this;
+	        if (!options.silent) {
+	          var model = link.getModel() || this.getModel();
+	          if (model) {
+	            model.setTerminal(link, this, isSource);
+	            scheduleSetTerminal.call(link, true);
+	          }
 	        }
-	    }, {
-	        key: 'removeLink',
-	        value: function removeLink(link) {
-	            var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 	
+	        if (!isSetTerminalScheduled.call(link)) {
 	
-	            if (link) {
+	          if (this.node) {
+	            this.node.addLink(link, isSource, { silent: true });
+	          }
 	
-	                scheduleSetTerminal.call(link, false);
-	
-	                if (!options.silent) {
-	                    var model = link.getModel() || this.getModel();
-	                    if (model) {
-	                        model.setTerminal(link, null, isSource);
-	                        scheduleSetTerminal.call(link, true);
-	                    }
-	                }
-	
-	                if (!isSetTerminalScheduled.call(link)) {
-	
-	                    if (this.node) {
-	                        this.node.removeLink(link, isSource, { silent: true });
-	                    }
-	
-	                    link.setTerminal(null, isSource, { silent: true });
-	                }
-	            }
-	
-	            return this;
+	          link.setTerminal(this, isSource, { silent: true });
 	        }
-	    }, {
-	        key: 'duplicate',
-	        value: function duplicate(terminal) {
+	      }
 	
-	            var cloned = new Terminal(terminal);
+	      return this;
+	    }
+	  }, {
+	    key: 'removeLink',
+	    value: function removeLink(link) {
+	      var isSource = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 	
-	            // copy the missing properties
-	            utils.forEach(['node', 'port', 'point'], function (key) {
-	                if (this[key] && !cloned[key]) {
-	                    cloned[key] = this[key];
-	                }
-	            }, this);
 	
-	            return cloned;
+	      if (link) {
+	
+	        scheduleSetTerminal.call(link, false);
+	
+	        if (!options.silent) {
+	          var model = link.getModel() || this.getModel();
+	          if (model) {
+	            model.setTerminal(link, null, isSource);
+	            scheduleSetTerminal.call(link, true);
+	          }
 	        }
-	    }, {
-	        key: 'getModel',
-	        value: function getModel() {
 	
-	            return this.node && this.node.getModel();
+	        if (!isSetTerminalScheduled.call(link)) {
+	
+	          if (this.node) {
+	            this.node.removeLink(link, isSource, { silent: true });
+	          }
+	
+	          link.setTerminal(null, isSource, { silent: true });
 	        }
-	    }]);
+	      }
 	
-	    return Terminal;
+	      return this;
+	    }
+	  }, {
+	    key: 'duplicate',
+	    value: function duplicate(terminal) {
+	
+	      var cloned = new Terminal(terminal);
+	
+	      // copy the missing properties
+	      utils.forEach(['node', 'port', 'point'], function (key) {
+	        if (this[key] && !cloned[key]) {
+	          cloned[key] = this[key];
+	        }
+	      }, this);
+	
+	      return cloned;
+	    }
+	  }, {
+	    key: 'getModel',
+	    value: function getModel() {
+	
+	      return this.node && this.node.getModel();
+	    }
+	  }]);
+	
+	  return Terminal;
 	}();
 	
 	// exports
@@ -5375,7 +5376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5403,107 +5404,107 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var Portal = function (_Node) {
-	    _inherits(Portal, _Node);
+	  _inherits(Portal, _Node);
 	
-	    function Portal(options) {
-	        _classCallCheck(this, Portal);
+	  function Portal(options) {
+	    _classCallCheck(this, Portal);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Portal).call(this, options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Portal).call(this, options));
 	
-	        _this.inPorts = (0, _array.map)(_this.metadata.inPorts, function (port) {
-	            return _this.standardizePort(port);
-	        });
-	        _this.outPorts = (0, _array.map)(_this.metadata.outPorts, function (port) {
-	            return _this.standardizePort(port);
-	        });
-	        _this.portById = {};
+	    _this.inPorts = (0, _array.map)(_this.metadata.inPorts, function (port) {
+	      return _this.standardizePort(port);
+	    });
+	    _this.outPorts = (0, _array.map)(_this.metadata.outPorts, function (port) {
+	      return _this.standardizePort(port);
+	    });
+	    _this.portById = {};
 	
-	        (0, _array.forEach)(_this.inPorts, function (port) {
-	            _this.portById[port.id] = port;
-	        });
+	    (0, _array.forEach)(_this.inPorts, function (port) {
+	      _this.portById[port.id] = port;
+	    });
 	
-	        (0, _array.forEach)(_this.outPorts, function (port) {
-	            _this.portById[port.id] = port;
-	        });
-	        return _this;
+	    (0, _array.forEach)(_this.outPorts, function (port) {
+	      _this.portById[port.id] = port;
+	    });
+	    return _this;
+	  }
+	
+	  _createClass(Portal, [{
+	    key: 'eachInPort',
+	    value: function eachInPort(iterator, context) {
+	
+	      (0, _array.forEach)(this.inPorts, iterator, context);
 	    }
+	  }, {
+	    key: 'eachOutPort',
+	    value: function eachOutPort(iterator, context) {
 	
-	    _createClass(Portal, [{
-	        key: 'eachInPort',
-	        value: function eachInPort(iterator, context) {
+	      (0, _array.forEach)(this.outPorts, iterator, context);
+	    }
+	  }, {
+	    key: 'getInPorts',
+	    value: function getInPorts() {
 	
-	            (0, _array.forEach)(this.inPorts, iterator, context);
-	        }
-	    }, {
-	        key: 'eachOutPort',
-	        value: function eachOutPort(iterator, context) {
+	      return this.inPorts;
+	    }
+	  }, {
+	    key: 'getOutPorts',
+	    value: function getOutPorts() {
 	
-	            (0, _array.forEach)(this.outPorts, iterator, context);
-	        }
-	    }, {
-	        key: 'getInPorts',
-	        value: function getInPorts() {
+	      return this.outPorts;
+	    }
+	  }, {
+	    key: 'getPortById',
+	    value: function getPortById(id) {
 	
-	            return this.inPorts;
-	        }
-	    }, {
-	        key: 'getOutPorts',
-	        value: function getOutPorts() {
+	      return this.portById[id] || null;
+	    }
+	  }, {
+	    key: 'isInPort',
+	    value: function isInPort(port) {
 	
-	            return this.outPorts;
-	        }
-	    }, {
-	        key: 'getPortById',
-	        value: function getPortById(id) {
+	      return (0, _array.some)(this.inPorts, function (item) {
+	        return item.id === port.id;
+	      });
+	    }
+	  }, {
+	    key: 'isOutPort',
+	    value: function isOutPort(port) {
 	
-	            return this.portById[id] || null;
-	        }
-	    }, {
-	        key: 'isInPort',
-	        value: function isInPort(port) {
+	      return (0, _array.some)(this.outPorts, function (item) {
+	        return item.id === port.id;
+	      });
+	    }
+	  }, {
+	    key: 'standardizePort',
+	    value: function standardizePort(port) {
 	
-	            return (0, _array.some)(this.inPorts, function (item) {
-	                return item.id === port.id;
-	            });
-	        }
-	    }, {
-	        key: 'isOutPort',
-	        value: function isOutPort(port) {
+	      if (!(0, _lang.isObject)(port)) {
+	        port = { id: port };
+	      }
 	
-	            return (0, _array.some)(this.outPorts, function (item) {
-	                return item.id === port.id;
-	            });
-	        }
-	    }, {
-	        key: 'standardizePort',
-	        value: function standardizePort(port) {
+	      if (!port.id) {
+	        port.id = (0, _string.uuid)();
+	      }
 	
-	            if (!(0, _lang.isObject)(port)) {
-	                port = { id: port };
-	            }
+	      return port;
+	    }
+	  }, {
+	    key: 'getPortMarkup',
+	    value: function getPortMarkup() {
 	
-	            if (!port.id) {
-	                port.id = (0, _string.uuid)();
-	            }
+	      return this.metadata.portMarkup;
+	    }
+	  }]);
 	
-	            return port;
-	        }
-	    }, {
-	        key: 'getPortMarkup',
-	        value: function getPortMarkup() {
-	
-	            return this.metadata.portMarkup;
-	        }
-	    }]);
-	
-	    return Portal;
+	  return Portal;
 	}(_Node3.default);
 	
 	Portal.setDefaults({
-	    portMarkup: '',
-	    inPorts: [],
-	    outPorts: [],
-	    view: _PortalView2.default
+	  portMarkup: '',
+	  inPorts: [],
+	  outPorts: [],
+	  view: _PortalView2.default
 	});
 	
 	// exports
@@ -8670,7 +8671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.changes = undefined;
 	
@@ -8709,14 +8710,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var changes = {
-	    Change: _Change2.default,
-	    RootChange: _RootChange2.default,
-	    ChildChange: _ChildChange2.default,
-	    VisibleChange: _VisibleChange2.default,
-	    TerminalChange: _TerminalChange2.default,
-	    GeometryChange: _GeometryChange2.default,
-	    CollapseChange: _CollapseChange2.default,
-	    ChangeCollection: _ChangeCollection2.default
+	  Change: _Change2.default,
+	  RootChange: _RootChange2.default,
+	  ChildChange: _ChildChange2.default,
+	  VisibleChange: _VisibleChange2.default,
+	  TerminalChange: _TerminalChange2.default,
+	  GeometryChange: _GeometryChange2.default,
+	  CollapseChange: _CollapseChange2.default,
+	  ChangeCollection: _ChangeCollection2.default
 	};
 	
 	exports.changes = changes;
@@ -8728,42 +8729,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	// Abstract class for all changes
-	
 	var Change = function () {
-	    function Change() {
-	        _classCallCheck(this, Change);
+	  function Change() {
+	    _classCallCheck(this, Change);
+	  }
+	
+	  _createClass(Change, [{
+	    key: "digest",
+	
+	
+	    // constructor() {
+	    //
+	    //   if (new.target === Change) {
+	    //     throw new Error('`Change` is an abstract class that cannot be instantiated.');
+	    //   }
+	    // }
+	
+	    value: function digest() {
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(Change, [{
-	        key: "digest",
-	
-	
-	        /*
-	         constructor() {
-	            if (new.target === Change) {
-	                throw new Error('`Change` is an abstract class that cannot be instantiated.');
-	            }
-	         }
-	         */
-	
-	        value: function digest() {
-	            return this;
-	        }
-	    }]);
-	
-	    return Change;
+	  return Change;
 	}();
-	
-	// exports
-	// -------
 	
 	exports.default = Change;
 
@@ -8774,7 +8770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8792,35 +8788,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var RootChange = function (_Change) {
-	    _inherits(RootChange, _Change);
+	  _inherits(RootChange, _Change);
 	
-	    function RootChange(model, root) {
-	        _classCallCheck(this, RootChange);
+	  function RootChange(model, root) {
+	    _classCallCheck(this, RootChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RootChange).call(this));
 	
-	        _this.model = model;
-	        _this.root = root;
-	        _this.previous = root;
-	        return _this;
+	    _this.model = model;
+	    _this.root = root;
+	    _this.previous = root;
+	    return _this;
+	  }
+	
+	  _createClass(RootChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.root = this.previous;
+	      this.previous = this.model.rootChanged(this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(RootChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.root = this.previous;
-	            this.previous = this.model.rootChanged(this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return RootChange;
+	  return RootChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = RootChange;
 
@@ -8831,7 +8824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8849,81 +8842,78 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var ChildChange = function (_Change) {
-	    _inherits(ChildChange, _Change);
+	  _inherits(ChildChange, _Change);
 	
-	    function ChildChange(model, child, parent, index) {
-	        _classCallCheck(this, ChildChange);
+	  function ChildChange(model, child, parent, index) {
+	    _classCallCheck(this, ChildChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildChange).call(this));
 	
-	        _this.model = model;
-	        _this.child = child;
-	        _this.parent = parent;
-	        _this.index = index;
+	    _this.model = model;
+	    _this.child = child;
+	    _this.parent = parent;
+	    _this.index = index;
 	
-	        _this.previous = parent;
-	        _this.previousIndex = index;
-	        return _this;
+	    _this.previous = parent;
+	    _this.previousIndex = index;
+	    return _this;
+	  }
+	
+	  _createClass(ChildChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      var model = this.model;
+	      var child = this.child;
+	
+	      var newParent = this.previous;
+	      var newIndex = this.previousIndex;
+	
+	      var oldParent = child.parent;
+	      var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
+	
+	      // the new parent is null, then the child(and link) will be removed
+	      if (!newParent) {
+	        this.disConnect(child, false);
+	      }
+	
+	      oldParent = model.childChanged(child, newParent, newIndex);
+	
+	      this.parent = newParent;
+	      this.index = newIndex;
+	      this.previous = oldParent;
+	      this.previousIndex = oldIndex;
+	
+	      return this;
 	    }
+	  }, {
+	    key: 'disConnect',
+	    value: function disConnect(cell) {
 	
-	    _createClass(ChildChange, [{
-	        key: 'digest',
-	        value: function digest() {
+	      if (cell.isLink()) {
 	
-	            var model = this.model;
-	            var child = this.child;
+	        var source = cell.getTerminal(true);
+	        var target = cell.getTerminal(false);
 	
-	            var newParent = this.previous;
-	            var newIndex = this.previousIndex;
-	
-	            var oldParent = child.parent;
-	            var oldIndex = oldParent ? oldParent.indexOfChild(child) : 0;
-	
-	            // the new parent is null, then the child(and link) will be removed
-	            if (!newParent) {
-	                this.disConnect(child, false);
-	            }
-	
-	            oldParent = model.childChanged(child, newParent, newIndex);
-	
-	            this.parent = newParent;
-	            this.index = newIndex;
-	            this.previous = oldParent;
-	            this.previousIndex = oldIndex;
-	
-	            return this;
+	        if (source) {
+	          this.model.terminalChanged(cell, null, true);
 	        }
-	    }, {
-	        key: 'disConnect',
-	        value: function disConnect(cell) {
 	
-	            if (cell.isLink()) {
-	
-	                var source = cell.getTerminal(true);
-	                var target = cell.getTerminal(false);
-	
-	                if (source) {
-	                    this.model.terminalChanged(cell, null, true);
-	                }
-	
-	                if (target) {
-	                    this.model.terminalChanged(cell, null, false);
-	                }
-	            }
-	
-	            cell.eachChild(function (child) {
-	                this.disConnect(child);
-	            }, this);
-	
-	            return this;
+	        if (target) {
+	          this.model.terminalChanged(cell, null, false);
 	        }
-	    }]);
+	      }
 	
-	    return ChildChange;
+	      cell.eachChild(function (child) {
+	        this.disConnect(child);
+	      }, this);
+	
+	      return this;
+	    }
+	  }]);
+	
+	  return ChildChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = ChildChange;
 
@@ -8934,7 +8924,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8952,36 +8942,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var VisibleChange = function (_Change) {
-	    _inherits(VisibleChange, _Change);
+	  _inherits(VisibleChange, _Change);
 	
-	    function VisibleChange(model, cell, visible) {
-	        _classCallCheck(this, VisibleChange);
+	  function VisibleChange(model, cell, visible) {
+	    _classCallCheck(this, VisibleChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VisibleChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VisibleChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.visible = visible;
-	        _this.previous = visible;
-	        return _this;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.visible = visible;
+	    _this.previous = visible;
+	    return _this;
+	  }
+	
+	  _createClass(VisibleChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.visible = this.previous;
+	      this.previous = this.model.visibleChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(VisibleChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.visible = this.previous;
-	            this.previous = this.model.visibleChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return VisibleChange;
+	  return VisibleChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = VisibleChange;
 
@@ -8992,7 +8979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -9010,37 +8997,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var TerminalChange = function (_Change) {
-	    _inherits(TerminalChange, _Change);
+	  _inherits(TerminalChange, _Change);
 	
-	    function TerminalChange(model, link, terminal, isSource) {
-	        _classCallCheck(this, TerminalChange);
+	  function TerminalChange(model, link, terminal, isSource) {
+	    _classCallCheck(this, TerminalChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TerminalChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TerminalChange).call(this));
 	
-	        _this.model = model;
-	        _this.link = link;
-	        _this.terminal = terminal;
-	        _this.previous = terminal;
-	        _this.isSource = isSource;
-	        return _this;
+	    _this.model = model;
+	    _this.link = link;
+	    _this.terminal = terminal;
+	    _this.previous = terminal;
+	    _this.isSource = isSource;
+	    return _this;
+	  }
+	
+	  _createClass(TerminalChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.terminal = this.previous;
+	      this.previous = this.model.terminalChanged(this.link, this.terminal, this.isSource);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(TerminalChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.terminal = this.previous;
-	            this.previous = this.model.terminalChanged(this.link, this.terminal, this.isSource);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return TerminalChange;
+	  return TerminalChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = TerminalChange;
 
@@ -9051,7 +9035,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -9069,37 +9053,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var GeometryChange = function (_Change) {
-	    _inherits(GeometryChange, _Change);
+	  _inherits(GeometryChange, _Change);
 	
-	    function GeometryChange(model, cell, geometry) {
-	        _classCallCheck(this, GeometryChange);
+	  function GeometryChange(model, cell, geometry) {
+	    _classCallCheck(this, GeometryChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(GeometryChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(GeometryChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.geometry = geometry;
-	        _this.previous = geometry;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.geometry = geometry;
+	    _this.previous = geometry;
 	
-	        return _this;
+	    return _this;
+	  }
+	
+	  _createClass(GeometryChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.geometry = this.previous;
+	      this.previous = this.model.geometryChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(GeometryChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.geometry = this.previous;
-	            this.previous = this.model.geometryChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return GeometryChange;
+	  return GeometryChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = GeometryChange;
 
@@ -9110,7 +9091,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -9128,36 +9109,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var CollapseChange = function (_Change) {
-	    _inherits(CollapseChange, _Change);
+	  _inherits(CollapseChange, _Change);
 	
-	    function CollapseChange(model, cell, collapsed) {
-	        _classCallCheck(this, CollapseChange);
+	  function CollapseChange(model, cell, collapsed) {
+	    _classCallCheck(this, CollapseChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CollapseChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CollapseChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.collapsed = collapsed;
-	        _this.previous = collapsed;
-	        return _this;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.collapsed = collapsed;
+	    _this.previous = collapsed;
+	    return _this;
+	  }
+	
+	  _createClass(CollapseChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.collapsed = this.previous;
+	      this.previous = this.model.collapseChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(CollapseChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.collapsed = this.previous;
-	            this.previous = this.model.collapseChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return CollapseChange;
+	  return CollapseChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = CollapseChange;
 
@@ -9168,7 +9146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -9176,58 +9154,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var ChangeCollection = function () {
-	    function ChangeCollection(model) {
-	        _classCallCheck(this, ChangeCollection);
+	  function ChangeCollection(model) {
+	    _classCallCheck(this, ChangeCollection);
 	
-	        this.model = model;
-	        this.changes = [];
+	    this.model = model;
+	    this.changes = [];
+	  }
+	
+	  _createClass(ChangeCollection, [{
+	    key: 'hasChange',
+	    value: function hasChange() {
+	
+	      return !!this.changes.length;
 	    }
+	  }, {
+	    key: 'getChanges',
+	    value: function getChanges() {
 	
-	    _createClass(ChangeCollection, [{
-	        key: 'hasChange',
-	        value: function hasChange() {
+	      return this.changes;
+	    }
+	  }, {
+	    key: 'add',
+	    value: function add(change) {
 	
-	            return !!this.changes.length;
-	        }
-	    }, {
-	        key: 'getChanges',
-	        value: function getChanges() {
+	      if (change) {
+	        this.changes.push(change);
+	      }
 	
-	            return this.changes;
-	        }
-	    }, {
-	        key: 'add',
-	        value: function add(change) {
+	      return this;
+	    }
+	  }, {
+	    key: 'clear',
+	    value: function clear() {
 	
-	            if (change) {
-	                this.changes.push(change);
-	            }
+	      this.changes = [];
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'clear',
-	        value: function clear() {
+	      return this;
+	    }
+	  }, {
+	    key: 'notify',
+	    value: function notify() {
 	
-	            this.changes = [];
+	      this.model.trigger('change', this.changes);
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'notify',
-	        value: function notify() {
+	      return this;
+	    }
+	  }]);
 	
-	            this.model.trigger('change', this.changes);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return ChangeCollection;
+	  return ChangeCollection;
 	}();
-	
-	// exports
-	// -------
 	
 	exports.default = ChangeCollection;
 
@@ -10828,7 +10803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -10846,36 +10821,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var SizeChange = function (_Change) {
-	    _inherits(SizeChange, _Change);
+	  _inherits(SizeChange, _Change);
 	
-	    function SizeChange(model, cell, size) {
-	        _classCallCheck(this, SizeChange);
+	  function SizeChange(model, cell, size) {
+	    _classCallCheck(this, SizeChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SizeChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SizeChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.size = size;
-	        _this.previous = size;
-	        return _this;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.size = size;
+	    _this.previous = size;
+	    return _this;
+	  }
+	
+	  _createClass(SizeChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.size = this.previous;
+	      this.previous = this.model.sizeChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(SizeChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.size = this.previous;
-	            this.previous = this.model.sizeChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return SizeChange;
+	  return SizeChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = SizeChange;
 
@@ -10886,7 +10858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -10904,36 +10876,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var PositionChange = function (_Change) {
-	    _inherits(PositionChange, _Change);
+	  _inherits(PositionChange, _Change);
 	
-	    function PositionChange(model, cell, position) {
-	        _classCallCheck(this, PositionChange);
+	  function PositionChange(model, cell, position) {
+	    _classCallCheck(this, PositionChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PositionChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PositionChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.position = position;
-	        _this.previous = position;
-	        return _this;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.position = position;
+	    _this.previous = position;
+	    return _this;
+	  }
+	
+	  _createClass(PositionChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.position = this.previous;
+	      this.previous = this.model.positionChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(PositionChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.position = this.previous;
-	            this.previous = this.model.positionChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return PositionChange;
+	  return PositionChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = PositionChange;
 
@@ -10944,7 +10913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -10962,36 +10931,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var RotationChange = function (_Change) {
-	    _inherits(RotationChange, _Change);
+	  _inherits(RotationChange, _Change);
 	
-	    function RotationChange(model, cell, rotation) {
-	        _classCallCheck(this, RotationChange);
+	  function RotationChange(model, cell, rotation) {
+	    _classCallCheck(this, RotationChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RotationChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RotationChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.rotation = rotation;
-	        _this.previous = rotation;
-	        return _this;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.rotation = rotation;
+	    _this.previous = rotation;
+	    return _this;
+	  }
+	
+	  _createClass(RotationChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.position = this.previous;
+	      this.previous = this.model.rotationChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(RotationChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.position = this.previous;
-	            this.previous = this.model.rotationChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return RotationChange;
+	  return RotationChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = RotationChange;
 
@@ -11002,7 +10968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -11020,36 +10986,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var AttributeChange = function (_Change) {
-	    _inherits(AttributeChange, _Change);
+	  _inherits(AttributeChange, _Change);
 	
-	    function AttributeChange(model, cell, attrs) {
-	        _classCallCheck(this, AttributeChange);
+	  function AttributeChange(model, cell, attrs) {
+	    _classCallCheck(this, AttributeChange);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AttributeChange).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AttributeChange).call(this));
 	
-	        _this.model = model;
-	        _this.cell = cell;
-	        _this.attrs = attrs;
-	        _this.previous = attrs;
-	        return _this;
+	    _this.model = model;
+	    _this.cell = cell;
+	    _this.attrs = attrs;
+	    _this.previous = attrs;
+	    return _this;
+	  }
+	
+	  _createClass(AttributeChange, [{
+	    key: 'digest',
+	    value: function digest() {
+	
+	      this.attrs = this.previous;
+	      this.previous = this.model.attributeChanged(this.cell, this.previous);
+	
+	      return this;
 	    }
+	  }]);
 	
-	    _createClass(AttributeChange, [{
-	        key: 'digest',
-	        value: function digest() {
-	
-	            this.attrs = this.previous;
-	            this.previous = this.model.attributeChanged(this.cell, this.previous);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return AttributeChange;
+	  return AttributeChange;
 	}(_Change3.default);
-	
-	// exports
-	// -------
 	
 	exports.default = AttributeChange;
 
@@ -13552,7 +13515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -13584,238 +13547,238 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var Link = function (_Cell) {
-	    _inherits(Link, _Cell);
+	  _inherits(Link, _Cell);
 	
-	    function Link(options) {
-	        _classCallCheck(this, Link);
+	  function Link(options) {
+	    _classCallCheck(this, Link);
 	
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Link).call(this, options));
 	
-	        _this.vertices = _this.metadata.vertices || [];
-	        return _this;
+	    _this.vertices = _this.metadata.vertices || [];
+	    return _this;
+	  }
+	
+	  // static
+	  // ------
+	
+	  _createClass(Link, [{
+	    key: 'isLink',
+	
+	
+	    // methods
+	    // -------
+	
+	    value: function isLink() {
+	
+	      return true;
+	    }
+	  }, {
+	    key: 'getRouter',
+	    value: function getRouter() {
+	
+	      var router = this.metadata.router || {};
+	
+	      if (utils.isFunction(router)) {
+	        router = { parse: router };
+	      } else if (!utils.isObject(router)) {
+	        router = { name: router };
+	      }
+	
+	      return router;
+	    }
+	  }, {
+	    key: 'getMarker',
+	    value: function getMarker(isSource) {
+	
+	      var marker = isSource ? this.metadata.sourceMarker : this.metadata.targetMarker;
+	
+	      if (utils.isFunction(marker)) {
+	        marker = { parse: marker };
+	      } else if (!utils.isObject(marker)) {
+	        marker = { name: marker };
+	      }
+	
+	      marker.selector = isSource ? '.source-marker' : '.target-marker';
+	
+	      return marker;
+	    }
+	  }, {
+	    key: 'getConnector',
+	    value: function getConnector() {
+	
+	      var connector = this.metadata.connector || {};
+	
+	      if (utils.isFunction(connector)) {
+	        connector = { parse: connector };
+	      } else if (!utils.isObject(connector)) {
+	        connector = { name: connector };
+	      }
+	
+	      connector.selector = '.connector';
+	
+	      return connector;
 	    }
 	
-	    // static
+	    // vertices
+	    // --------
+	
+	  }, {
+	    key: 'getVertices',
+	    value: function getVertices() {
+	
+	      return this.vertices;
+	    }
+	  }, {
+	    key: 'getVerticesCount',
+	    value: function getVerticesCount() {
+	
+	      return this.vertices ? this.vertices.length : 0;
+	    }
+	  }, {
+	    key: 'getVerticeAt',
+	    value: function getVerticeAt(index) {
+	
+	      return this.vertices ? this.vertices[index] : null;
+	    }
+	  }, {
+	    key: 'indexOfVertice',
+	    value: function indexOfVertice(point) {
+	
+	      if (point && _Point2.default.isPointLike(point)) {
+	
+	        for (var i = 0, l = this.getVerticesCount(); i < l; i++) {
+	
+	          var vertice = this.getVerticeAt(i);
+	
+	          if (point.x === vertice.x && point.y === vertice.y) {
+	            return i;
+	          }
+	        }
+	      }
+	
+	      return -1;
+	    }
+	  }, {
+	    key: 'eachVertice',
+	    value: function eachVertice(iterator, context) {
+	
+	      return utils.forEach(this.vertices, iterator, context);
+	    }
+	  }, {
+	    key: 'filterVertice',
+	    value: function filterVertice(iterator, context) {
+	
+	      return utils.filter(this.vertices, iterator, context);
+	    }
+	  }, {
+	    key: 'insertVertice',
+	    value: function insertVertice(points, index) {
+	
+	      var length = this.getVerticesCount();
+	
+	      index = utils.fixIndex(index, length);
+	
+	      if (!utils.isArray(points)) {
+	        points = [points];
+	      }
+	
+	      if (index === length) {
+	        var _vertices;
+	
+	        (_vertices = this.vertices).push.apply(_vertices, _toConsumableArray(points));
+	      } else {
+	        this.vertices.splice(index, 0, points);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeVertice',
+	    value: function removeVertice(point) {
+	
+	      var index = this.indexOfVertice(point);
+	      if (index >= 0) {
+	        this.removeVerticeAt(index);
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeVerticeAt',
+	    value: function removeVerticeAt(index) {
+	
+	      var vertice = this.getVerticeAt(index);
+	      if (vertice) {
+	        this.vertices.splice(index, 1);
+	      }
+	      return vertice;
+	    }
+	  }, {
+	    key: 'clearVertices',
+	    value: function clearVertices() {
+	
+	      this.vertices = [];
+	
+	      return this;
+	    }
+	
+	    // common
 	    // ------
 	
-	    _createClass(Link, [{
-	        key: 'isLink',
+	  }, {
+	    key: 'clone',
+	    value: function clone(options, withData) {
 	
+	      var cloned = _get(Object.getPrototypeOf(Link.prototype), 'clone', this).call(this, options, withData);
 	
-	        // methods
-	        // -------
+	      cloned.vertices = [];
 	
-	        value: function isLink() {
-	
-	            return true;
+	      utils.forEach(this.vertices, function (point) {
+	        if (_Point2.default.isPointLike(point)) {
+	          cloned.vertices.push({ x: point.x, y: point.y });
 	        }
-	    }, {
-	        key: 'getRouter',
-	        value: function getRouter() {
+	      });
 	
-	            var router = this.metadata.router || {};
+	      return cloned;
+	    }
+	  }], [{
+	    key: 'isLink',
+	    value: function isLink(link) {
+	      return link && link instanceof Link;
+	    }
+	  }]);
 	
-	            if (utils.isFunction(router)) {
-	                router = { parse: router };
-	            } else if (!utils.isObject(router)) {
-	                router = { name: router };
-	            }
-	
-	            return router;
-	        }
-	    }, {
-	        key: 'getMarker',
-	        value: function getMarker(isSource) {
-	
-	            var marker = isSource ? this.metadata.sourceMarker : this.metadata.targetMarker;
-	
-	            if (utils.isFunction(marker)) {
-	                marker = { parse: marker };
-	            } else if (!utils.isObject(marker)) {
-	                marker = { name: marker };
-	            }
-	
-	            marker.selector = isSource ? '.source-marker' : '.target-marker';
-	
-	            return marker;
-	        }
-	    }, {
-	        key: 'getConnector',
-	        value: function getConnector() {
-	
-	            var connector = this.metadata.connector || {};
-	
-	            if (utils.isFunction(connector)) {
-	                connector = { parse: connector };
-	            } else if (!utils.isObject(connector)) {
-	                connector = { name: connector };
-	            }
-	
-	            connector.selector = '.connector';
-	
-	            return connector;
-	        }
-	
-	        // vertices
-	        // --------
-	
-	    }, {
-	        key: 'getVertices',
-	        value: function getVertices() {
-	
-	            return this.vertices;
-	        }
-	    }, {
-	        key: 'getVerticesCount',
-	        value: function getVerticesCount() {
-	
-	            return this.vertices ? this.vertices.length : 0;
-	        }
-	    }, {
-	        key: 'getVerticeAt',
-	        value: function getVerticeAt(index) {
-	
-	            return this.vertices ? this.vertices[index] : null;
-	        }
-	    }, {
-	        key: 'indexOfVertice',
-	        value: function indexOfVertice(point) {
-	
-	            if (point && _Point2.default.isPointLike(point)) {
-	
-	                for (var i = 0, l = this.getVerticesCount(); i < l; i++) {
-	
-	                    var vertice = this.getVerticeAt(i);
-	
-	                    if (point.x === vertice.x && point.y === vertice.y) {
-	                        return i;
-	                    }
-	                }
-	            }
-	
-	            return -1;
-	        }
-	    }, {
-	        key: 'eachVertice',
-	        value: function eachVertice(iterator, context) {
-	
-	            return utils.forEach(this.vertices, iterator, context);
-	        }
-	    }, {
-	        key: 'filterVertice',
-	        value: function filterVertice(iterator, context) {
-	
-	            return utils.filter(this.vertices, iterator, context);
-	        }
-	    }, {
-	        key: 'insertVertice',
-	        value: function insertVertice(points, index) {
-	
-	            var length = this.getVerticesCount();
-	
-	            index = utils.fixIndex(index, length);
-	
-	            if (!utils.isArray(points)) {
-	                points = [points];
-	            }
-	
-	            if (index === length) {
-	                var _vertices;
-	
-	                (_vertices = this.vertices).push.apply(_vertices, _toConsumableArray(points));
-	            } else {
-	                this.vertices.splice(index, 0, points);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeVertice',
-	        value: function removeVertice(point) {
-	
-	            var index = this.indexOfVertice(point);
-	            if (index >= 0) {
-	                this.removeVerticeAt(index);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeVerticeAt',
-	        value: function removeVerticeAt(index) {
-	
-	            var vertice = this.getVerticeAt(index);
-	            if (vertice) {
-	                this.vertices.splice(index, 1);
-	            }
-	            return vertice;
-	        }
-	    }, {
-	        key: 'clearVertices',
-	        value: function clearVertices() {
-	
-	            this.vertices = [];
-	
-	            return this;
-	        }
-	
-	        // common
-	        // ------
-	
-	    }, {
-	        key: 'clone',
-	        value: function clone(options, withData) {
-	
-	            var cloned = _get(Object.getPrototypeOf(Link.prototype), 'clone', this).call(this, options, withData);
-	
-	            cloned.vertices = [];
-	
-	            utils.forEach(this.vertices, function (point) {
-	                if (_Point2.default.isPointLike(point)) {
-	                    cloned.vertices.push({ x: point.x, y: point.y });
-	                }
-	            });
-	
-	            return cloned;
-	        }
-	    }], [{
-	        key: 'isLink',
-	        value: function isLink(link) {
-	            return link && link instanceof Link;
-	        }
-	    }]);
-	
-	    return Link;
+	  return Link;
 	}(_Cell3.default);
 	
 	Link.setDefaults({
-	    tagName: 'g',
-	    markup: '' + '<path class="connector"/>' + '<path class="source-marker"/>' + '<path class="target-marker"/>',
-	    classNames: 'pane-cell pane-link', // pane-cell for event handler
-	    pane: 'linkPane',
-	    data: null, // related data(for business logic)
-	    view: null, // specify the constructor of the view
-	    router: null,
-	    connector: 'sharp',
-	    sourceMarker: null,
-	    targetMarker: null,
-	    attrs: {
-	        '.connector': {
-	            'fill': 'none',
-	            'stroke': '#000',
-	            'stroke-width': 1
-	        },
-	        '.source-marker': {
-	            'fill': '#000',
-	            'stroke': '#000',
-	            'stroke-width': 1
-	        },
-	        '.target-marker': {
-	            'fill': '#000',
-	            'stroke': '#000',
-	            'stroke-width': 1
-	        }
+	  tagName: 'g',
+	  markup: '' + '<path class="connector"/>' + '<path class="source-marker"/>' + '<path class="target-marker"/>',
+	  classNames: 'pane-cell pane-link', // pane-cell for event handler
+	  pane: 'linkPane',
+	  data: null, // related data(for business logic)
+	  view: null, // specify the constructor of the view
+	  router: null,
+	  connector: 'sharp',
+	  sourceMarker: null,
+	  targetMarker: null,
+	  attrs: {
+	    '.connector': {
+	      'fill': 'none',
+	      'stroke': '#000',
+	      'stroke-width': 1
+	    },
+	    '.source-marker': {
+	      'fill': '#000',
+	      'stroke': '#000',
+	      'stroke-width': 1
+	    },
+	    '.target-marker': {
+	      'fill': '#000',
+	      'stroke': '#000',
+	      'stroke-width': 1
 	    }
+	  }
 	});
 	
 	// exports

@@ -12,15 +12,15 @@ export const isNil = val => isUndefined(val) || isNull(val);
 // function and object are truly
 export const isObject = val => {
 
-    if (!val) {
-        return false;
-    }
+  if (!val) {
+    return false;
+  }
 
-    return typeof val === 'function' || typeof val === 'object';
+  return typeof val === 'function' || typeof val === 'object';
 };
 
 export const isType = (val, type) => {
-    return toString.call(val) === '[object ' + type + ']';
+  return toString.call(val) === '[object ' + type + ']';
 };
 
 export const isArray    = val => Array.isArray(val);
@@ -30,15 +30,15 @@ export const isFunction = val => isType(val, 'Function');
 
 export const isArrayLike = val => {
 
-    if (isArray(val)) {
-        return true;
-    }
+  if (isArray(val)) {
+    return true;
+  }
 
-    if (isFunction(val) || isWindow(val)) {
-        return false;
-    }
+  if (isFunction(val) || isWindow(val)) {
+    return false;
+  }
 
-    let len = !!val && 'length' in val && val.length;
+  let len = !!val && 'length' in val && val.length;
 
-    return len === 0 || typeof len === 'number' && len > 0 && (len - 1) in val;
+  return len === 0 || typeof len === 'number' && len > 0 && (len - 1) in val;
 };

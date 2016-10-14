@@ -1,27 +1,21 @@
 import Change from './Change';
 
-class RootChange extends Change {
+export default class RootChange extends Change {
 
-    constructor(model, root) {
+  constructor(model, root) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.root     = root;
-        this.previous = root;
-    }
+    this.model    = model;
+    this.root     = root;
+    this.previous = root;
+  }
 
-    digest() {
+  digest() {
 
-        this.root     = this.previous;
-        this.previous = this.model.rootChanged(this.previous);
+    this.root     = this.previous;
+    this.previous = this.model.rootChanged(this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default RootChange;

@@ -1,28 +1,22 @@
 import Change from './Change';
 
-class PositionChange extends Change {
+export default class PositionChange extends Change {
 
-    constructor(model, cell, position) {
+  constructor(model, cell, position) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.cell     = cell;
-        this.position = position;
-        this.previous = position;
-    }
+    this.model    = model;
+    this.cell     = cell;
+    this.position = position;
+    this.previous = position;
+  }
 
-    digest() {
+  digest() {
 
-        this.position = this.previous;
-        this.previous = this.model.positionChanged(this.cell, this.previous);
+    this.position = this.previous;
+    this.previous = this.model.positionChanged(this.cell, this.previous);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default PositionChange;

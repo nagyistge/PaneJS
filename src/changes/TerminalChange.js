@@ -1,30 +1,24 @@
 import Change from './Change';
 
 
-class TerminalChange extends Change {
+export default class TerminalChange extends Change {
 
-    constructor(model, link, terminal, isSource) {
+  constructor(model, link, terminal, isSource) {
 
-        super();
+    super();
 
-        this.model    = model;
-        this.link     = link;
-        this.terminal = terminal;
-        this.previous = terminal;
-        this.isSource = isSource;
-    }
+    this.model    = model;
+    this.link     = link;
+    this.terminal = terminal;
+    this.previous = terminal;
+    this.isSource = isSource;
+  }
 
-    digest() {
+  digest() {
 
-        this.terminal = this.previous;
-        this.previous = this.model.terminalChanged(this.link, this.terminal, this.isSource);
+    this.terminal = this.previous;
+    this.previous = this.model.terminalChanged(this.link, this.terminal, this.isSource);
 
-        return this;
-    }
+    return this;
+  }
 }
-
-
-// exports
-// -------
-
-export default TerminalChange;

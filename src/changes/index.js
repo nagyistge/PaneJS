@@ -9,17 +9,17 @@ import ChangeCollection from '../changes/ChangeCollection';
 
 
 let changes = {
-    Change,
-    RootChange,
-    ChildChange,
-    VisibleChange,
-    TerminalChange,
-    GeometryChange,
-    CollapseChange,
-    ChangeCollection
+  Change,
+  RootChange,
+  ChildChange,
+  VisibleChange,
+  TerminalChange,
+  GeometryChange,
+  CollapseChange,
+  ChangeCollection
 };
 
 
 export {
-    changes
+  changes
 };

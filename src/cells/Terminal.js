@@ -4,117 +4,118 @@ import Point from '../geometry/Point';
 
 function scheduleSetTerminal(scheduled) {
 
-    this.setTerminal.scheduled = scheduled;
+  this.setTerminal.scheduled = scheduled;
 
-    return this;
+  return this;
 }
 
 function isSetTerminalScheduled() {
 
-    return this.setTerminal.scheduled === true;
+  return this.setTerminal.scheduled === true;
 }
 
 
 class Terminal {
 
-    constructor(terminal) {
+  constructor(terminal) {
 
-        if (terminal instanceof Terminal) {
-            return terminal;
+    if (terminal instanceof Terminal) {
+      return terminal;
+    }
+
+    if (terminal) {
+
+      if (terminal.isNode && terminal.isNode()) {
+
+        this.node = terminal;
+
+      } else if (Point.isPointLike(terminal)) {
+
+        this.point = Point.fromPoint(terminal);
+
+      } else if (utils.isObject(terminal)) {
+        
+        this.node  = terminal.node;
+        this.port  = terminal.port;
+        this.point = Point.isPointLike(terminal.point)
+          ? Point.fromPoint(terminal.point)
+          : null;
+      }
+    }
+  }
+
+  addLink(link, isSource = true, options = {}) {
+
+    if (link) {
+
+      scheduleSetTerminal.call(link, false);
+
+      if (!options.silent) {
+        let model = link.getModel() || this.getModel();
+        if (model) {
+          model.setTerminal(link, this, isSource);
+          scheduleSetTerminal.call(link, true);
+        }
+      }
+
+      if (!isSetTerminalScheduled.call(link)) {
+
+        if (this.node) {
+          this.node.addLink(link, isSource, { silent: true });
         }
 
-        if (terminal) {
-
-            if (terminal.isNode && terminal.isNode()) {
-
-                this.node = terminal;
-
-            } else if (Point.isPointLike(terminal)) {
-
-                this.point = Point.fromPoint(terminal);
-
-            } else if (utils.isObject(terminal)) {
-                this.node  = terminal.node;
-                this.port  = terminal.port;
-                this.point = Point.isPointLike(terminal.point)
-                    ? Point.fromPoint(terminal.point)
-                    : null;
-            }
-        }
+        link.setTerminal(this, isSource, { silent: true });
+      }
     }
 
-    addLink(link, isSource = true, options = {}) {
+    return this;
+  }
 
-        if (link) {
+  removeLink(link, isSource = true, options = {}) {
 
-            scheduleSetTerminal.call(link, false);
+    if (link) {
 
-            if (!options.silent) {
-                let model = link.getModel() || this.getModel();
-                if (model) {
-                    model.setTerminal(link, this, isSource);
-                    scheduleSetTerminal.call(link, true);
-                }
-            }
+      scheduleSetTerminal.call(link, false);
 
-            if (!isSetTerminalScheduled.call(link)) {
+      if (!options.silent) {
+        let model = link.getModel() || this.getModel();
+        if (model) {
+          model.setTerminal(link, null, isSource);
+          scheduleSetTerminal.call(link, true);
+        }
+      }
 
-                if (this.node) {
-                    this.node.addLink(link, isSource, { silent: true });
-                }
+      if (!isSetTerminalScheduled.call(link)) {
 
-                link.setTerminal(this, isSource, { silent: true });
-            }
+        if (this.node) {
+          this.node.removeLink(link, isSource, { silent: true });
         }
 
-        return this;
+        link.setTerminal(null, isSource, { silent: true });
+      }
     }
 
-    removeLink(link, isSource = true, options = {}) {
+    return this;
+  }
 
-        if (link) {
+  duplicate(terminal) {
 
-            scheduleSetTerminal.call(link, false);
+    let cloned = new Terminal(terminal);
 
-            if (!options.silent) {
-                let model = link.getModel() || this.getModel();
-                if (model) {
-                    model.setTerminal(link, null, isSource);
-                    scheduleSetTerminal.call(link, true);
-                }
-            }
+    // copy the missing properties
+    utils.forEach(['node', 'port', 'point'], function (key) {
+      if (this[key] && !cloned[key]) {
+        cloned[key] = this[key];
+      }
+    }, this);
 
-            if (!isSetTerminalScheduled.call(link)) {
+    return cloned;
+  }
 
-                if (this.node) {
-                    this.node.removeLink(link, isSource, { silent: true });
-                }
+  getModel() {
 
-                link.setTerminal(null, isSource, { silent: true });
-            }
-        }
-
-        return this;
-    }
-
-    duplicate(terminal) {
-
-        let cloned = new Terminal(terminal);
-
-        // copy the missing properties
-        utils.forEach(['node', 'port', 'point'], function (key) {
-            if (this[key] && !cloned[key]) {
-                cloned[key] = this[key];
-            }
-        }, this);
-
-        return cloned;
-    }
-
-    getModel() {
-
-        return this.node && this.node.getModel();
-    }
+    return this.node && this.node.getModel();
+  }
 }
 
 
