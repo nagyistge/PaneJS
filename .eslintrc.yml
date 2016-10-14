@@ -12,29 +12,49 @@ plugins:
 
 rules:
   indent:
+    - error
     - 2
-    - 4
-  no-var: 1
-  vars-on-top: 0
-  func-names: 2
-  prefer-const: 0
-  comma-dangle: 0
-  padded-blocks: 0
-  no-floating-decimal: 0
-  no-use-before-define: 0
-  no-param-reassign: 0
-  no-nested-ternary: 0 # Disallow Nested Ternaries
-  func-names: 0 # Require Function Expressions to have a Name
-  wrap-iife: 0
-  dot-notation: 1
+  no-var: error
+  wrap-iife: off
+  func-names: off # Require Function Expressions to have a Name
+  no-bitwise: off
+  vars-on-top: off
+  no-plusplus: off
+  no-lonely-if: off
+  prefer-const: off
+  comma-dangle: off
+  padded-blocks: off
+  prefer-template: off
+  no-param-reassign: off
+  no-nested-ternary: off # Disallow Nested Ternaries
+  no-mixed-operators: off
+  operator-assignment: off
+  no-floating-decimal: off
+  no-use-before-define: off
+  no-underscore-dangle: off
+  class-methods-use-this: off
+  no-template-curly-in-string: off
+
+  import/imports-first: off
+  import/prefer-default-export: off
+
   no-multi-spaces:
-    - 2
+    - error
     - exceptions:
         ImportDeclaration : true
         VariableDeclarator: true
         AssignmentExpression: true
+
   no-unused-expressions:
-    - 2
+    - error
     -
       allowShortCircuit: true
       allowTernary: true
+
+  quote-props:
+    - error
+    - consistent-as-needed
+
+  no-restricted-syntax:
+    - error
+    - WithStatement
