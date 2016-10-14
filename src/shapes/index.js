@@ -11,24 +11,24 @@ import Polyline    from './basic/Polyline';
 import LabelLink   from './basic/LabelLink';
 import ElementLink from './basic/ElementLink';
 
-let shapes = {
-    basic: {
-        Text,
-        Rect,
-        Path,
-        Image,
-        Ports,
-        Circle,
-        Rhombus,
-        Ellipse,
-        Polygon,
-        Polyline,
-        LabelLink,
-        ElementLink
-    }
+const shapes = {
+  basic: {
+    Text,
+    Rect,
+    Path,
+    Image,
+    Ports,
+    Circle,
+    Rhombus,
+    Ellipse,
+    Polygon,
+    Polyline,
+    LabelLink,
+    ElementLink
+  }
 };
 
 
 export {
-    shapes
+  shapes
 };

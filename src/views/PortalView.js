@@ -6,163 +6,170 @@ import   NodeView from '../views/NodeView';
 
 class PortalView extends NodeView {
 
-    renderMarkup() {
+  renderMarkup() {
 
-        super.renderMarkup();
-        this.renderPorts();
+    super.renderMarkup();
+    this.renderPorts();
 
-        return this;
+    return this;
+  }
+
+  renderPorts() {
+
+    let vel  = this.vel;
+    let cell = this.getCell();
+
+    let inPorts    = cell.getInPorts();
+    let outPorts   = cell.getOutPorts();
+    let portMarkup = cell.getPortMarkup();
+
+    let inPortWrap  = vel.findOne(cell.getPortsWrapSelector(true));
+    let outPortWrap = vel.findOne(cell.getPortsWrapSelector(false));
+
+    if (inPortWrap) {
+
+      inPortWrap.empty();
+
+      utils.forEach(inPorts, function (port) {
+        let html = this.compileMarkup(portMarkup, port);
+        inPortWrap.append(vector(html));
+      }, this);
     }
 
-    renderPorts() {
+    if (outPortWrap) {
 
-        let vel  = this.vel;
-        let cell = this.getCell();
+      outPortWrap.empty();
 
-        let inPorts    = cell.getInPorts();
-        let outPorts   = cell.getOutPorts();
-        let portMarkup = cell.getPortMarkup();
-
-        let inPortWrap  = vel.findOne(cell.getPortsWrapSelector(true));
-        let outPortWrap = vel.findOne(cell.getPortsWrapSelector(false));
-
-        if (inPortWrap) {
-
-            inPortWrap.empty();
-
-            utils.forEach(inPorts, function (port) {
-                let html = this.compileMarkup(portMarkup, port);
-                inPortWrap.append(vector(html));
-            }, this);
-        }
-
-        if (outPortWrap) {
-
-            outPortWrap.empty();
-
-            utils.forEach(outPorts, function (port) {
-                let html = this.compileMarkup(portMarkup, port);
-                outPortWrap.append(vector(html));
-            }, this);
-        }
-
-
-        return this;
+      utils.forEach(outPorts, function (port) {
+        let html = this.compileMarkup(portMarkup, port);
+        outPortWrap.append(vector(html));
+      }, this);
     }
 
-    getConnectionPointOnPort() {
 
-        return null;
+    return this;
+  }
+
+  getConnectionPointOnPort() {
+
+    return null;
+  }
+
+  getPortBodyBBox(port) {
+
+    let node   = this.getCell();
+    let portId = utils.isObject(port) ? port.id : port;
+
+    port = node.getPortById(portId);
+
+    let selector = node.getPortSelector(port, node.isInPort(port));
+    if (selector) {
+      let vel  = this.findOne(selector);
+      let body = vel && vel.findOne('.port-body');
+      if (body) {
+        return body.getBBox();
+      }
     }
 
-    getPortBodyBBox(port) {
+    return null;
+  }
 
-        let node   = this.getCell();
-        let portId = utils.isObject(port) ? port.id : port;
+  getPortBodyGeom(port) {
 
-        port = node.getPortById(portId);
+    let node   = this.getCell();
+    let portId = utils.isObject(port) ? port.id : port;
 
-        let selector = node.getPortSelector(port, node.isInPort(port));
-        if (selector) {
-            let vel  = this.findOne(selector);
-            let body = vel && vel.findOne('.port-body');
-            if (body) {
-                return body.getBBox();
-            }
+    port = node.getPortById(portId);
+
+    let selector = node.getPortSelector(port, node.isInPort(port));
+    if (selector) {
+      let vel  = this.findOne(selector);
+      let body = vel && vel.findOne('.port-body');
+      let elem = body && body.node;
+
+      if (elem) {
+
+        let bbox   = body.getBBox(false, this.getPane());
+        let center = bbox.getCenter();
+
+        let result;
+
+        if (utils.isNode(elem, 'circle')) {
+          let r = utils.getComputedStyle(elem, 'r');
+
+          r = utils.toFloat(r);
+
+          if (r) {
+            result = new Ellipse(center.x, center.y, r, r);
+          }
+        } else if (utils.isNode(elem, 'ellipse')) {
+          let rx = utils.getComputedStyle(elem, 'rx');
+          let ry = utils.getComputedStyle(elem, 'ry');
+
+          rx = utils.toFloat(rx);
+          ry = utils.toFloat(ry);
+
+          if (rx && ry) {
+            result = new Ellipse(center.x, center.y, rx, ry);
+          }
+        } else {
+          result = bbox;
         }
+
+        return result;
+      }
     }
 
-    getPortBodyGeom(port) {
+    return null;
+  }
 
-        let node   = this.getCell();
-        let portId = utils.isObject(port) ? port.id : port;
+  findPortByElem(elem) {
 
-        port = node.getPortById(portId);
+    let that  = this;
+    let vel   = that.vel;
+    let cell  = that.cell;
+    let vPort = vector(elem);
 
-        let selector = node.getPortSelector(port, node.isInPort(port));
-        if (selector) {
-            let vel  = this.findOne(selector);
-            let body = vel && vel.findOne('.port-body');
-            let elem = body && body.node;
+    let className = 'pane-port';
 
-            if (elem) {
-
-                let bbox   = body.getBBox(false, this.getPane());
-                let center = bbox.getCenter();
-
-                let result;
-
-                if (utils.isNode(elem, 'circle')) {
-                    let r = utils.getComputedStyle(elem, 'r');
-
-                    r = utils.toFloat(r);
-
-                    if (r) {
-                        result = new Ellipse(center.x, center.y, r, r);
-                    }
-                } else if (utils.isNode(elem, 'ellipse')) {
-                    let rx = utils.getComputedStyle(elem, 'rx');
-                    let ry = utils.getComputedStyle(elem, 'ry');
-
-                    rx = utils.toFloat(rx);
-                    ry = utils.toFloat(ry);
-
-                    if (rx && ry) {
-                        result = new Ellipse(center.x, center.y, rx, ry);
-                    }
-                } else {
-                    result = bbox;
-                }
-
-                return result;
-            }
-        }
-
+    if (!vPort.hasClass(className)) {
+      vPort = vPort.findParent(className, vel.node);
     }
 
-    findPortByElem(elem) {
+    if (vPort) {
 
-        let that  = this;
-        let vel   = that.vel;
-        let cell  = that.cell;
-        let vPort = vector(elem);
+      let vWrap = vPort.parent();
+      if (vWrap) {
 
-        let className = 'pane-port';
+        let index = vPort.index();
+        let type  = vWrap.hasClass('in')
+          ? 'in' : vWrap.hasClass('out')
+          ? 'out' : '';
+        let ports = type === 'in'
+          ? cell.inPorts : type === 'out'
+          ? cell.outPorts
+          : [];
 
-        if (!vPort.hasClass(className)) {
-            vPort = vPort.findParent(className, vel.node);
-        }
+        let selector = cell.getPortSelector(type, index);
+        let result   = null;
 
-        if (vPort) {
+        utils.some(ports, (port) => {
 
-            let vWrap = vPort.parent();
-            if (vWrap) {
+          if (port.selector === selector) {
+            result = port;
+            return true;
+          }
 
-                let index = vPort.index();
-                let type  = vWrap.hasClass('in')
-                    ? 'in' : vWrap.hasClass('out')
-                    ? 'out' : '';
-                let ports = type === 'in'
-                    ? cell.inPorts : type === 'out'
-                    ? cell.outPorts
-                    : [];
+          return false;
 
-                let selector = cell.getPortSelector(type, index);
-                let result   = null;
+        });
 
-                utils.some(ports, function (port) {
-                    if (port.selector === selector) {
-                        result = port;
-                        return true;
-                    }
-                });
-
-                return result;
-            }
-        }
-
-        return null;
+        return result;
+      }
     }
+
+    return null;
+  }
 }
 
 

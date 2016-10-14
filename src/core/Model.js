@@ -18,1046 +18,1046 @@ import ChangeCollection from '../changes/ChangeCollection';
 
 class Model extends Events {
 
-    constructor(root) {
+  constructor(root) {
 
-        super();
+    super();
 
-        this.nextId       = 0;
-        this.updateLevel  = 0;
-        this.endingUpdate = false;
+    this.nextId       = 0;
+    this.updateLevel  = 0;
+    this.endingUpdate = false;
 
-        this.changes = new ChangeCollection(this);
+    this.changes = new ChangeCollection(this);
 
-        if (root) {
-            this.setRoot(root);
-        } else {
-            this.clear();
+    if (root) {
+      this.setRoot(root);
+    } else {
+      this.clear();
+    }
+  }
+
+  clear() {
+
+    return this.setRoot(this.createRoot());
+  }
+
+  getDefaultParent() {
+
+    // the first layer
+    return this.getRoot().getChildAt(0);
+  }
+
+  isOrphan(cell) {
+
+    return cell && cell.isOrphan();
+  }
+
+  isAncestor(ancestor, descendant) {
+
+    return ancestor && ancestor.isAncestor(descendant);
+  }
+
+  contains(ancestor, descendant) {
+
+    if (!descendant) {
+      descendant = ancestor;
+      ancestor   = this.root;
+    }
+
+    return this.isAncestor(ancestor, descendant);
+  }
+
+  getAncestors(descendant) {
+
+    return descendant ? descendant.getAncestors() : [];
+  }
+
+  getDescendants(ancestor) {
+
+    return ancestor ? ancestor.getDescendants() : [];
+  }
+
+  getParents(/* cells */) {
+    /* FIXME
+     let parents = [];
+
+     if (cells) {
+
+     let hash = {};
+
+     forEach(cells, function (cell) {
+     let parent = cell.parent;
+
+     if (parent) {
+     let id = cellRoute.create(parent);
+
+     if (!hash[id]) {
+     hash[id] = parent;
+     parents.push(parent);
+     }
+     }
+     });
+     }
+
+     return parents;
+     */
+  }
+
+  getCellById(id) {
+
+    return this.cells ? this.cells[id] : null;
+  }
+
+  findCellAtPoint(localPoint) {
+
+    let result = [];
+
+    if (localPoint) {
+      this.eachCell((cell) => {
+        if (this.isNode(cell)) {
+          let rect = cell.getBBox();
+          if (rect && rect.containsPoint(localPoint)) {
+            result.push(cell);
+          }
         }
+      });
     }
 
-    clear() {
+    return result;
+  }
 
-        return this.setRoot(this.createRoot());
-    }
+  findCellInArea(area) {
 
-    getDefaultParent() {
+    let result = [];
 
-        // the first layer
-        return this.getRoot().getChildAt(0);
-    }
-
-    isOrphan(cell) {
-
-        return cell && cell.isOrphan();
-    }
-
-    isAncestor(ancestor, descendant) {
-
-        return ancestor && ancestor.isAncestor(descendant);
-    }
-
-    contains(ancestor, descendant) {
-
-        if (!descendant) {
-            descendant = ancestor;
-            ancestor   = this.root;
+    if (area) {
+      this.eachCell((cell) => {
+        if (this.isNode(cell)) {
+          let rect = cell.getBBox();
+          if (rect && area.containsRect(rect)) {
+            result.push(cell);
+          }
         }
-
-        return this.isAncestor(ancestor, descendant);
+      });
     }
 
-    getAncestors(descendant) {
+    return result;
+  }
 
-        return descendant ? descendant.getAncestors() : [];
+  createCellId() {
+
+    let id = this.nextId;
+    this.nextId += 1;
+
+    return 'cell-' + id;
+  }
+
+
+  // root
+  // ----
+
+  isRoot(cell) {
+
+    return cell && this.root === cell;
+  }
+
+  createRoot() {
+
+    let root = new Cell();
+
+    root.insertChild(this.createLayer(), { silent: true });
+
+    return root;
+  }
+
+  getRoot(cell) {
+
+    let root = this.root;
+
+    while (cell) {
+      root = cell;
+      cell = cell.parent;
     }
 
-    getDescendants(ancestor) {
+    return root;
+  }
 
-        return ancestor ? ancestor.getDescendants() : [];
-    }
+  setRoot(root) {
 
-    getParents(/* cells */) {
-        /* FIXME
-         let parents = [];
+    return this.digest(new RootChange(this, root));
+  }
 
-         if (cells) {
+  rootChanged(root) {
 
-         let hash = {};
+    let prev = this.root;
 
-         forEach(cells, function (cell) {
-         let parent = cell.parent;
+    this.root   = root;
+    this.cells  = null;
+    this.nextId = 0;
+    this.cellAdded(root);
 
-         if (parent) {
-         let id = cellRoute.create(parent);
+    return prev;
+  }
 
-         if (!hash[id]) {
-         hash[id] = parent;
-         parents.push(parent);
-         }
-         }
-         });
-         }
 
-         return parents;
-         */
-    }
+  // Layers
+  // ------
 
-    getCellById(id) {
+  isLayer(cell) {
 
-        return this.cells ? this.cells[id] : null;
-    }
+    return cell && this.isRoot(cell.parent);
+  }
 
-    findCellAtPoint(localPoint) {
+  getLayers() {
 
-        let result = [];
+    return this.getRoot().children || [];
+  }
 
-        if (localPoint) {
-            this.eachCell(cell => {
-                if (this.isNode(cell)) {
-                    let rect = cell.getBBox();
-                    if (rect && rect.containsPoint(localPoint)) {
-                        result.push(cell);
-                    }
-                }
-            }, this);
-        }
+  createLayer() {
 
-        return result;
-    }
+    return new Cell();
+  }
 
-    findCellInArea(area) {
+  eachLayer(iterator, context) {
 
-        let result = [];
+    return utils.forEach(this.getLayers(), iterator, context);
+  }
 
-        if (area) {
-            this.eachCell(cell => {
-                if (this.isNode(cell)) {
-                    let rect = cell.getBBox();
-                    if (rect && area.containsRect(rect)) {
-                        result.push(cell);
-                    }
-                }
-            }, this);
-        }
 
-        return result;
-    }
+  // cell
+  // ----
 
-    createCellId() {
+  addNode(node, parent, index) {
 
-        let id = this.nextId;
-        this.nextId += 1;
+    return this.addCells([node], parent, index);
+  }
 
-        return 'cell-' + id;
-    }
+  addLink(link, source, target, parent, index) {
 
+    return this.addCells([link], parent, index, source, target);
+  }
 
-    // root
-    // ----
+  addCell(cell, parent, index, source, target) {
 
-    isRoot(cell) {
+    return this.addCells([cell], parent, index, source, target);
+  }
 
-        return cell && this.root === cell;
-    }
+  addCells(cells, parent, index, source, target) {
 
-    createRoot() {
+    parent = parent || this.getDefaultParent();
+    index  = utils.fixIndex(index, parent.getChildCount());
 
-        let root = new Cell();
+    this.beginUpdate();
 
-        root.insertChild(this.createLayer(), { silent: true });
-
-        return root;
-    }
-
-    getRoot(cell) {
-
-        let root = this.root;
-
-        while (cell) {
-            root = cell;
-            cell = cell.parent;
-        }
-
-        return root;
-    }
-
-    setRoot(root) {
-
-        return this.digest(new RootChange(this, root));
-    }
-
-    rootChanged(root) {
-
-        let prev = this.root;
-
-        this.root   = root;
-        this.cells  = null;
-        this.nextId = 0;
-        this.cellAdded(root);
-
-        return prev;
-    }
-
-
-    // Layers
-    // ------
-
-    isLayer(cell) {
-
-        return cell && this.isRoot(cell.parent);
-    }
-
-    getLayers() {
-
-        return this.getRoot().children || [];
-    }
-
-    createLayer() {
-
-        return new Cell();
-    }
-
-    eachLayer(iterator, context) {
-
-        return utils.forEach(this.getLayers(), iterator, context);
-    }
-
-
-    // cell
-    // ----
-
-    addNode(node, parent, index) {
-
-        return this.addCells([node], parent, index);
-    }
-
-    addLink(link, source, target, parent, index) {
-
-        return this.addCells([link], parent, index, source, target);
-    }
-
-    addCell(cell, parent, index, source, target) {
-
-        return this.addCells([cell], parent, index, source, target);
-    }
-
-    addCells(cells, parent, index, source, target) {
-
-        parent = parent || this.getDefaultParent();
-        index  = utils.fixIndex(index, parent.getChildCount());
-
-        this.beginUpdate();
-
-        try {
-            utils.forEach(cells, child => {
-                if (child) {
-                    if (child !== parent) {
-                        this.setParent(child, parent, index);
-                        index++;
-                    }
-
-                    source && this.setTerminal(child, source, true);
-                    target && this.setTerminal(child, target, false);
-                }
-            }, this);
-
-        } finally {
-            this.endUpdate();
-        }
-
-        return this;
-    }
-
-    removeCell(cell) {
-
-        if (cell) {
-            if (this.isRoot(cell)) {
-                this.setRoot(null);
-            } else if (this.getParent(cell)) {
-                this.digest(new ChildChange(this, cell, null));
-            }
-        }
-
-        return cell;
-    }
-
-    getParent(child) {
-
-        return child ? child.parent : null;
-    }
-
-    setParent(child, parent, index) {
-
+    try {
+      utils.forEach(cells, (child) => {
         if (child) {
-            if (parent) {
-                try {
-                    this.beginUpdate();
-                    this.digest(new ChildChange(this, child, parent, index));
-                } finally {
-                    this.endUpdate();
-                }
-            } else {
-                this.removeCell(child);
-            }
+          if (child !== parent) {
+            this.setParent(child, parent, index);
+            index += 1;
+          }
+
+          source && this.setTerminal(child, source, true);
+          target && this.setTerminal(child, target, false);
         }
-        return this;
+      });
+
+    } finally {
+      this.endUpdate();
     }
 
-    childChanged(child, parent, index) {
+    return this;
+  }
 
-        let previous = this.getParent(child);
+  removeCell(cell) {
 
-        if (parent) {
-            if (parent !== previous || previous.indexOfChild(child) !== index) {
-                // `insertChild` will firstly remove cell from previous parent
-                parent.insertChild(child, index, { silent: true });
-            }
-        } else if (previous) {
-            previous.removeChild(child, { silent: true });
-        }
-
-        if (parent) {
-            // check if the previous parent was already in the
-            // model and avoids calling cellAdded if it was.
-            if (!this.contains(previous)) {
-                this.cellAdded(child);
-            }
-        } else {
-            this.cellRemoved(child);
-        }
-
-        return previous;
+    if (cell) {
+      if (this.isRoot(cell)) {
+        this.setRoot(null);
+      } else if (this.getParent(cell)) {
+        this.digest(new ChildChange(this, cell, null));
+      }
     }
 
-    // linkChanged(link, terminal, isSource) {
-    //
-    //    let prev = link.getTerminal(isSource);
-    //
-    //    if (terminal) {
-    //        terminal.addLink(link, isSource);
-    //    } else if (prev) {
-    //        prev.removeLink(link, isSource);
-    //    }
-    //
-    //    return prev;
-    // }
+    return cell;
+  }
 
-    cellAdded(cell) {
+  getParent(child) {
 
-        // create an Id for the cell and map it
+    return child ? child.parent : null;
+  }
 
-        if (cell) {
-            // creates an Id for the cell if not Id exists
-            let id = cell.getId() || this.createCellId(cell);
-            if (id) {
-                let collision = this.getCellById(id);
+  setParent(child, parent, index) {
 
-                if (collision !== cell) {
-                    // creates new Id for the cell as long as there is a collision
-                    while (collision) {
-                        id        = this.createCellId(cell);
-                        collision = this.getCellById(id);
-                    }
-
-                    // lazily creates the cells dictionary
-                    if (!this.cells) {
-                        this.cells = {};
-                    }
-
-                    cell.setId(id);
-                    this.cells[id] = cell;
-                }
-            }
-
-            // makes sure IDs of deleted cells are not reused
-            if (utils.isNumeric(id)) {
-                this.nextId = Math.max(this.nextId, id);
-            }
-
-            cell.setModel(this);
-            // recursively processes child cells
-            cell.eachChild(this.cellAdded, this);
+    if (child) {
+      if (parent) {
+        try {
+          this.beginUpdate();
+          this.digest(new ChildChange(this, child, parent, index));
+        } finally {
+          this.endUpdate();
         }
+      } else {
+        this.removeCell(child);
+      }
+    }
+    return this;
+  }
+
+  childChanged(child, parent, index) {
+
+    let previous = this.getParent(child);
+
+    if (parent) {
+      if (parent !== previous || previous.indexOfChild(child) !== index) {
+        // `insertChild` will firstly remove cell from previous parent
+        parent.insertChild(child, index, { silent: true });
+      }
+    } else if (previous) {
+      previous.removeChild(child, { silent: true });
     }
 
-    cellRemoved(cell) {
-
-        if (cell) {
-            cell.eachChild(child => {
-                this.cellRemoved(child);
-            }, this);
-
-            let id = cell.getId();
-            if (this.cells && id) {
-                delete this.cells[id];
-            }
-
-            cell.setModel(null);
-        }
+    if (parent) {
+      // check if the previous parent was already in the
+      // model and avoids calling cellAdded if it was.
+      if (!this.contains(previous)) {
+        this.cellAdded(child);
+      }
+    } else {
+      this.cellRemoved(child);
     }
 
-    updateLinkParents(cell, root) {
+    return previous;
+  }
 
-        // Updates the parent for all links that are connected to node
+  // linkChanged(link, terminal, isSource) {
+  //
+  //    let prev = link.getTerminal(isSource);
+  //
+  //    if (terminal) {
+  //        terminal.addLink(link, isSource);
+  //    } else if (prev) {
+  //        prev.removeLink(link, isSource);
+  //    }
+  //
+  //    return prev;
+  // }
 
-        root = root || this.getRoot(cell);
+  cellAdded(cell) {
 
-        // update links on children first
-        cell.eachChild(child => {
-            this.updateLinkParents(child, root);
-        }, this);
+    // create an Id for the cell and map it
 
-        // update the parents of all connected links
-        cell.eachLink(link => {
-            // update edge parent if edge and child have
-            // a common root node (does not need to be the
-            // model root node)
-            if (this.isAncestor(root, link)) {
-                this.updateLinkParent(link, root);
-            }
-        }, this);
+    if (cell) {
+      // creates an Id for the cell if not Id exists
+      let id = cell.getId() || this.createCellId(cell);
+      if (id) {
+        let collision = this.getCellById(id);
+
+        if (collision !== cell) {
+          // creates new Id for the cell as long as there is a collision
+          while (collision) {
+            id        = this.createCellId(cell);
+            collision = this.getCellById(id);
+          }
+
+          // lazily creates the cells dictionary
+          if (!this.cells) {
+            this.cells = {};
+          }
+
+          cell.setId(id);
+          this.cells[id] = cell;
+        }
+      }
+
+      // makes sure IDs of deleted cells are not reused
+      if (utils.isNumeric(id)) {
+        this.nextId = Math.max(this.nextId, id);
+      }
+
+      cell.setModel(this);
+      // recursively processes child cells
+      cell.eachChild(this.cellAdded, this);
+    }
+  }
+
+  cellRemoved(cell) {
+
+    if (cell) {
+      cell.eachChild((child) => {
+        this.cellRemoved(child);
+      });
+
+      let id = cell.getId();
+      if (this.cells && id) {
+        delete this.cells[id];
+      }
+
+      cell.setModel(null);
+    }
+  }
+
+  updateLinkParents(cell, root) {
+
+    // Updates the parent for all links that are connected to node
+
+    root = root || this.getRoot(cell);
+
+    // update links on children first
+    cell.eachChild((child) => {
+      this.updateLinkParents(child, root);
+    });
+
+    // update the parents of all connected links
+    cell.eachLink((link) => {
+      // update edge parent if edge and child have
+      // a common root node (does not need to be the
+      // model root node)
+      if (this.isAncestor(root, link)) {
+        this.updateLinkParent(link, root);
+      }
+    });
+  }
+
+  updateLinkParent(link, root) {
+
+    let that   = this;
+    let cell   = null;
+    let source = link.getTerminal(true);
+    let target = link.getTerminal(false);
+
+    // use the first non-relative descendants of the source terminal
+    while (source && !source.isLink() && source.geometry && source.geometry.relative) {
+      source = source.parent;
     }
 
-    updateLinkParent(link, root) {
-
-        let that   = this;
-        let cell   = null;
-        let source = link.getTerminal(true);
-        let target = link.getTerminal(false);
-
-        // use the first non-relative descendants of the source terminal
-        while (source && !source.isLink() && source.geometry && source.geometry.relative) {
-            source = source.parent;
-        }
-
-        // use the first non-relative descendants of the target terminal
-        while (target && !target.isLink() && target.geometry && target.geometry.relative) {
-            target = target.parent;
-        }
-
-        if (that.isAncestor(root, source) && that.isAncestor(root, target)) {
-
-            if (source === target) {
-                cell = source.parent;
-            } else {
-                cell = that.getNearestCommonAncestor(source, target);
-            }
-
-            if (cell &&
-                (cell.parent !== that.viewport || that.isAncestor(cell, link)) &&
-                link.parent !== cell) {
-
-                let geo = link.geometry;
-
-                if (geo) {
-                    let origin1 = that.getOrigin(link.parent);
-                    let origin2 = that.getOrigin(cell);
-
-                    let dx = origin2.x - origin1.x;
-                    let dy = origin2.y - origin1.y;
-
-                    geo = geo.clone();
-                    geo.translate(-dx, -dy);
-                    that.setGeometry(link, geo);
-                }
-
-                that.add(cell, link);
-            }
-        }
+    // use the first non-relative descendants of the target terminal
+    while (target && !target.isLink() && target.geometry && target.geometry.relative) {
+      target = target.parent;
     }
 
-    getNearestCommonAncestor(/* cell1, cell2 */) {
+    if (that.isAncestor(root, source) && that.isAncestor(root, target)) {
 
-        /* FIXME
-         if (cell1 && cell2) {
+      if (source === target) {
+        cell = source.parent;
+      } else {
+        cell = that.getNearestCommonAncestor(source, target);
+      }
 
-         let route1 = cellRoute.create(cell1);
-         let route2 = cellRoute.create(cell2);
+      if (cell &&
+        (cell.parent !== that.viewport || that.isAncestor(cell, link)) &&
+        link.parent !== cell) {
 
-         if (route1 && route2) {
+        let geo = link.geometry;
 
-         let cell = cell1;
-         let route = route2;
-         let current = route1;
+        if (geo) {
+          let origin1 = that.getOrigin(link.parent);
+          let origin2 = that.getOrigin(cell);
 
-         if (route1.length > route2.length) {
-         cell = cell2;
-         route = route1;
-         current = route2;
-         }
+          let dx = origin2.x - origin1.x;
+          let dy = origin2.y - origin1.y;
 
-         while (cell) {
-         let parent = cell.parent;
-
-         // check if the cell path is equal to the beginning of the given cell path
-         if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
-         return cell;
-         }
-
-         cell = parent;
-         current = cellRoute.getParentRoute(current);
-         }
-         }
-         }
-         */
-
-        return null;
-    }
-
-    eachCell(iterator, context) {
-
-        if (this.cells && iterator && utils.isFunction(iterator)) {
-            utils.forIn(this.cells, (cell, id) => {
-                iterator.call(context, cell, id);
-            });
-        }
-    }
-
-    filterCell(iterator, context) {
-
-        let result = [];
-
-        if (this.cells && iterator && utils.isFunction(iterator)) {
-            utils.forIn(this.cells, (cell, id) => {
-                if (iterator.call(context, cell, id)) {
-                    result.push(cell);
-                }
-            });
+          geo = geo.clone();
+          geo.translate(-dx, -dy);
+          that.setGeometry(link, geo);
         }
 
-        return result;
+        that.add(cell, link);
+      }
     }
+  }
 
-    eachNode(iterator, context) {
+  getNearestCommonAncestor(/* cell1, cell2 */) {
 
-        let nodes = this.filterCell(cell => this.isNode(cell), this);
+    /* FIXME
+     if (cell1 && cell2) {
 
-        return utils.forEach(nodes, iterator, context);
+     let route1 = cellRoute.create(cell1);
+     let route2 = cellRoute.create(cell2);
+
+     if (route1 && route2) {
+
+     let cell = cell1;
+     let route = route2;
+     let current = route1;
+
+     if (route1.length > route2.length) {
+     cell = cell2;
+     route = route1;
+     current = route2;
+     }
+
+     while (cell) {
+     let parent = cell.parent;
+
+     // check if the cell path is equal to the beginning of the given cell path
+     if (route.indexOf(current + cellRoute.separator) === 0 && parent) {
+     return cell;
+     }
+
+     cell = parent;
+     current = cellRoute.getParentRoute(current);
+     }
+     }
+     }
+     */
+
+    return null;
+  }
+
+  eachCell(iterator, context) {
+
+    if (this.cells && iterator && utils.isFunction(iterator)) {
+      utils.forIn(this.cells, (cell, id) => {
+        iterator.call(context, cell, id);
+      });
     }
+  }
 
-    eachLink(iterator, context) {
+  filterCell(iterator, context) {
 
-        let links = this.filterCell(cell => this.isLink(cell), this);
+    let result = [];
 
-        return utils.forEach(links, iterator, context);
-    }
-
-
-    // children
-    // --------
-
-    getChildNodes(parent) {
-
-        return this.getChildCells(parent, true, false);
-    }
-
-    getChildLinks(parent) {
-
-        return this.getChildCells(parent, false, true);
-    }
-
-    eachChildNode(parent, iterator, context) {
-
-        utils.forEach(this.getChildNodes(parent), iterator, context);
-    }
-
-    eachChildLink(parent, iterator, context) {
-
-        utils.forEach(this.getChildLinks(parent), iterator, context);
-    }
-
-    getChildCells(parent, isNode, isLink) {
-
-        if (parent) {
-            return parent.filterChild(child => {
-                return (isNode && child.isNode()) || (isLink && child.isLink());
-            });
+    if (this.cells && iterator && utils.isFunction(iterator)) {
+      utils.forIn(this.cells, (cell, id) => {
+        if (iterator.call(context, cell, id)) {
+          result.push(cell);
         }
-
-        return [];
+      });
     }
 
-    indexOfChild(cell, child) {
+    return result;
+  }
 
-        return cell ? cell.indexOfChild(child) : -1;
+  eachNode(iterator, context) {
+
+    let nodes = this.filterCell(cell => this.isNode(cell), this);
+
+    return utils.forEach(nodes, iterator, context);
+  }
+
+  eachLink(iterator, context) {
+
+    let links = this.filterCell(cell => this.isLink(cell), this);
+
+    return utils.forEach(links, iterator, context);
+  }
+
+
+  // children
+  // --------
+
+  getChildNodes(parent) {
+
+    return this.getChildCells(parent, true, false);
+  }
+
+  getChildLinks(parent) {
+
+    return this.getChildCells(parent, false, true);
+  }
+
+  eachChildNode(parent, iterator, context) {
+
+    utils.forEach(this.getChildNodes(parent), iterator, context);
+  }
+
+  eachChildLink(parent, iterator, context) {
+
+    utils.forEach(this.getChildLinks(parent), iterator, context);
+  }
+
+  getChildCells(parent, isNode, isLink) {
+
+    if (parent) {
+      return parent.filterChild(child =>
+        (isNode && child.isNode()) || (isLink && child.isLink())
+      );
     }
 
-    getChildAt(cell, index) {
+    return [];
+  }
 
-        return cell ? cell.getChildAt(index) : null;
-    }
+  indexOfChild(cell, child) {
 
-    getChildren(cell) {
+    return cell ? cell.indexOfChild(child) : -1;
+  }
 
-        return cell ? cell.children : null;
-    }
+  getChildAt(cell, index) {
 
-    getChildCount(cell) {
+    return cell ? cell.getChildAt(index) : null;
+  }
 
-        return cell ? cell.getChildCount() : 0;
-    }
+  getChildren(cell) {
 
+    return cell ? cell.children : null;
+  }
 
-    // node
-    // ----
+  getChildCount(cell) {
 
-    isNode(cell) {
-
-        return cell ? cell.isNode() : false;
-    }
-
-    getLinkCount(cell) {
-
-        return cell ? cell.getLinkCount() : 0;
-    }
-
-    indexOfLink(cell, link) {
-
-        return cell ? cell.indexOfLink(link) : -1;
-    }
-
-    getLinkAt(cell, index) {
-
-        return cell ? cell.getLinkAt(index) : null;
-    }
+    return cell ? cell.getChildCount() : 0;
+  }
 
 
-    // link
-    // ----
+  // node
+  // ----
 
-    isLink(link) {
+  isNode(cell) {
 
-        return link ? link.isLink() : false;
-    }
+    return cell ? cell.isNode() : false;
+  }
 
-    getTerminal(link, isSource) {
+  getLinkCount(cell) {
 
-        return link ? link.getTerminal(isSource) : null;
-    }
+    return cell ? cell.getLinkCount() : 0;
+  }
 
-    getTerminalNode(link, isSource) {
+  indexOfLink(cell, link) {
 
-        return link ? link.getTerminalNode(isSource) : null;
-    }
+    return cell ? cell.indexOfLink(link) : -1;
+  }
 
-    getTerminalPort(link, isSource) {
+  getLinkAt(cell, index) {
 
-        return link ? link.getTerminalPort(isSource) : null;
-    }
+    return cell ? cell.getLinkAt(index) : null;
+  }
 
-    getTerminalPoint(link, isSource) {
 
-        return link ? link.getTerminalPoint(isSource) : null;
-    }
+  // link
+  // ----
 
-    setTerminal(link, terminal, isSource) {
+  isLink(link) {
 
-        // fully replace the terminal
+    return link ? link.isLink() : false;
+  }
 
-        if (link) {
-            try {
-                this.beginUpdate();
-                this.digest(new TerminalChange(this, link, new Terminal(terminal), isSource));
-            } finally {
-                this.endUpdate();
-            }
-        }
+  getTerminal(link, isSource) {
 
-        return this;
-    }
+    return link ? link.getTerminal(isSource) : null;
+  }
 
-    setTerminalNode(link, node, isSource) {
+  getTerminalNode(link, isSource) {
 
-        if (link) {
-            this.setTerminal(link, node, isSource);
-        }
+    return link ? link.getTerminalNode(isSource) : null;
+  }
 
-        return this;
-    }
+  getTerminalPort(link, isSource) {
 
-    setTerminalPort(link, port, isSource) {
+    return link ? link.getTerminalPort(isSource) : null;
+  }
 
-        // partial replace the terminal port
+  getTerminalPoint(link, isSource) {
 
-        if (link) {
-            let terminal = this.getTerminal(link, isSource);
+    return link ? link.getTerminalPoint(isSource) : null;
+  }
 
-            terminal = terminal
-                ? terminal.duplicate({ port })
-                : new Terminal({ port });
+  setTerminal(link, terminal, isSource) {
 
-            this.setTerminal(link, terminal, isSource);
-        }
+    // fully replace the terminal
 
-        return this;
-    }
-
-    setTerminalPoint(link, point, isSource) {
-
-        if (link) {
-            this.setTerminal(link, point, isSource);
-        }
-
-        return this;
-    }
-
-    setTerminals(link, source, target) {
-
+    if (link) {
+      try {
         this.beginUpdate();
+        this.digest(new TerminalChange(this, link, new Terminal(terminal), isSource));
+      } finally {
+        this.endUpdate();
+      }
+    }
+
+    return this;
+  }
+
+  setTerminalNode(link, node, isSource) {
+
+    if (link) {
+      this.setTerminal(link, node, isSource);
+    }
+
+    return this;
+  }
+
+  setTerminalPort(link, port, isSource) {
+
+    // partial replace the terminal port
+
+    if (link) {
+      let terminal = this.getTerminal(link, isSource);
+
+      terminal = terminal
+        ? terminal.duplicate({ port })
+        : new Terminal({ port });
+
+      this.setTerminal(link, terminal, isSource);
+    }
+
+    return this;
+  }
+
+  setTerminalPoint(link, point, isSource) {
+
+    if (link) {
+      this.setTerminal(link, point, isSource);
+    }
+
+    return this;
+  }
+
+  setTerminals(link, source, target) {
+
+    this.beginUpdate();
+
+    try {
+      this.setTerminal(link, source, true);
+      this.setTerminal(link, target, false);
+    } finally {
+      this.endUpdate();
+    }
+
+    return this;
+  }
+
+  removeFromTerminal(link, isSource) {
+
+    if (link) {
+      this.setTerminal(link, null, isSource);
+    }
+
+    return this;
+  }
+
+  terminalChanged(link, terminal, isSource) {
+
+    let prev = this.getTerminal(link, isSource);
+
+    if (terminal) {
+      terminal.addLink(link, isSource, { silent: true });
+    } else if (prev) {
+      prev.removeLink(link, isSource, { silent: true });
+    }
+
+    return prev;
+  }
+
+
+  // collapse
+  // --------
+
+  isCollapsed(cell) {
+
+    return cell ? cell.isCollapsed() : false;
+  }
+
+  setCollapsed(cell, collapsed) {
+
+    if (cell && collapsed !== this.isCollapsed(cell)) {
+      try {
+        this.beginUpdate();
+        this.digest(new CollapseChange(this, cell, collapsed));
+      } finally {
+        this.endUpdate();
+      }
+    }
+
+    return this;
+  }
+
+  collapseChanged(cell, collapsed) {
+
+    let previous = this.isCollapsed(cell);
+
+    cell.setCollapsed(collapsed, { silent: true });
+
+    return previous;
+  }
+
+
+  // visible
+  // -------
+
+  isVisible(cell) {
+
+    return cell ? cell.isVisible() : false;
+  }
+
+  setVisible(cell, visible) {
+
+    if (cell && visible !== this.isVisible(cell)) {
+      try {
+        this.beginUpdate();
+        this.digest(new VisibleChange(this, cell, visible));
+      } finally {
+        this.endUpdate();
+      }
+    }
+
+    return this;
+  }
+
+  visibleChanged(cell, visible) {
+
+    let previous = this.isVisible(cell);
+
+    cell.setVisible(visible, { silent: true });
+
+    return previous;
+  }
+
+
+  // attribute
+  // ---------
+
+  getAttribute(cell) {
+
+    return cell ? cell.getAttribute() : null;
+  }
+
+  setAttribute(cell, attrs) {
+
+    if (cell) {
+      try {
+        this.beginUpdate();
+        this.digest(new AttributeChange(this, cell, attrs));
+      } finally {
+        this.endUpdate();
+      }
+    }
+
+    return this;
+  }
+
+  attributeChanged(cell, attrs) {
+
+    let previous = this.getAttribute(cell);
+
+    cell.setAttribute(attrs, { silent: true });
+
+    return previous;
+  }
+
+
+  // geometry
+  // --------
+
+  getPosition(cell, raw) {
+
+    return cell ? cell.getPosition(raw) : null;
+  }
+
+  setPosition(cell, position) {
+
+    if (cell && position) {
+
+      let previous = cell.getPosition(true) || {};
+
+      position.relative = position.relative === true;
+      previous.relative = previous.relative === true;
+
+      if (previous.x !== position.x ||
+        previous.y !== position.y ||
+        previous.relative !== position.relative) {
 
         try {
-            this.setTerminal(link, source, true);
-            this.setTerminal(link, target, false);
+          this.beginUpdate();
+          this.digest(new PositionChange(this, cell, {
+            x: position.x,
+            y: position.y,
+            relative: position.relative
+          }));
         } finally {
-            this.endUpdate();
+          this.endUpdate();
         }
-
-        return this;
+      }
     }
 
-    removeFromTerminal(link, isSource) {
+    return this;
+  }
 
-        if (link) {
-            this.setTerminal(link, null, isSource);
+  positionChanged(cell, position) {
+
+    let previous = cell.getPosition(true);
+
+    cell.setPosition(position, { silent: true });
+
+    return previous;
+  }
+
+  getSize(cell, raw) {
+
+    return cell ? cell.getSize(raw) : null;
+  }
+
+  setSize(cell, size) {
+
+    if (cell && size) {
+
+      let prev = cell.getSize(true) || {};
+
+      size.relative = size.relative === true;
+      prev.relative = prev.relative === true;
+
+      if (prev.width !== size.width ||
+        prev.height !== size.height ||
+        prev.relative !== size.relative) {
+
+        try {
+          this.beginUpdate();
+          this.digest(new SizeChange(this, cell, {
+            width: size.width,
+            height: size.height,
+            relative: size.relative
+          }));
+        } finally {
+          this.endUpdate();
         }
-
-        return this;
+      }
     }
 
-    terminalChanged(link, terminal, isSource) {
+    return this;
+  }
 
-        let prev = this.getTerminal(link, isSource);
+  sizeChanged(cell, size) {
 
-        if (terminal) {
-            terminal.addLink(link, isSource, { silent: true });
-        } else if (prev) {
-            prev.removeLink(link, isSource, { silent: true });
+    let previous = cell.getSize(true);
+
+    cell.setSize(size, { silent: true });
+
+    return previous;
+  }
+
+  getRotation(cell, raw) {
+
+    return cell ? cell.getRotation(raw) : null;
+  }
+
+  setRotation(cell, rotation) {
+
+    if (cell && rotation) {
+
+      let previous = cell.getRotation(true) || {};
+
+      rotation.relative = rotation.relative === true;
+      previous.relative = previous.relative === true;
+
+      if (previous.angle !== rotation.angle ||
+        previous.relative !== rotation.relative) {
+
+        try {
+          this.beginUpdate();
+          this.digest(new RotationChange(this, cell, {
+            angle: rotation.angle,
+            relative: rotation.relative
+          }));
+        } finally {
+          this.endUpdate();
         }
-
-        return prev;
+      }
     }
 
+    return this;
+  }
 
-    // collapse
-    // --------
+  rotationChanged(cell, rotation) {
 
-    isCollapsed(cell) {
+    let previous = cell.getRotation(true);
 
-        return cell ? cell.isCollapsed() : false;
-    }
+    cell.setRotation(rotation, { silent: true });
 
-    setCollapsed(cell, collapsed) {
+    return previous;
+  }
 
-        if (cell && collapsed !== this.isCollapsed(cell)) {
-            try {
-                this.beginUpdate();
-                this.digest(new CollapseChange(this, cell, collapsed));
-            } finally {
-                this.endUpdate();
-            }
-        }
+  getGeometry(cell, raw) {
 
-        return this;
-    }
+    return cell ? cell.getGeometry(raw) : null;
+  }
 
-    collapseChanged(cell, collapsed) {
+  setGeometry(cell, geom) {
 
-        let previous = this.isCollapsed(cell);
-
-        cell.setCollapsed(collapsed, { silent: true });
-
-        return previous;
-    }
-
-
-    // visible
-    // -------
-
-    isVisible(cell) {
-
-        return cell ? cell.isVisible() : false;
-    }
-
-    setVisible(cell, visible) {
-
-        if (cell && visible !== this.isVisible(cell)) {
-            try {
-                this.beginUpdate();
-                this.digest(new VisibleChange(this, cell, visible));
-            } finally {
-                this.endUpdate();
-            }
-        }
-
-        return this;
-    }
-
-    visibleChanged(cell, visible) {
-
-        let previous = this.isVisible(cell);
-
-        cell.setVisible(visible, { silent: true });
-
-        return previous;
-    }
-
-
-    // attribute
-    // ---------
-
-    getAttribute(cell) {
-
-        return cell ? cell.getAttribute() : null;
-    }
-
-    setAttribute(cell, attrs) {
-
-        if (cell) {
-            try {
-                this.beginUpdate();
-                this.digest(new AttributeChange(this, cell, attrs));
-            } finally {
-                this.endUpdate();
-            }
-        }
-
-        return this;
-    }
-
-    attributeChanged(cell, attrs) {
-
-        let previous = this.getAttribute(cell);
-
-        cell.setAttribute(attrs, { silent: true });
-
-        return previous;
-    }
-
-
-    // geometry
-    // --------
-
-    getPosition(cell, raw) {
-
-        return cell ? cell.getPosition(raw) : null;
-    }
-
-    setPosition(cell, position) {
-
-        if (cell && position) {
-
-            let previous = cell.getPosition(true) || {};
-
-            position.relative = position.relative === true;
-            previous.relative = previous.relative === true;
-
-            if (previous.x !== position.x ||
-                previous.y !== position.y ||
-                previous.relative !== position.relative) {
-
-                try {
-                    this.beginUpdate();
-                    this.digest(new PositionChange(this, cell, {
-                        x: position.x,
-                        y: position.y,
-                        relative: position.relative
-                    }));
-                } finally {
-                    this.endUpdate();
-                }
-            }
-        }
-
-        return this;
-    }
-
-    positionChanged(cell, position) {
-
-        let previous = cell.getPosition(true);
-
-        cell.setPosition(position, { silent: true });
-
-        return previous;
-    }
-
-    getSize(cell, raw) {
-
-        return cell ? cell.getSize(raw) : null;
-    }
-
-    setSize(cell, size) {
-
-        if (cell && size) {
-
-            let prev = cell.getSize(true) || {};
-
-            size.relative = size.relative === true;
-            prev.relative = prev.relative === true;
-
-            if (prev.width !== size.width ||
-                prev.height !== size.height ||
-                prev.relative !== size.relative) {
-
-                try {
-                    this.beginUpdate();
-                    this.digest(new SizeChange(this, cell, {
-                        width: size.width,
-                        height: size.height,
-                        relative: size.relative
-                    }));
-                } finally {
-                    this.endUpdate();
-                }
-            }
-        }
-
-        return this;
-    }
-
-    sizeChanged(cell, size) {
-
-        let previous = cell.getSize(true);
-
-        cell.setSize(size, { silent: true });
-
-        return previous;
-    }
-
-    getRotation(cell, raw) {
-
-        return cell ? cell.getRotation(raw) : null;
-    }
-
-    setRotation(cell, rotation) {
-
-        if (cell && rotation) {
-
-            let previous = cell.getRotation(true) || {};
-
-            rotation.relative = rotation.relative === true;
-            previous.relative = previous.relative === true;
-
-            if (previous.angle !== rotation.angle ||
-                previous.relative !== rotation.relative) {
-
-                try {
-                    this.beginUpdate();
-                    this.digest(new RotationChange(this, cell, {
-                        angle: rotation.angle,
-                        relative: rotation.relative
-                    }));
-                } finally {
-                    this.endUpdate();
-                }
-            }
-        }
-
-        return this;
-    }
-
-    rotationChanged(cell, rotation) {
-
-        let previous = cell.getRotation(true);
-
-        cell.setRotation(rotation, { silent: true });
-
-        return previous;
-    }
-
-    getGeometry(cell, raw) {
-
-        return cell ? cell.getGeometry(raw) : null;
-    }
-
-    setGeometry(cell, geom) {
-
-        if (cell && geom) {
-            try {
-                this.beginUpdate();
-                this.digest(new GeometryChange(this, cell, geom));
-            } finally {
-                this.endUpdate();
-            }
-        }
-
-        return this;
-    }
-
-    geometryChanged(cell, geom) {
-
-        let previous = cell.getGeometry(true) || {};
-
-        utils.forEach(['size', 'position', 'rotation'], key => {
-            if (geom[key]) {
-                this[key + 'Changed'](cell, geom[key]);
-            }
-        }, this);
-
-        return previous;
-    }
-
-
-    // update
-    // ------
-
-    digest(change) {
-
-        // take effect the change
-        change.digest();
-
+    if (cell && geom) {
+      try {
         this.beginUpdate();
-        this.changes.add(change);
+        this.digest(new GeometryChange(this, cell, geom));
+      } finally {
         this.endUpdate();
-
-        return this;
+      }
     }
 
-    beginUpdate() {
+    return this;
+  }
 
-        this.updateLevel += 1;
-        this.trigger('beginUpdate');
+  geometryChanged(cell, geom) {
 
-        if (this.updateLevel === 1) {
-            this.trigger('startEdit');
-        }
+    let previous = cell.getGeometry(true) || {};
+
+    utils.forEach(['size', 'position', 'rotation'], (key) => {
+      if (geom[key]) {
+        this[key + 'Changed'](cell, geom[key]);
+      }
+    });
+
+    return previous;
+  }
+
+
+  // update
+  // ------
+
+  digest(change) {
+
+    // take effect the change
+    change.digest();
+
+    this.beginUpdate();
+    this.changes.add(change);
+    this.endUpdate();
+
+    return this;
+  }
+
+  beginUpdate() {
+
+    this.updateLevel += 1;
+    this.trigger('beginUpdate');
+
+    if (this.updateLevel === 1) {
+      this.trigger('startEdit');
+    }
+  }
+
+  endUpdate() {
+
+    this.updateLevel -= 1;
+
+    if (this.updateLevel === 0) {
+      this.trigger('endEdit');
     }
 
-    endUpdate() {
+    if (!this.endingUpdate) {
 
-        this.updateLevel -= 1;
+      this.endingUpdate = this.updateLevel === 0;
 
-        if (this.updateLevel === 0) {
-            this.trigger('endEdit');
-        }
+      let changes = this.changes;
 
-        if (!this.endingUpdate) {
+      this.trigger('endUpdate', changes.getChanges());
 
-            this.endingUpdate = this.updateLevel === 0;
+      // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 还需要一种机制来管理
+      if (this.endingUpdate && changes.hasChange()) {
+        changes
+          .notify()
+          .clear();
+      }
 
-            let changes = this.changes;
-
-            this.trigger('endUpdate', changes.getChanges());
-
-            // TODO: 如果此时还没有和 paper 关联, 所有的 changes 都将失效, 还需要一种机制来管理
-            if (this.endingUpdate && changes.hasChange()) {
-                changes
-                    .notify()
-                    .clear();
-            }
-
-            this.endingUpdate = false;
-        }
+      this.endingUpdate = false;
     }
+  }
 
-    isUpdated() {
+  isUpdated() {
 
-        return this.updateLevel === 0;
-    }
+    return this.updateLevel === 0;
+  }
 
-    destroy() {
+  destroy() {
 
-        utils.destroy(this);
-    }
+    utils.destroy(this);
+  }
 }
 
 

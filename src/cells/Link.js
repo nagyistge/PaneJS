@@ -97,7 +97,7 @@ class Link extends Cell {
 
     if (point && Point.isPointLike(point)) {
 
-      for (let i = 0, l = this.getVerticesCount(); i < l; i++) {
+      for (let i = 0, l = this.getVerticesCount(); i < l; i += 1) {
 
         let vertice = this.getVerticeAt(i);
 
@@ -175,7 +175,7 @@ class Link extends Cell {
 
     cloned.vertices = [];
 
-    utils.forEach(this.vertices, function (point) {
+    utils.forEach(this.vertices, (point) => {
       if (Point.isPointLike(point)) {
         cloned.vertices.push({ x: point.x, y: point.y });
       }
@@ -188,10 +188,10 @@ class Link extends Cell {
 
 Link.setDefaults({
   tagName: 'g',
-  markup: ''
-  + '<path class="connector"/>'
-  + '<path class="source-marker"/>'
-  + '<path class="target-marker"/>',
+  markup: `
+    <path class="connector"/>
+    <path class="source-marker"/>
+    <path class="target-marker"/>`,
   classNames: 'pane-cell pane-link', // pane-cell for event handler
   pane: 'linkPane',
   data: null,   // related data(for business logic)

@@ -4,321 +4,328 @@ import BaseView   from '../views/NodeView';
 
 
 const selectors = {
-    content: '.pane-node-content',
-    name: '.name',
-    portList: '.pane-port-list',
-    inPortList: '.pane-port-list.in',
-    outPortList: '.pane-port-list.out',
-    portWrap: '.pane-port-wrap',
-    portItem: '.pane-port',
-    portMagnet: '.port-magnet',
-    portAdsorb: '.is-adsorbed'
+  content: '.pane-node-content',
+  name: '.name',
+  portList: '.pane-port-list',
+  inPortList: '.pane-port-list.in',
+  outPortList: '.pane-port-list.out',
+  portWrap: '.pane-port-wrap',
+  portItem: '.pane-port',
+  portMagnet: '.port-magnet',
+  portAdsorb: '.is-adsorbed'
 };
 
 const classNames = {
-    portItem: 'pane-port',
-    inPortList: 'pane-port-list in',
-    outPortList: 'pane-port-list out',
-    connected: 'is-connected',
-    connecting: 'is-connecting',
-    connectable: 'is-connectable',
-    adsorbed: 'is-adsorbed',
+  portItem: 'pane-port',
+  inPortList: 'pane-port-list in',
+  outPortList: 'pane-port-list out',
+  connected: 'is-connected',
+  connecting: 'is-connecting',
+  connectable: 'is-connectable',
+  adsorbed: 'is-adsorbed',
 };
 
 
 class NodeView extends BaseView {
 
-    renderMarkup() {
+  renderMarkup() {
 
-        super.renderMarkup();
-        this.renderPorts(true);
-        this.renderPorts(false);
+    super.renderMarkup();
+    this.renderPorts(true);
+    this.renderPorts(false);
 
-        return this;
-    }
+    return this;
+  }
 
-    renderPorts(isInPort) {
+  renderPorts(isInPort) {
 
-        let node  = this.getCell();
-        let ports = node.getVisiblePorts(isInPort);
-        let count = ports.length;
+    let node  = this.getCell();
+    let ports = node.getVisiblePorts(isInPort);
+    let count = ports.length;
 
-        if (count) {
+    if (count) {
 
-            let portListVel = this.getPortListVel(isInPort);
-            if (portListVel) {
+      let portListVel = this.getPortListVel(isInPort);
+      if (portListVel) {
 
-                let markup  = node.getPortMarkup();
-                let content = utils.map(ports, function (port) {
-                    return this.compileMarkup(markup, port);
-                }, this).join('');
+        let markup  = node.getPortMarkup();
+        let content = utils.map(ports, port => this.compileMarkup(markup, port)).join('');
 
-                portListVel.html(content);
+        portListVel.html(content);
 
-                utils.forEach(portListVel.find(selectors.portWrap), function (vel) {
-                    vel.css({ 'width': utils.toPercentage(1 / (count + 1), 2) });
-                });
-
-                utils.forEach(ports, function (port) {
-                    this.setPortConnected(port, isInPort, port.connected === true);
-                }, this);
-            }
-        }
-
-        return this;
-    }
-
-    resize() {
-
-        if (!this.scalableNode) {
-            return this;
-        }
-
-
-        let cell   = this.cell;
-        let width  = cell.size.width;
-        let height = cell.size.height;
-
-        this.scalableNode
-            .findOne('foreignobject')
-            .attr({
-                width,
-                height
-            });
-
-        utils.forEach(this.scalableNode.find('.pane-port-list'), function (vel) {
-            vel.css({
-                width: width + 'px'
-            });
+        utils.forEach(portListVel.find(selectors.portWrap), (vel) => {
+          vel.css({ width: utils.toPercentage(1 / (count + 1), 2) });
         });
 
-        return super.resize();
+        utils.forEach(ports, (port) => {
+          this.setPortConnected(port, isInPort, port.connected === true);
+        });
+      }
     }
 
-    setNodeName(name) {
+    return this;
+  }
 
-        let node = this.getCell();
+  resize() {
 
-        if (node.data) {
-            node.data.name = name;
-        }
-
-        let elem = this.findOne(selectors.name);
-        if (elem) {
-            utils.emptyElement(elem);
-            elem.appendChild(document.createTextNode(name));
-        }
-
-        return this;
+    if (!this.scalableNode) {
+      return this;
     }
 
-    setPortConnected(port, isInPort, isConnected) {
 
-        let vel = this.getPortVel(port, isInPort);
-        if (vel) {
-            vel.toggleClass(classNames.connected, isConnected);
-        }
+    let cell   = this.cell;
+    let width  = cell.size.width;
+    let height = cell.size.height;
+
+    this.scalableNode
+      .findOne('foreignobject')
+      .attr({
+        width,
+        height
+      });
+
+    utils.forEach(this.scalableNode.find('.pane-port-list'), (vel) => {
+      vel.css({
+        width: width + 'px'
+      });
+    });
+
+    return super.resize();
+  }
+
+  setNodeName(name) {
+
+    let node = this.getCell();
+
+    if (node.data) {
+      node.data.name = name;
     }
 
-    setPortConnecting(port, isInPort, isConnecting) {
-
-        let vel = this.getPortVel(port, isInPort);
-        if (vel) {
-            vel.toggleClass(classNames.connecting, isConnecting);
-        }
+    let elem = this.findOne(selectors.name);
+    if (elem) {
+      utils.emptyElement(elem);
+      elem.appendChild(document.createTextNode(name));
     }
 
-    setPortHighlight(port, isInPort, isHighlighted) {
+    return this;
+  }
 
-        let vel = this.getPortVel(port, isInPort);
-        if (vel) {
-            vel.toggleClass(classNames.connectable, isHighlighted);
-        }
+  setPortConnected(port, isInPort, isConnected) {
 
-        let containerVel = this.findOne(selectors.content);
-        if (containerVel) {
-            containerVel.toggleClass(classNames.connectable, isHighlighted);
-        }
+    let vel = this.getPortVel(port, isInPort);
+    if (vel) {
+      vel.toggleClass(classNames.connected, isConnected);
+    }
+  }
 
-        if (port.connected === true) {
-            if (isHighlighted && port.connected) {
-                this.setPortConnected(port, isInPort, false);
-            } else {
-                this.setPortConnected(port, isInPort, true);
-            }
-        }
+  setPortConnecting(port, isInPort, isConnecting) {
+
+    let vel = this.getPortVel(port, isInPort);
+    if (vel) {
+      vel.toggleClass(classNames.connecting, isConnecting);
+    }
+  }
+
+  setPortHighlight(port, isInPort, isHighlighted) {
+
+    let vel = this.getPortVel(port, isInPort);
+    if (vel) {
+      vel.toggleClass(classNames.connectable, isHighlighted);
     }
 
-    setPortAdsorbed(port, isInPort, isAdsorbed) {
-
-        let vel = this.getPortVel(port, isInPort);
-        if (vel) {
-
-            let magnet = vel.findOne(selectors.portMagnet);
-            if (magnet) {
-                magnet.toggleClass(classNames.adsorbed, isAdsorbed);
-            }
-
-            if (isAdsorbed) {
-
-                let selector = this.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
-
-                utils.forEach(this.find(selector), function (item) {
-                    if (!magnet || item.node !== magnet.node) {
-                        item.removeClass(classNames.adsorbed);
-                    }
-                });
-            }
-        }
+    let containerVel = this.findOne(selectors.content);
+    if (containerVel) {
+      containerVel.toggleClass(classNames.connectable, isHighlighted);
     }
 
-    getBBox() {
+    if (port.connected === true) {
+      if (isHighlighted && port.connected) {
+        this.setPortConnected(port, isInPort, false);
+      } else {
+        this.setPortConnected(port, isInPort, true);
+      }
+    }
+  }
 
-        let bounds = utils.getBounds(this.elem);
-        if (bounds) {
-            return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
-        }
+  setPortAdsorbed(port, isInPort, isAdsorbed) {
+
+    let vel = this.getPortVel(port, isInPort);
+    if (vel) {
+
+      let magnet = vel.findOne(selectors.portMagnet);
+      if (magnet) {
+        magnet.toggleClass(classNames.adsorbed, isAdsorbed);
+      }
+
+      if (isAdsorbed) {
+
+        let selector = this.getPortSelector(isInPort) + ' ' + selectors.portAdsorb;
+
+        utils.forEach(this.find(selector), (item) => {
+          if (!magnet || item.node !== magnet.node) {
+            item.removeClass(classNames.adsorbed);
+          }
+        });
+      }
+    }
+  }
+
+  getBBox() {
+
+    let bounds = utils.getBounds(this.elem);
+    if (bounds) {
+      return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
     }
 
-    getStrokedBBox() {
+    return null;
+  }
 
-        let bbox        = this.cell.getBBox();
-        let borderWidth = 0;
-        let contentVel  = this.findOne(selectors.content);
-        if (contentVel) {
-            borderWidth = utils.getComputedStyle(contentVel.node, 'border-width') - 1;
-        }
+  getStrokedBBox() {
 
-        return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+    let bbox        = this.cell.getBBox();
+    let borderWidth = 0;
+    let contentVel  = this.findOne(selectors.content);
+    if (contentVel) {
+      borderWidth = utils.getComputedStyle(contentVel.node, 'border-width') - 1;
     }
 
-    getPortBodyBBox(port, isInPort) {
+    return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+  }
 
-        let elem = this.getPortElem(port, isInPort);
-        if (elem) {
-            let bounds = utils.getBounds(elem);
-            return this.getPaper().toLocalRect({
-                x: bounds.left,
-                y: bounds.top,
-                width: bounds.width,
-                height: bounds.height
-            });
-        }
+  getPortBodyBBox(port, isInPort) {
+
+    let elem = this.getPortElem(port, isInPort);
+    if (elem) {
+      let bounds = utils.getBounds(elem);
+      return this.getPaper().toLocalRect({
+        x: bounds.left,
+        y: bounds.top,
+        width: bounds.width,
+        height: bounds.height
+      });
     }
 
-    getPortSelector(isInPort, port) {
+    return null;
+  }
 
-        let selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
+  getPortSelector(isInPort, port) {
 
-        if (port) {
-            selector += '[data-id="' + port.id + '"]';
-        }
+    let selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
 
-        return selector;
+    if (port) {
+      selector += '[data-id="' + port.id + '"]';
     }
 
-    getPortListSelector(isInPort) {
+    return selector;
+  }
 
-        return isInPort ? selectors.inPortList : selectors.outPortList;
+  getPortListSelector(isInPort) {
+
+    return isInPort ? selectors.inPortList : selectors.outPortList;
+  }
+
+  getPortListVel(isInPort) {
+
+    return this.findOne(this.getPortListSelector(isInPort));
+  }
+
+  getPortsVel(isInPort) {
+
+    return this.find(this.getPortSelector(isInPort));
+  }
+
+  getPortVel(port, isInPort) {
+
+    let node = this.getCell();
+
+    if (!utils.isObject(port)) {
+      port = node.getPortById(port);
     }
 
-    getPortListVel(isInPort) {
-
-        return this.findOne(this.getPortListSelector(isInPort));
+    let selector = this.getPortSelector(isInPort, port);
+    if (selector) {
+      return this.findOne(selector);
     }
 
-    getPortsVel(isInPort) {
+    return null;
+  }
 
-        return this.find(this.getPortSelector(isInPort));
+  getPortElem(port, isInPort) {
+
+    const portVel = this.getPortVel(port, isInPort);
+    return portVel ? portVel.node : null;
+  }
+
+  findPortElem(elem) {
+
+    while (elem && elem !== this.elem) {
+      if (utils.hasClass(elem, classNames.portItem)) {
+        return elem;
+      }
+      elem = elem.parentNode;
     }
 
-    getPortVel(port, isInPort) {
+    return null;
+  }
 
-        let node = this.getCell();
+  isPortElem(elem) {
 
-        if (!utils.isObject(port)) {
-            port = node.getPortById(port);
-        }
+    return !!this.findPortElem(elem);
+  }
 
-        let selector = this.getPortSelector(isInPort, port);
-        if (selector) {
-            return this.findOne(selector);
-        }
+  isOutPortElem(elem) {
+
+    elem = this.findPortElem(elem);
+
+    while (elem && elem !== this.elem) {
+      if (utils.hasClass(elem, classNames.outPortList)) {
+        return true;
+      }
+      elem = elem.parentNode;
     }
 
-    getPortElem(port, isInPort) {
+    return false;
+  }
 
-        const portVel = this.getPortVel(port, isInPort);
-        return portVel ? portVel.node : null;
+  isInPortElem(elem) {
+
+    elem = this.findPortElem(elem);
+
+    while (elem && elem !== this.elem) {
+      if (utils.hasClass(elem, classNames.inPortList)) {
+        return true;
+      }
+      elem = elem.parentNode;
     }
 
-    findPortElem(elem) {
+    return false;
+  }
 
-        while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, classNames.portItem)) {
-                return elem;
-            }
-            elem = elem.parentNode;
-        }
+  findPortByElem(elem) {
 
-        return null;
-    }
+    let result   = null;
+    let portElem = elem && this.findPortElem(elem);
 
-    isPortElem(elem) {
+    if (portElem) {
+      let collection = this.isOutPortElem(portElem)
+        ? this.cell.getOutPorts()
+        : this.cell.getInPorts();
 
-        return this.findPortElem(elem) ? true : false;
-    }
+      let portId = portElem.getAttribute('data-id');
 
-    isOutPortElem(elem) {
+      utils.some(collection, (port) => {
 
-        elem = this.findPortElem(elem);
-
-        while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, classNames.outPortList)) {
-                return true;
-            }
-            elem = elem.parentNode;
+        if (utils.toString(port.id) === portId) {
+          result = port;
+          return true;
         }
 
         return false;
+      });
     }
 
-    isInPortElem(elem) {
-
-        elem = this.findPortElem(elem);
-
-        while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, classNames.inPortList)) {
-                return true;
-            }
-            elem = elem.parentNode;
-        }
-
-        return false;
-    }
-
-    findPortByElem(elem) {
-
-        let result   = null;
-        let portElem = elem && this.findPortElem(elem);
-
-        if (portElem) {
-            let collection = this.isOutPortElem(portElem)
-                ? this.cell.getOutPorts()
-                : this.cell.getInPorts();
-
-            let portId = portElem.getAttribute('data-id');
-
-            utils.some(collection, function (port) {
-                if (utils.toString(port.id) === portId) {
-                    result = port;
-                    return true;
-                }
-            });
-        }
-
-        return result;
-    }
+    return result;
+  }
 }
 
 

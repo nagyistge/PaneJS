@@ -20,29 +20,29 @@ import ConnectionHandler from './ConnectionHandler';
 import quadratic from './quadratic';
 
 
-let pai = {
-    Node,
-    NodeView,
-    LinkView,
+const pai = {
+  Node,
+  NodeView,
+  LinkView,
 
-    Group,
-    GroupView,
+  Group,
+  GroupView,
 
-    Remark,
-    RemarkView,
+  Remark,
+  RemarkView,
 
-    Navigator,
-    Snaplines,
-    PaperScroll,
+  Navigator,
+  Snaplines,
+  PaperScroll,
 
-    Handler,
-    SelectionHandler,
-    ConnectionHandler,
+  Handler,
+  SelectionHandler,
+  ConnectionHandler,
 
-    quadratic,
+  quadratic,
 };
 
 
 export {
-    pai
+  pai
 };

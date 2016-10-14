@@ -7,8 +7,7 @@ import GeometryChange   from '../changes/GeometryChange';
 import CollapseChange   from '../changes/CollapseChange';
 import ChangeCollection from '../changes/ChangeCollection';
 
-
-let changes = {
+const changes = {
   Change,
   RootChange,
   ChildChange,

@@ -15,14 +15,14 @@ export function keys(obj) {
 
 export function forIn(obj, iterator, context) {
 
-  forEach(keys(obj), function (key) {
+  forEach(keys(obj), (key) => {
     iterator.call(context, obj[key], key);
   });
 }
 
 export function extend(target = {}, ...sources) {
 
-  forEach(sources, source => {
+  forEach(sources, (source) => {
     if (source) {
       /* eslint guard-for-in: 0 */
       for (let key in source) {
@@ -36,7 +36,7 @@ export function extend(target = {}, ...sources) {
 
 export function merge(target = {}, ...sources) {
 
-  forEach(sources, source => {
+  forEach(sources, (source) => {
     if (source) {
       /* eslint guard-for-in: 0 */
       for (let name in source) {
@@ -87,7 +87,7 @@ export function destroy(obj) {
 
   if (obj) {
     for (let prop in obj) {
-      if (obj.hasOwnProperty(prop)) {
+      if (hasOwn(obj, prop)) {
         delete obj[prop];
       }
     }

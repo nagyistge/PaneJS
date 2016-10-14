@@ -23,7 +23,7 @@ export function toFloat(value, percentage) {
 
 export function toPercentage(value, precision = 2) {
 
-  return toFixed(value * 100, precision) + '%';
+  return `${toFixed(value * 100, precision)}%`;
 }
 
 export function toFixed(value, precision = 2) {

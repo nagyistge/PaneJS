@@ -1,25 +1,24 @@
-// import * as utils from '../../common/utils';
 import Point from '../../geometry/Point';
 
-function clovenMarker(vMarker, options) {
+export default function clovenMarker(vMarker, options) {
 
-    if (vMarker) {
+  if (vMarker) {
 
-        let rx = options.rx || 7;
-        let ry = options.ry || rx / 2;
-        let pathArr = [];
+    let rx      = options.rx || 7;
+    let ry      = options.ry || rx / 2;
+    let pathArr = [];
 
-        pathArr.push('M', rx, 0);
-        pathArr.push('L', 0, ry);
-        pathArr.push('L', rx, ry * 2);
+    pathArr.push('M', rx, 0);
+    pathArr.push('L', 0, ry);
+    pathArr.push('L', rx, ry * 2);
 
-        vMarker.attr('d', pathArr.join(' '));
+    vMarker.attr('d', pathArr.join(' '));
 
-        return {
-            rad: Math.atan2(ry, rx),
-            point: new Point(0, ry)
-        };
-    }
+    return {
+      rad: Math.atan2(ry, rx),
+      point: new Point(0, ry)
+    };
+  }
+
+  return null;
 }
-
-export default clovenMarker;

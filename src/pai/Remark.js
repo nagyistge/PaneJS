@@ -5,48 +5,48 @@ import RemarkView from './RemarkView';
 
 class Remark extends Node {
 
-    isRemark() {
+  isRemark() {
 
-        return true;
-    }
+    return true;
+  }
 
-    getRemark() {
+  getRemark() {
 
-        return this.data.name || '';
-    }
+    return this.data.name || '';
+  }
 
-    getBBox() {
+  getBBox() {
 
-        const size     = this.getSize();
-        const position = this.getPosition();
+    const size     = this.getSize();
+    const position = this.getPosition();
 
-        return new Rect(position.x, position.y, size.width, size.height);
-    }
+    return new Rect(position.x, position.y, size.width, size.height);
+  }
 
-    getMaxSize() {
+  getMaxSize() {
 
-        return {
-            width: 180,
-            height: 96
-        };
-    }
+    return {
+      width: 180,
+      height: 96
+    };
+  }
 
-    getSize() {
+  getSize() {
 
-        return this.metadata.size || this.getMaxSize();
-    }
+    return this.metadata.size || this.getMaxSize();
+  }
 
-    getPosition() {
+  getPosition() {
 
-        return this.metadata.position;
-    }
+    return this.metadata.position;
+  }
 }
 
 Remark.setDefaults({
-    tagName: 'g',
-    pane: 'decoratePane',
-    classNames: 'pane-remark',
-    view: RemarkView,
+  tagName: 'g',
+  pane: 'decoratePane',
+  classNames: 'pane-remark',
+  view: RemarkView,
 });
 
 

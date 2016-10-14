@@ -17,7 +17,7 @@ import { forIn } from './object';
 
 const rclass       = /[\t\r\n\f]/g;
 const rnotwhite    = (/\S+/g);
-const transformKey = (function () {
+const transformKey = (() => {
 
   if (isUndefined(document)) {
     return '';
@@ -32,7 +32,7 @@ const transformKey = (function () {
     'msTransform'
   ];
 
-  for (let i = 0, l = transforms.length; i < l; ++i) {
+  for (let i = 0, l = transforms.length; i < l; i += 1) {
 
     const key = transforms[i];
 
@@ -40,13 +40,15 @@ const transformKey = (function () {
       return key;
     }
   }
+
+  return transforms[0];
 })();
 
-const fillSpaces = str => ' ' + str + ' ';
+const fillSpaces = str => ` ${str} `;
 
 export function getClassName(elem) {
 
-  return elem.getAttribute && elem.getAttribute('class') || '';
+  return elem.getAttribute ? elem.getAttribute('class') : '';
 }
 
 export function hasClass(node, selector) {
@@ -81,7 +83,7 @@ export function addClass(node, selector) {
     let newValue = reduce(classes, (ret, cls) => {
 
       if (ret.indexOf(fillSpaces(cls)) < 0) {
-        ret += cls + ' ';
+        ret += `${cls} `;
       }
 
       return ret;
@@ -152,12 +154,10 @@ export function toggleClass(node, selector, stateVal) {
   }
 
   if (isString(selector)) {
-    forEach(selector.match(rnotwhite) || [], function (cls) {
-
+    forEach(selector.match(rnotwhite) || [], (cls) => {
       hasClass(node, cls)
         ? removeClass(node, cls)
         : addClass(node, cls);
-
     });
   }
 }
@@ -168,17 +168,17 @@ export function toggleClass(node, selector, stateVal) {
 
 export function styleStrToObject(styleStr) {
 
-  return reduce(split(styleStr, ';'), function (result, style) {
+  return reduce(split(styleStr, ';'), (result, style) => {
 
     if (style) {
-      let pairs = split(style, '=');
+      let [key, value] = split(style, '=');
 
-      result[trim(pairs[0])] = trim(pairs[1]);
+      result[key] = trim(value);
     }
 
     return result;
-  }, {});
 
+  }, {});
 }
 
 export function setStyle(elem, name, value) {
@@ -200,7 +200,7 @@ export function setStyle(elem, name, value) {
       pairs[name] = value;
     }
 
-    forIn(pairs, function (v, k) {
+    forIn(pairs, (v, k) => {
       elem.style[k === 'transform' ? transformKey : k] = v;
     });
   }
@@ -250,7 +250,7 @@ export function normalizeSides(box) {
 const docElem = document.documentElement;
 
 export const containsElement = docElem.compareDocumentPosition || docElem.contains ?
-  function (context, elem) {
+  (context, elem) => {
 
     let aDown = context.nodeType === 9 ? context.documentElement : context;
     let bUp   = elem && elem.parentNode;
@@ -261,7 +261,7 @@ export const containsElement = docElem.compareDocumentPosition || docElem.contai
           : context.compareDocumentPosition && context.compareDocumentPosition(bUp) & 16
       ));
   } :
-  function (context, elem) {
+  (context, elem) => {
 
     if (elem) {
 
@@ -327,31 +327,30 @@ export function getWindow(elem) {
 
 export function showHide(elem, show) {
 
+  /* eslint no-underscore-dangle: "off" */
+
   if (elem && elem.style) {
 
     let display = elem.style.display;
 
-    if (show) {
-      if (display === 'none') {
+    if (show && display === 'none') {
 
-        if (!isUndefined(elem.__display)) {
-          display = elem.__display;
-          delete elem.__display;
-        } else {
-          display = '';
-        }
-
-        elem.style.display = display || '';
+      if (!isUndefined(elem.__display)) {
+        display = elem.__display;
+        delete elem.__display;
+      } else {
+        display = '';
       }
-    } else {
-      if (display !== 'none') {
 
-        if (display) {
-          elem.__display = display;
-        }
+      elem.style.display = display || '';
 
-        elem.style.display = 'none';
+    } else if (!show && display !== 'none') {
+
+      if (display) {
+        elem.__display = display;
       }
+
+      elem.style.display = 'none';
     }
   }
 }
@@ -388,11 +387,12 @@ export function getOffset(elem) {
   }
 
   let win = getWindow(doc);
+  let { top, left } = box;
 
-  return {
-    top: box.top + (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0),
-    left: box.left + (win.pageXOffset || docElement.scrollLeft) - (docElement.clientLeft || 0)
-  };
+  top += (win.pageYOffset || docElement.scrollTop) - (docElement.clientTop || 0);
+  left += (win.pageXOffset || docElement.scrollLeft) - (docElement.clientLeft || 0);
+
+  return { top, left };
 }
 
 
@@ -425,7 +425,7 @@ function parseXML(str, async) {
   }
 
   if (!xml || xml.getElementsByTagName('parsererror').length) {
-    throw new Error('Invalid XML: ' + str);
+    throw new Error(`Invalid XML: ${str}`);
   }
 
   return xml;
@@ -472,11 +472,13 @@ function qualifyAttributeName(name) {
 export function setAttribute(elem, name, value) {
 
   if (isNil(value)) {
-    return removeAttribute(elem, name);
-  }
 
-  if (name === 'id') {
+    removeAttribute(elem, name);
+
+  } else if (name === 'id') {
+
     elem.id = value;
+
   } else {
 
     let qualified = qualifyAttributeName(name);

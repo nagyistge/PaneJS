@@ -10,7 +10,7 @@ export const isUndefined = val => typeof val === 'undefined';
 export const isNil = val => isUndefined(val) || isNull(val);
 
 // function and object are truly
-export const isObject = val => {
+export const isObject = (val) => {
 
   if (!val) {
     return false;
@@ -19,16 +19,13 @@ export const isObject = val => {
   return typeof val === 'function' || typeof val === 'object';
 };
 
-export const isType = (val, type) => {
-  return toString.call(val) === '[object ' + type + ']';
-};
-
+export const isType     = (val, type) => toString.call(val) === `[object ${type}]`;
 export const isArray    = val => Array.isArray(val);
 export const isWindow   = val => val && val === val.window;
 export const isNumeric  = val => !isArray(val) && (val - parseFloat(val) + 1) >= 0;
 export const isFunction = val => isType(val, 'Function');
 
-export const isArrayLike = val => {
+export const isArrayLike = (val) => {
 
   if (isArray(val)) {
     return true;

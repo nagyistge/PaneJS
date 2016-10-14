@@ -3,20 +3,28 @@ import { getByPath } from './object';
 
 const proto = String.prototype;
 
-export const toString = str => '' + str;
-
-export const toUpper = str => toString(str).toUpperCase();
-export const toLower = str => toString(str).toLowerCase();
+export const toString = str => String(str);
+export const toUpper  = str => toString(str).toUpperCase();
+export const toLower  = str => toString(str).toLowerCase();
 
 export const ucFirst = str => str.charAt(0).toUpperCase() + str.substring(1);
 export const lcFirst = str => str.charAt(0).toLowerCase() + str.substring(1);
 
-export const startWith = (str, prefix) => toString(str).indexOf(prefix) === 0;
-export const endWith   = (str, suffix) => toString(str).indexOf(suffix, toString(str).length - suffix.length) !== -1;
+export function trim(str) {
+  return str ? proto.trim.call(toString(str)) : '';
+}
 
-export const split = (str, divider = /\s+/) => toString(str).split(divider);
-export const trim  = str => str ? proto.trim.call('' + str) : '';
+export function split(str, divider = /\s+/) {
+  return toString(str).split(divider);
+}
 
+export function startWith(str, prefix) {
+  return toString(str).indexOf(prefix) === 0;
+}
+
+export function endWith(str, suffix) {
+  return toString(str).indexOf(suffix, toString(str).length - suffix.length) !== -1;
+}
 
 function padStr(str, max, pad, isStart) {
 
@@ -65,7 +73,7 @@ export const padEnd   = (str, max, pad) => padStr(str, max, pad, false);
 export function uuid() {
 
   // credit: http://stackoverflow.com/posts/2117523/revisions
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
 
     let r = Math.random() * 16 | 0;
     let v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -86,12 +94,12 @@ export function hashCode(str) {
     return hash;
   }
 
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < length; i += 1) {
 
     let c = str.charCodeAt(i);
 
     hash = ((hash << 5) - hash) + c;
-    hash = hash & hash; // Convert to 32bit integer
+    hash &= hash; // Convert to 32bit integer
   }
 
   return hash;

@@ -1,5 +1,6 @@
-import { isFunction } from '../utils/lang';
 import { some } from '../utils/array';
+import { hasOwn } from '../utils/object';
+import { isFunction } from '../utils/lang';
 import { containsElement } from '../utils/dom';
 import detector            from '../common/detector';
 
@@ -19,7 +20,7 @@ const hooks = {
   }
 };
 
-const isMatchSelector = function () {
+const isMatchSelector = (() => {
 
   const testDiv = DOC.createElement('div');
 
@@ -32,7 +33,7 @@ const isMatchSelector = function () {
 
   const hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div');
 
-  return function (elem, selector) {
+  return (elem, selector) => {
 
     if (hasMatchesSelector) {
       return matchesSelector.call(elem, selector);
@@ -52,10 +53,10 @@ const isMatchSelector = function () {
 
     return some(nodes, node => node === elem);
   };
-}();
+})();
 
 function mouseEnterLeaveWrap(elem, handler) {
-  return function (e) {
+  return (e) => {
     if (!isHover(e.delegateTarget || elem, e)) {
       handler.call(this, e);
     }
@@ -74,21 +75,11 @@ function isHover(elem, e) {
 function fixEvent(e) {
 
   // add W3C standard event methods
-  e.preventDefault  = fixEvent.preventDefault;
-  e.stopPropagation = fixEvent.stopPropagation;
+  e.preventDefault  = () => { e.returnValue = false; };
+  e.stopPropagation = () => { e.cancelBubble = true; };
 
   return e;
 }
-
-fixEvent.preventDefault = function () {
-
-  this.returnValue = false;
-};
-
-fixEvent.stopPropagation = function () {
-
-  this.cancelBubble = true;
-};
 
 function handleEvent(event) {
 
@@ -104,7 +95,7 @@ function handleEvent(event) {
   // execute each event handler
   for (let key in handlers) {
 
-    if (handlers.hasOwnProperty(key)) {
+    if (hasOwn(handlers, key)) {
 
       element.$$handleEvent = handlers[key];
 
@@ -125,7 +116,8 @@ function addEvent(elem, type, handler) {
 
     // assign each event handler a unique ID
     if (!handler.$$guid) {
-      handler.$$guid = ++addEvent.guid;
+      addEvent.guid += 1;
+      handler.$$guid = addEvent.guid;
     }
 
     // create a hash table of event types for the element
@@ -133,7 +125,7 @@ function addEvent(elem, type, handler) {
       elem.events = {};
     }
 
-    let fixedName = 'on' + type;
+    let fixedName = `on${type}`;
 
     // create a hash table of event handlers for each element/event pair
     let handlers = elem.events[type];
@@ -176,16 +168,17 @@ export function removeEventListener(elem, type, handler) {
   type = hook ? hook.type : type;
 
   if (elem.removeEventListener) {
+
     elem.removeEventListener(type, handler, false);
     wrapper && elem.removeEventListener(type, wrapper, false);
-  } else {
-    // delete the event handler from the hash table
-    if (elem.events && elem.events[type]) {
-      delete elem.events[type][handler.$$guid];
 
-      if (wrapper) {
-        delete elem.events[type][wrapper.$$guid];
-      }
+  } else if (elem.events && elem.events[type]) {
+
+    // delete the event handler from the hash table
+    delete elem.events[type][handler.$$guid];
+
+    if (wrapper) {
+      delete elem.events[type][wrapper.$$guid];
     }
   }
 }
@@ -256,13 +249,14 @@ export const hasCtrlKey  = e => e.ctrlKey;
 export const hasMetaKey  = e => e.metaKey;
 export const hasShiftKey = e => e.shiftKey;
 
-export const hasModifierKey    = (e) => {
+export function hasModifierKey(e) {
 
   return hasCtrlKey(e) || hasMetaKey(e) || hasShiftKey(e);
-};
-export const isLeftMouseButton = (e) => {
+}
+
+export function isLeftMouseButton(e) {
 
   return detector.IS_IE
     ? e.button === 1
     : e.button === 0;
-};
+}

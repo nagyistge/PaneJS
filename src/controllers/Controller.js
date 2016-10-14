@@ -3,22 +3,22 @@ import Events from '../common/Events';
 
 class Controller extends Events {
 
-    constructor(paper, options = {}) {
+  constructor(paper, options = {}) {
 
-        super();
+    super();
 
-        this.paper = paper;
-        this.model = paper.model;
+    this.paper = paper;
+    this.model = paper.model;
 
-        this.init(options);
-        this.on('controller:initalized');
-    }
+    this.init(options);
+    this.on('controller:initalized');
+  }
 
-    init() {
-        return this;
-    }
+  init() {
+    return this;
+  }
 
-    destroy() { }
+  destroy() { }
 }
 
 

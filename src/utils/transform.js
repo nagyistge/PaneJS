@@ -83,15 +83,15 @@ export function parseTransform(transform) {
 
 export function clearTranslate(transform) {
 
-  return transform && trim(transform.replace(/translate\([^)]*\)/g, '')) || '';
+  return transform ? trim(transform.replace(/translate\([^)]*\)/g, '')) : '';
 }
 
 export function clearScale(transform) {
 
-  return transform && trim(transform.replace(/scale\([^)]*\)/g, '')) || '';
+  return transform ? trim(transform.replace(/scale\([^)]*\)/g, '')) : '';
 }
 
 export function clearRotate(transform) {
 
-  return transform && trim(transform.replace(/rotate\([^)]*\)/g, '')) || '';
+  return transform ? trim(transform.replace(/rotate\([^)]*\)/g, '')) : '';
 }

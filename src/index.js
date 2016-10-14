@@ -48,9 +48,9 @@ import smoothConnector  from './shapes/connector/smooth';
 import roundedConnector from './shapes/connector/rounded';
 
 Paper
-    .registerConnector('sharp', sharpConnector)
-    .registerConnector('smooth', smoothConnector)
-    .registerConnector('rounded', roundedConnector);
+  .registConnector('sharp', sharpConnector)
+  .registConnector('smooth', smoothConnector)
+  .registConnector('rounded', roundedConnector);
 
 
 // markers
@@ -62,41 +62,41 @@ import clovenMarker  from './shapes/marker/cloven';
 import ovalMarker    from './shapes/marker/oval';
 
 Paper
-    .registerMarker('classic', classicMarker)
-    .registerMarker('diamond', diamondMarker)
-    .registerMarker('cloven', clovenMarker)
-    .registerMarker('block', blockMarker)
-    .registerMarker('oval', ovalMarker);
+  .registMarker('classic', classicMarker)
+  .registMarker('diamond', diamondMarker)
+  .registMarker('cloven', clovenMarker)
+  .registMarker('block', blockMarker)
+  .registMarker('oval', ovalMarker);
 
 
 // exports
 // -------
 
 export {
-    utils,
-    detector,
-    vector,
-    VElement,
-    Events,
+  utils,
+  detector,
+  vector,
+  VElement,
+  Events,
 
-    Model,
-    Paper,
+  Model,
+  Paper,
 
-    Cell,
-    Link,
-    Node,
-    Portal,
-    Terminal,
+  Cell,
+  Link,
+  Node,
+  Portal,
+  Terminal,
 
-    CellView,
-    LinkView,
-    NodeView,
-    PortalView,
-    VectorView,
+  CellView,
+  LinkView,
+  NodeView,
+  PortalView,
+  VectorView,
 
-    Handler,
-    SelectionHandler,
-    ConnectionHandler,
+  Handler,
+  SelectionHandler,
+  ConnectionHandler,
 };
 
 export * from './shapes/index';

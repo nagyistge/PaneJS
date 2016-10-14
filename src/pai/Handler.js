@@ -3,25 +3,25 @@ import Base from '../handlers/Handler';
 
 class Handler extends Base {
 
-    isGroup(cell) {
+  isGroup(cell) {
 
-        return cell && cell.isGroup && cell.isGroup();
-    }
+    return cell && cell.isGroup && cell.isGroup();
+  }
 
-    isRemark(cell) {
+  isRemark(cell) {
 
-        return cell && cell.isRemark && cell.isRemark();
-    }
+    return cell && cell.isRemark && cell.isRemark();
+  }
 
-    isNode(cell) {
+  isNode(cell) {
 
-        return cell && cell.isNode();
-    }
+    return cell && cell.isNode();
+  }
 
-    isLink(cell) {
+  isLink(cell) {
 
-        return cell && cell.isLink();
-    }
+    return cell && cell.isLink();
+  }
 }
 
 

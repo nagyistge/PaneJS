@@ -5,208 +5,208 @@ import VertexController from '../controllers/Vertex';
 
 class SelectHandler extends Handler {
 
-    init(options = {}) {
+  init(options = {}) {
 
-        let that = this;
+    let that = this;
 
-        this.name = options.name || 'select';
+    this.name = options.name || 'select';
 
-        let paper = this.getPaper();
-        let model = this.getModel();
+    let paper = this.getPaper();
+    let model = this.getModel();
 
-        this.previewVel  = vector('rect', {
-            'fill': 'none',
-            'stroke-dasharray': '3px, 3px',
-            'stroke': 'black'
-        });
-        this.previewRect = this.previewVel.node;
+    this.previewVel  = vector('rect', {
+      'fill': 'none',
+      'stroke-dasharray': '3px, 3px',
+      'stroke': 'black'
+    });
+    this.previewRect = this.previewVel.node;
 
-        paper.controlPane.appendChild(this.previewRect);
+    paper.controlPane.appendChild(this.previewRect);
 
-        this.hidePreview();
+    this.hidePreview();
 
-        paper.selection = [];
+    paper.selection = [];
 
-        this.origin = {
-            x: 0,
-            y: 0
+    this.origin = {
+      x: 0,
+      y: 0
+    };
+
+    paper.on('cell:pointerDown', (cell, view, e) => {
+
+      that.invoke(() => {
+        that.origin = {
+          x: e.x,
+          y: e.y
         };
+        that.selectCell(cell, utils.hasModifierKey(e));
+      });
+    });
 
-        paper.on('cell:pointerDown', function (cell, view, e) {
+    paper.on('cell:pointerMove', (cell, view, e) => {
+      that.invoke(() => {
+        that.showPreview()
+          .redrawPreview(e);
+      });
+    });
 
-            that.invoke(function () {
-                that.origin = {
-                    x: e.x,
-                    y: e.y
-                };
-                that.selectCell(cell, utils.hasModifierKey(e));
+    paper.on('cell:pointerUp', (cell, view, e) => {
+      that.invoke(() => {
+        let previousPosition = that.origin;
+        if (e.x !== previousPosition.x || e.y !== previousPosition.y) {
+
+          model.beginUpdate();
+
+          utils.forEach(paper.selection, (c) => {
+            let position = c.metadata.position;
+            model.setGeometry(c, {
+              position: {
+                x: position.x + (e.x - previousPosition.x),
+                y: position.y + (e.y - previousPosition.y),
+                relative: position.relative
+              }
             });
-        });
+          });
 
-        paper.on('cell:pointerMove', function (cell, view, e) {
-            that.invoke(function () {
-                that.showPreview()
-                    .redrawPreview(e);
-            });
-        });
+          model.endUpdate();
 
-        paper.on('cell:pointerUp', function (cell, view, e) {
-            that.invoke(function () {
-                let previousPosition = that.origin;
-                if (e.x !== previousPosition.x || e.y !== previousPosition.y) {
-
-                    model.beginUpdate();
-
-                    utils.forEach(paper.selection, function (c) {
-                        let position = c.metadata.position;
-                        model.setGeometry(c, {
-                            position: {
-                                x: position.x + (e.x - previousPosition.x),
-                                y: position.y + (e.y - previousPosition.y),
-                                relative: position.relative
-                            }
-                        });
-                    });
-
-                    model.endUpdate();
-
-                    utils.forEach(paper.selection, function (c) {
-                        c.vertexController.redraw();
-                    });
-                }
-                that.hidePreview();
-            });
-        });
-
-        paper.on('blank:pointerDown', function (e) {
-            that.invoke(function () {
-                if (!utils.hasModifierKey(e)) {
-                    that.clearSelection();
-                }
-            });
-        });
-
-        return this;
-    }
-
-    hidePreview() {
-
-        this.previewVel.hide();
-
-        return this;
-    }
-
-    showPreview() {
-
-        this.previewVel.show();
-        return this;
-    }
-
-    redrawPreview(position) {
-
-        let paper      = this.getPaper();
-        let previewVel = this.previewVel;
-        let selection  = paper.selection;
-
-        if (selection.length) {
-
-            let minP = {
-                x: Number.MAX_VALUE,
-                y: Number.MAX_VALUE
-            };
-            let maxP = {
-                x: 0,
-                y: 0
-            };
-
-            utils.forEach(selection, function (cell) {
-                let view = paper.getView(cell);
-                let bbox = view.vel.getBBox();
-                if (bbox.x < minP.x) {
-                    minP.x = bbox.x;
-                }
-                if (bbox.y < minP.y) {
-                    minP.y = bbox.y;
-                }
-                if (bbox.x + bbox.width > maxP.x) {
-                    maxP.x = bbox.x + bbox.width;
-                }
-                if (bbox.y + bbox.height > maxP.y) {
-                    maxP.y = bbox.y + bbox.height;
-                }
-            });
-
-            let previousPosition = this.origin;
-
-            previewVel.attr({
-                x: minP.x + (position.x - previousPosition.x),
-                y: minP.y + (position.y - previousPosition.y),
-                width: maxP.x - minP.x,
-                height: maxP.y - minP.y
-            });
+          utils.forEach(paper.selection, (c) => {
+            c.vertexController.redraw();
+          });
         }
+        that.hidePreview();
+      });
+    });
 
-        return this;
-    }
-
-    _selectCell(cell) {
-
-        let paper = this.getPaper();
-
-        cell.vertexController = new VertexController(paper, {
-            cell
-        });
-        cell.selected         = true;
-        paper.selection.push(cell);
-        return this;
-    }
-
-    _unselectCell(cell) {
-
-        let paper     = this.getPaper();
-        let selection = paper.selection;
-
-        if (utils.contains(selection, cell)) {
-            paper.selection.splice(utils.indexOf(selection, cell), 1);
+    paper.on('blank:pointerDown', (e) => {
+      that.invoke(() => {
+        if (!utils.hasModifierKey(e)) {
+          that.clearSelection();
         }
+      });
+    });
 
-        cell.vertexController.destroy();
-        cell.selected = false;
+    return this;
+  }
 
-        return this;
-    }
+  hidePreview() {
 
-    selectCell(cell, multi) {
+    this.previewVel.hide();
 
-        if (!multi) {
-            this.clearSelection();
-        } else {
-            return cell.selected
-                ? this._unselectCell(cell)
-                : this._selectCell(cell);
+    return this;
+  }
+
+  showPreview() {
+
+    this.previewVel.show();
+    return this;
+  }
+
+  redrawPreview(position) {
+
+    let paper      = this.getPaper();
+    let previewVel = this.previewVel;
+    let selection  = paper.selection;
+
+    if (selection.length) {
+
+      let minP = {
+        x: Number.MAX_VALUE,
+        y: Number.MAX_VALUE
+      };
+      let maxP = {
+        x: 0,
+        y: 0
+      };
+
+      utils.forEach(selection, (cell) => {
+        let view = paper.getView(cell);
+        let bbox = view.vel.getBBox();
+        if (bbox.x < minP.x) {
+          minP.x = bbox.x;
         }
-
-        if (cell.selected) {
-            return this;
+        if (bbox.y < minP.y) {
+          minP.y = bbox.y;
         }
+        if (bbox.x + bbox.width > maxP.x) {
+          maxP.x = bbox.x + bbox.width;
+        }
+        if (bbox.y + bbox.height > maxP.y) {
+          maxP.y = bbox.y + bbox.height;
+        }
+      });
 
-        this.clearSelection();
-        this._selectCell(cell);
+      let previousPosition = this.origin;
 
-        return this;
+      previewVel.attr({
+        x: minP.x + (position.x - previousPosition.x),
+        y: minP.y + (position.y - previousPosition.y),
+        width: maxP.x - minP.x,
+        height: maxP.y - minP.y
+      });
     }
 
-    clearSelection() {
+    return this;
+  }
 
-        utils.forEach(this.paper.selection, function (cell) {
-            cell.vertexController.destroy();
-            cell.selected = false;
-        });
+  _selectCell(cell) {
 
-        this.paper.selection = [];
+    let paper = this.getPaper();
 
-        return this;
+    cell.vertexController = new VertexController(paper, {
+      cell
+    });
+    cell.selected         = true;
+    paper.selection.push(cell);
+    return this;
+  }
+
+  _unselectCell(cell) {
+
+    let paper     = this.getPaper();
+    let selection = paper.selection;
+
+    if (utils.contains(selection, cell)) {
+      paper.selection.splice(utils.indexOf(selection, cell), 1);
     }
+
+    cell.vertexController.destroy();
+    cell.selected = false;
+
+    return this;
+  }
+
+  selectCell(cell, multi) {
+
+    if (!multi) {
+      this.clearSelection();
+    } else {
+      return cell.selected
+        ? this._unselectCell(cell)
+        : this._selectCell(cell);
+    }
+
+    if (cell.selected) {
+      return this;
+    }
+
+    this.clearSelection();
+    this._selectCell(cell);
+
+    return this;
+  }
+
+  clearSelection() {
+
+    utils.forEach(this.paper.selection, (cell) => {
+      cell.vertexController.destroy();
+      cell.selected = false;
+    });
+
+    this.paper.selection = [];
+
+    return this;
+  }
 }
 
 

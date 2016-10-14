@@ -34,7 +34,7 @@ class Terminal {
         this.point = Point.fromPoint(terminal);
 
       } else if (utils.isObject(terminal)) {
-        
+
         this.node  = terminal.node;
         this.port  = terminal.port;
         this.point = Point.isPointLike(terminal.point)
@@ -42,6 +42,8 @@ class Terminal {
           : null;
       }
     }
+
+    return this;
   }
 
   addLink(link, isSource = true, options = {}) {

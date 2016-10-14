@@ -12,7 +12,7 @@ function insertChild(child, index) {
   index = utils.fixIndex(index, childCount);
 
   if (child.parent === this && index === childCount) {
-    index--;
+    index -= 1;
   }
 
   // update parent
@@ -609,10 +609,10 @@ class Cell {
 
     let result = [];
 
-    this.eachChild(child => {
+    this.eachChild((child) => {
       result.push(child);
       result = result.concat(this.getDescendants(child));
-    }, this);
+    });
 
     return result;
   }
@@ -751,14 +751,14 @@ class Cell {
 
   _setGeometry(geom) {
 
-    utils.forEach(['size', 'position', 'rotation'], key => {
+    utils.forEach(['size', 'position', 'rotation'], (key) => {
 
       let val = geom[key];
       if (val) {
-        this['_set' + utils.ucFirst(key)](val);
+        this[`_set${utils.ucFirst(key)}`](val);
       }
 
-    }, this);
+    });
   }
 
   setGeometry(geom, options = {}) {
@@ -845,7 +845,7 @@ class Cell {
 
     this.visible
       = this.metadata.visible
-      = visible ? true : false;
+      = !!visible;
   }
 
   setVisible(visible, options = {}) {
@@ -1031,13 +1031,8 @@ class Cell {
 
   destroy() {
 
-    this.eachChild(child => {
-      child.destroy();
-    });
-
-    this.eachLink(link => {
-      link.destroy();
-    });
+    this.eachChild(child => child.destroy());
+    this.eachLink(link => link.destroy());
 
     this.removeFromTerminal(true)
       .removeFromTerminal(false)

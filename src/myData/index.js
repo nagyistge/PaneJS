@@ -12,24 +12,24 @@ import ConnectionHandler from './ConnectionHandler';
 import quadratic from './quadratic';
 
 
-let myData = {
+const myData = {
 
-    Node,
-    NodeView,
-    LinkView,
+  Node,
+  NodeView,
+  LinkView,
 
-    Snaplines,
-    PaperScroll,
+  Snaplines,
+  PaperScroll,
 
-    SizeHandler,
-    SelectionHandler,
-    ConnectionHandler,
+  SizeHandler,
+  SelectionHandler,
+  ConnectionHandler,
 
 
-    quadratic
+  quadratic
 };
 
 
 export {
-    myData
+  myData
 };

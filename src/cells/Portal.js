@@ -14,11 +14,11 @@ class Portal extends Node {
     this.outPorts = map(this.metadata.outPorts, port => this.standardizePort(port));
     this.portById = {};
 
-    forEach(this.inPorts, port => {
+    forEach(this.inPorts, (port) => {
       this.portById[port.id] = port;
     });
 
-    forEach(this.outPorts, port => {
+    forEach(this.outPorts, (port) => {
       this.portById[port.id] = port;
     });
   }

@@ -4,430 +4,439 @@ import CellView   from '../views/CellView';
 
 
 const selectors = {
-    scalable: '.pane-scalable',
-    rotatable: '.pane-rotatable',
-    content: '.pane-node-content',
-    name: '.name',
-    portList: '.pane-port-list',
-    inPortList: '.pane-port-list.in',
-    outPortList: '.pane-port-list.out',
-    portWrap: '.pane-port-wrap',
-    portItem: '.pane-port',
-    portMagnet: '.port-magnet',
-    portAdsorb: '.is-adsorbed'
+  scalable: '.pane-scalable',
+  rotatable: '.pane-rotatable',
+  content: '.pane-node-content',
+  name: '.name',
+  portList: '.pane-port-list',
+  inPortList: '.pane-port-list.in',
+  outPortList: '.pane-port-list.out',
+  portWrap: '.pane-port-wrap',
+  portItem: '.pane-port',
+  portMagnet: '.port-magnet',
+  portAdsorb: '.is-adsorbed'
 };
 
 const classNames = {
-    portItem: 'pane-port',
-    inPortList: 'pane-port-list in',
-    outPortList: 'pane-port-list out',
-    connected: 'is-connected',
-    connecting: 'is-connecting',
-    connectable: 'is-connectable',
-    adsorbed: 'is-adsorbed',
+  portItem: 'pane-port',
+  inPortList: 'pane-port-list in',
+  outPortList: 'pane-port-list out',
+  connected: 'is-connected',
+  connecting: 'is-connecting',
+  connectable: 'is-connectable',
+  adsorbed: 'is-adsorbed',
 };
 
 class HTMLNodeView extends CellView {
 
-    static get specialAttributes() {
+  static get specialAttributes() {
 
-        return [
-            'text',
-            'html',
-            'style'
-        ];
+    return [
+      'text',
+      'html',
+      'style'
+    ];
+  }
+
+  render() {
+
+    this.renderMarkup()
+      .renderPorts();
+
+    this.scalableNode  = this.findOne(selectors.scalable);
+    this.rotatableNode = this.findOne(selectors.rotatable);
+
+    this.update()
+      .resize()
+      .rotate()
+      .translate();
+
+    return this;
+  }
+
+  ensureElement() {
+
+    this.elem = utils.createElement(this.cell.getTagName());
+
+    // attach cell's id to elem
+    this.elem.cellId = this.cell.id;
+
+    let className = this.cell.getClassName();
+    if (className) {
+      utils.addClass(this.elem, className);
     }
 
-    render() {
-
-        this.renderMarkup()
-            .renderPorts();
-
-        this.scalableNode  = this.findOne(selectors.scalable);
-        this.rotatableNode = this.findOne(selectors.rotatable);
-
-        this.update()
-            .resize()
-            .rotate()
-            .translate();
-
-        return this;
+    let pane = this.getPane();
+    if (pane) {
+      pane.appendChild(this.elem);
     }
 
-    ensureElement() {
+    return this;
+  }
 
-        this.elem = utils.createElement(this.cell.getTagName());
+  renderMarkup() {
 
-        // attach cell's id to elem
-        this.elem.cellId = this.cell.id;
+    let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
 
-        let className = this.cell.getClassName();
-        if (className) {
-            utils.addClass(this.elem, className);
+    this.elem.innerHTML = markup;
+
+    return this;
+  }
+
+  renderPorts() {
+
+    let node     = this.getCell();
+    let inPorts  = node.getVisiblePorts(true);
+    let outPorts = node.getVisiblePorts(false);
+    let markup   = node.getPortMarkup();
+
+    if (inPorts.length) {
+
+      let inPortsWrap = this.findOne(selectors.inPortList);
+      let width       = 100 / (inPorts.length + 1);
+
+      utils.forEach(inPorts, function (port, i) {
+
+        let html = this.compileMarkup(markup, port);
+
+        $(html)
+          .css({ left: utils.toFixed(width * (i + 1), 4) + '%' })
+          .appendTo(inPortsWrap);
+      }, this);
+    }
+
+    if (outPorts.length) {
+
+      let outPortsWrap = this.findOne(selectors.outPortList);
+      let width        = 100 / (outPorts.length + 1);
+
+
+      utils.forEach(outPorts, function (port, i) {
+
+        let html = this.compileMarkup(markup, port);
+
+        $(html)
+          .css({ left: utils.toFixed(width * (i + 1), 4) + '%' })
+          .appendTo(outPortsWrap);
+
+      }, this);
+    }
+
+    return this;
+  }
+
+  find(selector) {
+
+    return selector === '.' ? [this.elem] : this.elem.querySelectorAll(selector);
+  }
+
+  findOne(selector) {
+
+    return selector === '.' ? this.elem : this.elem.querySelector(selector);
+  }
+
+  update(specifiedAttrs) {
+
+    utils.forIn(specifiedAttrs || this.cell.attrs, (attrs, selector) => {
+
+      let nodes = this.find(selector);
+      if (!nodes.length) {
+        return;
+      }
+
+      let specials = HTMLNodeView.specialAttributes.slice();
+      let normal   = {};
+
+      utils.forIn(attrs, (value, key) => {
+        if (!utils.contains(specials, key)) {
+          normal[key] = value;
         }
+      });
 
-        let pane = this.getPane();
-        if (pane) {
-            pane.appendChild(this.elem);
-        }
+      // set regular attributes
+      if (!utils.isEmptyObject(normal)) {
+        utils.forEach(nodes, (node) => {
+          utils.forIn(normal, (attrVal, attrName) => {
+            utils.setAttribute(node, attrName, attrVal);
+          });
+        });
+      }
 
-        return this;
-    }
+      if (!utils.isUndefined(attrs.style)) {
 
-    renderMarkup() {
-
-        let markup = this.compileMarkup(this.cell.getMarkup(), this.cell.data);
-
-        this.elem.innerHTML = markup;
-
-        return this;
-    }
-
-    renderPorts() {
-
-        let node     = this.getCell();
-        let inPorts  = node.getVisiblePorts(true);
-        let outPorts = node.getVisiblePorts(false);
-        let markup   = node.getPortMarkup();
-
-        if (inPorts.length) {
-
-            let inPortsWrap = this.findOne(selectors.inPortList);
-            let width       = 100 / (inPorts.length + 1);
-
-            utils.forEach(inPorts, function (port, i) {
-
-                let html = this.compileMarkup(markup, port);
-
-                $(html)
-                    .css({ left: utils.toFixed(width * (i + 1), 4) + '%' })
-                    .appendTo(inPortsWrap);
-            }, this);
-        }
-
-        if (outPorts.length) {
-
-            let outPortsWrap = this.findOne(selectors.outPortList);
-            let width        = 100 / (outPorts.length + 1);
-
-
-            utils.forEach(outPorts, function (port, i) {
-
-                let html = this.compileMarkup(markup, port);
-
-                $(html)
-                    .css({ left: utils.toFixed(width * (i + 1), 4) + '%' })
-                    .appendTo(outPortsWrap);
-
-            }, this);
-        }
-
-        return this;
-    }
-
-    find(selector) {
-
-        return selector === '.' ? [this.elem] : this.elem.querySelectorAll(selector);
-    }
-
-    findOne(selector) {
-
-        return selector === '.' ? this.elem : this.elem.querySelector(selector);
-    }
-
-    update(specifiedAttrs) {
-
-        utils.forIn(specifiedAttrs || this.cell.attrs, function (attrs, selector) {
-
-            let nodes = this.find(selector);
-            if (!nodes.length) {
-                return;
-            }
-
-            let specials = HTMLNodeView.specialAttributes.slice();
-            let normal   = {};
-
-            utils.forIn(attrs, function (value, key) {
-                if (!utils.contains(specials, key)) {
-                    normal[key] = value;
-                }
+        if (utils.isString(attrs.style)) {
+          utils.forEach(nodes, (node) => {
+            utils.setAttribute(node, 'style', attrs.style);
+          });
+        } else if (utils.isObject(attrs.style)) {
+          utils.forEach(nodes, (node) => {
+            utils.forIn(attrs.style, (val, name) => {
+              node.style[name] = val;
             });
-
-            // set regular attributes
-            if (!utils.isEmptyObject(normal)) {
-                utils.forEach(nodes, function (node) {
-                    utils.forIn(normal, function (attrVal, attrName) {
-                        utils.setAttribute(node, attrName, attrVal);
-                    });
-                });
-            }
-
-            if (!utils.isUndefined(attrs.style)) {
-
-                if (utils.isString(attrs.style)) {
-                    utils.forEach(nodes, function (node) {
-                        utils.setAttribute(node, 'style', attrs.style);
-                    });
-                } else if (utils.isObject(attrs.style)) {
-                    utils.forEach(nodes, function (node) {
-                        utils.forIn(attrs.style, function (val, name) {
-                            node.style[name] = val;
-                        });
-                    });
-                }
-            }
-
-            if (!utils.isUndefined(attrs.html)) {
-                utils.forEach(nodes, function (node) {
-                    node.innerHTML = attrs.html || '';
-                });
-            }
-
-            if (!utils.isUndefined(attrs.text)) {
-                utils.forEach(nodes, function (node) {
-                    utils.emptyElement(node);
-                    node.appendChild(document.createTextNode(attrs.text || ''));
-                });
-            }
-
-        }, this);
-
-        return this;
-    }
-
-    resize() {
-
-        let scalable = this.scalableNode;
-        if (!scalable) {
-            return this;
+          });
         }
+      }
 
-        let width  = scalable.clientWidth || scalable.offsetWidth || 1;
-        let height = scalable.clientHeight || scalable.offsetHeight || 1;
+      if (!utils.isUndefined(attrs.html)) {
+        utils.forEach(nodes, (node) => {
+          node.innerHTML = attrs.html || '';
+        });
+      }
 
-        let size = this.cell.getSize();
+      if (!utils.isUndefined(attrs.text)) {
+        utils.forEach(nodes, (node) => {
+          utils.emptyElement(node);
+          node.appendChild(document.createTextNode(attrs.text || ''));
+        });
+      }
 
-        let sx = size.width / width;
-        let sy = size.height / height;
+    });
 
-        sx = utils.toFixed(sx, 2);
-        sy = utils.toFixed(sy, 2);
+    return this;
+  }
 
-        utils.setScale(scalable, sx, sy);
+  resize() {
 
-        return this;
+    let scalable = this.scalableNode;
+    if (!scalable) {
+      return this;
     }
 
-    rotate() {
+    let width  = scalable.clientWidth || scalable.offsetWidth || 1;
+    let height = scalable.clientHeight || scalable.offsetHeight || 1;
 
-        if (this.rotatableNode) {
+    let size = this.cell.getSize();
 
-            let size = this.cell.getSize();
-            let ox   = size.width / 2;
-            let oy   = size.height / 2;
+    let sx = size.width / width;
+    let sy = size.height / height;
 
-            utils.setRotation(this.rotatableNode, this.cell.getRotation(), ox, oy);
-        }
+    sx = utils.toFixed(sx, 2);
+    sy = utils.toFixed(sy, 2);
 
-        return this;
+    utils.setScale(scalable, sx, sy);
+
+    return this;
+  }
+
+  rotate() {
+
+    if (this.rotatableNode) {
+
+      let size = this.cell.getSize();
+      let ox   = size.width / 2;
+      let oy   = size.height / 2;
+
+      utils.setRotation(this.rotatableNode, this.cell.getRotation(), ox, oy);
     }
 
-    translate() {
+    return this;
+  }
 
-        let position = this.cell.getPosition();
+  translate() {
 
-        utils.setTranslate(this.elem, position.x, position.y);
+    let position = this.cell.getPosition();
 
-        return this;
+    utils.setTranslate(this.elem, position.x, position.y);
+
+    return this;
+  }
+
+  setNodeName(name) {
+
+    let node = this.getCell();
+
+    if (node.data) {
+      node.data.name = name;
     }
 
-    setNodeName(name) {
-
-        let node = this.getCell();
-
-        if (node.data) {
-            node.data.name = name;
-        }
-
-        let elem = this.findOne(selectors.name);
-        if (elem) {
-            utils.emptyElement(elem);
-            elem.appendChild(document.createTextNode(name));
-        }
-
-        return this;
+    let elem = this.findOne(selectors.name);
+    if (elem) {
+      utils.emptyElement(elem);
+      elem.appendChild(document.createTextNode(name));
     }
 
-    setPortConnected(port, isInPort, isConnected) {
+    return this;
+  }
 
-        let elem = this.getPortElem(port, isInPort);
-        if (elem) {
-            utils.toggleClass(elem, classNames.connected, isConnected);
-        }
+  setPortConnected(port, isInPort, isConnected) {
+
+    let elem = this.getPortElem(port, isInPort);
+    if (elem) {
+      utils.toggleClass(elem, classNames.connected, isConnected);
+    }
+  }
+
+  setPortConnecting(port, isInPort, isConnecting) {
+
+    let elem = this.getPortElem(port, isInPort);
+    if (elem) {
+      utils.toggleClass(elem, classNames.connecting, isConnecting);
+    }
+  }
+
+  setPortHighlight(port, isInPort, isHighlighted) {
+
+    let elem = this.getPortElem(port, isInPort);
+    if (elem) {
+      utils.toggleClass(elem, classNames.connectable, isHighlighted);
     }
 
-    setPortConnecting(port, isInPort, isConnecting) {
+    let container = this.findOne(selectors.content);
+    if (container) {
+      utils.toggleClass(container, classNames.connectable, isHighlighted);
+    }
+  }
 
-        let elem = this.getPortElem(port, isInPort);
-        if (elem) {
-            utils.toggleClass(elem, classNames.connecting, isConnecting);
-        }
+  setPortAdsorbed(port, isInPort, isAdsorbed) {
+
+    let elem = this.getPortElem(port, isInPort);
+
+    elem = elem && elem.querySelector(selectors.portMagnet);
+    elem && utils.toggleClass(elem, classNames.adsorbed, isAdsorbed);
+  }
+
+  getBBox() {
+
+    let bounds = utils.getBounds(this.elem);
+    if (bounds) {
+      return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
     }
 
-    setPortHighlight(port, isInPort, isHighlighted) {
+    return null;
+  }
 
-        let elem = this.getPortElem(port, isInPort);
-        if (elem) {
-            utils.toggleClass(elem, classNames.connectable, isHighlighted);
-        }
+  getStrokedBBox() {
 
-        let container = this.findOne(selectors.content);
-        if (container) {
-            utils.toggleClass(container, classNames.connectable, isHighlighted);
-        }
+    let bbox        = this.cell.getBBox();
+    let borderWidth = 0;
+    let contentElem = this.findOne(selectors.content);
+
+    if (contentElem) {
+      borderWidth = utils.getComputedStyle(contentElem, 'border-width') - 1;
     }
 
-    setPortAdsorbed(port, isInPort, isAdsorbed) {
+    return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+  }
 
-        let elem = this.getPortElem(port, isInPort);
+  getPortBodyBBox(port, isInPort) {
 
-        elem = elem && elem.querySelector(selectors.portMagnet);
-        elem && utils.toggleClass(elem, classNames.adsorbed, isAdsorbed);
+    let elem = this.getPortElem(port, isInPort);
+    if (elem) {
+      let bounds = utils.getBounds(elem);
+      return this.getPaper().toLocalRect({
+        x: bounds.left,
+        y: bounds.top,
+        width: bounds.width,
+        height: bounds.height
+      });
     }
 
-    getBBox() {
+    return null;
+  }
 
-        let bounds = utils.getBounds(this.elem);
-        if (bounds) {
-            return new Rect(bounds.left, bounds.top, bounds.width, bounds.height);
-        }
+  getPortSelector(isInPort, port) {
+
+    let selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
+
+    if (port) {
+      selector += '[data-id="' + port.id + '"]';
     }
 
-    getStrokedBBox() {
+    return selector;
+  }
 
-        let bbox        = this.cell.getBBox();
-        let borderWidth = 0;
-        let contentElem = this.findOne(selectors.content);
+  getPortListSelector(isInPort) {
 
-        if (contentElem) {
-            borderWidth = utils.getComputedStyle(contentElem, 'border-width') - 1;
-        }
+    return isInPort ? selectors.inPortList : selectors.outPortList;
+  }
 
-        return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
+  getPortElem(port, isInPort) {
+
+    let node = this.getCell();
+
+    if (!utils.isObject(port)) {
+      port = node.getPortById(port);
     }
 
-    getPortBodyBBox(port, isInPort) {
-
-        let elem = this.getPortElem(port, isInPort);
-        if (elem) {
-            let bounds = utils.getBounds(elem);
-            return this.getPaper().toLocalRect({
-                x: bounds.left,
-                y: bounds.top,
-                width: bounds.width,
-                height: bounds.height
-            });
-        }
+    let selector = this.getPortSelector(port, isInPort);
+    if (selector) {
+      return this.findOne(selector);
     }
 
-    getPortSelector(isInPort, port) {
+    return null;
+  }
 
-        let selector = this.getPortListSelector(isInPort) + ' ' + selectors.portItem;
+  findPortElem(elem) {
 
-        if (port) {
-            selector += '[data-id="' + port.id + '"]';
-        }
-
-        return selector;
+    while (elem && elem !== this.elem) {
+      if (utils.hasClass(elem, classNames.portItem)) {
+        return elem;
+      }
+      elem = elem.parentNode;
     }
 
-    getPortListSelector(isInPort) {
+    return null;
+  }
 
-        return isInPort ? selectors.inPortList : selectors.outPortList;
+  isPortElem(elem) {
+
+    return !!this.findPortElem(elem);
+  }
+
+  isOutPortElem(elem) {
+
+    elem = this.findPortElem(elem);
+
+    while (elem && elem !== this.elem) {
+      if (utils.hasClass(elem, classNames.outPortList)) {
+        return true;
+      }
+      elem = elem.parentNode;
     }
 
-    getPortElem(port, isInPort) {
+    return false;
+  }
 
-        let node = this.getCell();
+  isInPortElem(elem) {
 
-        if (!utils.isObject(port)) {
-            port = node.getPortById(port);
-        }
+    elem = this.findPortElem(elem);
 
-        let selector = this.getPortSelector(port, isInPort);
-        if (selector) {
-            return this.findOne(selector);
-        }
+    while (elem && elem !== this.elem) {
+      if (utils.hasClass(elem, classNames.inPortList)) {
+        return true;
+      }
+      elem = elem.parentNode;
     }
 
-    findPortElem(elem) {
+    return false;
 
-        while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, classNames.portItem)) {
-                return elem;
-            }
-            elem = elem.parentNode;
-        }
+  }
 
-        return null;
-    }
+  findPortByElem(elem) {
 
-    isPortElem(elem) {
+    let result   = null;
+    let portElem = elem && this.findPortElem(elem);
 
-        return this.findPortElem(elem) ? true : false;
-    }
+    if (portElem) {
+      let collection = this.isOutPortElem(portElem)
+        ? this.cell.getOutPorts()
+        : this.cell.getInPorts();
 
-    isOutPortElem(elem) {
+      let portId = utils.toInt(portElem.getAttribute('data-id'));
 
-        elem = this.findPortElem(elem);
+      utils.some(collection, (port) => {
 
-        while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, classNames.outPortList)) {
-                return true;
-            }
-            elem = elem.parentNode;
+        if (port.id === portId) {
+          result = port;
+          return true;
         }
 
         return false;
+      });
     }
 
-    isInPortElem(elem) {
-
-        elem = this.findPortElem(elem);
-
-        while (elem && elem !== this.elem) {
-            if (utils.hasClass(elem, classNames.inPortList)) {
-                return true;
-            }
-            elem = elem.parentNode;
-        }
-
-        return false;
-
-    }
-
-    findPortByElem(elem) {
-
-        let result   = null;
-        let portElem = elem && this.findPortElem(elem);
-
-        if (portElem) {
-            let collection = this.isOutPortElem(portElem)
-                ? this.cell.getOutPorts()
-                : this.cell.getInPorts();
-
-            let portId = utils.toInt(portElem.getAttribute('data-id'));
-
-            utils.some(collection, function (port) {
-                if (port.id === portId) {
-                    result = port;
-                    return true;
-                }
-            });
-        }
-
-        return result;
-    }
+    return result;
+  }
 }
 
 
