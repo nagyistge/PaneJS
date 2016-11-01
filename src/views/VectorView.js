@@ -204,6 +204,44 @@ class VectorView extends CellView {
 
     return this;
   }
+
+  getBounds(elem) {
+
+    // fix `utils.getBounds` of elements in foreignObject.
+    if (elem) {
+
+      const doc = elem === document
+        ? elem
+        : elem.ownerDocument;
+
+      // get the bounds of the cell
+      let bounds = utils.getBounds(this.elem);
+      // get the offset relative to the cell's root element
+      let offset = utils.getOffsetUntil(elem, this.elem);
+
+      let paper = this.getPaper();
+      let scale = paper && paper.sx || 1;
+
+      // calc the bounds
+      let width  = (elem.offsetWidth || elem.clientWidth) * scale;
+      let height = (elem.offsetHeight || elem.clientHeight) * scale;
+      let left   = bounds.left + offset.left * scale;
+      let top    = bounds.top + offset.top * scale;
+      let right  = doc.body.clientWidth - width - left;
+      let bottom = doc.body.clientHeight - height - top;
+
+      return {
+        left,
+        top,
+        right,
+        bottom,
+        width,
+        height
+      };
+    }
+
+    return null;
+  }
 }
 
 

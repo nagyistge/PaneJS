@@ -994,6 +994,8 @@ function createVElement(elem, attrs, children) {
 
   if (utils.isString(elem)) {
 
+    elem = utils.trim(elem);
+
     if (elem.toLowerCase() === 'svg') {
       // create a new SVG canvas
       elem = utils.createSvgDocument();

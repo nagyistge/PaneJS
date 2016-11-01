@@ -188,10 +188,7 @@ class Link extends Cell {
 
 Link.setDefaults({
   tagName: 'g',
-  markup: `
-    <path class="connector"/>
-    <path class="source-marker"/>
-    <path class="target-marker"/>`,
+  markup: '<path class="connector"/><path class="source-marker"/><path class="target-marker"/>',
   classNames: 'pane-cell pane-link', // pane-cell for event handler
   pane: 'linkPane',
   data: null,   // related data(for business logic)

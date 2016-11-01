@@ -20025,4 +20025,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs-pai.js.map
+//# sourceMappingURL=panejs-pai-0.2.2.js.map

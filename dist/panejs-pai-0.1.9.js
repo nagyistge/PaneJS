@@ -1780,6 +1780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.showHide = showHide;
 	exports.isHidden = isHidden;
 	exports.getOffset = getOffset;
+	exports.getOffsetUntil = getOffsetUntil;
 	exports.createSvgDocument = createSvgDocument;
 	exports.createSvgElement = createSvgElement;
 	exports.setAttribute = setAttribute;
@@ -2163,6 +2164,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return { top: top, left: left };
 	}
 	
+	function getOffsetUntil(elem, stop) {
+	
+	  var node = elem;
+	  var left = 0;
+	  var top = 0;
+	
+	  while (node && node !== stop && node !== document.documentElement) {
+	    left += node.offsetLeft;
+	    top += node.offsetTop;
+	    node = node.offsetParent;
+	  }
+	
+	  return { left: left, top: top };
+	}
+	
 	// xml namespaces.
 	var ns = {
 	  xml: 'http://www.w3.org/XML/1998/namespace',
@@ -2317,6 +2333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function getActualBoundingClientRect(node) {
+	
 	  // same as native getBoundingClientRect, except it takes into
 	  // account  parent <frame> offsets if the element lies within
 	  // a nested document (<frame> or <iframe>-like).
@@ -6828,6 +6845,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (utils.isString(elem)) {
 	
+	    elem = utils.trim(elem);
+	
 	    if (elem.toLowerCase() === 'svg') {
 	      // create a new SVG canvas
 	      elem = utils.createSvgDocument();
@@ -7897,6 +7916,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	
 	      return this;
+	    }
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds(elem) {
+	
+	      // fix `utils.getBounds` of elements in foreignObject
+	
+	      if (elem) {
+	
+	        var doc = elem === document ? elem : elem.ownerDocument;
+	
+	        // get the bounds of the cell
+	        var bounds = utils.getBounds(this.elem);
+	        // get the offset relative to the cell's root element
+	        var offset = utils.getOffsetUntil(elem, this.elem);
+	
+	        // calc the bounds
+	        var width = elem.offsetWidth || elem.clientWidth;
+	        var height = elem.offsetHeight || elem.clientHeight;
+	        var left = bounds.left + offset.left;
+	        var top = bounds.top + offset.top;
+	        var right = doc.body.clientWidth - width - left;
+	        var bottom = doc.body.clientHeight - height - top;
+	
+	        return {
+	          left: left,
+	          top: top,
+	          right: right,
+	          bottom: bottom,
+	          width: width,
+	          height: height
+	        };
+	      }
+	
+	      return null;
 	    }
 	  }]);
 	
@@ -13816,7 +13870,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	Link.setDefaults({
 	  tagName: 'g',
-	  markup: '\n    <path class="connector"/>\n    <path class="source-marker"/>\n    <path class="target-marker"/>',
+	  markup: '<path class="connector"/><path class="source-marker"/><path class="target-marker"/>',
 	  classNames: 'pane-cell pane-link', // pane-cell for event handler
 	  pane: 'linkPane',
 	  data: null, // related data(for business logic)
@@ -15463,7 +15517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.pai = undefined;
 	
@@ -15529,25 +15583,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	var pai = {
-	    Node: _Node2.default,
-	    NodeView: _NodeView2.default,
-	    LinkView: _LinkView2.default,
+	  Node: _Node2.default,
+	  NodeView: _NodeView2.default,
+	  LinkView: _LinkView2.default,
 	
-	    Group: _Group2.default,
-	    GroupView: _GroupView2.default,
+	  Group: _Group2.default,
+	  GroupView: _GroupView2.default,
 	
-	    Remark: _Remark2.default,
-	    RemarkView: _RemarkView2.default,
+	  Remark: _Remark2.default,
+	  RemarkView: _RemarkView2.default,
 	
-	    Navigator: _Navigator2.default,
-	    Snaplines: _Snaplines2.default,
-	    PaperScroll: _PaperScroll2.default,
+	  Navigator: _Navigator2.default,
+	  Snaplines: _Snaplines2.default,
+	  PaperScroll: _PaperScroll2.default,
 	
-	    Handler: _Handler2.default,
-	    SelectionHandler: _SelectionHandler2.default,
-	    ConnectionHandler: _ConnectionHandler2.default,
+	  Handler: _Handler2.default,
+	  SelectionHandler: _SelectionHandler2.default,
+	  ConnectionHandler: _ConnectionHandler2.default,
 	
-	    quadratic: _quadratic2.default
+	  quadratic: _quadratic2.default
 	};
 	
 	exports.pai = pai;
@@ -15856,12 +15910,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return borderWidth ? bbox.grow(borderWidth / 2) : bbox;
 	    }
 	  }, {
+	    key: 'getOffset',
+	    value: function getOffset(elem) {
+	
+	      var left = 0;
+	      var top = 0;
+	      var node = elem;
+	
+	      while (node && node !== this.elem && node !== document.documentElement) {
+	        left += node.offsetLeft;
+	        top += node.offsetTop;
+	        node = node.offsetParent;
+	      }
+	
+	      return {
+	        left: left,
+	        top: top
+	      };
+	    }
+	  }, {
 	    key: 'getPortBodyBBox',
 	    value: function getPortBodyBBox(port, isInPort) {
 	
 	      var elem = this.getPortElem(port, isInPort);
 	      if (elem) {
-	        var bounds = utils.getBounds(elem);
+	        var bounds = this.getBounds(elem);
 	
 	        return this.getPaper().toLocalRect({
 	          x: bounds.left,
@@ -16141,7 +16214,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this.cacheStaticConnPoint(point, isSource);
 	      this.cacheTerminalView(view, isSource);
-	      this.cacheTerminalPort(port, isSource);
+	      this.cacheTerminalPort(port, isSource);isSource;
 	
 	      return this;
 	    }
@@ -17696,7 +17769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -17710,55 +17783,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = {
-	    paperScroll: null,
-	    distance: 0
+	  paperScroll: null,
+	  distance: 0
 	};
 	
 	var Navigator = function () {
-	    function Navigator(options) {
-	        _classCallCheck(this, Navigator);
+	  function Navigator(options) {
+	    _classCallCheck(this, Navigator);
 	
-	        if (options) {
-	            this.install(options);
-	        }
+	    if (options) {
+	      this.install(options);
 	    }
+	  }
 	
-	    _createClass(Navigator, [{
-	        key: 'destroy',
-	        value: function destroy() {
+	  _createClass(Navigator, [{
+	    key: 'destroy',
+	    value: function destroy() {
 	
-	            if (!this.destroyed) {
-	                utils.removeElement(this.container);
-	                utils.destroy(this);
-	            }
-	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
+	      if (!this.destroyed) {
+	        utils.removeElement(this.container);
+	        utils.destroy(this);
+	      }
+	    }
+	  }, {
+	    key: 'install',
+	    value: function install(options) {
 	
-	            this.options = utils.merge({}, defaults, options);
-	            this.paperScroll = this.options.paperScroll;
-	            this.paper = this.paperScroll.paper;
+	      this.options = utils.merge({}, defaults, options);
+	      this.paperScroll = this.options.paperScroll;
+	      this.paper = this.paperScroll.paper;
 	
-	            this.ensureElement();
+	      this.ensureElement();
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
+	      return this;
+	    }
+	  }, {
+	    key: 'ensureElement',
+	    value: function ensureElement() {
 	
-	            this.container = utils.createElement('div');
+	      this.container = utils.createElement('div');
 	
-	            this.paper.wrap.appendChild(this.container);
+	      this.paper.wrap.appendChild(this.container);
 	
-	            utils.addClass(this.container, 'pane-navigator');
+	      utils.addClass(this.container, 'pane-navigator');
 	
-	            return this;
-	        }
-	    }]);
+	      return this;
+	    }
+	  }]);
 	
-	    return Navigator;
+	  return Navigator;
 	}();
 	
 	// exports
@@ -17987,7 +18060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -18007,483 +18080,483 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = {
-	    paper: null,
-	    space: 50,
-	    minWidth: 0,
-	    minHeight: 0
+	  paper: null,
+	  space: 50,
+	  minWidth: 0,
+	  minHeight: 0
 	};
 	
 	var PaperScroll = function () {
-	    function PaperScroll(options) {
-	        _classCallCheck(this, PaperScroll);
+	  function PaperScroll(options) {
+	    _classCallCheck(this, PaperScroll);
 	
-	        if (options) {
-	            this.install(options);
-	        }
+	    if (options) {
+	      this.install(options);
 	    }
+	  }
 	
-	    _createClass(PaperScroll, [{
-	        key: 'destroy',
-	        value: function destroy() {
+	  _createClass(PaperScroll, [{
+	    key: 'destroy',
+	    value: function destroy() {
 	
-	            if (!this.destroyed) {
-	                utils.removeElement(this.scrollElem);
-	                utils.destroy(this);
-	            }
+	      if (!this.destroyed) {
+	        utils.removeElement(this.scrollElem);
+	        utils.destroy(this);
+	      }
+	    }
+	  }, {
+	    key: 'install',
+	    value: function install(options) {
+	
+	      this.options = utils.merge({}, defaults, options);
+	      this.space = utils.normalizeSides(this.options.space);
+	      this.paper = this.options.paper;
+	
+	      var paper = this.paper;
+	
+	      // save scale for quick accessing
+	      this.sx = paper.sx;
+	      this.sy = paper.sy;
+	
+	      // save the original canvas size
+	      this.baseWidth = paper.width;
+	      this.baseHeight = paper.height;
+	
+	      // init for next calculating
+	      this.scrollLeft = 0;
+	      this.scrollTop = 0;
+	      this.stageLevel = 0;
+	      this.stageScrollLeft = 0;
+	      this.stageScrollTop = 0;
+	
+	      paper.on('paper:scale', this.doScale, this);
+	      paper.on('paper:resize', this.doResize, this);
+	
+	      this.ensureElement();
+	      this.addScrollEvent();
+	
+	      this.doResize();
+	      this.adjustClientSize();
+	      this.adjustPadding();
+	      this.center();
+	    }
+	  }, {
+	    key: 'ensureElement',
+	    value: function ensureElement() {
+	
+	      var paper = this.paper;
+	      var scrollElem = utils.createElement('div');
+	
+	      this.scrollElem = scrollElem;
+	      this.scrollParent = paper.getWrap();
+	
+	      utils.addClass(scrollElem, 'pane-scroll');
+	
+	      this.scrollElem.appendChild(paper.getStage());
+	      this.scrollParent.appendChild(scrollElem);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'addScrollEvent',
+	    value: function addScrollEvent() {
+	      var _this = this;
+	
+	      if (!this.onScroll) {
+	        (function () {
+	
+	          var that = _this;
+	
+	          that.onScroll = function () {
+	            that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
+	          };
+	        })();
+	      }
+	
+	      utils.addEventListener(this.scrollParent, 'scroll', this.onScroll);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'removeScrollEvent',
+	    value: function removeScrollEvent() {
+	
+	      utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'adjustClientSize',
+	    value: function adjustClientSize() {
+	
+	      var scrollBarWidth = utils.getScrollBarWidth();
+	      this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
+	      this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'adjustPadding',
+	    value: function adjustPadding(padding) {
+	
+	      if (padding) {
+	        padding = utils.normalizeSides(padding);
+	      } else {
+	
+	        var space = this.space;
+	        var clientWidth = this.clientWidth;
+	        var clientHeight = this.clientHeight;
+	
+	        padding = {
+	          top: clientHeight - space.top,
+	          right: clientWidth - space.right,
+	          bottom: clientHeight - space.bottom,
+	          left: clientWidth - space.left
+	        };
+	      }
+	
+	      this.padding = padding;
+	
+	      utils.setStyle(this.scrollElem, {
+	        paddingTop: padding.top + 'px',
+	        paddingRight: padding.right + 'px',
+	        paddingBottom: padding.bottom + 'px',
+	        paddingLeft: padding.left + 'px'
+	      });
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'adjustPaper',
+	    value: function adjustPaper() {
+	
+	      var paper = this.paper;
+	
+	      var sx = paper.sx;
+	      var sy = paper.sy;
+	
+	      var options = {
+	        frameWidth: this.baseWidth * sx,
+	        frameHeight: this.baseHeight * sy
+	      };
+	
+	      if (this.options.minWidth) {
+	        options.minWidth = this.options.minWidth * sx;
+	      }
+	
+	      if (this.options.minHeight) {
+	        options.minHeight = this.options.minHeight * sy;
+	      }
+	
+	      var tx = paper.tx;
+	      var ty = paper.ty;
+	
+	      if (paper.fitToContent(options)) {
+	
+	        var dLeft = paper.tx - tx;
+	        var dTop = paper.ty - ty;
+	
+	        if (dLeft !== 0 || dTop !== 0) {
+	
+	          this.increaseStage();
+	          this.stageScroll(dLeft, dTop, { relative: true });
+	          this.decreaseStage();
 	        }
-	    }, {
-	        key: 'install',
-	        value: function install(options) {
-	
-	            this.options = utils.merge({}, defaults, options);
-	            this.space = utils.normalizeSides(this.options.space);
-	            this.paper = this.options.paper;
-	
-	            var paper = this.paper;
-	
-	            // save scale for quick accessing
-	            this.sx = paper.sx;
-	            this.sy = paper.sy;
-	
-	            // save the original canvas size
-	            this.baseWidth = paper.width;
-	            this.baseHeight = paper.height;
-	
-	            // init for next calculating
-	            this.scrollLeft = 0;
-	            this.scrollTop = 0;
-	            this.stageLevel = 0;
-	            this.stageScrollLeft = 0;
-	            this.stageScrollTop = 0;
-	
-	            paper.on('paper:scale', this.doScale, this);
-	            paper.on('paper:resize', this.doResize, this);
-	
-	            this.ensureElement();
-	            this.addScrollEvent();
-	
-	            this.doResize();
-	            this.adjustClientSize();
-	            this.adjustPadding();
-	            this.center();
-	        }
-	    }, {
-	        key: 'ensureElement',
-	        value: function ensureElement() {
-	
-	            var paper = this.paper;
-	            var scrollElem = utils.createElement('div');
-	
-	            this.scrollElem = scrollElem;
-	            this.scrollParent = paper.getWrap();
-	
-	            utils.addClass(scrollElem, 'pane-scroll');
-	
-	            this.scrollElem.appendChild(paper.getStage());
-	            this.scrollParent.appendChild(scrollElem);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'addScrollEvent',
-	        value: function addScrollEvent() {
-	            var _this = this;
-	
-	            if (!this.onScroll) {
-	                (function () {
-	
-	                    var that = _this;
-	
-	                    that.onScroll = function () {
-	                        that.setScroll(that.scrollParent.scrollLeft, that.scrollParent.scrollTop);
-	                    };
-	                })();
-	            }
-	
-	            utils.addEventListener(this.scrollParent, 'scroll', this.onScroll);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'removeScrollEvent',
-	        value: function removeScrollEvent() {
-	
-	            utils.removeEventListener(this.scrollParent, 'scroll', this.onScroll);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'adjustClientSize',
-	        value: function adjustClientSize() {
-	
-	            var scrollBarWidth = utils.getScrollBarWidth();
-	            this.clientWidth = this.scrollParent.clientWidth - scrollBarWidth;
-	            this.clientHeight = this.scrollParent.clientHeight - scrollBarWidth;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'adjustPadding',
-	        value: function adjustPadding(padding) {
-	
-	            if (padding) {
-	                padding = utils.normalizeSides(padding);
-	            } else {
-	
-	                var space = this.space;
-	                var clientWidth = this.clientWidth;
-	                var clientHeight = this.clientHeight;
-	
-	                padding = {
-	                    top: clientHeight - space.top,
-	                    right: clientWidth - space.right,
-	                    bottom: clientHeight - space.bottom,
-	                    left: clientWidth - space.left
-	                };
-	            }
-	
-	            this.padding = padding;
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'doScale',
+	    value: function doScale(sx, sy, ox, oy) {
+	
+	      this.sx = sx;
+	      this.sy = sy;
+	
+	      this.adjustPaper();
+	
+	      if (ox || oy) {
+	        this.center(ox, oy);
+	      }
 	
-	            utils.setStyle(this.scrollElem, {
-	                paddingTop: padding.top + 'px',
-	                paddingRight: padding.right + 'px',
-	                paddingBottom: padding.bottom + 'px',
-	                paddingLeft: padding.left + 'px'
-	            });
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'adjustPaper',
-	        value: function adjustPaper() {
-	
-	            var paper = this.paper;
-	
-	            var sx = paper.sx;
-	            var sy = paper.sy;
-	
-	            var options = {
-	                frameWidth: this.baseWidth * sx,
-	                frameHeight: this.baseHeight * sy
-	            };
-	
-	            if (this.options.minWidth) {
-	                options.minWidth = this.options.minWidth * sx;
-	            }
-	
-	            if (this.options.minHeight) {
-	                options.minHeight = this.options.minHeight * sy;
-	            }
-	
-	            var tx = paper.tx;
-	            var ty = paper.ty;
-	
-	            if (paper.fitToContent(options)) {
-	
-	                var dLeft = paper.tx - tx;
-	                var dTop = paper.ty - ty;
-	
-	                if (dLeft !== 0 || dTop !== 0) {
-	
-	                    this.increaseStage();
-	                    this.stageScroll(dLeft, dTop, { relative: true });
-	                    this.decreaseStage();
-	                }
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'doScale',
-	        value: function doScale(sx, sy, ox, oy) {
-	
-	            this.sx = sx;
-	            this.sy = sy;
-	
-	            this.adjustPaper();
-	
-	            if (ox || oy) {
-	                this.center(ox, oy);
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'doResize',
-	        value: function doResize() {
-	            var width = arguments.length <= 0 || arguments[0] === undefined ? this.baseWidth : arguments[0];
-	            var height = arguments.length <= 1 || arguments[1] === undefined ? this.baseHeight : arguments[1];
-	
-	
-	            utils.setStyle(this.scrollElem, {
-	                width: width + 'px',
-	                height: height + 'px'
-	            });
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'applyScroll',
-	        value: function applyScroll() {
-	            var scrollLeft = arguments.length <= 0 || arguments[0] === undefined ? this.stageScrollLeft : arguments[0];
-	            var scrollTop = arguments.length <= 1 || arguments[1] === undefined ? this.stageScrollTop : arguments[1];
-	
-	
-	            this.removeScrollEvent();
-	
-	            this.scrollParent.scrollLeft = scrollLeft;
-	            this.scrollParent.scrollTop = scrollTop;
-	
-	            this.setScroll(this.stageScrollLeft, this.stageScrollTop);
-	            this.addScrollEvent();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'setScroll',
-	        value: function setScroll(scrollLeft, scrollTop) {
-	
-	            // save current scroll
-	            this.scrollLeft = scrollLeft;
-	            this.scrollTop = scrollTop;
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'stageScroll',
-	        value: function stageScroll(scrollLeft, scrollTop) {
-	            var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	
-	            if (options.relative) {
-	                this.stageScrollLeft += scrollLeft;
-	                this.stageScrollTop += scrollTop;
-	            } else {
-	                this.stageScrollLeft = scrollLeft;
-	                this.stageScrollTop = scrollTop;
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'increaseStage',
-	        value: function increaseStage() {
-	
-	            this.stageLevel += 1;
-	
-	            if (this.stageLevel === 1) {
-	                this.stageScrollLeft = this.scrollLeft;
-	                this.stageScrollTop = this.scrollTop;
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'decreaseStage',
-	        value: function decreaseStage() {
-	
-	            this.stageLevel -= 1;
-	
-	            if (this.stageLevel === 0) {
-	
-	                this.applyScroll();
-	
-	                this.stageScrollLeft = 0;
-	                this.stageScrollTop = 0;
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'center',
-	        value: function center(x, y) {
-	
-	            // adjust the paper position so the point [x,y] is moved to the
-	            // center of scroll element. If no point given [x,y] equals to
-	            // center of the paper element.
-	
-	            var paper = this.paper;
-	
-	            var tx = paper.tx;
-	            var ty = paper.ty;
-	
-	            if (utils.isUndefined(x) || utils.isUndefined(y)) {
-	
-	                // the paper rectangle
-	                //   x1,y1 ---------
-	                //   |             |
-	                //   ----------- x2,y2
-	                var x1 = -tx; // translate x
-	                var y1 = -ty; // translate y
-	                var x2 = x1 + paper.width;
-	                var y2 = y1 + paper.height;
-	
-	                // get the center of the paper
-	                x = (x1 + x2) / 2;
-	                y = (y1 + y2) / 2;
-	            } else {
-	                // local coordinates to viewport coordinates
-	                x *= paper.sx; // scale x
-	                y *= paper.sy; // scale y
-	            }
-	
-	            var dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
-	            var dTop = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
-	
-	            this.increaseStage();
-	            this.stageScroll(-dLeft, -dTop, { relative: true });
-	            this.decreaseStage();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'centerContent',
-	        value: function centerContent() {
-	
-	            var bound = this.paper.getContentBBox(true);
-	            this.center(bound.x + bound.width / 2, bound.y + bound.height / 2);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'toLocalPoint',
-	        value: function toLocalPoint(x, y) {
-	
-	            // return point that relative to the stage's left-top corner
-	            // x: x coordinate relative to the wrap
-	            // y: y coordinate relative to the wrap
-	
-	            var paper = this.paper;
-	            var padding = this.padding;
-	
-	            x += this.scrollLeft - padding.left - paper.tx;
-	            x /= paper.sx;
-	
-	            y += this.scrollTop - padding.top - paper.ty;
-	            y /= paper.sy;
-	
-	            return {
-	                x: Math.round(x),
-	                y: Math.round(y)
-	            };
-	        }
-	    }, {
-	        key: 'getCenter',
-	        value: function getCenter() {
-	
-	            return this.toLocalPoint(this.clientWidth / 2, this.clientHeight / 2);
-	        }
-	    }, {
-	        key: 'beforeZoom',
-	        value: function beforeZoom() {
-	
-	            if (_detector2.default.IS_IE) {
-	                // IE is trying to show every frame while we manipulate the paper.
-	                // That makes the viewport kind of jumping while zooming.
-	                utils.setStyle(this.elem, 'visibility', 'hidden');
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'afterZoom',
-	        value: function afterZoom() {
-	
-	            if (_detector2.default.IS_IE) {
-	                utils.setStyle(this.elem, 'visibility', '');
-	            }
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'zoom',
-	        value: function zoom(value) {
-	            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	
-	            var sx = value;
-	            var sy = value;
-	
-	            if (!options.absolute) {
-	                sx += this.sx;
-	                sy += this.sy;
-	            }
-	
-	            var scaleGrid = options.scaleGrid;
-	            if (scaleGrid) {
-	                sx = utils.snapToGrid(sx, scaleGrid);
-	                sy = utils.snapToGrid(sy, scaleGrid);
-	            }
-	
-	            // check if the new scale won't exceed the given boundaries
-	            var minScale = options.minScale;
-	            var maxScale = options.maxScale;
-	
-	            sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
-	            sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
-	
-	            // the scale center
-	            var cx = options.cx;
-	            var cy = options.cy;
-	
-	            // if the scale center is not specified find
-	            // the center of the paper's visible area.
-	            if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
-	
-	                // the center of the container
-	                var center = this.getCenter();
-	
-	                cx = center.x;
-	                cy = center.y;
-	            }
-	
-	            var dLeft = cx * (sx - this.sx);
-	            var dTop = cy * (sy - this.sy);
-	
-	            this.beforeZoom();
-	            this.increaseStage();
-	
-	            this.paper.scale(sx, sy);
-	            this.stageScroll(dLeft, dTop, { relative: true });
-	
-	            this.decreaseStage();
-	            this.afterZoom();
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'zoomToFit',
-	        value: function zoomToFit() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-	
-	            var paper = this.paper;
-	
-	            var x = paper.tx;
-	            var y = paper.ty;
-	
-	            var width = this.scrollParent.clientWidth;
-	            var height = this.scrollParent.clientHeight;
-	
-	            options.fittingBBox = options.fittingBBox || { x: x, y: y, width: width, height: height };
-	
-	            this.beforeZoom();
-	
-	            // scale the viewport
-	            paper.scaleContentToFit(options);
-	            // restore original origin
-	            paper.translate(x, y);
-	
-	            this.adjustPaper();
-	            this.centerContent();
-	
-	            this.afterZoom();
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return PaperScroll;
+	      return this;
+	    }
+	  }, {
+	    key: 'doResize',
+	    value: function doResize() {
+	      var width = arguments.length <= 0 || arguments[0] === undefined ? this.baseWidth : arguments[0];
+	      var height = arguments.length <= 1 || arguments[1] === undefined ? this.baseHeight : arguments[1];
+	
+	
+	      utils.setStyle(this.scrollElem, {
+	        width: width + 'px',
+	        height: height + 'px'
+	      });
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'applyScroll',
+	    value: function applyScroll() {
+	      var scrollLeft = arguments.length <= 0 || arguments[0] === undefined ? this.stageScrollLeft : arguments[0];
+	      var scrollTop = arguments.length <= 1 || arguments[1] === undefined ? this.stageScrollTop : arguments[1];
+	
+	
+	      this.removeScrollEvent();
+	
+	      this.scrollParent.scrollLeft = scrollLeft;
+	      this.scrollParent.scrollTop = scrollTop;
+	
+	      this.setScroll(this.stageScrollLeft, this.stageScrollTop);
+	      this.addScrollEvent();
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'setScroll',
+	    value: function setScroll(scrollLeft, scrollTop) {
+	
+	      // save current scroll
+	      this.scrollLeft = scrollLeft;
+	      this.scrollTop = scrollTop;
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'stageScroll',
+	    value: function stageScroll(scrollLeft, scrollTop) {
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	
+	      if (options.relative) {
+	        this.stageScrollLeft += scrollLeft;
+	        this.stageScrollTop += scrollTop;
+	      } else {
+	        this.stageScrollLeft = scrollLeft;
+	        this.stageScrollTop = scrollTop;
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'increaseStage',
+	    value: function increaseStage() {
+	
+	      this.stageLevel += 1;
+	
+	      if (this.stageLevel === 1) {
+	        this.stageScrollLeft = this.scrollLeft;
+	        this.stageScrollTop = this.scrollTop;
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'decreaseStage',
+	    value: function decreaseStage() {
+	
+	      this.stageLevel -= 1;
+	
+	      if (this.stageLevel === 0) {
+	
+	        this.applyScroll();
+	
+	        this.stageScrollLeft = 0;
+	        this.stageScrollTop = 0;
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'center',
+	    value: function center(x, y) {
+	
+	      // adjust the paper position so the point [x,y] is moved to the
+	      // center of scroll element. If no point given [x,y] equals to
+	      // center of the paper element.
+	
+	      var paper = this.paper;
+	
+	      var tx = paper.tx;
+	      var ty = paper.ty;
+	
+	      if (utils.isUndefined(x) || utils.isUndefined(y)) {
+	
+	        // the paper rectangle
+	        //   x1,y1 ---------
+	        //   |             |
+	        //   ----------- x2,y2
+	        var x1 = -tx; // translate x
+	        var y1 = -ty; // translate y
+	        var x2 = x1 + paper.width;
+	        var y2 = y1 + paper.height;
+	
+	        // get the center of the paper
+	        x = (x1 + x2) / 2;
+	        y = (y1 + y2) / 2;
+	      } else {
+	        // local coordinates to viewport coordinates
+	        x *= paper.sx; // scale x
+	        y *= paper.sy; // scale y
+	      }
+	
+	      var dLeft = this.clientWidth / 2 - (x + tx + this.padding.left - this.scrollLeft);
+	      var dTop = this.clientHeight / 2 - (y + ty + this.padding.top - this.scrollTop);
+	
+	      this.increaseStage();
+	      this.stageScroll(-dLeft, -dTop, { relative: true });
+	      this.decreaseStage();
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'centerContent',
+	    value: function centerContent() {
+	
+	      var bound = this.paper.getContentBBox(true);
+	      this.center(bound.x + bound.width / 2, bound.y + bound.height / 2);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'toLocalPoint',
+	    value: function toLocalPoint(x, y) {
+	
+	      // return point that relative to the stage's left-top corner
+	      // x: x coordinate relative to the wrap
+	      // y: y coordinate relative to the wrap
+	
+	      var paper = this.paper;
+	      var padding = this.padding;
+	
+	      x += this.scrollLeft - padding.left - paper.tx;
+	      x /= paper.sx;
+	
+	      y += this.scrollTop - padding.top - paper.ty;
+	      y /= paper.sy;
+	
+	      return {
+	        x: Math.round(x),
+	        y: Math.round(y)
+	      };
+	    }
+	  }, {
+	    key: 'getCenter',
+	    value: function getCenter() {
+	
+	      return this.toLocalPoint(this.clientWidth / 2, this.clientHeight / 2);
+	    }
+	  }, {
+	    key: 'beforeZoom',
+	    value: function beforeZoom() {
+	
+	      if (_detector2.default.IS_IE) {
+	        // IE is trying to show every frame while we manipulate the paper.
+	        // That makes the viewport kind of jumping while zooming.
+	        utils.setStyle(this.elem, 'visibility', 'hidden');
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'afterZoom',
+	    value: function afterZoom() {
+	
+	      if (_detector2.default.IS_IE) {
+	        utils.setStyle(this.elem, 'visibility', '');
+	      }
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'zoom',
+	    value: function zoom(value) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	
+	      var sx = value;
+	      var sy = value;
+	
+	      if (!options.absolute) {
+	        sx += this.sx;
+	        sy += this.sy;
+	      }
+	
+	      var scaleGrid = options.scaleGrid;
+	      if (scaleGrid) {
+	        sx = utils.snapToGrid(sx, scaleGrid);
+	        sy = utils.snapToGrid(sy, scaleGrid);
+	      }
+	
+	      // check if the new scale won't exceed the given boundaries
+	      var minScale = options.minScale;
+	      var maxScale = options.maxScale;
+	
+	      sx = utils.clamp(sx, minScale || 0, maxScale || Number.MAX_VALUE);
+	      sy = utils.clamp(sy, minScale || 0, maxScale || Number.MAX_VALUE);
+	
+	      // the scale center
+	      var cx = options.cx;
+	      var cy = options.cy;
+	
+	      // if the scale center is not specified find
+	      // the center of the paper's visible area.
+	      if (utils.isUndefined(cx) || utils.isUndefined(cy)) {
+	
+	        // the center of the container
+	        var center = this.getCenter();
+	
+	        cx = center.x;
+	        cy = center.y;
+	      }
+	
+	      var dLeft = cx * (sx - this.sx);
+	      var dTop = cy * (sy - this.sy);
+	
+	      this.beforeZoom();
+	      this.increaseStage();
+	
+	      this.paper.scale(sx, sy);
+	      this.stageScroll(dLeft, dTop, { relative: true });
+	
+	      this.decreaseStage();
+	      this.afterZoom();
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'zoomToFit',
+	    value: function zoomToFit() {
+	      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	
+	      var paper = this.paper;
+	
+	      var x = paper.tx;
+	      var y = paper.ty;
+	
+	      var width = this.scrollParent.clientWidth;
+	      var height = this.scrollParent.clientHeight;
+	
+	      options.fittingBBox = options.fittingBBox || { x: x, y: y, width: width, height: height };
+	
+	      this.beforeZoom();
+	
+	      // scale the viewport
+	      paper.scaleContentToFit(options);
+	      // restore original origin
+	      paper.translate(x, y);
+	
+	      this.adjustPaper();
+	      this.centerContent();
+	
+	      this.afterZoom();
+	
+	      return this;
+	    }
+	  }]);
+	
+	  return PaperScroll;
 	}();
 	
 	// exports
@@ -18498,7 +18571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -18516,41 +18589,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var Handler = function (_Base) {
-	    _inherits(Handler, _Base);
+	  _inherits(Handler, _Base);
 	
-	    function Handler() {
-	        _classCallCheck(this, Handler);
+	  function Handler() {
+	    _classCallCheck(this, Handler);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Handler).apply(this, arguments));
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Handler).apply(this, arguments));
+	  }
+	
+	  _createClass(Handler, [{
+	    key: 'isGroup',
+	    value: function isGroup(cell) {
+	
+	      return cell && cell.isGroup && cell.isGroup();
 	    }
+	  }, {
+	    key: 'isRemark',
+	    value: function isRemark(cell) {
 	
-	    _createClass(Handler, [{
-	        key: 'isGroup',
-	        value: function isGroup(cell) {
+	      return cell && cell.isRemark && cell.isRemark();
+	    }
+	  }, {
+	    key: 'isNode',
+	    value: function isNode(cell) {
 	
-	            return cell && cell.isGroup && cell.isGroup();
-	        }
-	    }, {
-	        key: 'isRemark',
-	        value: function isRemark(cell) {
+	      return cell && cell.isNode();
+	    }
+	  }, {
+	    key: 'isLink',
+	    value: function isLink(cell) {
 	
-	            return cell && cell.isRemark && cell.isRemark();
-	        }
-	    }, {
-	        key: 'isNode',
-	        value: function isNode(cell) {
+	      return cell && cell.isLink();
+	    }
+	  }]);
 	
-	            return cell && cell.isNode();
-	        }
-	    }, {
-	        key: 'isLink',
-	        value: function isLink(cell) {
-	
-	            return cell && cell.isLink();
-	        }
-	    }]);
-	
-	    return Handler;
+	  return Handler;
 	}(_Handler2.default);
 	
 	// exports

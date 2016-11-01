@@ -196,7 +196,8 @@ class NodeView extends BaseView {
 
     let elem = this.getPortElem(port, isInPort);
     if (elem) {
-      let bounds = utils.getBounds(elem);
+      let bounds = this.getBounds(elem);
+
       return this.getPaper().toLocalRect({
         x: bounds.left,
         y: bounds.top,

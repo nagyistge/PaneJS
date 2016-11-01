@@ -12,8 +12,8 @@ var paths = {
 
 var entry = {};
 
-entry[pkg.name]                     = './src/index.js';
-entry[pkg.name + '-' + pkg.version] = './src/index.js';
+// entry[pkg.name]                     = './src/index.js';
+// entry[pkg.name + '-' + pkg.version] = './src/index.js';
 
 entry[pkg.name + '-pai']                = './src/pai.js';
 entry[pkg.name + '-pai-' + pkg.version] = './src/pai.js';

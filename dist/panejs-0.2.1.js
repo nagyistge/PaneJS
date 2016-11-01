@@ -15513,4 +15513,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs.js.map
+//# sourceMappingURL=panejs-0.2.1.js.map

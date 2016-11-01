@@ -75,7 +75,7 @@ class LinkView extends VectorView {
 
     this.cacheStaticConnPoint(point, isSource);
     this.cacheTerminalView(view, isSource);
-    this.cacheTerminalPort(port, isSource);
+    this.cacheTerminalPort(port, isSource);isSource
 
     return this;
   }

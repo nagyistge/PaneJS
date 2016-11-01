@@ -395,6 +395,21 @@ export function getOffset(elem) {
   return { top, left };
 }
 
+export function getOffsetUntil(elem, stop) {
+
+  let node = elem;
+  let left = 0;
+  let top  = 0;
+
+  while (node && node !== stop && node !== document.documentElement) {
+    left += node.offsetLeft;
+    top += node.offsetTop;
+    node = node.offsetParent;
+  }
+
+  return { left, top };
+}
+
 
 // xml namespaces.
 const ns = {
@@ -555,12 +570,11 @@ export function getTransformToElement(source, target) {
   return matrix.multiply(source.getScreenCTM());
 }
 
-
 function getActualBoundingClientRect(node) {
+
   // same as native getBoundingClientRect, except it takes into
   // account  parent <frame> offsets if the element lies within
   // a nested document (<frame> or <iframe>-like).
-
 
   let boundingRect = node.getBoundingClientRect();
 

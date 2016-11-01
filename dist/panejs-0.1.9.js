@@ -1775,6 +1775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.showHide = showHide;
 	exports.isHidden = isHidden;
 	exports.getOffset = getOffset;
+	exports.getOffsetUntil = getOffsetUntil;
 	exports.createSvgDocument = createSvgDocument;
 	exports.createSvgElement = createSvgElement;
 	exports.setAttribute = setAttribute;
@@ -2158,6 +2159,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return { top: top, left: left };
 	}
 	
+	function getOffsetUntil(elem, stop) {
+	
+	  var node = elem;
+	  var left = 0;
+	  var top = 0;
+	
+	  while (node && node !== stop && node !== document.documentElement) {
+	    left += node.offsetLeft;
+	    top += node.offsetTop;
+	    node = node.offsetParent;
+	  }
+	
+	  return { left: left, top: top };
+	}
+	
 	// xml namespaces.
 	var ns = {
 	  xml: 'http://www.w3.org/XML/1998/namespace',
@@ -2312,6 +2328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function getActualBoundingClientRect(node) {
+	
 	  // same as native getBoundingClientRect, except it takes into
 	  // account  parent <frame> offsets if the element lies within
 	  // a nested document (<frame> or <iframe>-like).
@@ -6823,6 +6840,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (utils.isString(elem)) {
 	
+	    elem = utils.trim(elem);
+	
 	    if (elem.toLowerCase() === 'svg') {
 	      // create a new SVG canvas
 	      elem = utils.createSvgDocument();
@@ -7892,6 +7911,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	
 	      return this;
+	    }
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds(elem) {
+	
+	      // fix `utils.getBounds` of elements in foreignObject
+	
+	      if (elem) {
+	
+	        var doc = elem === document ? elem : elem.ownerDocument;
+	
+	        // get the bounds of the cell
+	        var bounds = utils.getBounds(this.elem);
+	        // get the offset relative to the cell's root element
+	        var offset = utils.getOffsetUntil(elem, this.elem);
+	
+	        // calc the bounds
+	        var width = elem.offsetWidth || elem.clientWidth;
+	        var height = elem.offsetHeight || elem.clientHeight;
+	        var left = bounds.left + offset.left;
+	        var top = bounds.top + offset.top;
+	        var right = doc.body.clientWidth - width - left;
+	        var bottom = doc.body.clientHeight - height - top;
+	
+	        return {
+	          left: left,
+	          top: top,
+	          right: right,
+	          bottom: bottom,
+	          width: width,
+	          height: height
+	        };
+	      }
+	
+	      return null;
 	    }
 	  }]);
 	
@@ -13811,7 +13865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	Link.setDefaults({
 	  tagName: 'g',
-	  markup: '\n    <path class="connector"/>\n    <path class="source-marker"/>\n    <path class="target-marker"/>',
+	  markup: '<path class="connector"/><path class="source-marker"/><path class="target-marker"/>',
 	  classNames: 'pane-cell pane-link', // pane-cell for event handler
 	  pane: 'linkPane',
 	  data: null, // related data(for business logic)
