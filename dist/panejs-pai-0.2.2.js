@@ -8442,7 +8442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this.cacheStaticConnPoint(point, isSource);
 	      this.cacheTerminalView(view, isSource);
-	      this.cacheTerminalPort(port, isSource);isSource;
+	      this.cacheTerminalPort(port, isSource);
 	
 	      return this;
 	    }
