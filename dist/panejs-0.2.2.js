@@ -7916,8 +7916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getBounds',
 	    value: function getBounds(elem) {
 	
-	      // fix `utils.getBounds` of elements in foreignObject
-	
+	      // fix `utils.getBounds` of elements in foreignObject.
 	      if (elem) {
 	
 	        var doc = elem === document ? elem : elem.ownerDocument;
@@ -7927,11 +7926,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // get the offset relative to the cell's root element
 	        var offset = utils.getOffsetUntil(elem, this.elem);
 	
+	        var paper = this.getPaper();
+	        var scale = paper && paper.sx || 1;
+	
 	        // calc the bounds
-	        var width = elem.offsetWidth || elem.clientWidth;
-	        var height = elem.offsetHeight || elem.clientHeight;
-	        var left = bounds.left + offset.left;
-	        var top = bounds.top + offset.top;
+	        var width = (elem.offsetWidth || elem.clientWidth) * scale;
+	        var height = (elem.offsetHeight || elem.clientHeight) * scale;
+	        var left = bounds.left + offset.left * scale;
+	        var top = bounds.top + offset.top * scale;
 	        var right = doc.body.clientWidth - width - left;
 	        var bottom = doc.body.clientHeight - height - top;
 	
@@ -15513,4 +15515,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=panejs-0.2.1.js.map
+//# sourceMappingURL=panejs-0.2.2.js.map
